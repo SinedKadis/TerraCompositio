@@ -1,12 +1,14 @@
 package net.sinedkadis.terracompositio;
 
 import com.mojang.logging.LogUtils;
+import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.Sheets;
 import net.minecraft.client.renderer.entity.EntityRenderers;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
@@ -34,13 +36,14 @@ import net.sinedkadis.terracompositio.screen.ModMenuTypes;
 import net.sinedkadis.terracompositio.sound.ModSounds;
 import net.sinedkadis.terracompositio.util.ModGameRules;
 import net.sinedkadis.terracompositio.util.ModWoodTypes;
-import org.slf4j.Logger;
+import org.apache.logging.log4j.LogManager;
+import org.apache.logging.log4j.Logger;
 
 @Mod(TerraCompositio.MOD_ID)
 public class TerraCompositio
 {
     public static final String MOD_ID = "terracompositio";
-    private static final Logger LOGGER = LogUtils.getLogger();
+    public static final Logger logger = LogManager.getLogger("TerraCompositio");
 
     public TerraCompositio()
     {
@@ -90,6 +93,18 @@ public class TerraCompositio
             event.accept(ModItems.Pebble);
             event.accept(ModItems.StoneStaff);
         }*/
+    }
+    /**
+     * Makes a translation key for the given name
+     * @param base  Base name, such as "block" or "gui"
+     * @param name  Object name
+     * @return  Translation key
+     */
+    public static String makeDescriptionId(String base, String name) {
+        return Util.makeDescriptionId(base, getResource(name));
+    }
+    public static ResourceLocation getResource(String name) {
+        return new ResourceLocation(MOD_ID, name);
     }
 
     // You can use SubscribeEvent and let the Event Bus discover methods to call

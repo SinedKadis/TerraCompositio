@@ -1,10 +1,13 @@
 package net.sinedkadis.terracompositio.block.custom;
 
+import com.mojang.logging.LogUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.BucketItem;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.BaseEntityBlock;
@@ -21,6 +24,7 @@ import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.util.LazyOptional;
+import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandlerItem;
 import net.minecraftforge.fluids.capability.templates.FluidTank;
@@ -28,11 +32,13 @@ import net.sinedkadis.terracompositio.block.entity.FlowExtractorBlockEntity;
 import net.sinedkadis.terracompositio.block.entity.ModBlockEntities;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import org.slf4j.Logger;
 
 public class FlowExtractorBlock extends BaseEntityBlock {
     public FlowExtractorBlock(Properties properties) {
         super(properties);
     }
+    private static final Logger LOGGER = LogUtils.getLogger();
     @Override
     public RenderShape getRenderShape(BlockState pState) {
         return RenderShape.MODEL;
@@ -73,24 +79,15 @@ public class FlowExtractorBlock extends BaseEntityBlock {
 
     @SuppressWarnings("deprecation")
     @Override
-    public @NotNull InteractionResult use(@NotNull BlockState pState, @NotNull Level pLevel, @NotNull BlockPos pPos, @NotNull Player pPlayer, @NotNull InteractionHand pHand, @NotNull BlockHitResult pHit) {
-        LazyOptional<IFluidHandlerItem> fluidHandler = pPlayer.getItemInHand(InteractionHand.MAIN_HAND).getCapability(ForgeCapabilities.FLUID_HANDLER_ITEM);
-        FluidTank fluidTank = ModBlockEntities.FLOW_EXTRACTOR_BE.get().getBlockEntity(pLevel,pPos).getFluidTank();
-        fluidHandler.ifPresent(iFluidHandlerItem -> {
-            if(!fluidTank.getFluid().isFluidEqual(iFluidHandlerItem.getFluidInTank(0)))
-                return;
-
-            int amountToDrain = fluidTank.getCapacity() - fluidTank.getFluidAmount();
-            int amount = iFluidHandlerItem.drain(amountToDrain, IFluidHandler.FluidAction.SIMULATE).getAmount();
-            if(amount > 0) {
-                fluidTank.fill(iFluidHandlerItem.drain(amountToDrain, IFluidHandler.FluidAction.EXECUTE), IFluidHandler.FluidAction.EXECUTE);
-
-                if(amount <= amountToDrain) {
-                    pPlayer.setItemInHand(InteractionHand.MAIN_HAND,iFluidHandlerItem.getContainer());
-                }
-            }
-        });
-
-        return super.use(pState,pLevel,pPos,pPlayer,pHand,pHit);
+    public InteractionResult use(BlockState state, Level world, BlockPos pos, Player player, InteractionHand hand, BlockHitResult rayTraceResult) {
+        if (player.isShiftKeyDown()) {
+            return InteractionResult.PASS;
+        }
+        BlockEntity te = world.getBlockEntity(pos);
+        if (te instanceof FlowExtractorBlockEntity) {
+            ((FlowExtractorBlockEntity) te).interact(player, hand);
+            return InteractionResult.SUCCESS;
+        }
+        return super.use(state, world, pos, player, hand, rayTraceResult);
     }
 }
