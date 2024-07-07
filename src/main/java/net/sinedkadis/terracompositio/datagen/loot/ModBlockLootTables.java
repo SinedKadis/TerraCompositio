@@ -44,6 +44,7 @@ public class ModBlockLootTables extends BlockLootSubProvider {
         this.dropSelf(ModBlocks.FLOW_CEDAR_FENCE_GATE.get());
         this.dropSelf(ModBlocks.FLOW_CEDAR_TRAPDOOR.get());
         this.dropSelf(ModBlocks.WEDGE.get());
+        this.dropSelf(ModBlocks.FLOW_EXTRACTOR.get());
 
         this.add(ModBlocks.FLOW_CEDAR_SLAB.get(),
                 block -> createSlabItemTable(ModBlocks.FLOW_CEDAR_SLAB.get()));

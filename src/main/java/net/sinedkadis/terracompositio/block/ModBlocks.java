@@ -35,7 +35,7 @@ public class ModBlocks {
         registerBlockItem(name, toReturn);
         return toReturn;
     }
-    private static <T extends Block>void registerBlockItem(String name, RegistryObject<T> block) {
+    private static <T extends Block> void registerBlockItem(String name, RegistryObject<T> block) {
         ModItems.ITEMS.register(name, () -> new BlockItem(block.get(), new Item.Properties()));
     }
 
@@ -116,4 +116,7 @@ public class ModBlocks {
             () -> new ModHangingSignBlock(BlockBehaviour.Properties.copy(Blocks.OAK_HANGING_SIGN), ModWoodTypes.FLOW_CEDAR));
     public static final RegistryObject<Block> FLOW_CEDAR_WALL_HANGING_SIGN = BLOCKS.register("flow_cedar_wall_hanging_sign",
             () -> new ModWallHangingSignBlock(BlockBehaviour.Properties.copy(Blocks.OAK_WALL_HANGING_SIGN), ModWoodTypes.FLOW_CEDAR));
+
+    public static final RegistryObject<Block> FLOW_EXTRACTOR = registerBlock("flow_extractor",
+            () -> new FlowExtractorBlock(BlockBehaviour.Properties.copy(Blocks.DARK_OAK_PLANKS)));
 }

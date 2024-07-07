@@ -9,6 +9,7 @@ import net.minecraftforge.client.event.EntityRenderersEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.sinedkadis.terracompositio.TerraCompositio;
+import net.sinedkadis.terracompositio.block.entity.FlowExtractorBlockEntity;
 import net.sinedkadis.terracompositio.block.entity.ModBlockEntities;
 import net.sinedkadis.terracompositio.block.entity.renderer.FlowPortBlockEntityRenderer;
 import net.sinedkadis.terracompositio.entity.client.ModModelLayers;

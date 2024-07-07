@@ -29,6 +29,7 @@
   "fluid_type.terracompositio.flow": "Flow",
   "fluid_type.terracompositio.birch_juice": "Birch Juice",
   "block.terracompositio.wedge": "Wedge",
+  "block.terracompositio.flow_extractor": "Flow Extractor",
   "effect.terracompositio.flow_saturation": "Flow Saturation",
   "sounds.terracompositio.flow_leak": "Flow Leaking",
 

@@ -17,6 +17,12 @@ public class ModBlockEntities {
             BLOCK_ENTITIES.register("flow_port_be", () ->
                     BlockEntityType.Builder.of(FlowPortBlockEntity::new,
                             ModBlocks.FLOWING_FLOW_PORT.get()).build(null));
+    public static final RegistryObject<BlockEntityType<FlowExtractorBlockEntity>> FLOW_EXTRACTOR_BE=
+            BLOCK_ENTITIES.register("flow_extractor_be", () ->
+                    BlockEntityType.Builder.of(FlowExtractorBlockEntity::new,
+                            ModBlocks.FLOW_EXTRACTOR.get()).build(null));
+
+
     public static final RegistryObject<BlockEntityType<ModSignBlockEntity>> MOD_SIGN=
             BLOCK_ENTITIES.register("mod_sign", () ->
                     BlockEntityType.Builder.of(ModSignBlockEntity::new,
