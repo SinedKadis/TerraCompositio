@@ -24,6 +24,8 @@ import net.sinedkadis.terracompositio.item.ModItems;
 import java.util.Map;
 import java.util.function.Predicate;
 
+import static net.sinedkadis.terracompositio.TerraCompositio.GLOGGER;
+
 public class BirchJuiceCauldronBlock extends ModCauldronBlock {
 
 
@@ -33,17 +35,18 @@ public class BirchJuiceCauldronBlock extends ModCauldronBlock {
     }
 
     @Override
-    public boolean canRecieveWedgeDrip(Fluid fluid) {
+    public boolean canReceiveWedgeDrip(Fluid fluid) {
         return fluid == ModFluids.BIRCH_JUICE_FLUID.source.get();
     }
 
     @Override
     public InteractionResult use(BlockState pState, Level pLevel, BlockPos pPos, Player pPlayer, InteractionHand pHand, BlockHitResult pHit) {
         ItemStack itemStack = pPlayer.getItemInHand(pHand);
+        //GLOGGER.debug("Use called, {}, {}", pLevel,pLevel.getBlockEntity(pPos));
         if (pState.getValue(LEVEL) == 3) {
             if (itemStack.getItem() == Items.BUCKET) {
                 pLevel.setBlock(pPos, Blocks.CAULDRON.defaultBlockState(), 1);
-                if (itemStack.getCount() > 1) {
+                if (itemStack.getCount() > 1||pPlayer.isCreative()) {
                     if (!pPlayer.addItem(new ItemStack(ModFluids.BIRCH_JUICE_FLUID.bucket.get()))) {
                         pPlayer.drop(new ItemStack(ModFluids.BIRCH_JUICE_FLUID.bucket.get()), false);
                     }

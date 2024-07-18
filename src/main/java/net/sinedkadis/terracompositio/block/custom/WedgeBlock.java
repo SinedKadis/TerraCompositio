@@ -56,7 +56,7 @@ public class WedgeBlock extends Block {
     }
     @Nullable
     private static BlockPos findFillableCauldronBelowWedge(Level pLevel, BlockPos pPos, Fluid pFluid) {
-        Predicate<BlockState> $$3 = (blockState) -> (blockState.getBlock() instanceof ModCauldronBlock && ((ModCauldronBlock) blockState.getBlock()).canRecieveWedgeDrip(pFluid))
+        Predicate<BlockState> $$3 = (blockState) -> (blockState.getBlock() instanceof ModCauldronBlock && ((ModCauldronBlock) blockState.getBlock()).canReceiveWedgeDrip(pFluid))
                 ||blockState.is(Blocks.CAULDRON);
         BiPredicate<BlockPos, BlockState> $$4 = (blockPos, blockState) -> canDripThrough(pLevel, blockPos, blockState);
         return findBlockVertical(pLevel, pPos, Direction.DOWN.getAxisDirection(), $$4, $$3, 11).orElse(null);

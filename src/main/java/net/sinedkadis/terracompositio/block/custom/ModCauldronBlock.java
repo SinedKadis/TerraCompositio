@@ -13,7 +13,7 @@ public abstract class ModCauldronBlock extends LayeredCauldronBlock {
     public ModCauldronBlock(Properties pProperties, Predicate<Biome.Precipitation> pFillPredicate, Map<Item, CauldronInteraction> pInteractions) {
         super(pProperties, pFillPredicate, pInteractions);
     }
-    public boolean canRecieveWedgeDrip(Fluid fluid){
+    public boolean canReceiveWedgeDrip(Fluid fluid){
         return false;
     }
     //public abstract void WedgeDripReceived();

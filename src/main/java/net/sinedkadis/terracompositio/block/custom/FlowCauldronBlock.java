@@ -39,7 +39,7 @@ public class FlowCauldronBlock extends ModCauldronBlock {
     }
 
     @Override
-    public boolean canRecieveWedgeDrip(Fluid fluid) {
+    public boolean canReceiveWedgeDrip(Fluid fluid) {
         return fluid == ModFluids.FLOW_FLUID.source.get();
     }
 
@@ -54,7 +54,7 @@ public class FlowCauldronBlock extends ModCauldronBlock {
         if (pState.getValue(LEVEL) == 3) {
             if (itemStack.getItem() == Items.BUCKET) {
                 pLevel.setBlock(pPos, Blocks.CAULDRON.defaultBlockState(), 1);
-                if (itemStack.getCount() > 1) {
+                if (itemStack.getCount() > 1||pPlayer.isCreative()) {
                     if (!pPlayer.addItem(new ItemStack(ModFluids.FLOW_FLUID.bucket.get()))) {
                         pPlayer.drop(new ItemStack(ModFluids.FLOW_FLUID.bucket.get()), false);
                     }

@@ -1,8 +1,6 @@
 package net.sinedkadis.terracompositio;
 
-import com.mojang.logging.LogUtils;
 import net.minecraft.Util;
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.client.renderer.ItemBlockRenderTypes;
 import net.minecraft.client.renderer.RenderType;
@@ -13,7 +11,6 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
 import net.minecraftforge.event.server.ServerStartingEvent;
-import net.minecraftforge.eventbus.api.Event;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -39,11 +36,12 @@ import net.sinedkadis.terracompositio.util.ModWoodTypes;
 import org.apache.logging.log4j.LogManager;
 import org.apache.logging.log4j.Logger;
 
+
 @Mod(TerraCompositio.MOD_ID)
 public class TerraCompositio
 {
     public static final String MOD_ID = "terracompositio";
-    public static final Logger logger = LogManager.getLogger("TerraCompositio");
+    public static final Logger GLOGGER = LogManager.getLogger("TerraCompositio");
 
     public TerraCompositio()
     {
@@ -94,12 +92,7 @@ public class TerraCompositio
             event.accept(ModItems.StoneStaff);
         }*/
     }
-    /**
-     * Makes a translation key for the given name
-     * @param base  Base name, such as "block" or "gui"
-     * @param name  Object name
-     * @return  Translation key
-     */
+
     public static String makeDescriptionId(String base, String name) {
         return Util.makeDescriptionId(base, getResource(name));
     }
