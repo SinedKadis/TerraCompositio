@@ -3,12 +3,14 @@ package net.sinedkadis.terracompositio.fluid;
 import com.mojang.blaze3d.shaders.FogShape;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.logging.LogUtils;
+import lombok.Getter;
 import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.FogRenderer;
 import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 
 import net.minecraft.server.level.ServerPlayer;
@@ -39,13 +41,18 @@ import net.minecraft.world.phys.HitResult;
 import net.minecraftforge.client.extensions.common.IClientFluidTypeExtensions;
 import net.minecraftforge.common.SoundAction;
 import net.minecraftforge.common.SoundActions;
+import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.extensions.IForgeBucketPickup;
+import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidType;
 import net.minecraftforge.fluids.ForgeFlowingFluid;
+import net.minecraftforge.fluids.capability.IFluidHandlerItem;
+import net.minecraftforge.fluids.capability.wrappers.FluidBucketWrapper;
 import net.minecraftforge.registries.RegistryObject;
 import net.sinedkadis.terracompositio.block.ModBlocks;
 import net.sinedkadis.terracompositio.block.custom.FlowCauldronBlock;
 import net.sinedkadis.terracompositio.item.ModItems;
+import net.sinedkadis.terracompositio.item.custom.ModBucketItem;
 import org.apache.commons.lang3.function.TriFunction;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -56,11 +63,12 @@ import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
 
-public class ModFluidRegistryContainer implements IForgeBucketPickup {
+public class ModFluidRegistryContainer implements IForgeBucketPickup{
     public final RegistryObject<FluidType> type;
     public final FluidType.Properties typeProperties;
     public final RegistryObject<LiquidBlock> block;
     public final RegistryObject<Item> bucket;
+    @Getter
     private ForgeFlowingFluid.Properties properties;
     public final RegistryObject<ForgeFlowingFluid.Source> source;
     public final RegistryObject<ForgeFlowingFluid.Flowing> flowing;
@@ -176,6 +184,9 @@ public class ModFluidRegistryContainer implements IForgeBucketPickup {
                 }
                 return pStack;
             }
+            public ICapabilityProvider initCapabilities(@NotNull ItemStack stack, @javax.annotation.Nullable CompoundTag nbt) {
+                return new FluidBucketWrapper(stack);
+            }
         });
         this.properties.bucket(this.bucket);
     }
@@ -184,10 +195,6 @@ public class ModFluidRegistryContainer implements IForgeBucketPickup {
                                   Supplier<IClientFluidTypeExtensions> clientExtensions, BlockBehaviour.Properties blockProperties,
                                   Item.Properties itemProperties) {
         this(name, typeProperties, clientExtensions, null, blockProperties, itemProperties);
-    }
-
-    public ForgeFlowingFluid.Properties getProperties() {
-        return this.properties;
     }
 
     public static IClientFluidTypeExtensions createExtension(ClientExtensions extensions) {
@@ -240,6 +247,7 @@ public class ModFluidRegistryContainer implements IForgeBucketPickup {
     public Optional<SoundEvent> getPickupSound(BlockState state) {
         return Optional.of(SoundEvents.BUCKET_FILL);
     }
+
 
     public static class AdditionalProperties {
         private int levelDecreasePerBlock = 1;
