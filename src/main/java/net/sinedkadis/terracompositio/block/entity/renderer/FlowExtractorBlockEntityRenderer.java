@@ -20,6 +20,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.FastColor;
+import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -52,15 +53,13 @@ public class FlowExtractorBlockEntityRenderer implements BlockEntityRenderer<Flo
     @Override
     public void render(FlowExtractorBlockEntity pBlockEntity, float pPartialTick, PoseStack pPoseStack, MultiBufferSource pBuffer, int pPackedLight, int pPackedOverlay) {
 
-        FluidStack fluid = pBlockEntity.getFluidStack();
-        float fluidScale = fluid.isEmpty() ? 0 : pBlockEntity.prevScale;
+        FluidStack fluid = pBlockEntity.getInputFluidTank().getPrimaryHandler().getFluid();
+        float fluidScale = 1;
         VertexConsumer buffer;
 
         if (fluidScale > 0) {
-            //GLOGGER.debug("RENDER: "+"Fluid scale > 0 : {}",fluidScale);
             buffer = pBuffer.getBuffer(Sheets.translucentCullBlockSheet());
-            renderObject(getFluidModel(fluid, fluidScale), pPoseStack, buffer, getColorARGB(fluid, fluidScale),
-                    calculateGlowLight(pPackedLight, fluid), pPackedOverlay, RenderResizableCuboid.FaceDisplay.FRONT, getCamera(), pBlockEntity.getBlockPos());
+           // renderObject(getFluidModel(fluid, fluidScale), pPoseStack, buffer, getColorARGB(fluid, fluidScale), calculateGlowLight(pPackedLight, fluid), pPackedOverlay, RenderResizableCuboid.FaceDisplay.FRONT, getCamera(), pBlockEntity.getBlockPos());
         }
     }
 
@@ -239,7 +238,7 @@ public class FlowExtractorBlockEntityRenderer implements BlockEntityRenderer<Flo
         FLOWING
     }
     public static TextureAtlasSprite getSprite(ResourceLocation spriteLocation) {
-        return Minecraft.getInstance().getTextureAtlas(TextureAtlas.LOCATION_BLOCKS).apply(spriteLocation);
+        return Minecraft.getInstance().getTextureAtlas(InventoryMenu.BLOCK_ATLAS).apply(spriteLocation);
     }
 
     private static final Map<FluidStack, Int2ObjectMap<Model3D>> cachedCenterFluids = new HashMap<>();

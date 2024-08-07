@@ -17,7 +17,6 @@ import org.slf4j.Logger;
 import java.util.function.Consumer;
 
 public class FlowArmorItem extends ModArmorItem{
-    private static final Logger LOGGER = LogUtils.getLogger();
     private float[] damage = new float[4];
 
     @Override
@@ -39,16 +38,13 @@ public class FlowArmorItem extends ModArmorItem{
 
     @Override
     public <T extends LivingEntity> int damageItem(ItemStack stack, int amount, T entity, Consumer<T> onBroken) {
-        //LOGGER.debug("Method called");
         int currentDurability = stack.getMaxDamage() - stack.getItem().getDamage(stack);
         if (amount >= currentDurability){
-            //LOGGER.debug("{} is more than {}", amount, currentDurability);
             if(entity instanceof ServerPlayer pPlayer) {
-                //LOGGER.debug("Entity is Server player");
                 setNonFlowArmorBack(pPlayer,this.type.getSlot().getIndex());
                 return 0;
-            }// else LOGGER.debug("No");
-        } //else LOGGER.debug("{} is less than {}", amount, currentDurability);
+            }
+        }
         return amount;
     }
 
@@ -98,25 +94,25 @@ public class FlowArmorItem extends ModArmorItem{
             ItemStack stack = new ItemStack(ModItems.FLOW_CEDAR_BOOTS.get());
             stack.setTag(pPlayer.getInventory().getItem(slotID).getTag());
             stack.setDamageValue((int) (damage[0] * stack.getMaxDamage()));
-            pPlayer.getInventory().setItem(slotID,stack);
+            pPlayer.getInventory().armor.set(slotID,stack);
         }
         if (this.type.getSlot() == EquipmentSlot.LEGS){
             ItemStack stack = new ItemStack(ModItems.FLOW_CEDAR_LEGGINGS.get());
             stack.setTag(pPlayer.getInventory().getItem(slotID).getTag());
             stack.setDamageValue((int) (damage[1] * stack.getMaxDamage()));
-            pPlayer.getInventory().setItem(slotID,stack);
+            pPlayer.getInventory().armor.set(slotID,stack);
         }
         if (this.type.getSlot() == EquipmentSlot.CHEST){
             ItemStack stack = new ItemStack(ModItems.FLOW_CEDAR_CHESTPLATE.get());
             stack.setTag(pPlayer.getInventory().getItem(slotID).getTag());
             stack.setDamageValue((int) (damage[2] * stack.getMaxDamage()));
-            pPlayer.getInventory().setItem(slotID,stack);
+            pPlayer.getInventory().armor.set(slotID,stack);
         }
         if (this.type.getSlot() == EquipmentSlot.HEAD){
             ItemStack stack = new ItemStack(ModItems.FLOW_CEDAR_HELMET.get());
             stack.setTag(pPlayer.getInventory().getItem(slotID).getTag());
             stack.setDamageValue((int) (damage[3] * stack.getMaxDamage()));
-            pPlayer.getInventory().setItem(slotID,stack);
+            pPlayer.getInventory().armor.set(slotID,stack);
         }
     }
  /*

@@ -4,58 +4,60 @@ import lombok.Getter;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.chat.Component;
+import net.minecraft.nbt.Tag;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
-import net.minecraft.sounds.SoundEvent;
-import net.minecraft.sounds.SoundEvents;
-import net.minecraft.sounds.SoundSource;
-import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResult;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.*;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.common.SoundAction;
-import net.minecraftforge.common.SoundActions;
+import net.minecraft.world.level.material.Fluids;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
-import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.IFluidTank;
 import net.minecraftforge.fluids.capability.IFluidHandler;
-import net.minecraftforge.fluids.capability.IFluidHandlerItem;
 import net.minecraftforge.fluids.capability.templates.FluidTank;
-import net.sinedkadis.terracompositio.TerraCompositio;
 import net.sinedkadis.terracompositio.cfe.CFEContainer;
+import net.sinedkadis.terracompositio.fluid.CombinedTankWrapper;
+import net.sinedkadis.terracompositio.fluid.ModFluidTank;
 import net.sinedkadis.terracompositio.fluid.ModFluids;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import static net.sinedkadis.terracompositio.TerraCompositio.GLOGGER;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 
-public class FlowExtractorBlockEntity extends BlockEntity implements CFEContainer {
+import static net.sinedkadis.terracompositio.TerraCompositio.GLOGGER;
+import static net.sinedkadis.terracompositio.fluid.ModFluidTank.iterateCompoundList;
+import static net.sinedkadis.terracompositio.fluid.ModFluidTank.writeCompoundList;
+
+public class FlowExtractorBlockEntity extends ModBlockEntity implements CFEContainer {
+    List<FluidStack> visualizedOutputFluids;
+
     @Getter
-    private final FluidTank fluidTank = new FluidTank(1000) {
-        @Override
-        protected void onContentsChanged() {
-            super.onContentsChanged();
-            FlowExtractorBlockEntity.this.sendUpdate();
-        }
-    };
+    private final ModFluidTank inputFluidTank = new ModFluidTank(this,1,1000,true)
+            .whenFluidUpdates(this::sendUpdate);
     @Getter
-    private final LazyOptional<FluidTank> fluidOptional = LazyOptional.of(() -> this.fluidTank);
+    private final ModFluidTank outputFluidTank = new ModFluidTank(this,1,1000,true)
+            .whenFluidUpdates(this::sendUpdate);
+    @Getter
+    private final LazyOptional<IFluidHandler> fluidOptional = LazyOptional.of(() -> {
+        LazyOptional<? extends IFluidHandler> inputCap = inputFluidTank.getCapability();
+        LazyOptional<? extends IFluidHandler> outputCap = outputFluidTank.getCapability();
+        return new CombinedTankWrapper(outputCap.orElse(null), inputCap.orElse(null));}
+    );
+
+
     private int CFE;
-    public float prevScale;
 
 
 
     public FlowExtractorBlockEntity(BlockPos pPos, BlockState pBlockState) {
         super(ModBlockEntities.FLOW_EXTRACTOR_BE.get(),pPos, pBlockState);
+        visualizedOutputFluids = Collections.synchronizedList(new ArrayList<>());
     }
 
     @Override
@@ -75,34 +77,31 @@ public class FlowExtractorBlockEntity extends BlockEntity implements CFEContaine
     @Override
     protected void saveAdditional(@NotNull CompoundTag pTag) {
         super.saveAdditional(pTag);
-        pTag.put("FluidTank", this.fluidTank.writeToNBT(new CompoundTag()));
+        pTag.put("VisualizedFluids", writeCompoundList(visualizedOutputFluids,
+                ia -> ia.writeToNBT(new CompoundTag())));
+        visualizedOutputFluids.clear();
         pTag.putInt("CFE",this.CFE);
-        pTag.putFloat("prevScale",this.prevScale);
     }
 
     @Override
     public void load(@NotNull CompoundTag pTag) {
         super.load(pTag);
-        this.fluidTank.readFromNBT(pTag.getCompound("FluidTank"));
+        iterateCompoundList(pTag.getList("VisualizedFluids", Tag.TAG_COMPOUND),
+                c -> visualizedOutputFluids
+                        .add(FluidStack.loadFluidStackFromNBT(c)));
         this.CFE = pTag.getInt("CFE");
-        this.prevScale = pTag.getInt("prevScale");
     }
 
     public void tick(Level pLevel, BlockPos pPos, BlockState pState) {
-        if(this.fluidTank.getFluidAmount() >= this.fluidTank.getCapacity())
-            return;
-        if (this.fluidTank.getFluid().getFluid() == ModFluids.FLOW_FLUID.source.get().getSource()){
-            this.fluidTank.drain(1, IFluidHandler.FluidAction.EXECUTE);
+        if (this.inputFluidTank.getPrimaryHandler().getFluid().getFluid() == ModFluids.FLOW_FLUID.source.get().getSource()
+                && (this.outputFluidTank.getPrimaryHandler().getFluid().getFluid() == Fluids.WATER
+                    || this.outputFluidTank.getPrimaryHandler().getFluid().getFluid() == Fluids.EMPTY)){
+            this.inputFluidTank.getPrimaryHandler().drain(1, IFluidHandler.FluidAction.EXECUTE);
             this.CFE++;
-        }
-        float scale = fluidTank.getCapacity() == 0 ? 0 : (float) fluidTank.getFluidAmount() /fluidTank.getCapacity();
-        //GLOGGER.debug(scale);
-        if (scale != prevScale) {
-            prevScale = scale;
+            this.outputFluidTank.getPrimaryHandler().fill(new FluidStack(Fluids.WATER,1), IFluidHandler.FluidAction.EXECUTE);
         }
 
     }
-
     public static float getScale(float prevScale, IFluidTank tank) {
         return getScale(prevScale, tank.getFluidAmount(), tank.getCapacity(), tank.getFluid().isEmpty());
     }
@@ -133,11 +132,7 @@ public class FlowExtractorBlockEntity extends BlockEntity implements CFEContaine
         return prevScale;
     }
 
-    @Nullable
-    @Override
-    public Packet<ClientGamePacketListener> getUpdatePacket() {
-        return ClientboundBlockEntityDataPacket.create(this);
-    }
+
 
     @Override
     public @NotNull CompoundTag getUpdateTag() {
@@ -156,17 +151,9 @@ public class FlowExtractorBlockEntity extends BlockEntity implements CFEContaine
         CFE = count;
     }
 
-    private void sendUpdate() {
-        setChanged();
-
-        if (this.level != null)
-            this.level.sendBlockUpdated(this.worldPosition, getBlockState(), getBlockState(), Block.UPDATE_ALL);
+    public boolean isEmpty() {
+        return inputFluidTank.isEmpty() && outputFluidTank.isEmpty();
     }
 
-    public FluidStack getFluidStack() {
-        return new FluidStack(
-                this.fluidTank.getFluid().getFluid(),
-                this.fluidTank.getFluidAmount()
-        );
-    }
+
 }
