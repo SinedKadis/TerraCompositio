@@ -83,11 +83,6 @@ public abstract class ModBlockEntity extends BlockEntity {
         return tag;
     }
 
-    public void sendData() {
-        if (level instanceof ServerLevel serverLevel)
-            serverLevel.getChunkSource().blockChanged(getBlockPos());
-    }
-
     public PacketDistributor.PacketTarget packetTarget() {
         return PacketDistributor.TRACKING_CHUNK.with(this::containedChunk);
     }

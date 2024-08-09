@@ -42,7 +42,7 @@ public class FlowExtractorBlockEntity extends ModBlockEntity implements CFEConta
             .whenFluidUpdates(this::sendUpdate);
     @Getter
     private final ModFluidTank outputFluidTank = new ModFluidTank(this,1,1000,true)
-            .whenFluidUpdates(this::sendUpdate);
+            .whenFluidUpdates(this::sendUpdate).forbidInsertion();;
     @Getter
     private final LazyOptional<IFluidHandler> fluidOptional = LazyOptional.of(() -> {
         LazyOptional<? extends IFluidHandler> inputCap = inputFluidTank.getCapability();

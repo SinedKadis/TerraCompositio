@@ -161,24 +161,13 @@ public class ModFluidTank {
                 return;
             fluidLevel.chase(tank.getFluidAmount() / (float) tank.getCapacity(), .25, LerpedFloat.Chaser.EXP);
             if (!blockEntity.getLevel().isClientSide)
-                sendDataLazily();
+                updateFluids();
             if (blockEntity.isVirtual() && !tank.getFluid()
                     .isEmpty())
                 renderedFluid = tank.getFluid();
         }
-        public void sendDataLazily() {
-            if (syncCooldown > 0) {
-                queuedSync = true;
-                return;
-            }
-            updateFluids();
-            queuedSync = false;
-            syncCooldown = SYNC_RATE;
-        }
         protected void updateFluids() {
             fluidUpdateCallback.run();
-            blockEntity.sendData();
-            blockEntity.setChanged();
         }
 
         public float getTotalUnits(float partialTicks) {
