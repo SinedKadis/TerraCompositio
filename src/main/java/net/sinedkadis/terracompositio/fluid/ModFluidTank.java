@@ -4,6 +4,7 @@ import com.mojang.datafixers.util.Pair;
 import lombok.Getter;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -16,6 +17,7 @@ import net.minecraftforge.fluids.capability.templates.FluidTank;
 import net.minecraftforge.items.wrapper.EmptyHandler;
 import net.sinedkadis.terracompositio.block.entity.ModBlockEntity;
 import net.sinedkadis.terracompositio.util.LerpedFloat;
+import org.apache.commons.lang3.mutable.MutableInt;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Consumer;
@@ -33,6 +35,8 @@ public class ModFluidTank {
     private static final int SYNC_RATE = 8;
     @Getter
     protected TankSegment[] tanks;
+    @Getter
+    protected IFluidHandler[] handlers;
 
     public ModFluidTank(ModBlockEntity blockEntity,int tanks,int capacity,boolean enforceVariety) {
         this.blockEntity = blockEntity;
@@ -40,7 +44,7 @@ public class ModFluidTank {
         insertionAllowed = true;
         extractionAllowed = true;
         this.tanks = new TankSegment[tanks];
-        IFluidHandler[] handlers = new IFluidHandler[tanks];
+        handlers = new IFluidHandler[tanks];
         for (int i = 0; i < tanks; i++) {
             TankSegment tankSegment = new TankSegment(capacity);
             this.tanks[i] = tankSegment;
@@ -92,6 +96,23 @@ public class ModFluidTank {
         return true;
     }
 
+    public void write(CompoundTag nbt, boolean clientPacket) {
+        ListTag tanksNBT = new ListTag();
+        forEach(ts -> tanksNBT.add(ts.writeNBT()));
+        nbt.put("Tanks", tanksNBT);
+    }
+
+
+    public void read(CompoundTag nbt, boolean clientPacket) {
+        MutableInt index = new MutableInt(0);
+        iterateCompoundList(nbt.getList("Tanks", Tag.TAG_COMPOUND), c -> {
+            if (index.intValue() >= tanks.length)
+                return;
+            tanks[index.intValue()].readNBT(c, clientPacket);
+            index.increment();
+        });
+    }
+
     public class InternalFluidHandler extends CombinedTankWrapper {
 
         public InternalFluidHandler(IFluidHandler[] handlers, boolean enforceVariety) {
@@ -140,31 +161,31 @@ public class ModFluidTank {
         listNBT.forEach(inbt -> consumer.accept((CompoundTag) inbt));
     }
 
+    @Getter
     public class TankSegment {
 
         protected SmartFluidTank tank;
-        @Getter
         protected LerpedFloat fluidLevel;
-        @Getter
         protected FluidStack renderedFluid;
 
         public TankSegment(int capacity) {
-            tank = new SmartFluidTank(capacity,f -> onFluidStackChanged());
+            tank = new SmartFluidTank(capacity, this::onFluidStackChanged);
             fluidLevel = LerpedFloat.linear()
                     .startWithValue(0)
                     .chase(0, .25, LerpedFloat.Chaser.EXP);
             renderedFluid = FluidStack.EMPTY;
         }
 
-        public void onFluidStackChanged() {
+        public void onFluidStackChanged(FluidStack stack) {
             if (!blockEntity.hasLevel())
                 return;
             fluidLevel.chase(tank.getFluidAmount() / (float) tank.getCapacity(), .25, LerpedFloat.Chaser.EXP);
             if (!blockEntity.getLevel().isClientSide)
                 updateFluids();
-            if (blockEntity.isVirtual() && !tank.getFluid()
-                    .isEmpty())
+            if (blockEntity.isVirtual() && !tank.getFluid().isEmpty())
                 renderedFluid = tank.getFluid();
+            else
+                renderedFluid = FluidStack.EMPTY;
         }
         protected void updateFluids() {
             fluidUpdateCallback.run();

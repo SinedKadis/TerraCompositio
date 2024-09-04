@@ -6,12 +6,12 @@ import net.minecraftforge.items.wrapper.EmptyHandler;
 import org.jetbrains.annotations.NotNull;
 
 public class CombinedTankWrapper implements IFluidHandler {
-    protected final IFluidHandler[] itemHandler;
+    protected final IFluidHandler[] fluidHandlers;
     protected final int[] baseIndex;
     protected final int tankCount;
     protected boolean enforceVariety;
     public CombinedTankWrapper(IFluidHandler... fluidHandlers) {
-        this.itemHandler = fluidHandlers;
+        this.fluidHandlers = fluidHandlers;
         this.baseIndex = new int[fluidHandlers.length];
         int index = 0;
         for (int i = 0; i < fluidHandlers.length; i++) {
@@ -66,7 +66,7 @@ public class CombinedTankWrapper implements IFluidHandler {
 
         boolean fittingHandlerFound = false;
         Outer: for (boolean searchPass : new boolean[]{true, false}) {
-            for (IFluidHandler iFluidHandler : itemHandler) {
+            for (IFluidHandler iFluidHandler : fluidHandlers) {
 
                 for (int i = 0; i < iFluidHandler.getTanks(); i++)
                     if (searchPass && iFluidHandler.getFluidInTank(i)
@@ -98,7 +98,7 @@ public class CombinedTankWrapper implements IFluidHandler {
         FluidStack drained = FluidStack.EMPTY;
         resource = resource.copy();
 
-        for (IFluidHandler iFluidHandler : itemHandler) {
+        for (IFluidHandler iFluidHandler : fluidHandlers) {
             FluidStack drainedFromCurrent = iFluidHandler.drain(resource, action);
             int amount = drainedFromCurrent.getAmount();
             resource.shrink(amount);
@@ -117,7 +117,7 @@ public class CombinedTankWrapper implements IFluidHandler {
     public FluidStack drain(int maxDrain, IFluidHandler.FluidAction action) {
         FluidStack drained = FluidStack.EMPTY;
 
-        for (IFluidHandler iFluidHandler : itemHandler) {
+        for (IFluidHandler iFluidHandler : fluidHandlers) {
             FluidStack drainedFromCurrent = iFluidHandler.drain(maxDrain, action);
             int amount = drainedFromCurrent.getAmount();
             maxDrain -= amount;
@@ -140,9 +140,9 @@ public class CombinedTankWrapper implements IFluidHandler {
         return -1;
     }
     protected IFluidHandler getHandlerFromIndex(int index) {
-        if (index < 0 || index >= itemHandler.length)
+        if (index < 0 || index >= fluidHandlers.length)
             return (IFluidHandler) EmptyHandler.INSTANCE;
-        return itemHandler[index];
+        return fluidHandlers[index];
     }
 
     protected int getSlotFromIndex(int slot, int index) {

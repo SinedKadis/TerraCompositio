@@ -42,13 +42,14 @@ public class FlowExtractorBlockEntity extends ModBlockEntity implements CFEConta
             .whenFluidUpdates(this::sendUpdate);
     @Getter
     private final ModFluidTank outputFluidTank = new ModFluidTank(this,1,1000,true)
-            .whenFluidUpdates(this::sendUpdate).forbidInsertion();;
+            .whenFluidUpdates(this::sendUpdate).forbidInsertion();
     @Getter
     private final LazyOptional<IFluidHandler> fluidOptional = LazyOptional.of(() -> {
         LazyOptional<? extends IFluidHandler> inputCap = inputFluidTank.getCapability();
         LazyOptional<? extends IFluidHandler> outputCap = outputFluidTank.getCapability();
         return new CombinedTankWrapper(outputCap.orElse(null), inputCap.orElse(null));}
     );
+    private final ModFluidTank[] tanks = new ModFluidTank[]{inputFluidTank,outputFluidTank};
 
 
     private int CFE;
@@ -81,6 +82,8 @@ public class FlowExtractorBlockEntity extends ModBlockEntity implements CFEConta
                 ia -> ia.writeToNBT(new CompoundTag())));
         visualizedOutputFluids.clear();
         pTag.putInt("CFE",this.CFE);
+        inputFluidTank.write(pTag, false);
+        outputFluidTank.write(pTag, false);
     }
 
     @Override
@@ -90,6 +93,8 @@ public class FlowExtractorBlockEntity extends ModBlockEntity implements CFEConta
                 c -> visualizedOutputFluids
                         .add(FluidStack.loadFluidStackFromNBT(c)));
         this.CFE = pTag.getInt("CFE");
+        inputFluidTank.read(pTag, false);
+        outputFluidTank.read(pTag, false);
     }
 
     public void tick(Level pLevel, BlockPos pPos, BlockState pState) {
@@ -153,6 +158,32 @@ public class FlowExtractorBlockEntity extends ModBlockEntity implements CFEConta
 
     public boolean isEmpty() {
         return inputFluidTank.isEmpty() && outputFluidTank.isEmpty();
+    }
+    public float getTotalFluidUnits(float partialTicks) {
+        int renderedFluids = 0;
+        float totalUnits = 0;
+
+        for (ModFluidTank tank : tanks) {
+            if (tank == null)
+                continue;
+            for (ModFluidTank.TankSegment tankSegment : tank.getTanks()) {
+                FluidStack fluid = tankSegment.getRenderedFluid();
+                if (fluid.isEmpty()) {
+                    continue;
+                }
+                float units = tankSegment.getTotalUnits(partialTicks);
+                if (units < 1)
+                    continue;
+                totalUnits += units;
+                renderedFluids++;
+            }
+        }
+
+        if (renderedFluids == 0)
+            return 0;
+        if (totalUnits < 1)
+            return 0;
+        return totalUnits;
     }
 
 

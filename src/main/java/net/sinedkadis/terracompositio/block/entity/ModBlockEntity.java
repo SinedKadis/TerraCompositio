@@ -44,8 +44,9 @@ public abstract class ModBlockEntity extends BlockEntity {
         super(type, pos, state);
     }
 
-    public void markVirtual() {
+    public ModBlockEntity markVirtual() {
         virtualMode = true;
+        return this;
     }
 
     public boolean isVirtual() {

@@ -53,9 +53,6 @@ import net.sinedkadis.terracompositio.util.IBE;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.List;
-import java.util.Optional;
-
 public class FlowExtractorBlock extends BaseEntityBlock implements IBE<FlowExtractorBlockEntity> {
     public FlowExtractorBlock(Properties properties) {
         super(properties);
@@ -87,7 +84,7 @@ public class FlowExtractorBlock extends BaseEntityBlock implements IBE<FlowExtra
     @Nullable
     @Override
     public BlockEntity newBlockEntity(@NotNull BlockPos pPos, @NotNull BlockState pState) {
-        return ModBlockEntities.FLOW_EXTRACTOR_BE.get().create(pPos, pState);
+        return ModBlockEntities.FLOW_EXTRACTOR_BE.get().create(pPos, pState).markVirtual();
     }
 
     @Nullable
@@ -113,7 +110,7 @@ public class FlowExtractorBlock extends BaseEntityBlock implements IBE<FlowExtra
                     return InteractionResult.SUCCESS;
 
                 if (canItemBeEmptied(worldIn, heldItem)
-                        || canItemBeFilled(worldIn, heldItem))
+                        || canItemBeFilled( worldIn, heldItem))
                     return InteractionResult.SUCCESS;
                 if (heldItem.getItem()
                         .equals(Items.SPONGE)
@@ -136,12 +133,12 @@ public class FlowExtractorBlock extends BaseEntityBlock implements IBE<FlowExtra
 
     private static void playEmptySound(Level world, BlockPos pos, Player player, FluidStack transferred) {
         world.playSound(null, pos, getEmptySound(transferred), SoundSource.BLOCKS, 1.0F, 1.0F);
-        player.displayClientMessage(Component.translatable(KEY_FILLED, transferred.getAmount(), transferred.getDisplayName()), true);
+        //player.displayClientMessage(Component.translatable(KEY_FILLED, transferred.getAmount(), transferred.getDisplayName()), true);
     }
 
     private static void playFillSound(Level world, BlockPos pos, Player player, FluidStack transferred) {
         world.playSound(null, pos, getFillSound(transferred), SoundSource.BLOCKS, 1.0F, 1.0F);
-        player.displayClientMessage(Component.translatable(KEY_DRAINED, transferred.getAmount(), transferred.getDisplayName()), true);
+        //player.displayClientMessage(Component.translatable(KEY_DRAINED, transferred.getAmount(), transferred.getDisplayName()), true);
     }
     public static SoundEvent getEmptySound(FluidStack fluid) {
         return getSound(fluid, SoundActions.BUCKET_EMPTY, SoundEvents.BUCKET_EMPTY);
@@ -187,6 +184,7 @@ public class FlowExtractorBlock extends BaseEntityBlock implements IBE<FlowExtra
                         .placeItemBackInInventory(emptyingResult.getSecond());
             }
         }
+        playFillSound(worldIn,be.getBlockPos(),player,fluidStack);
         return true;
     }
     public static boolean canItemBeEmptied(Level world, ItemStack stack) {
@@ -273,6 +271,7 @@ public class FlowExtractorBlock extends BaseEntityBlock implements IBE<FlowExtra
                 player.getInventory()
                         .placeItemBackInInventory(out);
             be.sendUpdate();
+            playEmptySound(world,be.getBlockPos(),player,fluid);
             return true;
         }
 
