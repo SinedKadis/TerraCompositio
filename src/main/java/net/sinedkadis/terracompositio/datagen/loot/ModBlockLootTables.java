@@ -46,6 +46,7 @@ public class ModBlockLootTables extends BlockLootSubProvider {
         this.dropSelf(ModBlocks.FLOW_CEDAR_TRAPDOOR.get());
         this.dropSelf(ModBlocks.WEDGE.get());
         this.dropSelf(ModBlocks.FLOW_EXTRACTOR.get());
+        this.dropOther(ModBlocks.FLOW_INFUSER.get(), ModBlocks.FLOW_CEDAR_LOG.get());
 
         this.add(ModBlocks.FLOW_CEDAR_SLAB.get(),
                 block -> createSlabItemTable(ModBlocks.FLOW_CEDAR_SLAB.get()));
@@ -62,9 +63,7 @@ public class ModBlockLootTables extends BlockLootSubProvider {
         this.add(ModBlocks.END_STONE_SAPPHIRE_ORE.get(),
                 block -> createCopperLikeOreDrops(ModBlocks.END_STONE_SAPPHIRE_ORE.get(), ModItems.RAW_SAPPHIRE.get()));
         */
-        this.dropOther(ModBlocks.FLOWING_FLOW_CEDAR_LOG.get(), ModBlocks.FLOW_CEDAR_LOG.get());
-        this.dropOther(ModBlocks.FLOWING_FLOW_CEDAR_WOOD.get(),ModBlocks.FLOW_CEDAR_WOOD.get());
-        this.dropOther(ModBlocks.FLOWING_FLOW_PORT.get(),ModBlocks.FLOW_PORT.get());
+        this.dropOther(ModBlocks.FLOW_PORT.get(),ModBlocks.FLOW_PORT.get());
         this.dropOther(ModBlocks.FLOW_CAULDRON.get(), Blocks.CAULDRON);
         this.dropOther(ModBlocks.BIRCH_JUICE_CAULDRON.get(), Blocks.CAULDRON);
 

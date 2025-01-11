@@ -88,10 +88,12 @@ public abstract class ModCFEBlockEntity extends ModBlockEntity{
     @Override
     protected void saveAdditional(CompoundTag pTag) {
         List<Integer> cords = new ArrayList<>();
-        cords.add(cfeSourceBlockPos.getX());
-        cords.add(cfeSourceBlockPos.getY());
-        cords.add(cfeSourceBlockPos.getZ());
-        pTag.putIntArray("source",cords);
+        if (cfeSourceBlockPos != null) {
+            cords.add(cfeSourceBlockPos.getX());
+            cords.add(cfeSourceBlockPos.getY());
+            cords.add(cfeSourceBlockPos.getZ());
+            pTag.putIntArray("source", cords);
+        }
         super.saveAdditional(pTag);
     }
 

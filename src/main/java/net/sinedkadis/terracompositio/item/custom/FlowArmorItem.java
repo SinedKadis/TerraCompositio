@@ -94,7 +94,7 @@ public class FlowArmorItem extends ModArmorItem{
             ItemStack stack = new ItemStack(ModItems.FLOW_CEDAR_BOOTS.get());
             stack.setTag(pPlayer.getInventory().getItem(slotID).getTag());
             stack.setDamageValue((int) (damage[0] * stack.getMaxDamage()));
-            pPlayer.getInventory().armor.set(slotID,stack);
+            pPlayer.getInventory().armor.set(slotID,stack); //todo чет крашнулось тут примерно
         }
         if (this.type.getSlot() == EquipmentSlot.LEGS){
             ItemStack stack = new ItemStack(ModItems.FLOW_CEDAR_LEGGINGS.get());

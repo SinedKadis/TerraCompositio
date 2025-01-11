@@ -1,7 +1,0 @@
-{
-  "parent": "minecraft:block/cube_column",
-  "textures": {
-    "end": "terracompositio:block/flowing_flow_cedar_log",
-    "side": "terracompositio:block/flowing_flow_cedar_log"
-  }
-}

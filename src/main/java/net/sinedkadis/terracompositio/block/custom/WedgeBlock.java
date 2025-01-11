@@ -39,6 +39,8 @@ import java.util.function.BiPredicate;
 import java.util.function.Predicate;
 
 import static net.minecraft.world.level.block.LayeredCauldronBlock.LEVEL;
+import static net.sinedkadis.terracompositio.block.ModBlockStateProperties.INFUSED;
+
 public class WedgeBlock extends Block {
     public static final DirectionProperty FACING = HorizontalDirectionalBlock.FACING;
     public static final BooleanProperty ATTACHED = BlockStateProperties.ATTACHED;
@@ -147,7 +149,8 @@ public class WedgeBlock extends Block {
         if (pState.getValue(ATTACHED)) {
             if (AnimTick++ > 20) {
                 AnimTick = 0;
-                if (pLevel.getBlockState(pPos.relative(pState.getValue(FACING).getOpposite())).is(ModTags.Blocks.FLOWING_FLOW_CEDAR_LOGS)) {
+                if (pLevel.getBlockState(pPos.relative(pState.getValue(FACING).getOpposite())).is(ModTags.Blocks.FLOW_CEDAR_LOGS)
+                        && pLevel.getBlockState(pPos.relative(pState.getValue(FACING).getOpposite())).getValue(INFUSED)) {
                     if (pLevel.isClientSide) {
                         generateParticles(pLevel, pPos, pState, ModParticles.FLOW_PARTICLE.get());
                     }
@@ -172,7 +175,8 @@ public class WedgeBlock extends Block {
             BlockPos cauldronPos1 = findFillableCauldronBelowWedge(pLevel, pPos, ModFluids.BIRCH_JUICE_FLUID.source.get());
             if (cauldronPos != null||cauldronPos1 != null) {
                // LOGGER.debug("Wedge attached, cauldron at "+cauldronPos);
-                if (pLevel.getBlockState(pPos.relative(pState.getValue(FACING).getOpposite())).is(ModTags.Blocks.FLOWING_FLOW_CEDAR_LOGS)
+                if (pLevel.getBlockState(pPos.relative(pState.getValue(FACING).getOpposite())).is(ModTags.Blocks.FLOW_CEDAR_LOGS)
+                        && pLevel.getBlockState(pPos.relative(pState.getValue(FACING).getOpposite())).getValue(INFUSED)
                         && cauldronPos != null) {
                     if (pLevel.getBlockState(cauldronPos).is(ModBlocks.FLOW_CAULDRON.get())) {
                        // LOGGER.debug("Flow Cauldron detected, trying increase level");
@@ -258,8 +262,9 @@ public class WedgeBlock extends Block {
     }
 
     public void calculateState(BlockState pState, Level pLevel, BlockPos pPos) {
-        if (pLevel.getBlockState(pPos.relative(pState.getValue(FACING).getOpposite())).is(ModTags.Blocks.FLOWING_FLOW_CEDAR_LOGS)
-        || pLevel.getBlockState(pPos.relative(pState.getValue(FACING).getOpposite())).is(BlockTags.BIRCH_LOGS)){
+        if (pLevel.getBlockState(pPos.relative(pState.getValue(FACING).getOpposite())).is(ModTags.Blocks.FLOW_CEDAR_LOGS)
+                && pLevel.getBlockState(pPos.relative(pState.getValue(FACING).getOpposite())).getValue(INFUSED)
+                || pLevel.getBlockState(pPos.relative(pState.getValue(FACING).getOpposite())).is(BlockTags.BIRCH_LOGS)){
             if (!pState.getValue(ATTACHED)){
                 pLevel.setBlockAndUpdate(pPos,this.defaultBlockState().setValue(FACING,pState.getValue(FACING)).setValue(ATTACHED,true));
 

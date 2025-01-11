@@ -100,7 +100,7 @@ public class FlowBlockPortMenu extends AbstractContainerMenu {
     @Override
     public boolean stillValid(Player pPlayer) {
         return stillValid(ContainerLevelAccess.create(level,blockEntity.getBlockPos()),
-                pPlayer, ModBlocks.FLOWING_FLOW_PORT.get());
+                pPlayer, ModBlocks.FLOW_PORT.get());
     }
     private void addPlayerInventory(Inventory playerInventory) {
         for (int i = 0; i < 3; ++i) {

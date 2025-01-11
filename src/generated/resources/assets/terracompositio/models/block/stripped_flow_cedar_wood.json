@@ -1,7 +1,7 @@
 {
   "parent": "minecraft:block/cube_column",
   "textures": {
-    "end": "terracompositio:block/stripped_flow_cedar_log",
+    "end": "terracompositio:block/stripped_flow_cedar_log_top",
     "side": "terracompositio:block/stripped_flow_cedar_log"
   }
 }

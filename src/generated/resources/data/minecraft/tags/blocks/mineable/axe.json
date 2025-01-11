@@ -1,10 +1,8 @@
 {
   "values": [
-    "terracompositio:flowing_flow_cedar_log",
-    "terracompositio:flow_cedar_leaves",
-    "terracompositio:flowing_flow_port",
-    "terracompositio:flowing_flow_cedar_wood",
     "terracompositio:flow_cedar_log",
+    "terracompositio:flow_cedar_leaves",
+    "terracompositio:flow_port",
     "terracompositio:flow_cedar_wood",
     "terracompositio:flow_cedar_planks",
     "terracompositio:stripped_flow_cedar_log",

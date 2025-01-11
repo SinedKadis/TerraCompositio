@@ -24,9 +24,6 @@ public class ModItemTagGenerator extends ItemTagsProvider {
 
     @Override
     protected void addTags(HolderLookup.@NotNull Provider pProvider) {
-        this.tag(ItemTags.LOGS)
-                .add(ModBlocks.FLOWING_FLOW_CEDAR_LOG.get().asItem(),
-                        ModBlocks.FLOWING_FLOW_CEDAR_WOOD.get().asItem());
         this.tag(ItemTags.LOGS_THAT_BURN)
                 .add(ModBlocks.FLOW_CEDAR_LOG.get().asItem(),
                         ModBlocks.FLOW_CEDAR_WOOD.get().asItem(),

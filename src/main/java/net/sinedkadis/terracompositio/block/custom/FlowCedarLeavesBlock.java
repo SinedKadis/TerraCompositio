@@ -13,6 +13,8 @@ import org.jetbrains.annotations.NotNull;
 
 import java.util.OptionalInt;
 
+import static net.sinedkadis.terracompositio.block.ModBlockStateProperties.INFUSED;
+
 public class FlowCedarLeavesBlock extends LeavesBlock {
     public FlowCedarLeavesBlock(Properties pProperties) {
         super(pProperties);
@@ -54,7 +56,8 @@ public class FlowCedarLeavesBlock extends LeavesBlock {
         return getOptionalDistanceAt(pNeighbor).orElse(7);
     }
     public static @NotNull OptionalInt getOptionalDistanceAt(BlockState pState) {
-        if (pState.is(ModTags.Blocks.FLOWING_FLOW_CEDAR_LOGS)) {
+        if (pState.is(ModTags.Blocks.FLOW_CEDAR_LOGS)
+                && pState.getValue(INFUSED)) {
             return OptionalInt.of(0);
         } else {
             return pState.hasProperty(DISTANCE) ? OptionalInt.of(pState.getValue(DISTANCE)) : OptionalInt.empty();

@@ -21,13 +21,10 @@ public class ModCreativeModTabs {
                         pOutput.accept(ModItems.PEBBLE.get());
                         pOutput.accept(ModItems.STONE_STAFF.get());
                         pOutput.accept(ModItems.OAK_STAFF.get());
-                        pOutput.accept(ModBlocks.FLOWING_FLOW_CEDAR_LOG.get());
                         pOutput.accept(ModBlocks.FLOW_CEDAR_LOG.get());
                         pOutput.accept(ModBlocks.STRIPPED_FLOW_CEDAR_LOG.get());
-                        pOutput.accept(ModBlocks.FLOWING_FLOW_CEDAR_WOOD.get());
                         pOutput.accept(ModBlocks.FLOW_CEDAR_WOOD.get());
                         pOutput.accept(ModBlocks.STRIPPED_FLOW_CEDAR_WOOD.get());
-                        pOutput.accept(ModBlocks.FLOWING_FLOW_PORT.get());
                         pOutput.accept(ModBlocks.FLOW_PORT.get());
                         pOutput.accept(ModBlocks.FLOW_CEDAR_LEAVES.get());
                         pOutput.accept(ModBlocks.FLOW_CEDAR_PLANKS.get());

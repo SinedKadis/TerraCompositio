@@ -43,23 +43,17 @@ public class ModBlocks {
         BLOCKS.register(eventBus);
     }
 
-    public static final RegistryObject<Block> FLOWING_FLOW_CEDAR_LOG = registerBlock("flowing_flow_cedar_log",
-            () -> new FlowingFlowCedarLikeBlock(BlockBehaviour.Properties.copy(Blocks.OAK_LOG).strength(3f).sound(ModSounds.FLOWING_FLOW_CEDAR_LIKE_BLOCK_SOUNDS)));
-    public static final RegistryObject<Block> FLOWING_FLOW_PORT = registerBlock("flowing_flow_port",
-            () -> new FlowingFlowPortBlock(BlockBehaviour.Properties.copy(Blocks.OAK_WOOD).strength(3f).sound(ModSounds.FLOWING_FLOW_CEDAR_LIKE_BLOCK_SOUNDS)));
-    public static final RegistryObject<Block> FLOW_PORT = registerBlock("flow_port",
-            () -> new FlowCedarLikeBlock(BlockBehaviour.Properties.copy(Blocks.OAK_LOG).strength(3f)));
-
-    public static final RegistryObject<Block> FLOWING_FLOW_CEDAR_WOOD = registerBlock("flowing_flow_cedar_wood",
-            () -> new FlowingFlowCedarLikeBlock(BlockBehaviour.Properties.copy(Blocks.OAK_WOOD).strength(3f).sound(ModSounds.FLOWING_FLOW_CEDAR_LIKE_BLOCK_SOUNDS)));
-    public static final RegistryObject<Block> STRIPPED_FLOW_CEDAR_LOG = registerBlock("stripped_flow_cedar_log",
-            () -> new StrippedFlowCedarLikeBlock(BlockBehaviour.Properties.copy(Blocks.STRIPPED_OAK_LOG).strength(3f)));
-    public static final RegistryObject<Block> STRIPPED_FLOW_CEDAR_WOOD = registerBlock("stripped_flow_cedar_wood",
-            () -> new StrippedFlowCedarLikeBlock(BlockBehaviour.Properties.copy(Blocks.STRIPPED_OAK_WOOD).strength(3f)));
     public static final RegistryObject<Block> FLOW_CEDAR_LOG = registerBlock("flow_cedar_log",
-            () -> new FlowCedarLikeBlock(BlockBehaviour.Properties.copy(Blocks.OAK_LOG).strength(3f)));
+            () -> new FlowCedarLikeBlock(BlockBehaviour.Properties.copy(Blocks.OAK_LOG).strength(3f).sound(ModSounds.FLOWING_FLOW_CEDAR_LIKE_BLOCK_SOUNDS)));
+    public static final RegistryObject<Block> FLOW_PORT = registerBlock("flow_port",
+            () -> new FlowPortBlock(BlockBehaviour.Properties.copy(Blocks.OAK_WOOD).strength(3f).sound(ModSounds.FLOWING_FLOW_CEDAR_LIKE_BLOCK_SOUNDS)));
+
     public static final RegistryObject<Block> FLOW_CEDAR_WOOD = registerBlock("flow_cedar_wood",
-            () -> new FlowCedarLikeBlock(BlockBehaviour.Properties.copy(Blocks.OAK_LOG).strength(3f)));
+            () -> new FlowCedarLikeBlock(BlockBehaviour.Properties.copy(Blocks.OAK_WOOD).strength(3f).sound(ModSounds.FLOWING_FLOW_CEDAR_LIKE_BLOCK_SOUNDS)));
+    public static final RegistryObject<Block> STRIPPED_FLOW_CEDAR_LOG = registerBlock("stripped_flow_cedar_log",
+            () -> new FlowCedarLikeBlock(BlockBehaviour.Properties.copy(Blocks.STRIPPED_OAK_LOG).strength(3f)));
+    public static final RegistryObject<Block> STRIPPED_FLOW_CEDAR_WOOD = registerBlock("stripped_flow_cedar_wood",
+            () -> new FlowCedarLikeBlock(BlockBehaviour.Properties.copy(Blocks.STRIPPED_OAK_WOOD).strength(3f)));
 
     public static final RegistryObject<Block> FLOW_CEDAR_PLANKS = registerBlock("flow_cedar_planks",
             () -> new Block(BlockBehaviour.Properties.copy(Blocks.OAK_PLANKS)){

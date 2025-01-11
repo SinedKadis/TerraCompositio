@@ -33,12 +33,10 @@ public class ModBlockTagGenerator extends BlockTagsProvider {
                         ModBlocks.END_STONE_SAPPHIRE_ORE.get(),
                         ModBlocks.SOUND_BLOCK.get());*/
         this.tag(BlockTags.MINEABLE_WITH_AXE)
-                .add(ModBlocks.FLOWING_FLOW_CEDAR_LOG.get(),
+                .add(ModBlocks.FLOW_CEDAR_LOG.get(),
                         ModBlocks.FLOW_CEDAR_LEAVES.get(),
-                        ModBlocks.FLOWING_FLOW_PORT.get(),
+                        ModBlocks.FLOW_PORT.get(),
                         //ModBlocks.NONFLOW_PORT.get(),
-                        ModBlocks.FLOWING_FLOW_CEDAR_WOOD.get(),
-                        ModBlocks.FLOW_CEDAR_LOG.get(),
                         ModBlocks.FLOW_CEDAR_WOOD.get(),
                         ModBlocks.FLOW_CEDAR_PLANKS.get(),
                         ModBlocks.STRIPPED_FLOW_CEDAR_LOG.get(),
@@ -46,13 +44,13 @@ public class ModBlockTagGenerator extends BlockTagsProvider {
 
 
         this.tag(BlockTags.NEEDS_IRON_TOOL)
-                .add(ModBlocks.FLOWING_FLOW_CEDAR_LOG.get(),
+                .add(ModBlocks.FLOW_CEDAR_LOG.get(),
                         ModBlocks.FLOW_CEDAR_LEAVES.get(),
-                        ModBlocks.FLOWING_FLOW_PORT.get(),
-                        ModBlocks.FLOWING_FLOW_CEDAR_WOOD.get());
+                        ModBlocks.FLOW_PORT.get(),
+                        ModBlocks.FLOW_CEDAR_WOOD.get());
         this.tag(BlockTags.LOGS)
-                .add(ModBlocks.FLOWING_FLOW_CEDAR_LOG.get(),
-                        ModBlocks.FLOWING_FLOW_CEDAR_WOOD.get());
+                .add(ModBlocks.FLOW_CEDAR_LOG.get(),
+                        ModBlocks.FLOW_CEDAR_WOOD.get());
         this.tag(BlockTags.LOGS_THAT_BURN)
                 .add(ModBlocks.FLOW_CEDAR_LOG.get(),
                         ModBlocks.FLOW_CEDAR_WOOD.get(),
@@ -78,10 +76,6 @@ public class ModBlockTagGenerator extends BlockTagsProvider {
                 .add(ModBlocks.FLOW_CEDAR_FENCE.get());
         this.tag(BlockTags.FENCE_GATES)
                 .add(ModBlocks.FLOW_CEDAR_FENCE_GATE.get());
-        this.tag(ModTags.Blocks.FLOWING_FLOW_CEDAR_LOGS)
-                .add(ModBlocks.FLOWING_FLOW_CEDAR_LOG.get(),
-                        ModBlocks.FLOWING_FLOW_CEDAR_WOOD.get(),
-                        ModBlocks.FLOWING_FLOW_PORT.get());
         this.tag(ModTags.Blocks.FLOW_CEDAR_LOGS)
                 .add(ModBlocks.FLOW_CEDAR_LOG.get(),
                         ModBlocks.FLOW_CEDAR_WOOD.get(),

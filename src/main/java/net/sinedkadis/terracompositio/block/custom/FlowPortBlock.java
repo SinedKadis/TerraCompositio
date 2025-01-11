@@ -18,40 +18,48 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraftforge.common.ToolAction;
 import net.minecraftforge.network.NetworkHooks;
+import net.sinedkadis.terracompositio.block.ModBlockStateProperties;
 import net.sinedkadis.terracompositio.block.ModBlocks;
 import net.sinedkadis.terracompositio.block.entity.FlowPortBlockEntity;
 import net.sinedkadis.terracompositio.block.entity.ModBlockEntities;
+import net.sinedkadis.terracompositio.util.BlockData;
 import net.sinedkadis.terracompositio.util.ModGameRules;
 import net.sinedkadis.terracompositio.util.ModTags;
 import org.jetbrains.annotations.Nullable;
 import org.slf4j.Logger;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import static net.minecraft.world.level.block.RotatedPillarBlock.AXIS;
-import static net.sinedkadis.terracompositio.block.custom.FlowingFlowCedarLikeBlock.AnyEquals;
-import static net.sinedkadis.terracompositio.block.custom.FlowingFlowCedarLikeBlock.getNearBlocks;
+import static net.sinedkadis.terracompositio.block.custom.FlowCedarLikeBlock.getNearBlocks;
 
 
 
-public class FlowingFlowPortBlock extends BaseEntityBlock {
-    public FlowingFlowPortBlock(Properties pProperties) {
+public class FlowPortBlock extends BaseEntityBlock {
+    public FlowPortBlock(Properties pProperties) {
         super(pProperties);
     }
-    private static final Logger LOGGER = LogUtils.getLogger();
+    public static final BooleanProperty INFUSED;
 
     @Override
     public @Nullable BlockState getToolModifiedState(BlockState state, UseOnContext context, ToolAction toolAction, boolean simulate) {
         if(context.getItemInHand().getItem() instanceof AxeItem){
-            if(state.is(ModBlocks.FLOWING_FLOW_PORT.get())){
-                return ModBlocks.STRIPPED_FLOW_CEDAR_LOG.get().defaultBlockState();
+            if(state.is(ModBlocks.FLOW_PORT.get())){
+                return ModBlocks.STRIPPED_FLOW_CEDAR_LOG.get().defaultBlockState().setValue(INFUSED,state.getValue(INFUSED));
             }
 
         }
         return super.getToolModifiedState(state, context,toolAction,simulate);
+    }
+
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> pBuilder) {
+        pBuilder.add(INFUSED);
     }
 
     @Override
@@ -70,46 +78,13 @@ public class FlowingFlowPortBlock extends BaseEntityBlock {
         super.onRemove(pState, pLevel, pPos, pNewState, pIsMoving);
         if (pNewState.is(Blocks.AIR) || pIsMoving) {
             if (!pLevel.getGameRules().getBoolean(ModGameRules.DISABLE_FLOW_LEAKING)) {
-                List<BlockPos> totoReplace = getNearBlocks(pPos);
-                for (BlockPos pos : totoReplace) {
-                    if (pos != pPos){
-                        if (pLevel.getBlockState(pos).is(ModTags.Blocks.FLOWING_FLOW_CEDAR_LOGS)) {
-                            List<BlockPos> toReplace = getNearBlocks(pos);
-                            for (BlockPos blockPos : toReplace) {
-                                if (!AnyEquals(totoReplace, blockPos)) {
-                                    if (pLevel.getBlockState(blockPos).is(ModBlocks.FLOWING_FLOW_CEDAR_LOG.get())) {
-                                        pLevel.setBlockAndUpdate(blockPos,
-                                                ModBlocks.FLOW_CEDAR_LOG.get().defaultBlockState().setValue(AXIS, pLevel.getBlockState(blockPos).getValue(AXIS)));
-                                    }
-                                    if (pLevel.getBlockState(blockPos).is(ModBlocks.FLOWING_FLOW_CEDAR_WOOD.get())) {
-                                        pLevel.setBlockAndUpdate(blockPos,
-                                                ModBlocks.FLOW_CEDAR_WOOD.get().defaultBlockState().setValue(AXIS, pLevel.getBlockState(blockPos).getValue(AXIS)));
-                                    }
-                                    if (pLevel.getBlockState(blockPos).is(ModBlocks.FLOWING_FLOW_PORT.get())) {
-                                        pLevel.setBlockAndUpdate(blockPos,
-                                                ModBlocks.FLOW_PORT.get().defaultBlockState());
-                                    }
-                                }
-                            }
-                        }
-                    }
-                }
-                for (BlockPos blockPos : totoReplace) {
-                    if (blockPos != pPos) {
-                        if (pLevel.getBlockState(blockPos).is(ModBlocks.FLOWING_FLOW_CEDAR_LOG.get())) {
-                            pLevel.setBlockAndUpdate(blockPos,
-                                    ModBlocks.FLOW_CEDAR_LOG.get().defaultBlockState().setValue(AXIS, pLevel.getBlockState(blockPos).getValue(AXIS)));
-                        }
-                        if (pLevel.getBlockState(blockPos).is(ModBlocks.FLOWING_FLOW_CEDAR_WOOD.get())) {
-                            pLevel.setBlockAndUpdate(blockPos,
-                                    ModBlocks.FLOW_CEDAR_WOOD.get().defaultBlockState().setValue(AXIS, pLevel.getBlockState(blockPos).getValue(AXIS)));
-                        }
-                        if (pLevel.getBlockState(blockPos).is(ModBlocks.FLOWING_FLOW_PORT.get())) {
-                            pLevel.setBlockAndUpdate(blockPos,
-                                    ModBlocks.FLOW_PORT.get().defaultBlockState());
-                        }
-                    }
-                }
+                BlockPos fpos = pPos.relative(pState.getValue(AXIS),1);
+                BlockPos bpos = pPos.relative(pState.getValue(AXIS),-1);
+                List<BlockPos> toReplace = new ArrayList<>(getNearBlocks(fpos));
+                toReplace.addAll(getNearBlocks(bpos));
+                toReplace.stream()
+                        .filter(pos -> pos != pPos)
+                        .forEach(pos -> pLevel.setBlockAndUpdate(pos,pLevel.getBlockState(pos).setValue(INFUSED,false)));
             }
         }
     }
@@ -173,5 +148,9 @@ public class FlowingFlowPortBlock extends BaseEntityBlock {
         }
         return createTickerHelper(pBlockEntityType, ModBlockEntities.FLOW_PORT_BE.get(),
                 (pLevel1, pPos, pState1, pBlockEntity) -> pBlockEntity.tick(pLevel1,pPos,pState1));
+    }
+
+    static {
+        INFUSED = ModBlockStateProperties.INFUSED;
     }
 }

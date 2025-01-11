@@ -1,6 +1,9 @@
 {
   "variants": {
-    "": {
+    "infused=false": {
+      "model": "terracompositio:block/flow_port"
+    },
+    "infused=true": {
       "model": "terracompositio:block/flow_port"
     }
   }
