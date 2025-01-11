@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:block/cube_all",
+  "textures": {
+    "all": "terracompositio:block/creative_cfe_source"
+  }
+}

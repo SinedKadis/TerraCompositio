@@ -23,6 +23,7 @@ public class ModBlockStateProvider extends BlockStateProvider {
         blockWithItem(ModBlocks.FLOWING_FLOW_PORT);
         blockWithItem(ModBlocks.FLOW_CEDAR_LEAVES);
         blockWithItem(ModBlocks.FLOW_PORT);
+        blockWithItem(ModBlocks.CREATIVE_CFE_SOURCE);
         woodBlockWithItem(ModBlocks.FLOWING_FLOW_CEDAR_WOOD,ModBlocks.FLOWING_FLOW_CEDAR_LOG);
         logBlockWithItem(ModBlocks.FLOW_CEDAR_LOG);
         blockWithItem(ModBlocks.FLOW_CEDAR_PLANKS);

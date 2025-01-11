@@ -19,9 +19,11 @@ import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.sinedkadis.terracompositio.block.ModBlocks;
 import net.sinedkadis.terracompositio.block.entity.ModBlockEntities;
+import net.sinedkadis.terracompositio.cfe.CFENetworkHandler;
 import net.sinedkadis.terracompositio.effect.ModEffects;
 import net.sinedkadis.terracompositio.entity.ModEntities;
 import net.sinedkadis.terracompositio.entity.client.ModBoatRenderer;
+import net.sinedkadis.terracompositio.events.CFENetworkEvent;
 import net.sinedkadis.terracompositio.fluid.ModFluids;
 import net.sinedkadis.terracompositio.item.ModCreativeModTabs;
 import net.sinedkadis.terracompositio.item.ModItems;
@@ -79,9 +81,9 @@ public class TerraCompositio
     }
 
 
-    private void commonSetup(final FMLCommonSetupEvent event)
-    {
-
+    private void commonSetup(final FMLCommonSetupEvent event) {
+        IEventBus bus = MinecraftForge.EVENT_BUS;
+        bus.addListener((CFENetworkEvent e) -> CFENetworkHandler.instance.onNetworkEvent(e.getReceiver(),e.getAction()));
     }
 
     // Add the example block item to the building blocks tab

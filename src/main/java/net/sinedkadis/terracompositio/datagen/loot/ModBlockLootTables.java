@@ -36,6 +36,7 @@ public class ModBlockLootTables extends BlockLootSubProvider {
         this.dropSelf(ModBlocks.STRIPPED_FLOW_CEDAR_LOG.get());
         this.dropSelf(ModBlocks.STRIPPED_FLOW_CEDAR_WOOD.get());
         this.dropSelf(ModBlocks.FLOW_PORT.get());
+        this.dropSelf(ModBlocks.CREATIVE_CFE_SOURCE.get());
 
         this.dropSelf(ModBlocks.FLOW_CEDAR_STAIRS.get());
         this.dropSelf(ModBlocks.FLOW_CEDAR_BUTTON.get());

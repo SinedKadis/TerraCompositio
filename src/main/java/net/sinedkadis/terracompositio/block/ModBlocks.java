@@ -119,4 +119,8 @@ public class ModBlocks {
 
     public static final RegistryObject<Block> FLOW_EXTRACTOR = registerBlock("flow_extractor",
             () -> new FlowExtractorBlock(BlockBehaviour.Properties.copy(Blocks.DARK_OAK_PLANKS)));
+    public static final RegistryObject<Block> CREATIVE_CFE_SOURCE = registerBlock("creative_cfe_source",
+            () -> new CreativeCFESourceBlock(BlockBehaviour.Properties.copy(Blocks.IRON_BLOCK)));
+    public static final RegistryObject<Block> FLOW_INFUSER = registerBlock("flow_infuser",
+            () -> new FlowInfuserBlock(BlockBehaviour.Properties.copy(Blocks.IRON_BLOCK)));
 }

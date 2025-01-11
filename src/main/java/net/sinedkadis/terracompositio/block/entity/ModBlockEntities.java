@@ -21,6 +21,15 @@ public class ModBlockEntities {
             BLOCK_ENTITIES.register("flow_extractor_be", () ->
                     BlockEntityType.Builder.of(FlowExtractorBlockEntity::new,
                             ModBlocks.FLOW_EXTRACTOR.get()).build(null));
+    public static final RegistryObject<BlockEntityType<CreativeCFESourceBlockEntity>> CREATIVE_CFE_SOURCE_BE =
+            BLOCK_ENTITIES.register("creative_cfe_source_be", () ->
+                    BlockEntityType.Builder.of(CreativeCFESourceBlockEntity::new,
+                            ModBlocks.CREATIVE_CFE_SOURCE.get()).build(null));
+    public static final RegistryObject<BlockEntityType<FlowInfuserBlockEntity>> FLOW_INFUSER_BE =
+            BLOCK_ENTITIES.register("flow_infuser_be", () ->
+                    BlockEntityType.Builder.of(FlowInfuserBlockEntity::new,
+                            ModBlocks.FLOW_INFUSER.get()).build(null));
+
 
 
     public static final RegistryObject<BlockEntityType<ModSignBlockEntity>> MOD_SIGN=

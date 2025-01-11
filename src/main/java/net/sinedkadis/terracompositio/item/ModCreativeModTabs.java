@@ -56,6 +56,7 @@ public class ModCreativeModTabs {
                         pOutput.accept(ModItems.FLOW_CEDAR_CHESTPLATE.get());
                         pOutput.accept(ModItems.FLOW_CEDAR_LEGGINGS.get());
                         pOutput.accept(ModItems.FLOW_CEDAR_BOOTS.get());
+                        pOutput.accept(ModBlocks.CREATIVE_CFE_SOURCE.get());
 
 
                     })

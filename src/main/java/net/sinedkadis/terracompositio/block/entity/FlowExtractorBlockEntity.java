@@ -5,11 +5,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.Tag;
-import net.minecraft.network.protocol.Packet;
-import net.minecraft.network.protocol.game.ClientGamePacketListener;
-import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraftforge.common.capabilities.Capability;
@@ -18,8 +14,7 @@ import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.IFluidTank;
 import net.minecraftforge.fluids.capability.IFluidHandler;
-import net.minecraftforge.fluids.capability.templates.FluidTank;
-import net.sinedkadis.terracompositio.cfe.CFEContainer;
+import net.sinedkadis.terracompositio.cfe.CFESource;
 import net.sinedkadis.terracompositio.fluid.CombinedTankWrapper;
 import net.sinedkadis.terracompositio.fluid.ModFluidTank;
 import net.sinedkadis.terracompositio.fluid.ModFluids;
@@ -34,7 +29,7 @@ import static net.sinedkadis.terracompositio.TerraCompositio.GLOGGER;
 import static net.sinedkadis.terracompositio.fluid.ModFluidTank.iterateCompoundList;
 import static net.sinedkadis.terracompositio.fluid.ModFluidTank.writeCompoundList;
 
-public class FlowExtractorBlockEntity extends ModBlockEntity implements CFEContainer {
+public class FlowExtractorBlockEntity extends ModBlockEntity implements CFESource {
     List<FluidStack> visualizedOutputFluids;
 
     @Getter
@@ -146,16 +141,6 @@ public class FlowExtractorBlockEntity extends ModBlockEntity implements CFEConta
         return nbt;
     }
 
-    @Override
-    public int getCFE() {
-        return CFE;
-    }
-
-    @Override
-    public void setCFE(int count) {
-        CFE = count;
-    }
-
     public boolean isEmpty() {
         return inputFluidTank.isEmpty() && outputFluidTank.isEmpty();
     }
@@ -167,7 +152,7 @@ public class FlowExtractorBlockEntity extends ModBlockEntity implements CFEConta
             if (tank == null)
                 continue;
             for (ModFluidTank.TankSegment tankSegment : tank.getTanks()) {
-                FluidStack fluid = tankSegment.getRenderedFluid();
+                FluidStack fluid = tankSegment.getRenderedFluid(); //todo починить и делать
                 if (fluid.isEmpty()) {
                     continue;
                 }
@@ -187,4 +172,23 @@ public class FlowExtractorBlockEntity extends ModBlockEntity implements CFEConta
     }
 
 
+    @Override
+    public Level getCFESourceLevel() {
+        return this.level;
+    }
+
+    @Override
+    public BlockPos getCFESourceBlockPos() {
+        return getBlockPos();
+    }
+
+    @Override
+    public int getCurrentCFE() {
+        return CFE;
+    }
+
+    @Override
+    public void takeCFE(int cfe) {
+        CFE = CFE - cfe;
+    }
 }
