@@ -19,7 +19,8 @@ import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.sinedkadis.terracompositio.block.ModBlocks;
 import net.sinedkadis.terracompositio.block.entity.ModBlockEntities;
-import net.sinedkadis.terracompositio.cfe.CFENetworkHandler;
+import net.sinedkadis.terracompositio.api.cfe.CFENetwork;
+import net.sinedkadis.terracompositio.api.cfe.CFENetworkHandler;
 import net.sinedkadis.terracompositio.effect.ModEffects;
 import net.sinedkadis.terracompositio.entity.ModEntities;
 import net.sinedkadis.terracompositio.entity.client.ModBoatRenderer;
@@ -35,18 +36,15 @@ import net.sinedkadis.terracompositio.screen.ModMenuTypes;
 import net.sinedkadis.terracompositio.sound.ModSounds;
 import net.sinedkadis.terracompositio.util.ModGameRules;
 import net.sinedkadis.terracompositio.util.ModWoodTypes;
-import org.apache.logging.log4j.LogManager;
-import org.apache.logging.log4j.Logger;
 
 
 @Mod(TerraCompositio.MOD_ID)
 public class TerraCompositio
 {
     public static final String MOD_ID = "terracompositio";
-    public static final Logger GLOGGER = LogManager.getLogger("TerraCompositio");
 
-    public TerraCompositio()
-    {
+    public TerraCompositio() {
+
         IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
 
         ModCreativeModTabs.register(modEventBus);
@@ -131,5 +129,8 @@ public class TerraCompositio
             ItemBlockRenderTypes.setRenderLayer(ModFluids.FLOW_FLUID.source.get(), RenderType.translucent());
             ItemBlockRenderTypes.setRenderLayer(ModFluids.FLOW_FLUID.flowing.get(), RenderType.translucent());
         }
+    }
+    public CFENetwork getCFENetworkInstance(){
+        return CFENetworkHandler.instance;
     }
 }

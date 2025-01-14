@@ -24,6 +24,8 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
 
+import static net.sinedkadis.terracompositio.block.ModBlockStateProperties.INFUSED;
+
 public class FlowInfuserBlockEntity extends ModCFEBlockEntity{
     private final ItemStackHandler itemHandler = new ItemStackHandler(2){
         @Override
@@ -112,7 +114,8 @@ public class FlowInfuserBlockEntity extends ModCFEBlockEntity{
 
     @Override
     public void tick(Level pLevel, BlockPos pPos, BlockState pState) {
-        super.tick(pLevel, pPos, pState);
+        if (pState.getValue(INFUSED))
+            super.tick(pLevel, pPos, pState);
         if(hasRecipe() && enoughCFE()){
             increaseCraftingProgress();
             CFE--;
@@ -175,5 +178,35 @@ public class FlowInfuserBlockEntity extends ModCFEBlockEntity{
 
     private boolean enoughSpaceInOutput(int count) {
         return this.itemHandler.getStackInSlot(SLOT_OUTPUT).getCount() + count <=this.itemHandler.getStackInSlot(SLOT_OUTPUT).getMaxStackSize();
+    }
+
+    public ItemStack getInputSlot(){
+        return this.itemHandler.getStackInSlot(SLOT_INPUT);
+    }
+    public ItemStack getOutputSlot(){
+        return this.itemHandler.getStackInSlot(SLOT_OUTPUT);
+    }
+
+    public ItemStack addItemInSlot(int Slot, ItemStack item, int count){
+        this.itemHandler.setStackInSlot(Slot,new ItemStack(item.getItem(),
+                this.itemHandler.getStackInSlot(Slot).getCount()+count));
+        item.setCount(item.getCount()-count);
+        return new ItemStack(item.getItem(),item.getCount());
+
+
+    }
+    public void setSlotEmpty(int Slot){
+        this.itemHandler.setStackInSlot(Slot,/*new ItemStack(ModItems.ITEM_PLACEHOLDER.get(),1)*/ItemStack.EMPTY);
+
+    }
+    public ItemStack getRenderStack() {
+        if(itemHandler.getStackInSlot(SLOT_OUTPUT).isEmpty()) {
+            /*if(itemHandler.getStackInSlot(SLOT_INPUT).isEmpty()){
+                return new ItemStack(Items.AIR,1);
+            }*/
+            return itemHandler.getStackInSlot(SLOT_INPUT);
+        } else {
+            return itemHandler.getStackInSlot(SLOT_OUTPUT);
+        }
     }
 }

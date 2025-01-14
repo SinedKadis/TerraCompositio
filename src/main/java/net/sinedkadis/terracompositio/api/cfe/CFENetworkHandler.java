@@ -1,32 +1,30 @@
-package net.sinedkadis.terracompositio.cfe;
+package net.sinedkadis.terracompositio.api.cfe;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Vec3i;
 import net.minecraft.world.level.Level;
+import net.sinedkadis.terracompositio.api.TerraCompositioAPI;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.HashSet;
-import java.util.Map;
-import java.util.Set;
-import java.util.WeakHashMap;
+import java.util.*;
 
 public class CFENetworkHandler implements CFENetwork{
     public static final CFENetworkHandler instance = new CFENetworkHandler();
 
-    private final Map<Level, Set<CFESource>> cfeReceivers = new WeakHashMap<>();
+    private final Map<Level, Set<CFESource>> cfeSources = new WeakHashMap<>();
 
-    public void onNetworkEvent(CFESource receiver, CFENetworkAction action) {
+    public void onNetworkEvent(CFESource source, CFENetworkAction action) {
         if (action == CFENetworkAction.ADD){
-            add(cfeReceivers,receiver.getCFESourceLevel(),(CFESource) receiver);
+            add(cfeSources,source.getCFESourceLevel(),(CFESource) source);
         }else{
-            remove(cfeReceivers,receiver.getCFESourceLevel(),(CFESource) receiver);
+            remove(cfeSources,source.getCFESourceLevel(),(CFESource) source);
         }
     }
 
     @Override
     public CFESource getClosestSource(BlockPos pos, Level level, int limit) {
-        if (cfeReceivers.containsKey(level)) {
-            return getClosest(cfeReceivers.get(level), pos, limit);
+        if (cfeSources.containsKey(level)) {
+            return getClosest(cfeSources.get(level), pos, limit);
         }
         return null;
     }
@@ -59,6 +57,12 @@ public class CFENetworkHandler implements CFENetwork{
     public Set<CFESource> getAllCFESources(Level level) {
         return Set.of();
     }
+
+    @Override
+    public void fireCFENetworkEvent(CFESource source, CFENetworkAction action) {
+        TerraCompositioAPI.INSTANCE.fireCFENetworkEvent(source,action);
+    }
+
     private <T> void remove(Map<Level, Set<T>> map, Level level, T thing) {
         if (!map.containsKey(level)) {
             return;
@@ -73,5 +77,9 @@ public class CFENetworkHandler implements CFENetwork{
 
     private <T> void add(Map<Level, Set<T>> map, Level level, T thing) {
         map.computeIfAbsent(level, k -> new HashSet<>()).add(thing);
+    }
+
+    public boolean isIn(Level pLevel, CFESource cfeSource) {
+        return cfeSources.getOrDefault(pLevel, Collections.emptySet()).contains(cfeSource);
     }
 }

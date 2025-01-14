@@ -25,6 +25,7 @@ public class JEITerraCompositioPlugin implements IModPlugin {
     @Override
     public void registerCategories(IRecipeCategoryRegistration registration) {
         registration.addRecipeCategories(new FlowPortCategory(registration.getJeiHelpers().getGuiHelper()));
+        registration.addRecipeCategories(new FlowInfusionCategory(registration.getJeiHelpers().getGuiHelper()));
     }
 
     @Override

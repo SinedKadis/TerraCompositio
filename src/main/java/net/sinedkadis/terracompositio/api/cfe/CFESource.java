@@ -1,4 +1,4 @@
-package net.sinedkadis.terracompositio.cfe;
+package net.sinedkadis.terracompositio.api.cfe;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;

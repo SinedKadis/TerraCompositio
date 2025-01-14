@@ -204,6 +204,7 @@ public class FlowPortBlockEntity extends BlockEntity implements MenuProvider {
     public ItemStack getOutputSlot(){
         return this.itemHandler.getStackInSlot(SLOT_OUTPUT);
     }
+
     public ItemStack addItemInSlot(int Slot, ItemStack item, int count){
         this.itemHandler.setStackInSlot(Slot,new ItemStack(item.getItem(),
                          this.itemHandler.getStackInSlot(Slot).getCount()+count));

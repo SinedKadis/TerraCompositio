@@ -17,7 +17,6 @@ import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraftforge.common.ToolAction;
 import net.sinedkadis.terracompositio.block.ModBlockStateProperties;
 import net.sinedkadis.terracompositio.block.ModBlocks;
-import net.sinedkadis.terracompositio.util.BlockData;
 import net.sinedkadis.terracompositio.util.ModGameRules;
 import net.sinedkadis.terracompositio.util.ModTags;
 import org.jetbrains.annotations.NotNull;
@@ -92,16 +91,16 @@ public class FlowCedarLikeBlock extends RotatedPillarBlock {
     public void onRemove(BlockState pState, Level pLevel, BlockPos pPos, BlockState pNewState, boolean pIsMoving) {
         super.onRemove(pState, pLevel, pPos, pNewState, pIsMoving);
         if (pNewState.is(Blocks.AIR)) {
-            if (!pLevel.getGameRules().getBoolean(ModGameRules.DISABLE_FLOW_LEAKING)) {
+            if (pState.getValue(INFUSED)&&!pLevel.getGameRules().getBoolean(ModGameRules.DISABLE_FLOW_LEAKING)) {
                 BlockPos fpos = pPos.relative(pState.getValue(AXIS),1);
                 BlockPos bpos = pPos.relative(pState.getValue(AXIS),-1);
                 getNearBlocks(fpos).stream()
                         .filter(pos -> pos != pPos)
-                        .filter(pos -> pLevel.getBlockState(pos).is(ModTags.Blocks.FLOW_CEDAR_LOGS))
+                        .filter(pos -> pLevel.getBlockState(pos).is(ModTags.Blocks.FLOW_LEAKABLE))
                         .forEach(pos -> pLevel.setBlockAndUpdate(pos,pLevel.getBlockState(pos).setValue(INFUSED,false)));
                 getNearBlocks(bpos).stream()
                         .filter(pos -> pos != pPos)
-                        .filter(pos -> pLevel.getBlockState(pos).is(ModTags.Blocks.FLOW_CEDAR_LOGS))
+                        .filter(pos -> pLevel.getBlockState(pos).is(ModTags.Blocks.FLOW_LEAKABLE))
                         .forEach(pos -> pLevel.setBlockAndUpdate(pos,pLevel.getBlockState(pos).setValue(INFUSED,false)));
             }
         }
@@ -125,9 +124,9 @@ public class FlowCedarLikeBlock extends RotatedPillarBlock {
     public void tick(BlockState pState, ServerLevel pLevel, BlockPos pPos, RandomSource pRandom) {
         for (BlockPos blockPos : getNearBlocks(pPos)){
             if (blockPos != pPos){
-                if (pLevel.getBlockState(blockPos).is(ModTags.Blocks.FLOW_CEDAR_LOGS)) {
+                if (pLevel.getBlockState(blockPos).is(ModTags.Blocks.FLOW_LEAKABLE)) {
                     if (!pLevel.getBlockState(blockPos).getValue(INFUSED) && pRandom.nextFloat() > 0.99f)
-                        pLevel.setBlockAndUpdate(blockPos,pLevel.getBlockState(blockPos).setValue(INFUSED,false));
+                        pLevel.setBlockAndUpdate(blockPos,pLevel.getBlockState(blockPos).setValue(INFUSED,true));
                 }
             }
         }

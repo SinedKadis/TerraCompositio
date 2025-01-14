@@ -14,7 +14,7 @@ import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.IFluidTank;
 import net.minecraftforge.fluids.capability.IFluidHandler;
-import net.sinedkadis.terracompositio.cfe.CFESource;
+import net.sinedkadis.terracompositio.api.cfe.CFESource;
 import net.sinedkadis.terracompositio.fluid.CombinedTankWrapper;
 import net.sinedkadis.terracompositio.fluid.ModFluidTank;
 import net.sinedkadis.terracompositio.fluid.ModFluids;
@@ -25,7 +25,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-import static net.sinedkadis.terracompositio.TerraCompositio.GLOGGER;
+
 import static net.sinedkadis.terracompositio.fluid.ModFluidTank.iterateCompoundList;
 import static net.sinedkadis.terracompositio.fluid.ModFluidTank.writeCompoundList;
 
@@ -114,13 +114,13 @@ public class FlowExtractorBlockEntity extends ModBlockEntity implements CFESourc
             //GLOGGER.debug("RENDER: "+"difference > 0.01");
             return (9 * prevScale + targetScale) / 10;
         } else if (!empty && full && difference > 0) {
-            GLOGGER.debug("RENDER: "+"!empty && full && difference > 0");
+
             //If we are full but our difference is less than 0.01, but we want to get our scale all the way up to the target
             // instead of leaving it at a value just under. Note: We also check that we are not empty as we technically may
             // be both empty and full if the current capacity is zero
             return targetScale;
         } else if (!empty && prevScale == 0) {
-            GLOGGER.debug("RENDER: "+"!empty && prevScale == 0");
+
             //If we have any contents make sure we end up rendering it
             return targetScale;
         }

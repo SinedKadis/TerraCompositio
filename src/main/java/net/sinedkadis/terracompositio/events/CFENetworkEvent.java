@@ -2,8 +2,8 @@ package net.sinedkadis.terracompositio.events;
 
 import lombok.Getter;
 import net.minecraftforge.eventbus.api.Event;
-import net.sinedkadis.terracompositio.cfe.CFENetworkAction;
-import net.sinedkadis.terracompositio.cfe.CFESource;
+import net.sinedkadis.terracompositio.api.cfe.CFENetworkAction;
+import net.sinedkadis.terracompositio.api.cfe.CFESource;
 
 public class CFENetworkEvent extends Event {
     @Getter

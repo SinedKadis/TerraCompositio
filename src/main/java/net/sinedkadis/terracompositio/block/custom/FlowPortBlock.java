@@ -93,31 +93,24 @@ public class FlowPortBlock extends BaseEntityBlock {
     public InteractionResult use(BlockState pState, Level pLevel, BlockPos pPos, Player pPlayer, InteractionHand pHand, BlockHitResult pHit) {
         //if (!pLevel.isClientSide()){
             BlockEntity entity = pLevel.getBlockEntity(pPos);
-            if(entity instanceof  FlowPortBlockEntity){
+            if(entity instanceof  FlowPortBlockEntity && pState.getValue(INFUSED)){
                 ItemStack itemstack = pPlayer.getItemInHand(pHand);
                 ItemStack outputSlot = ModBlockEntities.FLOW_PORT_BE.get().getBlockEntity(pLevel,pPos).getOutputSlot();
                 ItemStack inputSlot = ModBlockEntities.FLOW_PORT_BE.get().getBlockEntity(pLevel,pPos).getInputSlot();
                 if (outputSlot.isEmpty() && inputSlot.isEmpty()){
-                    //LOGGER.debug("Block is empty");
                     if(!itemstack.isEmpty()) {
-                        /*LOGGER.debug("Putting "+*/ModBlockEntities.FLOW_PORT_BE.get().getBlockEntity(pLevel,pPos).addItemInSlot(0,itemstack,1)/*)*/;
+                        ModBlockEntities.FLOW_PORT_BE.get().getBlockEntity(pLevel,pPos).addItemInSlot(0,itemstack,1);
                      pLevel.playSound(pPlayer,pPos, SoundEvents.ITEM_FRAME_ADD_ITEM, SoundSource.BLOCKS);
                     }
                 }else if (!outputSlot.isEmpty()){
-                    //LOGGER.debug("Output is not empty, putting "+outputSlot+" in inventory");
                     if (!pPlayer.addItem(outputSlot)) {
                         pPlayer.drop(outputSlot, false);
-
-                        //LOGGER.debug("Dropped");
                     }
                     ModBlockEntities.FLOW_PORT_BE.get().getBlockEntity(pLevel,pPos).setSlotEmpty(1);
                     pLevel.playSound(pPlayer,pPos, SoundEvents.ITEM_FRAME_REMOVE_ITEM, SoundSource.BLOCKS);
                 } else if (!inputSlot.isEmpty()){
-                    //LOGGER.debug("Input is not empty, putting "+inputSlot+" in inventory");
                     if (!pPlayer.addItem(inputSlot)) {
                         pPlayer.drop(inputSlot, false);
-
-                        //LOGGER.debug("Dropped");
                     }
                     ModBlockEntities.FLOW_PORT_BE.get().getBlockEntity(pLevel,pPos).setSlotEmpty(0);
                     pLevel.playSound(pPlayer,pPos, SoundEvents.ITEM_FRAME_REMOVE_ITEM, SoundSource.BLOCKS);

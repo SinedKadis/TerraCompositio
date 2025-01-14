@@ -24,7 +24,7 @@ import net.sinedkadis.terracompositio.item.ModItems;
 import java.util.Map;
 import java.util.function.Predicate;
 
-import static net.sinedkadis.terracompositio.TerraCompositio.GLOGGER;
+
 
 public class BirchJuiceCauldronBlock extends ModCauldronBlock {
 

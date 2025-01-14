@@ -37,7 +37,7 @@ public class FlowInfusionCategory implements IRecipeCategory<FlowInfusionRecipe>
 
     @Override
     public Component getTitle() {
-        return Component.translatable("block.terracompositio.flow_port");
+        return Component.translatable("block.terracompositio.flow_infuser");
     }
 
     @Override

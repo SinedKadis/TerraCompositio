@@ -10,8 +10,10 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.sinedkadis.terracompositio.TerraCompositio;
 import net.sinedkadis.terracompositio.block.entity.FlowExtractorBlockEntity;
+import net.sinedkadis.terracompositio.block.entity.FlowInfuserBlockEntity;
 import net.sinedkadis.terracompositio.block.entity.ModBlockEntities;
 import net.sinedkadis.terracompositio.block.entity.renderer.FlowExtractorBlockEntityRenderer;
+import net.sinedkadis.terracompositio.block.entity.renderer.FlowInfuserBlockEntityRenderer;
 import net.sinedkadis.terracompositio.block.entity.renderer.FlowPortBlockEntityRenderer;
 import net.sinedkadis.terracompositio.entity.client.ModModelLayers;
 
@@ -27,6 +29,7 @@ public class ModEventBusClientEvents {
     @SubscribeEvent
     public static void registerBER(EntityRenderersEvent.RegisterRenderers event) {
         event.registerBlockEntityRenderer(ModBlockEntities.FLOW_PORT_BE.get(), FlowPortBlockEntityRenderer::new);
+        event.registerBlockEntityRenderer(ModBlockEntities.FLOW_INFUSER_BE.get(), FlowInfuserBlockEntityRenderer::new);
         event.registerBlockEntityRenderer(ModBlockEntities.FLOW_EXTRACTOR_BE.get(), FlowExtractorBlockEntityRenderer::new);
         event.registerBlockEntityRenderer(ModBlockEntities.MOD_SIGN.get(), SignRenderer::new);
         event.registerBlockEntityRenderer(ModBlockEntities.MOD_HANGING_SIGN.get(), HangingSignRenderer::new);

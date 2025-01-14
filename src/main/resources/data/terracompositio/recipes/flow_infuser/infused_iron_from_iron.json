@@ -1,0 +1,12 @@
+{
+  "type": "terracompositio:flow_infusion",
+  "ingredients": [
+    {
+      "item": "minecraft:iron_ingot"
+    }
+  ],
+  "output": {
+    "count": 1,
+    "item": "minecraft:gold_ingot"
+  }
+}

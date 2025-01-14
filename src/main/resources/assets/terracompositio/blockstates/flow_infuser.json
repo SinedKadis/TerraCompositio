@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "infused=true": {
+      "model": "terracompositio:block/flow_infuser_infused"
+    },
+    "infused=false": {
+      "model": "terracompositio:block/flow_infuser"
+    }
+  }
+}

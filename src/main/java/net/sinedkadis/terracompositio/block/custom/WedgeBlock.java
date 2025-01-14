@@ -149,7 +149,7 @@ public class WedgeBlock extends Block {
         if (pState.getValue(ATTACHED)) {
             if (AnimTick++ > 20) {
                 AnimTick = 0;
-                if (pLevel.getBlockState(pPos.relative(pState.getValue(FACING).getOpposite())).is(ModTags.Blocks.FLOW_CEDAR_LOGS)
+                if (pLevel.getBlockState(pPos.relative(pState.getValue(FACING).getOpposite())).is(ModTags.Blocks.FLOW_LEAKABLE)
                         && pLevel.getBlockState(pPos.relative(pState.getValue(FACING).getOpposite())).getValue(INFUSED)) {
                     if (pLevel.isClientSide) {
                         generateParticles(pLevel, pPos, pState, ModParticles.FLOW_PARTICLE.get());
@@ -175,7 +175,7 @@ public class WedgeBlock extends Block {
             BlockPos cauldronPos1 = findFillableCauldronBelowWedge(pLevel, pPos, ModFluids.BIRCH_JUICE_FLUID.source.get());
             if (cauldronPos != null||cauldronPos1 != null) {
                // LOGGER.debug("Wedge attached, cauldron at "+cauldronPos);
-                if (pLevel.getBlockState(pPos.relative(pState.getValue(FACING).getOpposite())).is(ModTags.Blocks.FLOW_CEDAR_LOGS)
+                if (pLevel.getBlockState(pPos.relative(pState.getValue(FACING).getOpposite())).is(ModTags.Blocks.FLOW_LEAKABLE)
                         && pLevel.getBlockState(pPos.relative(pState.getValue(FACING).getOpposite())).getValue(INFUSED)
                         && cauldronPos != null) {
                     if (pLevel.getBlockState(cauldronPos).is(ModBlocks.FLOW_CAULDRON.get())) {
@@ -262,7 +262,7 @@ public class WedgeBlock extends Block {
     }
 
     public void calculateState(BlockState pState, Level pLevel, BlockPos pPos) {
-        if (pLevel.getBlockState(pPos.relative(pState.getValue(FACING).getOpposite())).is(ModTags.Blocks.FLOW_CEDAR_LOGS)
+        if (pLevel.getBlockState(pPos.relative(pState.getValue(FACING).getOpposite())).is(ModTags.Blocks.FLOW_LEAKABLE)
                 && pLevel.getBlockState(pPos.relative(pState.getValue(FACING).getOpposite())).getValue(INFUSED)
                 || pLevel.getBlockState(pPos.relative(pState.getValue(FACING).getOpposite())).is(BlockTags.BIRCH_LOGS)){
             if (!pState.getValue(ATTACHED)){

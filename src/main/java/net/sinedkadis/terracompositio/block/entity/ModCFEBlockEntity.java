@@ -6,14 +6,16 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
-import net.sinedkadis.terracompositio.cfe.CFESource;
-import net.sinedkadis.terracompositio.cfe.CFENetwork;
-import net.sinedkadis.terracompositio.cfe.CFENetworkHandler;
+import net.sinedkadis.terracompositio.TerraCompositio;
+import net.sinedkadis.terracompositio.api.TerraCompositioAPI;
+import net.sinedkadis.terracompositio.api.cfe.CFENetworkAction;
+import net.sinedkadis.terracompositio.api.cfe.CFESource;
+import net.sinedkadis.terracompositio.api.cfe.CFENetwork;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static net.sinedkadis.terracompositio.cfe.CFENetworkHandler.distSqr;
+import static net.sinedkadis.terracompositio.api.cfe.CFENetworkHandler.distSqr;
 
 public abstract class ModCFEBlockEntity extends ModBlockEntity{
     private BlockPos cfeSourceBlockPos;
@@ -30,7 +32,7 @@ public abstract class ModCFEBlockEntity extends ModBlockEntity{
     }
 
     public BlockPos searchForSource() {
-        CFENetwork network = CFENetworkHandler.instance;
+        CFENetwork network = TerraCompositioAPI.instance().getCFENetworkInstance();
         var closestSource = network.getClosestSource(getBlockPos(), getLevel(), connectRange);
         return closestSource == null ? null : closestSource.getCFESourceBlockPos();
     }
@@ -40,7 +42,7 @@ public abstract class ModCFEBlockEntity extends ModBlockEntity{
             if (cfeSourceBlockPos == null || !isValidSource(cfeSourceBlockPos)){
                 cfeSourceBlockPos = searchForSource();
             }
-            if (cfeSourceBlockPos != null){
+            if (isValidSource(cfeSourceBlockPos)){
                 if (CFE < maxCFE && cfeSource.getCurrentCFE() > 0){
                     double cfe = getTransfer(pPos);
                     addCFE(cfe);
@@ -101,7 +103,9 @@ public abstract class ModCFEBlockEntity extends ModBlockEntity{
     public void load(CompoundTag pTag) {
         super.load(pTag);
         int[] cords = pTag.getIntArray("source");
-        cfeSourceBlockPos = new BlockPos(cords[0],cords[1],cords[2]);
-        cfeSource = findSourceCandidateAt(cfeSourceBlockPos);
+        if (cords.length>0) {
+            cfeSourceBlockPos = new BlockPos(cords[0], cords[1], cords[2]);
+            findSourceCandidateAt(cfeSourceBlockPos);
+        }
     }
 }
