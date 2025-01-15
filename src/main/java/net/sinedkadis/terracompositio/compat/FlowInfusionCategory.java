@@ -3,11 +3,14 @@ package net.sinedkadis.terracompositio.compat;
 import mezz.jei.api.constants.VanillaTypes;
 import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
 import mezz.jei.api.gui.drawable.IDrawable;
+import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
 import mezz.jei.api.helpers.IGuiHelper;
 import mezz.jei.api.recipe.IFocusGroup;
 import mezz.jei.api.recipe.RecipeIngredientRole;
 import mezz.jei.api.recipe.RecipeType;
 import mezz.jei.api.recipe.category.IRecipeCategory;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
@@ -15,10 +18,12 @@ import net.sinedkadis.terracompositio.TerraCompositio;
 import net.sinedkadis.terracompositio.block.ModBlocks;
 import net.sinedkadis.terracompositio.recipe.FlowInfusionRecipe;
 
+import java.awt.*;
+
 public class FlowInfusionCategory implements IRecipeCategory<FlowInfusionRecipe> {
     public static final ResourceLocation UID = new ResourceLocation(TerraCompositio.MOD_ID,"flow_infusion");
     public static final ResourceLocation TEXTURE = new ResourceLocation(TerraCompositio.MOD_ID,
-            "textures/gui/flow_port_gui.png");
+            "textures/gui/flow_infuser_gui.png");
 
     public static final RecipeType<FlowInfusionRecipe> FLOW_INFUSION_RECIPE_RECIPE_TYPE=
             new RecipeType<>(UID, FlowInfusionRecipe.class);
@@ -55,4 +60,15 @@ public class FlowInfusionCategory implements IRecipeCategory<FlowInfusionRecipe>
         iRecipeLayoutBuilder.addSlot(RecipeIngredientRole.INPUT,41,16).addIngredients(flowSaturationRecipe.getIngredients().get(0));
         iRecipeLayoutBuilder.addSlot(RecipeIngredientRole.OUTPUT,121,48).addItemStack(flowSaturationRecipe.getResultItem(null));
     }
+
+    @Override
+    public void draw(FlowInfusionRecipe recipe, IRecipeSlotsView recipeSlotsView, GuiGraphics guiGraphics, double mouseX, double mouseY) {
+        String cfe = "CFE: "+ recipe.getCfe();
+        String cfe_t = "CFE/t: "+ recipe.getCFETick();
+        String duration = "Duration: "+ recipe.getTicks()+" t.";
+        guiGraphics.drawString(Minecraft.getInstance().font,cfe,5,50, Color.WHITE.getRGB());
+        guiGraphics.drawString(Minecraft.getInstance().font,cfe_t,5,60, Color.WHITE.getRGB());
+        guiGraphics.drawString(Minecraft.getInstance().font,duration,5,70, Color.WHITE.getRGB());
+    }
+
 }

@@ -42,6 +42,11 @@ public class FlowPortBlockEntity extends BlockEntity implements MenuProvider {
                 level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), 3);
             }
         }
+
+        @Override
+        public int getSlotLimit(int slot) {
+            return 1;
+        }
     };
     private static final int SLOT_INPUT = 0;
     private static final int SLOT_OUTPUT = 1;

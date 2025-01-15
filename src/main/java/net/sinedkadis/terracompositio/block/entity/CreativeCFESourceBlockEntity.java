@@ -3,11 +3,9 @@ package net.sinedkadis.terracompositio.block.entity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.common.ForgeHooks;
-import net.sinedkadis.terracompositio.TerraCompositio;
 import net.sinedkadis.terracompositio.api.TerraCompositioAPI;
 import net.sinedkadis.terracompositio.api.cfe.CFENetworkAction;
-import net.sinedkadis.terracompositio.api.cfe.CFENetworkHandler;
+import net.sinedkadis.terracompositio.util.CFENetworkHandler;
 import net.sinedkadis.terracompositio.api.cfe.CFESource;
 
 public class CreativeCFESourceBlockEntity extends ModBlockEntity implements CFESource {

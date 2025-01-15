@@ -1,23 +1,26 @@
 package net.sinedkadis.terracompositio.block.entity;
 
+import lombok.Getter;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
-import net.sinedkadis.terracompositio.TerraCompositio;
 import net.sinedkadis.terracompositio.api.TerraCompositioAPI;
-import net.sinedkadis.terracompositio.api.cfe.CFENetworkAction;
 import net.sinedkadis.terracompositio.api.cfe.CFESource;
 import net.sinedkadis.terracompositio.api.cfe.CFENetwork;
+import net.sinedkadis.terracompositio.particle.ModParticles;
 
 import java.util.ArrayList;
 import java.util.List;
 
-import static net.sinedkadis.terracompositio.api.cfe.CFENetworkHandler.distSqr;
+import static net.sinedkadis.terracompositio.util.CFENetworkHandler.distSqr;
 
 public abstract class ModCFEBlockEntity extends ModBlockEntity{
+
+    @Getter
     private BlockPos cfeSourceBlockPos;
     private CFESource cfeSource;
     protected int CFE = 0;
@@ -33,7 +36,7 @@ public abstract class ModCFEBlockEntity extends ModBlockEntity{
 
     public BlockPos searchForSource() {
         CFENetwork network = TerraCompositioAPI.instance().getCFENetworkInstance();
-        var closestSource = network.getClosestSource(getBlockPos(), getLevel(), connectRange);
+        var closestSource = network.getClosestSource(getBlockPos(), getLevel(), connectRange*2);
         return closestSource == null ? null : closestSource.getCFESourceBlockPos();
     }
 
@@ -47,6 +50,7 @@ public abstract class ModCFEBlockEntity extends ModBlockEntity{
                     double cfe = getTransfer(pPos);
                     addCFE(cfe);
                     cfeSource.takeCFE((int) cfe);
+                    spawnParticles(pLevel,pPos,((ModCFEBlockEntity) pLevel.getBlockEntity(pPos)).getCfeSourceBlockPos());
                 }
             }
         }
@@ -96,6 +100,7 @@ public abstract class ModCFEBlockEntity extends ModBlockEntity{
             cords.add(cfeSourceBlockPos.getZ());
             pTag.putIntArray("source", cords);
         }
+        pTag.putInt("cfe",CFE);
         super.saveAdditional(pTag);
     }
 
@@ -103,9 +108,27 @@ public abstract class ModCFEBlockEntity extends ModBlockEntity{
     public void load(CompoundTag pTag) {
         super.load(pTag);
         int[] cords = pTag.getIntArray("source");
+        CFE = pTag.getInt("cfe");
         if (cords.length>0) {
             cfeSourceBlockPos = new BlockPos(cords[0], cords[1], cords[2]);
             findSourceCandidateAt(cfeSourceBlockPos);
         }
+    }
+
+    private static void spawnParticles(Level pLevel,BlockPos targetPos, BlockPos sourcePos) {
+        if (pLevel == null || pLevel.isClientSide())
+            return;
+
+        var level = (ServerLevel) pLevel;
+
+        double x = sourcePos.getX() + (level.getRandom().nextDouble() * 0.2D) + 0.5D;
+        double y = sourcePos.getY() + (level.getRandom().nextDouble() * 0.2D) + 0.5D;
+        double z = sourcePos.getZ() + (level.getRandom().nextDouble() * 0.2D) + 0.5D;
+
+        double velX = targetPos.getX() - sourcePos.getX();
+        double velY = targetPos.getY() - sourcePos.getY();
+        double velZ = targetPos.getZ() - sourcePos.getZ();
+
+        level.sendParticles(ModParticles.FLOW_STILL_PARTICLE.get(), x, y, z, 0, velX, velY, velZ, 0.08D);
     }
 }

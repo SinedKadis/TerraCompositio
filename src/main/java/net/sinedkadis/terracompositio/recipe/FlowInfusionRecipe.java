@@ -2,6 +2,7 @@ package net.sinedkadis.terracompositio.recipe;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import lombok.Getter;
 import net.minecraft.core.NonNullList;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.network.FriendlyByteBuf;
@@ -18,10 +19,16 @@ public class FlowInfusionRecipe implements Recipe<SimpleContainer> {
     private final NonNullList<Ingredient> inputItems;
     private final ItemStack output;
     private final ResourceLocation id;
+    @Getter
+    private final int cfe;
+    @Getter
+    private final int ticks;
 
-    public FlowInfusionRecipe(NonNullList<Ingredient> inputItems, ItemStack output, ResourceLocation id) {
+    public FlowInfusionRecipe(NonNullList<Ingredient> inputItems, ItemStack output, ResourceLocation id, int cfe, int ticks) {
         this.inputItems = inputItems;
         this.output = output;
+        this.cfe = cfe;
+        this.ticks = ticks;
         this.id = id;
     }
 
@@ -53,7 +60,9 @@ public class FlowInfusionRecipe implements Recipe<SimpleContainer> {
     public ItemStack getResultItem(RegistryAccess pRegistryAccess) {
         return output.copy();
     }
-
+    public float getCFETick(){
+        return (float) cfe /ticks;
+    }
     @Override
     public ResourceLocation getId() {
         return id;
@@ -78,6 +87,8 @@ public class FlowInfusionRecipe implements Recipe<SimpleContainer> {
         @Override
         public FlowInfusionRecipe fromJson(ResourceLocation pRecipeId, JsonObject pSerializedRecipe) {
             ItemStack output = ShapedRecipe.itemStackFromJson(GsonHelper.getAsJsonObject(pSerializedRecipe, "output"));
+            int cfe = GsonHelper.getAsInt(pSerializedRecipe,"cfe");
+            int ticks = GsonHelper.getAsInt(pSerializedRecipe,"time");
             JsonArray ingredients = GsonHelper.getAsJsonArray(pSerializedRecipe,"ingredients");
             NonNullList<Ingredient> inputs = NonNullList.withSize(1,Ingredient.EMPTY);
             for (int i=0; i < inputs.size();i++){
@@ -86,7 +97,7 @@ public class FlowInfusionRecipe implements Recipe<SimpleContainer> {
 
 
 
-            return new FlowInfusionRecipe(inputs,output,pRecipeId);
+            return new FlowInfusionRecipe(inputs,output,pRecipeId,cfe,ticks);
         }
 
         @Override
@@ -96,7 +107,9 @@ public class FlowInfusionRecipe implements Recipe<SimpleContainer> {
                 inputs.set(i,Ingredient.fromNetwork(pBuffer));
             }
             ItemStack output = pBuffer.readItem();
-            return new FlowInfusionRecipe(inputs,output,pRecipeId);
+            int cfe = pBuffer.readInt();
+            int ticks = pBuffer.readInt();
+            return new FlowInfusionRecipe(inputs,output,pRecipeId,cfe,ticks);
         }
 
         @Override
@@ -106,6 +119,8 @@ public class FlowInfusionRecipe implements Recipe<SimpleContainer> {
                 ingredient.toNetwork(pBuffer);
             }
             pBuffer.writeItemStack(pRecipe.getResultItem(null),false);
+            pBuffer.writeInt(pRecipe.cfe);
+            pBuffer.writeInt(pRecipe.ticks);
         }
     }
 }

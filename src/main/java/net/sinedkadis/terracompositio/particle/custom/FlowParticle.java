@@ -47,8 +47,7 @@ public class FlowParticle extends TextureSheetParticle {
         this.zo = this.z;
         this.preMoveUpdate();
         if (!this.removed) {
-            this.yd -= (double)this.gravity;
-            this.move(this.xd, this.yd, this.zd);
+            //this.move(this.xd, this.yd, this.zd);
             this.postMoveUpdate();
             if (!this.removed) {
                 this.xd *= 0.9800000190734863;
@@ -60,7 +59,6 @@ public class FlowParticle extends TextureSheetParticle {
                     if ($$1.getType() == this.type && this.y < (double)((float)$$0.getY() + $$1.getHeight(this.level, $$0))) {
                         this.remove();
                     }
-
                 }
             }
         }

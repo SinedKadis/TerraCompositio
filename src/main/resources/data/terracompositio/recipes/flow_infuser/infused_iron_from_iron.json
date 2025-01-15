@@ -8,5 +8,7 @@
   "output": {
     "count": 1,
     "item": "minecraft:gold_ingot"
-  }
+  },
+  "cfe": 50,
+  "time": 10
 }

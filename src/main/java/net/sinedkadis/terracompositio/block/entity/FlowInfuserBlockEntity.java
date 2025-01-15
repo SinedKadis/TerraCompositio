@@ -3,6 +3,7 @@ package net.sinedkadis.terracompositio.block.entity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.Containers;
@@ -17,12 +18,14 @@ import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemStackHandler;
+import net.sinedkadis.terracompositio.particle.ModParticles;
 import net.sinedkadis.terracompositio.recipe.FlowInfusionRecipe;
 import net.sinedkadis.terracompositio.recipe.FlowSaturationRecipe;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
+import java.util.function.Consumer;
 
 import static net.sinedkadis.terracompositio.block.ModBlockStateProperties.INFUSED;
 
@@ -35,16 +38,22 @@ public class FlowInfuserBlockEntity extends ModCFEBlockEntity{
                 level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), 3);
             }
         }
+
+        @Override
+        public int getSlotLimit(int slot) {
+            return 1;
+        }
     };
     private static final int SLOT_INPUT = 0;
     private static final int SLOT_OUTPUT = 1;
     protected final ContainerData data;
     private int progress = 0;
-    private int maxProgress = 78;
+    private int maxProgress;
+    private float tickCFECost;
     private LazyOptional<IItemHandler> lazyItemHandler = LazyOptional.empty();
 
     public FlowInfuserBlockEntity(BlockPos pPos, BlockState pBlockState) {
-        super(ModBlockEntities.FLOW_INFUSER_BE.get(),pPos, pBlockState,1000,5);
+        super(ModBlockEntities.FLOW_INFUSER_BE.get(),pPos, pBlockState,100,5);
         this.data =new ContainerData() {
             @Override
             public int get(int pIndex) {
@@ -68,6 +77,7 @@ public class FlowInfuserBlockEntity extends ModCFEBlockEntity{
                 return 2;
             }
         };
+
     }
 
     @Override
@@ -118,19 +128,21 @@ public class FlowInfuserBlockEntity extends ModCFEBlockEntity{
             super.tick(pLevel, pPos, pState);
         if(hasRecipe() && enoughCFE()){
             increaseCraftingProgress();
-            CFE--;
+            CFE = (int) (CFE-tickCFECost);
             setChanged(pLevel, pPos, pState);
+            if (!pLevel.isClientSide){
+                ((ServerLevel) pLevel).sendParticles(ModParticles.FLOW_STILL_PARTICLE.get(),pPos.getX()+0.5D,pPos.getY()+0.5D,pPos.getZ()+0.5D,3,0,-0.1D,0,0.1D);
+            }
             if(hasProgressFinished()){
                 craftItem();
                 resetProgress();
             }
-        }else {
+        }else if(!hasRecipe()) {
             resetProgress();
         }
     }
 
     private boolean enoughCFE() {
-        int tickCFECost = 1;
         return CFE >= tickCFECost;
     }
 
@@ -160,6 +172,8 @@ public class FlowInfuserBlockEntity extends ModCFEBlockEntity{
             return false;
         }
         ItemStack result = recipe.get().getResultItem(null);
+        maxProgress = recipe.get().getTicks();
+        tickCFECost = recipe.get().getCFETick();
         return enoughSpaceInOutput(result.getCount())&& sameItemInOutput(result.getItem());
     }
 
@@ -200,13 +214,13 @@ public class FlowInfuserBlockEntity extends ModCFEBlockEntity{
 
     }
     public ItemStack getRenderStack() {
-        if(itemHandler.getStackInSlot(SLOT_OUTPUT).isEmpty()) {
+        if(itemHandler.getStackInSlot(SLOT_INPUT).isEmpty()) {
             /*if(itemHandler.getStackInSlot(SLOT_INPUT).isEmpty()){
                 return new ItemStack(Items.AIR,1);
             }*/
-            return itemHandler.getStackInSlot(SLOT_INPUT);
-        } else {
             return itemHandler.getStackInSlot(SLOT_OUTPUT);
+        } else {
+            return itemHandler.getStackInSlot(SLOT_INPUT);
         }
     }
 }

@@ -2,14 +2,19 @@ package net.sinedkadis.terracompositio.block.custom;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.particles.ParticleOptions;
+import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.AxeItem;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
@@ -89,6 +94,13 @@ public class FlowInfuserBlock extends BaseEntityBlock implements IBE<FlowInfuser
     @Override
     public void onRemove(BlockState pState, Level pLevel, BlockPos pPos, BlockState pNewState, boolean pIsMoving) {
         super.onRemove(pState, pLevel, pPos, pNewState, pIsMoving);
+        if (pState.getBlock() != pNewState.getBlock()
+                && pState.getValue(INFUSED) != pNewState.getValue(INFUSED)){
+            BlockEntity blockEntity = pLevel.getBlockEntity(pPos);
+            if (blockEntity instanceof FlowInfuserBlockEntity){
+                ((FlowInfuserBlockEntity) blockEntity).drops();
+            }
+        }
         if (pNewState.is(Blocks.AIR)) {
             if (pState.getValue(INFUSED)&&!pLevel.getGameRules().getBoolean(ModGameRules.DISABLE_FLOW_LEAKING)) {
                 BlockPos fpos = pPos.relative(Direction.UP,1);
@@ -133,7 +145,7 @@ public class FlowInfuserBlock extends BaseEntityBlock implements IBE<FlowInfuser
             }
         }
         //}
-        return InteractionResult.sidedSuccess(pLevel.isClientSide());
+        return pState.getValue(INFUSED) ? InteractionResult.sidedSuccess(pLevel.isClientSide()) : InteractionResult.PASS;
     }
 
     @Nullable

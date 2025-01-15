@@ -1,7 +1,6 @@
 package net.sinedkadis.terracompositio.block.custom;
 
 
-import com.mojang.logging.LogUtils;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
@@ -27,11 +26,8 @@ import net.sinedkadis.terracompositio.block.ModBlockStateProperties;
 import net.sinedkadis.terracompositio.block.ModBlocks;
 import net.sinedkadis.terracompositio.block.entity.FlowPortBlockEntity;
 import net.sinedkadis.terracompositio.block.entity.ModBlockEntities;
-import net.sinedkadis.terracompositio.util.BlockData;
 import net.sinedkadis.terracompositio.util.ModGameRules;
-import net.sinedkadis.terracompositio.util.ModTags;
 import org.jetbrains.annotations.Nullable;
-import org.slf4j.Logger;
 
 import java.util.ArrayList;
 import java.util.List;

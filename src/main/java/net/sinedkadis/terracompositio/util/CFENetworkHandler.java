@@ -1,14 +1,17 @@
-package net.sinedkadis.terracompositio.api.cfe;
+package net.sinedkadis.terracompositio.util;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Vec3i;
 import net.minecraft.world.level.Level;
 import net.sinedkadis.terracompositio.api.TerraCompositioAPI;
+import net.sinedkadis.terracompositio.api.cfe.CFENetwork;
+import net.sinedkadis.terracompositio.api.cfe.CFENetworkAction;
+import net.sinedkadis.terracompositio.api.cfe.CFESource;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
-public class CFENetworkHandler implements CFENetwork{
+public class CFENetworkHandler implements CFENetwork {
     public static final CFENetworkHandler instance = new CFENetworkHandler();
 
     private final Map<Level, Set<CFESource>> cfeSources = new WeakHashMap<>();
