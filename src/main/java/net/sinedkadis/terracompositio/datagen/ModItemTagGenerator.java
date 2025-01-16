@@ -4,9 +4,12 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.tags.ItemTagsProvider;
 
+import net.minecraft.data.tags.TagsProvider;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.world.level.block.Block;
+import net.minecraftforge.common.Tags;
 import net.minecraftforge.common.data.ExistingFileHelper;
+import net.minecraftforge.common.data.ForgeItemTagsProvider;
 import net.sinedkadis.terracompositio.TerraCompositio;
 import net.sinedkadis.terracompositio.block.ModBlocks;
 import net.sinedkadis.terracompositio.item.ModItems;
@@ -64,5 +67,9 @@ public class ModItemTagGenerator extends ItemTagsProvider {
                 .add(ModItems.FLOW_CEDAR_BOAT.get());
         this.tag(ItemTags.CHEST_BOATS)
                 .add(ModItems.FLOW_CEDAR_CHEST_BOAT.get());
+        this.tag(Tags.Items.INGOTS)
+                .add(ModItems.INFUSED_IRON_INGOT.get());
+        this.tag(Tags.Items.NUGGETS)
+                .add(ModItems.COPPER_NUGGET.get());
     }
 }

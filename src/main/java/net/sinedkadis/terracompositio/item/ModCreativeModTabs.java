@@ -55,6 +55,9 @@ public class ModCreativeModTabs {
                         pOutput.accept(ModItems.FLOW_CEDAR_BOOTS.get());
                         pOutput.accept(ModBlocks.CREATIVE_CFE_SOURCE.get());
                         pOutput.accept(ModBlocks.FLOW_INFUSER.get());
+                        pOutput.accept(ModItems.INFUSED_IRON_INGOT.get());
+                        pOutput.accept(ModItems.COPPER_NUGGET.get());
+                        pOutput.accept(ModItems.FLOW_INFUSER_KIT.get());
 
 
                     })

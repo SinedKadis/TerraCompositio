@@ -50,7 +50,6 @@ public class JEITerraCompositioPlugin implements IModPlugin {
     @Override
     public void registerRecipeCatalysts(IRecipeCatalystRegistration registration) {
         RecipeManager recipeManager = Minecraft.getInstance().level.getRecipeManager();
-        List<FlowInfusionRecipe> flowInfusionRecipes = recipeManager.getAllRecipesFor(FlowInfusionRecipe.Type.INSTANCE);
         registration.addRecipeCatalyst(new ItemStack(ModBlocks.FLOW_INFUSER.get()),FlowInfusionCategory.FLOW_INFUSION_RECIPE_RECIPE_TYPE);
     }
 }

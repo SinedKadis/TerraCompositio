@@ -1,11 +1,14 @@
 package net.sinedkadis.terracompositio.item;
 
+import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.item.ArmorItem;
-import net.minecraft.world.item.HangingSignItem;
-import net.minecraft.world.item.Item;
-import net.minecraft.world.item.SignItem;
+import net.minecraft.world.item.*;
 import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.level.Level;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -18,6 +21,13 @@ import net.sinedkadis.terracompositio.item.custom.FlowBottleItem;
 import net.sinedkadis.terracompositio.item.custom.ModArmorItem;
 import net.sinedkadis.terracompositio.item.custom.ModBoatItem;
 import net.sinedkadis.terracompositio.particle.ModParticles;
+import net.sinedkadis.terracompositio.util.ModTags;
+import org.jetbrains.annotations.Nullable;
+import org.w3c.dom.Text;
+
+import java.util.List;
+
+import static net.sinedkadis.terracompositio.block.ModBlockStateProperties.INFUSED;
 
 public class ModItems {
     public static final DeferredRegister<Item> ITEMS =
@@ -68,6 +78,46 @@ public class ModItems {
             () -> new ModBoatItem(false, ModBoatEntity.Type.FLOW_CEDAR, new Item.Properties()));
     public static final RegistryObject<Item> FLOW_CEDAR_CHEST_BOAT = ITEMS.register("flow_cedar_chest_boat",
             () -> new ModBoatItem(true, ModBoatEntity.Type.FLOW_CEDAR, new Item.Properties()));
+
+    public static final RegistryObject<Item> INFUSED_IRON_INGOT = ITEMS.register("infused_iron_ingot",
+            () -> new Item(new Item.Properties()));
+    public static final RegistryObject<Item> COPPER_NUGGET = ITEMS.register("copper_nugget",
+            () -> new Item(new Item.Properties()));
+    public static final RegistryObject<Item> FLOW_INFUSER_KIT = ITEMS.register("flow_infuser_kit",
+            () -> new Item(new Item.Properties()){
+                @Override
+                public InteractionResult onItemUseFirst(ItemStack stack, UseOnContext context) {
+                    ItemStack offhand = context.getPlayer().getItemInHand(InteractionHand.OFF_HAND);
+                    if (offhand != null && offhand.getItem() instanceof AxeItem){
+                        if (context.getLevel().getBlockState(context.getClickedPos()).is(ModTags.Blocks.FLOW_CEDAR_LOGS)) {
+                            context.getLevel().setBlockAndUpdate(context.getClickedPos(),
+                                    ModBlocks.FLOW_INFUSER.get().defaultBlockState()
+                                            .setValue(INFUSED,context.getLevel().getBlockState(context.getClickedPos()).getValue(INFUSED)));
+                            stack.shrink(1);
+                            if (context.getLevel() instanceof ServerLevel level){
+                                level.playSound(null,context.getClickedPos(), SoundEvents.ANVIL_PLACE, SoundSource.BLOCKS);
+                                level.sendParticles(ModParticles.FLOW_STILL_PARTICLE.get(),
+                                        context.getClickedPos().getX(),
+                                        context.getClickedPos().getY(),
+                                        context.getClickedPos().getZ(),
+                                        10,
+                                        context.getLevel().getRandom().nextFloat(),
+                                        context.getLevel().getRandom().nextFloat(),
+                                        context.getLevel().getRandom().nextFloat(),
+                                        0.5D);
+                            }
+                            return InteractionResult.CONSUME_PARTIAL;
+                        }
+                    }
+                    return InteractionResult.PASS;
+                }
+
+                @Override
+                public void appendHoverText(ItemStack pStack, @Nullable Level pLevel, List<Component> pTooltipComponents, TooltipFlag pIsAdvanced) {
+                    super.appendHoverText(pStack, pLevel, pTooltipComponents, pIsAdvanced);
+                    pTooltipComponents.add(Component.translatable("item.terracompositio.flow_infuser_kit.tooltip"));
+                }
+            });
 
 
     public static void register(IEventBus eventBus){

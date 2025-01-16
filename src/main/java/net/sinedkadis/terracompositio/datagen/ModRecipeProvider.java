@@ -85,6 +85,14 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                 .define('S', Items.IRON_NUGGET)
                 .unlockedBy(getHasName(Items.IRON_BARS), has(Items.IRON_BARS))
                 .save(pWriter);
+        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, ModItems.FLOW_INFUSER_KIT.get())
+                .pattern(" N ")
+                .pattern("SNS")
+                .pattern(" N ")
+                .define('S', Items.STICK)
+                .define('N',ModItems.COPPER_NUGGET.get())
+                .unlockedBy(getHasName(Items.STICK), has(ModItems.COPPER_NUGGET.get()))
+                .save(pWriter);
 
 
         ShapelessRecipeBuilder.shapeless(RecipeCategory.BUILDING_BLOCKS, ModBlocks.FLOW_CEDAR_PLANKS.get(), 4)
@@ -94,6 +102,10 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
         ShapelessRecipeBuilder.shapeless(RecipeCategory.BUILDING_BLOCKS, ModBlocks.FLOW_CEDAR_BUTTON.get(), 4)
                 .requires(ModBlocks.FLOW_CEDAR_PLANKS.get())
                 .unlockedBy(getHasName(ModBlocks.FLOW_CEDAR_PLANKS.get()), has(ModBlocks.FLOW_CEDAR_PLANKS.get()))
+                .save(pWriter);
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, ModItems.COPPER_NUGGET.get(), 9)
+                .requires(Items.COPPER_INGOT)
+                .unlockedBy(getHasName(Items.COPPER_INGOT), has(Items.COPPER_INGOT))
                 .save(pWriter);
 
 

@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "N": {
+      "item": "terracompositio:copper_nugget"
+    },
+    "S": {
+      "item": "minecraft:stick"
+    }
+  },
+  "pattern": [
+    " N ",
+    "SNS",
+    " N "
+  ],
+  "result": {
+    "item": "terracompositio:flow_infuser_kit"
+  },
+  "show_notification": true
+}

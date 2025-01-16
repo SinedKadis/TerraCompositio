@@ -12,7 +12,7 @@ import net.sinedkadis.terracompositio.TerraCompositio;
 public class ModTags {
     public static class  Blocks{
         public static final TagKey<Block> FLOW_LEAKABLE = tag("flow_cedar_logs");
-
+        public static final TagKey<Block> FLOW_CEDAR_LOGS = tag("flow_cedar_logs");
 
         private static TagKey<Block> tag(String name){
             return BlockTags.create(new ResourceLocation(TerraCompositio.MOD_ID, name));

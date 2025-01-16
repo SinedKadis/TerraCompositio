@@ -72,6 +72,10 @@ public class ModItemModelProvider extends ItemModelProvider {
         simpleItem(ModItems.FLOW_CEDAR_BOAT);
         simpleItem(ModItems.FLOW_CEDAR_CHEST_BOAT);
 
+        simpleItem(ModItems.INFUSED_IRON_INGOT);
+        simpleItem(ModItems.COPPER_NUGGET);
+        simpleItem(ModItems.FLOW_INFUSER_KIT);
+
 
     }
 

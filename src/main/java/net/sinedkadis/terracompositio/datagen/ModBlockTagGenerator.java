@@ -36,7 +36,7 @@ public class ModBlockTagGenerator extends BlockTagsProvider {
                 .add(ModBlocks.FLOW_CEDAR_LOG.get(),
                         ModBlocks.FLOW_CEDAR_LEAVES.get(),
                         ModBlocks.FLOW_PORT.get(),
-                        //ModBlocks.NONFLOW_PORT.get(),
+                        ModBlocks.FLOW_INFUSER.get(),
                         ModBlocks.FLOW_CEDAR_WOOD.get(),
                         ModBlocks.FLOW_CEDAR_PLANKS.get(),
                         ModBlocks.STRIPPED_FLOW_CEDAR_LOG.get(),
@@ -47,9 +47,6 @@ public class ModBlockTagGenerator extends BlockTagsProvider {
                 .add(ModBlocks.FLOW_CEDAR_LOG.get(),
                         ModBlocks.FLOW_CEDAR_LEAVES.get(),
                         ModBlocks.FLOW_PORT.get(),
-                        ModBlocks.FLOW_CEDAR_WOOD.get());
-        this.tag(BlockTags.LOGS)
-                .add(ModBlocks.FLOW_CEDAR_LOG.get(),
                         ModBlocks.FLOW_CEDAR_WOOD.get());
         this.tag(BlockTags.LOGS_THAT_BURN)
                 .add(ModBlocks.FLOW_CEDAR_LOG.get(),
@@ -83,6 +80,9 @@ public class ModBlockTagGenerator extends BlockTagsProvider {
                         ModBlocks.FLOW_INFUSER.get(),
                         ModBlocks.STRIPPED_FLOW_CEDAR_LOG.get(),
                         ModBlocks.STRIPPED_FLOW_CEDAR_WOOD.get());
+        this.tag(ModTags.Blocks.FLOW_CEDAR_LOGS)
+                .add(ModBlocks.FLOW_CEDAR_LOG.get(),
+                        ModBlocks.FLOW_CEDAR_WOOD.get());
         //this.tag(BlockTags.NEEDS_DIAMOND_TOOL)
         //        .add(ModBlocks.RAW_SAPPHIRE_BLOCK.get());
 

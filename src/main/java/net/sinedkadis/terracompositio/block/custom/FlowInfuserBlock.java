@@ -95,7 +95,7 @@ public class FlowInfuserBlock extends BaseEntityBlock implements IBE<FlowInfuser
     public void onRemove(BlockState pState, Level pLevel, BlockPos pPos, BlockState pNewState, boolean pIsMoving) {
         super.onRemove(pState, pLevel, pPos, pNewState, pIsMoving);
         if (pState.getBlock() != pNewState.getBlock()
-                && pState.getValue(INFUSED) != pNewState.getValue(INFUSED)){
+                || pState.getValue(INFUSED) != pNewState.getValue(INFUSED)){
             BlockEntity blockEntity = pLevel.getBlockEntity(pPos);
             if (blockEntity instanceof FlowInfuserBlockEntity){
                 ((FlowInfuserBlockEntity) blockEntity).drops();
@@ -104,7 +104,7 @@ public class FlowInfuserBlock extends BaseEntityBlock implements IBE<FlowInfuser
         if (pNewState.is(Blocks.AIR)) {
             if (pState.getValue(INFUSED)&&!pLevel.getGameRules().getBoolean(ModGameRules.DISABLE_FLOW_LEAKING)) {
                 BlockPos fpos = pPos.relative(Direction.UP,1);
-                BlockPos bpos = pPos.relative(Direction.DOWN,-1);
+                BlockPos bpos = pPos.relative(Direction.DOWN,1);
                 getNearBlocks(fpos).stream()
                         .filter(pos -> pos != pPos)
                         .filter(pos -> pLevel.getBlockState(pos).is(ModTags.Blocks.FLOW_LEAKABLE))

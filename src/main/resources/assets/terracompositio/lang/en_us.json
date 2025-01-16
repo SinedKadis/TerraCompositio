@@ -36,15 +36,19 @@
   "item.terracompositio.flow_cedar_leggings": "Flow Cedar Leggings",
   "item.terracompositio.flow_cedar_boots": "Flow Cedar Boots",
 
-  "item.terracompositio.flowing_flow_cedar_helmet": "Flowing Flow Cedar Helmet",
-  "item.terracompositio.flowing_flow_cedar_chestplate": "Flowing Flow Cedar Chestplate",
-  "item.terracompositio.flowing_flow_cedar_leggings": "Flowing Flow Cedar Leggings",
-  "item.terracompositio.flowing_flow_cedar_boots": "Flowing Flow Cedar Boots",
+  "item.terracompositio.flowing_flow_cedar_helmet": "Infused Flow Cedar Helmet",
+  "item.terracompositio.flowing_flow_cedar_chestplate": "Infused Flow Cedar Chestplate",
+  "item.terracompositio.flowing_flow_cedar_leggings": "Infused Flow Cedar Leggings",
+  "item.terracompositio.flowing_flow_cedar_boots": "Infused Flow Cedar Boots",
 
   "block.terracompositio.flow_cedar_sign": "Flow Cedar Sign",
   "block.terracompositio.flow_cedar_hanging_sign": "Flow Cedar Hanging Sign",
 
   "item.terracompositio.flow_cedar_boat": "Flow Cedar Boat",
   "item.terracompositio.flow_cedar_chest_boat": "Flow Cedar Boat with Chest",
-  "block.terracompositio.creative_cfe_source": "Creative CFE Source"
+  "block.terracompositio.creative_cfe_source": "Creative CFE Source",
+  "item.terracompositio.flow_infuser_kit.tooltip": "Use on flow infused log with axe in offhand to create a Flow Infuser",
+  "item.terracompositio.flow_infuser_kit": "Flow Infuser Kit",
+  "item.terracompositio.copper_nugget": "Copper Nugget",
+  "item.terracompositio.infused_iron_ingot": "Infused Iron Ingot"
 }

@@ -122,11 +122,15 @@ public class FlowCedarLikeBlock extends RotatedPillarBlock {
 
     @Override
     public void tick(BlockState pState, ServerLevel pLevel, BlockPos pPos, RandomSource pRandom) {
-        for (BlockPos blockPos : getNearBlocks(pPos)){
-            if (blockPos != pPos){
-                if (pLevel.getBlockState(blockPos).is(ModTags.Blocks.FLOW_LEAKABLE)) {
-                    if (!pLevel.getBlockState(blockPos).getValue(INFUSED) && pRandom.nextFloat() > 0.99f)
-                        pLevel.setBlockAndUpdate(blockPos,pLevel.getBlockState(blockPos).setValue(INFUSED,true));
+        if (pState.getValue(INFUSED)) {
+            for (BlockPos blockPos : getNearBlocks(pPos)) {
+                if (blockPos.getX() != pPos.getX()
+                        && blockPos.getY() != pPos.getY()
+                        && blockPos.getZ() != pPos.getZ()) {
+                    if (pLevel.getBlockState(blockPos).is(ModTags.Blocks.FLOW_LEAKABLE)) {
+                        if (!pLevel.getBlockState(blockPos).getValue(INFUSED) && pRandom.nextFloat() > 0.99f)
+                            pLevel.setBlockAndUpdate(blockPos, pLevel.getBlockState(blockPos).setValue(INFUSED, true));
+                    }
                 }
             }
         }
