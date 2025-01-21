@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "": {
+      "model": "terracompositio:block/flow_containing_raw_ore_block"
+    }
+  }
+}

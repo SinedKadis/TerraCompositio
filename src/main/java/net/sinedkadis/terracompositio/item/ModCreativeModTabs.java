@@ -60,6 +60,9 @@ public class ModCreativeModTabs {
                         pOutput.accept(ModItems.FLOW_INFUSER_KIT.get());
                         pOutput.accept(ModItems.FLOW_CONTAINING_RAW_ORE.get());
                         pOutput.accept(ModBlocks.FLOW_CONTAINING_RAW_ORE_BLOCK.get());
+                        pOutput.accept(ModItems.LOW_ENRICHED_FCO.get());
+                        pOutput.accept(ModItems.MEDIUM_ENRICHED_FCO.get());
+                        pOutput.accept(ModItems.HIGH_ENRICHED_FCO.get());
                         pOutput.accept(ModBlocks.FLOW_CONTAINING_ORE.get());
                         pOutput.accept(ModBlocks.FLOW_CONTAINING_DEEPSLATE_ORE.get());
 

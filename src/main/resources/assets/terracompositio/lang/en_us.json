@@ -54,5 +54,8 @@
   "block.terracompositio.flow_containing_ore": "Flow Containing Ore",
   "block.terracompositio.flow_containing_deepslate_ore": "Deepslate Flow Containing Ore",
   "item.terracompositio.flow_containing_raw_ore": "Flow Containing Raw Ore",
-  "block.terracompositio.flow_containing_raw_ore_block": "Flow Containing Raw Ore Block"
+  "block.terracompositio.flow_containing_raw_ore_block": "Flow Containing Raw Ore Block",
+  "item.terracompositio.low_enriched_fco": "Low Enriched Flow Containing Ore",
+  "item.terracompositio.medium_enriched_fco": "Medium Enriched Flow Containing Ore",
+  "item.terracompositio.high_enriched_fco": "High Enriched Flow Containing Ore"
 }

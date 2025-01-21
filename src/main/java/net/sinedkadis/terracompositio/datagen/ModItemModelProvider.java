@@ -76,6 +76,9 @@ public class ModItemModelProvider extends ItemModelProvider {
         simpleItem(ModItems.COPPER_NUGGET);
         simpleItem(ModItems.FLOW_INFUSER_KIT);
         simpleItem(ModItems.FLOW_CONTAINING_RAW_ORE);
+        simpleItem(ModItems.LOW_ENRICHED_FCO);
+        simpleItem(ModItems.MEDIUM_ENRICHED_FCO);
+        simpleItem(ModItems.HIGH_ENRICHED_FCO);
 
 
     }

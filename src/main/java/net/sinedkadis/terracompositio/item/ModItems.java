@@ -1,5 +1,6 @@
 package net.sinedkadis.terracompositio.item;
 
+import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
@@ -115,10 +116,16 @@ public class ModItems {
                 @Override
                 public void appendHoverText(ItemStack pStack, @Nullable Level pLevel, List<Component> pTooltipComponents, TooltipFlag pIsAdvanced) {
                     super.appendHoverText(pStack, pLevel, pTooltipComponents, pIsAdvanced);
-                    pTooltipComponents.add(Component.translatable("item.terracompositio.flow_infuser_kit.tooltip"));
+                    pTooltipComponents.add(Component.translatable("item.terracompositio.flow_infuser_kit.tooltip").withStyle(ChatFormatting.GRAY));
                 }
             });
     public static final RegistryObject<Item> FLOW_CONTAINING_RAW_ORE = ITEMS.register("flow_containing_raw_ore",
+            () -> new Item(new Item.Properties()));
+    public static final RegistryObject<Item> LOW_ENRICHED_FCO = ITEMS.register("low_enriched_fco",
+            () -> new Item(new Item.Properties()));
+    public static final RegistryObject<Item> MEDIUM_ENRICHED_FCO = ITEMS.register("medium_enriched_fco",
+            () -> new Item(new Item.Properties()));
+    public static final RegistryObject<Item> HIGH_ENRICHED_FCO = ITEMS.register("high_enriched_fco",
             () -> new Item(new Item.Properties()));
 
 
