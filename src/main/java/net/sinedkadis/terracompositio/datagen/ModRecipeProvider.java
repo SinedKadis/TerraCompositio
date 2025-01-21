@@ -107,6 +107,14 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                 .requires(Items.COPPER_INGOT)
                 .unlockedBy(getHasName(Items.COPPER_INGOT), has(Items.COPPER_INGOT))
                 .save(pWriter);
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, ModItems.FLOW_CONTAINING_RAW_ORE.get(), 9)
+                .requires(ModBlocks.FLOW_CONTAINING_RAW_ORE_BLOCK.get())
+                .unlockedBy(getHasName(ModBlocks.FLOW_CONTAINING_RAW_ORE_BLOCK.get()), has(ModBlocks.FLOW_CONTAINING_RAW_ORE_BLOCK.get()))
+                .save(pWriter);
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, ModBlocks.FLOW_CONTAINING_RAW_ORE_BLOCK.get(), 1)
+                .requires(ModItems.FLOW_CONTAINING_RAW_ORE.get(),9)
+                .unlockedBy(getHasName(ModItems.FLOW_CONTAINING_RAW_ORE.get()), has(ModItems.FLOW_CONTAINING_RAW_ORE.get()))
+                .save(pWriter);
 
 
 

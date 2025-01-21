@@ -24,14 +24,10 @@ public class ModBlockTagGenerator extends BlockTagsProvider {
         //this.tag(ModTags.Blocks.METAL_DETECTOR_VALUABLES)
         //        .add(ModBlocks.FLOW_LOG.get()).addTag(Tags.Blocks.NEEDS_NETHERITE_TOOL);
 
-        /*this.tag(BlockTags.MINEABLE_WITH_PICKAXE)
-                .add(ModBlocks.SAPPHIRE_BLOCK.get(),
-                        ModBlocks.RAW_SAPPHIRE_BLOCK.get(),
-                        ModBlocks.SAPPHIRE_ORE.get(),
-                        ModBlocks.DEEPSLATE_SAPPHIRE_ORE.get(),
-                        ModBlocks.NETHER_SAPPHIRE_ORE.get(),
-                        ModBlocks.END_STONE_SAPPHIRE_ORE.get(),
-                        ModBlocks.SOUND_BLOCK.get());*/
+        this.tag(BlockTags.MINEABLE_WITH_PICKAXE)
+                .add(ModBlocks.FLOW_CONTAINING_RAW_ORE_BLOCK.get(),
+                        ModBlocks.FLOW_CONTAINING_ORE.get(),
+                        ModBlocks.FLOW_CONTAINING_DEEPSLATE_ORE.get());
         this.tag(BlockTags.MINEABLE_WITH_AXE)
                 .add(ModBlocks.FLOW_CEDAR_LOG.get(),
                         ModBlocks.FLOW_CEDAR_LEAVES.get(),

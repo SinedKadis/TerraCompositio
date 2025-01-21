@@ -118,6 +118,8 @@ public class ModItems {
                     pTooltipComponents.add(Component.translatable("item.terracompositio.flow_infuser_kit.tooltip"));
                 }
             });
+    public static final RegistryObject<Item> FLOW_CONTAINING_RAW_ORE = ITEMS.register("flow_containing_raw_ore",
+            () -> new Item(new Item.Properties()));
 
 
     public static void register(IEventBus eventBus){

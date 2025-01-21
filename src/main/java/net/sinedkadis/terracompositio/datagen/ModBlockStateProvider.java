@@ -30,6 +30,9 @@ public class ModBlockStateProvider extends BlockStateProvider {
         blockWithItem(ModBlocks.FLOW_CEDAR_PLANKS);
         flowLogBlockWithItem(ModBlocks.STRIPPED_FLOW_CEDAR_LOG);
         flowWoodBlockWithItem(ModBlocks.STRIPPED_FLOW_CEDAR_WOOD,ModBlocks.STRIPPED_FLOW_CEDAR_LOG);
+        blockWithItem(ModBlocks.FLOW_CONTAINING_ORE);
+        blockWithItem(ModBlocks.FLOW_CONTAINING_DEEPSLATE_ORE);
+        blockWithItem(ModBlocks.FLOW_CONTAINING_RAW_ORE_BLOCK);
 
 
 

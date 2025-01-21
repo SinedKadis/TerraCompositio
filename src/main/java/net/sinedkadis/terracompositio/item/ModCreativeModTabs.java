@@ -58,6 +58,10 @@ public class ModCreativeModTabs {
                         pOutput.accept(ModItems.INFUSED_IRON_INGOT.get());
                         pOutput.accept(ModItems.COPPER_NUGGET.get());
                         pOutput.accept(ModItems.FLOW_INFUSER_KIT.get());
+                        pOutput.accept(ModItems.FLOW_CONTAINING_RAW_ORE.get());
+                        pOutput.accept(ModBlocks.FLOW_CONTAINING_RAW_ORE_BLOCK.get());
+                        pOutput.accept(ModBlocks.FLOW_CONTAINING_ORE.get());
+                        pOutput.accept(ModBlocks.FLOW_CONTAINING_DEEPSLATE_ORE.get());
 
 
                     })

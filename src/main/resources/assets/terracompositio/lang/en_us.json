@@ -50,5 +50,9 @@
   "item.terracompositio.flow_infuser_kit.tooltip": "Use on flow infused log with axe in offhand to create a Flow Infuser",
   "item.terracompositio.flow_infuser_kit": "Flow Infuser Kit",
   "item.terracompositio.copper_nugget": "Copper Nugget",
-  "item.terracompositio.infused_iron_ingot": "Infused Iron Ingot"
+  "item.terracompositio.infused_iron_ingot": "Infused Iron Ingot",
+  "block.terracompositio.flow_containing_ore": "Flow Containing Ore",
+  "block.terracompositio.flow_containing_deepslate_ore": "Deepslate Flow Containing Ore",
+  "item.terracompositio.flow_containing_raw_ore": "Flow Containing Raw Ore",
+  "block.terracompositio.flow_containing_raw_ore_block": "Flow Containing Raw Ore Block"
 }

@@ -75,6 +75,7 @@ public class ModItemModelProvider extends ItemModelProvider {
         simpleItem(ModItems.INFUSED_IRON_INGOT);
         simpleItem(ModItems.COPPER_NUGGET);
         simpleItem(ModItems.FLOW_INFUSER_KIT);
+        simpleItem(ModItems.FLOW_CONTAINING_RAW_ORE);
 
 
     }
