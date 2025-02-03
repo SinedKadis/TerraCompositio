@@ -33,6 +33,8 @@ import org.slf4j.Logger;
 
 import java.util.Optional;
 
+import static net.sinedkadis.terracompositio.block.ModBlockStateProperties.INFUSED;
+
 public class FlowPortBlockEntity extends BlockEntity implements MenuProvider {
     private final ItemStackHandler itemHandler = new ItemStackHandler(2){
         @Override
@@ -128,21 +130,23 @@ public class FlowPortBlockEntity extends BlockEntity implements MenuProvider {
     public void tick(Level pLevel, BlockPos pPos, BlockState pState) {
         //boolean hasRecipe = hasRecipe();
         //LOGGER.debug("Recipe found("+hasRecipe+")");
-        if(hasRecipe()){
-            tickForSound++;
-            if(tickForSound==5){
-                tickForSound = 0;
-                pLevel.playSound(null,pPos, SoundEvents.ITEM_FRAME_ROTATE_ITEM, SoundSource.BLOCKS);
-            }
-            increaseCraftingProgress();
-            setChanged(pLevel, pPos, pState);
-            if(hasProgressFinished()){
-                craftItem();
+        if (pState.getValue(INFUSED)) {
+            if (hasRecipe()) {
+                tickForSound++;
+                if (tickForSound == 5) {
+                    tickForSound = 0;
+                    pLevel.playSound(null, pPos, SoundEvents.ITEM_FRAME_ROTATE_ITEM, SoundSource.BLOCKS);
+                }
+                increaseCraftingProgress();
+                setChanged(pLevel, pPos, pState);
+                if (hasProgressFinished()) {
+                    craftItem();
 
+                    resetProgress();
+                }
+            } else {
                 resetProgress();
             }
-        }else {
-            resetProgress();
         }
     }
 

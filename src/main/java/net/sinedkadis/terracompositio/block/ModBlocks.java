@@ -21,6 +21,7 @@ import net.sinedkadis.terracompositio.block.custom.*;
 import net.sinedkadis.terracompositio.item.ModItems;
 import net.sinedkadis.terracompositio.sound.ModSounds;
 import net.sinedkadis.terracompositio.util.ModWoodTypes;
+import net.sinedkadis.terracompositio.worldgen.tree.FlowCedarTreeGrower;
 
 import java.util.function.Supplier;
 
@@ -123,4 +124,6 @@ public class ModBlocks {
             () -> new Block(BlockBehaviour.Properties.copy(Blocks.DEEPSLATE_IRON_ORE)));
     public static final RegistryObject<Block> FLOW_CONTAINING_RAW_ORE_BLOCK = registerBlock("flow_containing_raw_ore_block",
             () -> new Block(BlockBehaviour.Properties.copy(Blocks.RAW_IRON_BLOCK)));
+    public static final RegistryObject<Block> FLOW_CEDAR_BIG_SAPLING = registerBlock("big_flow_cedar_sapling",
+            () -> new SaplingBlock(new FlowCedarTreeGrower(), BlockBehaviour.Properties.copy(Blocks.OAK_SAPLING)));
 }

@@ -65,6 +65,7 @@ public class ModCreativeModTabs {
                         pOutput.accept(ModItems.HIGH_ENRICHED_FCO.get());
                         pOutput.accept(ModBlocks.FLOW_CONTAINING_ORE.get());
                         pOutput.accept(ModBlocks.FLOW_CONTAINING_DEEPSLATE_ORE.get());
+                        pOutput.accept(ModBlocks.FLOW_CEDAR_BIG_SAPLING.get());
 
 
                     })

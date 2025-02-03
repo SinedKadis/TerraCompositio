@@ -80,7 +80,7 @@ public class ModItemModelProvider extends ItemModelProvider {
         simpleItem(ModItems.MEDIUM_ENRICHED_FCO);
         simpleItem(ModItems.HIGH_ENRICHED_FCO);
 
-
+        saplingItem(ModBlocks.FLOW_CEDAR_BIG_SAPLING);
     }
 
     // Shoutout to El_Redstoniano for making this
@@ -136,6 +136,12 @@ public class ModItemModelProvider extends ItemModelProvider {
         return withExistingParent(item.getId().getPath(),
                 new ResourceLocation("item/generated")).texture("layer0",
                 new ResourceLocation(TerraCompositio.MOD_ID,"item/" + item.getId().getPath()));
+    }
+
+    private ItemModelBuilder saplingItem(RegistryObject<Block> item) {
+        return withExistingParent(item.getId().getPath(),
+                new ResourceLocation("item/generated")).texture("layer0",
+                new ResourceLocation(TerraCompositio.MOD_ID,"block/" + item.getId().getPath()));
     }
 
     public void evenSimplerBlockItem(RegistryObject<Block> block) {

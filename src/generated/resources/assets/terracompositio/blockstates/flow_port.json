@@ -4,7 +4,7 @@
       "model": "terracompositio:block/flow_port"
     },
     "infused=true": {
-      "model": "terracompositio:block/flow_port"
+      "model": "terracompositio:block/flow_port_infused"
     }
   }
 }

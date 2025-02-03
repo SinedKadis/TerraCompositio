@@ -89,7 +89,7 @@ public class FlowPortBlock extends BaseEntityBlock {
     public InteractionResult use(BlockState pState, Level pLevel, BlockPos pPos, Player pPlayer, InteractionHand pHand, BlockHitResult pHit) {
         //if (!pLevel.isClientSide()){
             BlockEntity entity = pLevel.getBlockEntity(pPos);
-            if(entity instanceof  FlowPortBlockEntity && pState.getValue(INFUSED)){
+            if(entity instanceof  FlowPortBlockEntity){
                 ItemStack itemstack = pPlayer.getItemInHand(pHand);
                 ItemStack outputSlot = ModBlockEntities.FLOW_PORT_BE.get().getBlockEntity(pLevel,pPos).getOutputSlot();
                 ItemStack inputSlot = ModBlockEntities.FLOW_PORT_BE.get().getBlockEntity(pLevel,pPos).getInputSlot();
@@ -114,8 +114,6 @@ public class FlowPortBlock extends BaseEntityBlock {
                     NetworkHooks.openScreen(((ServerPlayer) pPlayer), ((FlowPortBlockEntity) entity),pPos);
                 }
 
-            }else {
-                throw new IllegalStateException("Our Container provider is missing");
             }
         //}
 

@@ -24,7 +24,7 @@ public class ModBlockStateProvider extends BlockStateProvider {
     protected void registerStatesAndModels() {
         flowLogBlockWithItem(ModBlocks.FLOW_CEDAR_LOG);
         blockWithItem(ModBlocks.FLOW_CEDAR_LEAVES);
-        flowPortBlockWithItem(ModBlocks.FLOW_PORT);
+        flowPortBlockWithItem(ModBlocks.FLOW_PORT,ModBlocks.FLOW_CEDAR_LOG);
         blockWithItem(ModBlocks.CREATIVE_CFE_SOURCE);
         flowWoodBlockWithItem(ModBlocks.FLOW_CEDAR_WOOD,ModBlocks.FLOW_CEDAR_LOG);
         blockWithItem(ModBlocks.FLOW_CEDAR_PLANKS);
@@ -48,7 +48,12 @@ public class ModBlockStateProvider extends BlockStateProvider {
         hangingSignBlock(ModBlocks.FLOW_CEDAR_HANGING_SIGN.get(), ModBlocks.FLOW_CEDAR_WALL_HANGING_SIGN.get(),
                 blockTexture(ModBlocks.FLOW_CEDAR_PLANKS.get()));
 
+        saplingBlock(ModBlocks.FLOW_CEDAR_BIG_SAPLING);
+    }
 
+    private void saplingBlock(RegistryObject<Block> blockRegistryObject) {
+        simpleBlock(blockRegistryObject.get(),
+                models().cross(ForgeRegistries.BLOCKS.getKey(blockRegistryObject.get()).getPath(), blockTexture(blockRegistryObject.get())).renderType("cutout"));
     }
 
     public void hangingSignBlock(Block signBlock, Block wallSignBlock, ResourceLocation texture) {
@@ -87,18 +92,20 @@ public class ModBlockStateProvider extends BlockStateProvider {
         simpleBlockItem(block.get(), new ModelFile.UncheckedModelFile(TerraCompositio.MOD_ID+":block/"+ ForgeRegistries.BLOCKS.getKey(block.get()).getPath()));
     }
 
-    public void flowPortBlockWithItem(RegistryObject<Block> blockRegistryObject){
+    public void flowPortBlockWithItem(RegistryObject<Block> blockRegistryObject,RegistryObject<Block> top){
         FlowPortBlock block = (FlowPortBlock) blockRegistryObject.get();
         this.getVariantBuilder(block)
                 .partialState()
                     .with(FlowPortBlock.INFUSED,true)
                         .modelForState().modelFile(this.models()
-                        .cubeAll(this.name(block),this.extend(this.blockTexture(block),"_infused")))
+                        .cubeColumn(this.name(block)+"_infused",
+                                this.extend(this.blockTexture(block),"_infused"),
+                                this.extend(this.blockTexture(top.get()),"_top_infused")))
                             .addModel()
                 .partialState()
                     .with(FlowPortBlock.INFUSED,false)
                         .modelForState().modelFile(this.models()
-                        .cubeAll(this.name(block),this.blockTexture(block)))
+                        .cubeColumn(this.name(block),this.blockTexture(block),this.extend(this.blockTexture(top.get()),"_top")))
                             .addModel();
         this.simpleBlockItem(blockRegistryObject.get(),cubeAll(blockRegistryObject.get()));
     }

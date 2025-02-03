@@ -36,6 +36,8 @@ import net.sinedkadis.terracompositio.screen.ModMenuTypes;
 import net.sinedkadis.terracompositio.sound.ModSounds;
 import net.sinedkadis.terracompositio.util.ModGameRules;
 import net.sinedkadis.terracompositio.util.ModWoodTypes;
+import net.sinedkadis.terracompositio.worldgen.tree.ModFoliagePlacers;
+import net.sinedkadis.terracompositio.worldgen.tree.ModTrunkPlacerTypes;
 
 
 @Mod(TerraCompositio.MOD_ID)
@@ -73,6 +75,8 @@ public class TerraCompositio
 
         ModRecipes.register(modEventBus);
         ModMenuTypes.register(modEventBus);
+        ModTrunkPlacerTypes.register(modEventBus);
+        ModFoliagePlacers.register(modEventBus);
 
 
         ModGameRules.init();
