@@ -58,5 +58,6 @@
   "item.terracompositio.low_enriched_fco": "Low Enriched Flow Containing Ore",
   "item.terracompositio.medium_enriched_fco": "Medium Enriched Flow Containing Ore",
   "item.terracompositio.high_enriched_fco": "High Enriched Flow Containing Ore",
-  "block.terracompositio.big_flow_cedar_sapling": "Big Flow Cedar Sapling"
+  "block.terracompositio.big_flow_cedar_sapling": "Big Flow Cedar Sapling",
+  "block.terracompositio.flow_cedar_sapling": "Flow Cedar Sapling"
 }

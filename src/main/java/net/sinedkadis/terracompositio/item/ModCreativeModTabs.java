@@ -15,7 +15,7 @@ public class ModCreativeModTabs {
     public static final DeferredRegister<CreativeModeTab> Creative_mode_tabs =
             DeferredRegister.create(Registries.CREATIVE_MODE_TAB, TerraCompositio.MOD_ID);
     public static final RegistryObject<CreativeModeTab> Terra_Compositio = Creative_mode_tabs.register("terra_compositio",
-            () -> CreativeModeTab.builder().icon(() -> new ItemStack(ModItems.PEBBLE.get()))
+            () -> CreativeModeTab.builder().icon(() -> new ItemStack(ModBlocks.FLOW_CEDAR_LOG.get()))
                     .title(Component.translatable("creativetab.terra_compositio"))
                     .displayItems((pParameters, pOutput) -> {
                         pOutput.accept(ModItems.PEBBLE.get());
@@ -66,6 +66,7 @@ public class ModCreativeModTabs {
                         pOutput.accept(ModBlocks.FLOW_CONTAINING_ORE.get());
                         pOutput.accept(ModBlocks.FLOW_CONTAINING_DEEPSLATE_ORE.get());
                         pOutput.accept(ModBlocks.FLOW_CEDAR_BIG_SAPLING.get());
+                        pOutput.accept(ModBlocks.FLOW_CEDAR_SAPLING.get());
 
 
                     })

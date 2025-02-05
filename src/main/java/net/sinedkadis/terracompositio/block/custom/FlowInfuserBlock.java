@@ -46,7 +46,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.HashMap;
 import java.util.Map;
 
-import static net.sinedkadis.terracompositio.block.custom.FlowCedarLikeBlock.getNearBlocks;
+import static net.sinedkadis.terracompositio.util.TCUtil.getNearBlocks;
 
 public class FlowInfuserBlock extends BaseEntityBlock implements IBE<FlowInfuserBlockEntity> {
     public static BooleanProperty INFUSED;

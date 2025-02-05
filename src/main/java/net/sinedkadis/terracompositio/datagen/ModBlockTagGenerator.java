@@ -102,6 +102,9 @@ public class ModBlockTagGenerator extends BlockTagsProvider {
                 .add(ModBlocks.FLOW_CEDAR_WALL_SIGN.get());
         this.tag(BlockTags.STANDING_SIGNS)
                 .add(ModBlocks.FLOW_CEDAR_SIGN.get());
+        this.tag(BlockTags.SAPLINGS)
+                .add(ModBlocks.FLOW_CEDAR_SAPLING.get(),
+                        ModBlocks.FLOW_CEDAR_BIG_SAPLING.get());
 
     }
 }

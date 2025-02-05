@@ -8,10 +8,10 @@ import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
 import net.sinedkadis.terracompositio.worldgen.ModConfiguredFeatures;
 import org.jetbrains.annotations.Nullable;
 
-public class FlowCedarTreeGrower extends AbstractTreeGrower {
+public class BigFlowCedarTreeGrower extends AbstractTreeGrower {
     @Nullable
     @Override
     protected ResourceKey<ConfiguredFeature<?, ?>> getConfiguredFeature(RandomSource pRandom, boolean pHasFlowers) {
-        return ModConfiguredFeatures.FLOW_CEDAR_KEY;
+        return ModConfiguredFeatures.BIG_FLOW_CEDAR_KEY;
     }
 }

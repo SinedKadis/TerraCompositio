@@ -12,7 +12,9 @@ import net.minecraft.world.level.levelgen.feature.configurations.FeatureConfigur
 import net.minecraft.world.level.levelgen.feature.configurations.OreConfiguration;
 import net.minecraft.world.level.levelgen.feature.configurations.TreeConfiguration;
 import net.minecraft.world.level.levelgen.feature.featuresize.TwoLayersFeatureSize;
+import net.minecraft.world.level.levelgen.feature.foliageplacers.FancyFoliagePlacer;
 import net.minecraft.world.level.levelgen.feature.stateproviders.BlockStateProvider;
+import net.minecraft.world.level.levelgen.feature.trunkplacers.FancyTrunkPlacer;
 import net.minecraft.world.level.levelgen.structure.templatesystem.RuleTest;
 import net.minecraft.world.level.levelgen.structure.templatesystem.TagMatchTest;
 import net.sinedkadis.terracompositio.TerraCompositio;
@@ -29,6 +31,7 @@ public class ModConfiguredFeatures {
     //public static final ResourceKey<ConfiguredFeature<?, ?>> NETHER_SAPPHIRE_ORE_KEY = registerKey("nether_sapphire_ore");
     //public static final ResourceKey<ConfiguredFeature<?, ?>> END_SAPPHIRE_ORE_KEY = registerKey("end_sapphire_ore");
     public static final ResourceKey<ConfiguredFeature<?, ?>> BIG_FLOW_CEDAR_KEY = registerKey("big_flow_cedar");
+    public static final ResourceKey<ConfiguredFeature<?, ?>> FLOW_CEDAR_KEY = registerKey("flow_cedar");
 
     public static void bootstrap(BootstapContext<ConfiguredFeature<?, ?>> context) {
         RuleTest stoneReplaceable = new TagMatchTest(BlockTags.STONE_ORE_REPLACEABLES);
@@ -51,6 +54,14 @@ public class ModConfiguredFeatures {
 
                 BlockStateProvider.simple(ModBlocks.FLOW_CEDAR_LEAVES.get()),
                 new BigFlowCedarFoliagePlacer(ConstantInt.of(3), ConstantInt.of(2), 3),
+
+                new TwoLayersFeatureSize(1, 0, 2)).build());
+        register(context, FLOW_CEDAR_KEY, Feature.TREE, new TreeConfiguration.TreeConfigurationBuilder(
+                BlockStateProvider.simple(ModBlocks.FLOW_CEDAR_LOG.get().defaultBlockState().setValue(INFUSED,true)),
+                new FancyTrunkPlacer(5, 4, 3),
+
+                BlockStateProvider.simple(ModBlocks.FLOW_CEDAR_LEAVES.get()),
+                new FancyFoliagePlacer(ConstantInt.of(3), ConstantInt.of(2), 3),
 
                 new TwoLayersFeatureSize(1, 0, 2)).build());
     }

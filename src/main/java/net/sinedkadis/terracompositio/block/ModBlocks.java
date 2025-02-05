@@ -19,8 +19,8 @@ import net.minecraftforge.registries.RegistryObject;
 import net.sinedkadis.terracompositio.TerraCompositio;
 import net.sinedkadis.terracompositio.block.custom.*;
 import net.sinedkadis.terracompositio.item.ModItems;
-import net.sinedkadis.terracompositio.sound.ModSounds;
 import net.sinedkadis.terracompositio.util.ModWoodTypes;
+import net.sinedkadis.terracompositio.worldgen.tree.BigFlowCedarTreeGrower;
 import net.sinedkadis.terracompositio.worldgen.tree.FlowCedarTreeGrower;
 
 import java.util.function.Supplier;
@@ -125,5 +125,7 @@ public class ModBlocks {
     public static final RegistryObject<Block> FLOW_CONTAINING_RAW_ORE_BLOCK = registerBlock("flow_containing_raw_ore_block",
             () -> new Block(BlockBehaviour.Properties.copy(Blocks.RAW_IRON_BLOCK)));
     public static final RegistryObject<Block> FLOW_CEDAR_BIG_SAPLING = registerBlock("big_flow_cedar_sapling",
+            () -> new SaplingBlock(new BigFlowCedarTreeGrower(), BlockBehaviour.Properties.copy(Blocks.OAK_SAPLING)));
+    public static final RegistryObject<Block> FLOW_CEDAR_SAPLING = registerBlock("flow_cedar_sapling",
             () -> new SaplingBlock(new FlowCedarTreeGrower(), BlockBehaviour.Properties.copy(Blocks.OAK_SAPLING)));
 }

@@ -49,6 +49,7 @@ public class ModBlockLootTables extends BlockLootSubProvider {
         this.dropOther(ModBlocks.FLOW_INFUSER.get(), ModBlocks.FLOW_CEDAR_LOG.get());
         this.dropSelf(ModBlocks.FLOW_CONTAINING_RAW_ORE_BLOCK.get());
         this.dropSelf(ModBlocks.FLOW_CEDAR_BIG_SAPLING.get());
+        this.dropSelf(ModBlocks.FLOW_CEDAR_SAPLING.get());
 
         this.add(ModBlocks.FLOW_CEDAR_SLAB.get(),
                 block -> createSlabItemTable(ModBlocks.FLOW_CEDAR_SLAB.get()));

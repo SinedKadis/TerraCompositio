@@ -2,6 +2,7 @@ package net.sinedkadis.terracompositio.recipe;
 
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
+import lombok.Getter;
 import net.minecraft.core.NonNullList;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.network.FriendlyByteBuf;
@@ -18,11 +19,14 @@ public class FlowSaturationRecipe implements Recipe<SimpleContainer> {
     private final NonNullList<Ingredient> inputItems;
     private final ItemStack output;
     private final ResourceLocation id;
+    @Getter
+    private final boolean flowConsume;
 
-    public FlowSaturationRecipe(NonNullList<Ingredient> inputItems, ItemStack output, ResourceLocation id) {
+    public FlowSaturationRecipe(NonNullList<Ingredient> inputItems, ItemStack output, ResourceLocation id,boolean flowConsume) {
         this.inputItems = inputItems;
         this.output = output;
         this.id = id;
+        this.flowConsume = flowConsume;
     }
 
     @Override
@@ -83,10 +87,11 @@ public class FlowSaturationRecipe implements Recipe<SimpleContainer> {
             for (int i=0; i < inputs.size();i++){
                 inputs.set(i,Ingredient.fromJson(ingredients.get(i)));
             }
+            boolean flowConsume = GsonHelper.getAsBoolean(pSerializedRecipe,"flow_consume");
 
 
 
-            return new FlowSaturationRecipe(inputs,output,pRecipeId);
+            return new FlowSaturationRecipe(inputs,output,pRecipeId,flowConsume);
         }
 
         @Override
@@ -96,7 +101,8 @@ public class FlowSaturationRecipe implements Recipe<SimpleContainer> {
                 inputs.set(i,Ingredient.fromNetwork(pBuffer));
             }
             ItemStack output = pBuffer.readItem();
-            return new FlowSaturationRecipe(inputs,output,pRecipeId);
+            boolean flowConsume = pBuffer.readBoolean();
+            return new FlowSaturationRecipe(inputs,output,pRecipeId,flowConsume);
         }
 
         @Override
@@ -106,6 +112,7 @@ public class FlowSaturationRecipe implements Recipe<SimpleContainer> {
                 ingredient.toNetwork(pBuffer);
             }
             pBuffer.writeItemStack(pRecipe.getResultItem(null),false);
+            pBuffer.writeBoolean(pRecipe.flowConsume);
         }
     }
 }

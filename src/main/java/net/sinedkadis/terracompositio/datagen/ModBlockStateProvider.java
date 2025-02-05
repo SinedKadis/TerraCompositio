@@ -49,6 +49,7 @@ public class ModBlockStateProvider extends BlockStateProvider {
                 blockTexture(ModBlocks.FLOW_CEDAR_PLANKS.get()));
 
         saplingBlock(ModBlocks.FLOW_CEDAR_BIG_SAPLING);
+        saplingBlock(ModBlocks.FLOW_CEDAR_SAPLING);
     }
 
     private void saplingBlock(RegistryObject<Block> blockRegistryObject) {

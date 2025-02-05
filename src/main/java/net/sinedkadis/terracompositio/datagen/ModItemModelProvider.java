@@ -81,6 +81,7 @@ public class ModItemModelProvider extends ItemModelProvider {
         simpleItem(ModItems.HIGH_ENRICHED_FCO);
 
         saplingItem(ModBlocks.FLOW_CEDAR_BIG_SAPLING);
+        saplingItem(ModBlocks.FLOW_CEDAR_SAPLING);
     }
 
     // Shoutout to El_Redstoniano for making this

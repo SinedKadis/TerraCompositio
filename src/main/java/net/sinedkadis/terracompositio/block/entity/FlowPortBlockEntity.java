@@ -8,6 +8,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.*;
@@ -25,6 +26,7 @@ import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemStackHandler;
+import net.sinedkadis.terracompositio.particle.ModParticles;
 import net.sinedkadis.terracompositio.recipe.FlowSaturationRecipe;
 import net.sinedkadis.terracompositio.screen.FlowBlockPortMenu;
 import org.jetbrains.annotations.NotNull;
@@ -34,6 +36,7 @@ import org.slf4j.Logger;
 import java.util.Optional;
 
 import static net.sinedkadis.terracompositio.block.ModBlockStateProperties.INFUSED;
+import static net.sinedkadis.terracompositio.block.custom.FlowCedarLikeBlock.flowLeak;
 
 public class FlowPortBlockEntity extends BlockEntity implements MenuProvider {
     private final ItemStackHandler itemHandler = new ItemStackHandler(2){
@@ -161,6 +164,19 @@ public class FlowPortBlockEntity extends BlockEntity implements MenuProvider {
         this.itemHandler.extractItem(SLOT_INPUT,1,false);
         this.itemHandler.setStackInSlot(SLOT_OUTPUT, new ItemStack(result.getItem(),
                 this.itemHandler.getStackInSlot(SLOT_OUTPUT).getCount()+result.getCount()));
+        if (recipe.get().isFlowConsume())
+            flowLeak(this.getBlockState(),this.level,this.worldPosition,true);
+        if (this.level instanceof ServerLevel level){
+            level.sendParticles(ModParticles.FLOW_STILL_PARTICLE.get(),
+                    this.getBlockPos().getX(),
+                    this.getBlockPos().getY(),
+                    this.getBlockPos().getZ(),
+                    10,
+                    this.level.getRandom().nextFloat(),
+                    this.level.getRandom().nextFloat(),
+                    this.level.getRandom().nextFloat(),
+                    0.5D);
+        }
     }
 
     private boolean hasProgressFinished() {

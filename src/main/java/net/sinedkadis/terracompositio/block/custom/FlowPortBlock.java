@@ -33,8 +33,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import static net.minecraft.world.level.block.RotatedPillarBlock.AXIS;
-import static net.sinedkadis.terracompositio.block.custom.FlowCedarLikeBlock.getNearBlocks;
-
+import static net.sinedkadis.terracompositio.util.TCUtil.getNearBlocks;
 
 
 public class FlowPortBlock extends BaseEntityBlock {

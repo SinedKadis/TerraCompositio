@@ -27,6 +27,9 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import static net.sinedkadis.terracompositio.util.TCUtil.getNearBlocks;
+
+
 public class FlowCedarLikeBlock extends RotatedPillarBlock {
     public static final BooleanProperty INFUSED;
 
@@ -91,34 +94,35 @@ public class FlowCedarLikeBlock extends RotatedPillarBlock {
     public void onRemove(BlockState pState, Level pLevel, BlockPos pPos, BlockState pNewState, boolean pIsMoving) {
         super.onRemove(pState, pLevel, pPos, pNewState, pIsMoving);
         if (pNewState.is(Blocks.AIR)) {
-            if (pState.getValue(INFUSED)&&!pLevel.getGameRules().getBoolean(ModGameRules.DISABLE_FLOW_LEAKING)) {
-                BlockPos fpos = pPos.relative(pState.getValue(AXIS),1);
-                BlockPos bpos = pPos.relative(pState.getValue(AXIS),-1);
-                getNearBlocks(fpos).stream()
-                        .filter(pos -> pos != pPos)
-                        .filter(pos -> pLevel.getBlockState(pos).is(ModTags.Blocks.FLOW_LEAKABLE))
-                        .forEach(pos -> pLevel.setBlockAndUpdate(pos,pLevel.getBlockState(pos).setValue(INFUSED,false)));
-                getNearBlocks(bpos).stream()
-                        .filter(pos -> pos != pPos)
-                        .filter(pos -> pLevel.getBlockState(pos).is(ModTags.Blocks.FLOW_LEAKABLE))
-                        .forEach(pos -> pLevel.setBlockAndUpdate(pos,pLevel.getBlockState(pos).setValue(INFUSED,false)));
-            }
+            flowLeak(pState, pLevel, pPos,false);
         }
     }
 
-    static @NotNull List<BlockPos> getNearBlocks(BlockPos pPos) {
-        List<BlockPos> toReplace = new ArrayList<>();
-        for (int x = -1;x<=1;x++){
-            for (int y = -1;y<=1;y++){
-                for (int z = -1;z<=1;z++){
-                    toReplace.add(new BlockPos(pPos.getX() + x,
-                            pPos.getY() + y,
-                            pPos.getZ() + z));
+    public static void flowLeak(BlockState pState, Level pLevel, BlockPos pPos,boolean chained) {
+        if (pState.hasProperty(INFUSED) && pState.getValue(INFUSED)&&!pLevel.getGameRules().getBoolean(ModGameRules.DISABLE_FLOW_LEAKING)) {
+
+                BlockPos fpos;
+                BlockPos bpos;
+                if (pState.hasProperty(AXIS)) {
+                    fpos = pPos.relative(pState.getValue(AXIS), 1);
+                    bpos = pPos.relative(pState.getValue(AXIS), -1);
+                } else {
+                    fpos = pPos.relative(Direction.Axis.Y, 1);
+                    bpos = pPos.relative(Direction.Axis.Y, -1);
                 }
-            }
+                getNearBlocks(fpos,chained ? 3 : 1).stream()
+                        .filter(pos -> pos != pPos)
+                        .filter(pos -> pLevel.getBlockState(pos).is(ModTags.Blocks.FLOW_LEAKABLE))
+                        .forEach(pos -> pLevel.setBlockAndUpdate(pos, pLevel.getBlockState(pos).setValue(INFUSED, false)));
+                getNearBlocks(bpos,chained ? 3 : 1).stream()
+                        .filter(pos -> pos != pPos)
+                        .filter(pos -> pLevel.getBlockState(pos).is(ModTags.Blocks.FLOW_LEAKABLE))
+                        .forEach(pos -> pLevel.setBlockAndUpdate(pos, pLevel.getBlockState(pos).setValue(INFUSED, false)));
+
         }
-        return toReplace;
     }
+
+
 
     @Override
     public void tick(BlockState pState, ServerLevel pLevel, BlockPos pPos, RandomSource pRandom) {
