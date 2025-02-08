@@ -3,14 +3,18 @@ package net.sinedkadis.terracompositio.events;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.effect.MobEffect;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.event.TickEvent;
+import net.minecraftforge.event.entity.living.LivingEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.sinedkadis.terracompositio.TerraCompositio;
 import net.sinedkadis.terracompositio.effect.ModEffects;
+import net.sinedkadis.terracompositio.fluid.ModFluids;
 import net.sinedkadis.terracompositio.particle.ModParticles;
 
 @Mod.EventBusSubscriber(modid = TerraCompositio.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
@@ -28,6 +32,20 @@ public class ForgeEventBusEvents {
                                 true, pos.x, pos.y, pos.z, 10, 0.1, 0.1, 0.1, 0.0);
                     }
                 }
+            }
+        }
+    }
+    @SubscribeEvent
+    public static void onLivingTickEvent(LivingEvent.LivingTickEvent event){
+        FluidState fluidstate = event.getEntity().level().getFluidState(event.getEntity().blockPosition());
+        if (fluidstate.getFluidType() == ModFluids.FLOW_FLUID.type.get()  && !event.getEntity().canStandOnFluid(fluidstate) || event.getEntity().hasEffect((MobEffect)ModEffects.FLOW_SATURATION.get())) {
+            if (fluidstate.getFluidType() == ModFluids.FLOW_FLUID.type.get() && !event.getEntity().canStandOnFluid(fluidstate) && event.getEntity().hasEffect((MobEffect)ModEffects.FLOW_SATURATION.get())) {
+                event.getEntity().setDeltaMovement(event.getEntity().getDeltaMovement().scale(1.4F));
+            }else if (event.getEntity().hasEffect((MobEffect)ModEffects.FLOW_SATURATION.get())) {
+                if (event.getEntity().onGround() || event.getEntity().onClimbable())
+                    event.getEntity().setDeltaMovement(event.getEntity().getDeltaMovement().scale(1.2F));
+            }else {
+                event.getEntity().setDeltaMovement(event.getEntity().getDeltaMovement().scale(1.2F));
             }
         }
     }

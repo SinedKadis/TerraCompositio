@@ -14,7 +14,6 @@ import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.texture.TextureAtlas;
 import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.client.resources.model.BakedModel;
-import net.minecraft.client.resources.model.WeightedBakedModel;
 import net.minecraft.core.Direction;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.inventory.InventoryMenu;
@@ -24,8 +23,6 @@ import net.minecraftforge.client.model.BakedModelWrapper;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidType;
 import net.sinedkadis.terracompositio.TerraCompositio;
-import net.sinedkadis.terracompositio.util.GetSelector;
-import net.sinedkadis.terracompositio.util.GetWrapper;
 import org.joml.Matrix4f;
 import org.joml.Vector3f;
 import net.minecraft.client.renderer.RenderStateShard;
@@ -394,12 +391,7 @@ public class FluidRenderer {
         }
         BakedModel baked = minecraft.getModelManager().getBlockModelShaper().getBlockModel(state);
         // map multipart and weighted random into the first variant
-        if (baked instanceof GetSelector igetSelector) {
-           baked = igetSelector.getselectors().get(0).getRight();
-        }
-        if (baked instanceof GetWrapper igetWrapper) {
-           baked = igetWrapper.getwrapped();
-        }
+
         // final model should match the desired type
         if (clazz.isInstance(baked)) {
             return clazz.cast(baked);
