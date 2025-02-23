@@ -26,17 +26,25 @@ import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
+import java.util.function.Supplier;
 
 import static net.sinedkadis.terracompositio.util.TCUtil.getNearBlocks;
 
 
 public class FlowCedarLikeBlock extends RotatedPillarBlock {
     public static final BooleanProperty INFUSED;
+    @Nullable
+    private final Supplier<Block> stripPair;
 
+    public FlowCedarLikeBlock(Properties pProperties, Supplier<Block> stripPair) {
+        super(pProperties);
+        this.registerDefaultState((BlockState)this.defaultBlockState().setValue(INFUSED, false));
+        this.stripPair = stripPair;
+    }
     public FlowCedarLikeBlock(Properties pProperties) {
         super(pProperties);
         this.registerDefaultState((BlockState)this.defaultBlockState().setValue(INFUSED, false));
-
+        this.stripPair = null;
     }
 
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> pBuilder) {
@@ -60,30 +68,29 @@ public class FlowCedarLikeBlock extends RotatedPillarBlock {
 
     @Override
     public @Nullable BlockState getToolModifiedState(BlockState state, UseOnContext context, ToolAction toolAction, boolean simulate) {
-        Map<BlockState,BlockState> stripPair = new HashMap<>();
+//        Map<BlockState,BlockState> stripPair = new HashMap<>();
+//
+//        stripPair.put(
+//                ModBlocks.FLOW_CEDAR_LOG.get().defaultBlockState(),
+//                ModBlocks.STRIPPED_FLOW_CEDAR_LOG.get().defaultBlockState());
+//        stripPair.put(
+//                ModBlocks.FLOW_CEDAR_WOOD.get().defaultBlockState(),
+//                ModBlocks.STRIPPED_FLOW_CEDAR_WOOD.get().defaultBlockState());
+//        stripPair.put(
+//                ModBlocks.FLOW_PORT.get().defaultBlockState(),
+//                ModBlocks.STRIPPED_FLOW_CEDAR_WOOD.get().defaultBlockState());
+//        stripPair.put(
+//                ModBlocks.FLOW_CEDAR_LOG.get().defaultBlockState().setValue(INFUSED,true),
+//                ModBlocks.STRIPPED_FLOW_CEDAR_LOG.get().defaultBlockState().setValue(INFUSED,true));
+//        stripPair.put(
+//                ModBlocks.FLOW_CEDAR_WOOD.get().defaultBlockState().setValue(INFUSED,true),
+//                ModBlocks.STRIPPED_FLOW_CEDAR_WOOD.get().defaultBlockState().setValue(INFUSED,true));
+//        stripPair.put(
+//                ModBlocks.FLOW_PORT.get().defaultBlockState().setValue(INFUSED,true),
+//                ModBlocks.STRIPPED_FLOW_CEDAR_WOOD.get().defaultBlockState().setValue(INFUSED,true));
 
-        stripPair.put(
-                ModBlocks.FLOW_CEDAR_LOG.get().defaultBlockState(),
-                ModBlocks.STRIPPED_FLOW_CEDAR_LOG.get().defaultBlockState());
-        stripPair.put(
-                ModBlocks.FLOW_CEDAR_WOOD.get().defaultBlockState(),
-                ModBlocks.STRIPPED_FLOW_CEDAR_WOOD.get().defaultBlockState());
-        stripPair.put(
-                ModBlocks.FLOW_PORT.get().defaultBlockState(),
-                ModBlocks.STRIPPED_FLOW_CEDAR_WOOD.get().defaultBlockState());
-        stripPair.put(
-                ModBlocks.FLOW_CEDAR_LOG.get().defaultBlockState().setValue(INFUSED,true),
-                ModBlocks.STRIPPED_FLOW_CEDAR_LOG.get().defaultBlockState().setValue(INFUSED,true));
-        stripPair.put(
-                ModBlocks.FLOW_CEDAR_WOOD.get().defaultBlockState().setValue(INFUSED,true),
-                ModBlocks.STRIPPED_FLOW_CEDAR_WOOD.get().defaultBlockState().setValue(INFUSED,true));
-        stripPair.put(
-                ModBlocks.FLOW_PORT.get().defaultBlockState().setValue(INFUSED,true),
-                ModBlocks.STRIPPED_FLOW_CEDAR_WOOD.get().defaultBlockState().setValue(INFUSED,true));
-
-        if(context.getItemInHand().getItem() instanceof AxeItem){
-            if (stripPair.containsKey(state))
-                return stripPair.get(state)
+        if(context.getItemInHand().getItem() instanceof AxeItem && stripPair != null){
+            return stripPair.get().defaultBlockState()
                     .setValue(AXIS, state.getValue(AXIS))
                     .setValue(INFUSED,state.getValue(INFUSED));
         }
@@ -110,11 +117,11 @@ public class FlowCedarLikeBlock extends RotatedPillarBlock {
                     fpos = pPos.relative(Direction.Axis.Y, 1);
                     bpos = pPos.relative(Direction.Axis.Y, -1);
                 }
-                getNearBlocks(fpos,chained ? 3 : 1).stream()
+                getNearBlocks(fpos,chained ? 4 : 2).stream()
                         .filter(pos -> pos != pPos)
                         .filter(pos -> pLevel.getBlockState(pos).is(ModTags.Blocks.FLOW_LEAKABLE))
                         .forEach(pos -> pLevel.setBlockAndUpdate(pos, pLevel.getBlockState(pos).setValue(INFUSED, false)));
-                getNearBlocks(bpos,chained ? 3 : 1).stream()
+                getNearBlocks(bpos,chained ? 4 : 2).stream()
                         .filter(pos -> pos != pPos)
                         .filter(pos -> pLevel.getBlockState(pos).is(ModTags.Blocks.FLOW_LEAKABLE))
                         .forEach(pos -> pLevel.setBlockAndUpdate(pos, pLevel.getBlockState(pos).setValue(INFUSED, false)));

@@ -59,5 +59,13 @@
   "item.terracompositio.medium_enriched_fco": "Medium Enriched Flow Containing Ore",
   "item.terracompositio.high_enriched_fco": "High Enriched Flow Containing Ore",
   "block.terracompositio.big_flow_cedar_sapling": "Big Flow Cedar Sapling",
-  "block.terracompositio.flow_cedar_sapling": "Flow Cedar Sapling"
+  "block.terracompositio.flow_cedar_sapling": "Flow Cedar Sapling",
+  "item.terracompositio.flow_rotating_axe.axe": "Axe Mode",
+  "item.terracompositio.flow_rotating_axe.wrench_axe": "Wrench-Axe Mode",
+  "item.terracompositio.flow_rotating_axe.wrench": "Wrench Mode",
+  "message.terracompositio.wrench_mode": "Switched to %s",
+  "item.terracompositio.flow_rotating_axe": "Infused Iron Axe",
+  "item.terracompositio.flow_rotating_axe.mode": "Mode: %s",
+  "item.terracompositio.flow_rotating_axe.too_massive_tree": "I can't. Maybe it's too big",
+  "item.terracompositio.flow_rotating_axe.no_change": "I can't change anything here"
 }

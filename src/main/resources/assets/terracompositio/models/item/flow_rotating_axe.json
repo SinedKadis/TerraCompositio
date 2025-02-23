@@ -1,0 +1,20 @@
+{
+  "parent": "item/handheld",
+  "textures": {
+    "layer0": "terracompositio:item/flow_axe"
+  },
+  "overrides": [
+    {
+      "predicate": {
+        "wrench_mode": 1
+      },
+      "model": "terracompositio:item/flow_wrench_axe"
+    },
+    {
+      "predicate": {
+        "wrench_mode": 2
+      },
+      "model": "terracompositio:item/flow_wrench"
+    }
+  ]
+}

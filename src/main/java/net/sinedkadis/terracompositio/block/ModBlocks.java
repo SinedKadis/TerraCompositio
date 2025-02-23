@@ -45,12 +45,12 @@ public class ModBlocks {
     }
 
     public static final RegistryObject<Block> FLOW_CEDAR_LOG = registerBlock("flow_cedar_log",
-            () -> new FlowCedarLikeBlock(BlockBehaviour.Properties.copy(Blocks.OAK_LOG).strength(3f)));
+            () -> new FlowCedarLikeBlock(BlockBehaviour.Properties.copy(Blocks.OAK_LOG).strength(3f), ModBlocks.STRIPPED_FLOW_CEDAR_LOG));
     public static final RegistryObject<Block> FLOW_PORT = registerBlock("flow_port",
-            () -> new FlowPortBlock(BlockBehaviour.Properties.copy(Blocks.OAK_WOOD).strength(3f)));
+            () -> new FlowPortBlock(BlockBehaviour.Properties.copy(Blocks.OAK_WOOD).strength(3f),ModBlocks.STRIPPED_FLOW_CEDAR_LOG));
 
     public static final RegistryObject<Block> FLOW_CEDAR_WOOD = registerBlock("flow_cedar_wood",
-            () -> new FlowCedarLikeBlock(BlockBehaviour.Properties.copy(Blocks.OAK_WOOD).strength(3f)));
+            () -> new FlowCedarLikeBlock(BlockBehaviour.Properties.copy(Blocks.OAK_WOOD).strength(3f),ModBlocks.STRIPPED_FLOW_CEDAR_WOOD));
     public static final RegistryObject<Block> STRIPPED_FLOW_CEDAR_LOG = registerBlock("stripped_flow_cedar_log",
             () -> new FlowCedarLikeBlock(BlockBehaviour.Properties.copy(Blocks.STRIPPED_OAK_LOG).strength(3f)));
     public static final RegistryObject<Block> STRIPPED_FLOW_CEDAR_WOOD = registerBlock("stripped_flow_cedar_wood",
@@ -117,7 +117,7 @@ public class ModBlocks {
     public static final RegistryObject<Block> CREATIVE_CFE_SOURCE = registerBlock("creative_cfe_source",
             () -> new CreativeCFESourceBlock(BlockBehaviour.Properties.copy(Blocks.IRON_BLOCK)));
     public static final RegistryObject<Block> FLOW_INFUSER = registerBlock("flow_infuser",
-            () -> new FlowInfuserBlock(BlockBehaviour.Properties.copy(Blocks.IRON_BLOCK).noOcclusion()));
+            () -> new FlowInfuserBlock(BlockBehaviour.Properties.copy(Blocks.IRON_BLOCK).noOcclusion(), ModBlocks.STRIPPED_FLOW_CEDAR_LOG));
     public static final RegistryObject<Block> FLOW_CONTAINING_ORE = registerBlock("flow_containing_ore",
             () -> new Block(BlockBehaviour.Properties.copy(Blocks.IRON_ORE)));
     public static final RegistryObject<Block> FLOW_CONTAINING_DEEPSLATE_ORE = registerBlock("flow_containing_deepslate_ore",
@@ -128,4 +128,6 @@ public class ModBlocks {
             () -> new SaplingBlock(new BigFlowCedarTreeGrower(), BlockBehaviour.Properties.copy(Blocks.OAK_SAPLING)));
     public static final RegistryObject<Block> FLOW_CEDAR_SAPLING = registerBlock("flow_cedar_sapling",
             () -> new SaplingBlock(new FlowCedarTreeGrower(), BlockBehaviour.Properties.copy(Blocks.OAK_SAPLING)));
+    public static final RegistryObject<Block> MATTER_INFUSER = registerBlock("matter_infuser",
+            () -> new MatterInfuserBlock(BlockBehaviour.Properties.copy(Blocks.IRON_BLOCK).noOcclusion(),ModBlocks.STRIPPED_FLOW_CEDAR_LOG));
 }

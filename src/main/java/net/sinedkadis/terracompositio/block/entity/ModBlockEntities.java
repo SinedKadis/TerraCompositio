@@ -29,6 +29,10 @@ public class ModBlockEntities {
             BLOCK_ENTITIES.register("flow_infuser_be", () ->
                     BlockEntityType.Builder.of(FlowInfuserBlockEntity::new,
                             ModBlocks.FLOW_INFUSER.get()).build(null));
+    public static final RegistryObject<BlockEntityType<MatterInfuserBlockEntity>> MATTER_INFUSER_BE =
+            BLOCK_ENTITIES.register("matter_infuser_be", () ->
+                    BlockEntityType.Builder.of(MatterInfuserBlockEntity::new,
+                            ModBlocks.MATTER_INFUSER.get()).build(null));
 
 
 

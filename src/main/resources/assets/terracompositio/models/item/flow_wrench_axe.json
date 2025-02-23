@@ -1,0 +1,6 @@
+{
+  "parent": "item/handheld",
+  "textures": {
+    "layer0": "terracompositio:item/flow_wrench_axe"
+  }
+}
