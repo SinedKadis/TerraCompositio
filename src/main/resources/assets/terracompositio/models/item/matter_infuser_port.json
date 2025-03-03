@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "terracompositio:block/matter_infuser_port_zero"
+  }
+}

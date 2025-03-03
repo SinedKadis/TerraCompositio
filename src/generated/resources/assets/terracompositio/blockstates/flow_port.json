@@ -1,10 +1,52 @@
 {
   "variants": {
-    "infused=false": {
+    "axis=x,infused=false": {
+      "model": "terracompositio:block/flow_port",
+      "x": 90,
+      "y": 90
+    },
+    "axis=x,infused=true": {
+      "model": "terracompositio:block/flow_port_infused",
+      "x": 90,
+      "y": 90
+    },
+    "axis=y,facing=east,infused=false": {
+      "model": "terracompositio:block/flow_port",
+      "y": 90
+    },
+    "axis=y,facing=east,infused=true": {
+      "model": "terracompositio:block/flow_port_infused",
+      "y": 90
+    },
+    "axis=y,facing=north,infused=false": {
       "model": "terracompositio:block/flow_port"
     },
-    "infused=true": {
+    "axis=y,facing=north,infused=true": {
       "model": "terracompositio:block/flow_port_infused"
+    },
+    "axis=y,facing=south,infused=false": {
+      "model": "terracompositio:block/flow_port",
+      "y": 180
+    },
+    "axis=y,facing=south,infused=true": {
+      "model": "terracompositio:block/flow_port_infused",
+      "y": 180
+    },
+    "axis=y,facing=west,infused=false": {
+      "model": "terracompositio:block/flow_port",
+      "y": 270
+    },
+    "axis=y,facing=west,infused=true": {
+      "model": "terracompositio:block/flow_port_infused",
+      "y": 270
+    },
+    "axis=z,infused=false": {
+      "model": "terracompositio:block/flow_port",
+      "x": 90
+    },
+    "axis=z,infused=true": {
+      "model": "terracompositio:block/flow_port_infused",
+      "x": 90
     }
   }
 }

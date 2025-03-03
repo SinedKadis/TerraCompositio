@@ -56,7 +56,12 @@ public class ModCreativeModTabs {
                         pOutput.accept(ModItems.FLOW_CEDAR_BOOTS.get());
                         pOutput.accept(ModBlocks.CREATIVE_CFE_SOURCE.get());
                         pOutput.accept(ModBlocks.FLOW_INFUSER.get());
+
                         pOutput.accept(ModItems.INFUSED_IRON_INGOT.get());
+                        pOutput.accept(ModItems.INFUSED_IRON_ROD.get());
+                        pOutput.accept(ModItems.GOLD_ROD.get());
+                        pOutput.accept(ModItems.COPPER_ROD.get());
+
                         pOutput.accept(ModItems.COPPER_NUGGET.get());
                         pOutput.accept(ModItems.FLOW_INFUSER_KIT.get());
                         pOutput.accept(ModItems.FLOW_CONTAINING_RAW_ORE.get());
@@ -69,7 +74,10 @@ public class ModCreativeModTabs {
                         pOutput.accept(ModBlocks.FLOW_CEDAR_BIG_SAPLING.get());
                         pOutput.accept(ModBlocks.FLOW_CEDAR_SAPLING.get());
 
-                        pOutput.accept(ModBlocks.MATTER_INFUSER.get());
+                        pOutput.accept(ModBlocks.FLOW_CEDAR_CASING.get());
+                        pOutput.accept(ModBlocks.MATTER_INFUSER_PORT.get());
+                        pOutput.accept(ModBlocks.MATTER_INFUSER_IO.get());
+                        pOutput.accept(ModItems.INPUT_BUS.get());
 
 
                     })

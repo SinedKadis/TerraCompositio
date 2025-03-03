@@ -7,6 +7,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.*;
 import net.minecraftforge.client.model.generators.BlockStateProvider;
 import net.minecraftforge.client.model.generators.ModelFile;
+import net.minecraftforge.client.model.generators.VariantBlockStateBuilder;
 import net.minecraftforge.common.data.ExistingFileHelper;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
@@ -25,6 +26,7 @@ public class ModBlockStateProvider extends BlockStateProvider {
     @Override
     protected void registerStatesAndModels() {
         flowLogBlockWithItem(ModBlocks.FLOW_CEDAR_LOG);
+
         blockWithItem(ModBlocks.FLOW_CEDAR_LEAVES);
         flowPortBlockWithItem(ModBlocks.FLOW_PORT,
                 ModBlocks.FLOW_CEDAR_LOG,
@@ -90,7 +92,7 @@ public class ModBlockStateProvider extends BlockStateProvider {
     }
 
     private void flowWoodBlockWithItem(RegistryObject<Block> block, RegistryObject<Block> texture){
-        flowLogBlock(((RotatedPillarBlock) block.get()),texture.get(),texture.get());
+        flowLogBlock(((RotatedPillarBlock) block.get()),texture.get(),texture.get(),true);
         simpleBlockItem(block.get(), new ModelFile.UncheckedModelFile(TerraCompositio.MOD_ID+":block/"+ ForgeRegistries.BLOCKS.getKey(block.get()).getPath()));
     }
     private  void flowPortBlockWithItem(RegistryObject<Block> block, RegistryObject<Block> sideTexture, RegistryObject<Block> topTexture){
@@ -175,35 +177,17 @@ public class ModBlockStateProvider extends BlockStateProvider {
     }
 
     private void flowLogBlockWithItem(RegistryObject<Block> block){
-        flowLogBlock((RotatedPillarBlock) block.get(),block.get(),block.get());
+        flowLogBlock((RotatedPillarBlock) block.get(),block.get(),block.get(),true);
         simpleBlockItem(block.get(), new ModelFile.UncheckedModelFile(TerraCompositio.MOD_ID+":block/"+ ForgeRegistries.BLOCKS.getKey(block.get()).getPath()));
     }
 
-    public void flowLogBlock(RotatedPillarBlock block,Block sideTexture,Block topTexture) {
+    public void flowLogBlock(Block block,Block sideTexture,Block topTexture,boolean infused) {
         ResourceLocation side = this.blockTexture(sideTexture);
         ResourceLocation end = this.extend(this.blockTexture(topTexture), "_top");
-        ResourceLocation side_infused = this.extend(this.blockTexture(sideTexture), "_infused");
-        ResourceLocation end_infused = this.extend(this.blockTexture(topTexture), "_top_infused");
+
         ModelFile vertical = this.models().cubeColumn(this.name(block), side, end);
         ModelFile horizontal = this.models().cubeColumnHorizontal(this.name(block) + "_horizontal", side, end);
-        ModelFile vertical_infused = this.models().cubeColumn(this.name(block)+"_infused", side_infused, end_infused);
-        ModelFile horizontal_infused = this.models().cubeColumnHorizontal(this.name(block) + "_horizontal" + "_infused", side_infused, end_infused);
-        this.getVariantBuilder(block)
-                .partialState()
-                    .with(RotatedPillarBlock.AXIS, Direction.Axis.Y)
-                    .with(FlowCedarLikeBlock.INFUSED, true)
-                        .modelForState().modelFile(vertical_infused)
-                            .addModel()
-                .partialState()
-                    .with(RotatedPillarBlock.AXIS, Direction.Axis.Z)
-                    .with(FlowCedarLikeBlock.INFUSED, true)
-                        .modelForState().modelFile(horizontal_infused).rotationX(90)
-                            .addModel()
-                .partialState()
-                    .with(RotatedPillarBlock.AXIS, Direction.Axis.X)
-                    .with(FlowCedarLikeBlock.INFUSED, true)
-                        .modelForState().modelFile(horizontal_infused).rotationX(90).rotationY(90)
-                            .addModel()
+        VariantBlockStateBuilder builder = this.getVariantBuilder(block)
                 .partialState()
                     .with(RotatedPillarBlock.AXIS, Direction.Axis.Y)
                     .with(FlowCedarLikeBlock.INFUSED, false)
@@ -219,6 +203,34 @@ public class ModBlockStateProvider extends BlockStateProvider {
                     .with(FlowCedarLikeBlock.INFUSED, false)
                         .modelForState().modelFile(horizontal).rotationX(90).rotationY(90)
                             .addModel();
+        ResourceLocation side_infused;
+        ResourceLocation end_infused;
+        if (infused) {
+            side_infused = this.extend(this.blockTexture(sideTexture), "_infused");
+            end_infused = this.extend(this.blockTexture(topTexture), "_top_infused");
+
+        } else {
+            side_infused = this.blockTexture(sideTexture);
+            end_infused = this.blockTexture(topTexture);
+        }
+        ModelFile vertical_infused = this.models().cubeColumn(this.name(block) + "_infused", side_infused, end_infused);
+        ModelFile horizontal_infused = this.models().cubeColumnHorizontal(this.name(block) + "_horizontal" + "_infused", side_infused, end_infused);
+            builder.partialState()
+                        .with(RotatedPillarBlock.AXIS, Direction.Axis.Y)
+                        .with(FlowCedarLikeBlock.INFUSED, true)
+                            .modelForState().modelFile(vertical_infused)
+                                .addModel()
+                    .partialState()
+                        .with(RotatedPillarBlock.AXIS, Direction.Axis.Z)
+                        .with(FlowCedarLikeBlock.INFUSED, true)
+                            .modelForState().modelFile(horizontal_infused).rotationX(90)
+                            .addModel()
+                    .partialState()
+                        .with(RotatedPillarBlock.AXIS, Direction.Axis.X)
+                        .with(FlowCedarLikeBlock.INFUSED, true)
+                            .modelForState().modelFile(horizontal_infused).rotationX(90).rotationY(90)
+                                .addModel();
+
     }
     private ResourceLocation extend(ResourceLocation rl, String suffix) {
         String var10002 = rl.getNamespace();

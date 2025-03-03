@@ -2,15 +2,63 @@ package net.sinedkadis.terracompositio.util;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.TagKey;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.Property;
+import net.sinedkadis.terracompositio.particle.ModParticles;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
+import static net.sinedkadis.terracompositio.block.ModBlockStateProperties.INFUSED;
+
 public class TCUtil {
+    public static @NotNull InteractionResult handleInWorldBlockCraft(BlockState oldState, BlockState newState, Level pLevel, BlockPos pPos, ItemStack item, int count) {
+        pLevel.setBlock(pPos,copyBlockStates(oldState,newState),3);
+        item.shrink(count);
+        if (pLevel instanceof ServerLevel level && oldState.hasProperty(INFUSED) && oldState.getValue(INFUSED)){
+            level.playSound(null, pPos, SoundEvents.ANVIL_PLACE, SoundSource.BLOCKS);
+            level.sendParticles(ModParticles.FLOW_STILL_PARTICLE.get(),
+                    pPos.getX(),
+                    pPos.getY(),
+                    pPos.getZ(),
+                    10,
+                    pLevel.getRandom().nextFloat(),
+                    pLevel.getRandom().nextFloat(),
+                    pLevel.getRandom().nextFloat(),
+                    0.5D);
+        }
+        return InteractionResult.sidedSuccess(pLevel.isClientSide);
+    }
+
+    public static BlockState copyBlockStates(BlockState oldState, BlockState newState) {
+        for (Property<?> property : oldState.getProperties()) {
+            if (newState.hasProperty(property)) {
+                newState = copyProperty(oldState, newState, property);
+            }
+        }
+        return newState;
+    }
+
+    @SuppressWarnings("unchecked")
+    private static <T extends Comparable<T>> BlockState copyProperty(BlockState oldState, BlockState newState, Property<?> property) {
+        Property<T> typedProperty = (Property<T>) property;
+        T value = oldState.getValue(typedProperty);
+        T newValue = newState.getValue(typedProperty);
+        T newValueDafault = newState.getBlock().defaultBlockState().getValue(typedProperty);
+        if (newValue == newValueDafault)
+            return newState.setValue(typedProperty, value);
+        return newState;
+    }
+
     public static @NotNull List<BlockPos> getNearBlocks(@Nullable Level level, BlockPos pPos, @Nullable TagKey<Block> block, int iteration) {
         List<BlockPos> result = new ArrayList<>();
         if (iteration <= 0) {

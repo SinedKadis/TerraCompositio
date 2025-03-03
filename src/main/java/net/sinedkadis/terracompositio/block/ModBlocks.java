@@ -128,6 +128,10 @@ public class ModBlocks {
             () -> new SaplingBlock(new BigFlowCedarTreeGrower(), BlockBehaviour.Properties.copy(Blocks.OAK_SAPLING)));
     public static final RegistryObject<Block> FLOW_CEDAR_SAPLING = registerBlock("flow_cedar_sapling",
             () -> new SaplingBlock(new FlowCedarTreeGrower(), BlockBehaviour.Properties.copy(Blocks.OAK_SAPLING)));
-    public static final RegistryObject<Block> MATTER_INFUSER = registerBlock("matter_infuser",
-            () -> new MatterInfuserBlock(BlockBehaviour.Properties.copy(Blocks.IRON_BLOCK).noOcclusion(),ModBlocks.STRIPPED_FLOW_CEDAR_LOG));
+    public static final RegistryObject<Block> FLOW_CEDAR_CASING = registerBlock("flow_cedar_casing",
+            () -> new FlowCedarCasingBlock(BlockBehaviour.Properties.copy(Blocks.STRIPPED_OAK_LOG).strength(3f)));
+    public static final RegistryObject<Block> MATTER_INFUSER_PORT = registerBlock("matter_infuser_port",
+            () -> new MatterInfuserPortBlock(BlockBehaviour.Properties.copy(Blocks.TRIPWIRE_HOOK).sound(SoundType.COPPER)));
+    public static final RegistryObject<Block> MATTER_INFUSER_IO = registerBlock("matter_infuser_io",
+            () -> new FlowCedarLikeBlock(BlockBehaviour.Properties.copy(Blocks.IRON_BLOCK),ModBlocks.STRIPPED_FLOW_CEDAR_LOG));
 }

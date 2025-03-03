@@ -24,7 +24,7 @@ import net.sinedkadis.terracompositio.item.ModItems;
 import java.util.LinkedHashMap;
 
 public class ModItemModelProvider extends ItemModelProvider {
-    private static LinkedHashMap<ResourceKey<TrimMaterial>, Float> trimMaterials = new LinkedHashMap<>();
+    private static final LinkedHashMap<ResourceKey<TrimMaterial>, Float> trimMaterials = new LinkedHashMap<>();
     static {
         trimMaterials.put(TrimMaterials.QUARTZ, 0.1F);
         trimMaterials.put(TrimMaterials.IRON, 0.2F);
@@ -79,6 +79,10 @@ public class ModItemModelProvider extends ItemModelProvider {
         simpleItem(ModItems.LOW_ENRICHED_FCO);
         simpleItem(ModItems.MEDIUM_ENRICHED_FCO);
         simpleItem(ModItems.HIGH_ENRICHED_FCO);
+        simpleItem(ModItems.INFUSED_IRON_ROD);
+        simpleItem(ModItems.GOLD_ROD);
+        simpleItem(ModItems.INPUT_BUS);
+        simpleItem(ModItems.COPPER_ROD);
 
         saplingItem(ModBlocks.FLOW_CEDAR_BIG_SAPLING);
         saplingItem(ModBlocks.FLOW_CEDAR_SAPLING);

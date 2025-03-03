@@ -1,7 +1,12 @@
 {
-  "parent": "minecraft:block/cube_column",
+  "parent": "minecraft:block/cube",
   "textures": {
-    "end": "terracompositio:block/flow_cedar_log_top_infused",
-    "side": "terracompositio:block/flow_port_infused"
+    "down": "terracompositio:block/flow_cedar_log_top_infused",
+    "east": "terracompositio:block/flow_cedar_log_infused",
+    "north": "terracompositio:block/flow_port_infused",
+    "particle": "terracompositio:block/flow_port_infused",
+    "south": "terracompositio:block/flow_cedar_log_infused",
+    "up": "terracompositio:block/flow_cedar_log_top_infused",
+    "west": "terracompositio:block/flow_cedar_log_infused"
   }
 }

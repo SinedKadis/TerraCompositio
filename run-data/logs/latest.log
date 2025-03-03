@@ -1,44 +1,103 @@
-[04лют.2025 11:29:05.310] [main/INFO] [cpw.mods.modlauncher.Launcher/MODLAUNCHER]: ModLauncher running: args [--launchTarget, forgedatauserdev, --assetIndex, 5, --assetsDir, C:\Users\sined\.gradle\caches\forge_gradle\assets, --gameDir, ., --fml.forgeVersion, 47.3.1, --fml.mcVersion, 1.20.1, --fml.forgeGroup, net.minecraftforge, --fml.mcpVersion, 20230612.114412, --mod, terracompositio, --all, --output, D:\Dsoft\Projects\TerraCompositio\src\generated\resources, --existing, D:\Dsoft\Projects\TerraCompositio\src\main\resources, --mixin.config, mixins.terracompositio.json]
-[04лют.2025 11:29:05.323] [main/INFO] [cpw.mods.modlauncher.Launcher/MODLAUNCHER]: ModLauncher 10.0.9+10.0.9+main.dcd20f30 starting: java version 17.0.11 by Oracle Corporation; OS Windows 11 arch amd64 version 10.0
-[04лют.2025 11:29:05.495] [main/INFO] [net.minecraftforge.fml.loading.ImmediateWindowHandler/]: ImmediateWindowProvider not loading because launch target is forgedatauserdev
-[04лют.2025 11:29:05.552] [main/INFO] [mixin/]: SpongePowered MIXIN Subsystem Version=0.8.5 Source=union:/C:/Users/sined/.gradle/caches/modules-2/files-2.1/org.spongepowered/mixin/0.8.5/9d1c0c3a304ae6697ecd477218fa61b850bf57fc/mixin-0.8.5.jar%23128!/ Service=ModLauncher Env=CLIENT
-[04лют.2025 11:29:05.965] [main/WARN] [net.minecraftforge.fml.loading.moddiscovery.ModFileParser/LOADING]: Mod file C:\Users\sined\.gradle\caches\modules-2\files-2.1\net.minecraftforge\javafmllanguage\1.20.1-47.3.1\b9fa98d5c9fa107169a3390a1c8993d2134fbf54\javafmllanguage-1.20.1-47.3.1.jar is missing mods.toml file
-[04лют.2025 11:29:05.969] [main/WARN] [net.minecraftforge.fml.loading.moddiscovery.ModFileParser/LOADING]: Mod file C:\Users\sined\.gradle\caches\modules-2\files-2.1\net.minecraftforge\lowcodelanguage\1.20.1-47.3.1\aaa252b4d4c34d0c02e647d7a2ef3df3bc11d73a\lowcodelanguage-1.20.1-47.3.1.jar is missing mods.toml file
-[04лют.2025 11:29:05.972] [main/WARN] [net.minecraftforge.fml.loading.moddiscovery.ModFileParser/LOADING]: Mod file C:\Users\sined\.gradle\caches\modules-2\files-2.1\net.minecraftforge\mclanguage\1.20.1-47.3.1\1722b26446496b5e686cdf124342e8f7fd33dc91\mclanguage-1.20.1-47.3.1.jar is missing mods.toml file
-[04лют.2025 11:29:05.977] [main/WARN] [net.minecraftforge.fml.loading.moddiscovery.ModFileParser/LOADING]: Mod file C:\Users\sined\.gradle\caches\modules-2\files-2.1\net.minecraftforge\fmlcore\1.20.1-47.3.1\4ed2bfe4ae3a6c27f587d45f58d648db68d19c00\fmlcore-1.20.1-47.3.1.jar is missing mods.toml file
-[04лют.2025 11:29:06.083] [main/INFO] [net.minecraftforge.fml.loading.moddiscovery.JarInJarDependencyLocator/]: No dependencies to load found. Skipping!
-[04лют.2025 11:29:07.514] [main/WARN] [mixin/]: Compatibility level JAVA_17 specified by mixins.terracompositio.json is higher than the maximum level supported by this version of mixin (JAVA_13).
-[04лют.2025 11:29:07.514] [main/INFO] [mixin/]: Compatibility level set to JAVA_17
-[04лют.2025 11:29:07.514] [main/INFO] [cpw.mods.modlauncher.LaunchServiceHandler/MODLAUNCHER]: Launching target 'forgedatauserdev' with arguments [--gameDir, ., --assetsDir, C:\Users\sined\.gradle\caches\forge_gradle\assets, --assetIndex, 5, --mod, terracompositio, --all, --output, D:\Dsoft\Projects\TerraCompositio\src\generated\resources, --existing, D:\Dsoft\Projects\TerraCompositio\src\main\resources]
-[04лют.2025 11:29:07.596] [main/INFO] [mixin/]: Attempting to load Fernflower decompiler (Threaded mode)
-[04лют.2025 11:29:07.597] [main/INFO] [mixin/]: Fernflower could not be loaded, exported classes will not be decompiled. NoClassDefFoundError: org/jetbrains/java/decompiler/main/extern/IResultSaver
-[04лют.2025 11:29:07.610] [main/INFO] [mixin/]: Preparing mixins for MixinEnvironment[DEFAULT]
-[04лют.2025 11:29:07.610] [main/INFO] [mixin/]: Selecting config mixins.terracompositio.json
-[04лют.2025 11:29:07.613] [main/WARN] [mixin/]: Reference map 'mixin.refmap.json' for mixins.terracompositio.json could not be read. If this is a development environment you can ignore this message
-[04лют.2025 11:29:07.614] [main/INFO] [mixin/]: Preparing mixins.terracompositio.json (3)
-[04лют.2025 11:29:07.994] [main/INFO] [net.minecraftforge.data.loading.DatagenModLoader/]: Initializing Data Gatherer for mods [terracompositio]
-[04лют.2025 11:29:08.155] [main/INFO] [mixin/]: Mixing LivingEntityMixin from mixins.terracompositio.json into net.minecraft.world.entity.LivingEntity
-[04лют.2025 11:29:12.440] [modloading-worker-0/INFO] [net.minecraftforge.common.ForgeMod/FORGEMOD]: Forge mod loading, version 47.3.1, for MC 1.20.1 with MCP 20230612.114412
-[04лют.2025 11:29:12.440] [modloading-worker-0/INFO] [net.minecraftforge.common.MinecraftForge/FORGE]: MinecraftForge v47.3.1 Initialized
-[04лют.2025 11:29:12.757] [modloading-worker-0/INFO] [mezz.jei.library.load.PluginCaller/]: Sending ConfigManager...
-[04лют.2025 11:29:12.763] [modloading-worker-0/INFO] [mezz.jei.library.load.PluginCaller/]: Sending ConfigManager took 3.862 ms
-[04лют.2025 11:29:13.106] [main/WARN] [net.minecraft.server.packs.VanillaPackResourcesBuilder/]: Assets URL 'union:/C:/Users/sined/.gradle/caches/forge_gradle/minecraft_user_repo/net/minecraftforge/forge/1.20.1-47.3.1_mapped_parchment_2023.09.03-1.20.1/forge-1.20.1-47.3.1_mapped_parchment_2023.09.03-1.20.1.jar%23191!/assets/.mcassetsroot' uses unexpected schema
-[04лют.2025 11:29:13.106] [main/WARN] [net.minecraft.server.packs.VanillaPackResourcesBuilder/]: Assets URL 'union:/C:/Users/sined/.gradle/caches/forge_gradle/minecraft_user_repo/net/minecraftforge/forge/1.20.1-47.3.1_mapped_parchment_2023.09.03-1.20.1/forge-1.20.1-47.3.1_mapped_parchment_2023.09.03-1.20.1.jar%23191!/data/.mcassetsroot' uses unexpected schema
-[04лют.2025 11:29:13.292] [main/INFO] [net.minecraft.data.DataGenerator/]: Starting provider: Recipes
-[04лют.2025 11:29:13.328] [main/INFO] [net.minecraft.data.DataGenerator/]: Recipes finished after 36 ms
-[04лют.2025 11:29:13.329] [main/INFO] [net.minecraft.data.DataGenerator/]: Starting provider: Loot Tables
-[04лют.2025 11:29:13.536] [main/INFO] [net.minecraft.data.DataGenerator/]: Loot Tables finished after 208 ms
-[04лют.2025 11:29:13.537] [main/INFO] [net.minecraft.data.DataGenerator/]: Starting provider: Block States: terracompositio
-[04лют.2025 11:29:13.744] [main/INFO] [net.minecraft.data.DataGenerator/]: Block States: terracompositio finished after 207 ms
-[04лют.2025 11:29:13.744] [main/INFO] [net.minecraft.data.DataGenerator/]: Starting provider: Item Models: terracompositio
-[04лют.2025 11:29:13.819] [main/INFO] [net.minecraft.data.DataGenerator/]: Item Models: terracompositio finished after 75 ms
-[04лют.2025 11:29:13.820] [main/INFO] [net.minecraft.data.DataGenerator/]: Starting provider: Tags for minecraft:block mod id terracompositio
-[04лют.2025 11:29:13.847] [main/INFO] [net.minecraft.data.DataGenerator/]: Tags for minecraft:block mod id terracompositio finished after 26 ms
-[04лют.2025 11:29:13.847] [main/INFO] [net.minecraft.data.DataGenerator/]: Starting provider: Tags for minecraft:item mod id terracompositio
-[04лют.2025 11:29:13.849] [main/INFO] [net.minecraft.data.DataGenerator/]: Tags for minecraft:item mod id terracompositio finished after 2 ms
-[04лют.2025 11:29:13.849] [main/INFO] [net.minecraft.data.DataGenerator/]: Starting provider: Tags for minecraft:fluid mod id terracompositio
-[04лют.2025 11:29:13.850] [main/INFO] [net.minecraft.data.DataGenerator/]: Tags for minecraft:fluid mod id terracompositio finished after 0 ms
-[04лют.2025 11:29:13.850] [main/INFO] [net.minecraft.data.DataGenerator/]: Starting provider: Registries
-[04лют.2025 11:29:13.866] [main/INFO] [net.minecraft.data.DataGenerator/]: Registries finished after 15 ms
-[04лют.2025 11:29:13.866] [main/INFO] [net.minecraft.data.DataGenerator/]: All providers took: 575 ms
-[04лют.2025 11:29:13.879] [main/INFO] [net.minecraft.data.HashCache/]: Caching: total files: 308, old count: 308, new count: 309, removed stale: 0, written: 0
+[03бер.2025 14:27:28.345] [main/INFO] [cpw.mods.modlauncher.Launcher/MODLAUNCHER]: ModLauncher running: args [--launchTarget, forgedatauserdev, --assetIndex, 5, --assetsDir, C:\Users\sined\.gradle\caches\forge_gradle\assets, --gameDir, ., --fml.forgeVersion, 47.3.1, --fml.mcVersion, 1.20.1, --fml.forgeGroup, net.minecraftforge, --fml.mcpVersion, 20230612.114412, --mod, terracompositio, --all, --output, D:\Dsoft\Projects\TerraCompositio\src\generated\resources, --existing, D:\Dsoft\Projects\TerraCompositio\src\main\resources, --mixin.config, mixins.terracompositio.json]
+[03бер.2025 14:27:28.353] [main/INFO] [cpw.mods.modlauncher.Launcher/MODLAUNCHER]: ModLauncher 10.0.9+10.0.9+main.dcd20f30 starting: java version 17.0.11 by Oracle Corporation; OS Windows 11 arch amd64 version 10.0
+[03бер.2025 14:27:28.509] [main/INFO] [net.minecraftforge.fml.loading.ImmediateWindowHandler/]: ImmediateWindowProvider not loading because launch target is forgedatauserdev
+[03бер.2025 14:27:28.578] [main/INFO] [mixin/]: SpongePowered MIXIN Subsystem Version=0.8.5 Source=union:/C:/Users/sined/.gradle/caches/modules-2/files-2.1/org.spongepowered/mixin/0.8.5/9d1c0c3a304ae6697ecd477218fa61b850bf57fc/mixin-0.8.5.jar%23128!/ Service=ModLauncher Env=CLIENT
+[03бер.2025 14:27:28.961] [main/WARN] [net.minecraftforge.fml.loading.moddiscovery.ModFileParser/LOADING]: Mod file C:\Users\sined\.gradle\caches\modules-2\files-2.1\net.minecraftforge\javafmllanguage\1.20.1-47.3.1\b9fa98d5c9fa107169a3390a1c8993d2134fbf54\javafmllanguage-1.20.1-47.3.1.jar is missing mods.toml file
+[03бер.2025 14:27:28.965] [main/WARN] [net.minecraftforge.fml.loading.moddiscovery.ModFileParser/LOADING]: Mod file C:\Users\sined\.gradle\caches\modules-2\files-2.1\net.minecraftforge\lowcodelanguage\1.20.1-47.3.1\aaa252b4d4c34d0c02e647d7a2ef3df3bc11d73a\lowcodelanguage-1.20.1-47.3.1.jar is missing mods.toml file
+[03бер.2025 14:27:28.969] [main/WARN] [net.minecraftforge.fml.loading.moddiscovery.ModFileParser/LOADING]: Mod file C:\Users\sined\.gradle\caches\modules-2\files-2.1\net.minecraftforge\mclanguage\1.20.1-47.3.1\1722b26446496b5e686cdf124342e8f7fd33dc91\mclanguage-1.20.1-47.3.1.jar is missing mods.toml file
+[03бер.2025 14:27:28.974] [main/WARN] [net.minecraftforge.fml.loading.moddiscovery.ModFileParser/LOADING]: Mod file C:\Users\sined\.gradle\caches\modules-2\files-2.1\net.minecraftforge\fmlcore\1.20.1-47.3.1\4ed2bfe4ae3a6c27f587d45f58d648db68d19c00\fmlcore-1.20.1-47.3.1.jar is missing mods.toml file
+[03бер.2025 14:27:29.142] [main/INFO] [net.minecraftforge.fml.loading.moddiscovery.JarInJarDependencyLocator/]: No dependencies to load found. Skipping!
+[03бер.2025 14:27:31.112] [main/WARN] [mixin/]: Compatibility level JAVA_17 specified by mixins.terracompositio.json is higher than the maximum level supported by this version of mixin (JAVA_13).
+[03бер.2025 14:27:31.112] [main/INFO] [mixin/]: Compatibility level set to JAVA_17
+[03бер.2025 14:27:31.128] [main/WARN] [mixin/]: Compatibility level JAVA_16 specified by jade.mixins.json is higher than the maximum level supported by this version of mixin (JAVA_13).
+[03бер.2025 14:27:31.131] [main/INFO] [cpw.mods.modlauncher.LaunchServiceHandler/MODLAUNCHER]: Launching target 'forgedatauserdev' with arguments [--gameDir, ., --assetsDir, C:\Users\sined\.gradle\caches\forge_gradle\assets, --assetIndex, 5, --mod, terracompositio, --all, --output, D:\Dsoft\Projects\TerraCompositio\src\generated\resources, --existing, D:\Dsoft\Projects\TerraCompositio\src\main\resources]
+[03бер.2025 14:27:31.217] [main/INFO] [mixin/]: Attempting to load Fernflower decompiler (Threaded mode)
+[03бер.2025 14:27:31.218] [main/INFO] [mixin/]: Fernflower could not be loaded, exported classes will not be decompiled. NoClassDefFoundError: org/jetbrains/java/decompiler/main/extern/IResultSaver
+[03бер.2025 14:27:31.249] [main/INFO] [mixin/]: Preparing mixins for MixinEnvironment[DEFAULT]
+[03бер.2025 14:27:31.250] [main/INFO] [mixin/]: Selecting config mixins.terracompositio.json
+[03бер.2025 14:27:31.253] [main/WARN] [mixin/]: Reference map 'mixin.refmap.json' for mixins.terracompositio.json could not be read. If this is a development environment you can ignore this message
+[03бер.2025 14:27:31.254] [main/INFO] [mixin/]: Selecting config flywheel.mixins.json
+[03бер.2025 14:27:31.547] [main/INFO] [mixin/]: Remapping refMap flywheel.refmap.json using D:\Dsoft\Projects\TerraCompositio\build\createSrgToMcp\output.srg
+[03бер.2025 14:27:31.547] [main/INFO] [mixin/]: Selecting config create.mixins.json
+[03бер.2025 14:27:31.549] [main/INFO] [mixin/]: Remapping refMap create.refmap.json using D:\Dsoft\Projects\TerraCompositio\build\createSrgToMcp\output.srg
+[03бер.2025 14:27:31.549] [main/INFO] [mixin/]: Selecting config jade.mixins.json
+[03бер.2025 14:27:31.550] [main/INFO] [mixin/]: Remapping refMap jade.refmap.json using D:\Dsoft\Projects\TerraCompositio\build\createSrgToMcp\output.srg
+[03бер.2025 14:27:31.551] [main/INFO] [mixin/]: Preparing mixins.terracompositio.json (0)
+[03бер.2025 14:27:31.551] [main/INFO] [mixin/]: Preparing flywheel.mixins.json (23)
+[03бер.2025 14:27:31.951] [main/INFO] [mixin/]: Preparing jade.mixins.json (3)
+[03бер.2025 14:27:31.958] [main/INFO] [mixin/]: Preparing create.mixins.json (36)
+[03бер.2025 14:27:32.109] [main/INFO] [mixin/]: Prepared 62 mixins in 0,859 sec (13,9ms avg) (0ms load, 0ms transform, 0ms plugin)
+[03бер.2025 14:27:32.391] [main/INFO] [net.minecraftforge.data.loading.DatagenModLoader/]: Initializing Data Gatherer for mods [terracompositio]
+[03бер.2025 14:27:32.524] [main/INFO] [mixin/]: Mixing EntityMixin from create.mixins.json into net.minecraft.world.entity.Entity
+[03бер.2025 14:27:32.535] [main/INFO] [mixin/]: Mixing ContraptionDriverInteractMixin from create.mixins.json into net.minecraft.world.entity.Entity
+[03бер.2025 14:27:32.538] [main/INFO] [mixin/]: Mixing accessor.EntityAccessor from create.mixins.json into net.minecraft.world.entity.Entity
+[03бер.2025 14:27:32.565] [main/INFO] [mixin/]: Mixing client.EntityContraptionInteractionMixin from create.mixins.json into net.minecraft.world.entity.Entity
+[03бер.2025 14:27:32.567] [main/INFO] [mixin/]: Renaming synthetic method lambda$create$onSpawnSprintParticle$4(Lnet/minecraft/world/entity/Entity;Lnet/minecraft/core/BlockPos;Lcom/simibubi/create/content/contraptions/Contraption;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/core/BlockPos;)V to md5c8d12$lambda$create$onSpawnSprintParticle$4$0 in create.mixins.json:client.EntityContraptionInteractionMixin
+[03бер.2025 14:27:32.568] [main/INFO] [mixin/]: Renaming synthetic method lambda$create$onMove$3(Lnet/minecraft/world/phys/Vec3;Lnet/minecraft/world/entity/Entity;Lcom/simibubi/create/content/contraptions/AbstractContraptionEntity;)Z to md5c8d12$lambda$create$onMove$3$1 in create.mixins.json:client.EntityContraptionInteractionMixin
+[03бер.2025 14:27:32.568] [main/INFO] [mixin/]: Renaming synthetic method lambda$create$contraptionStepSounds$2(Lorg/apache/commons/lang3/mutable/MutableBoolean;Lcom/simibubi/create/content/contraptions/Contraption;Lnet/minecraft/world/level/block/state/BlockState;Lnet/minecraft/core/BlockPos;)V to md5c8d12$lambda$create$contraptionStepSounds$2$2 in create.mixins.json:client.EntityContraptionInteractionMixin
+[03бер.2025 14:27:32.568] [main/INFO] [mixin/]: Renaming synthetic method lambda$create$forCollision$1(Lnet/minecraft/world/phys/Vec3;Lorg/apache/logging/log4j/util/TriConsumer;Lcom/simibubi/create/content/contraptions/AbstractContraptionEntity;)V to md5c8d12$lambda$create$forCollision$1$3 in create.mixins.json:client.EntityContraptionInteractionMixin
+[03бер.2025 14:27:32.569] [main/INFO] [mixin/]: Renaming synthetic method lambda$create$getIntersectionContraptionsStream$0(Lcom/simibubi/create/content/contraptions/AbstractContraptionEntity;)Z to md5c8d12$lambda$create$getIntersectionContraptionsStream$0$4 in create.mixins.json:client.EntityContraptionInteractionMixin
+[03бер.2025 14:27:32.803] [main/INFO] [mixin/]: Mixing CustomItemUseEffectsMixin from create.mixins.json into net.minecraft.world.entity.LivingEntity
+[03бер.2025 14:27:32.827] [main/INFO] [mixin/]: Mixing LavaSwimmingMixin from create.mixins.json into net.minecraft.world.entity.LivingEntity
+[03бер.2025 14:27:32.837] [main/INFO] [mixin/]: Mixing accessor.LivingEntityAccessor from create.mixins.json into net.minecraft.world.entity.LivingEntity
+[03бер.2025 14:27:32.962] [main/INFO] [mixin/]: Mixing accessor.ServerLevelAccessor from create.mixins.json into net.minecraft.server.level.ServerLevel
+[03бер.2025 14:27:33.092] [main/INFO] [mixin/]: Mixing EntityTypeMixin from flywheel.mixins.json into net.minecraft.world.entity.EntityType
+[03бер.2025 14:27:33.117] [main/INFO] [mixin/]: Mixing BlockEntityTypeMixin from flywheel.mixins.json into net.minecraft.world.level.block.entity.BlockEntityType
+[03бер.2025 14:27:33.384] [main/INFO] [mixin/]: Mixing accessor.DispenserBlockAccessor from create.mixins.json into net.minecraft.world.level.block.DispenserBlock
+[03бер.2025 14:27:33.598] [main/INFO] [mixin/]: Mixing WaterWheelFluidSpreadMixin from create.mixins.json into net.minecraft.world.level.material.FlowingFluid
+[03бер.2025 14:27:33.697] [main/INFO] [mixin/]: Mixing accessor.FallingBlockEntityAccessor from create.mixins.json into net.minecraft.world.entity.item.FallingBlockEntity
+[03бер.2025 14:27:33.697] [main/INFO] [mixin/]: Renaming @Invoker method create$callInit(Lnet/minecraft/world/level/Level;DDDLnet/minecraft/world/level/block/state/BlockState;)Lnet/minecraft/world/entity/item/FallingBlockEntity; to create$callInit_$md$5c8d12$0 in create.mixins.json:accessor.FallingBlockEntityAccessor
+[03бер.2025 14:27:33.712] [main/INFO] [mixin/]: Mixing instancemanage.InstanceRemoveMixin from flywheel.mixins.json into net.minecraft.world.level.block.entity.BlockEntity
+[03бер.2025 14:27:34.901] [main/INFO] [mixin/]: Mixing BlockItemMixin from create.mixins.json into net.minecraft.world.item.BlockItem
+[03бер.2025 14:27:35.964] [main/INFO] [mixin/]: Mixing accessor.UseOnContextAccessor from create.mixins.json into net.minecraft.world.item.context.UseOnContext
+[03бер.2025 14:27:36.238] [main/INFO] [mixin/]: Mixing instancemanage.InstanceAddMixin from flywheel.mixins.json into net.minecraft.world.level.chunk.LevelChunk
+[03бер.2025 14:27:36.562] [main/INFO] [mixin/]: Mixing accessor.AbstractProjectileDispenseBehaviorAccessor from create.mixins.json into net.minecraft.core.dispenser.AbstractProjectileDispenseBehavior
+[03бер.2025 14:27:37.766] [modloading-worker-0/INFO] [net.minecraftforge.common.ForgeMod/FORGEMOD]: Forge mod loading, version 47.3.1, for MC 1.20.1 with MCP 20230612.114412
+[03бер.2025 14:27:37.767] [modloading-worker-0/INFO] [net.minecraftforge.common.MinecraftForge/FORGE]: MinecraftForge v47.3.1 Initialized
+[03бер.2025 14:27:37.777] [modloading-worker-0/INFO] [mixin/]: Mixing ClientLevelMixin from flywheel.mixins.json into net.minecraft.client.multiplayer.ClientLevel
+[03бер.2025 14:27:37.808] [modloading-worker-0/INFO] [mixin/]: Mixing PausedPartialTickAccessor from flywheel.mixins.json into net.minecraft.client.Minecraft
+[03бер.2025 14:27:37.813] [modloading-worker-0/INFO] [mixin/]: Mixing client.WindowResizeMixin from create.mixins.json into net.minecraft.client.Minecraft
+[03бер.2025 14:27:37.854] [modloading-worker-0/INFO] [mixin/]: Mixing client.HeavyBootsOnPlayerMixin from create.mixins.json into net.minecraft.client.player.LocalPlayer
+[03бер.2025 14:27:37.983] [modloading-worker-0/INFO] [com.jozufozu.flywheel.backend.Backend/]: No shaders mod detected.
+[03бер.2025 14:27:38.021] [modloading-worker-0/INFO] [mixin/]: Mixing accessor.ParticleEngineAccessor from create.mixins.json into net.minecraft.client.particle.ParticleEngine
+[03бер.2025 14:27:38.070] [modloading-worker-0/INFO] [mixin/]: Mixing CameraMixin from flywheel.mixins.json into net.minecraft.client.Camera
+[03бер.2025 14:27:38.072] [modloading-worker-0/INFO] [mixin/]: Mixing client.CameraMixin from create.mixins.json into net.minecraft.client.Camera
+[03бер.2025 14:27:38.093] [modloading-worker-0/INFO] [mixin/]: Mixing fix.FixNormalScalingMixin from flywheel.mixins.json into com.mojang.blaze3d.vertex.PoseStack
+[03бер.2025 14:27:38.096] [modloading-worker-0/INFO] [mixin/]: Mixing matrix.PoseStackMixin from flywheel.mixins.json into com.mojang.blaze3d.vertex.PoseStack
+[03бер.2025 14:27:38.147] [modloading-worker-0/INFO] [mixin/]: Mixing FrustumMixin from flywheel.mixins.json into net.minecraft.client.renderer.culling.Frustum
+[03бер.2025 14:27:38.163] [modloading-worker-0/INFO] [mixin/]: Mixing RenderTypeMixin from flywheel.mixins.json into net.minecraft.client.renderer.RenderType
+[03бер.2025 14:27:38.186] [modloading-worker-0/INFO] [mezz.jei.library.load.PluginCaller/]: Sending ConfigManager...
+[03бер.2025 14:27:38.190] [modloading-worker-0/INFO] [mixin/]: Mixing LevelRendererAccessor from flywheel.mixins.json into net.minecraft.client.renderer.LevelRenderer
+[03бер.2025 14:27:38.194] [modloading-worker-0/INFO] [mixin/]: Mixing fix.FixFabulousDepthMixin from flywheel.mixins.json into net.minecraft.client.renderer.LevelRenderer
+[03бер.2025 14:27:38.195] [modloading-worker-0/INFO] [mixin/]: Mixing instancemanage.InstanceUpdateMixin from flywheel.mixins.json into net.minecraft.client.renderer.LevelRenderer
+[03бер.2025 14:27:38.196] [modloading-worker-0/INFO] [mixin/]: Mixing client.LevelRendererMixin from create.mixins.json into net.minecraft.client.renderer.LevelRenderer
+[03бер.2025 14:27:38.196] [modloading-worker-0/INFO] [mixin/]: Renaming synthetic method lambda$create$onDestroyBlockProgress$0(J)Ljava/util/SortedSet; to md5c8d12$lambda$create$onDestroyBlockProgress$0$0 in create.mixins.json:client.LevelRendererMixin
+[03бер.2025 14:27:38.201] [modloading-worker-0/INFO] [mixin/]: Mixing LevelRendererMixin from flywheel.mixins.json into net.minecraft.client.renderer.LevelRenderer
+[03бер.2025 14:27:38.335] [modloading-worker-0/INFO] [mezz.jei.library.load.PluginCaller/]: Sending ConfigManager took 146.7 ms
+[03бер.2025 14:27:38.404] [modloading-worker-0/INFO] [mixin/]: Mixing accessor.GameRendererAccessor from create.mixins.json into net.minecraft.client.renderer.GameRenderer
+[03бер.2025 14:27:38.411] [modloading-worker-0/INFO] [mixin/]: Mixing client.GameRendererMixin from create.mixins.json into net.minecraft.client.renderer.GameRenderer
+[03бер.2025 14:27:39.936] [modloading-worker-0/INFO] [mixin/]: Mixing FontMixin from jade.mixins.json into net.minecraft.client.gui.Font
+[03бер.2025 14:27:39.936] [modloading-worker-0/WARN] [mixin/]: jade.mixins.json:FontMixin: Class version 61 required is higher than the class version supported by the current version of Mixin (JAVA_16 supports class version 60)
+[03бер.2025 14:27:39.944] [modloading-worker-0/INFO] [mixin/]: Mixing accessor.FontAccessor from create.mixins.json into net.minecraft.client.gui.Font
+[03бер.2025 14:27:41.064] [main/INFO] [mixin/]: Mixing accessor.AgeableListModelAccessor from create.mixins.json into net.minecraft.client.model.AgeableListModel
+[03бер.2025 14:27:41.433] [Worker-Main-1/INFO] [mixin/]: Mixing MapItemSavedDataMixin from create.mixins.json into net.minecraft.world.level.saveddata.maps.MapItemSavedData
+[03бер.2025 14:27:41.494] [main/WARN] [net.minecraft.server.packs.VanillaPackResourcesBuilder/]: Assets URL 'union:/D:/Dsoft/Projects/TerraCompositio/build/fg_cache/net/minecraftforge/forge/1.20.1-47.3.1_mapped_parchment_2023.09.03-1.20.1/forge-1.20.1-47.3.1_mapped_parchment_2023.09.03-1.20.1.jar%23191!/assets/.mcassetsroot' uses unexpected schema
+[03бер.2025 14:27:41.495] [main/WARN] [net.minecraft.server.packs.VanillaPackResourcesBuilder/]: Assets URL 'union:/D:/Dsoft/Projects/TerraCompositio/build/fg_cache/net/minecraftforge/forge/1.20.1-47.3.1_mapped_parchment_2023.09.03-1.20.1/forge-1.20.1-47.3.1_mapped_parchment_2023.09.03-1.20.1.jar%23191!/data/.mcassetsroot' uses unexpected schema
+[03бер.2025 14:27:41.895] [main/INFO] [net.minecraft.data.DataGenerator/]: Starting provider: Recipes
+[03бер.2025 14:27:41.920] [main/INFO] [net.minecraft.data.DataGenerator/]: Recipes finished after 25 ms
+[03бер.2025 14:27:41.920] [main/INFO] [net.minecraft.data.DataGenerator/]: Starting provider: Loot Tables
+[03бер.2025 14:27:41.976] [main/INFO] [net.minecraft.data.DataGenerator/]: Loot Tables finished after 55 ms
+[03бер.2025 14:27:41.976] [main/INFO] [net.minecraft.data.DataGenerator/]: Starting provider: Block States: terracompositio
+[03бер.2025 14:27:42.186] [main/INFO] [net.minecraft.data.DataGenerator/]: Block States: terracompositio finished after 210 ms
+[03бер.2025 14:27:42.186] [main/INFO] [net.minecraft.data.DataGenerator/]: Starting provider: Item Models: terracompositio
+[03бер.2025 14:27:42.282] [main/INFO] [net.minecraft.data.DataGenerator/]: Item Models: terracompositio finished after 95 ms
+[03бер.2025 14:27:42.282] [main/INFO] [net.minecraft.data.DataGenerator/]: Starting provider: Tags for minecraft:block mod id terracompositio
+[03бер.2025 14:27:42.310] [main/INFO] [net.minecraft.data.DataGenerator/]: Tags for minecraft:block mod id terracompositio finished after 28 ms
+[03бер.2025 14:27:42.311] [main/INFO] [net.minecraft.data.DataGenerator/]: Starting provider: Tags for minecraft:item mod id terracompositio
+[03бер.2025 14:27:42.314] [main/INFO] [net.minecraft.data.DataGenerator/]: Tags for minecraft:item mod id terracompositio finished after 3 ms
+[03бер.2025 14:27:42.314] [main/INFO] [net.minecraft.data.DataGenerator/]: Starting provider: Tags for minecraft:fluid mod id terracompositio
+[03бер.2025 14:27:42.315] [main/INFO] [net.minecraft.data.DataGenerator/]: Tags for minecraft:fluid mod id terracompositio finished after 0 ms
+[03бер.2025 14:27:42.315] [main/INFO] [net.minecraft.data.DataGenerator/]: Starting provider: Registries
+[03бер.2025 14:27:42.334] [main/INFO] [net.minecraft.data.DataGenerator/]: Registries finished after 18 ms
+[03бер.2025 14:27:42.334] [main/INFO] [net.minecraft.data.DataGenerator/]: All providers took: 440 ms
+[03бер.2025 14:27:42.354] [main/INFO] [net.minecraft.data.HashCache/]: Caching: total files: 327, old count: 325, new count: 328, removed stale: 0, written: 9

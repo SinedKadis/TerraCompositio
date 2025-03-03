@@ -1,0 +1,12 @@
+{
+  "parent": "minecraft:block/cube",
+  "textures": {
+    "down": "terracompositio:block/flow_cedar_log_top",
+    "east": "terracompositio:block/flow_cedar_casing",
+    "south": "terracompositio:block/flow_cedar_casing_up",
+    "particle": "terracompositio:block/flow_cedar_casing",
+    "north": "terracompositio:block/flow_cedar_casing",
+    "up": "terracompositio:block/flow_cedar_log_top",
+    "west": "terracompositio:block/flow_cedar_casing"
+  }
+}

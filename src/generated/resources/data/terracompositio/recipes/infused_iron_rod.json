@@ -1,0 +1,17 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "R": {
+      "item": "terracompositio:infused_iron_ingot"
+    }
+  },
+  "pattern": [
+    "R",
+    "R"
+  ],
+  "result": {
+    "item": "terracompositio:infused_iron_rod"
+  },
+  "show_notification": true
+}

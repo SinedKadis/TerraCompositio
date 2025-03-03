@@ -37,7 +37,9 @@ public class ModBlockTagGenerator extends BlockTagsProvider {
                         ModBlocks.FLOW_CEDAR_PLANKS.get(),
                         ModBlocks.STRIPPED_FLOW_CEDAR_LOG.get(),
                         ModBlocks.STRIPPED_FLOW_CEDAR_WOOD.get(),
-                        ModBlocks.MATTER_INFUSER.get());
+                        ModBlocks.MATTER_INFUSER_PORT.get(),
+                        ModBlocks.FLOW_CEDAR_CASING.get(),
+                        ModBlocks.MATTER_INFUSER_IO.get());
 
 
         this.tag(BlockTags.NEEDS_IRON_TOOL)
@@ -52,7 +54,7 @@ public class ModBlockTagGenerator extends BlockTagsProvider {
                         ModBlocks.STRIPPED_FLOW_CEDAR_LOG.get(),
                         ModBlocks.STRIPPED_FLOW_CEDAR_WOOD.get(),
                         ModBlocks.FLOW_INFUSER.get(),
-                        ModBlocks.MATTER_INFUSER.get());
+                        ModBlocks.MATTER_INFUSER_PORT.get());
         this.tag(BlockTags.PLANKS)
                 .add(ModBlocks.FLOW_CEDAR_PLANKS.get());
         this.tag(BlockTags.LEAVES)
@@ -72,14 +74,6 @@ public class ModBlockTagGenerator extends BlockTagsProvider {
                 .add(ModBlocks.FLOW_CEDAR_FENCE.get());
         this.tag(BlockTags.FENCE_GATES)
                 .add(ModBlocks.FLOW_CEDAR_FENCE_GATE.get());
-        this.tag(ModTags.Blocks.FLOW_LEAKABLE)
-                .add(ModBlocks.FLOW_CEDAR_LOG.get(),
-                        ModBlocks.FLOW_CEDAR_WOOD.get(),
-                        ModBlocks.FLOW_PORT.get(),
-                        ModBlocks.FLOW_INFUSER.get(),
-                        ModBlocks.STRIPPED_FLOW_CEDAR_LOG.get(),
-                        ModBlocks.STRIPPED_FLOW_CEDAR_WOOD.get(),
-                        ModBlocks.MATTER_INFUSER.get());
         this.tag(ModTags.Blocks.FLOW_CEDAR_LOGS)
                 .add(ModBlocks.FLOW_CEDAR_LOG.get(),
                         ModBlocks.FLOW_CEDAR_WOOD.get());

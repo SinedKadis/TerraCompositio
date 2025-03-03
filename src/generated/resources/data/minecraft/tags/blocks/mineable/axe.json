@@ -8,6 +8,8 @@
     "terracompositio:flow_cedar_planks",
     "terracompositio:stripped_flow_cedar_log",
     "terracompositio:stripped_flow_cedar_wood",
-    "terracompositio:matter_infuser"
+    "terracompositio:matter_infuser_port",
+    "terracompositio:flow_cedar_casing",
+    "terracompositio:matter_infuser_io"
   ]
 }

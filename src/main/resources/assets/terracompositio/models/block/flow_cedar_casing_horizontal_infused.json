@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/cube_column_horizontal",
+  "textures": {
+    "end": "terracompositio:block/flow_cedar_log_top_infused",
+    "side": "terracompositio:block/flow_cedar_casing_infused"
+  }
+}

@@ -5,6 +5,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.tags.ItemTags;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.item.*;
@@ -23,8 +24,10 @@ import net.sinedkadis.terracompositio.util.ModTags;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
+import java.util.Objects;
 
 import static net.sinedkadis.terracompositio.block.ModBlockStateProperties.INFUSED;
+import static net.sinedkadis.terracompositio.item.custom.WrenchAxeItem.getMode;
 
 public class ModItems {
     public static final DeferredRegister<Item> ITEMS =
@@ -83,33 +86,6 @@ public class ModItems {
     public static final RegistryObject<Item> FLOW_INFUSER_KIT = ITEMS.register("flow_infuser_kit",
             () -> new Item(new Item.Properties()){
                 @Override
-                public InteractionResult onItemUseFirst(ItemStack stack, UseOnContext context) {
-                    ItemStack offhand = context.getPlayer().getItemInHand(InteractionHand.OFF_HAND);
-                    if (offhand != null && offhand.getItem() instanceof AxeItem){
-                        if (context.getLevel().getBlockState(context.getClickedPos()).is(ModTags.Blocks.FLOW_CEDAR_LOGS)) {
-                            context.getLevel().setBlockAndUpdate(context.getClickedPos(),
-                                    ModBlocks.FLOW_INFUSER.get().defaultBlockState()
-                                            .setValue(INFUSED,context.getLevel().getBlockState(context.getClickedPos()).getValue(INFUSED)));
-                            stack.shrink(1);
-                            if (context.getLevel() instanceof ServerLevel level){
-                                level.playSound(null,context.getClickedPos(), SoundEvents.ANVIL_PLACE, SoundSource.BLOCKS);
-                                level.sendParticles(ModParticles.FLOW_STILL_PARTICLE.get(),
-                                        context.getClickedPos().getX(),
-                                        context.getClickedPos().getY(),
-                                        context.getClickedPos().getZ(),
-                                        10,
-                                        context.getLevel().getRandom().nextFloat(),
-                                        context.getLevel().getRandom().nextFloat(),
-                                        context.getLevel().getRandom().nextFloat(),
-                                        0.5D);
-                            }
-                            return InteractionResult.CONSUME_PARTIAL;
-                        }
-                    }
-                    return InteractionResult.PASS;
-                }
-
-                @Override
                 public void appendHoverText(ItemStack pStack, @Nullable Level pLevel, List<Component> pTooltipComponents, TooltipFlag pIsAdvanced) {
                     super.appendHoverText(pStack, pLevel, pTooltipComponents, pIsAdvanced);
                     pTooltipComponents.add(Component.translatable("item.terracompositio.flow_infuser_kit.tooltip").withStyle(ChatFormatting.GRAY));
@@ -125,6 +101,14 @@ public class ModItems {
             () -> new Item(new Item.Properties()));
     public static final RegistryObject<Item> FLOW_ROTATING_AXE = ITEMS.register("flow_rotating_axe",
             () -> new WrenchAxeItem(Tiers.IRON, 6.0F, -3.1F, new Item.Properties()));
+    public static final RegistryObject<Item> GOLD_ROD = ITEMS.register("gold_rod",
+            () -> new Item(new Item.Properties()));
+    public static final RegistryObject<Item> INFUSED_IRON_ROD = ITEMS.register("infused_iron_rod",
+            () -> new Item(new Item.Properties()));
+    public static final RegistryObject<Item> COPPER_ROD = ITEMS.register("copper_rod",
+            () -> new Item(new Item.Properties()));
+    public static final RegistryObject<Item> INPUT_BUS = ITEMS.register("copper_input_bus",
+            () -> new Item(new Item.Properties()));
 
 
     public static void register(IEventBus eventBus){

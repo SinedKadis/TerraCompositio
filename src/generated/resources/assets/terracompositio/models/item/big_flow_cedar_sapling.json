@@ -1,0 +1,6 @@
+{
+  "parent": "minecraft:item/generated",
+  "textures": {
+    "layer0": "terracompositio:block/big_flow_cedar_sapling"
+  }
+}

@@ -67,5 +67,12 @@
   "item.terracompositio.flow_rotating_axe": "Infused Iron Axe",
   "item.terracompositio.flow_rotating_axe.mode": "Mode: %s",
   "item.terracompositio.flow_rotating_axe.too_massive_tree": "I can't. Maybe it's too big",
-  "item.terracompositio.flow_rotating_axe.no_change": "I can't change anything here"
+  "item.terracompositio.flow_rotating_axe.no_change": "I can't change anything here",
+  "item.terracompositio.infused_iron_rod": "Infused Iron Rod",
+  "item.terracompositio.gold_rod": "Gold Rod",
+  "item.terracompositio.copper_rod": "Copper Rod",
+  "item.terracompositio.copper_input_bus": "Copper Input Bus",
+  "block.terracompositio.matter_infuser_port": "Matter Infuser Port",
+  "block.terracompositio.matter_infuser_io": "Matter Infuser Unit",
+  "block.terracompositio.flow_cedar_casing": "Flow Cedar Casing"
 }

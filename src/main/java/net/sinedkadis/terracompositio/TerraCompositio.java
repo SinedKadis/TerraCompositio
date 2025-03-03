@@ -29,6 +29,7 @@ import net.sinedkadis.terracompositio.api.cfe.CFENetwork;
 import net.sinedkadis.terracompositio.block.entity.renderer.FlowExtractorBlockEntityRenderer;
 import net.sinedkadis.terracompositio.block.entity.renderer.FlowInfuserBlockEntityRenderer;
 import net.sinedkadis.terracompositio.block.entity.renderer.FlowPortBlockEntityRenderer;
+import net.sinedkadis.terracompositio.block.entity.renderer.MatterInfuserPortBlockEntityRenderer;
 import net.sinedkadis.terracompositio.entity.client.ModModelLayers;
 import net.sinedkadis.terracompositio.item.custom.WrenchAxeItem;
 import net.sinedkadis.terracompositio.util.CFENetworkHandler;
@@ -162,6 +163,7 @@ public class TerraCompositio
         @SubscribeEvent
         public static void registerBER(EntityRenderersEvent.RegisterRenderers event) {
             event.registerBlockEntityRenderer(ModBlockEntities.FLOW_PORT_BE.get(), FlowPortBlockEntityRenderer::new);
+            event.registerBlockEntityRenderer(ModBlockEntities.MATTER_INFUSER_PORT_BE.get(), MatterInfuserPortBlockEntityRenderer::new);
             event.registerBlockEntityRenderer(ModBlockEntities.FLOW_INFUSER_BE.get(), FlowInfuserBlockEntityRenderer::new);
             event.registerBlockEntityRenderer(ModBlockEntities.FLOW_EXTRACTOR_BE.get(), FlowExtractorBlockEntityRenderer::new);
             event.registerBlockEntityRenderer(ModBlockEntities.MOD_SIGN.get(), SignRenderer::new);

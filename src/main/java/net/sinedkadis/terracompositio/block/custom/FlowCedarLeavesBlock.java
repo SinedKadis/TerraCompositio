@@ -56,7 +56,7 @@ public class FlowCedarLeavesBlock extends LeavesBlock {
         return getOptionalDistanceAt(pNeighbor).orElse(7);
     }
     public static @NotNull OptionalInt getOptionalDistanceAt(BlockState pState) {
-        if (pState.is(ModTags.Blocks.FLOW_LEAKABLE)
+        if (pState.hasProperty(INFUSED)
                 && pState.getValue(INFUSED)) {
             return OptionalInt.of(0);
         } else {

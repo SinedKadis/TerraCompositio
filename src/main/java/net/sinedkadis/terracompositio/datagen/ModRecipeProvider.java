@@ -8,6 +8,7 @@ import net.minecraft.world.item.crafting.AbstractCookingRecipe;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.level.ItemLike;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraftforge.common.crafting.conditions.IConditionBuilder;
 import net.sinedkadis.terracompositio.TerraCompositio;
 import net.sinedkadis.terracompositio.block.ModBlocks;
@@ -93,6 +94,22 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                 .define('N',ModItems.COPPER_NUGGET.get())
                 .unlockedBy(getHasName(Items.STICK), has(ModItems.COPPER_NUGGET.get()))
                 .save(pWriter);
+        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, ModBlocks.MATTER_INFUSER_PORT.get())
+                .pattern(" R ")
+                .pattern("RFR")
+                .pattern(" R ")
+                .define('R', ModItems.COPPER_ROD.get())
+                .define('F',Items.ITEM_FRAME)
+                .unlockedBy(getHasName(Items.ITEM_FRAME), has(Items.ITEM_FRAME))
+                .save(pWriter);
+        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, ModItems.INPUT_BUS.get())
+                .pattern(" R ")
+                .pattern("RHR")
+                .pattern(" R ")
+                .define('R', ModItems.COPPER_ROD.get())
+                .define('H', Items.IRON_INGOT)
+                .unlockedBy(getHasName(Items.IRON_INGOT), has(Items.IRON_INGOT))
+                .save(pWriter);
 
 
         ShapelessRecipeBuilder.shapeless(RecipeCategory.BUILDING_BLOCKS, ModBlocks.FLOW_CEDAR_PLANKS.get(), 4)
@@ -147,6 +164,24 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                 .define('W', ModTags.Items.FLOW_CEDAR_LOGS)
                 .define('L', Items.LEATHER)
                 .unlockedBy(getHasName(ModBlocks.FLOW_CEDAR_LOG.get()), has(ModBlocks.FLOW_CEDAR_LOG.get()))
+                .save(pWriter);
+        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, ModItems.INFUSED_IRON_ROD.get())
+                .pattern("R")
+                .pattern("R")
+                .define('R', ModItems.INFUSED_IRON_INGOT.get())
+                .unlockedBy(getHasName(ModItems.INFUSED_IRON_INGOT.get()), has(ModItems.INFUSED_IRON_INGOT.get()))
+                .save(pWriter);
+        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, ModItems.GOLD_ROD.get())
+                .pattern("R")
+                .pattern("R")
+                .define('R', Items.GOLD_INGOT)
+                .unlockedBy(getHasName(Items.GOLD_INGOT), has(Items.GOLD_INGOT))
+                .save(pWriter);
+        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, ModItems.COPPER_ROD.get())
+                .pattern("R")
+                .pattern("R")
+                .define('R', Items.COPPER_INGOT)
+                .unlockedBy(getHasName(Items.COPPER_INGOT), has(Items.COPPER_INGOT))
                 .save(pWriter);
         /*ShapelessRecipeBuilder.shapeless(RecipeCategory.BUILDING_BLOCKS, ModBlocks.NONFLOW_PLANKS.get(), 4)
                 .requires(ModBlocks.NONFLOW_WOOD.get())

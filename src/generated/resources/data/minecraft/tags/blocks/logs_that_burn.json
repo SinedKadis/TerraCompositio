@@ -4,6 +4,8 @@
     "terracompositio:flow_cedar_wood",
     "terracompositio:flow_port",
     "terracompositio:stripped_flow_cedar_log",
-    "terracompositio:stripped_flow_cedar_wood"
+    "terracompositio:stripped_flow_cedar_wood",
+    "terracompositio:flow_infuser",
+    "terracompositio:matter_infuser_port"
   ]
 }

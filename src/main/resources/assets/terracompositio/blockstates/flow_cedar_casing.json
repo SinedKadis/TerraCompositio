@@ -1,0 +1,118 @@
+{
+  "variants": {
+    "axis=x,infused=false,parts=west": {
+      "model": "terracompositio:block/flow_cedar_casing_horizontal",
+      "x": 90,
+      "y": 90
+    },
+    "axis=x,infused=false,parts=east": {
+      "model": "terracompositio:block/flow_cedar_casing_horizontal",
+      "x": 90,
+      "y": 90
+    },
+    "axis=x,infused=false,parts=north": {
+      "model": "terracompositio:block/flow_cedar_casing_horizontal_minus",
+      "x": 90,
+      "y": 90
+    },
+    "axis=x,infused=false,parts=south": {
+      "model": "terracompositio:block/flow_cedar_casing_horizontal_plus",
+      "x": 90,
+      "y": 90
+    },
+    "axis=x,infused=false,parts=up": {
+      "model": "terracompositio:block/flow_cedar_casing_horizontal_up",
+      "x": 90,
+      "y": 90
+    },
+    "axis=x,infused=false,parts=down": {
+      "model": "terracompositio:block/flow_cedar_casing_horizontal",
+      "x": 90,
+      "y": 90
+    },
+    "axis=x,infused=true,parts=west": {
+      "model": "terracompositio:block/flow_cedar_casing_horizontal_infused",
+      "x": 90,
+      "y": 90
+    },
+    "axis=x,infused=true,parts=east": {
+      "model": "terracompositio:block/flow_cedar_casing_horizontal_infused",
+      "x": 90,
+      "y": 90
+    },
+    "axis=x,infused=true,parts=north": {
+      "model": "terracompositio:block/flow_cedar_casing_horizontal_infused_minus",
+      "x": 90,
+      "y": 90
+    },
+    "axis=x,infused=true,parts=south": {
+      "model": "terracompositio:block/flow_cedar_casing_horizontal_infused_plus",
+      "x": 90,
+      "y": 90
+    },
+    "axis=x,infused=true,parts=up": {
+      "model": "terracompositio:block/flow_cedar_casing_horizontal_infused_up",
+      "x": 90,
+      "y": 90
+    },
+    "axis=x,infused=true,parts=down": {
+      "model": "terracompositio:block/flow_cedar_casing_horizontal_infused",
+      "x": 90,
+      "y": 90
+    },
+    "axis=y,infused=false": {
+      "model": "terracompositio:block/flow_cedar_casing"
+    },
+    "axis=y,infused=true": {
+      "model": "terracompositio:block/flow_cedar_casing_infused"
+    },
+    "axis=z,infused=false,parts=west": {
+      "model": "terracompositio:block/flow_cedar_casing_horizontal",
+      "x": 90
+    },
+    "axis=z,infused=false,parts=east": {
+      "model": "terracompositio:block/flow_cedar_casing_horizontal",
+      "x": 90
+    },
+    "axis=z,infused=false,parts=north": {
+      "model": "terracompositio:block/flow_cedar_casing_horizontal_minus",
+      "x": 90
+    },
+    "axis=z,infused=false,parts=south": {
+      "model": "terracompositio:block/flow_cedar_casing_horizontal_plus",
+      "x": 90
+    },
+    "axis=z,infused=false,parts=up": {
+      "model": "terracompositio:block/flow_cedar_casing_horizontal_up",
+      "x": 90
+    },
+    "axis=z,infused=false,parts=down": {
+      "model": "terracompositio:block/flow_cedar_casing_horizontal",
+      "x": 90
+    },
+    "axis=z,infused=true,parts=west": {
+      "model": "terracompositio:block/flow_cedar_casing_horizontal_infused",
+      "x": 90
+    },
+    "axis=z,infused=true,parts=east": {
+      "model": "terracompositio:block/flow_cedar_casing_horizontal_infused",
+      "x": 90
+    },
+    "axis=z,infused=true,parts=north": {
+      "model": "terracompositio:block/flow_cedar_casing_horizontal_infused_minus",
+      "x": 90
+    },
+    "axis=z,infused=true,parts=south": {
+      "model": "terracompositio:block/flow_cedar_casing_horizontal_infused_plus",
+      "x": 90
+    },
+    "axis=z,infused=true,parts=up": {
+      "model": "terracompositio:block/flow_cedar_casing_horizontal_infused_up",
+      "x": 90
+    },
+    "axis=z,infused=true,parts=down": {
+      "model": "terracompositio:block/flow_cedar_casing_horizontal_infused",
+      "x": 90
+    }
+  }
+}

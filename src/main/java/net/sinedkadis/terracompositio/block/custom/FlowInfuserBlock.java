@@ -45,80 +45,19 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.HashMap;
 import java.util.Map;
+import java.util.function.Supplier;
 
 import static net.sinedkadis.terracompositio.util.TCUtil.getNearBlocks;
 
-public class FlowInfuserBlock extends BaseEntityBlock implements IBE<FlowInfuserBlockEntity> {
-    public static BooleanProperty INFUSED;
+public class FlowInfuserBlock extends FlowCedarLikeBaseEntityBlock {
 
-    public FlowInfuserBlock(Properties pProperties) {
-        super(pProperties);
-        this.registerDefaultState((BlockState)this.defaultBlockState().setValue(INFUSED, false));
+    public FlowInfuserBlock(Properties pProperties, Supplier<Block> stripPair) {
+        super(pProperties, stripPair);
     }
 
-    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> pBuilder) {
-        pBuilder.add(INFUSED);
-    }
 
     @Override
-    public boolean isFlammable(BlockState state, BlockGetter level, BlockPos pos, Direction direction) {
-        return !state.getValue(INFUSED);
-    }
-
-    @Override
-    public int getFlammability(BlockState state, BlockGetter level, BlockPos pos, Direction direction) {
-        return state.getValue(INFUSED) ? 0 : 5;
-    }
-
-    @Override
-    public int getFireSpreadSpeed(BlockState state, BlockGetter level, BlockPos pos, Direction direction) {
-        return state.getValue(INFUSED) ? 0 : 5;
-    }
-
-    @Override
-    public @Nullable BlockState getToolModifiedState(BlockState state, UseOnContext context, ToolAction toolAction, boolean simulate) {
-        Map<BlockState,BlockState> stripPair = new HashMap<>();
-
-        stripPair.put(
-                ModBlocks.FLOW_INFUSER.get().defaultBlockState(),
-                ModBlocks.STRIPPED_FLOW_CEDAR_LOG.get().defaultBlockState());
-
-        if(context.getItemInHand().getItem() instanceof AxeItem){
-            if (stripPair.containsKey(state))
-                return stripPair.get(state)
-                        .setValue(INFUSED,state.getValue(INFUSED));
-        }
-        return super.getToolModifiedState(state, context,toolAction,simulate);
-    }
-
-    @Override
-    public void onRemove(BlockState pState, Level pLevel, BlockPos pPos, BlockState pNewState, boolean pIsMoving) {
-        super.onRemove(pState, pLevel, pPos, pNewState, pIsMoving);
-        if (pState.getBlock() != pNewState.getBlock()
-                || pState.getValue(INFUSED) != pNewState.getValue(INFUSED)){
-            BlockEntity blockEntity = pLevel.getBlockEntity(pPos);
-            if (blockEntity instanceof FlowInfuserBlockEntity){
-                ((FlowInfuserBlockEntity) blockEntity).drops();
-            }
-        }
-        if (pNewState.is(Blocks.AIR)) {
-            if (pState.getValue(INFUSED)&&!pLevel.getGameRules().getBoolean(ModGameRules.DISABLE_FLOW_LEAKING)) {
-                BlockPos fpos = pPos.relative(Direction.UP,1);
-                BlockPos bpos = pPos.relative(Direction.DOWN,1);
-                getNearBlocks(fpos).stream()
-                        .filter(pos -> pos != pPos)
-                        .filter(pos -> pLevel.getBlockState(pos).is(ModTags.Blocks.FLOW_LEAKABLE))
-                        .forEach(pos -> pLevel.setBlockAndUpdate(pos,pLevel.getBlockState(pos).setValue(INFUSED,false)));
-                getNearBlocks(bpos).stream()
-                        .filter(pos -> pos != pPos)
-                        .filter(pos -> pLevel.getBlockState(pos).is(ModTags.Blocks.FLOW_LEAKABLE))
-                        .forEach(pos -> pLevel.setBlockAndUpdate(pos,pLevel.getBlockState(pos).setValue(INFUSED,false)));
-            }
-        }
-    }
-
-    @Override
-    public InteractionResult use(BlockState pState, Level pLevel, BlockPos pPos, Player pPlayer, InteractionHand pHand, BlockHitResult pHit) {
+    public @NotNull InteractionResult use(@NotNull BlockState pState, Level pLevel, @NotNull BlockPos pPos, @NotNull Player pPlayer, @NotNull InteractionHand pHand, @NotNull BlockHitResult pHit) {
         //if (!pLevel.isClientSide()){
         BlockEntity entity = pLevel.getBlockEntity(pPos);
         if(entity instanceof FlowInfuserBlockEntity && pState.getValue(INFUSED)){
@@ -154,16 +93,6 @@ public class FlowInfuserBlock extends BaseEntityBlock implements IBE<FlowInfuser
         return ModBlockEntities.FLOW_INFUSER_BE.get().create(blockPos, blockState).markVirtual();
     }
 
-    @Override
-    public Class<FlowInfuserBlockEntity> getBlockEntityClass() {
-        return FlowInfuserBlockEntity.class;
-    }
-
-    @Override
-    public RenderShape getRenderShape(BlockState pState) {
-        return RenderShape.MODEL;
-    }
-
     @Nullable
     @Override
     public <T extends BlockEntity> BlockEntityTicker<T> getTicker(@NotNull Level pLevel, @NotNull BlockState pState, @NotNull BlockEntityType<T> pBlockEntityType) {
@@ -172,9 +101,5 @@ public class FlowInfuserBlock extends BaseEntityBlock implements IBE<FlowInfuser
         }
         return createTickerHelper(pBlockEntityType, ModBlockEntities.FLOW_INFUSER_BE.get(),
                 (pLevel1, pPos, pState1, pBlockEntity) -> pBlockEntity.tick(pLevel1,pPos,pState1));
-    }
-
-    static {
-        INFUSED = ModBlockStateProperties.INFUSED;
     }
 }

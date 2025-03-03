@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "F": {
+      "item": "minecraft:item_frame"
+    },
+    "R": {
+      "item": "terracompositio:copper_rod"
+    }
+  },
+  "pattern": [
+    " R ",
+    "RFR",
+    " R "
+  ],
+  "result": {
+    "item": "terracompositio:matter_infuser_port"
+  },
+  "show_notification": true
+}

@@ -1,10 +1,20 @@
 package net.sinedkadis.terracompositio.block.custom;
 
+import mekanism.api.annotations.NothingNullByDefault;
+import mekanism.api.annotations.ParametersAreNotNullByDefault;
+import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
+import net.minecraft.tags.ItemTags;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.AxeItem;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
@@ -14,9 +24,15 @@ import net.minecraft.world.level.block.RotatedPillarBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
+import net.minecraft.world.level.block.state.properties.EnumProperty;
+import net.minecraft.world.level.block.state.properties.Property;
+import net.minecraft.world.phys.BlockHitResult;
 import net.minecraftforge.common.ToolAction;
 import net.sinedkadis.terracompositio.block.ModBlockStateProperties;
 import net.sinedkadis.terracompositio.block.ModBlocks;
+import net.sinedkadis.terracompositio.item.ModItems;
+import net.sinedkadis.terracompositio.item.custom.WrenchAxeItem;
+import net.sinedkadis.terracompositio.particle.ModParticles;
 import net.sinedkadis.terracompositio.util.ModGameRules;
 import net.sinedkadis.terracompositio.util.ModTags;
 import org.jetbrains.annotations.NotNull;
@@ -29,6 +45,7 @@ import java.util.Map;
 import java.util.function.Supplier;
 
 import static net.sinedkadis.terracompositio.util.TCUtil.getNearBlocks;
+import static net.sinedkadis.terracompositio.util.TCUtil.handleInWorldBlockCraft;
 
 
 public class FlowCedarLikeBlock extends RotatedPillarBlock {
@@ -36,7 +53,7 @@ public class FlowCedarLikeBlock extends RotatedPillarBlock {
     @Nullable
     private final Supplier<Block> stripPair;
 
-    public FlowCedarLikeBlock(Properties pProperties, Supplier<Block> stripPair) {
+    public FlowCedarLikeBlock(Properties pProperties, @Nullable Supplier<Block> stripPair) {
         super(pProperties);
         this.registerDefaultState((BlockState)this.defaultBlockState().setValue(INFUSED, false));
         this.stripPair = stripPair;
@@ -98,6 +115,27 @@ public class FlowCedarLikeBlock extends RotatedPillarBlock {
     }
 
     @Override
+    @ParametersAreNotNullByDefault
+    public InteractionResult use(BlockState pState, Level pLevel, BlockPos pPos, Player pPlayer, InteractionHand pHand, BlockHitResult pHit) {
+        ItemStack item = pPlayer.getItemInHand(InteractionHand.MAIN_HAND);
+        ItemStack item2 = pPlayer.getItemInHand(InteractionHand.OFF_HAND);
+        if (this.getClass() == FlowCedarLikeBlock.class) {
+            if (item.is(ModItems.GOLD_ROD.get())
+                    && item.getCount() > 4
+                    && item2.getItem() instanceof WrenchAxeItem) {
+                if (WrenchAxeItem.getMode(item2).equals(WrenchAxeItem.WrenchMode.WRENCH)) {
+                    return handleInWorldBlockCraft(pState, ModBlocks.FLOW_CEDAR_CASING.get().defaultBlockState(), pLevel, pPos, item, 4);
+                }
+                return super.use(pState, pLevel, pPos, pPlayer, pHand, pHit);
+            } else if (item.is(ModItems.FLOW_INFUSER_KIT.get())
+                    && item2.is(ItemTags.AXES)) {
+                return handleInWorldBlockCraft(pState, ModBlocks.FLOW_INFUSER.get().defaultBlockState(), pLevel, pPos, item, 1);
+            }
+        }
+        return super.use(pState, pLevel, pPos, pPlayer, pHand, pHit);
+    }
+
+    @Override
     public void onRemove(BlockState pState, Level pLevel, BlockPos pPos, BlockState pNewState, boolean pIsMoving) {
         super.onRemove(pState, pLevel, pPos, pNewState, pIsMoving);
         if (pNewState.is(Blocks.AIR)) {
@@ -108,22 +146,22 @@ public class FlowCedarLikeBlock extends RotatedPillarBlock {
     public static void flowLeak(BlockState pState, Level pLevel, BlockPos pPos,boolean chained) {
         if (pState.hasProperty(INFUSED) && pState.getValue(INFUSED)&&!pLevel.getGameRules().getBoolean(ModGameRules.DISABLE_FLOW_LEAKING)) {
 
-                BlockPos fpos;
-                BlockPos bpos;
+                BlockPos f_pos;
+                BlockPos b_pos;
                 if (pState.hasProperty(AXIS)) {
-                    fpos = pPos.relative(pState.getValue(AXIS), 1);
-                    bpos = pPos.relative(pState.getValue(AXIS), -1);
+                    f_pos = pPos.relative(pState.getValue(AXIS), 1);
+                    b_pos = pPos.relative(pState.getValue(AXIS), -1);
                 } else {
-                    fpos = pPos.relative(Direction.Axis.Y, 1);
-                    bpos = pPos.relative(Direction.Axis.Y, -1);
+                    f_pos = pPos.relative(Direction.Axis.Y, 1);
+                    b_pos = pPos.relative(Direction.Axis.Y, -1);
                 }
-                getNearBlocks(fpos,chained ? 4 : 2).stream()
+                getNearBlocks(f_pos,chained ? 4 : 2).stream()
                         .filter(pos -> pos != pPos)
-                        .filter(pos -> pLevel.getBlockState(pos).is(ModTags.Blocks.FLOW_LEAKABLE))
+                        .filter(pos -> pLevel.getBlockState(pos).hasProperty(INFUSED))
                         .forEach(pos -> pLevel.setBlockAndUpdate(pos, pLevel.getBlockState(pos).setValue(INFUSED, false)));
-                getNearBlocks(bpos,chained ? 4 : 2).stream()
+                getNearBlocks(b_pos,chained ? 4 : 2).stream()
                         .filter(pos -> pos != pPos)
-                        .filter(pos -> pLevel.getBlockState(pos).is(ModTags.Blocks.FLOW_LEAKABLE))
+                        .filter(pos -> pLevel.getBlockState(pos).hasProperty(INFUSED))
                         .forEach(pos -> pLevel.setBlockAndUpdate(pos, pLevel.getBlockState(pos).setValue(INFUSED, false)));
 
         }
@@ -138,7 +176,7 @@ public class FlowCedarLikeBlock extends RotatedPillarBlock {
                 if (blockPos.getX() != pPos.getX()
                         && blockPos.getY() != pPos.getY()
                         && blockPos.getZ() != pPos.getZ()) {
-                    if (pLevel.getBlockState(blockPos).is(ModTags.Blocks.FLOW_LEAKABLE)) {
+                    if (pLevel.getBlockState(blockPos).hasProperty(INFUSED)) {
                         if (!pLevel.getBlockState(blockPos).getValue(INFUSED) && pRandom.nextFloat() > 0.99f)
                             pLevel.setBlockAndUpdate(blockPos, pLevel.getBlockState(blockPos).setValue(INFUSED, true));
                     }

@@ -2,15 +2,15 @@ package net.sinedkadis.terracompositio.block.custom;
 
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.AxeItem;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -18,74 +18,42 @@ import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
-import net.minecraft.world.level.block.state.properties.BooleanProperty;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.level.block.state.properties.DirectionProperty;
 import net.minecraft.world.phys.BlockHitResult;
-import net.minecraftforge.common.ToolAction;
 import net.minecraftforge.network.NetworkHooks;
-import net.sinedkadis.terracompositio.block.ModBlockStateProperties;
-import net.sinedkadis.terracompositio.block.ModBlocks;
 import net.sinedkadis.terracompositio.block.entity.FlowPortBlockEntity;
 import net.sinedkadis.terracompositio.block.entity.ModBlockEntities;
-import net.sinedkadis.terracompositio.util.ModGameRules;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import static net.minecraft.world.level.block.RotatedPillarBlock.AXIS;
-import static net.sinedkadis.terracompositio.util.TCUtil.getNearBlocks;
+import java.util.function.Supplier;
 
 
-public class FlowPortBlock extends BaseEntityBlock {
-    public FlowPortBlock(Properties pProperties) {
-        super(pProperties);
+public class FlowPortBlock extends FlowCedarLikeBaseEntityBlock {
+    public static final DirectionProperty FACING;
+
+    public FlowPortBlock(Properties pProperties, Supplier<Block> stripPair) {
+        super(pProperties, stripPair);
     }
-    public static final BooleanProperty INFUSED;
 
     @Override
-    public @Nullable BlockState getToolModifiedState(BlockState state, UseOnContext context, ToolAction toolAction, boolean simulate) {
-        if(context.getItemInHand().getItem() instanceof AxeItem){
-            if(state.is(ModBlocks.FLOW_PORT.get())){
-                return ModBlocks.STRIPPED_FLOW_CEDAR_LOG.get().defaultBlockState().setValue(INFUSED,state.getValue(INFUSED));
-            }
-
-        }
-        return super.getToolModifiedState(state, context,toolAction,simulate);
-    }
-
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> pBuilder) {
-        pBuilder.add(INFUSED);
+        pBuilder.add(FACING,AXIS,INFUSED);
     }
 
     @Override
-    public RenderShape getRenderShape(BlockState pState) {
-        return RenderShape.MODEL;
-    }
-
-    @Override
-    public void onRemove(BlockState pState, Level pLevel, BlockPos pPos, BlockState pNewState, boolean pIsMoving) {
-        if (pState.getBlock() != pNewState.getBlock()){
-            BlockEntity blockEntity =pLevel.getBlockEntity(pPos);
-            if (blockEntity instanceof FlowPortBlockEntity){
-                ((FlowPortBlockEntity) blockEntity).drops();
-            }
-        }
-        super.onRemove(pState, pLevel, pPos, pNewState, pIsMoving);
-        if (pNewState.is(Blocks.AIR) || pIsMoving) {
-            if (!pLevel.getGameRules().getBoolean(ModGameRules.DISABLE_FLOW_LEAKING)) {
-                BlockPos fpos = pPos.relative(pState.getValue(AXIS),1);
-                BlockPos bpos = pPos.relative(pState.getValue(AXIS),-1);
-                List<BlockPos> toReplace = new ArrayList<>(getNearBlocks(fpos));
-                toReplace.addAll(getNearBlocks(bpos));
-                toReplace.stream()
-                        .filter(pos -> pos != pPos)
-                        .forEach(pos -> pLevel.setBlockAndUpdate(pos,pLevel.getBlockState(pos).setValue(INFUSED,false)));
-            }
+    public BlockState getStateForPlacement(BlockPlaceContext pContext) {
+        Direction direction = pContext.getClickedFace();
+        if (direction.getAxis().isHorizontal()){
+            return this.defaultBlockState().setValue(AXIS,direction.getAxis());
+        }else {
+            return this.defaultBlockState().setValue(AXIS,Direction.Axis.Y).setValue(FACING,pContext.getHorizontalDirection().getOpposite());
         }
     }
 
     @Override
-    public InteractionResult use(BlockState pState, Level pLevel, BlockPos pPos, Player pPlayer, InteractionHand pHand, BlockHitResult pHit) {
+    public @NotNull InteractionResult use(@NotNull BlockState pState, Level pLevel, @NotNull BlockPos pPos, @NotNull Player pPlayer, @NotNull InteractionHand pHand, @NotNull BlockHitResult pHit) {
         //if (!pLevel.isClientSide()){
             BlockEntity entity = pLevel.getBlockEntity(pPos);
             if(entity instanceof  FlowPortBlockEntity){
@@ -137,6 +105,6 @@ public class FlowPortBlock extends BaseEntityBlock {
     }
 
     static {
-        INFUSED = ModBlockStateProperties.INFUSED;
+        FACING = BlockStateProperties.HORIZONTAL_FACING;
     }
 }

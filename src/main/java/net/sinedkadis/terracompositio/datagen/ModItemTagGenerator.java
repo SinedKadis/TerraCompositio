@@ -4,12 +4,10 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.tags.ItemTagsProvider;
 
-import net.minecraft.data.tags.TagsProvider;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.world.level.block.Block;
 import net.minecraftforge.common.Tags;
 import net.minecraftforge.common.data.ExistingFileHelper;
-import net.minecraftforge.common.data.ForgeItemTagsProvider;
 import net.sinedkadis.terracompositio.TerraCompositio;
 import net.sinedkadis.terracompositio.block.ModBlocks;
 import net.sinedkadis.terracompositio.item.ModItems;
@@ -33,7 +31,9 @@ public class ModItemTagGenerator extends ItemTagsProvider {
                         ModBlocks.FLOW_PORT.get().asItem(),
                         ModBlocks.STRIPPED_FLOW_CEDAR_LOG.get().asItem(),
                         ModBlocks.STRIPPED_FLOW_CEDAR_WOOD.get().asItem(),
-                        ModBlocks.MATTER_INFUSER.get().asItem(),
+                        ModBlocks.MATTER_INFUSER_PORT.get().asItem(),
+                        ModBlocks.MATTER_INFUSER_IO.get().asItem(),
+                        ModBlocks.FLOW_CEDAR_CASING.get().asItem(),
                         ModBlocks.FLOW_INFUSER.get().asItem());
         this.tag(ItemTags.PLANKS)
                 .add(ModBlocks.FLOW_CEDAR_PLANKS.get().asItem());
@@ -73,5 +73,11 @@ public class ModItemTagGenerator extends ItemTagsProvider {
                 .add(ModItems.INFUSED_IRON_INGOT.get());
         this.tag(Tags.Items.NUGGETS)
                 .add(ModItems.COPPER_NUGGET.get());
+        this.tag(Tags.Items.RODS)
+                .add(ModItems.INFUSED_IRON_ROD.get(),
+                        ModItems.GOLD_ROD.get(),
+                        ModItems.COPPER_ROD.get());
+        this.tag(ItemTags.AXES)
+                .add(ModItems.FLOW_ROTATING_AXE.get());
     }
 }

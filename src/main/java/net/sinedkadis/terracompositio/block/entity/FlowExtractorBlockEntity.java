@@ -61,7 +61,7 @@ public class FlowExtractorBlockEntity extends ModBlockEntity implements CFESourc
         if(cap == ForgeCapabilities.FLUID_HANDLER)
             return this.fluidOptional.cast();
 
-        return super.getCapability(cap);
+        return super.getCapability(cap);//todo bruh
     }
 
     @Override

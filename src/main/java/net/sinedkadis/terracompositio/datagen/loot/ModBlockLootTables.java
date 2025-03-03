@@ -8,12 +8,17 @@ import net.minecraft.world.item.Item;
 
 import net.minecraft.world.item.enchantment.Enchantments;
 
+import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.storage.loot.LootPool;
 import net.minecraft.world.level.storage.loot.LootTable;
 import net.minecraft.world.level.storage.loot.entries.LootItem;
+import net.minecraft.world.level.storage.loot.entries.LootPoolEntryContainer;
 import net.minecraft.world.level.storage.loot.functions.ApplyBonusCount;
 import net.minecraft.world.level.storage.loot.functions.SetItemCountFunction;
+import net.minecraft.world.level.storage.loot.providers.number.ConstantValue;
+import net.minecraft.world.level.storage.loot.providers.number.NumberProvider;
 import net.minecraft.world.level.storage.loot.providers.number.UniformGenerator;
 import net.minecraftforge.registries.RegistryObject;
 import net.sinedkadis.terracompositio.block.ModBlocks;
@@ -50,7 +55,11 @@ public class ModBlockLootTables extends BlockLootSubProvider {
         this.dropSelf(ModBlocks.FLOW_CONTAINING_RAW_ORE_BLOCK.get());
         this.dropSelf(ModBlocks.FLOW_CEDAR_BIG_SAPLING.get());
         this.dropSelf(ModBlocks.FLOW_CEDAR_SAPLING.get());
-        this.dropSelf(ModBlocks.MATTER_INFUSER.get());
+
+
+        this.add(ModBlocks.FLOW_CEDAR_CASING.get(), this.createSingleItemTable(ModItems.INFUSED_IRON_ROD.get(),ConstantValue.exactly(4)));
+        this.dropSelf(ModBlocks.MATTER_INFUSER_PORT.get());
+        this.dropSelf(ModBlocks.MATTER_INFUSER_IO.get());
 
         this.add(ModBlocks.FLOW_CEDAR_SLAB.get(),
                 block -> createSlabItemTable(ModBlocks.FLOW_CEDAR_SLAB.get()));
