@@ -1,8 +1,8 @@
 package net.sinedkadis.terracompositio.block.custom;
 
+import mekanism.api.annotations.ParametersAreNotNullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.tags.ItemTags;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.item.ItemEntity;
@@ -11,20 +11,20 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.EntityBlock;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.DirectionProperty;
 import net.minecraft.world.phys.BlockHitResult;
 import net.sinedkadis.terracompositio.block.ModBlocks;
 import net.sinedkadis.terracompositio.item.ModItems;
-import net.sinedkadis.terracompositio.item.custom.WrenchAxeItem;
+import org.jetbrains.annotations.Nullable;
 
-import static net.minecraft.world.level.block.state.properties.BlockStateProperties.AXIS;
 import static net.sinedkadis.terracompositio.util.TCUtil.handleInWorldBlockCraft;
 
-public class FlowCedarCasingBlock extends FlowCedarLikeBlock{
+public class FlowCedarCasingBlock extends FlowCedarLikeBlock implements EntityBlock {
     public static final DirectionProperty PARTS = DirectionProperty.create("parts");
-
     public FlowCedarCasingBlock(Properties pProperties) {
         super(pProperties);
         registerDefaultState(defaultBlockState().setValue(PARTS,Direction.DOWN));
@@ -41,6 +41,7 @@ public class FlowCedarCasingBlock extends FlowCedarLikeBlock{
     }
 
     @Override
+    @ParametersAreNotNullByDefault
     public InteractionResult use(BlockState pState, Level pLevel, BlockPos pPos, Player pPlayer, InteractionHand pHand, BlockHitResult pHit) {
         ItemStack item = pPlayer.getItemInHand(InteractionHand.MAIN_HAND);
         if (item.is(ModItems.INPUT_BUS.get()) && pState.getValue(AXIS) != Direction.Axis.Y) {
@@ -86,5 +87,12 @@ public class FlowCedarCasingBlock extends FlowCedarLikeBlock{
             return blockState.getValue(PARTS).equals(Direction.UP);
         }
         return false;
+    }
+
+    @Nullable
+    @Override
+    @ParametersAreNotNullByDefault
+    public BlockEntity newBlockEntity(BlockPos blockPos, BlockState blockState) {
+        return null;
     }
 }

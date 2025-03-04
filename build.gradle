@@ -190,7 +190,7 @@ dependencies {
 
 mixin {
     // MixinGradle Settings
-    add sourceSets.main, 'mixins.refmap.json'
+    add sourceSets.main, 'mixins.terracompositio.refmap.json'
     config 'mixins.terracompositio.json'
     debug.verbose = true
     debug.export = true

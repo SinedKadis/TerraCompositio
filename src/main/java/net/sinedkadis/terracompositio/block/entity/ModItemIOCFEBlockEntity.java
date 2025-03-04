@@ -62,7 +62,7 @@ public abstract class ModItemIOCFEBlockEntity extends ModCFEBlockEntity{
                 switch (pIndex){
                     case 0 -> ModItemIOCFEBlockEntity.this.progress = pValue;
                     case 1 -> ModItemIOCFEBlockEntity.this.maxProgress = pValue;
-                };
+                }
             }
 
             @Override
@@ -74,10 +74,16 @@ public abstract class ModItemIOCFEBlockEntity extends ModCFEBlockEntity{
 
     @Override
     public @NotNull <T> LazyOptional<T> getCapability(@NotNull Capability<T> cap, @Nullable Direction side) {
+        LazyOptional<T> lazyItemHandler1 = getCap(cap,side);
+        if (lazyItemHandler1 != null) return lazyItemHandler1;
+        return super.getCapability(cap,side);
+    }
+
+    protected <T> @Nullable LazyOptional<T> getCap(@NotNull Capability<T> cap,@Nullable Direction side) {
         if(cap == ForgeCapabilities.ITEM_HANDLER){
             return lazyItemHandler.cast();
         }
-        return super.getCapability(cap,side);
+        return null;
     }
 
     @Override
@@ -97,6 +103,7 @@ public abstract class ModItemIOCFEBlockEntity extends ModCFEBlockEntity{
         for (int i = 0; i < itemHandler.getSlots(); i++){
             inventory.setItem(i, itemHandler.getStackInSlot(i));
         }
+        assert this.level != null;
         Containers.dropContents(this.level, this.worldPosition,inventory);
     }
 
@@ -151,6 +158,7 @@ public abstract class ModItemIOCFEBlockEntity extends ModCFEBlockEntity{
             inventory.setItem(i, this.itemHandler.getStackInSlot(i));
         }
 
+        assert this.level != null;
         return this.level.getRecipeManager().getRecipeFor(FlowInfusionRecipe.Type.INSTANCE, inventory, level);
     }
 

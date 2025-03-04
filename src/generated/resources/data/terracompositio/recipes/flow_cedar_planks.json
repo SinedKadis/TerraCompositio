@@ -3,7 +3,7 @@
   "category": "building",
   "ingredients": [
     {
-      "tag": "terracompositio:flow_cedar_logs"
+      "tag": "terracompositio:flow_cedar_logs_items"
     }
   ],
   "result": {
