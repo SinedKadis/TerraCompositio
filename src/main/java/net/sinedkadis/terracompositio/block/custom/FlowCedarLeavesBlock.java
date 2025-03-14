@@ -1,5 +1,6 @@
 package net.sinedkadis.terracompositio.block.custom;
 
+import mekanism.api.annotations.ParametersAreNotNullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
@@ -8,12 +9,11 @@ import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.LeavesBlock;
 import net.minecraft.world.level.block.state.BlockState;
-import net.sinedkadis.terracompositio.util.ModTags;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.OptionalInt;
 
-import static net.sinedkadis.terracompositio.block.ModBlockStateProperties.INFUSED;
+import static net.sinedkadis.terracompositio.registries.ModBlockStateProperties.INFUSED;
 
 public class FlowCedarLeavesBlock extends LeavesBlock {
     public FlowCedarLeavesBlock(Properties pProperties) {
@@ -35,6 +35,7 @@ public class FlowCedarLeavesBlock extends LeavesBlock {
     }
 
     @Override
+    @ParametersAreNotNullByDefault
     public void tick(BlockState pState, ServerLevel pLevel, BlockPos pPos, RandomSource pRandom) {
         pLevel.setBlock(pPos, updateDistance(pState, pLevel, pPos), 3);
     }

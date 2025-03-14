@@ -1,6 +1,6 @@
 package net.sinedkadis.terracompositio.block.entity;
 
-import com.mojang.logging.LogUtils;
+import mekanism.api.annotations.ParametersAreNotNullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -26,16 +26,16 @@ import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemStackHandler;
-import net.sinedkadis.terracompositio.particle.ModParticles;
+import net.sinedkadis.terracompositio.registries.ModBlockEntities;
+import net.sinedkadis.terracompositio.registries.ModParticles;
 import net.sinedkadis.terracompositio.recipe.FlowSaturationRecipe;
 import net.sinedkadis.terracompositio.screen.FlowBlockPortMenu;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import org.slf4j.Logger;
 
 import java.util.Optional;
 
-import static net.sinedkadis.terracompositio.block.ModBlockStateProperties.INFUSED;
+import static net.sinedkadis.terracompositio.registries.ModBlockStateProperties.INFUSED;
 import static net.sinedkadis.terracompositio.block.custom.FlowCedarLikeBlock.flowLeak;
 
 public class FlowPortBlockEntity extends BlockEntity implements MenuProvider {
@@ -43,7 +43,7 @@ public class FlowPortBlockEntity extends BlockEntity implements MenuProvider {
         @Override
         protected void onContentsChanged(int slot) {
             setChanged();
-            if(!level.isClientSide()) {
+            if (level != null && !level.isClientSide()) {
                 level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), 3);
             }
         }
@@ -79,7 +79,7 @@ public class FlowPortBlockEntity extends BlockEntity implements MenuProvider {
                 switch (pIndex){
                     case 0 -> FlowPortBlockEntity.this.progress = pValue;
                     case 1 -> FlowPortBlockEntity.this.maxProgress = pValue;
-                };
+                }
             }
 
             @Override
@@ -113,7 +113,9 @@ public class FlowPortBlockEntity extends BlockEntity implements MenuProvider {
         for (int i = 0; i < itemHandler.getSlots(); i++){
             inventory.setItem(i, itemHandler.getStackInSlot(i));
         }
-        Containers.dropContents(this.level, this.worldPosition,inventory);
+        if (this.level != null) {
+            Containers.dropContents(this.level, this.worldPosition,inventory);
+        }
     }
 
     @Override
@@ -124,7 +126,7 @@ public class FlowPortBlockEntity extends BlockEntity implements MenuProvider {
     }
 
     @Override
-    public void load(CompoundTag pTag) {
+    public void load(@NotNull CompoundTag pTag) {
         super.load(pTag);
         itemHandler.deserializeNBT(pTag.getCompound("inventory"));
         progress = pTag.getInt("flow_port_progress");
@@ -159,23 +161,25 @@ public class FlowPortBlockEntity extends BlockEntity implements MenuProvider {
 
     private void craftItem() {
         Optional<FlowSaturationRecipe> recipe = getCurrentRecipe();
-        ItemStack result = recipe.get().getResultItem(null);
-        //LOGGER.debug("Item crafted");
-        this.itemHandler.extractItem(SLOT_INPUT,1,false);
-        this.itemHandler.setStackInSlot(SLOT_OUTPUT, new ItemStack(result.getItem(),
-                this.itemHandler.getStackInSlot(SLOT_OUTPUT).getCount()+result.getCount()));
-        if (recipe.get().isFlowConsume())
-            flowLeak(this.getBlockState(),this.level,this.worldPosition,true);
-        if (this.level instanceof ServerLevel level){
-            level.sendParticles(ModParticles.FLOW_STILL_PARTICLE.get(),
-                    this.getBlockPos().getX(),
-                    this.getBlockPos().getY(),
-                    this.getBlockPos().getZ(),
-                    10,
-                    this.level.getRandom().nextFloat(),
-                    this.level.getRandom().nextFloat(),
-                    this.level.getRandom().nextFloat(),
-                    0.5D);
+        if (recipe.isPresent()) {
+            ItemStack result = recipe.get().getResultItem(null);
+            //LOGGER.debug("Item crafted");
+            this.itemHandler.extractItem(SLOT_INPUT, 1, false);
+            this.itemHandler.setStackInSlot(SLOT_OUTPUT, new ItemStack(result.getItem(),
+                    this.itemHandler.getStackInSlot(SLOT_OUTPUT).getCount() + result.getCount()));
+            if (recipe.get().isFlowConsume())
+                flowLeak(this.getBlockState(), this.level, this.worldPosition, true);
+            if (this.level instanceof ServerLevel level1) {
+                level1.sendParticles(ModParticles.FLOW_STILL_PARTICLE.get(),
+                        this.getBlockPos().getX(),
+                        this.getBlockPos().getY(),
+                        this.getBlockPos().getZ(),
+                        10,
+                        this.level.getRandom().nextFloat(),
+                        this.level.getRandom().nextFloat(),
+                        this.level.getRandom().nextFloat(),
+                        0.5D);
+            }
         }
     }
 
@@ -202,7 +206,10 @@ public class FlowPortBlockEntity extends BlockEntity implements MenuProvider {
             inventory.setItem(i, this.itemHandler.getStackInSlot(i));
         }
 
-        return this.level.getRecipeManager().getRecipeFor(FlowSaturationRecipe.Type.INSTANCE, inventory, level);
+        if (this.level != null) {
+            return this.level.getRecipeManager().getRecipeFor(FlowSaturationRecipe.Type.INSTANCE, inventory, level);
+        }
+        return Optional.empty();
     }
 
     private boolean sameItemInOutput(Item item) {
@@ -214,12 +221,13 @@ public class FlowPortBlockEntity extends BlockEntity implements MenuProvider {
     }
 
     @Override
-    public Component getDisplayName() {
+    public @NotNull Component getDisplayName() {
         return Component.translatable("block.terracompositio.flow_port");
     }
 
     @Nullable
     @Override
+    @ParametersAreNotNullByDefault
     public AbstractContainerMenu createMenu(int pContainerId, Inventory pPlayerInventory, Player pPlayer) {
         return new FlowBlockPortMenu(pContainerId,pPlayerInventory,this,this.data);
     }
@@ -230,12 +238,16 @@ public class FlowPortBlockEntity extends BlockEntity implements MenuProvider {
         return this.itemHandler.getStackInSlot(SLOT_OUTPUT);
     }
 
-    public ItemStack addItemInSlot(int Slot, ItemStack item, int count){
-        this.itemHandler.setStackInSlot(Slot,new ItemStack(item.getItem(),
-                         this.itemHandler.getStackInSlot(Slot).getCount()+count));
-        item.setCount(item.getCount()-count);
-        return new ItemStack(item.getItem(),item.getCount());
-
+    public ItemStack insertItemStack(int slot, ItemStack item){
+        ItemStack itemStack;
+        if (item.getCount() == 1)
+            itemStack = item.copyWithCount(2);
+        else
+            itemStack = item.copy();
+        itemStack = this.itemHandler.insertItem(slot,itemStack,false);
+        if (item.getCount() == 1)
+            itemStack.shrink(1);
+        return itemStack;
 
     }
     public void setSlotEmpty(int Slot){
@@ -259,7 +271,7 @@ public class FlowPortBlockEntity extends BlockEntity implements MenuProvider {
     }
 
     @Override
-    public CompoundTag getUpdateTag() {
+    public @NotNull CompoundTag getUpdateTag() {
         return saveWithoutMetadata();
     }
     //public void setSlotOutput(ItemStack item){this.itemHandler.setStackInSlot(SLOT_OUTPUT,item);}

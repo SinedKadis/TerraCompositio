@@ -1,0 +1,6 @@
+{
+  "parent": "terracompositio:block/flow_cedar_casing_with_buses_infused",
+  "textures": {
+    "south": "terracompositio:block/flow_cedar_casing_input_plus_infused"
+  }
+}

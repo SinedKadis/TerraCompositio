@@ -71,7 +71,8 @@
   "item.terracompositio.infused_iron_rod": "Infused Iron Rod",
   "item.terracompositio.gold_rod": "Gold Rod",
   "item.terracompositio.copper_rod": "Copper Rod",
-  "item.terracompositio.copper_input_bus": "Copper Input Bus",
+  "item.terracompositio.copper_output_bus": "Copper Output Bus",
+  "item.terracompositio.lapis_input_bus": "Lapis Input Bus",
   "block.terracompositio.matter_infuser_port": "Matter Infuser Port",
   "block.terracompositio.matter_infuser_io": "Matter Infuser Unit",
   "block.terracompositio.flow_cedar_casing": "Flow Cedar Casing"

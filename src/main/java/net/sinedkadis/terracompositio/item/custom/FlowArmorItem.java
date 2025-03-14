@@ -1,6 +1,5 @@
 package net.sinedkadis.terracompositio.item.custom;
 
-import com.mojang.logging.LogUtils;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
@@ -9,10 +8,9 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ArmorMaterial;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.sinedkadis.terracompositio.item.ModArmorMaterials;
-import net.sinedkadis.terracompositio.item.ModItems;
+import net.sinedkadis.terracompositio.registries.ModArmorMaterials;
+import net.sinedkadis.terracompositio.registries.ModItems;
 import org.jetbrains.annotations.NotNull;
-import org.slf4j.Logger;
 
 import java.util.function.Consumer;
 
@@ -49,7 +47,7 @@ public class FlowArmorItem extends ModArmorItem{
     }
 
     @Override
-    public void inventoryTick(ItemStack pStack, Level pLevel, Entity pEntity, int pSlotId, boolean pIsSelected) {
+    public void inventoryTick(@NotNull ItemStack pStack, @NotNull Level pLevel, @NotNull Entity pEntity, int pSlotId, boolean pIsSelected) {
         super.inventoryTick(pStack, pLevel, pEntity, pSlotId, pIsSelected);
         if (!pLevel.isClientSide()
                 && pEntity instanceof Player pPlayer) {

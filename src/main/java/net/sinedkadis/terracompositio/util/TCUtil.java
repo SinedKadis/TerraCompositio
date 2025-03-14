@@ -12,20 +12,20 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.Property;
-import net.sinedkadis.terracompositio.particle.ModParticles;
+import net.sinedkadis.terracompositio.registries.ModParticles;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
-import static net.sinedkadis.terracompositio.block.ModBlockStateProperties.INFUSED;
+import static net.sinedkadis.terracompositio.registries.ModBlockStateProperties.INFUSED;
 
 public class TCUtil {
     public static @NotNull InteractionResult handleInWorldBlockCraft(BlockState oldState, BlockState newState, Level pLevel, BlockPos pPos, ItemStack item, int count) {
         pLevel.setBlock(pPos,copyBlockStates(oldState,newState),3);
         item.shrink(count);
         if (pLevel instanceof ServerLevel level && oldState.hasProperty(INFUSED) && oldState.getValue(INFUSED)){
-            level.playSound(null, pPos, SoundEvents.ANVIL_PLACE, SoundSource.BLOCKS);
+            level.playSound(null, pPos, SoundEvents.COPPER_PLACE, SoundSource.BLOCKS);
             level.sendParticles(ModParticles.FLOW_STILL_PARTICLE.get(),
                     pPos.getX(),
                     pPos.getY(),

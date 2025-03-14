@@ -1,6 +1,7 @@
 package net.sinedkadis.terracompositio.item.custom;
 
 
+import mekanism.api.annotations.ParametersAreNotNullByDefault;
 import net.minecraft.ChatFormatting;
 import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
@@ -38,7 +39,7 @@ import java.util.*;
 
 import static net.minecraft.world.level.block.Block.dropResources;
 import static net.minecraft.world.level.block.state.properties.BlockStateProperties.*;
-import static net.sinedkadis.terracompositio.block.ModBlockStateProperties.INFUSED;
+import static net.sinedkadis.terracompositio.registries.ModBlockStateProperties.INFUSED;
 import static net.sinedkadis.terracompositio.util.TCUtil.getNearBlocks;
 import static net.sinedkadis.terracompositio.util.TCUtil.getTouchingBlocks;
 
@@ -53,29 +54,35 @@ public class WrenchAxeItem extends AxeItem {
     }
 
     @Override
-    public InteractionResultHolder<ItemStack> use(Level pLevel, Player pPlayer, InteractionHand pUsedHand) {
+    @ParametersAreNotNullByDefault
+    public @NotNull InteractionResultHolder<ItemStack> use(Level pLevel, Player pPlayer, InteractionHand pUsedHand) {
         ItemStack stack = pPlayer.getItemInHand(pUsedHand);
         if (pPlayer.isCrouching() && !isPlayerLookingAtBlock(pPlayer,pLevel)) {
             wrenchMode = wrenchMode.next(); // Переключаем режим
             if (!stack.hasTag()) {
                 stack.setTag(new CompoundTag());
             }
-            stack.getTag().putInt("WrenchMode", wrenchMode.ordinal());
+            if (stack.getTag() != null) {
+                stack.getTag().putInt("WrenchMode", wrenchMode.ordinal());
+            }
             pPlayer.displayClientMessage(Component.translatable("message.terracompositio.wrench_mode", wrenchMode.getDisplayName()), true);
         }
         return super.use(pLevel, pPlayer, pUsedHand);
     }
     @Override
+    @ParametersAreNotNullByDefault
     public void onCraftedBy(ItemStack stack, Level level, Player player) {
         super.onCraftedBy(stack, level, player);
         if (!stack.hasTag()) {
             stack.setTag(new CompoundTag());
         }
-        stack.getTag().putInt("WrenchMode", wrenchMode.ordinal());
+        if (stack.getTag() != null) {
+            stack.getTag().putInt("WrenchMode", wrenchMode.ordinal());
+        }
     }
 
     @Override
-    public void verifyTagAfterLoad(CompoundTag tag) {
+    public void verifyTagAfterLoad(@NotNull CompoundTag tag) {
         super.verifyTagAfterLoad(tag);
         if (!tag.contains("WrenchMode")) {
             tag.putInt("WrenchMode", WrenchMode.AXE.ordinal());
@@ -96,6 +103,7 @@ public class WrenchAxeItem extends AxeItem {
     }
 
     @Override
+    @ParametersAreNotNullByDefault
     public void inventoryTick(ItemStack pStack, Level pLevel, Entity pEntity, int pSlotId, boolean pIsSelected) {
         super.inventoryTick(pStack, pLevel, pEntity, pSlotId, pIsSelected);
         if (!pLevel.isClientSide && pEntity instanceof Player) {
@@ -104,8 +112,9 @@ public class WrenchAxeItem extends AxeItem {
     }
 
     @Override
+    @ParametersAreNotNullByDefault
     public boolean canAttackBlock(BlockState pState, Level pLevel, BlockPos pPos, Player pPlayer) {
-        if (!pLevel.isClientSide && wrenchMode == WrenchMode.WRENCH) {
+        if (wrenchMode == WrenchMode.WRENCH) {
             this.wrenchInteraction(pPlayer, pState, pLevel, pPos, false, pPlayer.getItemInHand(InteractionHand.MAIN_HAND));
             return false;
         }
@@ -114,8 +123,9 @@ public class WrenchAxeItem extends AxeItem {
     }
 
     @Override
+    @ParametersAreNotNullByDefault
     public float getDestroySpeed(ItemStack pStack, BlockState pState) {
-        return 255;
+        return this.wrenchMode.equals(WrenchMode.WRENCH) ? 255 : super.getDestroySpeed(pStack,pState);
     }
 
     @Override
@@ -295,7 +305,7 @@ public class WrenchAxeItem extends AxeItem {
     }
 
     public static WrenchMode getMode(ItemStack stack) {
-        if (stack.hasTag() && stack.getTag().contains("WrenchMode")) {
+        if (stack.getTag() != null && stack.hasTag() && stack.getTag().contains("WrenchMode")) {
             return WrenchMode.values()[stack.getTag().getInt("WrenchMode")];
         }
         return WrenchMode.AXE; // Default mode
@@ -348,7 +358,8 @@ public class WrenchAxeItem extends AxeItem {
     }
 
     private static void message(Player pPlayer, Component pMessageComponent) {
-        ((ServerPlayer)pPlayer).sendSystemMessage(pMessageComponent, true);
+        if (pPlayer instanceof ServerPlayer player)
+            player.sendSystemMessage(pMessageComponent, true);
     }
     private static <T extends Comparable<T>> String getNameHelper(BlockState pState, Property<T> pProperty) {
         return pProperty.getName(pState.getValue(pProperty));

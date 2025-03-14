@@ -1,13 +1,9 @@
 package net.sinedkadis.terracompositio.block.custom;
 
-import mekanism.api.annotations.NothingNullByDefault;
 import mekanism.api.annotations.ParametersAreNotNullByDefault;
-import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.sounds.SoundEvents;
-import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
@@ -24,24 +20,16 @@ import net.minecraft.world.level.block.RotatedPillarBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
-import net.minecraft.world.level.block.state.properties.EnumProperty;
-import net.minecraft.world.level.block.state.properties.Property;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraftforge.common.ToolAction;
-import net.sinedkadis.terracompositio.block.ModBlockStateProperties;
-import net.sinedkadis.terracompositio.block.ModBlocks;
-import net.sinedkadis.terracompositio.item.ModItems;
+import net.sinedkadis.terracompositio.registries.ModBlockStateProperties;
+import net.sinedkadis.terracompositio.registries.ModBlocks;
+import net.sinedkadis.terracompositio.registries.ModItems;
 import net.sinedkadis.terracompositio.item.custom.WrenchAxeItem;
-import net.sinedkadis.terracompositio.particle.ModParticles;
-import net.sinedkadis.terracompositio.util.ModGameRules;
-import net.sinedkadis.terracompositio.util.ModTags;
+import net.sinedkadis.terracompositio.registries.ModGameRules;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import java.util.function.Supplier;
 
 import static net.sinedkadis.terracompositio.util.TCUtil.getNearBlocks;
@@ -55,12 +43,12 @@ public class FlowCedarLikeBlock extends RotatedPillarBlock {
 
     public FlowCedarLikeBlock(Properties pProperties, @Nullable Supplier<Block> stripPair) {
         super(pProperties);
-        this.registerDefaultState((BlockState)this.defaultBlockState().setValue(INFUSED, false));
+        this.registerDefaultState(this.defaultBlockState().setValue(INFUSED, false));
         this.stripPair = stripPair;
     }
     public FlowCedarLikeBlock(Properties pProperties) {
         super(pProperties);
-        this.registerDefaultState((BlockState)this.defaultBlockState().setValue(INFUSED, false));
+        this.registerDefaultState(this.defaultBlockState().setValue(INFUSED, false));
         this.stripPair = null;
     }
 
@@ -136,7 +124,8 @@ public class FlowCedarLikeBlock extends RotatedPillarBlock {
     }
 
     @Override
-    public void onRemove(BlockState pState, Level pLevel, BlockPos pPos, BlockState pNewState, boolean pIsMoving) {
+    @ParametersAreNotNullByDefault
+    public void onRemove(BlockState pState,Level pLevel,BlockPos pPos,BlockState pNewState, boolean pIsMoving) {
         super.onRemove(pState, pLevel, pPos, pNewState, pIsMoving);
         if (pNewState.is(Blocks.AIR)) {
             flowLeak(pState, pLevel, pPos,false);

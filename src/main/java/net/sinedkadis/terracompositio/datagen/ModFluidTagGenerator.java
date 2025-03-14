@@ -1,12 +1,14 @@
 package net.sinedkadis.terracompositio.datagen;
 
+import mekanism.api.annotations.ParametersAreNotNullByDefault;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.tags.FluidTagsProvider;
 import net.minecraft.tags.FluidTags;
 import net.minecraftforge.common.data.ExistingFileHelper;
 import net.sinedkadis.terracompositio.TerraCompositio;
-import net.sinedkadis.terracompositio.fluid.ModFluids;
+import net.sinedkadis.terracompositio.registries.ModFluids;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.concurrent.CompletableFuture;

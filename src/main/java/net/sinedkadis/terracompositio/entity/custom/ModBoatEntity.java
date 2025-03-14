@@ -1,5 +1,6 @@
 package net.sinedkadis.terracompositio.entity.custom;
 
+import lombok.Getter;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
@@ -11,9 +12,9 @@ import net.minecraft.world.entity.vehicle.Boat;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
-import net.sinedkadis.terracompositio.block.ModBlocks;
+import net.sinedkadis.terracompositio.registries.ModBlocks;
 import net.sinedkadis.terracompositio.entity.ModEntities;
-import net.sinedkadis.terracompositio.item.ModItems;
+import net.sinedkadis.terracompositio.registries.ModItems;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.function.IntFunction;
@@ -63,6 +64,7 @@ public class ModBoatEntity extends Boat {
         }
     }
 
+    @Getter
     public enum Type implements StringRepresentable {
         FLOW_CEDAR(ModBlocks.FLOW_CEDAR_PLANKS.get(), "flow_cedar");
 
@@ -78,14 +80,6 @@ public class ModBoatEntity extends Boat {
 
         public @NotNull String  getSerializedName() {
             return this.name;
-        }
-
-        public String getName() {
-            return this.name;
-        }
-
-        public Block getPlanks() {
-            return this.planks;
         }
 
         public String toString() {

@@ -16,6 +16,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LightLayer;
 import net.sinedkadis.terracompositio.block.entity.FlowPortBlockEntity;
+import org.jetbrains.annotations.NotNull;
 
 import static net.minecraft.world.level.block.state.properties.BlockStateProperties.FACING;
 import static net.minecraft.world.level.block.state.properties.BlockStateProperties.HORIZONTAL_FACING;
@@ -27,7 +28,7 @@ public class FlowPortBlockEntityRenderer implements BlockEntityRenderer<FlowPort
 
 
     @Override
-    public void render(FlowPortBlockEntity pBlockEntity, float pPartialTick, PoseStack pPoseStack, MultiBufferSource pBuffer, int pPackedLight, int pPackedOverlay) {
+    public void render(FlowPortBlockEntity pBlockEntity, float pPartialTick, PoseStack pPoseStack, @NotNull MultiBufferSource pBuffer, int pPackedLight, int pPackedOverlay) {
         ItemRenderer itemRenderer = Minecraft.getInstance().getItemRenderer();
         ItemStack itemStack = pBlockEntity.getRenderStack();
         Direction facing = pBlockEntity.getBlockState().getValue(HORIZONTAL_FACING);
@@ -49,12 +50,12 @@ public class FlowPortBlockEntityRenderer implements BlockEntityRenderer<FlowPort
         pPoseStack.scale(0.7f, 0.7f, 0.7f);
         pPoseStack.mulPose(Axis.YN.rotationDegrees(switch (facing){
             case EAST -> 90;
-            case NORTH -> 180;
+            case SOUTH -> 180;
             case WEST -> 270;
             default -> 0;
         }));
 
-        itemRenderer.renderStatic(itemStack, ItemDisplayContext.FIXED, getLightLevel(pBlockEntity.getLevel(), pBlockEntity.getBlockPos(),1),
+        itemRenderer.renderStatic(itemStack, ItemDisplayContext.FIXED, getLightLevel(pBlockEntity.getLevel(), pBlockEntity.getBlockPos(),facing),
                 OverlayTexture.NO_OVERLAY, pPoseStack, pBuffer, pBlockEntity.getLevel(), 1);
         pPoseStack.popPose();
 
@@ -87,22 +88,22 @@ public class FlowPortBlockEntityRenderer implements BlockEntityRenderer<FlowPort
 
     }
 
-    private int getLightLevel(Level level, BlockPos pos, int facing) {
+    private int getLightLevel(Level level, BlockPos pos, Direction facing) {
         int bLight;
         int sLight = switch (facing) {
-            case 0 -> {
+            case EAST -> {
                 bLight = level.getBrightness(LightLayer.BLOCK, pos.east());
                 yield level.getBrightness(LightLayer.SKY, pos.east());
             }
-            case 1 -> {
+            case NORTH -> {
                 bLight = level.getBrightness(LightLayer.BLOCK, pos.north());
                 yield level.getBrightness(LightLayer.SKY, pos.north());
             }
-            case 2 -> {
+            case WEST -> {
                 bLight = level.getBrightness(LightLayer.BLOCK, pos.west());
                 yield level.getBrightness(LightLayer.SKY, pos.west());
             }
-            case 3 -> {
+            case SOUTH -> {
                 bLight = level.getBrightness(LightLayer.BLOCK, pos.south());
                 yield level.getBrightness(LightLayer.SKY, pos.south());
             }

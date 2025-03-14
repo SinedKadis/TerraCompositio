@@ -1,10 +1,10 @@
 package net.sinedkadis.terracompositio.particle.custom;
 
+import mekanism.api.annotations.ParametersAreNotNullByDefault;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.*;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.particles.ParticleOptions;
-import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.core.particles.SimpleParticleType;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
@@ -15,8 +15,8 @@ import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.sinedkadis.terracompositio.fluid.ModFluids;
-import net.sinedkadis.terracompositio.particle.ModParticles;
+import net.sinedkadis.terracompositio.registries.ModFluids;
+import net.sinedkadis.terracompositio.registries.ModParticles;
 import org.jetbrains.annotations.NotNull;
 
 public class BirchJuiceParticle extends TextureSheetParticle {
@@ -47,7 +47,7 @@ public class BirchJuiceParticle extends TextureSheetParticle {
         this.zo = this.z;
         this.preMoveUpdate();
         if (!this.removed) {
-            this.yd -= (double)this.gravity;
+            this.yd -= this.gravity;
             this.move(this.xd, this.yd, this.zd);
             this.postMoveUpdate();
             if (!this.removed) {
@@ -87,7 +87,7 @@ public class BirchJuiceParticle extends TextureSheetParticle {
         public Provider(SpriteSet spriteSet) {
             this.sprites = spriteSet;
         }
-
+    @ParametersAreNotNullByDefault
     public Particle createParticle(SimpleParticleType particleType, ClientLevel level,
                                        double x, double y, double z,
                                        double dx, double dy, double dz) {

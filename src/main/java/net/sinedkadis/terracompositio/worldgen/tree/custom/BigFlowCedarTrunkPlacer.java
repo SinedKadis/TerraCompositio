@@ -13,7 +13,7 @@ import net.minecraft.world.level.levelgen.feature.configurations.TreeConfigurati
 import net.minecraft.world.level.levelgen.feature.foliageplacers.FoliagePlacer;
 import net.minecraft.world.level.levelgen.feature.trunkplacers.TrunkPlacer;
 import net.minecraft.world.level.levelgen.feature.trunkplacers.TrunkPlacerType;
-import net.sinedkadis.terracompositio.block.ModBlocks;
+import net.sinedkadis.terracompositio.registries.ModBlocks;
 import net.sinedkadis.terracompositio.worldgen.tree.ModTrunkPlacerTypes;
 
 import java.util.ArrayList;
@@ -45,11 +45,11 @@ public class BigFlowCedarTrunkPlacer extends TrunkPlacer {
         int z0 = pRandom.nextInt(bounds.get(0),bounds.get(1));
         int x1 = random(bounds.get(2),bounds.get(3));
         int z1 = random(bounds.get(0),bounds.get(1));
-        placeLogForce(pLevel, pBlockSetter, pRandom, pPos.relative(Direction.NORTH,x0*2).relative(Direction.EAST,z0*2).below(), pConfig);
-        placeLogForce(pLevel, pBlockSetter, pRandom, pPos.relative(Direction.NORTH,x0*2).relative(Direction.EAST,z0*2), pConfig);
-        placeLogForce(pLevel, pBlockSetter, pRandom, pPos.relative(Direction.SOUTH,x1*2).relative(Direction.EAST,z1*2).below(), pConfig);
-        placeLogForce(pLevel, pBlockSetter, pRandom, pPos.relative(Direction.SOUTH,x1*2).relative(Direction.EAST,z1*2), pConfig);
-        placeLogForce(pLevel, pBlockSetter, pRandom, pPos.relative(Direction.SOUTH,x1*2).relative(Direction.EAST,z1*2).above(), pConfig);
+        placeLogForce(pBlockSetter, pRandom, pPos.relative(Direction.NORTH,x0*2).relative(Direction.EAST,z0*2).below(), pConfig);
+        placeLogForce(pBlockSetter, pRandom, pPos.relative(Direction.NORTH,x0*2).relative(Direction.EAST,z0*2), pConfig);
+        placeLogForce(pBlockSetter, pRandom, pPos.relative(Direction.SOUTH,x1*2).relative(Direction.EAST,z1*2).below(), pConfig);
+        placeLogForce(pBlockSetter, pRandom, pPos.relative(Direction.SOUTH,x1*2).relative(Direction.EAST,z1*2), pConfig);
+        placeLogForce(pBlockSetter, pRandom, pPos.relative(Direction.SOUTH,x1*2).relative(Direction.EAST,z1*2).above(), pConfig);
         for(int y = 0; y < height; y++) {
             for(int x = bounds.get(0); x <= bounds.get(1); x++) {
                 for(int z = bounds.get(2); z <= bounds.get(3); z++) {
@@ -108,7 +108,7 @@ public class BigFlowCedarTrunkPlacer extends TrunkPlacer {
         return ImmutableList.of(new FoliagePlacer.FoliageAttachment(pPos.above(height-3), 0, false));
     }
 
-    private void placeLogForce(LevelSimulatedReader pLevel, BiConsumer<BlockPos, BlockState> pBlockSetter, RandomSource pRandom, BlockPos pPos, TreeConfiguration pConfig) {
+    private void placeLogForce(BiConsumer<BlockPos, BlockState> pBlockSetter, RandomSource pRandom, BlockPos pPos, TreeConfiguration pConfig) {
         pBlockSetter.accept(pPos, (BlockState)Function.identity().apply(pConfig.trunkProvider.getState(pRandom, pPos)));
     }
     private List<Integer> getSlice(RandomSource pRandom){

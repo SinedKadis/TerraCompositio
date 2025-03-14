@@ -11,7 +11,8 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.sinedkadis.terracompositio.api.TerraCompositioAPI;
 import net.sinedkadis.terracompositio.api.cfe.CFESource;
 import net.sinedkadis.terracompositio.api.cfe.CFENetwork;
-import net.sinedkadis.terracompositio.particle.ModParticles;
+import net.sinedkadis.terracompositio.registries.ModParticles;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,7 +30,9 @@ public abstract class ModCFEBlockEntity extends ModBlockEntity{
 
     public ModCFEBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state,int maxCFE,int connectRange) {
         super(type, pos, state);
-        cfeSourceBlockPos = searchForSource();
+        if (!(maxCFE == 0 || connectRange == 0)){
+            cfeSourceBlockPos = searchForSource();
+        }
         this.connectRange = connectRange;
         this.maxCFE = maxCFE;
     }
@@ -50,13 +53,18 @@ public abstract class ModCFEBlockEntity extends ModBlockEntity{
                     double cfe = getTransfer(pPos);
                     addCFE(cfe);
                     cfeSource.takeCFE((int) cfe);
-                    spawnParticles(pLevel,pPos,((ModCFEBlockEntity) pLevel.getBlockEntity(pPos)).getCfeSourceBlockPos());
+                    ModCFEBlockEntity blockEntity = (ModCFEBlockEntity) pLevel.getBlockEntity(pPos);
+                    if (blockEntity != null) {
+                        spawnParticles(pLevel,pPos, blockEntity.getCfeSourceBlockPos());
+                    }
                 }
             }
         }
     }
 
     private double getTransfer(BlockPos pPos) {
+        if (maxCFE== 0)
+            return 0;
         int currentSourceCFE = cfeSource.getCurrentCFE();
         int currentSpace = maxCFE - CFE;
         double cfeTransfer = Math.sqrt(pPos.distSqr(cfeSourceBlockPos)) < connectRange
@@ -68,11 +76,15 @@ public abstract class ModCFEBlockEntity extends ModBlockEntity{
     }
 
     private void addCFE(double transfer) {
+        if (maxCFE== 0)
+            return;
         this.CFE = (int)Math.min(maxCFE, CFE + transfer);
         setChanged();
     }
 
     private boolean isValidSource(BlockPos source) {
+        if (connectRange == 0)
+            return false;
         if (level == null || source == null || !level.isLoaded(source) || distSqr(getBlockPos(), source) > (long) connectRange * connectRange) {
             return false;
         }
@@ -92,26 +104,30 @@ public abstract class ModCFEBlockEntity extends ModBlockEntity{
     }
 
     @Override
-    protected void saveAdditional(CompoundTag pTag) {
-        List<Integer> cords = new ArrayList<>();
-        if (cfeSourceBlockPos != null) {
-            cords.add(cfeSourceBlockPos.getX());
-            cords.add(cfeSourceBlockPos.getY());
-            cords.add(cfeSourceBlockPos.getZ());
-            pTag.putIntArray("source", cords);
+    protected void saveAdditional(@NotNull CompoundTag pTag) {
+        if (!(maxCFE == 0 || connectRange == 0)) {
+            List<Integer> cords = new ArrayList<>();
+            if (cfeSourceBlockPos != null) {
+                cords.add(cfeSourceBlockPos.getX());
+                cords.add(cfeSourceBlockPos.getY());
+                cords.add(cfeSourceBlockPos.getZ());
+                pTag.putIntArray("source", cords);
+            }
+            pTag.putInt("cfe", CFE);
         }
-        pTag.putInt("cfe",CFE);
         super.saveAdditional(pTag);
     }
 
     @Override
-    public void load(CompoundTag pTag) {
+    public void load(@NotNull CompoundTag pTag) {
         super.load(pTag);
-        int[] cords = pTag.getIntArray("source");
-        CFE = pTag.getInt("cfe");
-        if (cords.length>0) {
-            cfeSourceBlockPos = new BlockPos(cords[0], cords[1], cords[2]);
-            findSourceCandidateAt(cfeSourceBlockPos);
+        if (!(maxCFE == 0 || connectRange == 0)) {
+            int[] cords = pTag.getIntArray("source");
+            CFE = pTag.getInt("cfe");
+            if (cords.length > 0) {
+                cfeSourceBlockPos = new BlockPos(cords[0], cords[1], cords[2]);
+                findSourceCandidateAt(cfeSourceBlockPos);
+            }
         }
     }
 

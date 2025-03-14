@@ -15,8 +15,9 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.sinedkadis.terracompositio.TerraCompositio;
-import net.sinedkadis.terracompositio.block.ModBlocks;
+import net.sinedkadis.terracompositio.registries.ModBlocks;
 import net.sinedkadis.terracompositio.recipe.FlowInfusionRecipe;
+import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;
 
@@ -36,33 +37,33 @@ public class FlowInfusionCategory implements IRecipeCategory<FlowInfusionRecipe>
     }
 
     @Override
-    public RecipeType<FlowInfusionRecipe> getRecipeType() {
+    public @NotNull RecipeType<FlowInfusionRecipe> getRecipeType() {
         return FLOW_INFUSION_RECIPE_RECIPE_TYPE;
     }
 
     @Override
-    public Component getTitle() {
+    public @NotNull Component getTitle() {
         return Component.translatable("block.terracompositio.flow_infuser");
     }
 
     @Override
-    public IDrawable getBackground() {
+    public @NotNull IDrawable getBackground() {
         return this.background;
     }
 
     @Override
-    public IDrawable getIcon() {
+    public @NotNull IDrawable getIcon() {
         return this.icon;
     }
 
     @Override
-    public void setRecipe(IRecipeLayoutBuilder iRecipeLayoutBuilder, FlowInfusionRecipe flowSaturationRecipe, IFocusGroup iFocusGroup) {
+    public void setRecipe(IRecipeLayoutBuilder iRecipeLayoutBuilder, FlowInfusionRecipe flowSaturationRecipe, @NotNull IFocusGroup iFocusGroup) {
         iRecipeLayoutBuilder.addSlot(RecipeIngredientRole.INPUT,41,16).addIngredients(flowSaturationRecipe.getIngredients().get(0));
         iRecipeLayoutBuilder.addSlot(RecipeIngredientRole.OUTPUT,121,48).addItemStack(flowSaturationRecipe.getResultItem(null));
     }
 
     @Override
-    public void draw(FlowInfusionRecipe recipe, IRecipeSlotsView recipeSlotsView, GuiGraphics guiGraphics, double mouseX, double mouseY) {
+    public void draw(FlowInfusionRecipe recipe, @NotNull IRecipeSlotsView recipeSlotsView, GuiGraphics guiGraphics, double mouseX, double mouseY) {
         String cfe = "CFE: "+ recipe.getCfe();
         String cfe_t = "CFE/t: "+ recipe.getCFETick();
         String duration = "Duration: "+ recipe.getTicks()+" t.";

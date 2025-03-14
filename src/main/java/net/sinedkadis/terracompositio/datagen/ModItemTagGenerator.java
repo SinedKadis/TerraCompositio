@@ -9,9 +9,9 @@ import net.minecraft.world.level.block.Block;
 import net.minecraftforge.common.Tags;
 import net.minecraftforge.common.data.ExistingFileHelper;
 import net.sinedkadis.terracompositio.TerraCompositio;
-import net.sinedkadis.terracompositio.block.ModBlocks;
-import net.sinedkadis.terracompositio.item.ModItems;
-import net.sinedkadis.terracompositio.util.ModTags;
+import net.sinedkadis.terracompositio.registries.ModBlocks;
+import net.sinedkadis.terracompositio.registries.ModItems;
+import net.sinedkadis.terracompositio.registries.ModTags;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 

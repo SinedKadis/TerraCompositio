@@ -1,5 +1,6 @@
 package net.sinedkadis.terracompositio.item.custom;
 
+import mekanism.api.annotations.ParametersAreNotNullByDefault;
 import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
@@ -17,10 +18,10 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.gameevent.GameEvent;
-import net.sinedkadis.terracompositio.block.ModBlocks;
+import net.sinedkadis.terracompositio.registries.ModBlocks;
 import net.sinedkadis.terracompositio.effect.ModEffects;
-import net.sinedkadis.terracompositio.item.ModArmorMaterials;
-import net.sinedkadis.terracompositio.item.ModItems;
+import net.sinedkadis.terracompositio.registries.ModArmorMaterials;
+import net.sinedkadis.terracompositio.registries.ModItems;
 import org.jetbrains.annotations.NotNull;
 
 import static net.minecraft.world.level.block.LayeredCauldronBlock.LEVEL;
@@ -32,18 +33,19 @@ public class FlowBottleItem extends Item {
     }
 
     @Override
-    public UseAnim getUseAnimation(ItemStack pStack) {
+    public @NotNull UseAnim getUseAnimation(@NotNull ItemStack pStack) {
         return UseAnim.DRINK;
     }
 
     @Override
+    @ParametersAreNotNullByDefault
     public @NotNull ItemStack finishUsingItem(ItemStack pStack, Level pLevel, LivingEntity pEntityLiving) {
         Player player = pEntityLiving instanceof Player ? (Player)pEntityLiving : null;
         if (player instanceof ServerPlayer) {
             CriteriaTriggers.CONSUME_ITEM.trigger((ServerPlayer)player, pStack);
         }
         if (player != null
-                && hasCorrectArmorOn(ModArmorMaterials.FLOW_CEDAR,player)){
+                && hasFlowCedarArmorOn(player)){
 
             float bootsDamagePercentage = (float) getDamage(player.getInventory().getArmor(0)) / player.getInventory().getArmor(0).getMaxDamage();
             float leggingsDamagePercentage = (float) getDamage(player.getInventory().getArmor(1)) / player.getInventory().getArmor(1).getMaxDamage();
@@ -106,50 +108,52 @@ public class FlowBottleItem extends Item {
     }
 
     @Override
-    public InteractionResult useOn(UseOnContext pContext) {
+    public @NotNull InteractionResult useOn(UseOnContext pContext) {
         ItemStack itemStack = pContext.getItemInHand();
         BlockState blockState = pContext.getLevel().getBlockState(pContext.getClickedPos());
-        if (blockState.hasProperty(LEVEL)){
+        Player player = pContext.getPlayer();
+        if (player != null && blockState.hasProperty(LEVEL)){
             int levelValue = blockState.getValue(LEVEL);
             if (itemStack.getCount()==1){
                 if (levelValue !=3) {
                     pContext.getLevel().setBlock(pContext.getClickedPos(),blockState.setValue(LEVEL, levelValue + 1),1);
-                    pContext.getPlayer().setItemInHand(pContext.getHand(),new ItemStack(Items.GLASS_BOTTLE));
-                    pContext.getPlayer().playSound(SoundEvents.BOTTLE_EMPTY);
+                    player.setItemInHand(pContext.getHand(),new ItemStack(Items.GLASS_BOTTLE));
+                    player.playSound(SoundEvents.BOTTLE_EMPTY);
                     return InteractionResult.SUCCESS;
                 }
             }else {
                 if (levelValue !=3) {
                     pContext.getLevel().setBlock(pContext.getClickedPos(),blockState.setValue(LEVEL, levelValue + 1),1);
-                    if (!pContext.getPlayer().addItem(new ItemStack(Items.GLASS_BOTTLE))){
-                        pContext.getPlayer().drop(new ItemStack(Items.GLASS_BOTTLE),false);
+                    if (!player.addItem(new ItemStack(Items.GLASS_BOTTLE))){
+                        player.drop(new ItemStack(Items.GLASS_BOTTLE),false);
                     }
-                    pContext.getPlayer().playSound(SoundEvents.BOTTLE_EMPTY);
+                    player.playSound(SoundEvents.BOTTLE_EMPTY);
                     return InteractionResult.SUCCESS;
                 }
             }
 
-        }else if (blockState == Blocks.CAULDRON.defaultBlockState()){
+        }else if (player != null && blockState == Blocks.CAULDRON.defaultBlockState()){
             pContext.getLevel().setBlock(pContext.getClickedPos(), ModBlocks.FLOW_CAULDRON.get().defaultBlockState().setValue(LEVEL,1),1);
             if (itemStack.getCount()==1){
-                pContext.getPlayer().setItemInHand(pContext.getHand(),new ItemStack(Items.GLASS_BOTTLE));
+                player.setItemInHand(pContext.getHand(),new ItemStack(Items.GLASS_BOTTLE));
             }else {
-                if (!pContext.getPlayer().addItem(new ItemStack(Items.GLASS_BOTTLE))){
-                    pContext.getPlayer().drop(new ItemStack(Items.GLASS_BOTTLE),false);
+                if (!player.addItem(new ItemStack(Items.GLASS_BOTTLE))){
+                    player.drop(new ItemStack(Items.GLASS_BOTTLE),false);
                 }
             }
-            pContext.getPlayer().playSound(SoundEvents.BOTTLE_EMPTY);
+            player.playSound(SoundEvents.BOTTLE_EMPTY);
             return InteractionResult.SUCCESS;
         }
         return InteractionResult.PASS;
     }
 
     @Override
-    public InteractionResultHolder<ItemStack> use(Level pLevel, Player pPlayer, InteractionHand pHand) {
+    @ParametersAreNotNullByDefault
+    public @NotNull InteractionResultHolder<ItemStack> use(Level pLevel, Player pPlayer, InteractionHand pHand) {
         return ItemUtils.startUsingInstantly(pLevel, pPlayer, pHand);
     }
 
-    private boolean hasCorrectArmorOn(ArmorMaterial material, Player player) {
+    private boolean hasFlowCedarArmorOn(Player player) {
         for (ItemStack armorStack : player.getInventory().armor) {
             if(!(armorStack.getItem() instanceof ArmorItem)) {
                 return false;
@@ -161,8 +165,8 @@ public class FlowBottleItem extends Item {
         ArmorItem breastplate = ((ArmorItem)player.getInventory().getArmor(2).getItem());
         ArmorItem helmet = ((ArmorItem)player.getInventory().getArmor(3).getItem());
 
-        return helmet.getMaterial() == material && breastplate.getMaterial() == material &&
-                leggings.getMaterial() == material && boots.getMaterial() == material;
+        return helmet.getMaterial() == ModArmorMaterials.FLOW_CEDAR && breastplate.getMaterial() == ModArmorMaterials.FLOW_CEDAR &&
+                leggings.getMaterial() == ModArmorMaterials.FLOW_CEDAR && boots.getMaterial() == ModArmorMaterials.FLOW_CEDAR;
     }
 
 }

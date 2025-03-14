@@ -17,9 +17,9 @@ import net.minecraftforge.common.data.ExistingFileHelper;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
 import net.sinedkadis.terracompositio.TerraCompositio;
-import net.sinedkadis.terracompositio.block.ModBlocks;
-import net.sinedkadis.terracompositio.fluid.ModFluids;
-import net.sinedkadis.terracompositio.item.ModItems;
+import net.sinedkadis.terracompositio.registries.ModBlocks;
+import net.sinedkadis.terracompositio.registries.ModFluids;
+import net.sinedkadis.terracompositio.registries.ModItems;
 
 import java.util.LinkedHashMap;
 
@@ -82,6 +82,7 @@ public class ModItemModelProvider extends ItemModelProvider {
         simpleItem(ModItems.INFUSED_IRON_ROD);
         simpleItem(ModItems.GOLD_ROD);
         simpleItem(ModItems.INPUT_BUS);
+        simpleItem(ModItems.OUTPUT_BUS);
         simpleItem(ModItems.COPPER_ROD);
 
         saplingItem(ModBlocks.FLOW_CEDAR_BIG_SAPLING);
@@ -93,10 +94,9 @@ public class ModItemModelProvider extends ItemModelProvider {
         final String MOD_ID = TerraCompositio.MOD_ID; // Change this to your mod id
 
         if(itemRegistryObject.get() instanceof ArmorItem armorItem) {
-            trimMaterials.entrySet().forEach(entry -> {
+            trimMaterials.forEach((trimMaterial, value) -> {
 
-                ResourceKey<TrimMaterial> trimMaterial = entry.getKey();
-                float trimValue = entry.getValue();
+                float trimValue = value;
 
                 String armorType = switch (armorItem.getEquipmentSlot()) {
                     case HEAD -> "helmet";
@@ -150,28 +150,49 @@ public class ModItemModelProvider extends ItemModelProvider {
     }
 
     public void evenSimplerBlockItem(RegistryObject<Block> block) {
-        this.withExistingParent(TerraCompositio.MOD_ID + ":" + ForgeRegistries.BLOCKS.getKey(block.get()).getPath(),
-                modLoc("block/" + ForgeRegistries.BLOCKS.getKey(block.get()).getPath()));
+        ResourceLocation key = ForgeRegistries.BLOCKS.getKey(block.get());
+        if (key != null) {
+            this.withExistingParent(TerraCompositio.MOD_ID + ":" + key.getPath(),
+                    modLoc("block/" + key.getPath()));
+        }
     }
 
     public void trapdoorItem(RegistryObject<Block> block) {
-        this.withExistingParent(ForgeRegistries.BLOCKS.getKey(block.get()).getPath(),
-                modLoc("block/" + ForgeRegistries.BLOCKS.getKey(block.get()).getPath() + "_bottom"));
+        ResourceLocation key = ForgeRegistries.BLOCKS.getKey(block.get());
+        if (key != null) {
+            this.withExistingParent(key.getPath(),
+                    modLoc("block/" + key.getPath() + "_bottom"));
+        }
     }
 
     public void fenceItem(RegistryObject<Block> block, RegistryObject<Block> baseBlock) {
-        this.withExistingParent(ForgeRegistries.BLOCKS.getKey(block.get()).getPath(), mcLoc("block/fence_inventory"))
-                .texture("texture",  new ResourceLocation(TerraCompositio.MOD_ID, "block/" + ForgeRegistries.BLOCKS.getKey(baseBlock.get()).getPath()));
+        ResourceLocation key = ForgeRegistries.BLOCKS.getKey(block.get());
+        if (key != null) {
+            this.withExistingParent(key.getPath(), mcLoc("block/fence_inventory"))
+                    .texture("texture",  new ResourceLocation(TerraCompositio.MOD_ID, "block/" + ForgeRegistries.BLOCKS.getKey(baseBlock.get()).getPath()));
+        }
     }
 
     public void buttonItem(RegistryObject<Block> block, RegistryObject<Block> baseBlock) {
-        this.withExistingParent(ForgeRegistries.BLOCKS.getKey(block.get()).getPath(), mcLoc("block/button_inventory"))
-                .texture("texture",  new ResourceLocation(TerraCompositio.MOD_ID, "block/" + ForgeRegistries.BLOCKS.getKey(baseBlock.get()).getPath()));
+        ResourceLocation key = ForgeRegistries.BLOCKS.getKey(block.get());
+        if (key != null) {
+            ResourceLocation key1 = ForgeRegistries.BLOCKS.getKey(baseBlock.get());
+            if (key1 != null) {
+                this.withExistingParent(key.getPath(), mcLoc("block/button_inventory"))
+                        .texture("texture",  new ResourceLocation(TerraCompositio.MOD_ID, "block/" + key1.getPath()));
+            }
+        }
     }
 
     public void wallItem(RegistryObject<Block> block, RegistryObject<Block> baseBlock) {
-        this.withExistingParent(ForgeRegistries.BLOCKS.getKey(block.get()).getPath(), mcLoc("block/wall_inventory"))
-                .texture("wall",  new ResourceLocation(TerraCompositio.MOD_ID, "block/" + ForgeRegistries.BLOCKS.getKey(baseBlock.get()).getPath()));
+        ResourceLocation key = ForgeRegistries.BLOCKS.getKey(block.get());
+        if (key != null) {
+            ResourceLocation key1 = ForgeRegistries.BLOCKS.getKey(baseBlock.get());
+            if (key1 != null) {
+                this.withExistingParent(key.getPath(), mcLoc("block/wall_inventory"))
+                        .texture("wall",  new ResourceLocation(TerraCompositio.MOD_ID, "block/" + key1.getPath()));
+            }
+        }
     }
 
     private ItemModelBuilder simpleBlockItem(RegistryObject<Block> item) {

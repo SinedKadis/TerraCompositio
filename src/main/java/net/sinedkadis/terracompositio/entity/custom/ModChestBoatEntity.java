@@ -10,7 +10,8 @@ import net.minecraft.world.entity.vehicle.ChestBoat;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.Level;
 import net.sinedkadis.terracompositio.entity.ModEntities;
-import net.sinedkadis.terracompositio.item.ModItems;
+import net.sinedkadis.terracompositio.registries.ModItems;
+import org.jetbrains.annotations.NotNull;
 
 public class ModChestBoatEntity extends ChestBoat {
     private static final EntityDataAccessor<Integer> DATA_ID_TYPE = SynchedEntityData.defineId(Boat.class, EntityDataSerializers.INT);
@@ -28,7 +29,7 @@ public class ModChestBoatEntity extends ChestBoat {
     }
 
     @Override
-    public Item getDropItem() {
+    public @NotNull Item getDropItem() {
         switch (getModVariant()) {
             case FLOW_CEDAR -> {
                 return ModItems.FLOW_CEDAR_CHEST_BOAT.get();

@@ -182,7 +182,7 @@ public class ModFluidTank {
             fluidLevel.chase(tank.getFluidAmount() / (float) tank.getCapacity(), .25, LerpedFloat.Chaser.EXP);
             if (!blockEntity.getLevel().isClientSide)
                 updateFluids();
-            if (blockEntity.isVirtual() && !tank.getFluid().isEmpty())
+            if (!tank.getFluid().isEmpty())
                 renderedFluid = tank.getFluid();
             else
                 renderedFluid = FluidStack.EMPTY;

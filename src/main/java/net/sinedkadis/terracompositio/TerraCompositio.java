@@ -23,8 +23,11 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import net.sinedkadis.terracompositio.block.ModBlocks;
-import net.sinedkadis.terracompositio.block.entity.ModBlockEntities;
+import net.minecraftforge.network.NetworkRegistry;
+import net.minecraftforge.network.simple.SimpleChannel;
+import net.sinedkadis.terracompositio.network.packets.SyncItemHandlerPacket;
+import net.sinedkadis.terracompositio.registries.ModBlocks;
+import net.sinedkadis.terracompositio.registries.ModBlockEntities;
 import net.sinedkadis.terracompositio.api.cfe.CFENetwork;
 import net.sinedkadis.terracompositio.block.entity.renderer.FlowExtractorBlockEntityRenderer;
 import net.sinedkadis.terracompositio.block.entity.renderer.FlowInfuserBlockEntityRenderer;
@@ -37,17 +40,17 @@ import net.sinedkadis.terracompositio.effect.ModEffects;
 import net.sinedkadis.terracompositio.entity.ModEntities;
 import net.sinedkadis.terracompositio.entity.client.ModBoatRenderer;
 import net.sinedkadis.terracompositio.events.CFENetworkEvent;
-import net.sinedkadis.terracompositio.fluid.ModFluids;
-import net.sinedkadis.terracompositio.item.ModCreativeModTabs;
-import net.sinedkadis.terracompositio.item.ModItems;
-import net.sinedkadis.terracompositio.particle.ModParticles;
-import net.sinedkadis.terracompositio.potion.ModPotions;
-import net.sinedkadis.terracompositio.recipe.ModRecipes;
+import net.sinedkadis.terracompositio.registries.ModFluids;
+import net.sinedkadis.terracompositio.registries.ModCreativeModTabs;
+import net.sinedkadis.terracompositio.registries.ModItems;
+import net.sinedkadis.terracompositio.registries.ModParticles;
+import net.sinedkadis.terracompositio.registries.ModPotions;
+import net.sinedkadis.terracompositio.registries.ModRecipes;
 import net.sinedkadis.terracompositio.screen.FlowBlockPortScreen;
 import net.sinedkadis.terracompositio.screen.ModMenuTypes;
 import net.sinedkadis.terracompositio.sound.ModSounds;
-import net.sinedkadis.terracompositio.util.ModGameRules;
-import net.sinedkadis.terracompositio.util.ModWoodTypes;
+import net.sinedkadis.terracompositio.registries.ModGameRules;
+import net.sinedkadis.terracompositio.registries.ModWoodTypes;
 import net.sinedkadis.terracompositio.worldgen.tree.ModFoliagePlacers;
 import net.sinedkadis.terracompositio.worldgen.tree.ModTrunkPlacerTypes;
 
@@ -56,6 +59,7 @@ import net.sinedkadis.terracompositio.worldgen.tree.ModTrunkPlacerTypes;
 public class TerraCompositio
 {
     public static final String MOD_ID = "terracompositio";
+    public static SimpleChannel CHANNEL;
 
     public TerraCompositio() {
 
@@ -145,13 +149,24 @@ public class TerraCompositio
             ItemBlockRenderTypes.setRenderLayer(ModFluids.FLOW_FLUID.source.get(), RenderType.translucent());
             ItemBlockRenderTypes.setRenderLayer(ModFluids.FLOW_FLUID.flowing.get(), RenderType.translucent());
 
-            event.enqueueWork(() -> {
-                ItemProperties.register(
-                        ModItems.FLOW_ROTATING_AXE.get(),
-                        new ResourceLocation("wrench_mode"),
-                        (stack, level, entity, seed) -> WrenchAxeItem.getMode(stack).ordinal()
-                );
-            });
+            event.enqueueWork(() -> ItemProperties.register(
+                    ModItems.FLOW_ROTATING_AXE.get(),
+                    new ResourceLocation("wrench_mode"),
+                    (stack, level, entity, seed) -> WrenchAxeItem.getMode(stack).ordinal()
+            ));
+
+            CHANNEL = NetworkRegistry.ChannelBuilder
+                    .named(new ResourceLocation(TerraCompositio.MOD_ID, "sync_item_handler"))
+                    .clientAcceptedVersions(s -> true)
+                    .serverAcceptedVersions(s -> true)
+                    .networkProtocolVersion(() -> "1.0")
+                    .simpleChannel();
+
+            CHANNEL.messageBuilder(SyncItemHandlerPacket.class, 0)
+                    .encoder(SyncItemHandlerPacket::encode)
+                    .decoder(SyncItemHandlerPacket::decode)
+                    .consumerMainThread(SyncItemHandlerPacket::handle)
+                    .add();
         }
 
         @SubscribeEvent
@@ -169,8 +184,5 @@ public class TerraCompositio
             event.registerBlockEntityRenderer(ModBlockEntities.MOD_SIGN.get(), SignRenderer::new);
             event.registerBlockEntityRenderer(ModBlockEntities.MOD_HANGING_SIGN.get(), HangingSignRenderer::new);
         }
-    }
-    public CFENetwork getCFENetworkInstance(){
-        return CFENetworkHandler.instance;
     }
 }

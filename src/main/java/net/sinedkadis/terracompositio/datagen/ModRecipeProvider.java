@@ -8,12 +8,11 @@ import net.minecraft.world.item.crafting.AbstractCookingRecipe;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.level.ItemLike;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraftforge.common.crafting.conditions.IConditionBuilder;
 import net.sinedkadis.terracompositio.TerraCompositio;
-import net.sinedkadis.terracompositio.block.ModBlocks;
-import net.sinedkadis.terracompositio.item.ModItems;
-import net.sinedkadis.terracompositio.util.ModTags;
+import net.sinedkadis.terracompositio.registries.ModBlocks;
+import net.sinedkadis.terracompositio.registries.ModItems;
+import net.sinedkadis.terracompositio.registries.ModTags;
 import org.jetbrains.annotations.NotNull;
 
 
@@ -102,11 +101,19 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                 .define('F',Items.ITEM_FRAME)
                 .unlockedBy(getHasName(Items.ITEM_FRAME), has(Items.ITEM_FRAME))
                 .save(pWriter);
-        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, ModItems.INPUT_BUS.get())
+        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, ModItems.OUTPUT_BUS.get())
                 .pattern(" R ")
                 .pattern("RHR")
                 .pattern(" R ")
                 .define('R', ModItems.COPPER_ROD.get())
+                .define('H', Items.IRON_INGOT)
+                .unlockedBy(getHasName(Items.IRON_INGOT), has(Items.IRON_INGOT))
+                .save(pWriter);
+        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, ModItems.INPUT_BUS.get())
+                .pattern(" R ")
+                .pattern("RHR")
+                .pattern(" R ")
+                .define('R', Items.LAPIS_LAZULI)
                 .define('H', Items.IRON_INGOT)
                 .unlockedBy(getHasName(Items.IRON_INGOT), has(Items.IRON_INGOT))
                 .save(pWriter);

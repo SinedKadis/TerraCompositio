@@ -9,7 +9,7 @@ import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.sinedkadis.terracompositio.block.entity.CreativeCFESourceBlockEntity;
-import net.sinedkadis.terracompositio.block.entity.ModBlockEntities;
+import net.sinedkadis.terracompositio.registries.ModBlockEntities;
 import net.sinedkadis.terracompositio.util.IBE;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -20,14 +20,14 @@ public class CreativeCFESourceBlock extends BaseEntityBlock implements IBE<Creat
     }
 
     @Override
-    public RenderShape getRenderShape(BlockState pState) {
+    public @NotNull RenderShape getRenderShape(@NotNull BlockState pState) {
         return RenderShape.MODEL;
     }
 
     @Nullable
     @Override
     public BlockEntity newBlockEntity(@NotNull BlockPos pPos, @NotNull BlockState pState) {
-        return ModBlockEntities.CREATIVE_CFE_SOURCE_BE.get().create(pPos, pState).markVirtual();
+        return ModBlockEntities.CREATIVE_CFE_SOURCE_BE.get().create(pPos, pState);
     }
 
     @Nullable

@@ -2,6 +2,6 @@
   "parent": "minecraft:block/cube_column",
   "textures": {
     "end": "terracompositio:block/flow_cedar_log_top",
-    "side": "terracompositio:block/flow_cedar_casing"
+    "side": "terracompositio:block/flow_cedar_casing_side"
   }
 }

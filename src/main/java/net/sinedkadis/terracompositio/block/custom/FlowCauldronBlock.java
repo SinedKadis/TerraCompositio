@@ -1,11 +1,9 @@
 package net.sinedkadis.terracompositio.block.custom;
 
-import com.mojang.logging.LogUtils;
+import mekanism.api.annotations.ParametersAreNotNullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.cauldron.CauldronInteraction;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
-import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
@@ -15,20 +13,15 @@ import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.biome.Biome;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.LayeredCauldronBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.phys.BlockHitResult;
-import net.minecraft.world.phys.HitResult;
-import net.sinedkadis.terracompositio.block.ModBlocks;
-import net.sinedkadis.terracompositio.fluid.ModFluids;
-import net.sinedkadis.terracompositio.item.ModItems;
-import org.slf4j.Logger;
+import net.sinedkadis.terracompositio.registries.ModFluids;
+import net.sinedkadis.terracompositio.registries.ModItems;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;
 import java.util.function.Predicate;
-
-import static net.sinedkadis.terracompositio.block.custom.WedgeBlock.ATTACHED;
 
 public class FlowCauldronBlock extends ModCauldronBlock {
 
@@ -44,12 +37,14 @@ public class FlowCauldronBlock extends ModCauldronBlock {
     }
 
     @Override
+    @ParametersAreNotNullByDefault
     protected void handleEntityOnFireInside(BlockState pState, Level pLevel, BlockPos pPos) {
 
     }
 
     @Override
-    public InteractionResult use(BlockState pState, Level pLevel, BlockPos pPos, Player pPlayer, InteractionHand pHand, BlockHitResult pHit) {
+    @ParametersAreNotNullByDefault
+    public @NotNull InteractionResult use(BlockState pState, Level pLevel, BlockPos pPos, Player pPlayer, InteractionHand pHand, BlockHitResult pHit) {
         ItemStack itemStack = pPlayer.getItemInHand(pHand);
         if (pState.getValue(LEVEL) == 3) {
             if (itemStack.getItem() == Items.BUCKET) {

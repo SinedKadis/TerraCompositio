@@ -1,6 +1,7 @@
 package net.sinedkadis.terracompositio.datagen;
 
 
+import mekanism.api.annotations.ParametersAreNotNullByDefault;
 import net.minecraft.core.Direction;
 import net.minecraft.data.PackOutput;
 import net.minecraft.resources.ResourceLocation;
@@ -12,10 +13,9 @@ import net.minecraftforge.common.data.ExistingFileHelper;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
 import net.sinedkadis.terracompositio.TerraCompositio;
-import net.sinedkadis.terracompositio.block.ModBlocks;
+import net.sinedkadis.terracompositio.registries.ModBlocks;
 import net.sinedkadis.terracompositio.block.custom.FlowCedarLikeBlock;
 
-import static net.minecraft.world.level.block.state.properties.BlockStateProperties.HORIZONTAL_FACING;
 import static net.sinedkadis.terracompositio.block.custom.FlowPortBlock.FACING;
 
 public class ModBlockStateProvider extends BlockStateProvider {
@@ -61,8 +61,11 @@ public class ModBlockStateProvider extends BlockStateProvider {
     }
 
     private void saplingBlock(RegistryObject<Block> blockRegistryObject) {
-        simpleBlock(blockRegistryObject.get(),
-                models().cross(ForgeRegistries.BLOCKS.getKey(blockRegistryObject.get()).getPath(), blockTexture(blockRegistryObject.get())).renderType("cutout"));
+        ResourceLocation key = ForgeRegistries.BLOCKS.getKey(blockRegistryObject.get());
+        if (key != null) {
+            simpleBlock(blockRegistryObject.get(),
+                    models().cross(key.getPath(), blockTexture(blockRegistryObject.get())).renderType("cutout"));
+        }
     }
 
     public void hangingSignBlock(Block signBlock, Block wallSignBlock, ResourceLocation texture) {
@@ -173,12 +176,18 @@ public class ModBlockStateProvider extends BlockStateProvider {
                     .with(FlowCedarLikeBlock.INFUSED, false)
                         .modelForState().modelFile(model).rotationX(90).rotationY(90)
                             .addModel();
-        simpleBlockItem(block.get(), new ModelFile.UncheckedModelFile(TerraCompositio.MOD_ID+":block/"+ ForgeRegistries.BLOCKS.getKey(block.get()).getPath()));
+        ResourceLocation key = ForgeRegistries.BLOCKS.getKey(block.get());
+        if (key != null) {
+            simpleBlockItem(block.get(), new ModelFile.UncheckedModelFile(TerraCompositio.MOD_ID+":block/"+ key.getPath()));
+        }
     }
 
     private void flowLogBlockWithItem(RegistryObject<Block> block){
-        flowLogBlock((RotatedPillarBlock) block.get(),block.get(),block.get(),true);
-        simpleBlockItem(block.get(), new ModelFile.UncheckedModelFile(TerraCompositio.MOD_ID+":block/"+ ForgeRegistries.BLOCKS.getKey(block.get()).getPath()));
+        flowLogBlock(block.get(),block.get(),block.get(),true);
+        ResourceLocation key = ForgeRegistries.BLOCKS.getKey(block.get());
+        if (key != null) {
+            simpleBlockItem(block.get(), new ModelFile.UncheckedModelFile(TerraCompositio.MOD_ID+":block/"+ key.getPath()));
+        }
     }
 
     public void flowLogBlock(Block block,Block sideTexture,Block topTexture,boolean infused) {

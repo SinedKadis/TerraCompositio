@@ -1,9 +1,13 @@
 package net.sinedkadis.terracompositio.block.custom;
 
+import mekanism.api.annotations.ParametersAreNotNullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
@@ -12,7 +16,6 @@ import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -22,20 +25,21 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.DirectionProperty;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.phys.BlockHitResult;
-import net.minecraft.world.phys.shapes.BooleanOp;
 import net.minecraft.world.phys.shapes.CollisionContext;
-import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import net.sinedkadis.terracompositio.block.ModBlocks;
-import net.sinedkadis.terracompositio.block.entity.ModBlockEntities;
-import net.sinedkadis.terracompositio.item.ModItems;
+import net.sinedkadis.terracompositio.block.entity.FlowCedarCasingBlockEntity;
+import net.sinedkadis.terracompositio.block.entity.MatterInfuserPortBlockEntity;
+import net.sinedkadis.terracompositio.registries.ModBlocks;
+import net.sinedkadis.terracompositio.registries.ModBlockEntities;
+import net.sinedkadis.terracompositio.registries.ModItems;
+import net.sinedkadis.terracompositio.util.FunctionSide;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Objects;
 
 import static net.minecraft.world.level.block.state.properties.BlockStateProperties.AXIS;
-
+import static net.sinedkadis.terracompositio.block.custom.FlowCedarCasingBlock.*;
 
 
 public class MatterInfuserPortBlock extends ModIOBaseEntityBlock {
@@ -61,7 +65,7 @@ public class MatterInfuserPortBlock extends ModIOBaseEntityBlock {
         Direction direction = pState.getValue(FACING);
         BlockPos blockpos = pPos.relative(direction.getOpposite());
         BlockState blockstate = pLevel.getBlockState(blockpos);
-        if (blockstate.hasProperty(AXIS))
+        if (blockstate.hasProperty(AXIS) && blockstate.is(ModBlocks.FLOW_CEDAR_CASING.get()))
             return direction.getAxis().isHorizontal() && blockstate.getValue(AXIS).equals(
                 switch (direction) {
                     case NORTH, SOUTH -> Direction.Axis.X;
@@ -71,7 +75,7 @@ public class MatterInfuserPortBlock extends ModIOBaseEntityBlock {
         return false;
     }
 
-    public VoxelShape getShape(BlockState pState, @NotNull BlockGetter pLevel, @NotNull BlockPos pPos, @NotNull CollisionContext pContext) {
+    public @NotNull VoxelShape getShape(BlockState pState, @NotNull BlockGetter pLevel, @NotNull BlockPos pPos, @NotNull CollisionContext pContext) {
         return switch (pState.getValue(FACING)) {
             default -> EAST_AABB;
             case WEST -> WEST_AABB;
@@ -101,28 +105,50 @@ public class MatterInfuserPortBlock extends ModIOBaseEntityBlock {
     }
 
     @Override
-    public void onRemove(BlockState pState, Level pLevel, BlockPos pPos, BlockState pNewState, boolean pIsMoving) {
+    public void onRemove(@NotNull BlockState pState, @NotNull Level pLevel, @NotNull BlockPos pPos, @NotNull BlockState pNewState, boolean pIsMoving) {
         super.onRemove(pState, pLevel, pPos, pNewState, pIsMoving);
         Direction direction = pState.getValue(FACING);
-        BlockPos blockpos = pPos.relative(direction.getOpposite());
-        BlockState blockstate = pLevel.getBlockState(blockpos);
-        if (blockstate.hasProperty(FlowCedarCasingBlock.PARTS) && pState.getBlock() != pNewState.getBlock()) {
-            if (blockstate.getValue(FlowCedarCasingBlock.PARTS) == pState.getValue(FACING) || (blockstate.getValue(FlowCedarCasingBlock.PARTS) == Direction.UP)) {
-                pLevel.setBlock(blockpos, blockstate.setValue(FlowCedarCasingBlock.PARTS, Direction.UP), 3);
-                if (blockstate.getValue(FlowCedarCasingBlock.PARTS) != Direction.UP) {
+        BlockPos casingPos = pPos.relative(direction.getOpposite());
+        BlockState casingState = pLevel.getBlockState(casingPos);
+        if (pState.getBlock() != pNewState.getBlock()) {
+            Direction directionByFunctionSide = getDirectionByFunctionSide(casingState);
+            if (directionByFunctionSide == direction) {
+                if (hasInputBusConnection(casingState)) {
                     pLevel.addFreshEntity(new ItemEntity(pLevel, pPos.getX(), pPos.getY(), pPos.getZ(), new ItemStack(ModItems.INFUSED_IRON_ROD.get())));
+                    casingState = casingState.setValue(INPUT_BUS_CONNECTION,false);
+                    pLevel.setBlock(casingPos,casingState,3);
                 }
-                return;
+                pLevel.setBlock(casingPos,casingState.setValue(FUNCTION_SIDE, FunctionSide.NONE),3);
             }
-            if (blockstate.getValue(FlowCedarCasingBlock.PARTS) == pState.getValue(FACING).getOpposite())
-                return;
-            if (blockstate.hasProperty(FlowCedarCasingBlock.PARTS))
-                pLevel.setBlock(blockpos, blockstate.setValue(FlowCedarCasingBlock.PARTS, Direction.DOWN), 3);
+            if (pLevel.getBlockEntity(casingPos) instanceof FlowCedarCasingBlockEntity blockEntity){
+                blockEntity.drops();
+                blockEntity.setSlotCount(2);
+            }
         }
         if (pState.getValue(STAGE).equals(2)) {
             pLevel.addFreshEntity(new ItemEntity(pLevel, pPos.getX(), pPos.getY(), pPos.getZ(), new ItemStack(ModItems.INFUSED_IRON_ROD.get(), 2)));
         }
+
     }
+
+    @Override
+    @ParametersAreNotNullByDefault
+    public void setPlacedBy(Level pLevel, BlockPos pPos, BlockState pState, @Nullable LivingEntity pPlacer, ItemStack pStack) {
+        super.setPlacedBy(pLevel, pPos, pState, pPlacer, pStack);
+        Direction direction = pState.getValue(FACING);
+        BlockPos casingPos = pPos.relative(direction.getOpposite());
+        BlockState casingState = pLevel.getBlockState(casingPos);
+        if (casingState.is(ModBlocks.FLOW_CEDAR_CASING.get())) {
+            FunctionSide functionSideByDirection = getFunctionSideByDirection(casingState, direction);
+            pLevel.setBlock(casingPos, casingState.setValue(FUNCTION_SIDE, functionSideByDirection), 3);
+            FlowCedarCasingBlockEntity blockEntity = (FlowCedarCasingBlockEntity) pLevel.getBlockEntity(casingPos);
+            if (blockEntity != null) {
+                blockEntity.drops();
+                blockEntity.setSlotCount(1);
+            }
+        }
+    }
+
 
     @Override
     public @NotNull InteractionResult use(@NotNull BlockState pState, Level pLevel, @NotNull BlockPos pPos, @NotNull Player pPlayer, @NotNull InteractionHand pHand, @NotNull BlockHitResult pHit) {
@@ -131,9 +157,9 @@ public class MatterInfuserPortBlock extends ModIOBaseEntityBlock {
         BlockState casingState = pLevel.getBlockState(casingPos);
         int stage = pState.getValue(STAGE);
         if (item.is(ModItems.INFUSED_IRON_ROD.get())){
-            if (stage == 0 && casingState.is(ModBlocks.FLOW_CEDAR_CASING.get()) && casingState.getValue(FlowCedarCasingBlock.PARTS).equals(Direction.UP)){
+            if (stage == 0 && casingState.is(ModBlocks.FLOW_CEDAR_CASING.get()) && hasInputBus(casingState)){
                 pLevel.setBlock(pPos,pState.setValue(STAGE,1),3);
-                pLevel.setBlock(casingPos,casingState.setValue(FlowCedarCasingBlock.PARTS, pState.getValue(FACING)),3);
+                pLevel.setBlock(casingPos,casingState.setValue(INPUT_BUS_CONNECTION, true),3);
                 item.shrink(1);
                 return InteractionResult.sidedSuccess(pLevel.isClientSide);
             } else if (stage == 1) {
@@ -142,17 +168,41 @@ public class MatterInfuserPortBlock extends ModIOBaseEntityBlock {
                     item.shrink(2);
                     return InteractionResult.sidedSuccess(pLevel.isClientSide);
                 }
-                return super.use(pState, pLevel, pPos, pPlayer, pHand, pHit);
+                return getUse(pState, pLevel, pPos, pPlayer, pHand, pHit);
             }
-            return super.use(pState, pLevel, pPos, pPlayer, pHand, pHit);
+            return getUse(pState, pLevel, pPos, pPlayer, pHand, pHit);
         }
-        return super.use(pState, pLevel, pPos, pPlayer, pHand, pHit);
+        return getUse(pState, pLevel, pPos, pPlayer, pHand, pHit);
+    }
+
+    private @NotNull InteractionResult getUse(@NotNull BlockState pState, Level pLevel, @NotNull BlockPos pPos, @NotNull Player pPlayer, @NotNull InteractionHand pHand, @NotNull BlockHitResult pHit) {
+        //if (!pLevel.isClientSide()){
+            BlockEntity entity = pLevel.getBlockEntity(pPos);
+            if(entity instanceof MatterInfuserPortBlockEntity blockEntity && infusedTest(pState)){
+                ItemStack itemstack = pPlayer.getItemInHand(pHand);
+                ItemStack inputSlot = blockEntity.getInputSlot();
+                if (inputSlot.isEmpty()){
+                    if(!itemstack.isEmpty()) {
+                        blockEntity.insertItemStack(0,itemstack);
+                        itemstack.shrink(1);
+                        pLevel.playSound(pPlayer, pPos, SoundEvents.ITEM_FRAME_ADD_ITEM, SoundSource.BLOCKS);
+                    }
+                } else if (!inputSlot.isEmpty()){
+                    if (!pPlayer.addItem(inputSlot)) {
+                        pPlayer.drop(inputSlot, false);
+                    }
+                    blockEntity.setSlotEmpty(0);
+                    pLevel.playSound(pPlayer, pPos, SoundEvents.ITEM_FRAME_REMOVE_ITEM, SoundSource.BLOCKS);
+                }
+            }
+        //}
+        return infusedTest(pState) ? InteractionResult.sidedSuccess(pLevel.isClientSide()) : InteractionResult.PASS;
     }
 
     @Nullable
     @Override
     public BlockEntity newBlockEntity(@NotNull BlockPos blockPos, @NotNull BlockState blockState) {
-        return Objects.requireNonNull(ModBlockEntities.MATTER_INFUSER_PORT_BE.get().create(blockPos, blockState)).markVirtual();
+        return Objects.requireNonNull(ModBlockEntities.MATTER_INFUSER_PORT_BE.get().create(blockPos, blockState));
     }
 
     @Nullable

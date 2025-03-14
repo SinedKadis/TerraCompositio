@@ -15,8 +15,8 @@ import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LightLayer;
-import net.sinedkadis.terracompositio.block.entity.FlowPortBlockEntity;
 import net.sinedkadis.terracompositio.block.entity.MatterInfuserPortBlockEntity;
+import org.jetbrains.annotations.NotNull;
 
 import static net.minecraft.world.level.block.state.properties.BlockStateProperties.HORIZONTAL_FACING;
 
@@ -27,9 +27,9 @@ public class MatterInfuserPortBlockEntityRenderer implements BlockEntityRenderer
 
 
     @Override
-    public void render(MatterInfuserPortBlockEntity pBlockEntity, float pPartialTick, PoseStack pPoseStack, MultiBufferSource pBuffer, int pPackedLight, int pPackedOverlay) {
+    public void render(MatterInfuserPortBlockEntity pBlockEntity, float pPartialTick, PoseStack pPoseStack, @NotNull MultiBufferSource pBuffer, int pPackedLight, int pPackedOverlay) {
         ItemRenderer itemRenderer = Minecraft.getInstance().getItemRenderer();
-        ItemStack itemStack = pBlockEntity.getRenderStack();
+        ItemStack itemStack = pBlockEntity.getClientItem();
         Direction facing = pBlockEntity.getBlockState().getValue(HORIZONTAL_FACING);
 //        ItemRenderer itemRenderer2 = Minecraft.getInstance().getItemRenderer();
 //        ItemStack itemStack2 = pBlockEntity.getRenderStack();
@@ -53,8 +53,11 @@ public class MatterInfuserPortBlockEntityRenderer implements BlockEntityRenderer
             default -> 0;
         }));
 
-        itemRenderer.renderStatic(itemStack, ItemDisplayContext.FIXED, getLightLevel(pBlockEntity.getLevel(), pBlockEntity.getBlockPos(),facing),
-                OverlayTexture.NO_OVERLAY, pPoseStack, pBuffer, pBlockEntity.getLevel(), 1);
+        Level level = pBlockEntity.getLevel();
+        if (level != null) {
+            itemRenderer.renderStatic(itemStack, ItemDisplayContext.FIXED, getLightLevel(level, pBlockEntity.getBlockPos()),
+                    OverlayTexture.NO_OVERLAY, pPoseStack, pBuffer, level, 1);
+        }
         pPoseStack.popPose();
 
 //        pPoseStack.pushPose();
@@ -86,7 +89,7 @@ public class MatterInfuserPortBlockEntityRenderer implements BlockEntityRenderer
 
     }
 
-    private int getLightLevel(Level level, BlockPos pos, Direction facing) {
+    private int getLightLevel(Level level, BlockPos pos) {
         int bLight = level.getBrightness(LightLayer.BLOCK, pos);
         int sLight =level.getBrightness(LightLayer.SKY, pos);
         return LightTexture.pack(bLight, sLight);

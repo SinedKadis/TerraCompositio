@@ -1,5 +1,6 @@
 package net.sinedkadis.terracompositio.block.custom;
 
+import mekanism.api.annotations.ParametersAreNotNullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -27,7 +28,8 @@ public abstract class ModIOBaseEntityBlock extends Block implements EntityBlock 
     }
 
     @Override
-    public void onRemove(BlockState pState, Level pLevel, BlockPos pPos, BlockState pNewState, boolean pIsMoving) {
+    @ParametersAreNotNullByDefault
+    public void onRemove(BlockState pState,Level pLevel,BlockPos pPos, BlockState pNewState, boolean pIsMoving) {
         if (pState.getBlock() != pNewState.getBlock()){
             BlockEntity blockEntity =pLevel.getBlockEntity(pPos);
             if (blockEntity instanceof ModItemIOCFEBlockEntity entity){
@@ -36,7 +38,7 @@ public abstract class ModIOBaseEntityBlock extends Block implements EntityBlock 
         }
         super.onRemove(pState, pLevel, pPos, pNewState, pIsMoving);
     }
-
+    @ParametersAreNotNullByDefault
     public boolean triggerEvent(BlockState pState, Level pLevel, BlockPos pPos, int pId, int pParam) {
         super.triggerEvent(pState, pLevel, pPos, pId, pParam);
         BlockEntity $$5 = pLevel.getBlockEntity(pPos);
@@ -44,6 +46,7 @@ public abstract class ModIOBaseEntityBlock extends Block implements EntityBlock 
     }
 
     @javax.annotation.Nullable
+    @ParametersAreNotNullByDefault
     public MenuProvider getMenuProvider(BlockState pState, Level pLevel, BlockPos pPos) {
         BlockEntity $$3 = pLevel.getBlockEntity(pPos);
         return $$3 instanceof MenuProvider ? (MenuProvider)$$3 : null;
@@ -61,11 +64,12 @@ public abstract class ModIOBaseEntityBlock extends Block implements EntityBlock 
         BlockEntity entity = pLevel.getBlockEntity(pPos);
         if(entity instanceof ModItemIOCFEBlockEntity blockEntity && infusedTest(pState)){
             ItemStack itemstack = pPlayer.getItemInHand(pHand);
-            ItemStack outputSlot = blockEntity.getOutputSlot();
-            ItemStack inputSlot = blockEntity.getInputSlot();
+            ItemStack outputSlot = blockEntity.getLastSlot();
+            ItemStack inputSlot = blockEntity.getFirstSlot();
             if (outputSlot.isEmpty() && inputSlot.isEmpty()){
                 if(!itemstack.isEmpty()) {
-                    blockEntity.addItemInSlot(0,itemstack,1);
+                    blockEntity.insertItemStack(0,itemstack);
+                    itemstack.shrink(1);
                     pLevel.playSound(pPlayer,pPos, SoundEvents.ITEM_FRAME_ADD_ITEM, SoundSource.BLOCKS);
                 }
             }else if (!outputSlot.isEmpty()){

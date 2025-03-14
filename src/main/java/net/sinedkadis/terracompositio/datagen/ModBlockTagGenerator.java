@@ -7,8 +7,8 @@ import net.minecraft.tags.BlockTags;
 import net.minecraftforge.common.data.BlockTagsProvider;
 import net.minecraftforge.common.data.ExistingFileHelper;
 import net.sinedkadis.terracompositio.TerraCompositio;
-import net.sinedkadis.terracompositio.block.ModBlocks;
-import net.sinedkadis.terracompositio.util.ModTags;
+import net.sinedkadis.terracompositio.registries.ModBlocks;
+import net.sinedkadis.terracompositio.registries.ModTags;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -27,7 +27,9 @@ public class ModBlockTagGenerator extends BlockTagsProvider {
         this.tag(BlockTags.MINEABLE_WITH_PICKAXE)
                 .add(ModBlocks.FLOW_CONTAINING_RAW_ORE_BLOCK.get(),
                         ModBlocks.FLOW_CONTAINING_ORE.get(),
-                        ModBlocks.FLOW_CONTAINING_DEEPSLATE_ORE.get());
+                        ModBlocks.FLOW_CONTAINING_DEEPSLATE_ORE.get(),
+                        ModBlocks.MATTER_INFUSER_PORT.get(),
+                        ModBlocks.MATTER_INFUSER_IO.get());
         this.tag(BlockTags.MINEABLE_WITH_AXE)
                 .add(ModBlocks.FLOW_CEDAR_LOG.get(),
                         ModBlocks.FLOW_CEDAR_LEAVES.get(),
@@ -37,9 +39,7 @@ public class ModBlockTagGenerator extends BlockTagsProvider {
                         ModBlocks.FLOW_CEDAR_PLANKS.get(),
                         ModBlocks.STRIPPED_FLOW_CEDAR_LOG.get(),
                         ModBlocks.STRIPPED_FLOW_CEDAR_WOOD.get(),
-                        ModBlocks.MATTER_INFUSER_PORT.get(),
-                        ModBlocks.FLOW_CEDAR_CASING.get(),
-                        ModBlocks.MATTER_INFUSER_IO.get());
+                        ModBlocks.FLOW_CEDAR_CASING.get());
 
 
         this.tag(BlockTags.NEEDS_IRON_TOOL)

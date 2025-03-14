@@ -17,7 +17,8 @@ import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.sinedkadis.terracompositio.api.cfe.CFESource;
 import net.sinedkadis.terracompositio.fluid.CombinedTankWrapper;
 import net.sinedkadis.terracompositio.fluid.ModFluidTank;
-import net.sinedkadis.terracompositio.fluid.ModFluids;
+import net.sinedkadis.terracompositio.registries.ModBlockEntities;
+import net.sinedkadis.terracompositio.registries.ModFluids;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -33,11 +34,10 @@ public class FlowExtractorBlockEntity extends ModBlockEntity implements CFESourc
     List<FluidStack> visualizedOutputFluids;
 
     @Getter
-    private final ModFluidTank inputFluidTank = new ModFluidTank(this,1,1000,true)
-            .whenFluidUpdates(this::sendUpdate);
+    private final ModFluidTank inputFluidTank = new ModFluidTank(this,1,1000,true);
     @Getter
     private final ModFluidTank outputFluidTank = new ModFluidTank(this,1,1000,true)
-            .whenFluidUpdates(this::sendUpdate).forbidInsertion();
+            .forbidInsertion();
     @Getter
     private final LazyOptional<IFluidHandler> fluidOptional = LazyOptional.of(() -> {
         LazyOptional<? extends IFluidHandler> inputCap = inputFluidTank.getCapability();

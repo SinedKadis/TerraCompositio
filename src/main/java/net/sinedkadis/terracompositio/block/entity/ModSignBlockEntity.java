@@ -4,6 +4,8 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.entity.SignBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.sinedkadis.terracompositio.registries.ModBlockEntities;
+import org.jetbrains.annotations.NotNull;
 
 public class ModSignBlockEntity extends SignBlockEntity {
     public ModSignBlockEntity(BlockPos pPos, BlockState pBlockState) {
@@ -11,7 +13,7 @@ public class ModSignBlockEntity extends SignBlockEntity {
     }
 
     @Override
-    public BlockEntityType<?> getType() {
+    public @NotNull BlockEntityType<?> getType() {
         return ModBlockEntities.MOD_SIGN.get();
     }
 }

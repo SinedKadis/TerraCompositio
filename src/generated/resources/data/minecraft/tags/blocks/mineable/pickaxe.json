@@ -2,6 +2,8 @@
   "values": [
     "terracompositio:flow_containing_raw_ore_block",
     "terracompositio:flow_containing_ore",
-    "terracompositio:flow_containing_deepslate_ore"
+    "terracompositio:flow_containing_deepslate_ore",
+    "terracompositio:matter_infuser_port",
+    "terracompositio:matter_infuser_io"
   ]
 }

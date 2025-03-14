@@ -1,118 +1,438 @@
 {
-  "variants": {
-    "axis=x,infused=false,parts=west": {
-      "model": "terracompositio:block/flow_cedar_casing_horizontal",
-      "x": 90,
-      "y": 90
+  "multipart": [
+    {
+      "when": { "axis": "y" },
+      "apply": {
+        "model": "terracompositio:block/flow_cedar_casing"
+      }
     },
-    "axis=x,infused=false,parts=east": {
-      "model": "terracompositio:block/flow_cedar_casing_horizontal",
-      "x": 90,
-      "y": 90
+    {
+      "when": { "axis": "y", "infused": true },
+      "apply": {
+        "model": "terracompositio:block/flow_cedar_casing_infused"
+      }
     },
-    "axis=x,infused=false,parts=north": {
-      "model": "terracompositio:block/flow_cedar_casing_horizontal_minus",
-      "x": 90,
-      "y": 90
+    {
+      "when": { "axis": "x" },
+      "apply": {
+        "model": "terracompositio:block/flow_cedar_casing_horizontal",
+        "x": 90,
+        "y": 90
+      }
     },
-    "axis=x,infused=false,parts=south": {
-      "model": "terracompositio:block/flow_cedar_casing_horizontal_plus",
-      "x": 90,
-      "y": 90
+    {
+      "when": { "axis": "z" },
+      "apply": {
+        "model": "terracompositio:block/flow_cedar_casing_horizontal",
+        "x": 90
+      }
     },
-    "axis=x,infused=false,parts=up": {
-      "model": "terracompositio:block/flow_cedar_casing_horizontal_up",
-      "x": 90,
-      "y": 90
+    {
+      "when": { "axis": "x", "infused": true },
+      "apply": {
+        "model": "terracompositio:block/flow_cedar_casing_horizontal_infused",
+        "x": 90,
+        "y": 90
+      }
     },
-    "axis=x,infused=false,parts=down": {
-      "model": "terracompositio:block/flow_cedar_casing_horizontal",
-      "x": 90,
-      "y": 90
+    {
+      "when": { "axis": "z", "infused": true },
+      "apply": {
+        "model": "terracompositio:block/flow_cedar_casing_horizontal_infused",
+        "x": 90
+      }
     },
-    "axis=x,infused=true,parts=west": {
-      "model": "terracompositio:block/flow_cedar_casing_horizontal_infused",
-      "x": 90,
-      "y": 90
+    {
+      "when": { "axis": "x", "input_bus": true },
+      "apply": {
+        "model": "terracompositio:block/flow_cedar_casing_with_input",
+        "x": 90,
+        "y": 90
+      }
     },
-    "axis=x,infused=true,parts=east": {
-      "model": "terracompositio:block/flow_cedar_casing_horizontal_infused",
-      "x": 90,
-      "y": 90
+    {
+      "when": { "axis": "x", "input_bus": true, "infused": true },
+      "apply": {
+        "model": "terracompositio:block/flow_cedar_casing_with_input_infused",
+        "x": 90,
+        "y": 90
+      }
     },
-    "axis=x,infused=true,parts=north": {
-      "model": "terracompositio:block/flow_cedar_casing_horizontal_infused_minus",
-      "x": 90,
-      "y": 90
+    {
+      "when": { "axis": "x", "input_bus": true, "input_bus_connection": true, "function_side": "plus" },
+      "apply": {
+        "model": "terracompositio:block/flow_cedar_casing_with_input_plus",
+        "x": 90,
+        "y": 90
+
+      }
     },
-    "axis=x,infused=true,parts=south": {
-      "model": "terracompositio:block/flow_cedar_casing_horizontal_infused_plus",
-      "x": 90,
-      "y": 90
+    {
+      "when": { "axis": "x", "input_bus": true, "input_bus_connection": true, "function_side": "plus", "infused": true },
+      "apply": {
+        "model": "terracompositio:block/flow_cedar_casing_with_input_plus_infused",
+        "x": 90,
+        "y": 90
+      }
     },
-    "axis=x,infused=true,parts=up": {
-      "model": "terracompositio:block/flow_cedar_casing_horizontal_infused_up",
-      "x": 90,
-      "y": 90
+    {
+      "when": { "axis": "x", "input_bus": true, "input_bus_connection": true, "function_side": "minus" },
+      "apply": {
+        "model": "terracompositio:block/flow_cedar_casing_with_input_minus",
+        "x": 90,
+        "y": 90
+      }
     },
-    "axis=x,infused=true,parts=down": {
-      "model": "terracompositio:block/flow_cedar_casing_horizontal_infused",
-      "x": 90,
-      "y": 90
+    {
+      "when": { "axis": "x", "input_bus": true, "input_bus_connection": true, "function_side": "minus", "infused": true },
+      "apply": {
+        "model": "terracompositio:block/flow_cedar_casing_with_input_minus_infused",
+        "x": 90,
+        "y": 90
+      }
     },
-    "axis=y,infused=false": {
-      "model": "terracompositio:block/flow_cedar_casing"
+    {
+      "when": { "axis": "z", "input_bus": true },
+      "apply": {
+        "model": "terracompositio:block/flow_cedar_casing_with_input",
+        "x": 90
+      }
     },
-    "axis=y,infused=true": {
-      "model": "terracompositio:block/flow_cedar_casing_infused"
+    {
+      "when": { "axis": "z", "input_bus": true, "infused": true },
+      "apply": {
+        "model": "terracompositio:block/flow_cedar_casing_with_input_infused",
+        "x": 90
+      }
     },
-    "axis=z,infused=false,parts=west": {
-      "model": "terracompositio:block/flow_cedar_casing_horizontal",
-      "x": 90
+    {
+      "when": { "axis": "z", "input_bus": true, "input_bus_connection": true, "function_side": "plus" },
+      "apply": {
+        "model": "terracompositio:block/flow_cedar_casing_with_input_plus",
+        "x": 90
+
+      }
     },
-    "axis=z,infused=false,parts=east": {
-      "model": "terracompositio:block/flow_cedar_casing_horizontal",
-      "x": 90
+    {
+      "when": { "axis": "z", "input_bus": true, "input_bus_connection": true, "function_side": "plus", "infused": true },
+      "apply": {
+        "model": "terracompositio:block/flow_cedar_casing_with_input_plus_infused",
+        "x": 90
+      }
     },
-    "axis=z,infused=false,parts=north": {
-      "model": "terracompositio:block/flow_cedar_casing_horizontal_minus",
-      "x": 90
+    {
+      "when": { "axis": "z", "input_bus": true, "input_bus_connection": true, "function_side": "minus" },
+      "apply": {
+        "model": "terracompositio:block/flow_cedar_casing_with_input_minus",
+        "x": 90
+      }
     },
-    "axis=z,infused=false,parts=south": {
-      "model": "terracompositio:block/flow_cedar_casing_horizontal_plus",
-      "x": 90
+    {
+      "when": { "axis": "z", "input_bus": true, "input_bus_connection": true, "function_side": "minus", "infused": true },
+      "apply": {
+        "model": "terracompositio:block/flow_cedar_casing_with_input_minus_infused",
+        "x": 90
+      }
     },
-    "axis=z,infused=false,parts=up": {
-      "model": "terracompositio:block/flow_cedar_casing_horizontal_up",
-      "x": 90
+    {
+      "when": { "axis": "x", "output_bus": true },
+      "apply": {
+        "model": "terracompositio:block/flow_cedar_casing_with_output",
+        "x": 90,
+        "y": 90
+      }
     },
-    "axis=z,infused=false,parts=down": {
-      "model": "terracompositio:block/flow_cedar_casing_horizontal",
-      "x": 90
+    {
+      "when": { "axis": "x", "output_bus": true, "infused": true },
+      "apply": {
+        "model": "terracompositio:block/flow_cedar_casing_with_output_infused",
+        "x": 90,
+        "y": 90
+      }
     },
-    "axis=z,infused=true,parts=west": {
-      "model": "terracompositio:block/flow_cedar_casing_horizontal_infused",
-      "x": 90
+    {
+      "when": { "axis": "x", "output_bus": true, "output_bus_connection": true, "function_side": "plus" },
+      "apply": {
+        "model": "terracompositio:block/flow_cedar_casing_with_output_plus",
+        "x": 90,
+        "y": 90
+      }
     },
-    "axis=z,infused=true,parts=east": {
-      "model": "terracompositio:block/flow_cedar_casing_horizontal_infused",
-      "x": 90
+    {
+      "when": { "axis": "x", "output_bus": true, "output_bus_connection": true, "function_side": "plus", "infused": true },
+      "apply": {
+        "model": "terracompositio:block/flow_cedar_casing_with_output_plus_infused",
+        "x": 90,
+        "y": 90
+      }
     },
-    "axis=z,infused=true,parts=north": {
-      "model": "terracompositio:block/flow_cedar_casing_horizontal_infused_minus",
-      "x": 90
+    {
+      "when": { "axis": "x", "output_bus": true, "output_bus_connection": true, "function_side": "minus" },
+      "apply": {
+        "model": "terracompositio:block/flow_cedar_casing_with_output_minus",
+        "x": 90,
+        "y": 90
+      }
     },
-    "axis=z,infused=true,parts=south": {
-      "model": "terracompositio:block/flow_cedar_casing_horizontal_infused_plus",
-      "x": 90
+    {
+      "when": { "axis": "x", "output_bus": true, "output_bus_connection": true, "function_side": "minus", "infused": true },
+      "apply": {
+        "model": "terracompositio:block/flow_cedar_casing_with_output_minus_infused",
+        "x": 90,
+        "y": 90
+      }
     },
-    "axis=z,infused=true,parts=up": {
-      "model": "terracompositio:block/flow_cedar_casing_horizontal_infused_up",
-      "x": 90
+    {
+      "when": { "axis": "z", "output_bus": true },
+      "apply": {
+        "model": "terracompositio:block/flow_cedar_casing_with_output",
+        "x": 90
+      }
     },
-    "axis=z,infused=true,parts=down": {
-      "model": "terracompositio:block/flow_cedar_casing_horizontal_infused",
-      "x": 90
+    {
+      "when": { "axis": "z", "output_bus": true, "infused": true },
+      "apply": {
+        "model": "terracompositio:block/flow_cedar_casing_with_output_infused",
+        "x": 90
+      }
+    },
+    {
+      "when": { "axis": "z", "output_bus": true, "output_bus_connection": true, "function_side": "plus" },
+      "apply": {
+        "model": "terracompositio:block/flow_cedar_casing_with_output_plus",
+        "x": 90
+      }
+    },
+    {
+      "when": { "axis": "z", "output_bus": true, "output_bus_connection": true, "function_side": "plus", "infused": true },
+      "apply": {
+        "model": "terracompositio:block/flow_cedar_casing_with_output_plus_infused",
+        "x": 90
+      }
+    },
+    {
+      "when": { "axis": "z", "output_bus": true, "output_bus_connection": true, "function_side": "minus" },
+      "apply": {
+        "model": "terracompositio:block/flow_cedar_casing_with_output_minus",
+        "x": 90
+      }
+    },
+    {
+      "when": { "axis": "z", "output_bus": true, "output_bus_connection": true, "function_side": "minus", "infused": true },
+      "apply": {
+        "model": "terracompositio:block/flow_cedar_casing_with_output_minus_infused",
+        "x": 90
+      }
+    },
+    {
+      "when": { "axis": "x", "input_bus": true, "output_bus": true },
+      "apply": {
+        "model": "terracompositio:block/flow_cedar_casing_with_input_output",
+        "x": 90,
+        "y": 90
+      }
+    },
+    {
+      "when": { "axis": "x", "input_bus": true, "output_bus": true, "infused": true },
+      "apply": {
+        "model": "terracompositio:block/flow_cedar_casing_with_input_output_infused",
+        "x": 90,
+        "y": 90
+      }
+    },
+    {
+      "when": { "axis": "x", "input_bus": true, "output_bus": true, "output_bus_connection": true, "function_side": "plus" },
+      "apply": {
+        "model": "terracompositio:block/flow_cedar_casing_with_input_output_plus",
+        "x": 90,
+        "y": 90
+      }
+    },
+    {
+      "when": { "axis": "x", "input_bus": true, "output_bus": true, "output_bus_connection": true, "function_side": "plus", "infused": true },
+      "apply": {
+        "model": "terracompositio:block/flow_cedar_casing_with_input_output_plus_infused",
+        "x": 90,
+        "y": 90
+      }
+    },
+    {
+      "when": { "axis": "x", "input_bus": true, "output_bus": true, "output_bus_connection": true, "function_side": "minus" },
+      "apply": {
+        "model": "terracompositio:block/flow_cedar_casing_with_input_output_minus",
+        "x": 90,
+        "y": 90
+      }
+    },
+    {
+      "when": { "axis": "x", "input_bus": true, "output_bus": true, "output_bus_connection": true, "function_side": "minus", "infused": true },
+      "apply": {
+        "model": "terracompositio:block/flow_cedar_casing_with_input_output_minus_infused",
+        "x": 90,
+        "y": 90
+      }
+    },
+    {
+      "when": { "axis": "x", "input_bus": true, "output_bus": true, "input_bus_connection": true, "function_side": "plus" },
+      "apply": {
+        "model": "terracompositio:block/flow_cedar_casing_with_input_plus_output",
+        "x": 90,
+        "y": 90
+      }
+    },
+    {
+      "when": { "axis": "x", "input_bus": true, "output_bus": true, "input_bus_connection": true, "function_side": "plus", "infused": true },
+      "apply": {
+        "model": "terracompositio:block/flow_cedar_casing_with_input_plus_output_infused",
+        "x": 90,
+        "y": 90
+      }
+    },
+    {
+      "when": { "axis": "x", "input_bus": true, "output_bus": true, "input_bus_connection": true, "function_side": "minus" },
+      "apply": {
+        "model": "terracompositio:block/flow_cedar_casing_with_input_minus_output",
+        "x": 90,
+        "y": 90
+      }
+    },
+    {
+      "when": { "axis": "x", "input_bus": true, "output_bus": true, "input_bus_connection": true, "function_side": "minus", "infused": true },
+      "apply": {
+        "model": "terracompositio:block/flow_cedar_casing_with_input_minus_output_infused",
+        "x": 90,
+        "y": 90
+      }
+    },
+    {
+      "when": { "axis": "x", "input_bus": true, "output_bus": true, "input_bus_connection": true,"output_bus_connection": true, "function_side": "minus" },
+      "apply": {
+        "model": "terracompositio:block/flow_cedar_casing_with_input_minus_output_minus",
+        "x": 90,
+        "y": 90
+      }
+    },
+    {
+      "when": { "axis": "x", "input_bus": true, "output_bus": true, "input_bus_connection": true,"output_bus_connection": true, "function_side": "minus", "infused": true },
+      "apply": {
+        "model": "terracompositio:block/flow_cedar_casing_with_input_minus_output_minus_infused",
+        "x": 90,
+        "y": 90
+      }
+    },
+    {
+      "when": { "axis": "x", "input_bus": true, "output_bus": true, "input_bus_connection": true,"output_bus_connection": true, "function_side": "plus" },
+      "apply": {
+        "model": "terracompositio:block/flow_cedar_casing_with_input_plus_output_plus",
+        "x": 90,
+        "y": 90
+      }
+    },
+    {
+      "when": { "axis": "x", "input_bus": true, "output_bus": true, "input_bus_connection": true,"output_bus_connection": true, "function_side": "plus", "infused": true },
+      "apply": {
+        "model": "terracompositio:block/flow_cedar_casing_with_input_plus_output_plus_infused",
+        "x": 90,
+        "y": 90
+      }
+    },
+    {
+      "when": { "axis": "z", "input_bus": true, "output_bus": true },
+      "apply": {
+        "model": "terracompositio:block/flow_cedar_casing_with_input_output",
+        "x": 90
+      }
+    },
+    {
+      "when": { "axis": "z", "input_bus": true, "output_bus": true, "infused": true },
+      "apply": {
+        "model": "terracompositio:block/flow_cedar_casing_with_input_output_infused",
+        "x": 90
+      }
+    },
+    {
+      "when": { "axis": "z", "input_bus": true, "output_bus": true, "output_bus_connection": true, "function_side": "plus" },
+      "apply": {
+        "model": "terracompositio:block/flow_cedar_casing_with_input_output_plus",
+        "x": 90
+      }
+    },
+    {
+      "when": { "axis": "z", "input_bus": true, "output_bus": true, "output_bus_connection": true, "function_side": "plus", "infused": true },
+      "apply": {
+        "model": "terracompositio:block/flow_cedar_casing_with_input_output_plus_infused",
+        "x": 90
+      }
+    },
+    {
+      "when": { "axis": "z", "input_bus": true, "output_bus": true, "output_bus_connection": true, "function_side": "minus" },
+      "apply": {
+        "model": "terracompositio:block/flow_cedar_casing_with_input_output_minus",
+        "x": 90
+      }
+    },
+    {
+      "when": { "axis": "z", "input_bus": true, "output_bus": true, "output_bus_connection": true, "function_side": "minus", "infused": true },
+      "apply": {
+        "model": "terracompositio:block/flow_cedar_casing_with_input_output_minus_infused",
+        "x": 90
+      }
+    },
+    {
+      "when": { "axis": "z", "input_bus": true, "output_bus": true, "input_bus_connection": true, "function_side": "plus" },
+      "apply": {
+        "model": "terracompositio:block/flow_cedar_casing_with_input_plus_output",
+        "x": 90
+      }
+    },
+    {
+      "when": { "axis": "z", "input_bus": true, "output_bus": true, "input_bus_connection": true, "function_side": "plus", "infused": true },
+      "apply": {
+        "model": "terracompositio:block/flow_cedar_casing_with_input_plus_output_infused",
+        "x": 90
+      }
+    },
+    {
+      "when": { "axis": "z", "input_bus": true, "output_bus": true, "input_bus_connection": true, "function_side": "minus" },
+      "apply": {
+        "model": "terracompositio:block/flow_cedar_casing_with_input_minus_output",
+        "x": 90
+      }
+    },
+    {
+      "when": { "axis": "z", "input_bus": true, "output_bus": true, "input_bus_connection": true, "function_side": "minus", "infused": true },
+      "apply": {
+        "model": "terracompositio:block/flow_cedar_casing_with_input_minus_output_infused",
+        "x": 90
+      }
+    },
+    {
+      "when": { "axis": "z", "input_bus": true, "output_bus": true, "input_bus_connection": true,"output_bus_connection": true, "function_side": "minus" },
+      "apply": {
+        "model": "terracompositio:block/flow_cedar_casing_with_input_minus_output_minus",
+        "x": 90
+      }
+    },
+    {
+      "when": { "axis": "z", "input_bus": true, "output_bus": true, "input_bus_connection": true,"output_bus_connection": true, "function_side": "minus", "infused": true },
+      "apply": {
+        "model": "terracompositio:block/flow_cedar_casing_with_input_minus_output_minus_infused",
+        "x": 90
+      }
+    },
+    {
+      "when": { "axis": "z", "input_bus": true, "output_bus": true, "input_bus_connection": true,"output_bus_connection": true, "function_side": "plus" },
+      "apply": {
+        "model": "terracompositio:block/flow_cedar_casing_with_input_plus_output_plus",
+        "x": 90
+      }
+    },
+    {
+      "when": { "axis": "z", "input_bus": true, "output_bus": true, "input_bus_connection": true,"output_bus_connection": true, "function_side": "plus", "infused": true },
+      "apply": {
+        "model": "terracompositio:block/flow_cedar_casing_with_input_plus_output_plus_infused",
+        "x": 90
+      }
     }
-  }
+  ]
 }

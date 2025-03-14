@@ -2,8 +2,8 @@ package net.sinedkadis.terracompositio.fluid;
 
 import com.mojang.blaze3d.shaders.FogShape;
 import com.mojang.blaze3d.systems.RenderSystem;
-import com.mojang.logging.LogUtils;
 import lombok.Getter;
+import mekanism.api.annotations.ParametersAreNotNullByDefault;
 import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
@@ -47,14 +47,14 @@ import net.minecraftforge.fluids.FluidType;
 import net.minecraftforge.fluids.ForgeFlowingFluid;
 import net.minecraftforge.fluids.capability.wrappers.FluidBucketWrapper;
 import net.minecraftforge.registries.RegistryObject;
-import net.sinedkadis.terracompositio.block.ModBlocks;
+import net.sinedkadis.terracompositio.registries.ModBlocks;
 import net.sinedkadis.terracompositio.block.custom.FlowCauldronBlock;
-import net.sinedkadis.terracompositio.item.ModItems;
+import net.sinedkadis.terracompositio.registries.ModFluids;
+import net.sinedkadis.terracompositio.registries.ModItems;
 import org.apache.commons.lang3.function.TriFunction;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
-import org.slf4j.Logger;
 
 import java.util.Optional;
 import java.util.function.Consumer;
@@ -69,7 +69,6 @@ public class ModFluidRegistryContainer implements IForgeBucketPickup{
     private ForgeFlowingFluid.Properties properties;
     public final RegistryObject<ForgeFlowingFluid.Source> source;
     public final RegistryObject<ForgeFlowingFluid.Flowing> flowing;
-    private static final Logger LOGGER = LogUtils.getLogger();
 
     public ModFluidRegistryContainer(String name, FluidType.Properties typeProperties,
                                   Supplier<IClientFluidTypeExtensions> clientExtensions, @Nullable AdditionalProperties additionalProperties,
@@ -111,19 +110,20 @@ public class ModFluidRegistryContainer implements IForgeBucketPickup{
             @Override
             public InteractionResult onItemUseFirst(ItemStack stack, UseOnContext context) {
                 BlockPos pPos = context.getClickedPos();
-                if (context.getItemInHand().getItem() == ModFluids.FLOW_FLUID.bucket.get()){
+                Player player = context.getPlayer();
+                if (player != null && context.getItemInHand().getItem() == ModFluids.FLOW_FLUID.bucket.get()){
                     if (context.getLevel().getBlockState(pPos)== Blocks.CAULDRON.defaultBlockState()){
                         context.getLevel().setBlock(pPos,ModBlocks.FLOW_CAULDRON.get().defaultBlockState().setValue(FlowCauldronBlock.LEVEL,3),1);
-                        context.getPlayer().setItemInHand(context.getHand(),new ItemStack(Items.BUCKET));
-                        context.getPlayer().playSound(SoundEvents.BUCKET_EMPTY); //TODO: fix sound when clicked with empty bucket on flow
+                        player.setItemInHand(context.getHand(),new ItemStack(Items.BUCKET));
+                        player.playSound(SoundEvents.BUCKET_EMPTY); //TODO: fix sound when clicked with empty bucket on flow
                         return InteractionResult.SUCCESS;
                     }
                 }
-                if (context.getItemInHand().getItem() == ModFluids.BIRCH_JUICE_FLUID.bucket.get()){
+                if (player != null && context.getItemInHand().getItem() == ModFluids.BIRCH_JUICE_FLUID.bucket.get()){
                     if (context.getLevel().getBlockState(pPos)== Blocks.CAULDRON.defaultBlockState()){
                         context.getLevel().setBlock(pPos,ModBlocks.BIRCH_JUICE_CAULDRON.get().defaultBlockState().setValue(FlowCauldronBlock.LEVEL,3),1);
-                        context.getPlayer().setItemInHand(context.getHand(),new ItemStack(Items.BUCKET));
-                        context.getPlayer().playSound(SoundEvents.BUCKET_EMPTY);
+                        player.setItemInHand(context.getHand(),new ItemStack(Items.BUCKET));
+                        player.playSound(SoundEvents.BUCKET_EMPTY);
                         return InteractionResult.SUCCESS;
                     }
                 }
@@ -131,7 +131,7 @@ public class ModFluidRegistryContainer implements IForgeBucketPickup{
                 return super.onItemUseFirst(stack, context);
             }
             @Override
-            public UseAnim getUseAnimation(ItemStack pStack) {
+            public @NotNull UseAnim getUseAnimation(@NotNull ItemStack pStack) {
                 if (pStack.is(ModFluids.BIRCH_JUICE_FLUID.bucket.get())) {
                     return UseAnim.DRINK;
                 }
@@ -139,7 +139,8 @@ public class ModFluidRegistryContainer implements IForgeBucketPickup{
             }
 
             @Override
-            public InteractionResultHolder<ItemStack> use(Level pLevel, Player pPlayer, InteractionHand pHand) {
+            @ParametersAreNotNullByDefault
+            public @NotNull InteractionResultHolder<ItemStack> use(Level pLevel, Player pPlayer, InteractionHand pHand) {
                 BlockHitResult blockhitresult = getPlayerPOVHitResult(pLevel, pPlayer, super.getFluid() == Fluids.EMPTY ? net.minecraft.world.level.ClipContext.Fluid.SOURCE_ONLY : net.minecraft.world.level.ClipContext.Fluid.NONE);
                 if (blockhitresult.getType() == HitResult.Type.MISS) {
                     return ItemUtils.startUsingInstantly(pLevel, pPlayer, pHand);
@@ -148,12 +149,13 @@ public class ModFluidRegistryContainer implements IForgeBucketPickup{
             }
 
             @Override
-            public int getUseDuration(ItemStack pStack) {
+            public int getUseDuration(@NotNull ItemStack pStack) {
                 return pStack.is(ModFluids.BIRCH_JUICE_FLUID.bucket.get()) ? 32 : 1;
             }
 
             @Override
-            public ItemStack finishUsingItem(ItemStack pStack, Level pLevel, LivingEntity pLivingEntity) {
+            @ParametersAreNotNullByDefault
+            public @NotNull ItemStack finishUsingItem(ItemStack pStack, Level pLevel, LivingEntity pLivingEntity) {
                 super.finishUsingItem(pStack, pLevel, pLivingEntity);
                 if (pStack.is(ModFluids.BIRCH_JUICE_FLUID.bucket.get())) {
                     Player player = pLivingEntity instanceof Player ? (Player) pLivingEntity : null;
