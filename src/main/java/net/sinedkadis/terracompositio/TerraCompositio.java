@@ -1,56 +1,19 @@
 package net.sinedkadis.terracompositio;
 
-import net.minecraft.Util;
-import net.minecraft.client.gui.screens.MenuScreens;
-import net.minecraft.client.model.BoatModel;
-import net.minecraft.client.model.ChestBoatModel;
-import net.minecraft.client.renderer.ItemBlockRenderTypes;
-import net.minecraft.client.renderer.RenderType;
-import net.minecraft.client.renderer.Sheets;
-import net.minecraft.client.renderer.blockentity.HangingSignRenderer;
-import net.minecraft.client.renderer.blockentity.SignRenderer;
-import net.minecraft.client.renderer.entity.EntityRenderers;
-import net.minecraft.client.renderer.item.ItemProperties;
-import net.minecraft.resources.ResourceLocation;
-import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.client.event.EntityRenderersEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
-import net.minecraftforge.event.server.ServerStartingEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
-import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import net.minecraftforge.network.NetworkRegistry;
 import net.minecraftforge.network.simple.SimpleChannel;
-import net.sinedkadis.terracompositio.network.packets.SyncItemHandlerPacket;
-import net.sinedkadis.terracompositio.registries.ModBlocks;
-import net.sinedkadis.terracompositio.registries.ModBlockEntities;
-import net.sinedkadis.terracompositio.api.cfe.CFENetwork;
-import net.sinedkadis.terracompositio.block.entity.renderer.FlowExtractorBlockEntityRenderer;
-import net.sinedkadis.terracompositio.block.entity.renderer.FlowInfuserBlockEntityRenderer;
-import net.sinedkadis.terracompositio.block.entity.renderer.FlowPortBlockEntityRenderer;
-import net.sinedkadis.terracompositio.block.entity.renderer.MatterInfuserPortBlockEntityRenderer;
-import net.sinedkadis.terracompositio.entity.client.ModModelLayers;
-import net.sinedkadis.terracompositio.item.custom.WrenchAxeItem;
+import net.sinedkadis.terracompositio.registries.*;
 import net.sinedkadis.terracompositio.util.CFENetworkHandler;
 import net.sinedkadis.terracompositio.effect.ModEffects;
 import net.sinedkadis.terracompositio.entity.ModEntities;
-import net.sinedkadis.terracompositio.entity.client.ModBoatRenderer;
 import net.sinedkadis.terracompositio.events.CFENetworkEvent;
-import net.sinedkadis.terracompositio.registries.ModFluids;
-import net.sinedkadis.terracompositio.registries.ModCreativeModTabs;
-import net.sinedkadis.terracompositio.registries.ModItems;
-import net.sinedkadis.terracompositio.registries.ModParticles;
-import net.sinedkadis.terracompositio.registries.ModPotions;
-import net.sinedkadis.terracompositio.registries.ModRecipes;
-import net.sinedkadis.terracompositio.screen.FlowBlockPortScreen;
 import net.sinedkadis.terracompositio.screen.ModMenuTypes;
 import net.sinedkadis.terracompositio.sound.ModSounds;
-import net.sinedkadis.terracompositio.registries.ModGameRules;
-import net.sinedkadis.terracompositio.registries.ModWoodTypes;
 import net.sinedkadis.terracompositio.worldgen.tree.ModFoliagePlacers;
 import net.sinedkadis.terracompositio.worldgen.tree.ModTrunkPlacerTypes;
 
@@ -64,36 +27,26 @@ public class TerraCompositio
     public TerraCompositio() {
 
         IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
+        modEventBus.addListener(this::commonSetup);
+        modEventBus.addListener(this::addCreative);
 
-        ModCreativeModTabs.register(modEventBus);
-
-        ModItems.register(modEventBus);
-
+        MinecraftForge.EVENT_BUS.register(this);
         ModFluids.FLUIDS.register(modEventBus);
         ModFluids.FLUID_TYPES.register(modEventBus);
 
+        ModCreativeModTabs.register(modEventBus);
+        ModItems.register(modEventBus);
         ModBlocks.register(modEventBus);
-
-        modEventBus.addListener(this::commonSetup);
-
         ModParticles.register(modEventBus);
         ModEffects.register(modEventBus);
         ModPotions.register(modEventBus);
         ModSounds.register(modEventBus);
         ModEntities.register(modEventBus);
-
         ModBlockEntities.register(modEventBus);
-        // Register ourselves for server and other game events we are interested in
-        MinecraftForge.EVENT_BUS.register(this);
-
-        // Register the item to a creative tab
-        modEventBus.addListener(this::addCreative);
-
         ModRecipes.register(modEventBus);
         ModMenuTypes.register(modEventBus);
         ModTrunkPlacerTypes.register(modEventBus);
         ModFoliagePlacers.register(modEventBus);
-
 
         ModGameRules.init();
     }
@@ -113,76 +66,4 @@ public class TerraCompositio
         }*/
     }
 
-    public static String makeDescriptionId(String base, String name) {
-        return Util.makeDescriptionId(base, getResource(name));
-    }
-    public static ResourceLocation getResource(String name) {
-        return new ResourceLocation(MOD_ID, name);
-    }
-
-    // You can use SubscribeEvent and let the Event Bus discover methods to call
-    @SubscribeEvent
-    public void onServerStarting(ServerStartingEvent event)
-    {
-        // Do something when the server starts
-        //LOGGER.info("HELLO from server starting");
-    }
-
-    // You can use EventBusSubscriber to automatically register all static methods in the class annotated with @SubscribeEvent
-    @Mod.EventBusSubscriber(modid = MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD, value = Dist.CLIENT)
-    public static class ClientModEvents
-    {
-        @SubscribeEvent
-        public static void onClientSetup(FMLClientSetupEvent event)
-        {
-            // Some client setup code
-            //LOGGER.info("HELLO FROM CLIENT SETUP");
-            //LOGGER.info("MINECRAFT NAME >> {}", Minecraft.getInstance().getUser().getName());
-            Sheets.addWoodType(ModWoodTypes.FLOW_CEDAR);
-
-            EntityRenderers.register(ModEntities.MOD_BOAT.get(), pContext -> new ModBoatRenderer(pContext, false));
-            EntityRenderers.register(ModEntities.MOD_CHEST_BOAT.get(), pContext -> new ModBoatRenderer(pContext, true));
-
-            MenuScreens.register(ModMenuTypes.FLOW_PORT_MENU.get(), FlowBlockPortScreen::new);
-            ItemBlockRenderTypes.setRenderLayer(ModFluids.BIRCH_JUICE_FLUID.source.get(), RenderType.translucent());
-            ItemBlockRenderTypes.setRenderLayer(ModFluids.BIRCH_JUICE_FLUID.flowing.get(), RenderType.translucent());
-            ItemBlockRenderTypes.setRenderLayer(ModFluids.FLOW_FLUID.source.get(), RenderType.translucent());
-            ItemBlockRenderTypes.setRenderLayer(ModFluids.FLOW_FLUID.flowing.get(), RenderType.translucent());
-
-            event.enqueueWork(() -> ItemProperties.register(
-                    ModItems.FLOW_ROTATING_AXE.get(),
-                    new ResourceLocation("wrench_mode"),
-                    (stack, level, entity, seed) -> WrenchAxeItem.getMode(stack).ordinal()
-            ));
-
-            CHANNEL = NetworkRegistry.ChannelBuilder
-                    .named(new ResourceLocation(TerraCompositio.MOD_ID, "sync_item_handler"))
-                    .clientAcceptedVersions(s -> true)
-                    .serverAcceptedVersions(s -> true)
-                    .networkProtocolVersion(() -> "1.0")
-                    .simpleChannel();
-
-            CHANNEL.messageBuilder(SyncItemHandlerPacket.class, 0)
-                    .encoder(SyncItemHandlerPacket::encode)
-                    .decoder(SyncItemHandlerPacket::decode)
-                    .consumerMainThread(SyncItemHandlerPacket::handle)
-                    .add();
-        }
-
-        @SubscribeEvent
-        public static void registerLayer(EntityRenderersEvent.RegisterLayerDefinitions event) {
-            event.registerLayerDefinition(ModModelLayers.PINE_BOAT_LAYER, BoatModel::createBodyModel);
-            event.registerLayerDefinition(ModModelLayers.PINE_CHEST_BOAT_LAYER, ChestBoatModel::createBodyModel);
-        }
-
-        @SubscribeEvent
-        public static void registerBER(EntityRenderersEvent.RegisterRenderers event) {
-            event.registerBlockEntityRenderer(ModBlockEntities.FLOW_PORT_BE.get(), FlowPortBlockEntityRenderer::new);
-            event.registerBlockEntityRenderer(ModBlockEntities.MATTER_INFUSER_PORT_BE.get(), MatterInfuserPortBlockEntityRenderer::new);
-            event.registerBlockEntityRenderer(ModBlockEntities.FLOW_INFUSER_BE.get(), FlowInfuserBlockEntityRenderer::new);
-            event.registerBlockEntityRenderer(ModBlockEntities.FLOW_EXTRACTOR_BE.get(), FlowExtractorBlockEntityRenderer::new);
-            event.registerBlockEntityRenderer(ModBlockEntities.MOD_SIGN.get(), SignRenderer::new);
-            event.registerBlockEntityRenderer(ModBlockEntities.MOD_HANGING_SIGN.get(), HangingSignRenderer::new);
-        }
-    }
 }

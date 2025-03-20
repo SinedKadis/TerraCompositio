@@ -21,7 +21,7 @@ public final class GameruleUtilities {
      *
      * @return A key that can be used to access the gamerule.
      */
-    private static final <T extends GameRules.Value<T>> GameRules.Key<T> register(String name, GameRules.Category category, GameRules.Type<T> defaultValue) {
+    private static <T extends GameRules.Value<T>> GameRules.Key<T> register(String name, GameRules.Category category, GameRules.Type<T> defaultValue) {
         var key = GameRules.register(name, category, defaultValue);
         ruleIDMap.put(name, key);
         return key;
@@ -36,7 +36,7 @@ public final class GameruleUtilities {
      *
      * @return A key that can be used to access the gamerule.
      */
-    public static final GameRules.Key<GameRules.BooleanValue> register(String name, GameRules.Category category, boolean defaultValue) {
+    public static GameRules.Key<GameRules.BooleanValue> register(String name, GameRules.Category category, boolean defaultValue) {
         return register(name, category, GameRules.BooleanValue.create(defaultValue));
     }
 
@@ -49,7 +49,7 @@ public final class GameruleUtilities {
      *
      * @return A key that can be used to access the gamerule.
      */
-    public static final GameRules.Key<GameRules.IntegerValue> register(String name, GameRules.Category category, int defaultValue) {
+    public static GameRules.Key<GameRules.IntegerValue> register(String name, GameRules.Category category, int defaultValue) {
         return register(name, category, GameRules.IntegerValue.create(defaultValue));
     }
 
@@ -62,7 +62,7 @@ public final class GameruleUtilities {
      *
      * @return The value wrapper object for the gamerule.
      */
-    public static final <T extends GameRules.Value<T>> T getGamerule(Level level, GameRules.Key<T> key) {
+    public static <T extends GameRules.Value<T>> T getGamerule(Level level, GameRules.Key<T> key) {
         return level.getGameRules().getRule(key);
     }
 
@@ -75,7 +75,7 @@ public final class GameruleUtilities {
      *
      * @return The value wrapper object for the gamerule.
      */
-    public static final <T extends GameRules.Value<T>> T getGamerule(Level level, String id) {
+    public static <T extends GameRules.Value<T>> T getGamerule(Level level, String id) {
         @SuppressWarnings("unchecked")
         var key = (GameRules.Key<T>) ruleIDMap.get(id);
         return level.getGameRules().getRule(key);
@@ -89,7 +89,7 @@ public final class GameruleUtilities {
      *
      * @return The boolean value for the gamerule.
      */
-    public static final boolean getBooleanGamerule(Level level, GameRules.Key<GameRules.BooleanValue> key) {
+    public static boolean getBooleanGamerule(Level level, GameRules.Key<GameRules.BooleanValue> key) {
         return getGamerule(level, key).get();
     }
 
@@ -101,7 +101,7 @@ public final class GameruleUtilities {
      *
      * @return The boolean value for the gamerule.
      */
-    public static final boolean getBooleanGamerule(Level level, String id) {
+    public static boolean getBooleanGamerule(Level level, String id) {
         return GameruleUtilities.<GameRules.BooleanValue>getGamerule(level, id).get();
     }
 
@@ -113,7 +113,7 @@ public final class GameruleUtilities {
      *
      * @return The integer value for the gamerule.
      */
-    public static final int getIntegerGamerule(Level level, GameRules.Key<GameRules.IntegerValue> key) {
+    public static int getIntegerGamerule(Level level, GameRules.Key<GameRules.IntegerValue> key) {
         return getGamerule(level, key).get();
     }
 
@@ -125,7 +125,7 @@ public final class GameruleUtilities {
      *
      * @return The integer value for the gamerule.
      */
-    public static final int getIntegerGamerule(Level level, String id) {
+    public static int getIntegerGamerule(Level level, String id) {
         return GameruleUtilities.<GameRules.IntegerValue>getGamerule(level, id).get();
     }
 }

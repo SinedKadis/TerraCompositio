@@ -13,6 +13,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.Level;
 import net.sinedkadis.terracompositio.TerraCompositio;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 public class FlowInfusionRecipe implements Recipe<SimpleContainer> {
@@ -33,7 +34,7 @@ public class FlowInfusionRecipe implements Recipe<SimpleContainer> {
     }
 
     @Override
-    public boolean matches(SimpleContainer pContainer, Level pLevel) {
+    public boolean matches(@NotNull SimpleContainer pContainer, Level pLevel) {
         if(pLevel.isClientSide()){
             return false;
         }
@@ -42,12 +43,12 @@ public class FlowInfusionRecipe implements Recipe<SimpleContainer> {
     }
 
     @Override
-    public NonNullList<Ingredient> getIngredients() {
+    public @NotNull NonNullList<Ingredient> getIngredients() {
         return inputItems;
     }
 
     @Override
-    public ItemStack assemble(SimpleContainer pContainer, RegistryAccess pRegistryAccess) {
+    public @NotNull ItemStack assemble(@NotNull SimpleContainer pContainer, @NotNull RegistryAccess pRegistryAccess) {
         return output.copy();
     }
 
@@ -57,35 +58,35 @@ public class FlowInfusionRecipe implements Recipe<SimpleContainer> {
     }
 
     @Override
-    public ItemStack getResultItem(RegistryAccess pRegistryAccess) {
+    public @NotNull ItemStack getResultItem(@Nullable RegistryAccess pRegistryAccess) {
         return output.copy();
     }
     public float getCFETick(){
         return (float) cfe /ticks;
     }
     @Override
-    public ResourceLocation getId() {
+    public @NotNull ResourceLocation getId() {
         return id;
     }
 
     @Override
-    public RecipeSerializer<?> getSerializer() {
+    public @NotNull RecipeSerializer<?> getSerializer() {
         return Serializer.INSTANCE;
     }
 
     @Override
-    public RecipeType<?> getType() {
+    public @NotNull RecipeType<?> getType() {
         return Type.INSTANCE;
     }
     public static class Type implements RecipeType<FlowInfusionRecipe>{
         public static final Type INSTANCE = new Type();
-        public static final String ID = "flow_infusion";
+        //public static final String ID = "flow_infusion";
     }
     public static class Serializer implements RecipeSerializer<FlowInfusionRecipe>{
         public static final Serializer INSTANCE = new Serializer();
-        public static final ResourceLocation ID = new ResourceLocation(TerraCompositio.MOD_ID,"flow_infusion");
+        //public static final ResourceLocation ID = new ResourceLocation(TerraCompositio.MOD_ID,"flow_infusion");
         @Override
-        public FlowInfusionRecipe fromJson(ResourceLocation pRecipeId, JsonObject pSerializedRecipe) {
+        public @NotNull FlowInfusionRecipe fromJson(@NotNull ResourceLocation pRecipeId, @NotNull JsonObject pSerializedRecipe) {
             ItemStack output = ShapedRecipe.itemStackFromJson(GsonHelper.getAsJsonObject(pSerializedRecipe, "output"));
             int cfe = GsonHelper.getAsInt(pSerializedRecipe,"cfe");
             int ticks = GsonHelper.getAsInt(pSerializedRecipe,"time");
@@ -101,11 +102,9 @@ public class FlowInfusionRecipe implements Recipe<SimpleContainer> {
         }
 
         @Override
-        public @Nullable FlowInfusionRecipe fromNetwork(ResourceLocation pRecipeId, FriendlyByteBuf pBuffer) {
+        public @Nullable FlowInfusionRecipe fromNetwork(@NotNull ResourceLocation pRecipeId, FriendlyByteBuf pBuffer) {
             NonNullList<Ingredient> inputs = NonNullList.withSize(pBuffer.readInt(),Ingredient.EMPTY);
-            for (int i = 0; i<inputs.size();i++){
-                inputs.set(i,Ingredient.fromNetwork(pBuffer));
-            }
+            inputs.replaceAll(ignored -> Ingredient.fromNetwork(pBuffer));
             ItemStack output = pBuffer.readItem();
             int cfe = pBuffer.readInt();
             int ticks = pBuffer.readInt();
