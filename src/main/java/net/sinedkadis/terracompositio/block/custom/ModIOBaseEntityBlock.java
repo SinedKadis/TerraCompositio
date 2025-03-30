@@ -62,35 +62,32 @@ public abstract class ModIOBaseEntityBlock extends Block implements EntityBlock 
     public @NotNull InteractionResult use(@NotNull BlockState pState, Level pLevel, @NotNull BlockPos pPos, @NotNull Player pPlayer, @NotNull InteractionHand pHand, @NotNull BlockHitResult pHit) {
         //if (!pLevel.isClientSide()){
         BlockEntity entity = pLevel.getBlockEntity(pPos);
-        if(entity instanceof ModItemIOCFEBlockEntity blockEntity && infusedTest(pState)){
+        if (entity instanceof ModItemIOCFEBlockEntity blockEntity) {
             ItemStack itemstack = pPlayer.getItemInHand(pHand);
             ItemStack outputSlot = blockEntity.getLastSlot();
             ItemStack inputSlot = blockEntity.getFirstSlot();
-            if (outputSlot.isEmpty() && inputSlot.isEmpty()){
-                if(!itemstack.isEmpty()) {
-                    blockEntity.insertItemStack(0,itemstack);
+            if (outputSlot.isEmpty() && inputSlot.isEmpty()) {
+                if (!itemstack.isEmpty()) {
+                    blockEntity.insertItemStack(0, itemstack);
                     itemstack.shrink(1);
-                    pLevel.playSound(pPlayer,pPos, SoundEvents.ITEM_FRAME_ADD_ITEM, SoundSource.BLOCKS);
+                    pLevel.playSound(pPlayer, pPos, SoundEvents.ITEM_FRAME_ADD_ITEM, SoundSource.BLOCKS);
                 }
-            }else if (!outputSlot.isEmpty()){
+            } else if (!outputSlot.isEmpty()) {
                 if (!pPlayer.addItem(outputSlot)) {
                     pPlayer.drop(outputSlot, false);
                 }
                 blockEntity.setSlotEmpty(1);
-                pLevel.playSound(pPlayer,pPos, SoundEvents.ITEM_FRAME_REMOVE_ITEM, SoundSource.BLOCKS);
-            } else if (!inputSlot.isEmpty()){
+                pLevel.playSound(pPlayer, pPos, SoundEvents.ITEM_FRAME_REMOVE_ITEM, SoundSource.BLOCKS);
+            } else if (!inputSlot.isEmpty()) {
                 if (!pPlayer.addItem(inputSlot)) {
                     pPlayer.drop(inputSlot, false);
                 }
                 blockEntity.setSlotEmpty(0);
-                pLevel.playSound(pPlayer,pPos, SoundEvents.ITEM_FRAME_REMOVE_ITEM, SoundSource.BLOCKS);
+                pLevel.playSound(pPlayer, pPos, SoundEvents.ITEM_FRAME_REMOVE_ITEM, SoundSource.BLOCKS);
             }
         }
         //}
-        return infusedTest(pState) ? InteractionResult.sidedSuccess(pLevel.isClientSide()) : InteractionResult.PASS;
+        return InteractionResult.sidedSuccess(pLevel.isClientSide());
     }
 
-    protected boolean infusedTest(BlockState pState) {
-        return true;
-    }
 }

@@ -1,48 +1,63 @@
 {
   "variants": {
-    "facing=east,stage=0": {
-      "model": "terracompositio:block/matter_infuser_port_zero",
+    "facing=east,up_connection=false,right_connection=false": {
+      "model": "terracompositio:block/matter_infuser_port",
       "y": 270
     },
-    "facing=east,stage=1": {
-      "model": "terracompositio:block/matter_infuser_port_one",
+    "facing=east,up_connection=true,right_connection=false": {
+      "model": "terracompositio:block/matter_infuser_port_up",
       "y": 270
     },
-    "facing=east,stage=2": {
-      "model": "terracompositio:block/matter_infuser_port_two",
+    "facing=east,up_connection=true,right_connection=true": {
+      "model": "terracompositio:block/matter_infuser_port_up_right",
       "y": 270
     },
-    "facing=north,stage=0": {
-      "model": "terracompositio:block/matter_infuser_port_zero",
+    "facing=east,up_connection=false,right_connection=true": {
+      "model": "terracompositio:block/matter_infuser_port_right",
+      "y": 270
+    },
+    "facing=north,up_connection=false,right_connection=false": {
+      "model": "terracompositio:block/matter_infuser_port",
       "y": 180
     },
-    "facing=north,stage=1": {
-      "model": "terracompositio:block/matter_infuser_port_one",
+    "facing=north,up_connection=true,right_connection=false": {
+      "model": "terracompositio:block/matter_infuser_port_up",
       "y": 180
     },
-    "facing=north,stage=2": {
-      "model": "terracompositio:block/matter_infuser_port_two",
+    "facing=north,up_connection=true,right_connection=true": {
+      "model": "terracompositio:block/matter_infuser_port_up_right",
       "y": 180
     },
-    "facing=south,stage=0": {
-      "model": "terracompositio:block/matter_infuser_port_zero"
+    "facing=north,up_connection=false,right_connection=true": {
+      "model": "terracompositio:block/matter_infuser_port_right",
+      "y": 180
     },
-    "facing=south,stage=1": {
-      "model": "terracompositio:block/matter_infuser_port_one"
+    "facing=south,up_connection=false,right_connection=false": {
+      "model": "terracompositio:block/matter_infuser_port"
     },
-    "facing=south,stage=2": {
-      "model": "terracompositio:block/matter_infuser_port_two"
+    "facing=south,up_connection=true,right_connection=false": {
+      "model": "terracompositio:block/matter_infuser_port_up"
     },
-    "facing=west,stage=0": {
-      "model": "terracompositio:block/matter_infuser_port_zero",
+    "facing=south,up_connection=true,right_connection=true": {
+      "model": "terracompositio:block/matter_infuser_port_up_right"
+    },
+    "facing=south,up_connection=false,right_connection=true": {
+      "model": "terracompositio:block/matter_infuser_port_right"
+    },
+    "facing=west,up_connection=false,right_connection=false": {
+      "model": "terracompositio:block/matter_infuser_port",
       "y": 90
     },
-    "facing=west,stage=1": {
-      "model": "terracompositio:block/matter_infuser_port_one",
+    "facing=west,up_connection=true,right_connection=false": {
+      "model": "terracompositio:block/matter_infuser_port_up",
       "y": 90
     },
-    "facing=west,stage=2": {
-      "model": "terracompositio:block/matter_infuser_port_two",
+    "facing=west,up_connection=true,right_connection=true": {
+      "model": "terracompositio:block/matter_infuser_port_up_right",
+      "y": 90
+    },
+    "facing=west,up_connection=false,right_connection=true": {
+      "model": "terracompositio:block/matter_infuser_port_right",
       "y": 90
     }
   }

@@ -31,8 +31,6 @@ public class ModItemTagGenerator extends ItemTagsProvider {
                         ModBlocks.FLOW_PORT.get().asItem(),
                         ModBlocks.STRIPPED_FLOW_CEDAR_LOG.get().asItem(),
                         ModBlocks.STRIPPED_FLOW_CEDAR_WOOD.get().asItem(),
-                        ModBlocks.MATTER_INFUSER_PORT.get().asItem(),
-                        ModBlocks.MATTER_INFUSER_IO.get().asItem(),
                         ModBlocks.FLOW_CEDAR_CASING.get().asItem(),
                         ModBlocks.FLOW_INFUSER.get().asItem());
         this.tag(ItemTags.PLANKS)

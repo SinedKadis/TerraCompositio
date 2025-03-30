@@ -188,11 +188,19 @@ public abstract class ModItemIOCFEBlockEntity extends ModCFEBlockEntity{
     }
 
     public ItemStack insertItemStack(int slot, ItemStack item){
-        return this.itemHandler.insertItem(slot,item, false);
+        ItemStack itemStack;
+        if (item.getCount() == 1)
+            itemStack = item.copyWithCount(2);
+        else
+            itemStack = item.copy();
+        itemStack = this.itemHandler.insertItem(slot,itemStack,false);
+        if (item.getCount() == 1)
+            itemStack.shrink(1);
+        return itemStack;
     }
     public void setSlotEmpty(int slot){
         slot = Mth.clamp(0,itemHandler.getSlots()-1,slot);
-        this.itemHandler.setStackInSlot(slot,/*new ItemStack(ModItems.ITEM_PLACEHOLDER.get(),1)*/ItemStack.EMPTY);
+        this.itemHandler.setStackInSlot(slot,ItemStack.EMPTY);
 
     }
 

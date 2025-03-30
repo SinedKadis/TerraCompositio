@@ -18,6 +18,9 @@ import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.phys.BlockHitResult;
+import net.sinedkadis.terracompositio.block.entity.FlowCedarCasingBlockEntity;
+import net.sinedkadis.terracompositio.block.entity.FlowPortBlockEntity;
+import net.sinedkadis.terracompositio.block.entity.ModItemIOCFEBlockEntity;
 import net.sinedkadis.terracompositio.registries.ModBlockEntities;
 import net.sinedkadis.terracompositio.registries.ModBlockStateProperties;
 import net.sinedkadis.terracompositio.registries.ModBlocks;
@@ -64,6 +67,15 @@ public class FlowCedarCasingBlock extends FlowCedarLikeBlock implements EntityBl
         if (item.is(ModItems.OUTPUT_BUS.get()) && !hasOutputBus(pState)) {
             return handleInWorldBlockCraft(pState, pLevel.getBlockState(pPos).setValue(OUTPUT_BUS, true), pLevel, pPos, item, 1);
         }
+        BlockPos blockPos = pPos.relative(getDirectionByFunctionSide(pState));
+        if (item.is(ModItems.INFUSED_IRON_ROD.get()) && !hasInputBusConnection(pState) && pLevel.getBlockState(blockPos).hasProperty(ModBlockStateProperties.UP_CONNECTION)){
+            pLevel.setBlock(pPos,pState.setValue(INPUT_BUS_CONNECTION,true),3);
+            return handleInWorldBlockCraft(pState, pLevel.getBlockState(blockPos).setValue(ModBlockStateProperties.UP_CONNECTION, true), pLevel, blockPos, item, 1);
+        }
+        if (item.is(ModItems.INFUSED_IRON_ROD.get()) && !hasOutputBusConnection(pState) && pLevel.getBlockState(blockPos).hasProperty(ModBlockStateProperties.DOWN_CONNECTION)){
+            pLevel.setBlock(pPos,pState.setValue(OUTPUT_BUS_CONNECTION,true),3);
+            return handleInWorldBlockCraft(pState, pLevel.getBlockState(blockPos).setValue(ModBlockStateProperties.DOWN_CONNECTION, true), pLevel, blockPos, item, 1);
+        }
         return super.use(pState, pLevel, pPos, pPlayer, pHand, pHit);
     }
 
@@ -88,9 +100,14 @@ public class FlowCedarCasingBlock extends FlowCedarLikeBlock implements EntityBl
             if (direction != Direction.DOWN) {
                 BlockPos blockPos = pPos.relative(direction);
                 BlockState blockState = pLevel.getBlockState(blockPos);
-                if (blockState.is(ModBlocks.MATTER_INFUSER_PORT.get())) {
+                if (blockState.is(ModBlocks.MATTER_INFUSER_PORT.get())
+                        || blockState.is(ModBlocks.MATTER_INFUSER_IO.get())) {
                     pLevel.destroyBlock(blockPos, true);
                 }
+            }
+            FlowCedarCasingBlockEntity blockEntity = (FlowCedarCasingBlockEntity) pLevel.getBlockEntity(pPos);
+            if (blockEntity != null) {
+                blockEntity.drops();
             }
         }
     }
@@ -102,7 +119,7 @@ public class FlowCedarCasingBlock extends FlowCedarLikeBlock implements EntityBl
     }
     public static boolean hasOutputBus(BlockState blockState) {
         if (blockState.hasProperty(OUTPUT_BUS))
-            return blockState.getValue(INPUT_BUS);
+            return blockState.getValue(OUTPUT_BUS);
         return false;
     }
     public static boolean hasInputBusConnection(BlockState blockState){

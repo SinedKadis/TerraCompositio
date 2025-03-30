@@ -29,7 +29,7 @@ public class MatterInfuserPortBlockEntityRenderer implements BlockEntityRenderer
     @Override
     public void render(MatterInfuserPortBlockEntity pBlockEntity, float pPartialTick, PoseStack pPoseStack, @NotNull MultiBufferSource pBuffer, int pPackedLight, int pPackedOverlay) {
         ItemRenderer itemRenderer = Minecraft.getInstance().getItemRenderer();
-        ItemStack itemStack = pBlockEntity.getClientItem();
+        ItemStack itemStack = pBlockEntity.getRenderItem();
         Direction facing = pBlockEntity.getBlockState().getValue(HORIZONTAL_FACING);
 //        ItemRenderer itemRenderer2 = Minecraft.getInstance().getItemRenderer();
 //        ItemStack itemStack2 = pBlockEntity.getRenderStack();
