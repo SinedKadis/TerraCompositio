@@ -157,7 +157,9 @@ dependencies {
     // compileOnly fg.deobf("mezz.jei:jei-${mc_version}-common-api:${jei_version}")
     // compileOnly fg.deobf("mezz.jei:jei-${mc_version}-forge-api:${jei_version}")
     // runtimeOnly fg.deobf("mezz.jei:jei-${mc_version}-forge:${jei_version}")
+
     annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
+
     // Example mod dependency using a mod jar from ./libs with a flat dir repository
     // This maps to ./libs/coolmod-${mc_version}-${coolmod_version}.jar
     // The group id is ignored when searching -- in this case, it is "blank"
@@ -179,7 +181,8 @@ dependencies {
     compileOnly "mekanism:Mekanism:${mekanism_version}:api"
 
     // If you want to test/use Mekanism & its modules during `runClient` invocation, use the following
-    runtimeOnly fg.deobf("mekanism:Mekanism:${mekanism_version}")// core
+    runtimeOnly fg.deobf("mekanism:Mekanism:${mekanism_version}:all")// core
+    //runtimeOnly fg.deobf("mekanism:Mekanism:${mekanism_version}:generators")// Mekanism: Generators
 
     implementation fg.deobf("curse.maven:jade-324717:${jade_id}")
 
@@ -191,7 +194,7 @@ dependencies {
 mixin {
     // MixinGradle Settings
     add sourceSets.main, 'mixins.terracompositio.refmap.json'
-    config 'mixins.terracompositio.json'
+    //config 'mixins.terracompositio.json'
     debug.verbose = true
     debug.export = true
 }

@@ -22,7 +22,7 @@ import net.sinedkadis.terracompositio.worldgen.tree.ModTrunkPlacerTypes;
 public class TerraCompositio
 {
     public static final String MOD_ID = "terracompositio";
-    public static SimpleChannel CHANNEL;
+    //public static SimpleChannel CHANNEL;
 
     public TerraCompositio() {
 

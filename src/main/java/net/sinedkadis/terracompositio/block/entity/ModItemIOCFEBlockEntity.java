@@ -3,6 +3,9 @@ package net.sinedkadis.terracompositio.block.entity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.protocol.Packet;
+import net.minecraft.network.protocol.game.ClientGamePacketListener;
+import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.util.Mth;
 import net.minecraft.world.Containers;
 import net.minecraft.world.SimpleContainer;
@@ -18,7 +21,6 @@ import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemStackHandler;
 import net.minecraftforge.network.PacketDistributor;
 import net.sinedkadis.terracompositio.TerraCompositio;
-import net.sinedkadis.terracompositio.network.packets.SyncItemHandlerPacket;
 import net.sinedkadis.terracompositio.recipe.FlowInfusionRecipe;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -30,11 +32,8 @@ public abstract class ModItemIOCFEBlockEntity extends ModCFEBlockEntity{
         @Override
         protected void onContentsChanged(int slot) {
             setChanged();
-            if (level != null && !level.isClientSide() && sendPacketOnContentChange()) {
+            if (level != null && !level.isClientSide()) {
                 level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), 3);
-                ItemStack itemStack = itemHandler.getStackInSlot(slot);
-                TerraCompositio.CHANNEL.send(PacketDistributor.TRACKING_CHUNK.with(() -> level.getChunkAt(getBlockPos())),
-                        new SyncItemHandlerPacket(getBlockPos(), itemStack));
             }
         }
 
@@ -50,7 +49,6 @@ public abstract class ModItemIOCFEBlockEntity extends ModCFEBlockEntity{
 
     protected static final int SLOT_INPUT = 0;
     protected static final int SLOT_OUTPUT = 1;
-    protected final ContainerData data;
     protected int progress = 0;
     protected int maxProgress;
     protected float tickCFECost;
@@ -58,29 +56,6 @@ public abstract class ModItemIOCFEBlockEntity extends ModCFEBlockEntity{
 
     public ModItemIOCFEBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state, int maxCFE, int connectRange) {
         super(type, pos, state, maxCFE, connectRange);
-        this.data =new ContainerData() {
-            @Override
-            public int get(int pIndex) {
-                return switch (pIndex){
-                    case 0 -> ModItemIOCFEBlockEntity.this.progress;
-                    case 1 -> ModItemIOCFEBlockEntity.this.maxProgress;
-                    default -> 0;
-                };
-            }
-
-            @Override
-            public void set(int pIndex, int pValue) {
-                switch (pIndex){
-                    case 0 -> ModItemIOCFEBlockEntity.this.progress = pValue;
-                    case 1 -> ModItemIOCFEBlockEntity.this.maxProgress = pValue;
-                }
-            }
-
-            @Override
-            public int getCount() {
-                return 2;
-            }
-        };
     }
     public ModItemIOCFEBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state){
         this(type,pos,state,0,0);
@@ -110,8 +85,9 @@ public abstract class ModItemIOCFEBlockEntity extends ModCFEBlockEntity{
         for (int i = 0; i < itemHandler.getSlots(); i++){
             inventory.setItem(i, itemHandler.getStackInSlot(i));
         }
-        assert this.level != null;
-        Containers.dropContents(this.level, this.worldPosition,inventory);
+        if (this.level != null) {
+            Containers.dropContents(this.level, this.worldPosition,inventory);
+        }
     }
 
     @Override
@@ -187,16 +163,20 @@ public abstract class ModItemIOCFEBlockEntity extends ModCFEBlockEntity{
         this.itemHandler.setSize(count);
     }
 
-    public ItemStack insertItemStack(int slot, ItemStack item){
+    public ItemStack insertItemStack(int slot, ItemStack stack){
         ItemStack itemStack;
-        if (item.getCount() == 1)
-            itemStack = item.copyWithCount(2);
+        if (stack.getCount() == 1)
+            itemStack = stack.copyWithCount(2);
         else
-            itemStack = item.copy();
+            itemStack = stack.copy();
         itemStack = this.itemHandler.insertItem(slot,itemStack,false);
-        if (item.getCount() == 1)
-            itemStack.shrink(1);
+        if (stack.getCount() == 1) {
+            stack.shrink(1);
+            return stack;
+        }
         return itemStack;
+        //return super.insertItem(slot,stack,false);
+        //return this.itemHandler.insertItem(slot,item,false);
     }
     public void setSlotEmpty(int slot){
         slot = Mth.clamp(0,itemHandler.getSlots()-1,slot);
@@ -205,13 +185,11 @@ public abstract class ModItemIOCFEBlockEntity extends ModCFEBlockEntity{
     }
 
     public ItemStack getRenderStack() {
-        if(itemHandler.getStackInSlot(SLOT_INPUT).isEmpty()) {
-            /*if(itemHandler.getStackInSlot(SLOT_INPUT).isEmpty()){
-                return new ItemStack(Items.AIR,1);
-            }*/
-            return itemHandler.getStackInSlot(SLOT_OUTPUT);
-        } else {
-            return itemHandler.getStackInSlot(SLOT_INPUT);
+        for (int i = itemHandler.getSlots()-1; i>=0; i--){
+            if (!itemHandler.getStackInSlot(i).isEmpty()){
+                return itemHandler.getStackInSlot(i);
+            }
         }
+        return ItemStack.EMPTY;
     }
 }

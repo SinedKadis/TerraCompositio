@@ -16,17 +16,15 @@ import net.minecraftforge.client.event.EntityRenderersEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
-import net.minecraftforge.network.NetworkRegistry;
 import net.sinedkadis.terracompositio.TerraCompositio;
+import net.sinedkadis.terracompositio.block.entity.renderer.FlowCedarCasingBlockEntityRenderer;
 import net.sinedkadis.terracompositio.block.entity.renderer.FlowExtractorBlockEntityRenderer;
 import net.sinedkadis.terracompositio.block.entity.renderer.FlowInfuserBlockEntityRenderer;
 import net.sinedkadis.terracompositio.block.entity.renderer.FlowPortBlockEntityRenderer;
-import net.sinedkadis.terracompositio.block.entity.renderer.MatterInfuserPortBlockEntityRenderer;
 import net.sinedkadis.terracompositio.entity.ModEntities;
 import net.sinedkadis.terracompositio.entity.client.ModBoatRenderer;
 import net.sinedkadis.terracompositio.entity.client.ModModelLayers;
 import net.sinedkadis.terracompositio.item.custom.WrenchAxeItem;
-import net.sinedkadis.terracompositio.network.packets.SyncItemHandlerPacket;
 import net.sinedkadis.terracompositio.registries.ModBlockEntities;
 import net.sinedkadis.terracompositio.registries.ModFluids;
 import net.sinedkadis.terracompositio.registries.ModItems;
@@ -58,19 +56,6 @@ public class ModEventBusClientEvents {
                 new ResourceLocation("wrench_mode"),
                 (stack, level, entity, seed) -> WrenchAxeItem.getMode(stack).ordinal()
         ));
-
-        TerraCompositio.CHANNEL = NetworkRegistry.ChannelBuilder
-                .named(new ResourceLocation(TerraCompositio.MOD_ID, "sync_item_handler"))
-                .clientAcceptedVersions(s -> true)
-                .serverAcceptedVersions(s -> true)
-                .networkProtocolVersion(() -> "1.0")
-                .simpleChannel();
-
-        TerraCompositio.CHANNEL.messageBuilder(SyncItemHandlerPacket.class, 0)
-                .encoder(SyncItemHandlerPacket::encode)
-                .decoder(SyncItemHandlerPacket::decode)
-                .consumerMainThread(SyncItemHandlerPacket::handle)
-                .add();
     }
 
     @SubscribeEvent
@@ -82,7 +67,7 @@ public class ModEventBusClientEvents {
     @SubscribeEvent
     public static void registerBER(EntityRenderersEvent.RegisterRenderers event) {
         event.registerBlockEntityRenderer(ModBlockEntities.FLOW_PORT_BE.get(), FlowPortBlockEntityRenderer::new);
-        event.registerBlockEntityRenderer(ModBlockEntities.MATTER_INFUSER_PORT_BE.get(), MatterInfuserPortBlockEntityRenderer::new);
+        event.registerBlockEntityRenderer(ModBlockEntities.FLOW_CEDAR_CASING_BE.get(), FlowCedarCasingBlockEntityRenderer::new);
         event.registerBlockEntityRenderer(ModBlockEntities.FLOW_INFUSER_BE.get(), FlowInfuserBlockEntityRenderer::new);
         event.registerBlockEntityRenderer(ModBlockEntities.FLOW_EXTRACTOR_BE.get(), FlowExtractorBlockEntityRenderer::new);
         event.registerBlockEntityRenderer(ModBlockEntities.MOD_SIGN.get(), SignRenderer::new);

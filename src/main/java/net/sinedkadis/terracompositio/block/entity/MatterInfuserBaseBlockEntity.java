@@ -22,8 +22,8 @@ public abstract class MatterInfuserBaseBlockEntity extends ModCFEBlockEntity{
             BlockEntity blockEntity = this.level.getBlockEntity(blockpos);
             if (blockEntity != null){
                 ItemStack inputSlot = ((FlowCedarCasingBlockEntity) blockEntity).getFirstSlot();
-                if (this instanceof MatterInfuserPortBlockEntity block)
-                    return inputSlot.isEmpty() ? block.getRenderItem() : inputSlot;
+                if (this instanceof MatterInfuserPortBlockEntity)
+                    return inputSlot;
                 return inputSlot;
             }
         }

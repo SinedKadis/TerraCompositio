@@ -74,12 +74,6 @@ public class MatterInfuserPortBlock extends MatterInfuserBaseBaseEntityBlock {
         BlockPos rightPos = pPos.relative(facing.getCounterClockWise());
         BlockState rightState = pLevel.getBlockState(rightPos);
         if (item.is(ModItems.INFUSED_IRON_ROD.get())){
-            if (!pState.getValue(UP_CONNECTION) && casingState.is(ModBlocks.FLOW_CEDAR_CASING.get()) && hasInputBus(casingState)){
-                pLevel.setBlock(pPos,pState.setValue(UP_CONNECTION,true),3);
-                pLevel.setBlock(casingPos,casingState.setValue(INPUT_BUS_CONNECTION, true),3);
-                item.shrink(1);
-                return InteractionResult.sidedSuccess(pLevel.isClientSide);
-            }
             if (!pState.getValue(RIGHT_CONNECTION) && rightState.is(ModBlocks.MATTER_INFUSER_IO.get())){
                 if (item.getCount() >= 2){
                     pLevel.setBlock(pPos,pState.setValue(RIGHT_CONNECTION,true),3);
@@ -89,25 +83,7 @@ public class MatterInfuserPortBlock extends MatterInfuserBaseBaseEntityBlock {
                 }
             }
         }
-        BlockEntity entity = pLevel.getBlockEntity(pPos);
-        if (entity instanceof MatterInfuserPortBlockEntity blockEntity) {
-            ItemStack itemstack = pPlayer.getItemInHand(pHand);
-            ItemStack inputSlot = blockEntity.getInputSlot();
-            if (inputSlot.isEmpty()) {
-                if (!itemstack.isEmpty()) {
-                    blockEntity.insertItemStack(0, itemstack);
-                    itemstack.shrink(1);
-                    pLevel.playSound(pPlayer, pPos, SoundEvents.ITEM_FRAME_ADD_ITEM, SoundSource.BLOCKS);
-                }
-            } else if (!inputSlot.isEmpty()) {
-                if (!pPlayer.addItem(inputSlot)) {
-                    pPlayer.drop(inputSlot, false);
-                }
-                blockEntity.setSlotEmpty(0);
-                pLevel.playSound(pPlayer, pPos, SoundEvents.ITEM_FRAME_REMOVE_ITEM, SoundSource.BLOCKS);
-            }
-        }
-        return InteractionResult.PASS;
+        return ((FlowCedarCasingBlock) casingState.getBlock()).use(casingState,pLevel,casingPos,pPlayer,pHand,pHit);
     }
 
     @Nullable

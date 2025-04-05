@@ -95,7 +95,7 @@ public abstract class MatterInfuserBaseBaseEntityBlock extends ModIOBaseEntityBl
         BlockPos casingPos = pPos.relative(direction.getOpposite());
         BlockState casingState = pLevel.getBlockState(casingPos);
         if (pState.getBlock() != pNewState.getBlock()) {
-            Direction directionByFunctionSide = getDirectionByFunctionSide(casingState);
+            Direction directionByFunctionSide = FunctionSide.getDirectionByFunctionSide(casingState);
             if (directionByFunctionSide == direction) {
                 if (hasInputBusConnection(casingState)) {
                     pLevel.addFreshEntity(new ItemEntity(pLevel, pPos.getX(), pPos.getY(), pPos.getZ(), new ItemStack(ModItems.INFUSED_IRON_ROD.get())));
@@ -119,7 +119,7 @@ public abstract class MatterInfuserBaseBaseEntityBlock extends ModIOBaseEntityBl
         BlockPos casingPos = pPos.relative(direction.getOpposite());
         BlockState casingState = pLevel.getBlockState(casingPos);
         if (casingState.is(ModBlocks.FLOW_CEDAR_CASING.get())) {
-            FunctionSide functionSideByDirection = getFunctionSideByDirection(casingState, direction);
+            FunctionSide functionSideByDirection = FunctionSide.getFunctionSideByDirection(casingState, direction);
             pLevel.setBlock(casingPos, casingState.setValue(FUNCTION_SIDE, functionSideByDirection), 3);
             FlowCedarCasingBlockEntity blockEntity = (FlowCedarCasingBlockEntity) pLevel.getBlockEntity(casingPos);
             if (blockEntity != null) {

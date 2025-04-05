@@ -15,7 +15,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LightLayer;
 import net.sinedkadis.terracompositio.block.entity.FlowInfuserBlockEntity;
-import net.sinedkadis.terracompositio.block.entity.FlowPortBlockEntity;
+import org.jetbrains.annotations.NotNull;
 
 public class FlowInfuserBlockEntityRenderer implements BlockEntityRenderer<FlowInfuserBlockEntity> {
     public FlowInfuserBlockEntityRenderer(BlockEntityRendererProvider.Context context) {
@@ -24,7 +24,7 @@ public class FlowInfuserBlockEntityRenderer implements BlockEntityRenderer<FlowI
 
 
     @Override
-    public void render(FlowInfuserBlockEntity pBlockEntity, float pPartialTick, PoseStack pPoseStack, MultiBufferSource pBuffer, int pPackedLight, int pPackedOverlay) {
+    public void render(FlowInfuserBlockEntity pBlockEntity, float pPartialTick, PoseStack pPoseStack, @NotNull MultiBufferSource pBuffer, int pPackedLight, int pPackedOverlay) {
         ItemRenderer itemRenderer = Minecraft.getInstance().getItemRenderer();
         ItemStack itemStack = pBlockEntity.getRenderStack();
 
@@ -34,37 +34,18 @@ public class FlowInfuserBlockEntityRenderer implements BlockEntityRenderer<FlowI
         pPoseStack.scale(0.7f, 0.7f, 0.7f);
         pPoseStack.mulPose(Axis.XN.rotationDegrees(90));
 
-        itemRenderer.renderStatic(itemStack, ItemDisplayContext.FIXED, getLightLevel(pBlockEntity.getLevel(), pBlockEntity.getBlockPos(),1),
+        itemRenderer.renderStatic(itemStack, ItemDisplayContext.FIXED, getLightLevel(pBlockEntity.getLevel(), pBlockEntity.getBlockPos()),
                 OverlayTexture.NO_OVERLAY, pPoseStack, pBuffer, pBlockEntity.getLevel(), 1);
         pPoseStack.popPose();
 
     }
 
-    private int getLightLevel(Level level, BlockPos pos, int facing) {
-        int bLight;
-        int sLight = switch (facing) {
-            case 0 -> {
-                bLight = level.getBrightness(LightLayer.BLOCK, pos.east());
-                yield level.getBrightness(LightLayer.SKY, pos.east());
-            }
-            case 1 -> {
-                bLight = level.getBrightness(LightLayer.BLOCK, pos.north());
-                yield level.getBrightness(LightLayer.SKY, pos.north());
-            }
-            case 2 -> {
-                bLight = level.getBrightness(LightLayer.BLOCK, pos.west());
-                yield level.getBrightness(LightLayer.SKY, pos.west());
-            }
-            case 3 -> {
-                bLight = level.getBrightness(LightLayer.BLOCK, pos.south());
-                yield level.getBrightness(LightLayer.SKY, pos.south());
-            }
-            default -> {
-                bLight = level.getBrightness(LightLayer.BLOCK, pos);
-                yield level.getBrightness(LightLayer.SKY, pos);
-            }
-        };
-
-        return LightTexture.pack(bLight, sLight);
+    private int getLightLevel(Level level, BlockPos pos) {
+        if (level != null) {
+            int bLight = level.getBrightness(LightLayer.BLOCK, pos);
+            int sLight = level.getBrightness(LightLayer.SKY, pos);
+            return LightTexture.pack(bLight, sLight);
+        }
+        return 1;
     }
 }
