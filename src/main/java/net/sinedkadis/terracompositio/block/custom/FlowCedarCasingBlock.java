@@ -16,6 +16,8 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityTicker;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
@@ -30,6 +32,7 @@ import net.sinedkadis.terracompositio.util.FunctionSide;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import static net.sinedkadis.terracompositio.block.custom.ModIOBaseEntityBlock.createTickerHelper;
 import static net.sinedkadis.terracompositio.util.TCUtil.handleInWorldBlockCraft;
 
 public class FlowCedarCasingBlock extends FlowCedarLikeBlock implements EntityBlock {
@@ -164,11 +167,29 @@ public class FlowCedarCasingBlock extends FlowCedarLikeBlock implements EntityBl
         return false;
     }
 
+    public static boolean isUnitAttached(Level level, BlockState blockState, BlockPos pos) {
+        Direction facing = FunctionSide.getDirectionByFunctionSide(blockState);
+        if (facing != Direction.DOWN){
+            return level.getBlockState(pos.relative(facing)).is(ModBlocks.MATTER_INFUSER_IO.get());
+        }
+        return false;
+    }
+
     @Nullable
     @Override
     @ParametersAreNotNullByDefault
     public BlockEntity newBlockEntity(BlockPos blockPos, BlockState blockState) {
         return ModBlockEntities.FLOW_CEDAR_CASING_BE.get().create(blockPos,blockState);
+    }
+
+    @Nullable
+    @Override
+    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(@NotNull Level pLevel, @NotNull BlockState pState, @NotNull BlockEntityType<T> pBlockEntityType) {
+        if (pLevel.isClientSide()) {
+            return null;
+        }
+        return createTickerHelper(pBlockEntityType, ModBlockEntities.FLOW_CEDAR_CASING_BE.get(),
+                (pLevel1, pPos, pState1, pBlockEntity) -> pBlockEntity.tick(pLevel1,pPos,pState1));
     }
 
     static {

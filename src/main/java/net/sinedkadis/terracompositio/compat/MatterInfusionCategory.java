@@ -1,0 +1,78 @@
+package net.sinedkadis.terracompositio.compat;
+
+import mezz.jei.api.constants.VanillaTypes;
+import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
+import mezz.jei.api.gui.drawable.IDrawable;
+import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
+import mezz.jei.api.helpers.IGuiHelper;
+import mezz.jei.api.recipe.IFocusGroup;
+import mezz.jei.api.recipe.RecipeIngredientRole;
+import mezz.jei.api.recipe.RecipeType;
+import mezz.jei.api.recipe.category.IRecipeCategory;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.gui.GuiGraphics;
+import net.minecraft.network.chat.Component;
+import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.ItemStack;
+import net.sinedkadis.terracompositio.TerraCompositio;
+import net.sinedkadis.terracompositio.recipe.MatterInfusionRecipe;
+import net.sinedkadis.terracompositio.registries.ModBlocks;
+import org.jetbrains.annotations.NotNull;
+
+import java.awt.*;
+
+public class MatterInfusionCategory implements IRecipeCategory<MatterInfusionRecipe> {
+    public static final ResourceLocation UID = new ResourceLocation(TerraCompositio.MOD_ID,"matter_infusion");
+    public static final ResourceLocation TEXTURE = new ResourceLocation(TerraCompositio.MOD_ID,
+            "textures/gui/matter_infuser_gui.png");
+
+    public static final RecipeType<MatterInfusionRecipe> MATTER_INFUSION_RECIPE_RECIPE_TYPE =
+            new RecipeType<>(UID, MatterInfusionRecipe.class);
+    private final IDrawable background;
+    private final IDrawable icon;
+
+    public MatterInfusionCategory(IGuiHelper helper) {
+        this.background = helper.createDrawable(TEXTURE,0,0,176,150);
+        this.icon = helper.createDrawableIngredient(VanillaTypes.ITEM_STACK,new ItemStack(ModBlocks.MATTER_INFUSER_IO.get()));
+    }
+
+    @Override
+    public @NotNull RecipeType<MatterInfusionRecipe> getRecipeType() {
+        return MATTER_INFUSION_RECIPE_RECIPE_TYPE;
+    }
+
+    @Override
+    public @NotNull Component getTitle() {
+        return Component.translatable("block.terracompositio.matter_infuser");
+    }
+
+    @Override
+    public @NotNull IDrawable getBackground() {
+        return this.background;
+    }
+
+    @Override
+    public @NotNull IDrawable getIcon() {
+        return this.icon;
+    }
+
+    @Override
+    public void setRecipe(IRecipeLayoutBuilder iRecipeLayoutBuilder, MatterInfusionRecipe matterSaturationRecipe, @NotNull IFocusGroup iFocusGroup) {
+        iRecipeLayoutBuilder.addSlot(RecipeIngredientRole.INPUT,20,10).addIngredients(matterSaturationRecipe.getIngredients().get(1));
+        iRecipeLayoutBuilder.addSlot(RecipeIngredientRole.CATALYST,55,42).addIngredients(matterSaturationRecipe.getIngredients().get(0));
+        iRecipeLayoutBuilder.addSlot(RecipeIngredientRole.OUTPUT,20,74).addItemStack(matterSaturationRecipe.getResultItem(null));
+    }
+
+    @Override
+    public void draw(MatterInfusionRecipe recipe, @NotNull IRecipeSlotsView recipeSlotsView, GuiGraphics guiGraphics, double mouseX, double mouseY) {
+        String cfe = "CFE: "+ recipe.getCfe();
+        String cfe_t = "CFE/t: "+ recipe.getCFETick();
+        Component duration = Component.translatable("block.terracompositio.matter_infuser.duration",(float)(recipe.getTicks()/20));
+        Component decayChance = Component.translatable("block.terracompositio.matter_infuser.decay_chance",recipe.getCatalystDecayRate());
+        guiGraphics.drawString(Minecraft.getInstance().font,cfe,5,110, Color.WHITE.getRGB());
+        guiGraphics.drawString(Minecraft.getInstance().font,cfe_t,5,120, Color.WHITE.getRGB());
+        guiGraphics.drawString(Minecraft.getInstance().font,duration,5,130, Color.WHITE.getRGB());
+        guiGraphics.drawString(Minecraft.getInstance().font,decayChance,5,140, Color.WHITE.getRGB());
+    }
+
+}

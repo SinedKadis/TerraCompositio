@@ -2,8 +2,6 @@ package net.sinedkadis.terracompositio.block.custom;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.sounds.SoundEvents;
-import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.item.ItemEntity;
@@ -18,7 +16,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.phys.BlockHitResult;
-import net.sinedkadis.terracompositio.block.entity.MatterInfuserPortBlockEntity;
 import net.sinedkadis.terracompositio.registries.ModBlockStateProperties;
 import net.sinedkadis.terracompositio.registries.ModBlocks;
 import net.sinedkadis.terracompositio.registries.ModBlockEntities;
@@ -63,7 +60,6 @@ public class MatterInfuserPortBlock extends MatterInfuserBaseBaseEntityBlock {
     protected int slotCount() {
         return 1;
     }
-
 
     @Override
     public @NotNull InteractionResult use(@NotNull BlockState pState, Level pLevel, @NotNull BlockPos pPos, @NotNull Player pPlayer, @NotNull InteractionHand pHand, @NotNull BlockHitResult pHit) {

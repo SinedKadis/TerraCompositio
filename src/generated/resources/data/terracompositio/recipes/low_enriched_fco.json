@@ -1,0 +1,15 @@
+{
+  "type": "terracompositio:matter_infusion",
+  "catalyst": "minecraft:coal",
+  "cfe": 100,
+  "input": {
+    "count": 4,
+    "item": "terracompositio:flow_containing_raw_ore"
+  },
+  "output": {
+    "count": 1,
+    "item": "terracompositio:low_enriched_fco"
+  },
+  "rate": 30,
+  "time": 200
+}

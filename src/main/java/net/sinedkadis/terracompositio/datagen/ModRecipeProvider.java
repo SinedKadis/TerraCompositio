@@ -10,6 +10,7 @@ import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.level.ItemLike;
 import net.minecraftforge.common.crafting.conditions.IConditionBuilder;
 import net.sinedkadis.terracompositio.TerraCompositio;
+import net.sinedkadis.terracompositio.datagen.builders.MatterInfusionRecipeBuilder;
 import net.sinedkadis.terracompositio.registries.ModBlocks;
 import net.sinedkadis.terracompositio.registries.ModItems;
 import net.sinedkadis.terracompositio.registries.ModTags;
@@ -194,6 +195,22 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                 .requires(ModBlocks.NONFLOW_WOOD.get())
                 .unlockedBy(getHasName(ModBlocks.NONFLOW_WOOD.get()), has(ModBlocks.NONFLOW_WOOD.get()))
                 .save(pWriter);*/
+
+        MatterInfusionRecipeBuilder.create(
+                ModItems.FLOW_CONTAINING_RAW_ORE.get(),4,
+                        ModItems.LOW_ENRICHED_FCO.get(),1,
+                        Items.COAL,100,200,30)
+                .save(pWriter);
+        MatterInfusionRecipeBuilder.create(
+                        ModItems.LOW_ENRICHED_FCO.get(),4,
+                        ModItems.MEDIUM_ENRICHED_FCO.get(),1,
+                        Items.REDSTONE,1000,1000,30)
+                .save(pWriter);
+        MatterInfusionRecipeBuilder.create(
+                        ModItems.MEDIUM_ENRICHED_FCO.get(),4,
+                        ModItems.HIGH_ENRICHED_FCO.get(),1,
+                        Items.DIAMOND,10000,2000,30)
+                .save(pWriter);
     }
 
     protected static void oreSmelting(@NotNull Consumer<FinishedRecipe> pFinishedRecipeConsumer, List<ItemLike> pIngredients, @NotNull RecipeCategory pCategory, @NotNull ItemLike pResult, float pExperience, int pCookingTIme, @NotNull String pGroup) {

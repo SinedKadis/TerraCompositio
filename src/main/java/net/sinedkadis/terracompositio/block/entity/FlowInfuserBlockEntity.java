@@ -9,7 +9,6 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.items.ItemStackHandler;
 import net.sinedkadis.terracompositio.registries.ModBlockEntities;
 import net.sinedkadis.terracompositio.registries.ModParticles;
 import net.sinedkadis.terracompositio.recipe.FlowInfusionRecipe;
@@ -33,7 +32,7 @@ public class FlowInfuserBlockEntity extends ModItemIOCFEBlockEntity {
             super.tick(pLevel, pPos, pState);
         if(hasRecipe() && enoughCFE()){
             increaseCraftingProgress();
-            CFE = (int) (CFE-tickCFECost);
+            consumeCFE();
             setChanged(pLevel, pPos, pState);
             if (!pLevel.isClientSide){
                 ((ServerLevel) pLevel).sendParticles(ModParticles.FLOW_STILL_PARTICLE.get(),pPos.getX()+0.5D,pPos.getY()+0.5D,pPos.getZ()+0.5D,3,0,-0.1D,0,0.1D);
@@ -52,7 +51,7 @@ public class FlowInfuserBlockEntity extends ModItemIOCFEBlockEntity {
         if (recipe.isPresent()) {
             ItemStack result = recipe.get().getResultItem(null);
             this.itemHandler.extractItem(SLOT_INPUT, 1, false);
-            this.itemHandler.insertItem(SLOT_OUTPUT, new ItemStack(result.getItem(),
+            this.itemHandler.forceInsertItem(SLOT_OUTPUT, new ItemStack(result.getItem(),
                     this.itemHandler.getStackInSlot(SLOT_OUTPUT).getCount() + result.getCount()),false);
         }
     }

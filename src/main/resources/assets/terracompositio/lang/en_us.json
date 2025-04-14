@@ -77,5 +77,8 @@
   "block.terracompositio.matter_infuser_io": "Matter Infuser Unit",
   "block.terracompositio.flow_cedar_casing": "Flow Cedar Casing",
   "item.terracompositio.flow_rotating_axe.too_hungry": "I'm too hungry for it",
-  "death.attack.tree_chop": "had more motivation to chop than to live."
+  "death.attack.tree_chop": "had more motivation to chop than to live.",
+  "block.terracompositio.matter_infuser": "Matter Infuser MultiBlock",
+  "block.terracompositio.matter_infuser.duration": "Duration: %s s.",
+  "block.terracompositio.matter_infuser.decay_chance": "Catalyst decay chance: %s%%"
 }

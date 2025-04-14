@@ -37,6 +37,10 @@ public abstract class ModCFEBlockEntity extends ModBlockEntity{
         this.maxCFE = maxCFE;
     }
 
+    public ModCFEBlockEntity(BlockEntityType<?> type, BlockPos pPos, BlockState pBlockState) {
+        this(type,pPos,pBlockState,0,0);
+    }
+
     public BlockPos searchForSource() {
         CFENetwork network = TerraCompositioAPI.instance().getCFENetworkInstance();
         var closestSource = network.getClosestSource(getBlockPos(), getLevel(), connectRange*2);

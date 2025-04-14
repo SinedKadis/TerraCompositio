@@ -1,0 +1,15 @@
+{
+  "type": "terracompositio:matter_infusion",
+  "catalyst": "minecraft:diamond",
+  "cfe": 10000,
+  "input": {
+    "count": 4,
+    "item": "terracompositio:medium_enriched_fco"
+  },
+  "output": {
+    "count": 1,
+    "item": "terracompositio:high_enriched_fco"
+  },
+  "rate": 30,
+  "time": 2000
+}
