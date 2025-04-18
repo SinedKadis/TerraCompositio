@@ -24,6 +24,7 @@ public abstract class ModCFEBlockEntity extends ModBlockEntity{
     @Getter
     private BlockPos cfeSourceBlockPos;
     private CFESource cfeSource;
+    @Getter
     protected int CFE = 0;
     private final int connectRange;
     private final int maxCFE;

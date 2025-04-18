@@ -1,4 +1,4 @@
-package net.sinedkadis.terracompositio.compat;
+package net.sinedkadis.terracompositio.compat.jei.categories;
 
 import mezz.jei.api.constants.VanillaTypes;
 import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;

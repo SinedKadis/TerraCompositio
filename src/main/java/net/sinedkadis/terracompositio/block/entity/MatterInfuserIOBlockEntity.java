@@ -83,6 +83,10 @@ public class MatterInfuserIOBlockEntity extends MatterInfuserBaseBlockEntity{
         return progress>=maxProgress;
     }
 
+    public int ticksLeft(){
+        return maxProgress-progress;
+    }
+
     private void increaseCraftingProgress() {
         progress++;
     }
@@ -112,7 +116,7 @@ public class MatterInfuserIOBlockEntity extends MatterInfuserBaseBlockEntity{
         return outputTest && infusedTest;
     }
 
-    private Optional<MatterInfusionRecipe> getCurrentRecipe() {
+    public Optional<MatterInfusionRecipe> getCurrentRecipe() {
         ItemStack catalyst = this.getCatalyst();
         ItemStack inputSlot = this.getInputSlot();
         if (catalyst.isEmpty() || inputSlot.isEmpty())
@@ -125,7 +129,7 @@ public class MatterInfuserIOBlockEntity extends MatterInfuserBaseBlockEntity{
         return Optional.empty();
     }
 
-    private ItemStack getCatalyst() {
+    public ItemStack getCatalyst() {
         MatterInfuserPortBlockEntity port = this.getPortBE();
         return port != null ? port.getInputSlot() : ItemStack.EMPTY;
     }

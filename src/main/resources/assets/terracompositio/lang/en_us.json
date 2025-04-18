@@ -80,5 +80,11 @@
   "death.attack.tree_chop": "had more motivation to chop than to live.",
   "block.terracompositio.matter_infuser": "Matter Infuser MultiBlock",
   "block.terracompositio.matter_infuser.duration": "Duration: %s s.",
-  "block.terracompositio.matter_infuser.decay_chance": "Catalyst decay chance: %s%%"
+  "block.terracompositio.matter_infuser.decay_chance": "Catalyst decay chance: %s%%",
+  "block.terracompositio.matter_infuser.cfe": "Clear Flow Energy: %s",
+  "block.terracompositio.matter_infuser.input": "Input: ",
+  "block.terracompositio.matter_infuser.output": "Output: ",
+  "block.terracompositio.matter_infuser.catalyst": "Catalyst: ",
+  "block.terracompositio.matter_infuser.cfe_t": "CFE/tick: %s",
+  "config.jade.plugin_terracompositio.matter_infuser_tooltip": "Test"
 }

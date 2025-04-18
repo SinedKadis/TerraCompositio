@@ -1,12 +1,12 @@
 package net.sinedkadis.terracompositio;
 
+import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
-import net.minecraftforge.network.simple.SimpleChannel;
 import net.sinedkadis.terracompositio.registries.*;
 import net.sinedkadis.terracompositio.util.CFENetworkHandler;
 import net.sinedkadis.terracompositio.effect.ModEffects;
@@ -22,6 +22,9 @@ import net.sinedkadis.terracompositio.worldgen.tree.ModTrunkPlacerTypes;
 public class TerraCompositio
 {
     public static final String MOD_ID = "terracompositio";
+    public static ResourceLocation modLoc(String location){
+        return new ResourceLocation(MOD_ID,location);
+    }
     //public static SimpleChannel CHANNEL;
 
     public TerraCompositio() {

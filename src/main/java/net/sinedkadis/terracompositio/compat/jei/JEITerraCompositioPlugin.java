@@ -1,4 +1,4 @@
-package net.sinedkadis.terracompositio.compat;
+package net.sinedkadis.terracompositio.compat.jei;
 
 import mezz.jei.api.IModPlugin;
 import mezz.jei.api.JeiPlugin;
@@ -13,6 +13,9 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.RecipeManager;
 import net.minecraft.world.level.ItemLike;
 import net.sinedkadis.terracompositio.TerraCompositio;
+import net.sinedkadis.terracompositio.compat.jei.categories.FlowInfusionCategory;
+import net.sinedkadis.terracompositio.compat.jei.categories.FlowPortCategory;
+import net.sinedkadis.terracompositio.compat.jei.categories.MatterInfusionCategory;
 import net.sinedkadis.terracompositio.recipe.MatterInfusionRecipe;
 import net.sinedkadis.terracompositio.registries.ModBlocks;
 import net.sinedkadis.terracompositio.recipe.FlowInfusionRecipe;
