@@ -25,6 +25,10 @@ public class FlowInfuserBlockEntity extends ModItemIOCFEBlockEntity {
         super(ModBlockEntities.FLOW_INFUSER_BE.get(),pPos, pBlockState,100,5);
     }
 
+    @Override
+    public int getSlotLimit(int slot) {
+        return 1;
+    }
 
     @Override
     public void tick(Level pLevel, BlockPos pPos, BlockState pState) {
@@ -45,6 +49,8 @@ public class FlowInfuserBlockEntity extends ModItemIOCFEBlockEntity {
             resetProgress();
         }
     }
+
+
 
     protected void craftItem() {
         Optional<FlowInfusionRecipe> recipe = getCurrentRecipe();

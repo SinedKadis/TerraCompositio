@@ -8,5 +8,8 @@ public interface CFESource {
     Level getCFESourceLevel();
     BlockPos getCFESourceBlockPos();
     int getCurrentCFE();
-    void takeCFE(int cfe);
+    int takeCFE(int cfe);
+    default int addCFE(int cfe){
+        return -takeCFE(-cfe);
+    }
 }

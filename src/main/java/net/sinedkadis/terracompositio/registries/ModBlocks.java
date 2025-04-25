@@ -110,8 +110,6 @@ public class ModBlocks {
     public static final RegistryObject<Block> FLOW_CEDAR_WALL_HANGING_SIGN = BLOCKS.register("flow_cedar_wall_hanging_sign",
             () -> new ModWallHangingSignBlock(BlockBehaviour.Properties.copy(Blocks.OAK_WALL_HANGING_SIGN), ModWoodTypes.FLOW_CEDAR));
 
-    public static final RegistryObject<Block> FLOW_EXTRACTOR = registerBlock("flow_extractor",
-            () -> new FlowExtractorBlock(BlockBehaviour.Properties.copy(Blocks.DARK_OAK_PLANKS)));
     public static final RegistryObject<Block> CREATIVE_CFE_SOURCE = registerBlock("creative_cfe_source",
             () -> new CreativeCFESourceBlock(BlockBehaviour.Properties.copy(Blocks.IRON_BLOCK)));
     public static final RegistryObject<Block> FLOW_INFUSER = registerBlock("flow_infuser",
@@ -132,4 +130,7 @@ public class ModBlocks {
             () -> new MatterInfuserPortBlock(BlockBehaviour.Properties.copy(Blocks.TRIPWIRE_HOOK).sound(SoundType.COPPER).strength(3f)));
     public static final RegistryObject<Block> MATTER_INFUSER_IO = registerBlock("matter_infuser_io",
             () -> new MatterInfuserIOBlock(BlockBehaviour.Properties.copy(Blocks.TRIPWIRE_HOOK).sound(SoundType.COPPER).strength(3f)));
+
+    public static final RegistryObject<Block> CONSTRUCTION_DESORBER = registerBlock("construction_desorber",
+            () -> new ConstructionDesorberBlock(BlockBehaviour.Properties.copy(Blocks.IRON_BLOCK).strength(3f).noOcclusion()));
 }

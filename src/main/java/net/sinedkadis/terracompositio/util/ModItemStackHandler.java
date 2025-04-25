@@ -5,9 +5,8 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.items.ItemStackHandler;
+import net.sinedkadis.terracompositio.block.entity.ModItemIOCFEBlockEntity;
 import org.jetbrains.annotations.NotNull;
-
-import static net.sinedkadis.terracompositio.block.custom.FlowCedarCasingBlock.isPortAttached;
 
 public class ModItemStackHandler extends ItemStackHandler {
     private final BlockEntity blockEntity;
@@ -15,6 +14,10 @@ public class ModItemStackHandler extends ItemStackHandler {
     public ModItemStackHandler(int size, BlockEntity blockEntity) {
         super(size);
         this.blockEntity = blockEntity;
+    }
+
+    public ModItemStackHandler(BlockEntity blockEntity) {
+        this(1,blockEntity);
     }
 
     @Override
@@ -29,7 +32,10 @@ public class ModItemStackHandler extends ItemStackHandler {
 
     @Override
     public int getSlotLimit(int slot) {
-        return isPortAttached(blockEntity.getLevel(),blockEntity.getBlockState(),blockEntity.getBlockPos()) ? 1 : 64;
+        if (blockEntity instanceof ModItemIOCFEBlockEntity entity){
+            return entity.getSlotLimit(slot);
+        }
+        return super.getSlotLimit(slot);
     }
 
 

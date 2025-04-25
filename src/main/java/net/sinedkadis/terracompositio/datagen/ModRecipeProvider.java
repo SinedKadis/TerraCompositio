@@ -191,6 +191,13 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                 .define('R', Items.COPPER_INGOT)
                 .unlockedBy(getHasName(Items.COPPER_INGOT), has(Items.COPPER_INGOT))
                 .save(pWriter);
+        ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, ModBlocks.CONSTRUCTION_DESORBER.get())
+                .pattern("ILI")
+                .pattern("III")
+                .define('I', Items.IRON_INGOT)
+                .define('L',ModBlocks.FLOW_CEDAR_LOG.get())
+                .unlockedBy(getHasName(ModBlocks.FLOW_CEDAR_LOG.get()), has(Items.IRON_INGOT))
+                .save(pWriter);
         /*ShapelessRecipeBuilder.shapeless(RecipeCategory.BUILDING_BLOCKS, ModBlocks.NONFLOW_PLANKS.get(), 4)
                 .requires(ModBlocks.NONFLOW_WOOD.get())
                 .unlockedBy(getHasName(ModBlocks.NONFLOW_WOOD.get()), has(ModBlocks.NONFLOW_WOOD.get()))

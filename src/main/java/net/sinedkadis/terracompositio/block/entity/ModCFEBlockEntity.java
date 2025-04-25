@@ -56,8 +56,7 @@ public abstract class ModCFEBlockEntity extends ModBlockEntity{
             if (isValidSource(cfeSourceBlockPos)){
                 if (CFE < maxCFE && cfeSource.getCurrentCFE() > 0){
                     double cfe = getTransfer(pPos);
-                    addCFE(cfe);
-                    cfeSource.takeCFE((int) cfe);
+                    addCFE(cfeSource.takeCFE((int) cfe));
                     ModCFEBlockEntity blockEntity = (ModCFEBlockEntity) pLevel.getBlockEntity(pPos);
                     if (blockEntity != null) {
                         spawnParticles(pLevel,pPos, blockEntity.getCfeSourceBlockPos());
@@ -68,20 +67,24 @@ public abstract class ModCFEBlockEntity extends ModBlockEntity{
     }
 
     private double getTransfer(BlockPos pPos) {
-        if (maxCFE== 0)
+        if (maxCFE == 0)
             return 0;
         int currentSourceCFE = cfeSource.getCurrentCFE();
         int currentSpace = maxCFE - CFE;
-        double cfeTransfer = Math.sqrt(pPos.distSqr(cfeSourceBlockPos)) < connectRange
-                ? Math.sqrt(pPos.distSqr(cfeSourceBlockPos))
-                : connectRange - Math.sqrt(pPos.distSqr(cfeSourceBlockPos)) < 0
-                    ? 0
-                    : connectRange - Math.sqrt(pPos.distSqr(cfeSourceBlockPos));
+        double cfeTransfer;
+        if (Math.sqrt(pPos.distSqr(cfeSourceBlockPos)) < connectRange)
+            cfeTransfer = Math.sqrt(pPos.distSqr(cfeSourceBlockPos));
+        else {
+            if (connectRange - Math.sqrt(pPos.distSqr(cfeSourceBlockPos)) < 0)
+                cfeTransfer = 0;
+            else
+                cfeTransfer = connectRange - Math.sqrt(pPos.distSqr(cfeSourceBlockPos));
+        }
         return Math.min(Math.min(currentSourceCFE,currentSpace),cfeTransfer);
     }
 
     private void addCFE(double transfer) {
-        if (maxCFE== 0)
+        if (maxCFE == 0)
             return;
         this.CFE = (int)Math.min(maxCFE, CFE + transfer);
         setChanged();

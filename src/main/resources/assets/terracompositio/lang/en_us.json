@@ -81,10 +81,17 @@
   "block.terracompositio.matter_infuser": "Matter Infuser MultiBlock",
   "block.terracompositio.matter_infuser.duration": "Duration: %s s.",
   "block.terracompositio.matter_infuser.decay_chance": "Catalyst decay chance: %s%%",
-  "block.terracompositio.matter_infuser.cfe": "Clear Flow Energy: %s",
-  "block.terracompositio.matter_infuser.input": "Input: ",
-  "block.terracompositio.matter_infuser.output": "Output: ",
+  "block.terracompositio.cfe": "Clear Flow Energy: %s",
+  "block.terracompositio.item_io.input": "Input: ",
+  "block.terracompositio.item_io.output": "Output: ",
   "block.terracompositio.matter_infuser.catalyst": "Catalyst: ",
   "block.terracompositio.matter_infuser.cfe_t": "CFE/tick: %s",
-  "config.jade.plugin_terracompositio.matter_infuser_tooltip": "Test"
+  "config.jade.plugin_terracompositio.matter_infuser_tooltip": "Matter Infuser",
+  "config.jade.plugin_terracompositio.mod_cfe_be_tooltip": "CFE",
+  "config.jade.plugin_terracompositio.mod_item_io_tooltip": "Item IO",
+  "block.terracompositio.construction_desorber": "Construction Desorber",
+  "config.jade.plugin_terracompositio.cfe_tick_config": "   CFE/tick",
+  "config.jade.plugin_terracompositio.catalyst_config": "   Catalyst",
+  "config.jade.plugin_terracompositio.decay_chance_config": "   Decay Chance",
+  "config.jade.plugin_terracompositio.duration_config": "   Duration"
 }

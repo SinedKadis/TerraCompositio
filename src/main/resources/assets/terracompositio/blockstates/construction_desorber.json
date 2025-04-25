@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "infused=true": {
+      "model": "terracompositio:block/construction_desorber_infused"
+    },
+    "infused=false": {
+      "model": "terracompositio:block/construction_desorber"
+    }
+  }
+}

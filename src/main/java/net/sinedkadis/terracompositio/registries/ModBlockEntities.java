@@ -17,10 +17,6 @@ public class ModBlockEntities {
             BLOCK_ENTITIES.register("flow_port_be", () ->
                     BlockEntityType.Builder.of(FlowPortBlockEntity::new,
                             ModBlocks.FLOW_PORT.get()).build(null));
-    public static final RegistryObject<BlockEntityType<FlowExtractorBlockEntity>> FLOW_EXTRACTOR_BE=
-            BLOCK_ENTITIES.register("flow_extractor_be", () ->
-                    BlockEntityType.Builder.of(FlowExtractorBlockEntity::new,
-                            ModBlocks.FLOW_EXTRACTOR.get()).build(null));
     public static final RegistryObject<BlockEntityType<CreativeCFESourceBlockEntity>> CREATIVE_CFE_SOURCE_BE =
             BLOCK_ENTITIES.register("creative_cfe_source_be", () ->
                     BlockEntityType.Builder.of(CreativeCFESourceBlockEntity::new,
@@ -52,6 +48,11 @@ public class ModBlockEntities {
             BLOCK_ENTITIES.register("mod_hanging_sign", () ->
                     BlockEntityType.Builder.of(ModHangingSignBlockEntity::new,
                             ModBlocks.FLOW_CEDAR_HANGING_SIGN.get(),ModBlocks.FLOW_CEDAR_WALL_HANGING_SIGN.get()).build(null));
+
+    public static final RegistryObject<BlockEntityType<ConstructionDesorberBlockEntity>> CONSTRUCTION_DESORBER_BE =
+            BLOCK_ENTITIES.register("construction_desorber_be", () ->
+                    BlockEntityType.Builder.of(ConstructionDesorberBlockEntity::new,
+                            ModBlocks.CONSTRUCTION_DESORBER.get()).build(null));
 
 
 

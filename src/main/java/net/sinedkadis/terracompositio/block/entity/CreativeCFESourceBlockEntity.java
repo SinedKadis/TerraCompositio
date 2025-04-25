@@ -39,8 +39,8 @@ public class CreativeCFESourceBlockEntity extends ModBlockEntity implements CFES
     }
 
     @Override
-    public void takeCFE(int cfe) {
-
+    public int takeCFE(int cfe) {
+        return cfe;
     }
 
     @Override

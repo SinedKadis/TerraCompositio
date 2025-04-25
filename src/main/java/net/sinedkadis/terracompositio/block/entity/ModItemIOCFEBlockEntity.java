@@ -21,6 +21,8 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
 
+import static net.sinedkadis.terracompositio.block.custom.FlowCedarCasingBlock.isPortAttached;
+
 public abstract class ModItemIOCFEBlockEntity extends ModCFEBlockEntity{
 
     protected final ModItemStackHandler itemHandler = new ModItemStackHandler(2,this);
@@ -112,9 +114,12 @@ public abstract class ModItemIOCFEBlockEntity extends ModCFEBlockEntity{
             return false;
         }
         ItemStack result = recipe.get().getResultItem(null);
-        maxProgress = recipe.get().getTicks();
-        tickCFECost = recipe.get().getCFETick();
-        return enoughSpaceInOutput(result.getCount())&& sameItemInOutput(result.getItem());
+        boolean outputTest = enoughSpaceInOutput(result.getCount()) && sameItemInOutput(result.getItem());
+        if (outputTest){
+            maxProgress = recipe.get().getTicks();
+            tickCFECost = recipe.get().getCFETick();
+        }
+        return outputTest;
     }
 
     protected Optional<FlowInfusionRecipe> getCurrentRecipe() {
@@ -187,5 +192,9 @@ public abstract class ModItemIOCFEBlockEntity extends ModCFEBlockEntity{
             return stack;
         }
         return itemStack;
+    }
+
+    public int getSlotLimit(int slot) {
+        return isPortAttached(this.getLevel(),this.getBlockState(),this.getBlockPos()) ? 1 : 64;
     }
 }

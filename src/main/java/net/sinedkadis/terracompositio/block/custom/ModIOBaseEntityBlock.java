@@ -1,6 +1,5 @@
 package net.sinedkadis.terracompositio.block.custom;
 
-import mekanism.api.annotations.ParametersAreNotNullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -19,6 +18,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.sinedkadis.terracompositio.block.entity.ModItemIOCFEBlockEntity;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public abstract class ModIOBaseEntityBlock extends Block implements EntityBlock {
 
@@ -28,8 +28,7 @@ public abstract class ModIOBaseEntityBlock extends Block implements EntityBlock 
     }
 
     @Override
-    @ParametersAreNotNullByDefault
-    public void onRemove(BlockState pState,Level pLevel,BlockPos pPos, BlockState pNewState, boolean pIsMoving) {
+    public void onRemove(BlockState pState, @NotNull Level pLevel, @NotNull BlockPos pPos, BlockState pNewState, boolean pIsMoving) {
         if (pState.getBlock() != pNewState.getBlock()){
             BlockEntity blockEntity =pLevel.getBlockEntity(pPos);
             if (blockEntity instanceof ModItemIOCFEBlockEntity entity){
@@ -38,21 +37,19 @@ public abstract class ModIOBaseEntityBlock extends Block implements EntityBlock 
         }
         super.onRemove(pState, pLevel, pPos, pNewState, pIsMoving);
     }
-    @ParametersAreNotNullByDefault
-    public boolean triggerEvent(BlockState pState, Level pLevel, BlockPos pPos, int pId, int pParam) {
+    public boolean triggerEvent(@NotNull BlockState pState, @NotNull Level pLevel, @NotNull BlockPos pPos, int pId, int pParam) {
         super.triggerEvent(pState, pLevel, pPos, pId, pParam);
         BlockEntity $$5 = pLevel.getBlockEntity(pPos);
         return $$5 != null && $$5.triggerEvent(pId, pParam);
     }
 
-    @javax.annotation.Nullable
-    @ParametersAreNotNullByDefault
-    public MenuProvider getMenuProvider(BlockState pState, Level pLevel, BlockPos pPos) {
+    @Nullable
+    public MenuProvider getMenuProvider(@NotNull BlockState pState, Level pLevel, @NotNull BlockPos pPos) {
         BlockEntity $$3 = pLevel.getBlockEntity(pPos);
         return $$3 instanceof MenuProvider ? (MenuProvider)$$3 : null;
     }
 
-    @javax.annotation.Nullable
+    @Nullable
     @SuppressWarnings("unchecked")
     protected static <E extends BlockEntity, A extends BlockEntity> BlockEntityTicker<A> createTickerHelper(BlockEntityType<A> pServerType, BlockEntityType<E> pClientType, BlockEntityTicker<? super E> pTicker) {
         return pClientType == pServerType ? (BlockEntityTicker<A>) pTicker : null;

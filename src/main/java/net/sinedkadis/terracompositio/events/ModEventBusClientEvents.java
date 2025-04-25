@@ -17,8 +17,8 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.sinedkadis.terracompositio.TerraCompositio;
+import net.sinedkadis.terracompositio.block.entity.renderer.ConstructionDesorberBlockEntityRenderer;
 import net.sinedkadis.terracompositio.block.entity.renderer.FlowCedarCasingBlockEntityRenderer;
-import net.sinedkadis.terracompositio.block.entity.renderer.FlowExtractorBlockEntityRenderer;
 import net.sinedkadis.terracompositio.block.entity.renderer.FlowInfuserBlockEntityRenderer;
 import net.sinedkadis.terracompositio.block.entity.renderer.FlowPortBlockEntityRenderer;
 import net.sinedkadis.terracompositio.entity.ModEntities;
@@ -69,8 +69,8 @@ public class ModEventBusClientEvents {
         event.registerBlockEntityRenderer(ModBlockEntities.FLOW_PORT_BE.get(), FlowPortBlockEntityRenderer::new);
         event.registerBlockEntityRenderer(ModBlockEntities.FLOW_CEDAR_CASING_BE.get(), FlowCedarCasingBlockEntityRenderer::new);
         event.registerBlockEntityRenderer(ModBlockEntities.FLOW_INFUSER_BE.get(), FlowInfuserBlockEntityRenderer::new);
-        event.registerBlockEntityRenderer(ModBlockEntities.FLOW_EXTRACTOR_BE.get(), FlowExtractorBlockEntityRenderer::new);
         event.registerBlockEntityRenderer(ModBlockEntities.MOD_SIGN.get(), SignRenderer::new);
         event.registerBlockEntityRenderer(ModBlockEntities.MOD_HANGING_SIGN.get(), HangingSignRenderer::new);
+        event.registerBlockEntityRenderer(ModBlockEntities.CONSTRUCTION_DESORBER_BE.get(), ConstructionDesorberBlockEntityRenderer::new);
     }
 }

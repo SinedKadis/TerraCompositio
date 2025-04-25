@@ -45,11 +45,11 @@ public class ModBlockLootTables extends BlockLootSubProvider {
         this.dropSelf(ModBlocks.FLOW_CEDAR_FENCE_GATE.get());
         this.dropSelf(ModBlocks.FLOW_CEDAR_TRAPDOOR.get());
         this.dropSelf(ModBlocks.WEDGE.get());
-        this.dropSelf(ModBlocks.FLOW_EXTRACTOR.get());
         this.dropOther(ModBlocks.FLOW_INFUSER.get(), ModBlocks.FLOW_CEDAR_LOG.get());
         this.dropSelf(ModBlocks.FLOW_CONTAINING_RAW_ORE_BLOCK.get());
         this.dropSelf(ModBlocks.FLOW_CEDAR_BIG_SAPLING.get());
         this.dropSelf(ModBlocks.FLOW_CEDAR_SAPLING.get());
+        this.dropSelf(ModBlocks.CONSTRUCTION_DESORBER.get());
 
 
         this.dropOther(ModBlocks.FLOW_CEDAR_CASING.get(),ModBlocks.FLOW_CEDAR_LOG.get());

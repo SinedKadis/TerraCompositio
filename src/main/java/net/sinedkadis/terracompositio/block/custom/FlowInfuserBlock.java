@@ -15,6 +15,7 @@ import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
+import net.sinedkadis.terracompositio.api.cfe.CFEEntityBlock;
 import net.sinedkadis.terracompositio.block.entity.FlowInfuserBlockEntity;
 import net.sinedkadis.terracompositio.registries.ModBlockEntities;
 import org.jetbrains.annotations.NotNull;
@@ -22,7 +23,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Supplier;
 
-public class FlowInfuserBlock extends FlowCedarLikeBaseEntityBlock {
+public class FlowInfuserBlock extends FlowCedarLikeBaseEntityBlock implements CFEEntityBlock {
 
     public FlowInfuserBlock(Properties pProperties, Supplier<Block> stripPair) {
         super(pProperties, stripPair);

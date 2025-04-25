@@ -46,7 +46,6 @@ public class ModCreativeModTabs {
                         pOutput.accept(ModItems.FLOW_BOTTLE.get());
                         pOutput.accept(ModFluids.BIRCH_JUICE_FLUID.bucket.get());
                         pOutput.accept(ModBlocks.WEDGE.get());
-                        pOutput.accept(ModBlocks.FLOW_EXTRACTOR.get());
 
                         pOutput.accept(ModItems.FLOW_CEDAR_HELMET.get());
                         pOutput.accept(ModItems.FLOW_CEDAR_CHESTPLATE.get());
@@ -78,6 +77,7 @@ public class ModCreativeModTabs {
                         pOutput.accept(ModItems.INPUT_BUS.get());
                         pOutput.accept(ModItems.OUTPUT_BUS.get());
 
+                        pOutput.accept(ModBlocks.CONSTRUCTION_DESORBER.get());
 
                     })
                     .build());

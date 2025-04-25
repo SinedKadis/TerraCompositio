@@ -1,6 +1,5 @@
 package net.sinedkadis.terracompositio.block.custom;
 
-import mekanism.api.annotations.ParametersAreNotNullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -40,16 +39,15 @@ public abstract class FlowCedarLikeBaseEntityBlock extends FlowCedarLikeBlock im
         }
         super.onRemove(pState, pLevel, pPos, pNewState, pIsMoving);
     }
-    @ParametersAreNotNullByDefault
-    public boolean triggerEvent(BlockState pState, Level pLevel, BlockPos pPos, int pId, int pParam) {
+
+    public boolean triggerEvent(@NotNull BlockState pState, @NotNull Level pLevel, @NotNull BlockPos pPos, int pId, int pParam) {
         super.triggerEvent(pState, pLevel, pPos, pId, pParam);
         BlockEntity $$5 = pLevel.getBlockEntity(pPos);
         return $$5 != null && $$5.triggerEvent(pId, pParam);
     }
 
-    @javax.annotation.Nullable
-    @ParametersAreNotNullByDefault
-    public MenuProvider getMenuProvider(BlockState pState, Level pLevel, BlockPos pPos) {
+    @Nullable
+    public MenuProvider getMenuProvider(@NotNull BlockState pState, Level pLevel, @NotNull BlockPos pPos) {
         BlockEntity $$3 = pLevel.getBlockEntity(pPos);
         return $$3 instanceof MenuProvider ? (MenuProvider)$$3 : null;
     }
