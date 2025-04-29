@@ -19,6 +19,7 @@ import net.minecraftforge.fluids.capability.templates.FluidTank;
 import net.sinedkadis.terracompositio.api.TerraCompositioAPI;
 import net.sinedkadis.terracompositio.api.cfe.CFENetworkAction;
 import net.sinedkadis.terracompositio.api.cfe.CFESource;
+import net.sinedkadis.terracompositio.registries.ModBlockStateProperties;
 import net.sinedkadis.terracompositio.registries.ModFluids;
 import net.sinedkadis.terracompositio.util.CFENetworkHandler;
 import org.jetbrains.annotations.NotNull;
@@ -46,9 +47,14 @@ public abstract class AbstractDesorberBlockEntity extends ModBlockEntity impleme
     public void tick(Level pLevel, BlockPos pPos, BlockState pState) {
         if (!pLevel.isClientSide) {
             boolean inNetwork = CFENetworkHandler.instance.isIn(pLevel, this);
-            if (!inNetwork && !this.isRemoved()) {
+            if (!inNetwork && !this.isRemoved() ) {
                 TerraCompositioAPI.INSTANCE.getCFENetworkInstance().fireCFENetworkEvent(this, CFENetworkAction.ADD);
             }
+        }
+        if (!fluidHandler.isEmpty() && !pState.getValue(ModBlockStateProperties.INFUSED)) {
+            pLevel.setBlockAndUpdate(pPos, pState.setValue(ModBlockStateProperties.INFUSED, true));
+        } else if (fluidHandler.isEmpty() && pState.getValue(ModBlockStateProperties.INFUSED)) {
+            pLevel.setBlockAndUpdate(pPos, pState.setValue(ModBlockStateProperties.INFUSED, false));
         }
     }
 

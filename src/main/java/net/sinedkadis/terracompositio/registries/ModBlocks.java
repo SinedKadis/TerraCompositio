@@ -133,4 +133,6 @@ public class ModBlocks {
 
     public static final RegistryObject<Block> CONSTRUCTION_DESORBER = registerBlock("construction_desorber",
             () -> new ConstructionDesorberBlock(BlockBehaviour.Properties.copy(Blocks.IRON_BLOCK).strength(3f).noOcclusion()));
+    public static final RegistryObject<Block> CULTIVATION_DESORBER = registerBlock("cultivation_desorber",
+            () -> new CultivationDesorberBlock(BlockBehaviour.Properties.copy(Blocks.IRON_BLOCK).strength(3f).noOcclusion()));
 }

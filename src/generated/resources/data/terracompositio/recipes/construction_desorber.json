@@ -6,7 +6,7 @@
       "item": "minecraft:iron_ingot"
     },
     "L": {
-      "item": "terracompositio:flow_cedar_log"
+      "tag": "terracompositio:flow_cedar_logs_items"
     }
   },
   "pattern": [

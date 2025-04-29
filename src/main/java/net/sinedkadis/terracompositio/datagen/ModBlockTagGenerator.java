@@ -30,7 +30,8 @@ public class ModBlockTagGenerator extends BlockTagsProvider {
                         ModBlocks.FLOW_CONTAINING_DEEPSLATE_ORE.get(),
                         ModBlocks.MATTER_INFUSER_PORT.get(),
                         ModBlocks.MATTER_INFUSER_IO.get(),
-                        ModBlocks.CONSTRUCTION_DESORBER.get());
+                        ModBlocks.CONSTRUCTION_DESORBER.get(),
+                        ModBlocks.CULTIVATION_DESORBER.get());
         this.tag(BlockTags.MINEABLE_WITH_AXE)
                 .add(ModBlocks.FLOW_CEDAR_LOG.get(),
                         ModBlocks.FLOW_CEDAR_LEAVES.get(),

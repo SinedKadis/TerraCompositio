@@ -53,6 +53,10 @@ public class ModBlockEntities {
             BLOCK_ENTITIES.register("construction_desorber_be", () ->
                     BlockEntityType.Builder.of(ConstructionDesorberBlockEntity::new,
                             ModBlocks.CONSTRUCTION_DESORBER.get()).build(null));
+    public static final RegistryObject<BlockEntityType<CultivationDesorberBlockEntity>> CULTIVATION_DESORBER_BE =
+            BLOCK_ENTITIES.register("cultivation_desorber_be", () ->
+                    BlockEntityType.Builder.of(CultivationDesorberBlockEntity::new,
+                            ModBlocks.CULTIVATION_DESORBER.get()).build(null));
 
 
 

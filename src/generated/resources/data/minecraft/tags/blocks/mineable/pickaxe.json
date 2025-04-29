@@ -5,6 +5,7 @@
     "terracompositio:flow_containing_deepslate_ore",
     "terracompositio:matter_infuser_port",
     "terracompositio:matter_infuser_io",
-    "terracompositio:construction_desorber"
+    "terracompositio:construction_desorber",
+    "terracompositio:cultivation_desorber"
   ]
 }

@@ -93,5 +93,6 @@
   "config.jade.plugin_terracompositio.cfe_tick_config": "   CFE/tick",
   "config.jade.plugin_terracompositio.catalyst_config": "   Catalyst",
   "config.jade.plugin_terracompositio.decay_chance_config": "   Decay Chance",
-  "config.jade.plugin_terracompositio.duration_config": "   Duration"
+  "config.jade.plugin_terracompositio.duration_config": "   Duration",
+  "block.terracompositio.cultivation_desorber": "Cultivation Desorber"
 }

@@ -18,9 +18,9 @@ public class CFENetworkHandler implements CFENetwork {
 
     public void onNetworkEvent(CFESource source, CFENetworkAction action) {
         if (action == CFENetworkAction.ADD){
-            add(cfeSources,source.getCFESourceLevel(),(CFESource) source);
+            add(cfeSources,source.getCFESourceLevel(), source);
         }else{
-            remove(cfeSources,source.getCFESourceLevel(),(CFESource) source);
+            remove(cfeSources,source.getCFESourceLevel(), source);
         }
     }
 
@@ -31,6 +31,17 @@ public class CFENetworkHandler implements CFENetwork {
         }
         return null;
     }
+
+    @Override
+    public CFESource getRandomSourceInRange(BlockPos pos, Level level, int limit) {
+        if (cfeSources.containsKey(level)) {
+            ArrayList<CFESource> list = new ArrayList<>(cfeSources.get(level).stream().toList());
+            Collections.shuffle(list);
+            return list.get(0);
+        }
+        return null;
+    }
+
     @Nullable
     private <T extends CFESource> T getClosest(Set<T> receivers, BlockPos pos, int limit) {
         long minDist = Long.MAX_VALUE;
@@ -57,8 +68,11 @@ public class CFENetworkHandler implements CFENetwork {
     }
 
     @Override
-    public Set<CFESource> getAllCFESources(Level level) {
-        return Set.of();
+    public List<CFESource> getAllCFESources(Level level) {
+        if (cfeSources.containsKey(level)) {
+            return cfeSources.get(level).stream().toList();
+        }
+        return List.of();
     }
 
     @Override

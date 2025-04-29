@@ -15,9 +15,9 @@ import net.sinedkadis.terracompositio.registries.ModBlockEntities;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class ConstructionDesorberBlock extends AbstractDesorberBlock{
+public class CultivationDesorberBlock extends AbstractDesorberBlock{
 
-    public ConstructionDesorberBlock(Properties pProperties) {
+    public CultivationDesorberBlock(Properties pProperties) {
         super(pProperties);
     }
 
@@ -29,11 +29,14 @@ public class ConstructionDesorberBlock extends AbstractDesorberBlock{
         VoxelShape southWall = Block.box(0, 3, 14, 16, 5, 16);
         VoxelShape westWall = Block.box(0, 3, 2, 2, 5, 14);
         VoxelShape eastWall = Block.box(14, 3, 2, 16, 5, 14);
-        VoxelShape pillar = Block.box(6, 2, 6, 10, 8, 10);
         VoxelShape edge1 = Block.box(1, 2, 1, 2, 3, 15);
         VoxelShape edge2 = Block.box(14, 2, 1, 15, 3, 15);
         VoxelShape edge3 = Block.box(2, 2, 1, 14, 3, 2);
         VoxelShape edge4 = Block.box(2, 2, 14, 14, 3, 15);
+        VoxelShape pillar1 = Block.box(2, 2, 2, 4, 14, 4);
+        VoxelShape pillar2 = Block.box(12, 2, 2, 14, 14, 4);
+        VoxelShape pillar3 = Block.box(12, 2, 12, 14, 14, 14);
+        VoxelShape pillar4 = Block.box(2, 2, 12, 4, 14, 14);
 
         return Shapes.or(
                 base,
@@ -41,18 +44,21 @@ public class ConstructionDesorberBlock extends AbstractDesorberBlock{
                 southWall,
                 westWall,
                 eastWall,
-                pillar,
                 edge1,
                 edge2,
                 edge3,
-                edge4
+                edge4,
+                pillar1,
+                pillar2,
+                pillar3,
+                pillar4
         );
     }
 
     @Nullable
     @Override
     public BlockEntity newBlockEntity(@NotNull BlockPos blockPos, @NotNull BlockState blockState) {
-        return ModBlockEntities.CONSTRUCTION_DESORBER_BE.get().create(blockPos,blockState);
+        return ModBlockEntities.CULTIVATION_DESORBER_BE.get().create(blockPos,blockState);
     }
 
     @Nullable
@@ -61,7 +67,7 @@ public class ConstructionDesorberBlock extends AbstractDesorberBlock{
         if (pLevel.isClientSide()) {
             return null;
         }
-        return createTickerHelper(pBlockEntityType, ModBlockEntities.CONSTRUCTION_DESORBER_BE.get(),
+        return createTickerHelper(pBlockEntityType, ModBlockEntities.CULTIVATION_DESORBER_BE.get(),
                 (pLevel1, pPos, pState1, pBlockEntity) -> pBlockEntity.tick(pLevel1,pPos,pState1));
     }
 }

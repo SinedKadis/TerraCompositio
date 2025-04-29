@@ -78,6 +78,7 @@ public class ModCreativeModTabs {
                         pOutput.accept(ModItems.OUTPUT_BUS.get());
 
                         pOutput.accept(ModBlocks.CONSTRUCTION_DESORBER.get());
+                        pOutput.accept(ModBlocks.CULTIVATION_DESORBER.get());
 
                     })
                     .build());

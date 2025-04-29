@@ -11,8 +11,11 @@ import net.minecraft.world.item.BottleItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.fluids.FluidStack;
@@ -20,11 +23,19 @@ import net.minecraftforge.fluids.FluidUtil;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandlerItem;
 import net.minecraftforge.fluids.capability.templates.FluidTank;
+import net.sinedkadis.terracompositio.registries.ModBlockStateProperties;
 import net.sinedkadis.terracompositio.registries.ModFluids;
 import net.sinedkadis.terracompositio.registries.ModItems;
 import org.jetbrains.annotations.NotNull;
 
 public abstract class AbstractDesorberBlock extends ModCFEBaseEntityBlock {
+    protected static final BooleanProperty INFUSED;
+
+    @Override
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> pBuilder) {
+        pBuilder.add(INFUSED);
+    }
+
     protected AbstractDesorberBlock(Properties pProperties) {
         super(pProperties);
     }
@@ -122,5 +133,9 @@ public abstract class AbstractDesorberBlock extends ModCFEBaseEntityBlock {
         }
 
         return InteractionResult.sidedSuccess(pLevel.isClientSide());
+    }
+
+    static {
+        INFUSED = ModBlockStateProperties.INFUSED;
     }
 }
