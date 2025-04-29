@@ -24,8 +24,10 @@ import net.sinedkadis.terracompositio.registries.ModBlockEntities;
 import net.sinedkadis.terracompositio.util.ModItemStackHandler;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.stream.Collectors;
 
 @Mod.EventBusSubscriber(modid = TerraCompositio.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class CultivationDesorberBlockEntity extends AbstractDesorberBlockEntity {
@@ -74,7 +76,13 @@ public class CultivationDesorberBlockEntity extends AbstractDesorberBlockEntity 
                     return null;
                 })
                 .filter(Objects::nonNull)
-                .toList();
+                .collect(Collectors.collectingAndThen(
+                        Collectors.toList(),
+                        collectedList -> {
+                            Collections.shuffle(collectedList);
+                            return collectedList;
+                        }
+                ));
         int CFEToAdd = 1;
         for (CultivationDesorberBlockEntity blockEntity : cultivators){
             FluidTank fluidHandler1 = blockEntity.fluidHandler;

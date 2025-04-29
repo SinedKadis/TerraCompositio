@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "building",
+  "key": {
+    "I": {
+      "item": "minecraft:copper_ingot"
+    },
+    "L": {
+      "tag": "terracompositio:flow_cedar_logs_items"
+    }
+  },
+  "pattern": [
+    "ILI",
+    "III"
+  ],
+  "result": {
+    "item": "terracompositio:cultivation_desorber"
+  },
+  "show_notification": true
+}

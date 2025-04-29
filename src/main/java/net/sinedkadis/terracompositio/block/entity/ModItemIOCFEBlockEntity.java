@@ -181,17 +181,7 @@ public abstract class ModItemIOCFEBlockEntity extends ModCFEBlockEntity{
     }
 
     public ItemStack forceInsertItemStack(int slot, ItemStack stack) {
-        ItemStack itemStack;
-        if (stack.getCount() == 1)
-            itemStack = stack.copyWithCount(2);
-        else
-            itemStack = stack.copy();
-        itemStack = this.itemHandler.forceInsertItem(slot,itemStack,false);
-        if (stack.getCount() == 1) {
-            stack.shrink(1);
-            return stack;
-        }
-        return itemStack;
+        return this.itemHandler.forceInsertItem(slot, this.itemHandler.forceInsertItem(slot, stack, false), false);
     }
 
     public int getSlotLimit(int slot) {

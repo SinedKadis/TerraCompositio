@@ -25,9 +25,9 @@ public class CFENetworkHandler implements CFENetwork {
     }
 
     @Override
-    public CFESource getClosestSource(BlockPos pos, Level level, int limit) {
+    public CFESource getClosestSourceWithCFE(BlockPos pos, Level level, int limit) {
         if (cfeSources.containsKey(level)) {
-            return getClosest(cfeSources.get(level), pos, limit);
+            return getClosestWithCFE(cfeSources.get(level), pos, limit);
         }
         return null;
     }
@@ -43,16 +43,16 @@ public class CFENetworkHandler implements CFENetwork {
     }
 
     @Nullable
-    private <T extends CFESource> T getClosest(Set<T> receivers, BlockPos pos, int limit) {
+    private <T extends CFESource> T getClosestWithCFE(Set<T> sources, BlockPos pos, int limit) {
         long minDist = Long.MAX_VALUE;
         long limitSquared = (long) limit * limit;
         T closest = null;
 
-        for (var receiver : receivers) {
-            long distance = distSqr(receiver.getCFESourceBlockPos(), pos);
-            if (distance <= limitSquared && distance < minDist) {
+        for (var source : sources) {
+            long distance = distSqr(source.getCFESourceBlockPos(), pos);
+            if (distance <= limitSquared && distance < minDist && source.getCurrentCFE() > 0) {
                 minDist = distance;
-                closest = receiver;
+                closest = source;
             }
         }
 

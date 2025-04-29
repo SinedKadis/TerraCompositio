@@ -44,7 +44,7 @@ public abstract class ModCFEBlockEntity extends ModBlockEntity{
 
     public BlockPos searchForSource() {
         CFENetwork network = TerraCompositioAPI.instance().getCFENetworkInstance();
-        var closestSource = network.getClosestSource(getBlockPos(), getLevel(), connectRange*2);
+        var closestSource = network.getClosestSourceWithCFE(getBlockPos(), getLevel(), connectRange*2);
         return closestSource == null ? null : closestSource.getCFESourceBlockPos();
     }
 
@@ -106,7 +106,8 @@ public abstract class ModCFEBlockEntity extends ModBlockEntity{
         BlockEntity be = level.getBlockEntity(source);
         if (be instanceof CFESource){
             cfeSource = (CFESource) be;
-            return cfeSource;
+            if (cfeSource.getCurrentCFE() > 0)
+                return cfeSource;
         }
         return null;
     }

@@ -59,8 +59,7 @@ public class MatterInfuserIOBlockEntity extends MatterInfuserBaseBlockEntity{
             ItemStack result = recipe.get().getResultItem(null);
             int takeCount = recipe.get().getIngredients().get(1).getItems()[0].getCount();
             this.extractItemStack(0, takeCount);
-            this.forceInsertItemStack(1, new ItemStack(result.getItem(),
-                    this.getItemInSlot(1).getCount() + result.getCount()));
+            this.forceInsertItemStack(1, result);
             if (this.level.getRandom().nextInt(100) < catalystDecayRate){
                 portBE.extractItemStack(0,1);
             }
