@@ -29,7 +29,7 @@ public abstract class AbstractDesorberBlockEntity extends ModBlockEntity impleme
     private int cfe = 0;
     public static final int MAX_CFE = 100;
     public static final int MIN_CFE = -100;
-    protected final FluidTank fluidHandler = new FluidTank(250){
+    protected final FluidTank fluidHandler = new FluidTank(getTankCapacity()){
         private final FluidStack flow = new FluidStack(ModFluids.FLOW_FLUID.source.get(), 1000);
         @Override
         public int fill(FluidStack resource, FluidAction action) {
@@ -38,6 +38,11 @@ public abstract class AbstractDesorberBlockEntity extends ModBlockEntity impleme
             return 0;
         }
     };
+
+    protected int getTankCapacity() {
+        return 250;
+    }
+
     protected LazyOptional<IFluidHandler> lazyFluidHandler = LazyOptional.empty();
 
     public AbstractDesorberBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {

@@ -94,5 +94,11 @@
   "config.jade.plugin_terracompositio.catalyst_config": "   Catalyst",
   "config.jade.plugin_terracompositio.decay_chance_config": "   Decay Chance",
   "config.jade.plugin_terracompositio.duration_config": "   Duration",
-  "block.terracompositio.cultivation_desorber": "Cultivation Desorber"
+  "block.terracompositio.cultivation_desorber": "Cultivation Desorber",
+  "block.terracompositio.time_passage_desorber": "Time Passage Desorber",
+  "config.jade.plugin_terracompositio.time_passage_desorber_tooltip": "Time Passage Desorber",
+  "config.jade.plugin_terracompositio.time_config": "   Time Collected",
+  "config.jade.plugin_terracompositio.chance_config": "   Chance to collect Time",
+  "block.terracompositio.time_passage_desorber.time": "Time Collected: %s s.",
+  "block.terracompositio.time_passage_desorber.chance": "Chance to collect Time: %s%%"
 }

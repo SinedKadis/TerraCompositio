@@ -79,6 +79,7 @@ public class ModCreativeModTabs {
 
                         pOutput.accept(ModBlocks.CONSTRUCTION_DESORBER.get());
                         pOutput.accept(ModBlocks.CULTIVATION_DESORBER.get());
+                        pOutput.accept(ModBlocks.TIME_PASSAGE_DESORBER.get());
 
                     })
                     .build());

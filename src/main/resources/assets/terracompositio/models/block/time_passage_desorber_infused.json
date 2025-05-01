@@ -1,0 +1,7 @@
+{
+  "parent": "terracompositio:block/time_passage_desorber",
+  "textures": {
+    "0": "terracompositio:block/time_passage_desorber_infused",
+    "particle": "terracompositio:block/time_passage_desorber_infused"
+  }
+}

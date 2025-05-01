@@ -135,4 +135,6 @@ public class ModBlocks {
             () -> new ConstructionDesorberBlock(BlockBehaviour.Properties.copy(Blocks.IRON_BLOCK).strength(3f).noOcclusion()));
     public static final RegistryObject<Block> CULTIVATION_DESORBER = registerBlock("cultivation_desorber",
             () -> new CultivationDesorberBlock(BlockBehaviour.Properties.copy(Blocks.IRON_BLOCK).strength(3f).noOcclusion()));
+    public static final RegistryObject<Block> TIME_PASSAGE_DESORBER = registerBlock("time_passage_desorber",
+            () -> new TimePassageDesorberBlock(BlockBehaviour.Properties.copy(Blocks.IRON_BLOCK).strength(3f).noOcclusion()));
 }

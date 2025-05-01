@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "infused=true": {
+      "model": "terracompositio:block/time_passage_desorber_infused"
+    },
+    "infused=false": {
+      "model": "terracompositio:block/time_passage_desorber"
+    }
+  }
+}
