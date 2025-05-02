@@ -1,6 +1,0 @@
-{
-  "parent": "minecraft:block/cube_all",
-  "textures": {
-    "all": "terracompositio:block/flow_containing_raw_ore_block"
-  }
-}

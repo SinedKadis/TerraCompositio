@@ -77,5 +77,13 @@ public class ModItemTagGenerator extends ItemTagsProvider {
                         ModItems.COPPER_ROD.get());
         this.tag(ItemTags.AXES)
                 .add(ModItems.FLOW_ROTATING_AXE.get());
+        this.tag(ModTags.Items.UNSTABLE_TECHNETIUM)
+                .add(ModItems.RAW_TECHNETIUM.get(),
+                        ModItems.LOW_ENRICHED_TECHNETIUM.get(),
+                        ModItems.HIGH_ENRICHED_TECHNETIUM.get(),
+                        ModItems.MEDIUM_ENRICHED_TECHNETIUM.get(),
+                        ModBlocks.TECHNETIUM_ORE.get().asItem(),
+                        ModBlocks.TECHNETIUM_DEEPSLATE_ORE.get().asItem(),
+                        ModBlocks.TECHNETIUM_RAW_ORE_BLOCK.get().asItem());
     }
 }

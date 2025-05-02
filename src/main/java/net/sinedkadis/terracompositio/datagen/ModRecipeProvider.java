@@ -132,13 +132,18 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                 .requires(Items.COPPER_INGOT)
                 .unlockedBy(getHasName(Items.COPPER_INGOT), has(Items.COPPER_INGOT))
                 .save(pWriter);
-        ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, ModItems.FLOW_CONTAINING_RAW_ORE.get(), 9)
-                .requires(ModBlocks.FLOW_CONTAINING_RAW_ORE_BLOCK.get())
-                .unlockedBy(getHasName(ModBlocks.FLOW_CONTAINING_RAW_ORE_BLOCK.get()), has(ModBlocks.FLOW_CONTAINING_RAW_ORE_BLOCK.get()))
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, ModItems.RAW_TECHNETIUM.get(), 9)
+                .requires(ModBlocks.TECHNETIUM_RAW_ORE_BLOCK.get())
+                .unlockedBy(getHasName(ModBlocks.TECHNETIUM_RAW_ORE_BLOCK.get()), has(ModBlocks.TECHNETIUM_RAW_ORE_BLOCK.get()))
                 .save(pWriter);
-        ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, ModBlocks.FLOW_CONTAINING_RAW_ORE_BLOCK.get(), 1)
-                .requires(ModItems.FLOW_CONTAINING_RAW_ORE.get(),9)
-                .unlockedBy(getHasName(ModItems.FLOW_CONTAINING_RAW_ORE.get()), has(ModItems.FLOW_CONTAINING_RAW_ORE.get()))
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, ModBlocks.TECHNETIUM_RAW_ORE_BLOCK.get(), 1)
+                .requires(ModItems.RAW_TECHNETIUM.get(),9)
+                .unlockedBy(getHasName(ModItems.RAW_TECHNETIUM.get()), has(ModItems.RAW_TECHNETIUM.get()))
+                .save(pWriter);
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.TOOLS, ModItems.SHIELDED_BUNDLE.get(), 1)
+                .requires(Items.BUNDLE)
+                .requires(ModItems.INFUSED_IRON_INGOT.get())
+                .unlockedBy(getHasName(ModItems.INFUSED_IRON_INGOT.get()), has(Items.BUNDLE))
                 .save(pWriter);
 
 
@@ -212,24 +217,30 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                 .define('L',ModTags.Items.FLOW_CEDAR_LOGS)
                 .unlockedBy(getHasName(ModBlocks.FLOW_CEDAR_LOG.get()), has(Items.GOLD_INGOT))
                 .save(pWriter);
-        /*ShapelessRecipeBuilder.shapeless(RecipeCategory.BUILDING_BLOCKS, ModBlocks.NONFLOW_PLANKS.get(), 4)
-                .requires(ModBlocks.NONFLOW_WOOD.get())
-                .unlockedBy(getHasName(ModBlocks.NONFLOW_WOOD.get()), has(ModBlocks.NONFLOW_WOOD.get()))
-                .save(pWriter);*/
+        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, Items.BUNDLE)
+                .pattern("S")
+                .pattern("L")
+                .define('S', Items.STRING)
+                .define('L',Items.LEATHER)
+                .unlockedBy(getHasName(Items.STRING), has(Items.LEATHER))
+                .save(pWriter);
+
+
+
 
         MatterInfusionRecipeBuilder.create(
-                ModItems.FLOW_CONTAINING_RAW_ORE.get(),4,
-                        ModItems.LOW_ENRICHED_FCO.get(),1,
+                ModItems.RAW_TECHNETIUM.get(),4,
+                        ModItems.LOW_ENRICHED_TECHNETIUM.get(),1,
                         Items.COAL,100,200,30)
                 .save(pWriter);
         MatterInfusionRecipeBuilder.create(
-                        ModItems.LOW_ENRICHED_FCO.get(),4,
-                        ModItems.MEDIUM_ENRICHED_FCO.get(),1,
+                        ModItems.LOW_ENRICHED_TECHNETIUM.get(),4,
+                        ModItems.MEDIUM_ENRICHED_TECHNETIUM.get(),1,
                         Items.REDSTONE,1000,1000,30)
                 .save(pWriter);
         MatterInfusionRecipeBuilder.create(
-                        ModItems.MEDIUM_ENRICHED_FCO.get(),4,
-                        ModItems.HIGH_ENRICHED_FCO.get(),1,
+                        ModItems.MEDIUM_ENRICHED_TECHNETIUM.get(),4,
+                        ModItems.HIGH_ENRICHED_TECHNETIUM.get(),1,
                         Items.DIAMOND,10000,2000,30)
                 .save(pWriter);
     }

@@ -22,6 +22,7 @@ import net.sinedkadis.terracompositio.registries.ModFluids;
 import net.sinedkadis.terracompositio.registries.ModItems;
 
 import java.util.LinkedHashMap;
+import java.util.Objects;
 
 public class ModItemModelProvider extends ItemModelProvider {
     private static final LinkedHashMap<ResourceKey<TrimMaterial>, Float> trimMaterials = new LinkedHashMap<>();
@@ -75,10 +76,10 @@ public class ModItemModelProvider extends ItemModelProvider {
         simpleItem(ModItems.INFUSED_IRON_INGOT);
         simpleItem(ModItems.COPPER_NUGGET);
         simpleItem(ModItems.FLOW_INFUSER_KIT);
-        simpleItem(ModItems.FLOW_CONTAINING_RAW_ORE);
-        simpleItem(ModItems.LOW_ENRICHED_FCO);
-        simpleItem(ModItems.MEDIUM_ENRICHED_FCO);
-        simpleItem(ModItems.HIGH_ENRICHED_FCO);
+        simpleItem(ModItems.RAW_TECHNETIUM);
+        simpleItem(ModItems.LOW_ENRICHED_TECHNETIUM);
+        simpleItem(ModItems.MEDIUM_ENRICHED_TECHNETIUM);
+        simpleItem(ModItems.HIGH_ENRICHED_TECHNETIUM);
         simpleItem(ModItems.INFUSED_IRON_ROD);
         simpleItem(ModItems.GOLD_ROD);
         simpleItem(ModItems.INPUT_BUS);
@@ -169,7 +170,7 @@ public class ModItemModelProvider extends ItemModelProvider {
         ResourceLocation key = ForgeRegistries.BLOCKS.getKey(block.get());
         if (key != null) {
             this.withExistingParent(key.getPath(), mcLoc("block/fence_inventory"))
-                    .texture("texture",  new ResourceLocation(TerraCompositio.MOD_ID, "block/" + ForgeRegistries.BLOCKS.getKey(baseBlock.get()).getPath()));
+                    .texture("texture",  new ResourceLocation(TerraCompositio.MOD_ID, "block/" + Objects.requireNonNull(ForgeRegistries.BLOCKS.getKey(baseBlock.get())).getPath()));
         }
     }
 

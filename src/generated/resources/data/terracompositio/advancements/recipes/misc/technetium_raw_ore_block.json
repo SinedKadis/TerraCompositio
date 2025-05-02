@@ -1,0 +1,35 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_technetium_raw_ore": {
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "terracompositio:technetium_raw_ore"
+            ]
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "terracompositio:technetium_raw_ore_block"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_technetium_raw_ore",
+      "has_the_recipe"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "terracompositio:technetium_raw_ore_block"
+    ]
+  },
+  "sends_telemetry_event": false
+}

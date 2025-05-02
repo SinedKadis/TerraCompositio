@@ -2,10 +2,12 @@ package net.sinedkadis.terracompositio.block.entity;
 
 import lombok.Getter;
 import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.sinedkadis.terracompositio.registries.ModBlockEntities;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Function;
 
@@ -70,4 +72,17 @@ public class TimePassageDesorberBlockEntity extends AbstractDesorberBlockEntity 
         return !this.fluidHandler.isEmpty() && this.fluidHandler.getFluidAmount() >= 10;
     }
 
+    @Override
+    protected void saveAdditional(@NotNull CompoundTag pTag) {
+        pTag.putInt("buffer", timeBuffer);
+        pTag.putInt("counter", timeCounter);
+        super.saveAdditional(pTag);
+    }
+
+    @Override
+    public void load(@NotNull CompoundTag pTag) {
+        super.load(pTag);
+        timeBuffer = pTag.getInt("buffer");
+        timeCounter = pTag.getInt("counter");
+    }
 }

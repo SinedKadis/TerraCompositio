@@ -1,12 +1,12 @@
 {
   "parent": "minecraft:recipes/root",
   "criteria": {
-    "has_flow_containing_raw_ore_block": {
+    "has_infused_iron_ingot": {
       "conditions": {
         "items": [
           {
             "items": [
-              "terracompositio:flow_containing_raw_ore_block"
+              "minecraft:bundle"
             ]
           }
         ]
@@ -15,20 +15,20 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "terracompositio:flow_containing_raw_ore"
+        "recipe": "terracompositio:shielded_bundle"
       },
       "trigger": "minecraft:recipe_unlocked"
     }
   },
   "requirements": [
     [
-      "has_flow_containing_raw_ore_block",
+      "has_infused_iron_ingot",
       "has_the_recipe"
     ]
   ],
   "rewards": {
     "recipes": [
-      "terracompositio:flow_containing_raw_ore"
+      "terracompositio:shielded_bundle"
     ]
   },
   "sends_telemetry_event": false

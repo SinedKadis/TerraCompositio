@@ -40,8 +40,8 @@ public class ModConfiguredFeatures {
         //RuleTest endReplaceables = new BlockMatchTest(Blocks.END_STONE);
 
         List<OreConfiguration.TargetBlockState> overworldFlowContainingOres = List.of(OreConfiguration.target(stoneReplaceable,
-                        ModBlocks.FLOW_CONTAINING_ORE.get().defaultBlockState()),
-                OreConfiguration.target(deepslateReplaceables, ModBlocks.FLOW_CONTAINING_DEEPSLATE_ORE.get().defaultBlockState()));
+                        ModBlocks.TECHNETIUM_ORE.get().defaultBlockState()),
+                OreConfiguration.target(deepslateReplaceables, ModBlocks.TECHNETIUM_DEEPSLATE_ORE.get().defaultBlockState()));
 
         register(context, OVERWORLD_FLOW_CONTAINING_ORE_KEY, Feature.ORE, new OreConfiguration(overworldFlowContainingOres, 9));
         /*register(context, NETHER_SAPPHIRE_ORE_KEY, Feature.ORE, new OreConfiguration(netherrackReplacables,

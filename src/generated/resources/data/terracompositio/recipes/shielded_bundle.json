@@ -1,0 +1,15 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "equipment",
+  "ingredients": [
+    {
+      "item": "minecraft:bundle"
+    },
+    {
+      "item": "terracompositio:infused_iron_ingot"
+    }
+  ],
+  "result": {
+    "item": "terracompositio:shielded_bundle"
+  }
+}

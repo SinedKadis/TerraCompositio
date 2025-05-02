@@ -1,12 +1,12 @@
 {
   "parent": "minecraft:recipes/root",
   "criteria": {
-    "has_flow_containing_raw_ore": {
+    "has_string": {
       "conditions": {
         "items": [
           {
             "items": [
-              "terracompositio:flow_containing_raw_ore"
+              "minecraft:leather"
             ]
           }
         ]
@@ -15,20 +15,20 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "terracompositio:flow_containing_raw_ore_block"
+        "recipe": "minecraft:bundle"
       },
       "trigger": "minecraft:recipe_unlocked"
     }
   },
   "requirements": [
     [
-      "has_flow_containing_raw_ore",
+      "has_string",
       "has_the_recipe"
     ]
   ],
   "rewards": {
     "recipes": [
-      "terracompositio:flow_containing_raw_ore_block"
+      "minecraft:bundle"
     ]
   },
   "sends_telemetry_event": false

@@ -1,0 +1,11 @@
+{
+  "values": [
+    "terracompositio:technetium_raw_ore",
+    "terracompositio:low_enriched_technetium",
+    "terracompositio:high_enriched_technetium",
+    "terracompositio:medium_enriched_technetium",
+    "terracompositio:technetium_ore",
+    "terracompositio:technetium_deepslate_ore",
+    "terracompositio:technetium_raw_ore_block"
+  ]
+}

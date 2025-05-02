@@ -19,7 +19,7 @@ public class ModTags {
     }
     public static class  Items{
         public static final TagKey<Item> FLOW_CEDAR_LOGS = tag("flow_cedar_logs_items");
-
+        public static final TagKey<Item> UNSTABLE_TECHNETIUM = tag("unstable_technetium");
         private static TagKey<Item> tag(String name){
             return ItemTags.create(new ResourceLocation(TerraCompositio.MOD_ID, name));
         }

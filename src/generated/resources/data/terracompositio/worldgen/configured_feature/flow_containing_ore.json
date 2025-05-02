@@ -6,7 +6,7 @@
     "targets": [
       {
         "state": {
-          "Name": "terracompositio:flow_containing_ore"
+          "Name": "terracompositio:technetium_ore"
         },
         "target": {
           "predicate_type": "minecraft:tag_match",
@@ -15,7 +15,7 @@
       },
       {
         "state": {
-          "Name": "terracompositio:flow_containing_deepslate_ore"
+          "Name": "terracompositio:technetium_deepslate_ore"
         },
         "target": {
           "predicate_type": "minecraft:tag_match",

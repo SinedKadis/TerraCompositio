@@ -24,7 +24,7 @@
                   }
                 }
               ],
-              "name": "terracompositio:flow_containing_ore"
+              "name": "terracompositio:technetium_deepslate_ore"
             },
             {
               "type": "minecraft:item",
@@ -47,7 +47,7 @@
                   "function": "minecraft:explosion_decay"
                 }
               ],
-              "name": "terracompositio:flow_containing_raw_ore"
+              "name": "terracompositio:technetium_raw_ore"
             }
           ]
         }
@@ -55,5 +55,5 @@
       "rolls": 1.0
     }
   ],
-  "random_sequence": "terracompositio:blocks/flow_containing_ore"
+  "random_sequence": "terracompositio:blocks/technetium_deepslate_ore"
 }

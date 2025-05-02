@@ -21,6 +21,7 @@ import net.sinedkadis.terracompositio.block.entity.renderer.*;
 import net.sinedkadis.terracompositio.entity.ModEntities;
 import net.sinedkadis.terracompositio.entity.client.ModBoatRenderer;
 import net.sinedkadis.terracompositio.entity.client.ModModelLayers;
+import net.sinedkadis.terracompositio.item.custom.ShieldedBundleItem;
 import net.sinedkadis.terracompositio.item.custom.WrenchAxeItem;
 import net.sinedkadis.terracompositio.registries.ModBlockEntities;
 import net.sinedkadis.terracompositio.registries.ModFluids;
@@ -52,6 +53,11 @@ public class ModEventBusClientEvents {
                 ModItems.FLOW_ROTATING_AXE.get(),
                 new ResourceLocation("wrench_mode"),
                 (stack, level, entity, seed) -> WrenchAxeItem.getMode(stack).ordinal()
+        ));
+        event.enqueueWork(() -> ItemProperties.register(
+                ModItems.SHIELDED_BUNDLE.get(),
+                new ResourceLocation("filled"),
+                (stack, level, entity, seed) -> ShieldedBundleItem.getFullnessDisplay(stack)
         ));
     }
 

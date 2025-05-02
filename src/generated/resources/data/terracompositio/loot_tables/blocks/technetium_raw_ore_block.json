@@ -11,11 +11,11 @@
       "entries": [
         {
           "type": "minecraft:item",
-          "name": "terracompositio:flow_containing_raw_ore_block"
+          "name": "terracompositio:technetium_raw_ore_block"
         }
       ],
       "rolls": 1.0
     }
   ],
-  "random_sequence": "terracompositio:blocks/flow_containing_raw_ore_block"
+  "random_sequence": "terracompositio:blocks/technetium_raw_ore_block"
 }

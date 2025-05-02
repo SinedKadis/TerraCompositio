@@ -25,9 +25,9 @@ public class ModBlockTagGenerator extends BlockTagsProvider {
         //        .add(ModBlocks.FLOW_LOG.get()).addTag(Tags.Blocks.NEEDS_NETHERITE_TOOL);
 
         this.tag(BlockTags.MINEABLE_WITH_PICKAXE)
-                .add(ModBlocks.FLOW_CONTAINING_RAW_ORE_BLOCK.get(),
-                        ModBlocks.FLOW_CONTAINING_ORE.get(),
-                        ModBlocks.FLOW_CONTAINING_DEEPSLATE_ORE.get(),
+                .add(ModBlocks.TECHNETIUM_RAW_ORE_BLOCK.get(),
+                        ModBlocks.TECHNETIUM_ORE.get(),
+                        ModBlocks.TECHNETIUM_DEEPSLATE_ORE.get(),
                         ModBlocks.MATTER_INFUSER_PORT.get(),
                         ModBlocks.MATTER_INFUSER_IO.get(),
                         ModBlocks.CONSTRUCTION_DESORBER.get(),

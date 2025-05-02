@@ -61,13 +61,13 @@ public class ModCreativeModTabs {
 
                         pOutput.accept(ModItems.COPPER_NUGGET.get());
                         pOutput.accept(ModItems.FLOW_INFUSER_KIT.get());
-                        pOutput.accept(ModItems.FLOW_CONTAINING_RAW_ORE.get());
-                        pOutput.accept(ModBlocks.FLOW_CONTAINING_RAW_ORE_BLOCK.get());
-                        pOutput.accept(ModItems.LOW_ENRICHED_FCO.get());
-                        pOutput.accept(ModItems.MEDIUM_ENRICHED_FCO.get());
-                        pOutput.accept(ModItems.HIGH_ENRICHED_FCO.get());
-                        pOutput.accept(ModBlocks.FLOW_CONTAINING_ORE.get());
-                        pOutput.accept(ModBlocks.FLOW_CONTAINING_DEEPSLATE_ORE.get());
+                        pOutput.accept(ModItems.RAW_TECHNETIUM.get());
+                        pOutput.accept(ModBlocks.TECHNETIUM_RAW_ORE_BLOCK.get());
+                        pOutput.accept(ModItems.LOW_ENRICHED_TECHNETIUM.get());
+                        pOutput.accept(ModItems.MEDIUM_ENRICHED_TECHNETIUM.get());
+                        pOutput.accept(ModItems.HIGH_ENRICHED_TECHNETIUM.get());
+                        pOutput.accept(ModBlocks.TECHNETIUM_ORE.get());
+                        pOutput.accept(ModBlocks.TECHNETIUM_DEEPSLATE_ORE.get());
                         pOutput.accept(ModBlocks.FLOW_CEDAR_BIG_SAPLING.get());
                         pOutput.accept(ModBlocks.FLOW_CEDAR_SAPLING.get());
 
@@ -80,6 +80,8 @@ public class ModCreativeModTabs {
                         pOutput.accept(ModBlocks.CONSTRUCTION_DESORBER.get());
                         pOutput.accept(ModBlocks.CULTIVATION_DESORBER.get());
                         pOutput.accept(ModBlocks.TIME_PASSAGE_DESORBER.get());
+
+                        pOutput.accept(ModItems.SHIELDED_BUNDLE.get());
 
                     })
                     .build());

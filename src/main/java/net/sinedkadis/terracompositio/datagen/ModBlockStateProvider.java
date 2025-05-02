@@ -1,7 +1,6 @@
 package net.sinedkadis.terracompositio.datagen;
 
 
-import mekanism.api.annotations.ParametersAreNotNullByDefault;
 import net.minecraft.core.Direction;
 import net.minecraft.data.PackOutput;
 import net.minecraft.resources.ResourceLocation;
@@ -15,6 +14,8 @@ import net.minecraftforge.registries.RegistryObject;
 import net.sinedkadis.terracompositio.TerraCompositio;
 import net.sinedkadis.terracompositio.registries.ModBlocks;
 import net.sinedkadis.terracompositio.block.custom.FlowCedarLikeBlock;
+
+import java.util.Objects;
 
 import static net.sinedkadis.terracompositio.block.custom.FlowPortBlock.FACING;
 
@@ -38,9 +39,9 @@ public class ModBlockStateProvider extends BlockStateProvider {
         flowLogBlockWithItem(ModBlocks.STRIPPED_FLOW_CEDAR_LOG);
         flowWoodBlockWithItem(ModBlocks.STRIPPED_FLOW_CEDAR_WOOD,
                 ModBlocks.STRIPPED_FLOW_CEDAR_LOG);
-        blockWithItem(ModBlocks.FLOW_CONTAINING_ORE);
-        blockWithItem(ModBlocks.FLOW_CONTAINING_DEEPSLATE_ORE);
-        blockWithItem(ModBlocks.FLOW_CONTAINING_RAW_ORE_BLOCK);
+        blockWithItem(ModBlocks.TECHNETIUM_ORE);
+        blockWithItem(ModBlocks.TECHNETIUM_DEEPSLATE_ORE);
+        blockWithItem(ModBlocks.TECHNETIUM_RAW_ORE_BLOCK);
 
 
 
@@ -90,13 +91,9 @@ public class ModBlockStateProvider extends BlockStateProvider {
         simpleBlockWithItem(blockRegistryObject.get(), cubeAll(blockRegistryObject.get()));
     }
 
-    private void fluidBlockWithItem(RegistryObject<LiquidBlock> blockRegistryObject) {
-        simpleBlock(blockRegistryObject.get(), cubeAll(blockRegistryObject.get()));
-    }
-
     private void flowWoodBlockWithItem(RegistryObject<Block> block, RegistryObject<Block> texture){
-        flowLogBlock(((RotatedPillarBlock) block.get()),texture.get(),texture.get(),true);
-        simpleBlockItem(block.get(), new ModelFile.UncheckedModelFile(TerraCompositio.MOD_ID+":block/"+ ForgeRegistries.BLOCKS.getKey(block.get()).getPath()));
+        flowLogBlock(block.get(),texture.get(),texture.get(),true);
+        simpleBlockItem(block.get(), new ModelFile.UncheckedModelFile(TerraCompositio.MOD_ID+":block/"+ Objects.requireNonNull(ForgeRegistries.BLOCKS.getKey(block.get())).getPath()));
     }
     private  void flowPortBlockWithItem(RegistryObject<Block> block, RegistryObject<Block> sideTexture, RegistryObject<Block> topTexture){
         ResourceLocation side = this.blockTexture(sideTexture.get());

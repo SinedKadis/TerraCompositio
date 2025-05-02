@@ -18,6 +18,7 @@ import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
 import net.sinedkadis.terracompositio.TerraCompositio;
 import net.sinedkadis.terracompositio.block.custom.*;
+import net.sinedkadis.terracompositio.item.custom.UnstableTechnetiumBlockItem;
 import net.sinedkadis.terracompositio.worldgen.tree.BigFlowCedarTreeGrower;
 import net.sinedkadis.terracompositio.worldgen.tree.FlowCedarTreeGrower;
 
@@ -36,6 +37,14 @@ public class ModBlocks {
     }
     private static <T extends Block> void registerBlockItem(String name, RegistryObject<T> block) {
         ModItems.ITEMS.register(name, () -> new BlockItem(block.get(), new Item.Properties()));
+    }
+    private static <T extends Block>RegistryObject<T> registerUnstableTechnetiumBlock(String name, Supplier<T> block,int radiation) {
+        RegistryObject<T> toReturn = BLOCKS.register(name, block);
+        registerUnstableTechnetiumBlockItem(name, toReturn,radiation);
+        return toReturn;
+    }
+    private static <T extends Block> void registerUnstableTechnetiumBlockItem(String name, RegistryObject<T> block,int radiation) {
+        ModItems.ITEMS.register(name, () -> new UnstableTechnetiumBlockItem(block.get(), new Item.Properties(),radiation));
     }
 
     public static void register(IEventBus eventBus) {
@@ -114,12 +123,12 @@ public class ModBlocks {
             () -> new CreativeCFESourceBlock(BlockBehaviour.Properties.copy(Blocks.IRON_BLOCK)));
     public static final RegistryObject<Block> FLOW_INFUSER = registerBlock("flow_infuser",
             () -> new FlowInfuserBlock(BlockBehaviour.Properties.copy(Blocks.IRON_BLOCK).noOcclusion(), ModBlocks.STRIPPED_FLOW_CEDAR_LOG));
-    public static final RegistryObject<Block> FLOW_CONTAINING_ORE = registerBlock("flow_containing_ore",
-            () -> new Block(BlockBehaviour.Properties.copy(Blocks.IRON_ORE)));
-    public static final RegistryObject<Block> FLOW_CONTAINING_DEEPSLATE_ORE = registerBlock("flow_containing_deepslate_ore",
-            () -> new Block(BlockBehaviour.Properties.copy(Blocks.DEEPSLATE_IRON_ORE)));
-    public static final RegistryObject<Block> FLOW_CONTAINING_RAW_ORE_BLOCK = registerBlock("flow_containing_raw_ore_block",
-            () -> new Block(BlockBehaviour.Properties.copy(Blocks.RAW_IRON_BLOCK)));
+    public static final RegistryObject<Block> TECHNETIUM_ORE = registerUnstableTechnetiumBlock("technetium_ore",
+            () -> new Block(BlockBehaviour.Properties.copy(Blocks.IRON_ORE)),2);
+    public static final RegistryObject<Block> TECHNETIUM_DEEPSLATE_ORE = registerUnstableTechnetiumBlock("technetium_deepslate_ore",
+            () -> new Block(BlockBehaviour.Properties.copy(Blocks.DEEPSLATE_IRON_ORE)),2);
+    public static final RegistryObject<Block> TECHNETIUM_RAW_ORE_BLOCK = registerUnstableTechnetiumBlock("technetium_raw_ore_block",
+            () -> new Block(BlockBehaviour.Properties.copy(Blocks.RAW_IRON_BLOCK)),8);
     public static final RegistryObject<Block> FLOW_CEDAR_BIG_SAPLING = registerBlock("big_flow_cedar_sapling",
             () -> new SaplingBlock(new BigFlowCedarTreeGrower(), BlockBehaviour.Properties.copy(Blocks.OAK_SAPLING)));
     public static final RegistryObject<Block> FLOW_CEDAR_SAPLING = registerBlock("flow_cedar_sapling",

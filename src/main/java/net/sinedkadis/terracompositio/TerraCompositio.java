@@ -1,6 +1,8 @@
 package net.sinedkadis.terracompositio;
 
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.CreativeModeTabs;
+import net.minecraft.world.item.Items;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
@@ -63,10 +65,9 @@ public class TerraCompositio
     // Add the example block item to the building blocks tab
     private void addCreative(BuildCreativeModeTabContentsEvent event)
     {
-        /*if(event.getTabKey() == CreativeModeTabs.INGREDIENTS) {
-            event.accept(ModItems.Pebble);
-            event.accept(ModItems.StoneStaff);
-        }*/
+        if(event.getTabKey() == CreativeModeTabs.TOOLS_AND_UTILITIES) {
+            event.accept(Items.BUNDLE);
+        }
     }
 
 }

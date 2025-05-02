@@ -1,6 +1,6 @@
 {
   "parent": "minecraft:item/generated",
   "textures": {
-    "layer0": "terracompositio:item/flow_containing_raw_ore"
+    "layer0": "terracompositio:item/low_enriched_technetium"
   }
 }

@@ -1,0 +1,6 @@
+{
+  "parent": "terracompositio:item/shielded_bundle",
+  "textures": {
+    "layer0": "terracompositio:item/shielded_bundle_filled"
+  }
+}

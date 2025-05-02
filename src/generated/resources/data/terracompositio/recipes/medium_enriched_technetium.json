@@ -4,11 +4,11 @@
   "cfe": 1000,
   "input": {
     "count": 4,
-    "item": "terracompositio:low_enriched_fco"
+    "item": "terracompositio:low_enriched_technetium"
   },
   "output": {
     "count": 1,
-    "item": "terracompositio:medium_enriched_fco"
+    "item": "terracompositio:medium_enriched_technetium"
   },
   "rate": 30,
   "time": 1000

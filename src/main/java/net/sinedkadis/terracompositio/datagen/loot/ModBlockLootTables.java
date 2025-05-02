@@ -46,7 +46,7 @@ public class ModBlockLootTables extends BlockLootSubProvider {
         this.dropSelf(ModBlocks.FLOW_CEDAR_TRAPDOOR.get());
         this.dropSelf(ModBlocks.WEDGE.get());
         this.dropOther(ModBlocks.FLOW_INFUSER.get(), ModBlocks.FLOW_CEDAR_LOG.get());
-        this.dropSelf(ModBlocks.FLOW_CONTAINING_RAW_ORE_BLOCK.get());
+        this.dropSelf(ModBlocks.TECHNETIUM_RAW_ORE_BLOCK.get());
         this.dropSelf(ModBlocks.FLOW_CEDAR_BIG_SAPLING.get());
         this.dropSelf(ModBlocks.FLOW_CEDAR_SAPLING.get());
         this.dropSelf(ModBlocks.CONSTRUCTION_DESORBER.get());
@@ -64,10 +64,10 @@ public class ModBlockLootTables extends BlockLootSubProvider {
                 block -> createDoorTable(ModBlocks.FLOW_CEDAR_DOOR.get()));
 
 
-        this.add(ModBlocks.FLOW_CONTAINING_ORE.get(),
-                block -> createCopperLikeOreDrops(ModBlocks.FLOW_CONTAINING_ORE.get(), ModItems.FLOW_CONTAINING_RAW_ORE.get()));
-        this.add(ModBlocks.FLOW_CONTAINING_DEEPSLATE_ORE.get(),
-                block -> createCopperLikeOreDrops(ModBlocks.FLOW_CONTAINING_DEEPSLATE_ORE.get(), ModItems.FLOW_CONTAINING_RAW_ORE.get()));
+        this.add(ModBlocks.TECHNETIUM_ORE.get(),
+                block -> createCopperLikeOreDrops(ModBlocks.TECHNETIUM_ORE.get(), ModItems.RAW_TECHNETIUM.get()));
+        this.add(ModBlocks.TECHNETIUM_DEEPSLATE_ORE.get(),
+                block -> createCopperLikeOreDrops(ModBlocks.TECHNETIUM_DEEPSLATE_ORE.get(), ModItems.RAW_TECHNETIUM.get()));
         /*this.add(ModBlocks.NETHER_SAPPHIRE_ORE.get(),
                 block -> createCopperLikeOreDrops(ModBlocks.NETHER_SAPPHIRE_ORE.get(), ModItems.RAW_SAPPHIRE.get()));
         this.add(ModBlocks.END_STONE_SAPPHIRE_ORE.get(),

@@ -82,14 +82,14 @@ public class ModItems {
                     pTooltipComponents.add(Component.translatable("item.terracompositio.flow_infuser_kit.tooltip").withStyle(ChatFormatting.GRAY));
                 }
             });
-    public static final RegistryObject<Item> FLOW_CONTAINING_RAW_ORE = ITEMS.register("flow_containing_raw_ore",
-            () -> new Item(new Item.Properties()));
-    public static final RegistryObject<Item> LOW_ENRICHED_FCO = ITEMS.register("low_enriched_fco",
-            () -> new Item(new Item.Properties()));
-    public static final RegistryObject<Item> MEDIUM_ENRICHED_FCO = ITEMS.register("medium_enriched_fco",
-            () -> new Item(new Item.Properties()));
-    public static final RegistryObject<Item> HIGH_ENRICHED_FCO = ITEMS.register("high_enriched_fco",
-            () -> new Item(new Item.Properties()));
+    public static final RegistryObject<Item> RAW_TECHNETIUM = ITEMS.register("technetium_raw_ore",
+            () -> new UnstableTechnetiumItem(new Item.Properties(),0));
+    public static final RegistryObject<Item> LOW_ENRICHED_TECHNETIUM = ITEMS.register("low_enriched_technetium",
+            () -> new UnstableTechnetiumItem(new Item.Properties(),1));
+    public static final RegistryObject<Item> MEDIUM_ENRICHED_TECHNETIUM = ITEMS.register("medium_enriched_technetium",
+            () -> new UnstableTechnetiumItem(new Item.Properties(),2));
+    public static final RegistryObject<Item> HIGH_ENRICHED_TECHNETIUM = ITEMS.register("high_enriched_technetium",
+            () -> new UnstableTechnetiumItem(new Item.Properties(),3));
     public static final RegistryObject<Item> FLOW_ROTATING_AXE = ITEMS.register("flow_rotating_axe",
             () -> new WrenchAxeItem(Tiers.IRON, 6.0F, -3.1F, new Item.Properties()));
     public static final RegistryObject<Item> GOLD_ROD = ITEMS.register("gold_rod",
@@ -102,6 +102,9 @@ public class ModItems {
             () -> new Item(new Item.Properties()));
     public static final RegistryObject<Item> OUTPUT_BUS = ITEMS.register("copper_output_bus",
             () -> new Item(new Item.Properties()));
+
+    public static final RegistryObject<Item> SHIELDED_BUNDLE = ITEMS.register("shielded_bundle",
+            () -> new ShieldedBundleItem(new Item.Properties()));
 
 
     public static void register(IEventBus eventBus){

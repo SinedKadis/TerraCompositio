@@ -1,6 +1,6 @@
 {
   "parent": "minecraft:item/generated",
   "textures": {
-    "layer0": "terracompositio:item/high_enriched_fco"
+    "layer0": "terracompositio:item/high_enriched_technetium"
   }
 }

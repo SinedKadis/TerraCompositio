@@ -1,8 +1,8 @@
 {
   "values": [
-    "terracompositio:flow_containing_raw_ore_block",
-    "terracompositio:flow_containing_ore",
-    "terracompositio:flow_containing_deepslate_ore",
+    "terracompositio:technetium_raw_ore_block",
+    "terracompositio:technetium_ore",
+    "terracompositio:technetium_deepslate_ore",
     "terracompositio:matter_infuser_port",
     "terracompositio:matter_infuser_io",
     "terracompositio:construction_desorber",
