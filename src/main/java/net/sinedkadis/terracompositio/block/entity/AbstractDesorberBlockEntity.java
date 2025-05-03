@@ -1,5 +1,6 @@
 package net.sinedkadis.terracompositio.block.entity;
 
+
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -42,7 +43,6 @@ public abstract class AbstractDesorberBlockEntity extends ModBlockEntity impleme
     protected int getTankCapacity() {
         return 250;
     }
-
     protected LazyOptional<IFluidHandler> lazyFluidHandler = LazyOptional.empty();
 
     public AbstractDesorberBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
@@ -65,8 +65,9 @@ public abstract class AbstractDesorberBlockEntity extends ModBlockEntity impleme
 
     @Override
     public @NotNull <T> LazyOptional<T> getCapability(@NotNull Capability<T> cap, @Nullable Direction side) {
-        if (cap == ForgeCapabilities.FLUID_HANDLER)
+        if (cap == ForgeCapabilities.FLUID_HANDLER && (side == null || side == Direction.DOWN)) {
             return lazyFluidHandler.cast();
+        }
         return super.getCapability(cap, side);
     }
 

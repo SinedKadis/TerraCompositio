@@ -2,6 +2,8 @@ package net.sinedkadis.terracompositio.util;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -37,6 +39,19 @@ public class TCUtil {
                     0.5D);
         }
         return InteractionResult.sidedSuccess(pLevel.isClientSide);
+    }
+
+    public static void spawnParticlesIn(Level pLevel, BlockPos targetPos){
+        if (pLevel instanceof ServerLevel level)
+            level.sendParticles(ModParticles.FLOW_STILL_PARTICLE.get(),
+                targetPos.getX()+pLevel.getRandom().nextFloat(),
+                targetPos.getY()+pLevel.getRandom().nextFloat(),
+                targetPos.getZ()+pLevel.getRandom().nextFloat(),
+                10,
+                    targetPos.getX(),
+                    targetPos.getY(),
+                    targetPos.getZ(),
+                0.5D);
     }
 
     public static BlockState copyBlockStates(BlockState oldState, BlockState newState) {
@@ -151,5 +166,62 @@ public class TCUtil {
     }
     public static @NotNull List<BlockPos> getTouchingBlocks(BlockPos pos){
         return getTouchingBlocks(null, pos,null);
+    }
+
+    public static void spawnParticles(Level pLevel,BlockPos targetPos, BlockPos sourcePos) {
+        if (pLevel == null || pLevel.isClientSide())
+            return;
+
+        var level = (ServerLevel) pLevel;
+
+        double x = sourcePos.getX() + (level.getRandom().nextDouble() * 0.2D) + 0.5D;
+        double y = sourcePos.getY() + (level.getRandom().nextDouble() * 0.2D) + 0.5D;
+        double z = sourcePos.getZ() + (level.getRandom().nextDouble() * 0.2D) + 0.5D;
+
+        double velX = targetPos.getX() - sourcePos.getX();
+        double velY = targetPos.getY() - sourcePos.getY();
+        double velZ = targetPos.getZ() - sourcePos.getZ();
+
+        level.sendParticles(ModParticles.FLOW_STILL_PARTICLE.get(), x, y, z, 0, velX, velY, velZ, 0.08D);
+    }
+
+    public static List<ItemStack> getContainerContents(ItemStack containerStack) {
+        if (containerStack.isEmpty()) {
+            return List.of();
+        }
+
+        CompoundTag stackTag = containerStack.getTag();
+        if (stackTag == null) {
+            return List.of();
+        }
+
+        CompoundTag blockEntityTag = stackTag.getCompound("BlockEntityTag");
+        if (blockEntityTag.contains("Items", CompoundTag.TAG_LIST)) {
+            return getItemsFromNBT(blockEntityTag.getList("Items", CompoundTag.TAG_COMPOUND));
+        }
+
+        if (stackTag.contains("Items", CompoundTag.TAG_LIST)) {
+            return getItemsFromNBT(stackTag.getList("Items", CompoundTag.TAG_COMPOUND));
+        }
+
+        if (stackTag.contains("Inventory", CompoundTag.TAG_LIST)) {
+            return getItemsFromNBT(stackTag.getList("Inventory", CompoundTag.TAG_COMPOUND));
+        }
+
+        return List.of();
+    }
+
+    private static List<ItemStack> getItemsFromNBT(ListTag itemsTag) {
+        List<ItemStack> items = new ArrayList<>(itemsTag.size());
+
+        for (int i = 0; i < itemsTag.size(); i++) {
+            CompoundTag itemTag = itemsTag.getCompound(i);
+            ItemStack itemStack = ItemStack.of(itemTag);
+            if (!itemStack.isEmpty()) {
+                items.add(itemStack);
+            }
+        }
+
+        return items;
     }
 }

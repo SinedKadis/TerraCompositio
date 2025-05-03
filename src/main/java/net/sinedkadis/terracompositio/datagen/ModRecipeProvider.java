@@ -3,12 +3,14 @@ package net.sinedkadis.terracompositio.datagen;
 
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.recipes.*;
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.AbstractCookingRecipe;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.level.ItemLike;
 import net.minecraftforge.common.crafting.conditions.IConditionBuilder;
+import net.minecraftforge.registries.ForgeRegistries;
 import net.sinedkadis.terracompositio.TerraCompositio;
 import net.sinedkadis.terracompositio.datagen.builders.MatterInfusionRecipeBuilder;
 import net.sinedkadis.terracompositio.registries.ModBlocks;
@@ -18,6 +20,7 @@ import org.jetbrains.annotations.NotNull;
 
 
 import java.util.List;
+import java.util.Objects;
 import java.util.function.Consumer;
 
 public class ModRecipeProvider extends RecipeProvider implements IConditionBuilder {
@@ -224,6 +227,23 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                 .define('L',Items.LEATHER)
                 .unlockedBy(getHasName(Items.STRING), has(Items.LEATHER))
                 .save(pWriter);
+        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, ModItems.WRENCH_AXE.get())
+                .pattern("II")
+                .pattern("IS")
+                .pattern(" S")
+                .define('I', ModItems.INFUSED_IRON_INGOT.get())
+                .define('S', Items.STICK)
+                .unlockedBy(getHasName(ModItems.INFUSED_IRON_INGOT.get()), has(Items.STICK))
+                .save(pWriter);
+        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, ModItems.WRENCH_AXE.get())
+                .pattern("II")
+                .pattern("SI")
+                .pattern("S ")
+                .define('I', ModItems.INFUSED_IRON_INGOT.get())
+                .define('S', Items.STICK)
+                .unlockedBy(getHasName(ModItems.INFUSED_IRON_INGOT.get()), has(Items.STICK))
+                .save(pWriter,new ResourceLocation(Objects.requireNonNull(ForgeRegistries.ITEMS.getKey(ModItems.WRENCH_AXE.get())).getNamespace(),
+                        Objects.requireNonNull(ForgeRegistries.ITEMS.getKey(ModItems.WRENCH_AXE.get())).getPath() + "_mirrored"));
 
 
 

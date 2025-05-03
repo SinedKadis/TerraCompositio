@@ -6,7 +6,6 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.core.registries.BuiltInRegistries;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
@@ -36,6 +35,12 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.util.FakePlayer;
+import net.minecraftforge.registries.ForgeRegistries;
+import net.sinedkadis.terracompositio.api.TerraCompositioAPI;
+import net.sinedkadis.terracompositio.api.cfe.CFENetwork;
+import net.sinedkadis.terracompositio.api.cfe.CFESource;
+import net.sinedkadis.terracompositio.block.custom.ConstructionDesorberBlock;
+import net.sinedkadis.terracompositio.registries.ModItems;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -54,6 +59,11 @@ public class WrenchAxeItem extends AxeItem {
 
     public WrenchAxeItem(Tier pTier, float pAttackDamageModifier, float pAttackSpeedModifier, Properties pProperties) {
         super(pTier, pAttackDamageModifier, pAttackSpeedModifier, pProperties);
+    }
+
+    @Override
+    public boolean isValidRepairItem(@NotNull ItemStack pToRepair, ItemStack pRepair) {
+        return pRepair.is(ModItems.INFUSED_IRON_INGOT.get()) || pRepair.is(ModItems.WRENCH_AXE.get());
     }
 
     @Override
@@ -451,16 +461,33 @@ public class WrenchAxeItem extends AxeItem {
         return WrenchMode.AXE; // Default mode
     }
 
-    private boolean wrenchInteraction(@Nullable Player pPlayer, BlockState pStateClicked, LevelAccessor pAccessor, BlockPos pPos, boolean pShouldCycleState, ItemStack pDebugStack) {
+    private boolean wrenchInteraction(@Nullable Player pPlayer, BlockState pStateClicked, LevelAccessor level, BlockPos pos, boolean pShouldCycleState, ItemStack pDebugStack) {
         Block block = pStateClicked.getBlock();
         StateDefinition<Block, BlockState> blockStateDefinition = block.getStateDefinition();
         Collection<Property<?>> properties = blockStateDefinition.getProperties().stream().filter(SURVIVAL_SAFE_PROPERTIES::contains).toList();
-        String name = BuiltInRegistries.BLOCK.getKey(block).toString();
+        String name = Objects.requireNonNull(ForgeRegistries.BLOCKS.getKey(block)).toString();
         if (properties.isEmpty()) {
             if (pPlayer != null)
                 message(pPlayer, Component.translatable("item.terracompositio.flow_rotating_axe.no_change").withStyle(ChatFormatting.BOLD));
             return false;
         } else {
+            CFENetwork network = TerraCompositioAPI.instance().getCFENetworkInstance();
+            List<CFESource> sources = network.getAllCFESources((Level) level);
+            List<ConstructionDesorberBlock> constructors = sources.stream()
+                    .map(CFESource::getCFESourceBlockPos)
+                    .filter(cfeSourceBlockPos -> Math.sqrt(cfeSourceBlockPos.distSqr(pos)) < 7)
+                    .map(cfeSourceBlockPos -> {
+                        if (level.getBlockState(cfeSourceBlockPos).getBlock() instanceof ConstructionDesorberBlock blockEntity)
+                            return blockEntity;
+                        return null;
+                    })
+                    .filter(Objects::nonNull).toList();
+            if (!constructors.isEmpty()) {
+                if (pPlayer != null) {
+                    message(pPlayer, Component.translatable("item.terracompositio.flow_rotating_axe.constructor_near").withStyle(ChatFormatting.BOLD));
+                    pDebugStack.hurtAndBreak(10,pPlayer,player1 -> player1.broadcastBreakEvent(InteractionHand.MAIN_HAND));
+                }
+            }
             CompoundTag debugProperty = pDebugStack.getOrCreateTagElement("DebugProperty");
             String debugPropertyName = debugProperty.getString(name);
             Property<?> blockStateDefinitionProperty = blockStateDefinition.getProperty(debugPropertyName);
@@ -471,10 +498,15 @@ public class WrenchAxeItem extends AxeItem {
                 BlockState newState;
                 if (pPlayer != null) {
                     newState = cycleState(pStateClicked, blockStateDefinitionProperty, pPlayer.isSecondaryUseActive());
+                    pDebugStack.hurtAndBreak(1,pPlayer,player1 -> player1.broadcastBreakEvent(InteractionHand.MAIN_HAND));
                 } else {
                     newState = cycleState(pStateClicked, blockStateDefinitionProperty, false);
+                    if (pDebugStack.hurt(1,level.getRandom(),null)){
+                        pDebugStack.shrink(1);
+                        pDebugStack.setDamageValue(0);
+                    }
                 }
-                pAccessor.setBlock(pPos, newState, 18);
+                level.setBlock(pos, newState, 18);
                 message(pPlayer, Component.translatable(Items.DEBUG_STICK.getDescriptionId() + ".update", blockStateDefinitionProperty.getName(), getNameHelper(newState, blockStateDefinitionProperty)).withStyle(ChatFormatting.BOLD));
             } else {
                 if (pPlayer != null) {

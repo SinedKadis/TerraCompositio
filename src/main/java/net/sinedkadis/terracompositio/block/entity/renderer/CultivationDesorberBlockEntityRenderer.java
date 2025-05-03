@@ -10,6 +10,7 @@ import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -35,7 +36,7 @@ public class CultivationDesorberBlockEntityRenderer implements BlockEntityRender
     @Override
     public void render(CultivationDesorberBlockEntity pBlockEntity, float pPartialTick, @NotNull PoseStack pPoseStack, @NotNull MultiBufferSource pBuffer, int pPackedLight, int pPackedOverlay) {
         if (!pBlockEntity.hasLevel()) return;
-        pBlockEntity.getCapability(ForgeCapabilities.FLUID_HANDLER).ifPresent(handler -> {
+        pBlockEntity.getCapability(ForgeCapabilities.FLUID_HANDLER, Direction.DOWN).ifPresent(handler -> {
             FluidTank tank = (FluidTank) handler;
             if (tank.isEmpty()) return;
 

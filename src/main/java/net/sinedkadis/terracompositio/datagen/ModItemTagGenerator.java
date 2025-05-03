@@ -76,7 +76,7 @@ public class ModItemTagGenerator extends ItemTagsProvider {
                         ModItems.GOLD_ROD.get(),
                         ModItems.COPPER_ROD.get());
         this.tag(ItemTags.AXES)
-                .add(ModItems.FLOW_ROTATING_AXE.get());
+                .add(ModItems.WRENCH_AXE.get());
         this.tag(ModTags.Items.UNSTABLE_TECHNETIUM)
                 .add(ModItems.RAW_TECHNETIUM.get(),
                         ModItems.LOW_ENRICHED_TECHNETIUM.get(),

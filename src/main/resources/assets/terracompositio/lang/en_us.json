@@ -101,5 +101,6 @@
   "config.jade.plugin_terracompositio.chance_config": "   Chance to collect Time",
   "block.terracompositio.time_passage_desorber.time": "Time Collected: %s s.",
   "block.terracompositio.time_passage_desorber.chance": "Chance to collect Time: %s%%",
-  "item.terracompositio.shielded_bundle": "Shielded Bundle"
+  "item.terracompositio.shielded_bundle": "Shielded Bundle",
+  "item.terracompositio.flow_rotating_axe.constructor_near": "Next to the construction desorber it is somehow difficult to do"
 }

@@ -7,6 +7,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.sinedkadis.terracompositio.registries.ModBlockEntities;
+import net.sinedkadis.terracompositio.util.TCUtil;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.function.Function;
@@ -50,6 +51,7 @@ public class TimePassageDesorberBlockEntity extends AbstractDesorberBlockEntity 
             timeBuffer++;
             if (chance > 1 && random < (chance-1)){
                 timeBuffer++;
+                TCUtil.spawnParticlesIn(pLevel,this.worldPosition);
             }
         }
     }

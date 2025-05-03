@@ -1,6 +1,7 @@
 package net.sinedkadis.terracompositio.block.custom;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -12,10 +13,14 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.SimpleWaterloggedBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
+import net.minecraft.world.level.material.FluidState;
+import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.fluids.FluidStack;
@@ -28,16 +33,24 @@ import net.sinedkadis.terracompositio.registries.ModFluids;
 import net.sinedkadis.terracompositio.registries.ModItems;
 import org.jetbrains.annotations.NotNull;
 
-public abstract class AbstractDesorberBlock extends ModCFEBaseEntityBlock {
+public abstract class AbstractDesorberBlock extends ModCFEBaseEntityBlock implements SimpleWaterloggedBlock {
     protected static final BooleanProperty INFUSED;
+    protected static final BooleanProperty WATERLOGGED;
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> pBuilder) {
-        pBuilder.add(INFUSED);
+        pBuilder.add(INFUSED,WATERLOGGED);
+    }
+
+
+
+    public @NotNull FluidState getFluidState(BlockState pState) {
+        return pState.getValue(WATERLOGGED) ? Fluids.WATER.getSource(false) : super.getFluidState(pState);
     }
 
     protected AbstractDesorberBlock(Properties pProperties) {
         super(pProperties);
+        this.registerDefaultState(this.defaultBlockState().setValue(WATERLOGGED,false));
     }
 
     @Override
@@ -57,7 +70,7 @@ public abstract class AbstractDesorberBlock extends ModCFEBaseEntityBlock {
             return InteractionResult.PASS;
         }
 
-        IFluidHandler fluidHandlerBlock = blockEntity.getCapability(ForgeCapabilities.FLUID_HANDLER, pHit.getDirection()).resolve().orElse(null);
+        IFluidHandler fluidHandlerBlock = blockEntity.getCapability(ForgeCapabilities.FLUID_HANDLER, Direction.DOWN).resolve().orElse(null);
         if (!(fluidHandlerBlock instanceof FluidTank tank)) {
             return InteractionResult.PASS;
         }
@@ -137,5 +150,6 @@ public abstract class AbstractDesorberBlock extends ModCFEBaseEntityBlock {
 
     static {
         INFUSED = ModBlockStateProperties.INFUSED;
+        WATERLOGGED = BlockStateProperties.WATERLOGGED;
     }
 }

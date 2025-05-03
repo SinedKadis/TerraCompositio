@@ -29,7 +29,7 @@ public class ForgeEventBusClientEvents {
         ItemStack offHandStack = player.getOffhandItem();
 
 
-        if (mainHandStack.getItem() instanceof WrenchAxeItem && offHandStack.getItem() instanceof AxeItem && player.getUseItem().is(ModItems.FLOW_ROTATING_AXE.get())) {
+        if (mainHandStack.getItem() instanceof WrenchAxeItem && offHandStack.getItem() instanceof AxeItem && player.getUseItem().is(ModItems.WRENCH_AXE.get())) {
             event.setCanceled(true);
             renderCustomItem(event.getPoseStack(), event.getMultiBufferSource(), event.getPackedLight(), event.getHand());
         }

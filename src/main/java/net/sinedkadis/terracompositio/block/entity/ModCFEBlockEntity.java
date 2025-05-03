@@ -3,7 +3,6 @@ package net.sinedkadis.terracompositio.block.entity;
 import lombok.Getter;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -11,7 +10,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.sinedkadis.terracompositio.api.TerraCompositioAPI;
 import net.sinedkadis.terracompositio.api.cfe.CFESource;
 import net.sinedkadis.terracompositio.api.cfe.CFENetwork;
-import net.sinedkadis.terracompositio.registries.ModParticles;
+import net.sinedkadis.terracompositio.util.TCUtil;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -59,7 +58,7 @@ public abstract class ModCFEBlockEntity extends ModBlockEntity{
                     addCFE(cfeSource.takeCFE((int) cfe));
                     ModCFEBlockEntity blockEntity = (ModCFEBlockEntity) pLevel.getBlockEntity(pPos);
                     if (blockEntity != null) {
-                        spawnParticles(pLevel,pPos, blockEntity.getCfeSourceBlockPos());
+                        TCUtil.spawnParticles(pLevel,pPos, blockEntity.getCfeSourceBlockPos());
                     }
                 }
             }
@@ -140,20 +139,4 @@ public abstract class ModCFEBlockEntity extends ModBlockEntity{
         }
     }
 
-    private static void spawnParticles(Level pLevel,BlockPos targetPos, BlockPos sourcePos) {
-        if (pLevel == null || pLevel.isClientSide())
-            return;
-
-        var level = (ServerLevel) pLevel;
-
-        double x = sourcePos.getX() + (level.getRandom().nextDouble() * 0.2D) + 0.5D;
-        double y = sourcePos.getY() + (level.getRandom().nextDouble() * 0.2D) + 0.5D;
-        double z = sourcePos.getZ() + (level.getRandom().nextDouble() * 0.2D) + 0.5D;
-
-        double velX = targetPos.getX() - sourcePos.getX();
-        double velY = targetPos.getY() - sourcePos.getY();
-        double velZ = targetPos.getZ() - sourcePos.getZ();
-
-        level.sendParticles(ModParticles.FLOW_STILL_PARTICLE.get(), x, y, z, 0, velX, velY, velZ, 0.08D);
-    }
 }

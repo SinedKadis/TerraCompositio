@@ -50,7 +50,7 @@ public class ModEventBusClientEvents {
         ItemBlockRenderTypes.setRenderLayer(ModFluids.FLOW_FLUID.flowing.get(), RenderType.translucent());
 
         event.enqueueWork(() -> ItemProperties.register(
-                ModItems.FLOW_ROTATING_AXE.get(),
+                ModItems.WRENCH_AXE.get(),
                 new ResourceLocation("wrench_mode"),
                 (stack, level, entity, seed) -> WrenchAxeItem.getMode(stack).ordinal()
         ));

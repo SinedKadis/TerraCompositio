@@ -19,6 +19,7 @@ import net.sinedkadis.terracompositio.api.cfe.CFENetwork;
 import net.sinedkadis.terracompositio.api.cfe.CFESource;
 import net.sinedkadis.terracompositio.registries.ModBlockEntities;
 import net.sinedkadis.terracompositio.util.ModItemStackHandler;
+import net.sinedkadis.terracompositio.util.TCUtil;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collections;
@@ -59,6 +60,7 @@ public class ConstructionDesorberBlockEntity extends AbstractDesorberBlockEntity
     public static void onEntityPlaceEvent(BlockEvent.EntityPlaceEvent event){
         BlockPos pos = event.getPos();
         LevelAccessor level = event.getLevel();
+
         CFENetwork network = TerraCompositioAPI.instance().getCFENetworkInstance();
         List<CFESource> sources = network.getAllCFESources((Level) level);
         List<ConstructionDesorberBlockEntity> constructors = sources.stream()
@@ -85,8 +87,11 @@ public class ConstructionDesorberBlockEntity extends AbstractDesorberBlockEntity
                 CFEToAdd -= blockEntity.addCFE(CFEToAdd);
                 blockEntity.setRenderStack(new ItemStack(event.getPlacedBlock().getBlock()));
                 if (CFEToAdd == 0) {
-                    if (!level.isClientSide())
-                        level.playSound(null,blockEntity.getBlockPos(), SoundEvents.BEACON_ACTIVATE, SoundSource.BLOCKS,0.1f,1f);
+                    if (!level.isClientSide()) {
+                        BlockPos blockEntityBlockPos = blockEntity.getBlockPos();
+                        level.playSound(null, blockEntityBlockPos, SoundEvents.BEACON_ACTIVATE, SoundSource.BLOCKS, 0.1f, 1f);
+                        TCUtil.spawnParticles((Level) level, blockEntityBlockPos,pos);
+                    }
                     break;
                 }
             }

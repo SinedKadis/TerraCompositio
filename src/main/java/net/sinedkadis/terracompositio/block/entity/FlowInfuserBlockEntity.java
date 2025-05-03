@@ -38,9 +38,7 @@ public class FlowInfuserBlockEntity extends ModItemIOCFEBlockEntity {
             increaseCraftingProgress();
             consumeCFE();
             setChanged(pLevel, pPos, pState);
-            if (!pLevel.isClientSide){
-                ((ServerLevel) pLevel).sendParticles(ModParticles.FLOW_STILL_PARTICLE.get(),pPos.getX()+0.5D,pPos.getY()+0.5D,pPos.getZ()+0.5D,3,0,-0.1D,0,0.1D);
-            }
+            spawnParticles(pLevel, pPos);
             if(hasProgressFinished()){
                 craftItem();
                 resetProgress();
@@ -50,6 +48,15 @@ public class FlowInfuserBlockEntity extends ModItemIOCFEBlockEntity {
         }
     }
 
+    private static void spawnParticles(Level pLevel, BlockPos targetPos) {
+        if (!pLevel.isClientSide){
+            ((ServerLevel) pLevel).sendParticles(
+                    ModParticles.FLOW_STILL_PARTICLE.get(),
+                    targetPos.getX()+0.5D,
+                    targetPos.getY()+0.5D,
+                    targetPos.getZ()+0.5D,3,0,-0.1D,0,0.1D);
+        }
+    }
 
 
     protected void craftItem() {

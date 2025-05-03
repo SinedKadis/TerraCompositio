@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "I": {
+      "item": "terracompositio:infused_iron_ingot"
+    },
+    "S": {
+      "item": "minecraft:stick"
+    }
+  },
+  "pattern": [
+    "II",
+    "IS",
+    " S"
+  ],
+  "result": {
+    "item": "terracompositio:flow_rotating_axe"
+  },
+  "show_notification": true
+}

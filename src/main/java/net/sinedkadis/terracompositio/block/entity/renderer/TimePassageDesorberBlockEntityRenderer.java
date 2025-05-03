@@ -1,13 +1,10 @@
 package net.sinedkadis.terracompositio.block.entity.renderer;
 
 import com.mojang.blaze3d.vertex.PoseStack;
-import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
-import net.minecraft.core.BlockPos;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.LightLayer;
+import net.minecraft.core.Direction;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.templates.FluidTank;
@@ -29,7 +26,7 @@ public class TimePassageDesorberBlockEntityRenderer implements BlockEntityRender
     @Override
     public void render(TimePassageDesorberBlockEntity pBlockEntity, float pPartialTick, @NotNull PoseStack pPoseStack, @NotNull MultiBufferSource pBuffer, int pPackedLight, int pPackedOverlay) {
         if (!pBlockEntity.hasLevel()) return;
-        pBlockEntity.getCapability(ForgeCapabilities.FLUID_HANDLER).ifPresent(handler -> {
+        pBlockEntity.getCapability(ForgeCapabilities.FLUID_HANDLER, Direction.DOWN).ifPresent(handler -> {
             FluidTank tank = (FluidTank) handler;
             if (tank.isEmpty()) return;
 

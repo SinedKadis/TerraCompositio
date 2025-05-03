@@ -22,6 +22,7 @@ import net.sinedkadis.terracompositio.api.cfe.CFENetwork;
 import net.sinedkadis.terracompositio.api.cfe.CFESource;
 import net.sinedkadis.terracompositio.registries.ModBlockEntities;
 import net.sinedkadis.terracompositio.util.ModItemStackHandler;
+import net.sinedkadis.terracompositio.util.TCUtil;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collections;
@@ -91,6 +92,7 @@ public class CultivationDesorberBlockEntity extends AbstractDesorberBlockEntity 
                 CFEToAdd -= blockEntity.addCFE(CFEToAdd);
                 if (!level.isClientSide())
                     level.playSound(null,pos, SoundEvents.AZALEA_LEAVES_STEP, SoundSource.BLOCKS);
+                TCUtil.spawnParticles((Level) level,blockEntity.getBlockPos(),pos);
                 blockEntity.setRenderStack(new ItemStack(state.getBlock()
                         .getDrops(state,new LootParams.Builder((ServerLevel) level)
                                 .withParameter(LootContextParams.ORIGIN,pos.getCenter())

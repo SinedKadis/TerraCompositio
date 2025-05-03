@@ -41,7 +41,7 @@ public class ShieldedBundleItem extends BundleItem {
         return 64;
     }
 
-    private static Stream<ItemStack> getContents(ItemStack pStack) {
+    public static Stream<ItemStack> getContents(ItemStack pStack) {
         CompoundTag compoundtag = pStack.getTag();
         if (compoundtag == null) {
             return Stream.empty();
@@ -55,9 +55,10 @@ public class ShieldedBundleItem extends BundleItem {
 
     @Override
     public boolean overrideOtherStackedOnMe(@NotNull ItemStack pStack, ItemStack pOther, @NotNull Slot pSlot, @NotNull ClickAction pAction, @NotNull Player pPlayer, @NotNull SlotAccess pAccess) {
-        if (!pOther.is(ModTags.Items.UNSTABLE_TECHNETIUM))
-            return false;
-        return super.overrideOtherStackedOnMe(pStack, pOther, pSlot, pAction, pPlayer, pAccess);
+        if (pOther.is(ModTags.Items.UNSTABLE_TECHNETIUM) || pOther.isEmpty()) {
+            return super.overrideOtherStackedOnMe(pStack, pOther, pSlot, pAction, pPlayer, pAccess);
+        }
+        return false;
     }
 
     @Override
