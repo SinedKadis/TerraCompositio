@@ -83,6 +83,9 @@ public class ModCreativeModTabs {
 
                         pOutput.accept(ModItems.SHIELDED_BUNDLE.get());
 
+                        pOutput.accept(ModBlocks.FLOW_CEDAR_PEDESTAL.get());
+                        pOutput.accept(ModBlocks.FLOW_CEDAR_TANK.get());
+
                     })
                     .build());
 

@@ -42,7 +42,9 @@ public class ModBlockTagGenerator extends BlockTagsProvider {
                         ModBlocks.FLOW_CEDAR_PLANKS.get(),
                         ModBlocks.STRIPPED_FLOW_CEDAR_LOG.get(),
                         ModBlocks.STRIPPED_FLOW_CEDAR_WOOD.get(),
-                        ModBlocks.FLOW_CEDAR_CASING.get());
+                        ModBlocks.FLOW_CEDAR_CASING.get(),
+                        ModBlocks.FLOW_CEDAR_PEDESTAL.get(),
+                        ModBlocks.FLOW_CEDAR_TANK.get());
 
 
         this.tag(BlockTags.NEEDS_IRON_TOOL)

@@ -143,4 +143,9 @@ public class ModBlocks {
             () -> new CultivationDesorberBlock(BlockBehaviour.Properties.copy(Blocks.IRON_BLOCK).strength(3f).noOcclusion()));
     public static final RegistryObject<Block> TIME_PASSAGE_DESORBER = registerBlock("time_passage_desorber",
             () -> new TimePassageDesorberBlock(BlockBehaviour.Properties.copy(Blocks.IRON_BLOCK).strength(3f).noOcclusion()));
+
+    public static final RegistryObject<Block> FLOW_CEDAR_PEDESTAL = registerBlock("flow_cedar_pedestal",
+            () -> new FlowCedarPedestalBlock(BlockBehaviour.Properties.copy(Blocks.AZALEA).noOcclusion()));
+    public static final RegistryObject<Block> FLOW_CEDAR_TANK = registerBlock("flow_cedar_tank",
+            () -> new FlowCedarTankBlock(BlockBehaviour.Properties.copy(Blocks.OAK_PLANKS).noOcclusion().noLootTable()));
 }

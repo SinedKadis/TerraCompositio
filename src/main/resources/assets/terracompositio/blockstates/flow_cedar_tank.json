@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "stage=0": {
+      "model": "terracompositio:block/flow_cedar_tank_with_rods_infused"
+    },
+    "stage=1": {
+      "model": "terracompositio:block/flow_cedar_tank_with_rods"
+    },
+    "stage=2": {
+      "model": "terracompositio:block/flow_cedar_tank_uncompleted"
+    },
+    "stage=3": {
+      "model": "terracompositio:block/flow_cedar_tank_glassed"
+    },
+    "stage=4": {
+      "model": "terracompositio:block/flow_cedar_tank_completed"
+    }
+  }
+}

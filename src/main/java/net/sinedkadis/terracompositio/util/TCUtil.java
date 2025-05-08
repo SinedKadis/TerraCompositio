@@ -12,8 +12,11 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.RotatedPillarBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.Property;
+import net.sinedkadis.terracompositio.block.custom.FlowCedarLikeBlock;
+import net.sinedkadis.terracompositio.registries.ModGameRules;
 import net.sinedkadis.terracompositio.registries.ModParticles;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -26,9 +29,10 @@ public class TCUtil {
     public static @NotNull InteractionResult handleInWorldBlockCraft(BlockState oldState, BlockState newState, Level pLevel, BlockPos pPos, ItemStack item, int count) {
         pLevel.setBlock(pPos,copyBlockStates(oldState,newState),3);
         item.shrink(count);
-        if (pLevel instanceof ServerLevel level && oldState.hasProperty(INFUSED) && oldState.getValue(INFUSED)){
+        if (pLevel instanceof ServerLevel level ){
             level.playSound(null, pPos, SoundEvents.COPPER_PLACE, SoundSource.BLOCKS);
-            level.sendParticles(ModParticles.FLOW_STILL_PARTICLE.get(),
+            if (oldState.hasProperty(INFUSED) && oldState.getValue(INFUSED))
+                level.sendParticles(ModParticles.FLOW_STILL_PARTICLE.get(),
                     pPos.getX(),
                     pPos.getY(),
                     pPos.getZ(),
@@ -227,5 +231,29 @@ public class TCUtil {
 
     public static boolean onRemoveHandlerBlacklist(BlockState state,Block... blocks){
         return Arrays.stream(blocks).map(block -> !state.is(block)).reduce((aBoolean, aBoolean2) -> aBoolean && aBoolean2).orElse(true);
+    }
+
+    public static void flowLeak(BlockState pState, Level pLevel, BlockPos pPos,boolean chained) {
+        if (pState.hasProperty(FlowCedarLikeBlock.INFUSED) && pState.getValue(FlowCedarLikeBlock.INFUSED)&&!pLevel.getGameRules().getBoolean(ModGameRules.DISABLE_FLOW_LEAKING)) {
+
+                BlockPos f_pos;
+                BlockPos b_pos;
+                if (pState.hasProperty(RotatedPillarBlock.AXIS)) {
+                    f_pos = pPos.relative(pState.getValue(RotatedPillarBlock.AXIS), 1);
+                    b_pos = pPos.relative(pState.getValue(RotatedPillarBlock.AXIS), -1);
+                } else {
+                    f_pos = pPos.relative(Direction.Axis.Y, 1);
+                    b_pos = pPos.relative(Direction.Axis.Y, -1);
+                }
+                getNearBlocks(f_pos,chained ? 4 : 2).stream()
+                        .filter(pos -> pos != pPos)
+                        .filter(pos -> pLevel.getBlockState(pos).hasProperty(FlowCedarLikeBlock.INFUSED))
+                        .forEach(pos -> pLevel.setBlockAndUpdate(pos, pLevel.getBlockState(pos).setValue(FlowCedarLikeBlock.INFUSED, false)));
+                getNearBlocks(b_pos,chained ? 4 : 2).stream()
+                        .filter(pos -> pos != pPos)
+                        .filter(pos -> pLevel.getBlockState(pos).hasProperty(FlowCedarLikeBlock.INFUSED))
+                        .forEach(pos -> pLevel.setBlockAndUpdate(pos, pLevel.getBlockState(pos).setValue(FlowCedarLikeBlock.INFUSED, false)));
+
+        }
     }
 }

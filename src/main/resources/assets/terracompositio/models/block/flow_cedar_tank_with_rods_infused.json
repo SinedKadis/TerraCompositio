@@ -1,0 +1,12 @@
+{
+  "parent": "block/cube",
+  "textures": {
+    "particle": "terracompositio:block/flow_cedar_tank_uncut_infused",
+    "down": "terracompositio:block/flow_cedar_tank_uncut_top_infused",
+    "up": "terracompositio:block/flow_cedar_tank_uncut_top_infused",
+    "north": "terracompositio:block/flow_cedar_tank_uncut_infused",
+    "south": "terracompositio:block/flow_cedar_tank_uncut_infused",
+    "east": "terracompositio:block/flow_cedar_tank_uncut_infused",
+    "west": "terracompositio:block/flow_cedar_tank_uncut_infused"
+  }
+}

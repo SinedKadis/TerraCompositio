@@ -35,7 +35,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Supplier;
 
-import static net.sinedkadis.terracompositio.block.custom.FlowCedarLikeBlock.flowLeak;
+import static net.sinedkadis.terracompositio.util.TCUtil.flowLeak;
 import static net.sinedkadis.terracompositio.util.TCUtil.*;
 
 

@@ -24,11 +24,13 @@ import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.phys.BlockHitResult;
 import net.sinedkadis.terracompositio.block.entity.FlowCedarCasingBlockEntity;
+import net.sinedkadis.terracompositio.item.custom.WrenchAxeItem;
 import net.sinedkadis.terracompositio.registries.ModBlockEntities;
 import net.sinedkadis.terracompositio.registries.ModBlockStateProperties;
 import net.sinedkadis.terracompositio.registries.ModBlocks;
 import net.sinedkadis.terracompositio.registries.ModItems;
 import net.sinedkadis.terracompositio.util.FunctionSide;
+import net.sinedkadis.terracompositio.util.TCUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -64,6 +66,17 @@ public class FlowCedarCasingBlock extends FlowCedarLikeBlock implements EntityBl
     @Override
     public @NotNull InteractionResult use(@NotNull BlockState pState, @NotNull Level pLevel, @NotNull BlockPos pPos, @NotNull Player pPlayer, @NotNull InteractionHand pHand, @NotNull BlockHitResult pHit) {
         ItemStack item = pPlayer.getItemInHand(InteractionHand.MAIN_HAND);
+        ItemStack item2 = pPlayer.getItemInHand(InteractionHand.OFF_HAND);
+        if (pState.getValue(AXIS).isVertical() && item2.getItem() instanceof WrenchAxeItem){
+            if (item.is(ModItems.INFUSED_IRON_ROD.get()) && item.getCount() >= 8){
+                if (WrenchAxeItem.getMode(item2).equals(WrenchAxeItem.WrenchMode.WRENCH)) {
+                    return handleInWorldBlockCraft(pState,
+                            ModBlocks.FLOW_CEDAR_TANK.get().defaultBlockState()
+                                    .setValue(FlowCedarTankBlock.STAGE, pState.getValue(INFUSED) ? 0 : 1),
+                            pLevel, pPos, item, 8);
+                }
+            }
+        }
         if (item.is(ModItems.INPUT_BUS.get()) && !hasInputBus(pState)) {
             return handleInWorldBlockCraft(pState, pState.setValue(INPUT_BUS, true), pLevel, pPos, item, 1);
         }
@@ -119,7 +132,9 @@ public class FlowCedarCasingBlock extends FlowCedarLikeBlock implements EntityBl
         if (hasOutputBusConnection(pState) && !hasOutputBusConnection(pNewState)){
             pLevel.addFreshEntity(new ItemEntity(pLevel, pPos.getX(),pPos.getY(),pPos.getZ(), new ItemStack(ModItems.INFUSED_IRON_ROD.get())));
         }
-        if (pState.getBlock() != pNewState.getBlock() && !pNewState.is(Blocks.STRUCTURE_VOID)) {
+        if (pState.getBlock() != pNewState.getBlock() && TCUtil.onRemoveHandlerBlacklist(pNewState,
+                Blocks.STRUCTURE_VOID,
+                ModBlocks.FLOW_CEDAR_TANK.get())) {
             pLevel.addFreshEntity(new ItemEntity(pLevel, pPos.getX(), pPos.getY(), pPos.getZ(), new ItemStack(ModItems.GOLD_ROD.get(), 4)));
             Direction direction = FunctionSide.getDirectionByFunctionSide(pState);
             if (direction != Direction.DOWN) {

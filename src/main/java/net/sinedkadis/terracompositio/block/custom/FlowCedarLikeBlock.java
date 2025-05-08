@@ -1,6 +1,5 @@
 package net.sinedkadis.terracompositio.block.custom;
 
-import mekanism.api.annotations.ParametersAreNotNullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
@@ -26,7 +25,6 @@ import net.sinedkadis.terracompositio.registries.ModBlockStateProperties;
 import net.sinedkadis.terracompositio.registries.ModBlocks;
 import net.sinedkadis.terracompositio.registries.ModItems;
 import net.sinedkadis.terracompositio.item.custom.WrenchAxeItem;
-import net.sinedkadis.terracompositio.registries.ModGameRules;
 import net.sinedkadis.terracompositio.util.TCUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -130,35 +128,9 @@ public class FlowCedarLikeBlock extends RotatedPillarBlock {
                 Blocks.STRUCTURE_VOID,
                 ModBlocks.FLOW_CEDAR_CASING.get(),
                 ModBlocks.FLOW_CEDAR_PORT.get())) {
-            flowLeak(pState, pLevel, pPos,false);
+            TCUtil.flowLeak(pState, pLevel, pPos,false);
         }
     }
-
-
-    public static void flowLeak(BlockState pState, Level pLevel, BlockPos pPos,boolean chained) {
-        if (pState.hasProperty(INFUSED) && pState.getValue(INFUSED)&&!pLevel.getGameRules().getBoolean(ModGameRules.DISABLE_FLOW_LEAKING)) {
-
-                BlockPos f_pos;
-                BlockPos b_pos;
-                if (pState.hasProperty(AXIS)) {
-                    f_pos = pPos.relative(pState.getValue(AXIS), 1);
-                    b_pos = pPos.relative(pState.getValue(AXIS), -1);
-                } else {
-                    f_pos = pPos.relative(Direction.Axis.Y, 1);
-                    b_pos = pPos.relative(Direction.Axis.Y, -1);
-                }
-                getNearBlocks(f_pos,chained ? 4 : 2).stream()
-                        .filter(pos -> pos != pPos)
-                        .filter(pos -> pLevel.getBlockState(pos).hasProperty(INFUSED))
-                        .forEach(pos -> pLevel.setBlockAndUpdate(pos, pLevel.getBlockState(pos).setValue(INFUSED, false)));
-                getNearBlocks(b_pos,chained ? 4 : 2).stream()
-                        .filter(pos -> pos != pPos)
-                        .filter(pos -> pLevel.getBlockState(pos).hasProperty(INFUSED))
-                        .forEach(pos -> pLevel.setBlockAndUpdate(pos, pLevel.getBlockState(pos).setValue(INFUSED, false)));
-
-        }
-    }
-
 
 
     @Override

@@ -23,10 +23,7 @@ import net.sinedkadis.terracompositio.entity.client.ModBoatRenderer;
 import net.sinedkadis.terracompositio.entity.client.ModModelLayers;
 import net.sinedkadis.terracompositio.item.custom.ShieldedBundleItem;
 import net.sinedkadis.terracompositio.item.custom.WrenchAxeItem;
-import net.sinedkadis.terracompositio.registries.ModBlockEntities;
-import net.sinedkadis.terracompositio.registries.ModFluids;
-import net.sinedkadis.terracompositio.registries.ModItems;
-import net.sinedkadis.terracompositio.registries.ModWoodTypes;
+import net.sinedkadis.terracompositio.registries.*;
 import net.sinedkadis.terracompositio.screen.FlowBlockPortScreen;
 import net.sinedkadis.terracompositio.screen.ModMenuTypes;
 
@@ -48,6 +45,8 @@ public class ModEventBusClientEvents {
         ItemBlockRenderTypes.setRenderLayer(ModFluids.BIRCH_JUICE_FLUID.flowing.get(), RenderType.translucent());
         ItemBlockRenderTypes.setRenderLayer(ModFluids.FLOW_FLUID.source.get(), RenderType.translucent());
         ItemBlockRenderTypes.setRenderLayer(ModFluids.FLOW_FLUID.flowing.get(), RenderType.translucent());
+        ItemBlockRenderTypes.setRenderLayer(ModBlocks.FLOW_CEDAR_PEDESTAL.get(), RenderType.cutout());
+        ItemBlockRenderTypes.setRenderLayer(ModBlocks.FLOW_CEDAR_TANK.get(), RenderType.cutout());
 
         event.enqueueWork(() -> ItemProperties.register(
                 ModItems.WRENCH_AXE.get(),

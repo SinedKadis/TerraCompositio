@@ -53,7 +53,6 @@ public class ModBlockLootTables extends BlockLootSubProvider {
         this.dropSelf(ModBlocks.CULTIVATION_DESORBER.get());
         this.dropSelf(ModBlocks.TIME_PASSAGE_DESORBER.get());
 
-
         this.dropOther(ModBlocks.FLOW_CEDAR_CASING.get(),ModBlocks.FLOW_CEDAR_LOG.get());
         this.dropSelf(ModBlocks.MATTER_INFUSER_PORT.get());
         this.dropSelf(ModBlocks.MATTER_INFUSER_IO.get());
