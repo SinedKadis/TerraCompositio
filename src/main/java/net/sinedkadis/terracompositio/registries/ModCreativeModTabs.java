@@ -24,7 +24,7 @@ public class ModCreativeModTabs {
                         pOutput.accept(ModBlocks.STRIPPED_FLOW_CEDAR_LOG.get());
                         pOutput.accept(ModBlocks.FLOW_CEDAR_WOOD.get());
                         pOutput.accept(ModBlocks.STRIPPED_FLOW_CEDAR_WOOD.get());
-                        pOutput.accept(ModBlocks.FLOW_PORT.get());
+                        pOutput.accept(ModBlocks.FLOW_CEDAR_PORT.get());
                         pOutput.accept(ModBlocks.FLOW_CEDAR_LEAVES.get());
                         pOutput.accept(ModBlocks.FLOW_CEDAR_PLANKS.get());
                         pOutput.accept(ModBlocks.FLOW_CEDAR_STAIRS.get());
@@ -68,7 +68,7 @@ public class ModCreativeModTabs {
                         pOutput.accept(ModItems.HIGH_ENRICHED_TECHNETIUM.get());
                         pOutput.accept(ModBlocks.TECHNETIUM_ORE.get());
                         pOutput.accept(ModBlocks.TECHNETIUM_DEEPSLATE_ORE.get());
-                        pOutput.accept(ModBlocks.FLOW_CEDAR_BIG_SAPLING.get());
+
                         pOutput.accept(ModBlocks.FLOW_CEDAR_SAPLING.get());
 
                         pOutput.accept(ModBlocks.FLOW_CEDAR_CASING.get());

@@ -27,6 +27,7 @@ import net.sinedkadis.terracompositio.registries.ModBlocks;
 import net.sinedkadis.terracompositio.registries.ModItems;
 import net.sinedkadis.terracompositio.item.custom.WrenchAxeItem;
 import net.sinedkadis.terracompositio.registries.ModGameRules;
+import net.sinedkadis.terracompositio.util.TCUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -103,8 +104,7 @@ public class FlowCedarLikeBlock extends RotatedPillarBlock {
     }
 
     @Override
-    @ParametersAreNotNullByDefault
-    public InteractionResult use(BlockState pState, Level pLevel, BlockPos pPos, Player pPlayer, InteractionHand pHand, BlockHitResult pHit) {
+    public @NotNull InteractionResult use(@NotNull BlockState pState, @NotNull Level pLevel, @NotNull BlockPos pPos, Player pPlayer, @NotNull InteractionHand pHand, @NotNull BlockHitResult pHit) {
         ItemStack item = pPlayer.getItemInHand(InteractionHand.MAIN_HAND);
         ItemStack item2 = pPlayer.getItemInHand(InteractionHand.OFF_HAND);
         if (this.getClass() == FlowCedarLikeBlock.class) {
@@ -124,13 +124,16 @@ public class FlowCedarLikeBlock extends RotatedPillarBlock {
     }
 
     @Override
-    @ParametersAreNotNullByDefault
-    public void onRemove(BlockState pState,Level pLevel,BlockPos pPos,BlockState pNewState, boolean pIsMoving) {
+    public void onRemove(@NotNull BlockState pState, @NotNull Level pLevel, @NotNull BlockPos pPos, @NotNull BlockState pNewState, boolean pIsMoving) {
         super.onRemove(pState, pLevel, pPos, pNewState, pIsMoving);
-        if (pNewState.is(Blocks.AIR)) {
+        if (pState.getBlock() != pNewState.getBlock() && TCUtil.onRemoveHandlerBlacklist(pNewState,
+                Blocks.STRUCTURE_VOID,
+                ModBlocks.FLOW_CEDAR_CASING.get(),
+                ModBlocks.FLOW_CEDAR_PORT.get())) {
             flowLeak(pState, pLevel, pPos,false);
         }
     }
+
 
     public static void flowLeak(BlockState pState, Level pLevel, BlockPos pPos,boolean chained) {
         if (pState.hasProperty(INFUSED) && pState.getValue(INFUSED)&&!pLevel.getGameRules().getBoolean(ModGameRules.DISABLE_FLOW_LEAKING)) {
@@ -159,7 +162,7 @@ public class FlowCedarLikeBlock extends RotatedPillarBlock {
 
 
     @Override
-    public void tick(BlockState pState, ServerLevel pLevel, BlockPos pPos, RandomSource pRandom) {
+    public void tick(BlockState pState, @NotNull ServerLevel pLevel, @NotNull BlockPos pPos, @NotNull RandomSource pRandom) {
         if (pState.getValue(INFUSED)) {
             for (BlockPos blockPos : getNearBlocks(pPos)) {
                 if (blockPos.getX() != pPos.getX()
@@ -175,7 +178,7 @@ public class FlowCedarLikeBlock extends RotatedPillarBlock {
     }
 
     @Override
-    public boolean isRandomlyTicking(BlockState pState) {
+    public boolean isRandomlyTicking(@NotNull BlockState pState) {
         return true;
     }
 

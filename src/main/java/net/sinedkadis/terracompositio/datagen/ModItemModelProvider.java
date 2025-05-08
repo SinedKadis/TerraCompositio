@@ -86,7 +86,7 @@ public class ModItemModelProvider extends ItemModelProvider {
         simpleItem(ModItems.OUTPUT_BUS);
         simpleItem(ModItems.COPPER_ROD);
 
-        saplingItem(ModBlocks.FLOW_CEDAR_BIG_SAPLING);
+
         saplingItem(ModBlocks.FLOW_CEDAR_SAPLING);
     }
 

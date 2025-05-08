@@ -8,7 +8,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.phys.Vec2;
 import net.sinedkadis.terracompositio.TerraCompositio;
-import net.sinedkadis.terracompositio.block.entity.FlowPortBlockEntity;
+import net.sinedkadis.terracompositio.block.entity.MatterInfuserIOBlockEntity;
 import net.sinedkadis.terracompositio.block.entity.ModItemIOCFEBlockEntity;
 import snownee.jade.api.BlockAccessor;
 import snownee.jade.api.IBlockComponentProvider;
@@ -75,9 +75,9 @@ public enum ModItemIOComponentProvider implements IBlockComponentProvider, IServ
         if (blockEntity instanceof ModItemIOCFEBlockEntity entity){
             inputSlot = entity.getFirstSlot();
             outputSlot = entity.getLastSlot();
-        } else if (blockEntity instanceof FlowPortBlockEntity entity){
-            inputSlot = entity.getInputSlot();
-            outputSlot = entity.getOutputSlot();
+        }
+        if(blockEntity instanceof MatterInfuserIOBlockEntity){
+            return;
         }
         compoundTag.putInt("input_c",inputSlot.getCount());
         compoundTag.putInt("input",Item.getId(inputSlot.getItem()));

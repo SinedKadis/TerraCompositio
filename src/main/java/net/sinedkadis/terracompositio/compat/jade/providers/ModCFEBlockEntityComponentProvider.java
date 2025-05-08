@@ -40,4 +40,8 @@ public enum ModCFEBlockEntityComponentProvider implements IBlockComponentProvide
 
     }
 
+    @Override
+    public int getDefaultPriority() {
+        return -1000;
+    }
 }

@@ -35,7 +35,7 @@ public class ModBlockLootTables extends BlockLootSubProvider {
         this.dropSelf(ModBlocks.FLOW_CEDAR_PLANKS.get());
         this.dropSelf(ModBlocks.STRIPPED_FLOW_CEDAR_LOG.get());
         this.dropSelf(ModBlocks.STRIPPED_FLOW_CEDAR_WOOD.get());
-        this.dropSelf(ModBlocks.FLOW_PORT.get());
+        this.dropOther(ModBlocks.FLOW_CEDAR_PORT.get(),ModBlocks.FLOW_CEDAR_LOG.get());
         this.dropSelf(ModBlocks.CREATIVE_CFE_SOURCE.get());
 
         this.dropSelf(ModBlocks.FLOW_CEDAR_STAIRS.get());
@@ -47,7 +47,7 @@ public class ModBlockLootTables extends BlockLootSubProvider {
         this.dropSelf(ModBlocks.WEDGE.get());
         this.dropOther(ModBlocks.FLOW_INFUSER.get(), ModBlocks.FLOW_CEDAR_LOG.get());
         this.dropSelf(ModBlocks.TECHNETIUM_RAW_ORE_BLOCK.get());
-        this.dropSelf(ModBlocks.FLOW_CEDAR_BIG_SAPLING.get());
+
         this.dropSelf(ModBlocks.FLOW_CEDAR_SAPLING.get());
         this.dropSelf(ModBlocks.CONSTRUCTION_DESORBER.get());
         this.dropSelf(ModBlocks.CULTIVATION_DESORBER.get());
@@ -73,7 +73,7 @@ public class ModBlockLootTables extends BlockLootSubProvider {
         this.add(ModBlocks.END_STONE_SAPPHIRE_ORE.get(),
                 block -> createCopperLikeOreDrops(ModBlocks.END_STONE_SAPPHIRE_ORE.get(), ModItems.RAW_SAPPHIRE.get()));
         */
-        this.dropOther(ModBlocks.FLOW_PORT.get(),ModBlocks.FLOW_PORT.get());
+        this.dropOther(ModBlocks.FLOW_CEDAR_PORT.get(),ModBlocks.FLOW_CEDAR_PORT.get());
         this.dropOther(ModBlocks.FLOW_CAULDRON.get(), Blocks.CAULDRON);
         this.dropOther(ModBlocks.BIRCH_JUICE_CAULDRON.get(), Blocks.CAULDRON);
 

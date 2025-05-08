@@ -17,7 +17,6 @@ import net.sinedkadis.terracompositio.block.custom.FlowCedarLikeBlock;
 
 import java.util.Objects;
 
-import static net.sinedkadis.terracompositio.block.custom.FlowPortBlock.FACING;
 
 public class ModBlockStateProvider extends BlockStateProvider {
     public ModBlockStateProvider(PackOutput output, ExistingFileHelper exFileHelper) {
@@ -29,9 +28,6 @@ public class ModBlockStateProvider extends BlockStateProvider {
         flowLogBlockWithItem(ModBlocks.FLOW_CEDAR_LOG);
 
         blockWithItem(ModBlocks.FLOW_CEDAR_LEAVES);
-        flowPortBlockWithItem(ModBlocks.FLOW_PORT,
-                ModBlocks.FLOW_CEDAR_LOG,
-                ModBlocks.FLOW_CEDAR_LOG);
         blockWithItem(ModBlocks.CREATIVE_CFE_SOURCE);
         flowWoodBlockWithItem(ModBlocks.FLOW_CEDAR_WOOD,
                 ModBlocks.FLOW_CEDAR_LOG);
@@ -57,7 +53,7 @@ public class ModBlockStateProvider extends BlockStateProvider {
         hangingSignBlock(ModBlocks.FLOW_CEDAR_HANGING_SIGN.get(), ModBlocks.FLOW_CEDAR_WALL_HANGING_SIGN.get(),
                 blockTexture(ModBlocks.FLOW_CEDAR_PLANKS.get()));
 
-        saplingBlock(ModBlocks.FLOW_CEDAR_BIG_SAPLING);
+
         saplingBlock(ModBlocks.FLOW_CEDAR_SAPLING);
     }
 
@@ -94,89 +90,6 @@ public class ModBlockStateProvider extends BlockStateProvider {
     private void flowWoodBlockWithItem(RegistryObject<Block> block, RegistryObject<Block> texture){
         flowLogBlock(block.get(),texture.get(),texture.get(),true);
         simpleBlockItem(block.get(), new ModelFile.UncheckedModelFile(TerraCompositio.MOD_ID+":block/"+ Objects.requireNonNull(ForgeRegistries.BLOCKS.getKey(block.get())).getPath()));
-    }
-    private  void flowPortBlockWithItem(RegistryObject<Block> block, RegistryObject<Block> sideTexture, RegistryObject<Block> topTexture){
-        ResourceLocation side = this.blockTexture(sideTexture.get());
-        ResourceLocation working_side = this.blockTexture(block.get());
-        ResourceLocation end = this.extend(this.blockTexture(topTexture.get()), "_top");
-        ResourceLocation side_infused = this.extend(this.blockTexture(sideTexture.get()), "_infused");
-        ResourceLocation working_side_infused = this.extend(this.blockTexture(block.get()), "_infused");
-        ResourceLocation end_infused = this.extend(this.blockTexture(topTexture.get()), "_top_infused");
-        ModelFile model = this.models().cube(this.name(block.get()),end,end, working_side, side,side,side).texture("particle",working_side);
-        ModelFile model_infused = this.models().cube(this.name(block.get())+"_infused",end_infused,end_infused, working_side_infused, side_infused,side_infused,side_infused).texture("particle",working_side_infused);
-        this.getVariantBuilder(block.get())
-                .partialState()
-                    .with(RotatedPillarBlock.AXIS, Direction.Axis.Y)
-                    .with(FACING,Direction.NORTH)
-                    .with(FlowCedarLikeBlock.INFUSED, true)
-                        .modelForState().modelFile(model_infused)
-                            .addModel()
-                .partialState()
-                    .with(RotatedPillarBlock.AXIS, Direction.Axis.Y)
-                    .with(FACING,Direction.EAST)
-                    .with(FlowCedarLikeBlock.INFUSED, true)
-                        .modelForState().modelFile(model_infused).rotationY(90)
-                            .addModel()
-                .partialState()
-                    .with(RotatedPillarBlock.AXIS, Direction.Axis.Y)
-                    .with(FACING,Direction.SOUTH)
-                    .with(FlowCedarLikeBlock.INFUSED, true)
-                        .modelForState().modelFile(model_infused).rotationY(180)
-                            .addModel()
-                .partialState()
-                    .with(RotatedPillarBlock.AXIS, Direction.Axis.Y)
-                    .with(FACING,Direction.WEST)
-                    .with(FlowCedarLikeBlock.INFUSED, true)
-                        .modelForState().modelFile(model_infused).rotationY(270)
-                            .addModel()
-                .partialState()
-                    .with(RotatedPillarBlock.AXIS, Direction.Axis.Z)
-                    .with(FlowCedarLikeBlock.INFUSED, true)
-                        .modelForState().modelFile(model_infused).rotationX(90)
-                            .addModel()
-                .partialState()
-                    .with(RotatedPillarBlock.AXIS, Direction.Axis.X)
-                    .with(FlowCedarLikeBlock.INFUSED, true)
-                        .modelForState().modelFile(model_infused).rotationX(90).rotationY(90)
-                            .addModel()
-                .partialState()
-                    .with(RotatedPillarBlock.AXIS, Direction.Axis.Y)
-                    .with(FACING,Direction.NORTH)
-                    .with(FlowCedarLikeBlock.INFUSED, false)
-                        .modelForState().modelFile(model)
-                            .addModel()
-                .partialState()
-                    .with(RotatedPillarBlock.AXIS, Direction.Axis.Y)
-                    .with(FACING,Direction.EAST)
-                    .with(FlowCedarLikeBlock.INFUSED, false)
-                        .modelForState().modelFile(model).rotationY(90)
-                            .addModel()
-                .partialState()
-                    .with(RotatedPillarBlock.AXIS, Direction.Axis.Y)
-                    .with(FACING,Direction.SOUTH)
-                    .with(FlowCedarLikeBlock.INFUSED, false)
-                        .modelForState().modelFile(model).rotationY(180)
-                            .addModel()
-                .partialState()
-                    .with(RotatedPillarBlock.AXIS, Direction.Axis.Y)
-                    .with(FACING,Direction.WEST)
-                    .with(FlowCedarLikeBlock.INFUSED, false)
-                        .modelForState().modelFile(model).rotationY(270)
-                            .addModel()
-                .partialState()
-                    .with(RotatedPillarBlock.AXIS, Direction.Axis.Z)
-                    .with(FlowCedarLikeBlock.INFUSED, false)
-                        .modelForState().modelFile(model).rotationX(90)
-                            .addModel()
-                .partialState()
-                    .with(RotatedPillarBlock.AXIS, Direction.Axis.X)
-                    .with(FlowCedarLikeBlock.INFUSED, false)
-                        .modelForState().modelFile(model).rotationX(90).rotationY(90)
-                            .addModel();
-        ResourceLocation key = ForgeRegistries.BLOCKS.getKey(block.get());
-        if (key != null) {
-            simpleBlockItem(block.get(), new ModelFile.UncheckedModelFile(TerraCompositio.MOD_ID+":block/"+ key.getPath()));
-        }
     }
 
     private void flowLogBlockWithItem(RegistryObject<Block> block){

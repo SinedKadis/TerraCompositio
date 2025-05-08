@@ -224,4 +224,8 @@ public class TCUtil {
 
         return items;
     }
+
+    public static boolean onRemoveHandlerBlacklist(BlockState state,Block... blocks){
+        return Arrays.stream(blocks).map(block -> !state.is(block)).reduce((aBoolean, aBoolean2) -> aBoolean && aBoolean2).orElse(true);
+    }
 }

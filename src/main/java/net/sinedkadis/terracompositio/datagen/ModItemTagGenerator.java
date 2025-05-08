@@ -28,7 +28,7 @@ public class ModItemTagGenerator extends ItemTagsProvider {
         this.tag(ItemTags.LOGS_THAT_BURN)
                 .add(ModBlocks.FLOW_CEDAR_LOG.get().asItem(),
                         ModBlocks.FLOW_CEDAR_WOOD.get().asItem(),
-                        ModBlocks.FLOW_PORT.get().asItem(),
+                        ModBlocks.FLOW_CEDAR_PORT.get().asItem(),
                         ModBlocks.STRIPPED_FLOW_CEDAR_LOG.get().asItem(),
                         ModBlocks.STRIPPED_FLOW_CEDAR_WOOD.get().asItem(),
                         ModBlocks.FLOW_CEDAR_CASING.get().asItem(),

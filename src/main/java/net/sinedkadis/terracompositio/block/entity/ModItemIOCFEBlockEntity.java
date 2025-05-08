@@ -14,12 +14,9 @@ import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.IItemHandler;
-import net.sinedkadis.terracompositio.recipe.FlowInfusionRecipe;
 import net.sinedkadis.terracompositio.util.ModItemStackHandler;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-
-import java.util.Optional;
 
 import static net.sinedkadis.terracompositio.block.custom.FlowCedarCasingBlock.isPortAttached;
 
@@ -42,7 +39,7 @@ public abstract class ModItemIOCFEBlockEntity extends ModCFEBlockEntity{
     }
 
     protected <T> @Nullable LazyOptional<T> getCap(@NotNull Capability<T> cap,@Nullable Direction side) {
-        if(cap == ForgeCapabilities.ITEM_HANDLER){
+        if(cap == ForgeCapabilities.ITEM_HANDLER && side != null){
             return lazyItemHandler.cast();
         }
         return null;
@@ -92,10 +89,6 @@ public abstract class ModItemIOCFEBlockEntity extends ModCFEBlockEntity{
         progress = 0;
     }
 
-    protected void craftItem() {
-
-    }
-
     protected boolean hasProgressFinished() {
         return progress>=maxProgress;
     }
@@ -108,29 +101,6 @@ public abstract class ModItemIOCFEBlockEntity extends ModCFEBlockEntity{
         progress++;
     }
 
-    protected boolean hasRecipe() {
-        Optional<FlowInfusionRecipe> recipe = getCurrentRecipe();
-        if (recipe.isEmpty()){
-            return false;
-        }
-        ItemStack result = recipe.get().getResultItem(null);
-        boolean outputTest = enoughSpaceInOutput(result.getCount()) && sameItemInOutput(result.getItem());
-        if (outputTest){
-            maxProgress = recipe.get().getTicks();
-            tickCFECost = recipe.get().getCFETick();
-        }
-        return outputTest;
-    }
-
-    protected Optional<FlowInfusionRecipe> getCurrentRecipe() {
-        SimpleContainer inventory = new SimpleContainer(this.itemHandler.getSlots());
-        for(int i = 0; i < itemHandler.getSlots(); i++) {
-            inventory.setItem(i, this.itemHandler.getStackInSlot(i));
-        }
-
-        assert this.level != null;
-        return this.level.getRecipeManager().getRecipeFor(FlowInfusionRecipe.Type.INSTANCE, inventory, level);
-    }
 
     protected boolean sameItemInOutput(Item item) {
         return this.itemHandler.getStackInSlot(SLOT_OUTPUT).isEmpty() || this.itemHandler.getStackInSlot(SLOT_OUTPUT).is(item);
@@ -163,7 +133,7 @@ public abstract class ModItemIOCFEBlockEntity extends ModCFEBlockEntity{
         }
         return itemStack;
         //return super.insertItem(slot,stack,false);
-        //return this.itemHandler.insertItem(slot,item,false);
+        //return this.itemHandler.insertItem(slot,stack,false);
     }
     public void setSlotEmpty(int slot){
         slot = Mth.clamp(0,itemHandler.getSlots()-1,slot);

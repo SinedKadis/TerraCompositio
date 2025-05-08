@@ -65,6 +65,15 @@ public enum MatterInfuserIOComponentProvider implements IBlockComponentProvider,
             compoundTag.putInt("duration", blockEntity.ticksLeft());
             compoundTag.putInt("decay_chance", matterInfusionRecipe.getCatalystDecayRate());
         });
+
+        ItemStack inputSlot = blockEntity.getInputSlot();
+        ItemStack outputSlot = blockEntity.getOutputSlot();
+
+        compoundTag.putInt("input_c",inputSlot.getCount());
+        compoundTag.putInt("input",Item.getId(inputSlot.getItem()));
+        compoundTag.putInt("output_c", outputSlot.getCount());
+        compoundTag.putInt("output", Item.getId(outputSlot.getItem()));
+
     }
 
     public ResourceLocation catalystConfigRL() {

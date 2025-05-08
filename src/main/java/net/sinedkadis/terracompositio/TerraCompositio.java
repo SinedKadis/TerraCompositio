@@ -17,7 +17,7 @@ import net.sinedkadis.terracompositio.events.CFENetworkEvent;
 import net.sinedkadis.terracompositio.screen.ModMenuTypes;
 import net.sinedkadis.terracompositio.sound.ModSounds;
 import net.sinedkadis.terracompositio.worldgen.tree.ModFoliagePlacers;
-import net.sinedkadis.terracompositio.worldgen.tree.ModTrunkPlacerTypes;
+import net.sinedkadis.terracompositio.worldgen.tree.ModTrunkPlacers;
 
 
 @Mod(TerraCompositio.MOD_ID)
@@ -50,7 +50,7 @@ public class TerraCompositio
         ModBlockEntities.register(modEventBus);
         ModRecipes.register(modEventBus);
         ModMenuTypes.register(modEventBus);
-        ModTrunkPlacerTypes.register(modEventBus);
+        ModTrunkPlacers.register(modEventBus);
         ModFoliagePlacers.register(modEventBus);
 
         ModGameRules.init();

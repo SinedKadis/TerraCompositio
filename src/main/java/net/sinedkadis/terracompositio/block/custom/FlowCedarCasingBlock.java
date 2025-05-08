@@ -1,6 +1,5 @@
 package net.sinedkadis.terracompositio.block.custom;
 
-import mekanism.api.annotations.ParametersAreNotNullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.sounds.SoundEvents;
@@ -14,6 +13,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
@@ -62,8 +62,7 @@ public class FlowCedarCasingBlock extends FlowCedarLikeBlock implements EntityBl
     }
 
     @Override
-    @ParametersAreNotNullByDefault
-    public @NotNull InteractionResult use(BlockState pState, Level pLevel, BlockPos pPos, Player pPlayer, InteractionHand pHand, BlockHitResult pHit) {
+    public @NotNull InteractionResult use(@NotNull BlockState pState, @NotNull Level pLevel, @NotNull BlockPos pPos, @NotNull Player pPlayer, @NotNull InteractionHand pHand, @NotNull BlockHitResult pHit) {
         ItemStack item = pPlayer.getItemInHand(InteractionHand.MAIN_HAND);
         if (item.is(ModItems.INPUT_BUS.get()) && !hasInputBus(pState)) {
             return handleInWorldBlockCraft(pState, pState.setValue(INPUT_BUS, true), pLevel, pPos, item, 1);
@@ -120,7 +119,7 @@ public class FlowCedarCasingBlock extends FlowCedarLikeBlock implements EntityBl
         if (hasOutputBusConnection(pState) && !hasOutputBusConnection(pNewState)){
             pLevel.addFreshEntity(new ItemEntity(pLevel, pPos.getX(),pPos.getY(),pPos.getZ(), new ItemStack(ModItems.INFUSED_IRON_ROD.get())));
         }
-        if (pState.getBlock() != pNewState.getBlock()) {
+        if (pState.getBlock() != pNewState.getBlock() && !pNewState.is(Blocks.STRUCTURE_VOID)) {
             pLevel.addFreshEntity(new ItemEntity(pLevel, pPos.getX(), pPos.getY(), pPos.getZ(), new ItemStack(ModItems.GOLD_ROD.get(), 4)));
             Direction direction = FunctionSide.getDirectionByFunctionSide(pState);
             if (direction != Direction.DOWN) {
@@ -177,8 +176,7 @@ public class FlowCedarCasingBlock extends FlowCedarLikeBlock implements EntityBl
 
     @Nullable
     @Override
-    @ParametersAreNotNullByDefault
-    public BlockEntity newBlockEntity(BlockPos blockPos, BlockState blockState) {
+    public BlockEntity newBlockEntity(@NotNull BlockPos blockPos, @NotNull BlockState blockState) {
         return ModBlockEntities.FLOW_CEDAR_CASING_BE.get().create(blockPos,blockState);
     }
 

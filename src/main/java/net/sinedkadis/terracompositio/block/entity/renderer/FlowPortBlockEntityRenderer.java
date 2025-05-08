@@ -15,20 +15,19 @@ import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LightLayer;
-import net.sinedkadis.terracompositio.block.entity.FlowPortBlockEntity;
+import net.sinedkadis.terracompositio.block.entity.FlowCedarPortBlockEntity;
 import org.jetbrains.annotations.NotNull;
 
-import static net.minecraft.world.level.block.state.properties.BlockStateProperties.FACING;
 import static net.minecraft.world.level.block.state.properties.BlockStateProperties.HORIZONTAL_FACING;
 
-public class FlowPortBlockEntityRenderer implements BlockEntityRenderer<FlowPortBlockEntity> {
+public class FlowPortBlockEntityRenderer implements BlockEntityRenderer<FlowCedarPortBlockEntity> {
     public FlowPortBlockEntityRenderer(BlockEntityRendererProvider.Context context) {
 
     }
 
 
     @Override
-    public void render(FlowPortBlockEntity pBlockEntity, float pPartialTick, PoseStack pPoseStack, @NotNull MultiBufferSource pBuffer, int pPackedLight, int pPackedOverlay) {
+    public void render(FlowCedarPortBlockEntity pBlockEntity, float pPartialTick, PoseStack pPoseStack, @NotNull MultiBufferSource pBuffer, int pPackedLight, int pPackedOverlay) {
         ItemRenderer itemRenderer = Minecraft.getInstance().getItemRenderer();
         ItemStack itemStack = pBlockEntity.getRenderStack();
         Direction facing = pBlockEntity.getBlockState().getValue(HORIZONTAL_FACING);

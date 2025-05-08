@@ -3,8 +3,8 @@
   "textures": {
     "down": "terracompositio:block/flow_cedar_log_top",
     "east": "terracompositio:block/flow_cedar_log",
-    "north": "terracompositio:block/flow_port",
-    "particle": "terracompositio:block/flow_port",
+    "north": "terracompositio:block/flow_cedar_port",
+    "particle": "terracompositio:block/flow_cedar_port",
     "south": "terracompositio:block/flow_cedar_log",
     "up": "terracompositio:block/flow_cedar_log_top",
     "west": "terracompositio:block/flow_cedar_log"

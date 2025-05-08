@@ -19,7 +19,6 @@ import net.minecraftforge.registries.RegistryObject;
 import net.sinedkadis.terracompositio.TerraCompositio;
 import net.sinedkadis.terracompositio.block.custom.*;
 import net.sinedkadis.terracompositio.item.custom.UnstableTechnetiumBlockItem;
-import net.sinedkadis.terracompositio.worldgen.tree.BigFlowCedarTreeGrower;
 import net.sinedkadis.terracompositio.worldgen.tree.FlowCedarTreeGrower;
 
 import java.util.function.Supplier;
@@ -53,8 +52,8 @@ public class ModBlocks {
 
     public static final RegistryObject<Block> FLOW_CEDAR_LOG = registerBlock("flow_cedar_log",
             () -> new FlowCedarLikeBlock(BlockBehaviour.Properties.copy(Blocks.OAK_LOG).strength(3f), ModBlocks.STRIPPED_FLOW_CEDAR_LOG));
-    public static final RegistryObject<Block> FLOW_PORT = registerBlock("flow_port",
-            () -> new FlowPortBlock(BlockBehaviour.Properties.copy(Blocks.OAK_WOOD).strength(3f),ModBlocks.STRIPPED_FLOW_CEDAR_LOG));
+    public static final RegistryObject<Block> FLOW_CEDAR_PORT = registerBlock("flow_cedar_port",
+            () -> new FlowCedarPortBlock(BlockBehaviour.Properties.copy(Blocks.OAK_WOOD).strength(3f),ModBlocks.STRIPPED_FLOW_CEDAR_LOG));
 
     public static final RegistryObject<Block> FLOW_CEDAR_WOOD = registerBlock("flow_cedar_wood",
             () -> new FlowCedarLikeBlock(BlockBehaviour.Properties.copy(Blocks.OAK_WOOD).strength(3f),ModBlocks.STRIPPED_FLOW_CEDAR_WOOD));
@@ -129,8 +128,6 @@ public class ModBlocks {
             () -> new Block(BlockBehaviour.Properties.copy(Blocks.DEEPSLATE_IRON_ORE)),2);
     public static final RegistryObject<Block> TECHNETIUM_RAW_ORE_BLOCK = registerUnstableTechnetiumBlock("technetium_raw_ore_block",
             () -> new Block(BlockBehaviour.Properties.copy(Blocks.RAW_IRON_BLOCK)),8);
-    public static final RegistryObject<Block> FLOW_CEDAR_BIG_SAPLING = registerBlock("big_flow_cedar_sapling",
-            () -> new SaplingBlock(new BigFlowCedarTreeGrower(), BlockBehaviour.Properties.copy(Blocks.OAK_SAPLING)));
     public static final RegistryObject<Block> FLOW_CEDAR_SAPLING = registerBlock("flow_cedar_sapling",
             () -> new SaplingBlock(new FlowCedarTreeGrower(), BlockBehaviour.Properties.copy(Blocks.OAK_SAPLING)));
     public static final RegistryObject<Block> FLOW_CEDAR_CASING = registerBlock("flow_cedar_casing",

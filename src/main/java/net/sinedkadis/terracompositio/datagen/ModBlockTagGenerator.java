@@ -36,7 +36,7 @@ public class ModBlockTagGenerator extends BlockTagsProvider {
         this.tag(BlockTags.MINEABLE_WITH_AXE)
                 .add(ModBlocks.FLOW_CEDAR_LOG.get(),
                         ModBlocks.FLOW_CEDAR_LEAVES.get(),
-                        ModBlocks.FLOW_PORT.get(),
+                        ModBlocks.FLOW_CEDAR_PORT.get(),
                         ModBlocks.FLOW_INFUSER.get(),
                         ModBlocks.FLOW_CEDAR_WOOD.get(),
                         ModBlocks.FLOW_CEDAR_PLANKS.get(),
@@ -48,15 +48,16 @@ public class ModBlockTagGenerator extends BlockTagsProvider {
         this.tag(BlockTags.NEEDS_IRON_TOOL)
                 .add(ModBlocks.FLOW_CEDAR_LOG.get(),
                         ModBlocks.FLOW_CEDAR_LEAVES.get(),
-                        ModBlocks.FLOW_PORT.get(),
+                        ModBlocks.FLOW_CEDAR_PORT.get(),
                         ModBlocks.FLOW_CEDAR_WOOD.get());
         this.tag(BlockTags.LOGS_THAT_BURN)
                 .add(ModBlocks.FLOW_CEDAR_LOG.get(),
                         ModBlocks.FLOW_CEDAR_WOOD.get(),
-                        ModBlocks.FLOW_PORT.get(),
+                        ModBlocks.FLOW_CEDAR_PORT.get(),
                         ModBlocks.STRIPPED_FLOW_CEDAR_LOG.get(),
                         ModBlocks.STRIPPED_FLOW_CEDAR_WOOD.get(),
-                        ModBlocks.FLOW_INFUSER.get());
+                        ModBlocks.FLOW_INFUSER.get(),
+                        ModBlocks.FLOW_CEDAR_CASING.get());
         this.tag(BlockTags.PLANKS)
                 .add(ModBlocks.FLOW_CEDAR_PLANKS.get());
         this.tag(BlockTags.LEAVES)
@@ -103,8 +104,7 @@ public class ModBlockTagGenerator extends BlockTagsProvider {
         this.tag(BlockTags.STANDING_SIGNS)
                 .add(ModBlocks.FLOW_CEDAR_SIGN.get());
         this.tag(BlockTags.SAPLINGS)
-                .add(ModBlocks.FLOW_CEDAR_SAPLING.get(),
-                        ModBlocks.FLOW_CEDAR_BIG_SAPLING.get());
+                .add(ModBlocks.FLOW_CEDAR_SAPLING.get());
 
     }
 }

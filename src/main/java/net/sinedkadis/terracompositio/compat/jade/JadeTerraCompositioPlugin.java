@@ -16,19 +16,20 @@ public class JadeTerraCompositioPlugin implements IWailaPlugin {
 
         registration.registerBlockDataProvider(ModCFEBlockEntityComponentProvider.INSTANCE, ModCFEBlockEntity.class);
         registration.registerBlockDataProvider(ModCFEBlockEntityComponentProvider.INSTANCE, FlowInfuserBlockEntity.class);
-        registration.registerBlockDataProvider(ModCFEBlockEntityComponentProvider.INSTANCE, MatterInfuserIOBlockEntity.class);
+       // registration.registerBlockDataProvider(ModCFEBlockEntityComponentProvider.INSTANCE, MatterInfuserIOBlockEntity.class);
         registration.registerBlockDataProvider(ModCFEBlockEntityComponentProvider.INSTANCE, AbstractDesorberBlockEntity.class);
 
         registration.registerBlockDataProvider(ModItemIOComponentProvider.INSTANCE, ModItemIOCFEBlockEntity.class);
-        registration.registerBlockDataProvider(ModItemIOComponentProvider.INSTANCE, FlowPortBlockEntity.class);
 
         registration.registerBlockDataProvider(MatterInfuserIOComponentProvider.INSTANCE, MatterInfuserIOBlockEntity.class);
 
         registration.registerBlockDataProvider(TimePassageDesorberComponentProvider.INSTANCE,TimePassageDesorberBlockEntity.class);
+
     }
 
     @Override
     public void registerClient(IWailaClientRegistration registration) {
+
 
         registration.registerBlockComponent(ModCFEBlockEntityComponentProvider.INSTANCE, ModCFEBaseEntityBlock.class);
         registration.registerBlockComponent(ModCFEBlockEntityComponentProvider.INSTANCE, FlowInfuserBlock.class);
@@ -36,9 +37,8 @@ public class JadeTerraCompositioPlugin implements IWailaPlugin {
 
         registration.registerBlockComponent(ModItemIOComponentProvider.INSTANCE, ModIOBaseEntityBlock.class);
         registration.registerBlockComponent(ModItemIOComponentProvider.INSTANCE, FlowInfuserBlock.class);
-        registration.registerBlockComponent(ModItemIOComponentProvider.INSTANCE, FlowPortBlock.class);
         registration.registerBlockComponent(ModItemIOComponentProvider.INSTANCE, FlowCedarCasingBlock.class);
-        registration.registerBlockComponent(ModItemIOComponentProvider.INSTANCE, MatterInfuserIOBlock.class);
+        //registration.registerBlockComponent(ModItemIOComponentProvider.INSTANCE, MatterInfuserIOBlock.class);
 
         registration.registerBlockComponent(MatterInfuserIOComponentProvider.INSTANCE, MatterInfuserIOBlock.class);
         registration.addConfig(MatterInfuserIOComponentProvider.INSTANCE.catalystConfigRL(),true);

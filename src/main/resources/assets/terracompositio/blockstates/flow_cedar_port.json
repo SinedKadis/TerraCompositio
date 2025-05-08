@@ -1,0 +1,34 @@
+{
+  "variants": {
+    "facing=east,infused=false": {
+      "model": "terracompositio:block/flow_cedar_port",
+      "y": 90
+    },
+    "facing=east,infused=true": {
+      "model": "terracompositio:block/flow_cedar_port_infused",
+      "y": 90
+    },
+    "facing=north,infused=false": {
+      "model": "terracompositio:block/flow_cedar_port"
+    },
+    "facing=north,infused=true": {
+      "model": "terracompositio:block/flow_cedar_port_infused"
+    },
+    "facing=south,infused=false": {
+      "model": "terracompositio:block/flow_cedar_port",
+      "y": 180
+    },
+    "facing=south,infused=true": {
+      "model": "terracompositio:block/flow_cedar_port_infused",
+      "y": 180
+    },
+    "facing=west,infused=false": {
+      "model": "terracompositio:block/flow_cedar_port",
+      "y": 270
+    },
+    "facing=west,infused=true": {
+      "model": "terracompositio:block/flow_cedar_port_infused",
+      "y": 270
+    }
+  }
+}
