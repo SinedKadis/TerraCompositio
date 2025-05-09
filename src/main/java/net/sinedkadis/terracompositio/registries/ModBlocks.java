@@ -80,7 +80,7 @@ public class ModBlocks {
                 }
             });
     public static final RegistryObject<Block> FLOW_CEDAR_LEAVES = registerBlock("flow_cedar_leaves",
-            () -> new FlowCedarLeavesBlock(BlockBehaviour.Properties.copy(Blocks.OAK_LEAVES).noLootTable()));
+            () -> new FlowCedarLeavesBlock(BlockBehaviour.Properties.copy(Blocks.OAK_LEAVES)));
     public static final RegistryObject<Block> FLOW_CEDAR_STAIRS = registerBlock("flow_cedar_stairs",
             () -> new StairBlock(() -> ModBlocks.FLOW_CEDAR_PLANKS.get().defaultBlockState(),
                     BlockBehaviour.Properties.copy(Blocks.OAK_PLANKS)));
@@ -147,5 +147,5 @@ public class ModBlocks {
     public static final RegistryObject<Block> FLOW_CEDAR_PEDESTAL = registerBlock("flow_cedar_pedestal",
             () -> new FlowCedarPedestalBlock(BlockBehaviour.Properties.copy(Blocks.AZALEA).noOcclusion()));
     public static final RegistryObject<Block> FLOW_CEDAR_TANK = registerBlock("flow_cedar_tank",
-            () -> new FlowCedarTankBlock(BlockBehaviour.Properties.copy(Blocks.OAK_PLANKS).noOcclusion().noLootTable()));
+            () -> new FlowCedarTankBlock(BlockBehaviour.Properties.copy(Blocks.OAK_PLANKS).noOcclusion()));
 }

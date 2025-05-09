@@ -1,10 +1,8 @@
 package net.sinedkadis.terracompositio.block.custom;
 
-import mekanism.api.annotations.ParametersAreNotNullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
@@ -20,13 +18,13 @@ import net.minecraft.world.phys.shapes.VoxelShape;
 import net.sinedkadis.terracompositio.api.cfe.CFEEntityBlock;
 import net.sinedkadis.terracompositio.block.entity.FlowCedarCasingBlockEntity;
 import net.sinedkadis.terracompositio.registries.ModBlocks;
-import net.sinedkadis.terracompositio.registries.ModItems;
 import net.sinedkadis.terracompositio.util.FunctionSide;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.Objects;
+
 import static net.minecraft.world.level.block.state.properties.BlockStateProperties.AXIS;
-import static net.sinedkadis.terracompositio.block.custom.FlowCedarCasingBlock.*;
 import static net.sinedkadis.terracompositio.block.custom.FlowCedarCasingBlock.FUNCTION_SIDE;
 
 public abstract class MatterInfuserBaseBaseEntityBlock extends ModIOBaseEntityBlock implements CFEEntityBlock {
@@ -61,6 +59,17 @@ public abstract class MatterInfuserBaseBaseEntityBlock extends ModIOBaseEntityBl
         return false;
     }
 
+    @Override
+    public void onRemove(BlockState pState, @NotNull Level pLevel, @NotNull BlockPos pPos, BlockState pNewState, boolean pIsMoving) {
+        super.onRemove(pState, pLevel, pPos, pNewState, pIsMoving);
+        Direction direction = pState.getValue(FACING);
+        BlockPos blockpos = pPos.relative(direction.getOpposite());
+        BlockState blockstate = pLevel.getBlockState(blockpos);
+        if (blockstate.is(ModBlocks.FLOW_CEDAR_CASING.get())){
+            ((FlowCedarCasingBlockEntity) Objects.requireNonNull(pLevel.getBlockEntity(blockpos))).setSlotCount(slotCount());
+        }
+    }
+
     public @NotNull VoxelShape getShape(BlockState pState, @NotNull BlockGetter pLevel, @NotNull BlockPos pPos, @NotNull CollisionContext pContext) {
         return switch (pState.getValue(FACING)) {
             default -> EAST_AABB;
@@ -89,32 +98,10 @@ public abstract class MatterInfuserBaseBaseEntityBlock extends ModIOBaseEntityBl
         return null;
     }
 
-    @Override
-    public void onRemove(@NotNull BlockState pState, @NotNull Level pLevel, @NotNull BlockPos pPos, @NotNull BlockState pNewState, boolean pIsMoving) {
-        super.onRemove(pState, pLevel, pPos, pNewState, pIsMoving);
-        Direction direction = pState.getValue(FACING);
-        BlockPos casingPos = pPos.relative(direction.getOpposite());
-        BlockState casingState = pLevel.getBlockState(casingPos);
-        if (pState.getBlock() != pNewState.getBlock()) {
-            Direction directionByFunctionSide = FunctionSide.getDirectionByFunctionSide(casingState);
-            if (directionByFunctionSide == direction) {
-                if (hasInputBusConnection(casingState)) {
-                    pLevel.addFreshEntity(new ItemEntity(pLevel, pPos.getX(), pPos.getY(), pPos.getZ(), new ItemStack(ModItems.INFUSED_IRON_ROD.get())));
-                    casingState = casingState.setValue(INPUT_BUS_CONNECTION,false);
-                    pLevel.setBlock(casingPos,casingState,3);
-                }
-                pLevel.setBlock(casingPos,casingState.setValue(FUNCTION_SIDE, FunctionSide.NONE),3);
-            }
-            if (pLevel.getBlockEntity(casingPos) instanceof FlowCedarCasingBlockEntity blockEntity){
-                blockEntity.drops();
-                blockEntity.setSlotCount(2);
-            }
-        }
-    }
+
 
     @Override
-    @ParametersAreNotNullByDefault
-    public void setPlacedBy(Level pLevel, BlockPos pPos, BlockState pState, @Nullable LivingEntity pPlacer, ItemStack pStack) {
+    public void setPlacedBy(@NotNull Level pLevel, @NotNull BlockPos pPos, @NotNull BlockState pState, @Nullable LivingEntity pPlacer, @NotNull ItemStack pStack) {
         super.setPlacedBy(pLevel, pPos, pState, pPlacer, pStack);
         Direction direction = pState.getValue(FACING);
         BlockPos casingPos = pPos.relative(direction.getOpposite());

@@ -6,14 +6,12 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
-import net.minecraft.world.entity.item.ItemEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
@@ -22,6 +20,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
+import net.minecraft.world.level.storage.loot.LootParams;
 import net.minecraft.world.phys.BlockHitResult;
 import net.sinedkadis.terracompositio.block.entity.FlowCedarCasingBlockEntity;
 import net.sinedkadis.terracompositio.item.custom.WrenchAxeItem;
@@ -30,9 +29,10 @@ import net.sinedkadis.terracompositio.registries.ModBlockStateProperties;
 import net.sinedkadis.terracompositio.registries.ModBlocks;
 import net.sinedkadis.terracompositio.registries.ModItems;
 import net.sinedkadis.terracompositio.util.FunctionSide;
-import net.sinedkadis.terracompositio.util.TCUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+
+import java.util.List;
 
 import static net.sinedkadis.terracompositio.block.custom.ModIOBaseEntityBlock.createTickerHelper;
 import static net.sinedkadis.terracompositio.util.TCUtil.handleInWorldBlockCraft;
@@ -120,22 +120,7 @@ public class FlowCedarCasingBlock extends FlowCedarLikeBlock implements EntityBl
     @Override
     public void onRemove(@NotNull BlockState pState, @NotNull Level pLevel, @NotNull BlockPos pPos, @NotNull BlockState pNewState, boolean pIsMoving) {
         super.onRemove(pState, pLevel, pPos, pNewState, pIsMoving);
-        if (hasInputBus(pState) && !hasInputBus(pNewState)){
-            pLevel.addFreshEntity(new ItemEntity(pLevel, pPos.getX(),pPos.getY(),pPos.getZ(), new ItemStack(ModItems.INPUT_BUS.get())));
-        }
-        if (hasInputBusConnection(pState) && !hasInputBusConnection(pNewState)){
-            pLevel.addFreshEntity(new ItemEntity(pLevel, pPos.getX(),pPos.getY(),pPos.getZ(), new ItemStack(ModItems.INFUSED_IRON_ROD.get())));
-        }
-        if (hasOutputBus(pState) && !hasOutputBus(pNewState)){
-            pLevel.addFreshEntity(new ItemEntity(pLevel, pPos.getX(),pPos.getY(),pPos.getZ(), new ItemStack(ModItems.OUTPUT_BUS.get())));
-        }
-        if (hasOutputBusConnection(pState) && !hasOutputBusConnection(pNewState)){
-            pLevel.addFreshEntity(new ItemEntity(pLevel, pPos.getX(),pPos.getY(),pPos.getZ(), new ItemStack(ModItems.INFUSED_IRON_ROD.get())));
-        }
-        if (pState.getBlock() != pNewState.getBlock() && TCUtil.onRemoveHandlerBlacklist(pNewState,
-                Blocks.STRUCTURE_VOID,
-                ModBlocks.FLOW_CEDAR_TANK.get())) {
-            pLevel.addFreshEntity(new ItemEntity(pLevel, pPos.getX(), pPos.getY(), pPos.getZ(), new ItemStack(ModItems.GOLD_ROD.get(), 4)));
+        if (pState.getBlock() != pNewState.getBlock()){
             Direction direction = FunctionSide.getDirectionByFunctionSide(pState);
             if (direction != Direction.DOWN) {
                 BlockPos blockPos = pPos.relative(direction);
@@ -150,6 +135,19 @@ public class FlowCedarCasingBlock extends FlowCedarLikeBlock implements EntityBl
                 blockEntity.drops();
             }
         }
+    }
+
+    @Override
+    public @NotNull List<ItemStack> getDrops(@NotNull BlockState pState, LootParams.@NotNull Builder pParams) {
+        List<ItemStack> drops = super.getDrops(pState,pParams);
+        if (hasInputBus(pState)){
+            drops.add(new ItemStack(ModItems.INPUT_BUS.get()));
+        }
+        if (hasOutputBus(pState)){
+            drops.add(new ItemStack(ModItems.OUTPUT_BUS.get()));
+        }
+        drops.add(new ItemStack(ModItems.GOLD_ROD.get(), 4));
+        return drops;
     }
 
     public static boolean hasInputBus(BlockState blockState){

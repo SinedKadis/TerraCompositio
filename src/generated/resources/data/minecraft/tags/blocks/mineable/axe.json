@@ -8,6 +8,8 @@
     "terracompositio:flow_cedar_planks",
     "terracompositio:stripped_flow_cedar_log",
     "terracompositio:stripped_flow_cedar_wood",
-    "terracompositio:flow_cedar_casing"
+    "terracompositio:flow_cedar_casing",
+    "terracompositio:flow_cedar_pedestal",
+    "terracompositio:flow_cedar_tank"
   ]
 }

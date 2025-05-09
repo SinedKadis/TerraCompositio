@@ -1,16 +1,26 @@
 package net.sinedkadis.terracompositio.block.custom;
 
-import mekanism.api.annotations.ParametersAreNotNullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
+import net.minecraft.world.item.enchantment.EnchantmentHelper;
+import net.minecraft.world.item.enchantment.Enchantments;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.LeavesBlock;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.storage.loot.LootParams;
+import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
+import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
+import net.sinedkadis.terracompositio.registries.ModBlocks;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
 import java.util.OptionalInt;
 
 import static net.sinedkadis.terracompositio.registries.ModBlockStateProperties.INFUSED;
@@ -35,10 +45,37 @@ public class FlowCedarLeavesBlock extends LeavesBlock {
     }
 
     @Override
-    @ParametersAreNotNullByDefault
-    public void tick(BlockState pState, ServerLevel pLevel, BlockPos pPos, RandomSource pRandom) {
+    public void tick(@NotNull BlockState pState, ServerLevel pLevel, @NotNull BlockPos pPos, @NotNull RandomSource pRandom) {
         pLevel.setBlock(pPos, updateDistance(pState, pLevel, pPos), 3);
     }
+
+    @Override
+    public @NotNull List<ItemStack> getDrops(@NotNull BlockState pState, LootParams.@NotNull Builder pParams) {
+        LootParams lootContext = pParams.withParameter(LootContextParams.BLOCK_STATE, pState).create(LootContextParamSets.BLOCK);
+
+
+        if (lootContext.getParamOrNull(LootContextParams.TOOL) != null) {
+            ItemStack tool = lootContext.getParameter(LootContextParams.TOOL);
+            if (tool.is(Items.SHEARS) || EnchantmentHelper.getItemEnchantmentLevel(Enchantments.SILK_TOUCH, tool) > 0) {
+                return Collections.singletonList(new ItemStack(this));
+            }
+        }
+
+        RandomSource random = pParams.getLevel().getRandom();
+        List<ItemStack> drops = new ArrayList<>();
+
+        if (random.nextFloat() < 0.05F) {
+            drops.add(new ItemStack(ModBlocks.FLOW_CEDAR_SAPLING.get()));
+        }
+
+        if (random.nextFloat() < 0.025F) {
+            drops.add(new ItemStack(Items.STICK, random.nextIntBetweenInclusive(1, 2)));
+        }
+
+        return drops;
+
+    }
+
     private static BlockState updateDistance(BlockState pState, LevelAccessor pLevel, BlockPos pPos) {
         int i = 7;
         BlockPos.MutableBlockPos blockpos$mutableblockpos = new BlockPos.MutableBlockPos();

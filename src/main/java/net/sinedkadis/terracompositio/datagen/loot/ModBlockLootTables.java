@@ -53,6 +53,9 @@ public class ModBlockLootTables extends BlockLootSubProvider {
         this.dropSelf(ModBlocks.CULTIVATION_DESORBER.get());
         this.dropSelf(ModBlocks.TIME_PASSAGE_DESORBER.get());
 
+        this.dropSelf(ModBlocks.FLOW_CEDAR_TANK.get());
+        this.dropOther(ModBlocks.FLOW_CEDAR_PEDESTAL.get(),ModBlocks.FLOW_CEDAR_SAPLING.get());
+
         this.dropOther(ModBlocks.FLOW_CEDAR_CASING.get(),ModBlocks.FLOW_CEDAR_LOG.get());
         this.dropSelf(ModBlocks.MATTER_INFUSER_PORT.get());
         this.dropSelf(ModBlocks.MATTER_INFUSER_IO.get());
@@ -62,6 +65,7 @@ public class ModBlockLootTables extends BlockLootSubProvider {
         this.add(ModBlocks.FLOW_CEDAR_DOOR.get(),
                 block -> createDoorTable(ModBlocks.FLOW_CEDAR_DOOR.get()));
 
+        this.dropSelf(ModBlocks.FLOW_CEDAR_LEAVES.get());
 
         this.add(ModBlocks.TECHNETIUM_ORE.get(),
                 block -> createCopperLikeOreDrops(ModBlocks.TECHNETIUM_ORE.get(), ModItems.RAW_TECHNETIUM.get()));

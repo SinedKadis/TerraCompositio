@@ -107,7 +107,7 @@ public class FlowCedarLikeBlock extends RotatedPillarBlock {
         ItemStack item2 = pPlayer.getItemInHand(InteractionHand.OFF_HAND);
         if (this.getClass() == FlowCedarLikeBlock.class) {
             if (item.is(ModItems.GOLD_ROD.get())
-                    && item.getCount() > 4
+                    && item.getCount() >= 4
                     && item2.getItem() instanceof WrenchAxeItem) {
                 if (WrenchAxeItem.getMode(item2).equals(WrenchAxeItem.WrenchMode.WRENCH)) {
                     return handleInWorldBlockCraft(pState, ModBlocks.FLOW_CEDAR_CASING.get().defaultBlockState(), pLevel, pPos, item, 4);
