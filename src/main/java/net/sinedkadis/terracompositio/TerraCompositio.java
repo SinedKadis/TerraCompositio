@@ -9,6 +9,7 @@ import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.sinedkadis.terracompositio.events.FluidNetworkEvent;
 import net.sinedkadis.terracompositio.registries.*;
 import net.sinedkadis.terracompositio.util.CFENetworkHandler;
 import net.sinedkadis.terracompositio.effect.ModEffects;
@@ -16,6 +17,7 @@ import net.sinedkadis.terracompositio.entity.ModEntities;
 import net.sinedkadis.terracompositio.events.CFENetworkEvent;
 import net.sinedkadis.terracompositio.screen.ModMenuTypes;
 import net.sinedkadis.terracompositio.sound.ModSounds;
+import net.sinedkadis.terracompositio.util.FluidNetworkHandler;
 import net.sinedkadis.terracompositio.worldgen.tree.ModFoliagePlacers;
 import net.sinedkadis.terracompositio.worldgen.tree.ModTrunkPlacers;
 
@@ -27,7 +29,6 @@ public class TerraCompositio
     public static ResourceLocation modLoc(String location){
         return new ResourceLocation(MOD_ID,location);
     }
-    //public static SimpleChannel CHANNEL;
 
     public TerraCompositio() {
 
@@ -59,12 +60,11 @@ public class TerraCompositio
 
     private void commonSetup(final FMLCommonSetupEvent event) {
         IEventBus bus = MinecraftForge.EVENT_BUS;
-        bus.addListener((CFENetworkEvent e) -> CFENetworkHandler.instance.onNetworkEvent(e.getReceiver(),e.getAction()));
+        bus.addListener((CFENetworkEvent e) -> CFENetworkHandler.instance.onNetworkEvent(e.getSource(),e.getAction()));
+        bus.addListener((FluidNetworkEvent e) -> FluidNetworkHandler.instance.onNetworkEvent(e.getSource(),e.getAction()));
     }
 
-    // Add the example block item to the building blocks tab
-    private void addCreative(BuildCreativeModeTabContentsEvent event)
-    {
+    private void addCreative(BuildCreativeModeTabContentsEvent event) {
         if(event.getTabKey() == CreativeModeTabs.TOOLS_AND_UTILITIES) {
             event.accept(Items.BUNDLE);
         }

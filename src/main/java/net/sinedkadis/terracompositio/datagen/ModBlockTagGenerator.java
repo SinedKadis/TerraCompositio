@@ -81,7 +81,8 @@ public class ModBlockTagGenerator extends BlockTagsProvider {
                 .add(ModBlocks.FLOW_CEDAR_FENCE_GATE.get());
         this.tag(ModTags.Blocks.FLOW_CEDAR_LOGS)
                 .add(ModBlocks.FLOW_CEDAR_LOG.get(),
-                        ModBlocks.FLOW_CEDAR_WOOD.get());
+                        ModBlocks.FLOW_CEDAR_WOOD.get(),
+                        ModBlocks.FLOW_CEDAR_PORT.get());
         //this.tag(BlockTags.NEEDS_DIAMOND_TOOL)
         //        .add(ModBlocks.RAW_SAPPHIRE_BLOCK.get());
 

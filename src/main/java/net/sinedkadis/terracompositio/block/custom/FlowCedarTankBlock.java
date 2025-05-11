@@ -1,23 +1,43 @@
 package net.sinedkadis.terracompositio.block.custom;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.AxeItem;
+import net.minecraft.world.item.BottleItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.item.context.UseOnContext;
+import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.BaseEntityBlock;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.RenderShape;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityTicker;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.IntegerProperty;
 import net.minecraft.world.level.storage.loot.LootParams;
+import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraftforge.common.ToolAction;
+import net.minecraftforge.common.capabilities.ForgeCapabilities;
+import net.minecraftforge.fluids.FluidStack;
+import net.minecraftforge.fluids.FluidUtil;
+import net.minecraftforge.fluids.capability.IFluidHandler;
+import net.minecraftforge.fluids.capability.IFluidHandlerItem;
+import net.minecraftforge.fluids.capability.templates.FluidTank;
+import net.sinedkadis.terracompositio.registries.ModBlockEntities;
 import net.sinedkadis.terracompositio.registries.ModBlocks;
+import net.sinedkadis.terracompositio.registries.ModFluids;
 import net.sinedkadis.terracompositio.registries.ModItems;
 import net.sinedkadis.terracompositio.util.TCUtil;
 import org.jetbrains.annotations.NotNull;
@@ -26,7 +46,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.ArrayList;
 import java.util.List;
 
-public class FlowCedarTankBlock extends Block {
+public class FlowCedarTankBlock extends BaseEntityBlock{
     public static final IntegerProperty STAGE = IntegerProperty.create("stage",0,4);
     public FlowCedarTankBlock(Properties pProperties) {
         super(pProperties);
@@ -37,7 +57,25 @@ public class FlowCedarTankBlock extends Block {
         pBuilder.add(STAGE);
     }
 
+    @Override
+    public @NotNull RenderShape getRenderShape(@NotNull BlockState pState) {
+        return RenderShape.MODEL;
+    }
 
+    @Nullable
+    @Override
+    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(@NotNull Level pLevel, @NotNull BlockState pState, @NotNull BlockEntityType<T> pBlockEntityType) {
+        if (pLevel.isClientSide()) {
+            return null;
+        }
+        return createTickerHelper(pBlockEntityType, ModBlockEntities.FLOW_CEDAR_TANK_BE.get(),
+                (pLevel1, pPos, pState1, pBlockEntity) -> pBlockEntity.tick(pLevel1,pPos,pState1));
+    }
+
+    @Override
+    public boolean canConnectRedstone(BlockState state, BlockGetter level, BlockPos pos, @Nullable Direction direction) {
+        return true;
+    }
 
     @Override
     public @Nullable BlockState getToolModifiedState(BlockState state, UseOnContext context, ToolAction toolAction, boolean simulate) {
@@ -60,17 +98,112 @@ public class FlowCedarTankBlock extends Block {
 
     @Override
     public @NotNull InteractionResult use(@NotNull BlockState pState, @NotNull Level pLevel, @NotNull BlockPos pPos, Player pPlayer, @NotNull InteractionHand pHand, @NotNull BlockHitResult pHit) {
-        ItemStack item = pPlayer.getItemInHand(pHand);
-        if (item.is(Items.GLASS) && pState.getValue(STAGE).equals(2)){
-            TCUtil.handleInWorldBlockCraft(pState,pState.setValue(STAGE,3),pLevel,pPos,item,1);
+        ItemStack heldItem = pPlayer.getItemInHand(pHand);
+
+        if (heldItem.is(Items.GLASS) && pState.getValue(STAGE).equals(2)){
+            TCUtil.handleInWorldBlockCraft(pState,pState.setValue(STAGE,3),pLevel,pPos,heldItem,1);
             return InteractionResult.SUCCESS;
         }
-        return super.use(pState, pLevel, pPos, pPlayer, pHand, pHit);
+
+        BlockEntity blockEntity = pLevel.getBlockEntity(pPos);
+        if (blockEntity == null) {
+            return InteractionResult.PASS;
+        }
+
+        IFluidHandler fluidHandlerBlock = blockEntity.getCapability(ForgeCapabilities.FLUID_HANDLER).resolve().orElse(null);
+        if (!(fluidHandlerBlock instanceof FluidTank tank)) {
+            return InteractionResult.PASS;
+        }
+
+        if (pPlayer.isShiftKeyDown()) {
+            return InteractionResult.PASS;
+        }
+
+        IFluidHandlerItem fluidHandlerItem = heldItem.getCapability(ForgeCapabilities.FLUID_HANDLER_ITEM).resolve().orElse(null);
+        if (fluidHandlerItem == null) {
+            FluidStack fluidStack = new FluidStack(ModFluids.FLOW_FLUID.source.get().getSource(), 250);
+            if (heldItem.is(ModItems.FLOW_BOTTLE.get())){
+                int filled = tank.fill(fluidStack, IFluidHandler.FluidAction.SIMULATE);
+                if (filled == 250){
+                    tank.fill(fluidStack, IFluidHandler.FluidAction.EXECUTE);
+                    heldItem.shrink(1);
+                    pPlayer.getInventory().add(new ItemStack(Items.GLASS_BOTTLE));
+                    if (pLevel instanceof ServerLevel level){
+                        level.playSound(null,pPos, SoundEvents.BOTTLE_EMPTY, SoundSource.BLOCKS);
+                    }
+                    return InteractionResult.SUCCESS;
+                }
+            }
+            if (heldItem.getItem() instanceof BottleItem) {
+                FluidStack drained = tank.drain(fluidStack, IFluidHandler.FluidAction.SIMULATE);
+                if (drained.isFluidStackIdentical(fluidStack)){
+                    tank.drain(fluidStack, IFluidHandler.FluidAction.EXECUTE);
+                    heldItem.shrink(1);
+                    pPlayer.getInventory().add(new ItemStack(ModItems.FLOW_BOTTLE.get()));
+                    if (pLevel instanceof ServerLevel level){
+                        level.playSound(null,pPos,SoundEvents.BUCKET_FILL,SoundSource.BLOCKS);
+                    }
+                    return InteractionResult.SUCCESS;
+                }
+            }
+
+            return InteractionResult.PASS;
+        }
+
+
+
+            FluidStack transferred = FluidUtil.tryFluidTransfer(tank, fluidHandlerItem, Integer.MAX_VALUE, false);
+
+            if (!transferred.isEmpty()) {
+                if (!pPlayer.getAbilities().instabuild) {
+                    FluidUtil.tryFluidTransfer(tank, fluidHandlerItem, Integer.MAX_VALUE, true);
+                    pPlayer.setItemInHand(pHand, fluidHandlerItem.getContainer());
+                } else {
+                    tank.fill(transferred, IFluidHandler.FluidAction.EXECUTE);
+                }
+                pLevel.playSound(
+                        null,
+                        pPos,
+                        SoundEvents.BUCKET_EMPTY,
+                        SoundSource.BLOCKS,
+                        1.0F,
+                        1.0F
+                );
+                return InteractionResult.SUCCESS;
+            }
+
+
+            transferred = FluidUtil.tryFluidTransfer(fluidHandlerItem, tank, Integer.MAX_VALUE, false);
+
+            if (!transferred.isEmpty()) {
+                if (!pPlayer.getAbilities().instabuild) {
+                    FluidUtil.tryFluidTransfer(fluidHandlerItem, tank, Integer.MAX_VALUE, true);
+                    pPlayer.setItemInHand(pHand, fluidHandlerItem.getContainer());
+                } else {
+                    tank.drain(transferred, IFluidHandler.FluidAction.EXECUTE);
+                }
+                pLevel.playSound(
+                        null,
+                        pPos,
+                        SoundEvents.BUCKET_FILL,
+                        SoundSource.BLOCKS,
+                        1.0F,
+                        1.0F
+                );
+                return InteractionResult.SUCCESS;
+            }
+
+
+        return InteractionResult.PASS;
     }
 
     @Override
-    public @NotNull List<ItemStack> getDrops(BlockState pState, LootParams.@NotNull Builder pParams) {
+    public @NotNull List<ItemStack> getDrops(@NotNull BlockState pState, LootParams.@NotNull Builder pParams) {
         List<ItemStack> drops = new ArrayList<>();
+        ItemStack inHand = pParams.getParameter(LootContextParams.TOOL);
+        if (inHand.getItem() instanceof AxeItem){
+            return super.getDrops(pState,pParams);
+        }
         switch (pState.getValue(STAGE)){
             case 0,1,2 -> {
                 drops.add(new ItemStack(ModBlocks.FLOW_CEDAR_LOG.get()));
@@ -85,5 +218,11 @@ public class FlowCedarTankBlock extends Block {
             }
         }
         return drops;
+    }
+
+    @Nullable
+    @Override
+    public BlockEntity newBlockEntity(@NotNull BlockPos blockPos, @NotNull BlockState blockState) {
+        return ModBlockEntities.FLOW_CEDAR_TANK_BE.get().create(blockPos,blockState);
     }
 }

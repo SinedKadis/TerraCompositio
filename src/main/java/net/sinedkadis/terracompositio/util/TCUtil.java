@@ -2,6 +2,7 @@ package net.sinedkadis.terracompositio.util;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.Vec3i;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.server.level.ServerLevel;
@@ -15,7 +16,12 @@ import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.RotatedPillarBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.Property;
+import net.minecraft.world.phys.Vec3;
+import net.minecraftforge.fluids.FluidStack;
 import net.sinedkadis.terracompositio.block.custom.FlowCedarLikeBlock;
+
+
+import net.sinedkadis.terracompositio.particle.FluidParticleData;
 import net.sinedkadis.terracompositio.registries.ModGameRules;
 import net.sinedkadis.terracompositio.registries.ModParticles;
 import org.jetbrains.annotations.NotNull;
@@ -26,6 +32,32 @@ import java.util.*;
 import static net.sinedkadis.terracompositio.registries.ModBlockStateProperties.INFUSED;
 
 public class TCUtil {
+    public static void sendFluidParticles(ServerLevel level, BlockPos target, BlockPos source,
+                                          int particleAmount, FluidStack fluidStack) {
+        if (fluidStack.isEmpty() || particleAmount <= 0 || level == null) return;
+
+        Vec3 targetCenter = Vec3.atCenterOf(target);
+        Vec3 sourceCenter = Vec3.atCenterOf(source);
+
+        // Создаем данные частицы
+        FluidParticleData particleData = new FluidParticleData(ModParticles.FLUID_FLOW.get(), fluidStack);
+
+        for (int i = 0; i < particleAmount; i++) {
+            double offsetX = sourceCenter.x + (level.random.nextDouble() - 0.5) * 0.8;
+            double offsetY = sourceCenter.y + (level.random.nextDouble() - 0.5) * 0.8;
+            double offsetZ = sourceCenter.z + (level.random.nextDouble() - 0.5) * 0.8;
+
+            // Отправляем частицу с данными о жидкости
+            level.sendParticles(particleData,
+                    offsetX, offsetY, offsetZ,
+                    0, // count
+                    targetCenter.x - offsetX, // xd (направление к цели)
+                    targetCenter.y - offsetY, // yd
+                    targetCenter.z - offsetZ,// zd
+                    Math.sqrt(TCUtil.distSqr(target,source))); // speed
+        }
+    }
+
     public static @NotNull InteractionResult handleInWorldBlockCraft(BlockState oldState, BlockState newState, Level pLevel, BlockPos pPos, ItemStack item, int count) {
         pLevel.setBlock(pPos,copyBlockStates(oldState,newState),3);
         item.shrink(count);
@@ -255,5 +287,14 @@ public class TCUtil {
                         .forEach(pos -> pLevel.setBlockAndUpdate(pos, pLevel.getBlockState(pos).setValue(FlowCedarLikeBlock.INFUSED, false)));
 
         }
+    }
+
+    public static long distSqr(Vec3i a, Vec3i b) {
+        //Vec3i#distSqr, while convenient, offsets the second argument by (0.5, 0.5, 0.5).
+        //Longs are used because "dx * dx" overflows with distances longer than about 46,300 blocks when using integers.
+        long dx = a.getX() - b.getX();
+        long dy = a.getY() - b.getY();
+        long dz = a.getZ() - b.getZ();
+        return dx * dx + dy * dy + dz * dz;
     }
 }

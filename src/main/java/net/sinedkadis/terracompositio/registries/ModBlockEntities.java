@@ -61,6 +61,10 @@ public class ModBlockEntities {
             BLOCK_ENTITIES.register("time_passage_desorber_be", () ->
                     BlockEntityType.Builder.of(TimePassageDesorberBlockEntity::new,
                             ModBlocks.TIME_PASSAGE_DESORBER.get()).build(null));
+    public static final RegistryObject<BlockEntityType<FlowCedarTankBlockEntity>> FLOW_CEDAR_TANK_BE =
+            BLOCK_ENTITIES.register("flow_cedar_tank_be", () ->
+                    BlockEntityType.Builder.of(FlowCedarTankBlockEntity::new,
+                            ModBlocks.FLOW_CEDAR_TANK.get()).build(null));
 
 
 

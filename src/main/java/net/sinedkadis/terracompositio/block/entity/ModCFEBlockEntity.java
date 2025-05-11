@@ -16,7 +16,8 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 
-import static net.sinedkadis.terracompositio.util.CFENetworkHandler.distSqr;
+import static net.sinedkadis.terracompositio.util.TCUtil.distSqr;
+
 
 public abstract class ModCFEBlockEntity extends ModBlockEntity{
 

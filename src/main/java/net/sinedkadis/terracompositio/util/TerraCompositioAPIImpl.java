@@ -1,11 +1,8 @@
 package net.sinedkadis.terracompositio.util;
 
-import net.minecraftforge.common.MinecraftForge;
+import net.sinedkadis.terracompositio.api.FluidNetwork;
 import net.sinedkadis.terracompositio.api.TerraCompositioAPI;
 import net.sinedkadis.terracompositio.api.cfe.CFENetwork;
-import net.sinedkadis.terracompositio.api.cfe.CFENetworkAction;
-import net.sinedkadis.terracompositio.api.cfe.CFESource;
-import net.sinedkadis.terracompositio.events.CFENetworkEvent;
 
 public class TerraCompositioAPIImpl implements TerraCompositioAPI {
     @Override
@@ -14,7 +11,8 @@ public class TerraCompositioAPIImpl implements TerraCompositioAPI {
     }
 
     @Override
-    public void fireCFENetworkEvent(CFESource source, CFENetworkAction action) {
-        MinecraftForge.EVENT_BUS.post(new CFENetworkEvent(source, action));
+    public FluidNetwork getFluidNetworkInstance() {
+        return FluidNetworkHandler.instance;
     }
+
 }

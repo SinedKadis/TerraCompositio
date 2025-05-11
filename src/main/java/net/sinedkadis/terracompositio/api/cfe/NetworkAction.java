@@ -1,6 +1,6 @@
 package net.sinedkadis.terracompositio.api.cfe;
 
-public enum CFENetworkAction {
+public enum NetworkAction {
     REMOVE,
     ADD
 }

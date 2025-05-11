@@ -1,23 +1,25 @@
 package net.sinedkadis.terracompositio.util;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Vec3i;
 import net.minecraft.world.level.Level;
-import net.sinedkadis.terracompositio.api.TerraCompositioAPI;
+import net.minecraftforge.common.MinecraftForge;
 import net.sinedkadis.terracompositio.api.cfe.CFENetwork;
-import net.sinedkadis.terracompositio.api.cfe.CFENetworkAction;
+import net.sinedkadis.terracompositio.api.cfe.NetworkAction;
 import net.sinedkadis.terracompositio.api.cfe.CFESource;
+import net.sinedkadis.terracompositio.events.CFENetworkEvent;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
+
+import static net.sinedkadis.terracompositio.util.TCUtil.distSqr;
 
 public class CFENetworkHandler implements CFENetwork {
     public static final CFENetworkHandler instance = new CFENetworkHandler();
 
     private final Map<Level, Set<CFESource>> cfeSources = new WeakHashMap<>();
 
-    public void onNetworkEvent(CFESource source, CFENetworkAction action) {
-        if (action == CFENetworkAction.ADD){
+    public void onNetworkEvent(CFESource source, NetworkAction action) {
+        if (action == NetworkAction.ADD){
             add(cfeSources,source.getCFESourceLevel(), source);
         }else{
             remove(cfeSources,source.getCFESourceLevel(), source);
@@ -58,14 +60,6 @@ public class CFENetworkHandler implements CFENetwork {
 
         return closest;
     }
-    public static long distSqr(Vec3i a, Vec3i b) {
-        //Vec3i#distSqr, while convenient, offsets the second argument by (0.5, 0.5, 0.5).
-        //Longs are used because "dx * dx" overflows with distances longer than about 46,300 blocks when using integers.
-        long dx = a.getX() - b.getX();
-        long dy = a.getY() - b.getY();
-        long dz = a.getZ() - b.getZ();
-        return dx * dx + dy * dy + dz * dz;
-    }
 
     @Override
     public List<CFESource> getAllCFESources(Level level) {
@@ -76,8 +70,8 @@ public class CFENetworkHandler implements CFENetwork {
     }
 
     @Override
-    public void fireCFENetworkEvent(CFESource source, CFENetworkAction action) {
-        TerraCompositioAPI.INSTANCE.fireCFENetworkEvent(source,action);
+    public void fireCFENetworkEvent(CFESource source, NetworkAction action) {
+        MinecraftForge.EVENT_BUS.post(new CFENetworkEvent(source,action));
     }
 
     private <T> void remove(Map<Level, Set<T>> map, Level level, T thing) {

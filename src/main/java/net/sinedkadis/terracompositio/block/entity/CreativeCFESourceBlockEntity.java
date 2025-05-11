@@ -4,7 +4,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.sinedkadis.terracompositio.api.TerraCompositioAPI;
-import net.sinedkadis.terracompositio.api.cfe.CFENetworkAction;
+import net.sinedkadis.terracompositio.api.cfe.NetworkAction;
 import net.sinedkadis.terracompositio.registries.ModBlockEntities;
 import net.sinedkadis.terracompositio.util.CFENetworkHandler;
 import net.sinedkadis.terracompositio.api.cfe.CFESource;
@@ -18,7 +18,7 @@ public class CreativeCFESourceBlockEntity extends ModBlockEntity implements CFES
         if (!pLevel.isClientSide) {
             boolean inNetwork = CFENetworkHandler.instance.isIn(pLevel, this);
             if (!inNetwork && !this.isRemoved()) {
-                TerraCompositioAPI.INSTANCE.getCFENetworkInstance().fireCFENetworkEvent(this, CFENetworkAction.ADD);
+                TerraCompositioAPI.INSTANCE.getCFENetworkInstance().fireCFENetworkEvent(this, NetworkAction.ADD);
             }
         }
     }
@@ -46,6 +46,6 @@ public class CreativeCFESourceBlockEntity extends ModBlockEntity implements CFES
     @Override
     public void setRemoved() {
         super.setRemoved();
-        TerraCompositioAPI.INSTANCE.getCFENetworkInstance().fireCFENetworkEvent(this, CFENetworkAction.REMOVE);
+        TerraCompositioAPI.INSTANCE.getCFENetworkInstance().fireCFENetworkEvent(this, NetworkAction.REMOVE);
     }
 }

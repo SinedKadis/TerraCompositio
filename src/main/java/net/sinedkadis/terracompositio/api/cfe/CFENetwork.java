@@ -9,5 +9,5 @@ public interface CFENetwork {
     CFESource getClosestSourceWithCFE(BlockPos pos, Level level, int limit);
     CFESource getRandomSourceInRange(BlockPos pos, Level level, int limit);
     List<CFESource> getAllCFESources(Level level);
-    void fireCFENetworkEvent(CFESource source, CFENetworkAction action);
+    void fireCFENetworkEvent(CFESource source, NetworkAction action);
 }

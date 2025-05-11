@@ -111,7 +111,7 @@ public class WrenchAxeItem extends AxeItem {
         return WrenchMode.AXE;
     }
 
-    public WrenchMode getWrenchMode(ItemStack stack) {
+    public static WrenchMode getWrenchMode(ItemStack stack) {
         if (stack.getItem() instanceof WrenchAxeItem) {
             CompoundTag tag = stack.getOrCreateTag();
             if (tag.contains("WrenchMode")) {
@@ -147,7 +147,7 @@ public class WrenchAxeItem extends AxeItem {
 
     @Override
     public float getDestroySpeed(@NotNull ItemStack pStack, @NotNull BlockState pState) {
-        return this.getWrenchMode(pStack).equals(WrenchMode.WRENCH) ? 255 : super.getDestroySpeed(pStack,pState);
+        return WrenchAxeItem.getWrenchMode(pStack).equals(WrenchMode.WRENCH) ? 255 : super.getDestroySpeed(pStack,pState);
     }
 
     @Override

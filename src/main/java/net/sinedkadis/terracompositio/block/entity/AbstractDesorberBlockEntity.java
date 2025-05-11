@@ -18,7 +18,7 @@ import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.fluids.capability.templates.FluidTank;
 import net.sinedkadis.terracompositio.api.TerraCompositioAPI;
-import net.sinedkadis.terracompositio.api.cfe.CFENetworkAction;
+import net.sinedkadis.terracompositio.api.cfe.NetworkAction;
 import net.sinedkadis.terracompositio.api.cfe.CFESource;
 import net.sinedkadis.terracompositio.registries.ModBlockStateProperties;
 import net.sinedkadis.terracompositio.registries.ModFluids;
@@ -53,7 +53,7 @@ public abstract class AbstractDesorberBlockEntity extends ModBlockEntity impleme
         if (!pLevel.isClientSide) {
             boolean inNetwork = CFENetworkHandler.instance.isIn(pLevel, this);
             if (!inNetwork && !this.isRemoved() ) {
-                TerraCompositioAPI.INSTANCE.getCFENetworkInstance().fireCFENetworkEvent(this, CFENetworkAction.ADD);
+                TerraCompositioAPI.INSTANCE.getCFENetworkInstance().fireCFENetworkEvent(this, NetworkAction.ADD);
             }
         }
         if (!fluidHandler.isEmpty() && !pState.getValue(ModBlockStateProperties.INFUSED)) {
@@ -127,7 +127,7 @@ public abstract class AbstractDesorberBlockEntity extends ModBlockEntity impleme
     @Override
     public void setRemoved() {
         super.setRemoved();
-        TerraCompositioAPI.INSTANCE.getCFENetworkInstance().fireCFENetworkEvent(this, CFENetworkAction.REMOVE);
+        TerraCompositioAPI.INSTANCE.getCFENetworkInstance().fireCFENetworkEvent(this, NetworkAction.REMOVE);
     }
 
     @Override

@@ -11,6 +11,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.IPlantable;
 import net.minecraftforge.common.PlantType;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 public class FlowCedarPedestalBlock extends Block implements IPlantable {
     public FlowCedarPedestalBlock(Properties pProperties) {
@@ -36,5 +37,10 @@ public class FlowCedarPedestalBlock extends Block implements IPlantable {
     @Override
     public PlantType getPlantType(BlockGetter level, BlockPos pos) {
         return PlantType.PLAINS;
+    }
+
+    @Override
+    public boolean canConnectRedstone(BlockState state, BlockGetter level, BlockPos pos, @Nullable Direction direction) {
+        return true;
     }
 }

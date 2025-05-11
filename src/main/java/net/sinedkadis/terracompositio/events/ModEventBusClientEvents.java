@@ -76,5 +76,7 @@ public class ModEventBusClientEvents {
         event.registerBlockEntityRenderer(ModBlockEntities.CONSTRUCTION_DESORBER_BE.get(), ConstructionDesorberBlockEntityRenderer::new);
         event.registerBlockEntityRenderer(ModBlockEntities.CULTIVATION_DESORBER_BE.get(), CultivationDesorberBlockEntityRenderer::new);
         event.registerBlockEntityRenderer(ModBlockEntities.TIME_PASSAGE_DESORBER_BE.get(), TimePassageDesorberBlockEntityRenderer::new);
+        event.registerBlockEntityRenderer(ModBlockEntities.FLOW_CEDAR_TANK_BE.get(), FlowCedarTankBlockEntityRenderer::new);
+
     }
 }

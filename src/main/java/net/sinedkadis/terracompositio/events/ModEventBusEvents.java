@@ -5,7 +5,6 @@ import net.minecraftforge.client.event.RegisterParticleProvidersEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.sinedkadis.terracompositio.TerraCompositio;
-//import net.sinedkadis.terracompositio.network.PacketHandler;
 import net.sinedkadis.terracompositio.registries.ModParticles;
 import net.sinedkadis.terracompositio.particle.custom.*;
 
@@ -23,6 +22,9 @@ public class ModEventBusEvents {
                 FlowSplashParticle.Provider::new);
         Minecraft.getInstance().particleEngine.register(ModParticles.BIRCH_JUICE_SPLASH_PARTICLE.get(),
                 BirchJuiceSplashParticle.Provider::new);
+
+        Minecraft.getInstance().particleEngine.register(ModParticles.FLUID_FLOW.get(),
+                FluidFlowParticle.Provider::new);
     }
 
 
