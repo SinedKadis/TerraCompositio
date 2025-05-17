@@ -31,7 +31,14 @@ public class CFENetworkHandler implements CFENetwork {
 
     public void networkMemberUpdated(CFENetworkMemberBE updated) {
         cfeSources.get(updated.getLevel()).stream()
-                .filter(member -> updated.getBlockPos() != member.getBlockPos())
+                .filter(member -> {
+                    if (updated.getBlockPos() != member.getBlockPos()) {
+                        return true;
+                    } else {
+                        member.onCFENetworkMemberUpdate();
+                        return false;
+                    }
+                })
                 .filter(member -> updated.getPriority() < member.getPriority())
                 .filter(member -> distSqr(member.getBlockPos(), updated.getBlockPos()) <= ((long) member.getLimit() * member.getLimit()))
                 .forEach(CFENetworkMemberBE::onCFENetworkMemberUpdate);

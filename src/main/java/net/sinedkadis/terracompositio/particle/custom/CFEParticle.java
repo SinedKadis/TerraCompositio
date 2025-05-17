@@ -2,13 +2,15 @@ package net.sinedkadis.terracompositio.particle.custom;
 
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.*;
+import net.minecraft.core.Vec3i;
 import net.minecraft.core.particles.SimpleParticleType;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.sinedkadis.terracompositio.util.TCUtil;
 import org.jetbrains.annotations.NotNull;
 
-public class CFEParticle extends RisingParticle{
+public class CFEParticle extends TextureSheetParticle{
     private final Vec3 targetPos;
 
     CFEParticle(ClientLevel level, double x, double y, double z,
@@ -17,12 +19,11 @@ public class CFEParticle extends RisingParticle{
         this.targetPos = new Vec3(x + xd, y + yd, z + zd); // Рассчитываем целевую позицию
         this.hasPhysics = false;
         this.gravity = 0.0F;
-//        this.lifetime = (int) Math.sqrt(Math.sqrt(
-//                TCUtil.distSqr(
-//                        new Vec3i((int) x, (int) y, (int) z),
-//                        new Vec3i((int) targetPos.x, (int) targetPos.y, (int) targetPos.z))))
-//                +1;
-        this.lifetime = 200;
+        this.lifetime = (int) Math.sqrt(Math.sqrt(
+                TCUtil.distSqr(
+                        new Vec3i((int) x, (int) y, (int) z),
+                        new Vec3i((int) targetPos.x, (int) targetPos.y, (int) targetPos.z))));
+        //this.lifetime = 200;
         this.scale(0.5F);
     }
 
@@ -32,11 +33,31 @@ public class CFEParticle extends RisingParticle{
 
     @Override
     public void tick() {
-        super.tick();
-        Vec3 direction = targetPos.subtract(this.x, this.y, this.z).normalize();//.scale(0.02);
+        this.xo = this.x;
+        this.yo = this.y;
+        this.zo = this.z;
+
+        if (this.age++ >= this.lifetime) {
+            this.remove();
+            return;
+        }
+
+        // Пересчитываем направление к targetPos (если нужно)
+        Vec3 direction = new Vec3(
+                targetPos.x - this.x,
+                targetPos.y - this.y,
+                targetPos.z - this.z
+        ).normalize();//.scale(0.05);  // нормализуем и умножаем на скорость
+
+        // Обновляем скорость
         this.xd = direction.x;
         this.yd = direction.y;
         this.zd = direction.z;
+
+        // Двигаем частицу
+        this.x += this.xd;
+        this.y += this.yd;
+        this.z += this.zd;
     }
 
     @OnlyIn(Dist.CLIENT)

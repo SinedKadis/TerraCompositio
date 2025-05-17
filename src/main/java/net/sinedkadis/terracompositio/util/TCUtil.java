@@ -221,25 +221,27 @@ public class TCUtil {
         return getTouchingBlocks(null, pos,null);
     }
 
-    public static void spawnParticles(Level pLevel,BlockPos targetPos, BlockPos sourcePos) {
-        if (pLevel == null || pLevel.isClientSide())
-            return;
+    public static void sendCFEParticles(ServerLevel level,BlockPos target, BlockPos source,int particleAmount){
+        if (particleAmount <= 0 || level == null) return;
 
-        var level = (ServerLevel) pLevel;
+        Vec3 targetCenter = Vec3.atCenterOf(target);
+        Vec3 sourceCenter = Vec3.atCenterOf(source);
 
-        double x = sourcePos.getX() + (level.getRandom().nextDouble() * 0.2D) + 0.5D;
-        double y = sourcePos.getY() + (level.getRandom().nextDouble() * 0.2D) + 0.5D;
-        double z = sourcePos.getZ() + (level.getRandom().nextDouble() * 0.2D) + 0.5D;
 
-        double velX = targetPos.getX() - sourcePos.getX();
-        double velY = targetPos.getY() - sourcePos.getY();
-        double velZ = targetPos.getZ() - sourcePos.getZ();
+        for (int i = 0; i < particleAmount; i++) {
+            double offsetX = sourceCenter.x + (level.random.nextDouble() - 0.5) * 0.8;
+            double offsetY = sourceCenter.y + (level.random.nextDouble() - 0.5) * 0.8;
+            double offsetZ = sourceCenter.z + (level.random.nextDouble() - 0.5) * 0.8;
 
-        level.sendParticles(ModParticles.CFE_PARTICLE.get(), x, y, z, 0, velX, velY, velZ, 0.08D);
-    }
-
-    public static void sendCFEParticles(ServerLevel level,BlockPos targetPos, BlockPos sourcePos,int amount){
-        spawnParticles(level,targetPos,sourcePos);
+            // Отправляем частицу с данными о жидкости
+            level.sendParticles(ModParticles.CFE_PARTICLE.get(),
+                    offsetX, offsetY, offsetZ,
+                    0, // count
+                    targetCenter.x - offsetX, // xd (направление к цели)
+                    targetCenter.y - offsetY, // yd
+                    targetCenter.z - offsetZ,// zd
+                    Math.sqrt(TCUtil.distSqr(target,source))); // speed
+        }
     }
 
 //    public static void sendCFEParticles(ServerLevel level, BlockPos target, BlockPos source, int particleAmount){

@@ -33,22 +33,25 @@ public class CFEContainer implements ICFEHandler, INBTSerializable<CompoundTag> 
 
     @Override
     public int takeCFE(int cfe) {
-        int deltaCFE = CFE - cfe;
-        if (Mth.clamp(deltaCFE,minCFE,maxCFE) == deltaCFE){
-            this.CFE = deltaCFE;
-            onContentsChanged();
-            return cfe;
-        } else {
-            if (cfe < 0){
-                this.CFE = maxCFE;
+        if (cfe != 0){
+            int deltaCFE = CFE - cfe;
+            if (Mth.clamp(deltaCFE, minCFE, maxCFE) == deltaCFE) {
+                this.CFE = deltaCFE;
                 onContentsChanged();
-                return cfe + (deltaCFE - maxCFE);
+                return cfe;
             } else {
-                this.CFE = minCFE;
-                onContentsChanged();
-                return cfe + (deltaCFE - minCFE);
+                if (cfe < 0) {
+                    this.CFE = maxCFE;
+                    onContentsChanged();
+                    return cfe + (deltaCFE - maxCFE);
+                } else {
+                    this.CFE = minCFE;
+                    onContentsChanged();
+                    return cfe + (deltaCFE - minCFE);
+                }
             }
         }
+        return 0;
     }
 
     protected void onContentsChanged(){
