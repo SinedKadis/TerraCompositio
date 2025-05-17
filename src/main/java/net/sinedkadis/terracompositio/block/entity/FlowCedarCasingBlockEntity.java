@@ -56,9 +56,9 @@ public class FlowCedarCasingBlockEntity extends ModItemIOCFEBlockEntity{
         return saveWithoutMetadata();
     }
 
-    @Override
+
     public void tick(Level pLevel, BlockPos pPos, BlockState pState) {
-        super.tick(pLevel, pPos, pState);
+        super.tick(pLevel,pPos,pState);
         --this.cooldownTime;
         if (this.notOnCooldown() && hasOutputBusConnection(pState)) {
             this.setCooldown(0);

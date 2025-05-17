@@ -18,8 +18,6 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
 
-import static net.sinedkadis.terracompositio.registries.ModBlockStateProperties.INFUSED;
-
 public class FlowInfuserBlockEntity extends ModItemIOCFEBlockEntity {
 
     public FlowInfuserBlockEntity(BlockPos pPos, BlockState pBlockState) {
@@ -31,10 +29,9 @@ public class FlowInfuserBlockEntity extends ModItemIOCFEBlockEntity {
         return 1;
     }
 
-    @Override
+
     public void tick(Level pLevel, BlockPos pPos, BlockState pState) {
-        if (pState.getValue(INFUSED))
-            super.tick(pLevel, pPos, pState);
+        super.tick(pLevel, pPos, pState);
         if(hasRecipe() && enoughCFE()){
             increaseCraftingProgress();
             consumeCFE();
@@ -76,7 +73,7 @@ public class FlowInfuserBlockEntity extends ModItemIOCFEBlockEntity {
     private static void spawnParticles(Level pLevel, BlockPos targetPos) {
         if (!pLevel.isClientSide){
             ((ServerLevel) pLevel).sendParticles(
-                    ModParticles.FLOW_STILL_PARTICLE.get(),
+                    ModParticles.CFE_PARTICLE.get(),
                     targetPos.getX()+0.5D,
                     targetPos.getY()+0.5D,
                     targetPos.getZ()+0.5D,3,0,-0.1D,0,0.1D);

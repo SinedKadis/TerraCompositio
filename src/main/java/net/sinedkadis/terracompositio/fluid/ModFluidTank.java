@@ -4,6 +4,9 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.fluids.capability.templates.FluidTank;
+import net.sinedkadis.terracompositio.api.networks.NetworkAction;
+import net.sinedkadis.terracompositio.api.networks.fluid.FluidNetworkMemberBE;
+import net.sinedkadis.terracompositio.api.TerraCompositioAPI;
 
 public class ModFluidTank extends FluidTank {
     private final BlockEntity blockEntity;
@@ -26,6 +29,9 @@ public class ModFluidTank extends FluidTank {
         if (level != null && !level.isClientSide()) {
             BlockState blockState = blockEntity.getBlockState();
             level.sendBlockUpdated(blockEntity.getBlockPos(), blockState, blockState, 3);
+        }
+        if (blockEntity instanceof FluidNetworkMemberBE fluidNetworkMemberBE){
+            TerraCompositioAPI.INSTANCE.getFluidNetworkInstance().fireFluidNetworkEvent(fluidNetworkMemberBE, NetworkAction.UPDATE);
         }
     }
 }

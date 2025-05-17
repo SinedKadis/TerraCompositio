@@ -11,13 +11,13 @@ import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.sinedkadis.terracompositio.events.FluidNetworkEvent;
 import net.sinedkadis.terracompositio.registries.*;
-import net.sinedkadis.terracompositio.util.CFENetworkHandler;
+import net.sinedkadis.terracompositio.cfe.CFENetworkHandler;
 import net.sinedkadis.terracompositio.effect.ModEffects;
 import net.sinedkadis.terracompositio.entity.ModEntities;
 import net.sinedkadis.terracompositio.events.CFENetworkEvent;
 import net.sinedkadis.terracompositio.screen.ModMenuTypes;
 import net.sinedkadis.terracompositio.sound.ModSounds;
-import net.sinedkadis.terracompositio.util.FluidNetworkHandler;
+import net.sinedkadis.terracompositio.fluid.FluidNetworkHandler;
 import net.sinedkadis.terracompositio.worldgen.tree.ModFoliagePlacers;
 import net.sinedkadis.terracompositio.worldgen.tree.ModTrunkPlacers;
 

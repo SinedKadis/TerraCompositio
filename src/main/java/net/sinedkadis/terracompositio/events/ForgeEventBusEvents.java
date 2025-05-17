@@ -25,7 +25,7 @@ public class ForgeEventBusEvents {
                     Vec3 pos = player.getEyePosition();
                     if (player.hasEffect(ModEffects.FLOW_SATURATION.get()) && counter++ > 5) {
                         counter = 0;
-                        serverLevel.sendParticles(player, ModParticles.FLOW_STILL_PARTICLE.get(),
+                        serverLevel.sendParticles(player, ModParticles.CFE_PARTICLE.get(),
                                 true, pos.x, pos.y, pos.z, 10, 0.1, 0.1, 0.1, 0.0);
                     }
                 }

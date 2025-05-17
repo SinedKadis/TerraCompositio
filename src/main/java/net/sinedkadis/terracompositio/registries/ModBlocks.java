@@ -129,7 +129,7 @@ public class ModBlocks {
     public static final RegistryObject<Block> TECHNETIUM_RAW_ORE_BLOCK = registerUnstableTechnetiumBlock("technetium_raw_ore_block",
             () -> new Block(BlockBehaviour.Properties.copy(Blocks.RAW_IRON_BLOCK)),8);
     public static final RegistryObject<Block> FLOW_CEDAR_SAPLING = registerBlock("flow_cedar_sapling",
-            () -> new SaplingBlock(new FlowCedarTreeGrower(), BlockBehaviour.Properties.copy(Blocks.OAK_SAPLING)));
+            () -> new FlowCedarSaplingBlock(new FlowCedarTreeGrower(), BlockBehaviour.Properties.copy(Blocks.OAK_SAPLING)));
     public static final RegistryObject<Block> FLOW_CEDAR_CASING = registerBlock("flow_cedar_casing",
             () -> new FlowCedarCasingBlock(BlockBehaviour.Properties.copy(Blocks.STRIPPED_OAK_LOG).strength(3f)));
     public static final RegistryObject<Block> MATTER_INFUSER_PORT = registerBlock("matter_infuser_port",

@@ -9,13 +9,13 @@ import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.DirectionProperty;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import net.sinedkadis.terracompositio.api.cfe.CFEEntityBlock;
 import net.sinedkadis.terracompositio.block.entity.FlowCedarCasingBlockEntity;
 import net.sinedkadis.terracompositio.registries.ModBlocks;
 import net.sinedkadis.terracompositio.util.FunctionSide;
@@ -27,7 +27,7 @@ import java.util.Objects;
 import static net.minecraft.world.level.block.state.properties.BlockStateProperties.AXIS;
 import static net.sinedkadis.terracompositio.block.custom.FlowCedarCasingBlock.FUNCTION_SIDE;
 
-public abstract class MatterInfuserBaseBaseEntityBlock extends ModIOBaseEntityBlock implements CFEEntityBlock {
+public abstract class MatterInfuserBaseBaseEntityBlock extends ModIOBaseEntityBlock implements EntityBlock {
     protected final static DirectionProperty FACING;
     protected static final VoxelShape NORTH_AABB;
     protected static final VoxelShape SOUTH_AABB;

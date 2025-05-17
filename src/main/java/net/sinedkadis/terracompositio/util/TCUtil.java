@@ -13,11 +13,15 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.RotatedPillarBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.Property;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.fluids.FluidStack;
+import net.sinedkadis.terracompositio.api.networks.cfe.CFENetwork;
+import net.sinedkadis.terracompositio.api.networks.cfe.CFENetworkMemberBE;
+import net.sinedkadis.terracompositio.api.networks.cfe.ICFEHandler;
 import net.sinedkadis.terracompositio.block.custom.FlowCedarLikeBlock;
 
 
@@ -32,6 +36,18 @@ import java.util.*;
 import static net.sinedkadis.terracompositio.registries.ModBlockStateProperties.INFUSED;
 
 public class TCUtil {
+
+    public static int tryCFETransfer(CFENetworkMemberBE target,CFENetworkMemberBE source,int maxTransfer){
+        ICFEHandler targetHandler = CFENetwork.getCFEHandler(target).orElse(null);
+        if (targetHandler != null && targetHandler.getCFE() != targetHandler.getMaxCFE()){
+            ICFEHandler sourceHandler = CFENetwork.getCFEHandler(source).orElse(null);
+            if (sourceHandler != null && sourceHandler.getCFE() != sourceHandler.getMinCFE()){
+                return targetHandler.addCFE(sourceHandler.takeCFE(Math.min(maxTransfer,sourceHandler.getCFE())));
+            }
+        }
+        return 0;
+    }
+
     public static void sendFluidParticles(ServerLevel level, BlockPos target, BlockPos source,
                                           int particleAmount, FluidStack fluidStack) {
         if (fluidStack.isEmpty() || particleAmount <= 0 || level == null) return;
@@ -59,12 +75,13 @@ public class TCUtil {
     }
 
     public static @NotNull InteractionResult handleInWorldBlockCraft(BlockState oldState, BlockState newState, Level pLevel, BlockPos pPos, ItemStack item, int count) {
+        pLevel.setBlock(pPos, Blocks.STRUCTURE_VOID.defaultBlockState(),3);
         pLevel.setBlock(pPos,copyBlockStates(oldState,newState),3);
         item.shrink(count);
         if (pLevel instanceof ServerLevel level ){
             level.playSound(null, pPos, SoundEvents.COPPER_PLACE, SoundSource.BLOCKS);
             if (oldState.hasProperty(INFUSED) && oldState.getValue(INFUSED))
-                level.sendParticles(ModParticles.FLOW_STILL_PARTICLE.get(),
+                level.sendParticles(ModParticles.CFE_PARTICLE.get(),
                     pPos.getX(),
                     pPos.getY(),
                     pPos.getZ(),
@@ -79,7 +96,7 @@ public class TCUtil {
 
     public static void spawnParticlesIn(Level pLevel, BlockPos targetPos){
         if (pLevel instanceof ServerLevel level)
-            level.sendParticles(ModParticles.FLOW_STILL_PARTICLE.get(),
+            level.sendParticles(ModParticles.CFE_PARTICLE.get(),
                 targetPos.getX()+pLevel.getRandom().nextFloat(),
                 targetPos.getY()+pLevel.getRandom().nextFloat(),
                 targetPos.getZ()+pLevel.getRandom().nextFloat(),
@@ -218,8 +235,35 @@ public class TCUtil {
         double velY = targetPos.getY() - sourcePos.getY();
         double velZ = targetPos.getZ() - sourcePos.getZ();
 
-        level.sendParticles(ModParticles.FLOW_STILL_PARTICLE.get(), x, y, z, 0, velX, velY, velZ, 0.08D);
+        level.sendParticles(ModParticles.CFE_PARTICLE.get(), x, y, z, 0, velX, velY, velZ, 0.08D);
     }
+
+    public static void sendCFEParticles(ServerLevel level,BlockPos targetPos, BlockPos sourcePos,int amount){
+        spawnParticles(level,targetPos,sourcePos);
+    }
+
+//    public static void sendCFEParticles(ServerLevel level, BlockPos target, BlockPos source, int particleAmount){
+//        if (particleAmount <= 0 || level == null) return;
+//
+//        Vec3 targetCenter = Vec3.atCenterOf(target);
+//        Vec3 sourceCenter = Vec3.atCenterOf(source);
+//
+//
+//        for (int i = 0; i < particleAmount; i++) {
+//            double offsetX = sourceCenter.x + (level.random.nextDouble() - 0.5) * 0.8;
+//            double offsetY = sourceCenter.y + (level.random.nextDouble() - 0.5) * 0.8;
+//            double offsetZ = sourceCenter.z + (level.random.nextDouble() - 0.5) * 0.8;
+//
+//            level.sendParticles(ModParticles.CFE_PARTICLE.get(),
+//                    offsetX, offsetY, offsetZ,
+//                    0,
+//                    targetCenter.x - offsetX,
+//                    targetCenter.y - offsetY,
+//                    targetCenter.z - offsetZ,
+//                    Math.sqrt(TCUtil.distSqr(target,source)));
+//        }
+//
+//    }
 
     public static List<ItemStack> getContainerContents(ItemStack containerStack) {
         if (containerStack.isEmpty()) {

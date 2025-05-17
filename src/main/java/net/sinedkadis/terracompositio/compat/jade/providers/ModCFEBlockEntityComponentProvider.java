@@ -33,9 +33,9 @@ public enum ModCFEBlockEntityComponentProvider implements IBlockComponentProvide
     public void appendServerData(CompoundTag compoundTag, BlockAccessor blockAccessor) {
         BlockEntity blockEntity = blockAccessor.getBlockEntity();
         if (blockEntity instanceof ModCFEBlockEntity entity){
-            compoundTag.putInt("cfe", entity.getCFE());
+            compoundTag.putInt("cfe", entity.getCfeContainer().getCFE());
         } else if (blockEntity instanceof AbstractDesorberBlockEntity entity) {
-            compoundTag.putInt("cfe", entity.getCurrentCFE());
+            compoundTag.putInt("cfe", entity.getCfeContainer().getCFE());
         }
 
     }

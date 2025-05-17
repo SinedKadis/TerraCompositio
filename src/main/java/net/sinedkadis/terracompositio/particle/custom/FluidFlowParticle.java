@@ -24,6 +24,7 @@ public class FluidFlowParticle extends TextureSheetParticle {
         this.targetPos = new Vec3(x + xd, y + yd, z + zd); // Рассчитываем целевую позицию
         this.setSprite(Minecraft.getInstance().getTextureAtlas(InventoryMenu.BLOCK_ATLAS).apply(clientFluid.getStillTexture(fluid)));
         this.multiplyColor(clientFluid.getTintColor(fluid));
+        this.hasPhysics = false;
         this.gravity = 0.0F;
         this.lifetime = (int) Math.sqrt(Math.sqrt(
                         TCUtil.distSqr(

@@ -82,7 +82,7 @@ public abstract class ModItemIOCFEBlockEntity extends ModCFEBlockEntity{
     }
 
     protected boolean enoughCFE() {
-        return CFE >= tickCFECost;
+        return this.cfeContainer.getCFE() >= tickCFECost;
     }
 
     protected void resetProgress() {
@@ -94,7 +94,7 @@ public abstract class ModItemIOCFEBlockEntity extends ModCFEBlockEntity{
     }
 
     protected void consumeCFE() {
-        CFE = (int) (CFE-tickCFECost);
+        this.cfeContainer.setCFE((int) (this.cfeContainer.getCFE()-tickCFECost));
     }
 
     protected void increaseCraftingProgress() {

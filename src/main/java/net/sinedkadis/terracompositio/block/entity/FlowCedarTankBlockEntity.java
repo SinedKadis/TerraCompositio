@@ -16,10 +16,10 @@ import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidUtil;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.fluids.capability.templates.FluidTank;
-import net.sinedkadis.terracompositio.api.FluidNetwork;
-import net.sinedkadis.terracompositio.api.FluidSource;
+import net.sinedkadis.terracompositio.api.networks.fluid.FluidNetwork;
+import net.sinedkadis.terracompositio.api.networks.fluid.FluidNetworkMemberBE;
 import net.sinedkadis.terracompositio.api.TerraCompositioAPI;
-import net.sinedkadis.terracompositio.api.cfe.NetworkAction;
+import net.sinedkadis.terracompositio.api.networks.NetworkAction;
 import net.sinedkadis.terracompositio.fluid.ModFluidTank;
 import net.sinedkadis.terracompositio.registries.ModBlockEntities;
 import net.sinedkadis.terracompositio.registries.ModBlocks;
@@ -31,13 +31,15 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 
 import static net.sinedkadis.terracompositio.registries.ModBlockStateProperties.INFUSED;
 
-public class FlowCedarTankBlockEntity extends ModBlockEntity implements FluidSource {
+public class FlowCedarTankBlockEntity extends ModBlockEntity implements FluidNetworkMemberBE {
     protected final ModFluidTank fluidHandler = new ModFluidTank(8000, this);
     protected LazyOptional<IFluidHandler> lazyFluidHandler = LazyOptional.empty();
-
+    private int tickCounter = 20;
+    private boolean wasActivated = false;
     public FlowCedarTankBlockEntity(BlockPos pos, BlockState state) {
         super(ModBlockEntities.FLOW_CEDAR_TANK_BE.get(), pos, state);
     }
@@ -75,42 +77,33 @@ public class FlowCedarTankBlockEntity extends ModBlockEntity implements FluidSou
     public void tick(Level level, BlockPos pos, BlockState state) {
         FluidNetwork fluidNetworkInstance = TerraCompositioAPI.INSTANCE.getFluidNetworkInstance();
         if (!level.isClientSide) {
-
             boolean inNetwork = fluidNetworkInstance.isIn(level, this.fluidHandler);
             if (!inNetwork && !this.isRemoved()) {
                 fluidNetworkInstance.fireFluidNetworkEvent(this, NetworkAction.ADD);
             }
         }
-        if (getPriority() > 0) {
-            FluidSource source;
-            if (fluidHandler.isEmpty()){
-                source = fluidNetworkInstance.getRandomFluidHandlerInRange(pos,level,fluidHandler.getFluid().getFluid(),10,getPriority());
-            } else {
-                source = fluidNetworkInstance
-                        .getClosestFluidHandlerWithMatchingContent(pos, level, fluidHandler.getFluid().getFluid(), 10, getPriority());
-            }
-            if (source != null) {
-                if (source.getFluidHandler() instanceof FluidTank sourceTank) {
-                    FluidStack transferred = FluidUtil.tryFluidTransfer(fluidHandler, sourceTank, 1000, true);
-                    int amount = transferred.getAmount();
-                    if (amount > 0){
-                        TCUtil.sendFluidParticles((ServerLevel) level,pos,source.getBlockPos(), amount /10,transferred);
-                    }
-                }
-            } else {
-                FluidStack fluidStack = new FluidStack(ModFluids.FLOW_FLUID.source.get(), 1000);
-                if (fluidHandler.fill(fluidStack, IFluidHandler.FluidAction.SIMULATE)>=1000){
-                    List<BlockPos> list = new java.util.ArrayList<>(TCUtil.getNearBlocks(pos, 10).stream()
-                            .filter(pos1 -> level.getBlockState(pos1).is(ModTags.Blocks.FLOW_CEDAR_LOGS))
-                            .filter(pos2 -> level.getBlockState(pos2).getValue(INFUSED))
-                            .toList());
-                    if (!list.isEmpty()) {
-                        Collections.shuffle(list);
-                        BlockPos blockPos = list.get(0);
-                        level.setBlockAndUpdate(blockPos, level.getBlockState(blockPos).setValue(INFUSED, false));
-                        fluidHandler.fill(fluidStack, IFluidHandler.FluidAction.EXECUTE);
-                        TCUtil.sendFluidParticles((ServerLevel) level, pos, blockPos, 100, fluidStack);
-                    }
+        if (getPriority()>0 && !wasActivated){
+            TerraCompositioAPI.instance().getFluidNetworkInstance().fireFluidNetworkEvent(this,NetworkAction.UPDATE);
+            wasActivated = true;
+        }
+        if (getPriority() == 0){
+            wasActivated = false;
+        }
+        tickCounter--;
+        if (tickCounter <= 0 && onPedestal(level, pos) && getPriority() > 0){
+            tickCounter = 20;
+            FluidStack fluidStack = new FluidStack(ModFluids.FLOW_FLUID.source.get(), 1000);
+            if (fluidHandler.fill(fluidStack, IFluidHandler.FluidAction.SIMULATE)>=1000){
+                List<BlockPos> list = new java.util.ArrayList<>(TCUtil.getNearBlocks(pos, 10).stream()
+                        .filter(pos1 -> level.getBlockState(pos1).is(ModTags.Blocks.FLOW_CEDAR_LOGS))
+                        .filter(pos2 -> level.getBlockState(pos2).getValue(INFUSED))
+                        .toList());
+                if (!list.isEmpty()) {
+                    Collections.shuffle(list);
+                    BlockPos blockPos = list.get(0);
+                    level.setBlockAndUpdate(blockPos, level.getBlockState(blockPos).setValue(INFUSED, false));
+                    fluidHandler.fill(fluidStack, IFluidHandler.FluidAction.EXECUTE);
+                    TCUtil.sendFluidParticles((ServerLevel) level, pos, blockPos, 100, fluidStack);
                 }
             }
         }
@@ -142,8 +135,33 @@ public class FlowCedarTankBlockEntity extends ModBlockEntity implements FluidSou
     }
 
     @Override
-    public IFluidHandler getFluidHandler() {
-        return this.fluidHandler;
+    public int getLimit() {
+        return 10;
+    }
+
+    @Override
+    public void onFluidNetworkMemberUpdate() {
+        FluidNetwork fluidNetworkInstance = TerraCompositioAPI.INSTANCE.getFluidNetworkInstance();
+        BlockPos pos = this.getBlockPos();
+        if (getPriority() > 0) {
+            FluidNetworkMemberBE source;
+            if (fluidHandler.isEmpty()){
+                source = fluidNetworkInstance.getRandomFluidHandlerInRange(pos,level,fluidHandler.getFluid().getFluid(),10,getPriority());
+            } else {
+                source = fluidNetworkInstance
+                        .getClosestFluidHandlerWithMatchingContent(pos, level, fluidHandler.getFluid().getFluid(), 10, getPriority());
+            }
+            if (source != null) {
+                Optional<IFluidHandler> fluidHandlerOptional = source.getBE().getCapability(ForgeCapabilities.FLUID_HANDLER).resolve();
+                if (fluidHandlerOptional.isPresent() && fluidHandlerOptional.get() instanceof FluidTank sourceTank) {
+                    FluidStack transferred = FluidUtil.tryFluidTransfer(fluidHandler, sourceTank, 1000, true);
+                    int amount = transferred.getAmount();
+                    if (amount > 0){
+                        TCUtil.sendFluidParticles((ServerLevel) level,pos,source.getBlockPos(), amount /10,transferred);
+                    }
+                }
+            }
+        }
     }
 
     @Nullable

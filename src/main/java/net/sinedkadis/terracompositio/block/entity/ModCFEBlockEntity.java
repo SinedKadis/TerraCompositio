@@ -2,142 +2,129 @@ package net.sinedkadis.terracompositio.block.entity;
 
 import lombok.Getter;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.Mth;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.util.LazyOptional;
 import net.sinedkadis.terracompositio.api.TerraCompositioAPI;
-import net.sinedkadis.terracompositio.api.cfe.CFESource;
-import net.sinedkadis.terracompositio.api.cfe.CFENetwork;
+import net.sinedkadis.terracompositio.api.networks.NetworkAction;
+import net.sinedkadis.terracompositio.api.networks.cfe.CFENetworkMemberBE;
+import net.sinedkadis.terracompositio.api.networks.cfe.CFENetwork;
+import net.sinedkadis.terracompositio.api.networks.cfe.ICFEHandler;
+import net.sinedkadis.terracompositio.cfe.CFECapability;
+import net.sinedkadis.terracompositio.cfe.CFEContainer;
 import net.sinedkadis.terracompositio.util.TCUtil;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
-import java.util.ArrayList;
-import java.util.List;
+@Getter
+public abstract class ModCFEBlockEntity extends ModBlockEntity implements CFENetworkMemberBE{
+    protected final int connectRange;
+    protected final CFEContainer cfeContainer = new CFEContainer(this);
+    protected LazyOptional<ICFEHandler> lazyCFEOptional = LazyOptional.empty();
 
-import static net.sinedkadis.terracompositio.util.TCUtil.distSqr;
-
-
-public abstract class ModCFEBlockEntity extends ModBlockEntity{
-
-    @Getter
-    private BlockPos cfeSourceBlockPos;
-    private CFESource cfeSource;
-    @Getter
-    protected int CFE = 0;
-    private final int connectRange;
-    private final int maxCFE;
-
+    public ModCFEBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state,int minCFE,int maxCFE,int connectRange) {
+        super(type, pos, state);
+        this.connectRange = connectRange;
+        cfeContainer.setMinCFE(minCFE);
+        cfeContainer.setMaxCFE(maxCFE);
+    }
     public ModCFEBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state,int maxCFE,int connectRange) {
         super(type, pos, state);
-        if (!(maxCFE == 0 || connectRange == 0)){
-            cfeSourceBlockPos = searchForSource();
-        }
         this.connectRange = connectRange;
-        this.maxCFE = maxCFE;
+        cfeContainer.setMinCFE(0);
+        cfeContainer.setMaxCFE(maxCFE);
     }
 
-    public ModCFEBlockEntity(BlockEntityType<?> type, BlockPos pPos, BlockState pBlockState) {
-        this(type,pPos,pBlockState,0,0);
+    @Override
+    public void onLoad() {
+        super.onLoad();
+        lazyCFEOptional = LazyOptional.of(() -> cfeContainer);
+        this.onCFENetworkMemberUpdate();
     }
 
-    public BlockPos searchForSource() {
-        CFENetwork network = TerraCompositioAPI.instance().getCFENetworkInstance();
-        var closestSource = network.getClosestSourceWithCFE(getBlockPos(), getLevel(), connectRange*2);
-        return closestSource == null ? null : closestSource.getCFESourceBlockPos();
+    @Override
+    public @NotNull <T> LazyOptional<T> getCapability(@NotNull Capability<T> cap, @Nullable Direction side) {
+        if (cap == CFECapability.CFE){
+            return lazyCFEOptional.cast();
+        }
+        return super.getCapability(cap, side);
     }
 
     public void tick(Level pLevel, BlockPos pPos, BlockState pState) {
-        if (!pLevel.isClientSide){
-            if (cfeSourceBlockPos == null || !isValidSource(cfeSourceBlockPos)){
-                cfeSourceBlockPos = searchForSource();
-            }
-            if (isValidSource(cfeSourceBlockPos)){
-                if (CFE < maxCFE && cfeSource.getCurrentCFE() > 0){
-                    double cfe = getTransfer(pPos);
-                    addCFE(cfeSource.takeCFE((int) cfe));
-                    ModCFEBlockEntity blockEntity = (ModCFEBlockEntity) pLevel.getBlockEntity(pPos);
-                    if (blockEntity != null) {
-                        TCUtil.spawnParticles(pLevel,pPos, blockEntity.getCfeSourceBlockPos());
-                    }
-                }
+        CFENetwork cfeNetworkInstance = TerraCompositioAPI.INSTANCE.getCFENetworkInstance();
+        if (!pLevel.isClientSide && connectRange != 0) {
+            boolean inNetwork = cfeNetworkInstance.isIn(pLevel, this);
+            if (!inNetwork && !this.isRemoved()) {
+                cfeNetworkInstance.fireCFENetworkEvent(this, NetworkAction.ADD);
             }
         }
     }
 
-    private double getTransfer(BlockPos pPos) {
-        if (maxCFE == 0)
-            return 0;
-        int currentSourceCFE = cfeSource.getCurrentCFE();
-        int currentSpace = maxCFE - CFE;
-        double cfeTransfer;
-        if (Math.sqrt(pPos.distSqr(cfeSourceBlockPos)) < connectRange)
-            cfeTransfer = Math.sqrt(pPos.distSqr(cfeSourceBlockPos));
-        else {
-            if (connectRange - Math.sqrt(pPos.distSqr(cfeSourceBlockPos)) < 0)
-                cfeTransfer = 0;
-            else
-                cfeTransfer = connectRange - Math.sqrt(pPos.distSqr(cfeSourceBlockPos));
-        }
-        return Math.min(Math.min(currentSourceCFE,currentSpace),cfeTransfer);
+    @Override
+    public void setRemoved() {
+        super.setRemoved();
+        TerraCompositioAPI.INSTANCE.getCFENetworkInstance().fireCFENetworkEvent(this, NetworkAction.REMOVE);
     }
 
-    private void addCFE(double transfer) {
-        if (maxCFE == 0)
-            return;
-        this.CFE = (int)Math.min(maxCFE, CFE + transfer);
-        setChanged();
+    @Override
+    public void invalidateCaps() {
+        super.invalidateCaps();
+        lazyCFEOptional.invalidate();
     }
 
-    private boolean isValidSource(BlockPos source) {
-        if (connectRange == 0)
-            return false;
-        if (level == null || source == null || !level.isLoaded(source) || distSqr(getBlockPos(), source) > (long) connectRange * connectRange) {
-            return false;
-        }
-        return findSourceCandidateAt(source) != null;
+    public ModCFEBlockEntity(BlockEntityType<?> type, BlockPos pPos, BlockState pBlockState) {
+        this(type,pPos,pBlockState,0,0,0);
     }
 
-    private CFESource findSourceCandidateAt(BlockPos source) {
-        if (level == null || source == null) {
-            return null;
+    @Override
+    public void onCFENetworkMemberUpdate() {
+        if (level != null && !level.isClientSide){
+            CFENetwork cfeNetwork = TerraCompositioAPI.instance().getCFENetworkInstance();
+            CFENetworkMemberBE source = cfeNetwork.getClosestSourceWithCFE(getBlockPos(), getLevel(), connectRange * 2,getPriority());
+            if (source != null){
+                int toTransfer = (int) Mth.clamp(
+                        Math.round(
+                                50 - Mth.square(
+                                        Math.abs(
+                                                Math.sqrt(
+                                                    TCUtil.distSqr(this.getBlockPos(), source.getBlockPos())
+                                                ) - connectRange
+                                        )
+                                )
+                        ),0,50);
+                int transferred = TCUtil.tryCFETransfer(this,source,toTransfer);
+                if (transferred > 0)
+                    TCUtil.sendCFEParticles((ServerLevel) level,worldPosition,source.getBlockPos(),transferred);
+            }
         }
-        BlockEntity be = level.getBlockEntity(source);
-        if (be instanceof CFESource){
-            cfeSource = (CFESource) be;
-            if (cfeSource.getCurrentCFE() > 0)
-                return cfeSource;
-        }
-        return null;
+    }
+
+    @Override
+    public int getPriority() {
+        return Integer.MAX_VALUE;
+    }
+
+    @Override
+    public int getLimit() {
+        return connectRange*2;
     }
 
     @Override
     protected void saveAdditional(@NotNull CompoundTag pTag) {
-        if (!(maxCFE == 0 || connectRange == 0)) {
-            List<Integer> cords = new ArrayList<>();
-            if (cfeSourceBlockPos != null) {
-                cords.add(cfeSourceBlockPos.getX());
-                cords.add(cfeSourceBlockPos.getY());
-                cords.add(cfeSourceBlockPos.getZ());
-                pTag.putIntArray("source", cords);
-            }
-            pTag.putInt("cfe", CFE);
-        }
+        cfeContainer.writeToNBT(pTag);
         super.saveAdditional(pTag);
     }
 
     @Override
     public void load(@NotNull CompoundTag pTag) {
         super.load(pTag);
-        if (!(maxCFE == 0 || connectRange == 0)) {
-            int[] cords = pTag.getIntArray("source");
-            CFE = pTag.getInt("cfe");
-            if (cords.length > 0) {
-                cfeSourceBlockPos = new BlockPos(cords[0], cords[1], cords[2]);
-                findSourceCandidateAt(cfeSourceBlockPos);
-            }
-        }
+        cfeContainer.readFromNBT(pTag);
     }
 
 }

@@ -10,12 +10,12 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
-import net.sinedkadis.terracompositio.api.cfe.CFEEntityBlock;
 import net.sinedkadis.terracompositio.block.entity.FlowInfuserBlockEntity;
 import net.sinedkadis.terracompositio.registries.ModBlockEntities;
 import org.jetbrains.annotations.NotNull;
@@ -23,7 +23,7 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Supplier;
 
-public class FlowInfuserBlock extends FlowCedarLikeBaseEntityBlock implements CFEEntityBlock {
+public class FlowInfuserBlock extends FlowCedarLikeBaseEntityBlock implements EntityBlock {
 
     public FlowInfuserBlock(Properties pProperties, Supplier<Block> stripPair) {
         super(pProperties, stripPair);

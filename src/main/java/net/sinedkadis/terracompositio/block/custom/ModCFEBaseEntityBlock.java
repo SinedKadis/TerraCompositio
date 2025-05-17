@@ -1,14 +1,14 @@
 package net.sinedkadis.terracompositio.block.custom;
 
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
-import net.sinedkadis.terracompositio.api.cfe.CFEEntityBlock;
 
 import javax.annotation.Nullable;
 
-public abstract class ModCFEBaseEntityBlock extends Block implements CFEEntityBlock {
+public abstract class ModCFEBaseEntityBlock extends Block implements EntityBlock {
     public ModCFEBaseEntityBlock(Properties pProperties) {
         super(pProperties);
     }
