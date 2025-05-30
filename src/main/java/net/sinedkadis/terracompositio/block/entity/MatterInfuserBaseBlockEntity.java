@@ -13,11 +13,11 @@ import static net.minecraft.world.level.block.state.properties.BlockStatePropert
 
 public abstract class MatterInfuserBaseBlockEntity extends ModCFEBlockEntity{
     public MatterInfuserBaseBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state, int maxCFE, int connectRange) {
-        super(type, pos, state, maxCFE, connectRange);
+        super(type, pos, state, maxCFE, connectRange,BlockMode.CONSUMER);
     }
 
     public MatterInfuserBaseBlockEntity(BlockEntityType<?> type, BlockPos pPos, BlockState pBlockState) {
-        super(type,pPos,pBlockState);
+        super(type,pPos,pBlockState,BlockMode.CONSUMER);
     }
 
     public ItemStack getInputSlot() {

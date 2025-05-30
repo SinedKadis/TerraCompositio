@@ -68,7 +68,7 @@ public class MatterInfusionRecipeBuilder implements RecipeBuilder {
     @Override
     public void save(@NotNull Consumer<FinishedRecipe> consumer, @NotNull ResourceLocation resourceLocation) {
         if (hasCriteria())
-            this.advancement.parent(new ResourceLocation("recipes/root")).addCriterion("has_the_recipe", RecipeUnlockedTrigger.unlocked(resourceLocation)).rewards(net.minecraft.advancements.AdvancementRewards.Builder.recipe(resourceLocation)).requirements(RequirementsStrategy.OR);
+            this.advancement.parent(Objects.requireNonNull(ResourceLocation.tryParse("recipes/root"))).addCriterion("has_the_recipe", RecipeUnlockedTrigger.unlocked(resourceLocation)).rewards(net.minecraft.advancements.AdvancementRewards.Builder.recipe(resourceLocation)).requirements(RequirementsStrategy.OR);
         consumer.accept(new Result(output,input,catalyst,cfe,time,rate, resourceLocation, advancement));
     }
 
@@ -97,6 +97,7 @@ public class MatterInfusionRecipeBuilder implements RecipeBuilder {
         @Override
         public @NotNull JsonObject serializeRecipe() {
             JsonObject jsonObject = new JsonObject();
+            assert MatterInfusionRecipe.Serializer.ID != null;
             jsonObject.addProperty("type", MatterInfusionRecipe.Serializer.ID.toString());
             this.serializeRecipeData(jsonObject);
             return jsonObject;

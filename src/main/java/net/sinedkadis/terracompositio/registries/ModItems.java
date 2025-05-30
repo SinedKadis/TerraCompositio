@@ -106,6 +106,9 @@ public class ModItems {
     public static final RegistryObject<Item> SHIELDED_BUNDLE = ITEMS.register("shielded_bundle",
             () -> new ShieldedBundleItem(new Item.Properties()));
 
+    public static final RegistryObject<Item> TECHNETIUM_INGOT = ITEMS.register("technetium_ingot",
+            () -> new Item(new Item.Properties()));
+
 
     public static void register(IEventBus eventBus){
         ITEMS.register(eventBus);

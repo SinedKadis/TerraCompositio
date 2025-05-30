@@ -44,8 +44,14 @@ public class MatterInfuserIOBlockEntity extends MatterInfuserBaseBlockEntity{
         }
     }
 
+    private float partialCFE = 0;
     private void consumeCFE() {
-        this.cfeContainer.setCFE((int) (cfeContainer.getCFE()-tickCFECost));
+        partialCFE += tickCFECost - ((int) tickCFECost);
+        this.cfeContainer.takeCFE((int)tickCFECost,false);
+        if (partialCFE > 1){
+            int taken = this.cfeContainer.takeCFE((int) partialCFE, false);
+            partialCFE -= taken;
+        }
     }
 
     private void resetProgress() {
@@ -91,7 +97,7 @@ public class MatterInfuserIOBlockEntity extends MatterInfuserBaseBlockEntity{
     }
 
     protected boolean enoughCFE() {
-        return this.cfeContainer.getCFE() >= tickCFECost;
+        return this.cfeContainer.getCFE() >= Math.ceil(tickCFECost);
     }
 
     private boolean hasRecipe() {

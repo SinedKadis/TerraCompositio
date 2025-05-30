@@ -3,6 +3,7 @@ package net.sinedkadis.terracompositio.recipe;
 import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import lombok.Getter;
+import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.NonNullList;
 import net.minecraft.core.RegistryAccess;
 import net.minecraft.network.FriendlyByteBuf;
@@ -15,6 +16,10 @@ import net.minecraft.world.level.Level;
 import net.sinedkadis.terracompositio.TerraCompositio;
 import org.jetbrains.annotations.Nullable;
 
+import javax.annotation.ParametersAreNonnullByDefault;
+
+@ParametersAreNonnullByDefault
+@MethodsReturnNonnullByDefault
 public class FlowSaturationRecipe implements Recipe<SimpleContainer> {
     private final NonNullList<Ingredient> inputItems;
     private final ItemStack output;
@@ -78,7 +83,7 @@ public class FlowSaturationRecipe implements Recipe<SimpleContainer> {
     }
     public static class Serializer implements RecipeSerializer<FlowSaturationRecipe>{
         public static final Serializer INSTANCE = new Serializer();
-        public static final ResourceLocation ID = new ResourceLocation(TerraCompositio.MOD_ID,"flow_saturation");
+        public static final ResourceLocation ID = ResourceLocation.tryBuild(TerraCompositio.MOD_ID,"flow_saturation");
         @Override
         public FlowSaturationRecipe fromJson(ResourceLocation pRecipeId, JsonObject pSerializedRecipe) {
             ItemStack output = ShapedRecipe.itemStackFromJson(GsonHelper.getAsJsonObject(pSerializedRecipe, "output"));
@@ -97,9 +102,7 @@ public class FlowSaturationRecipe implements Recipe<SimpleContainer> {
         @Override
         public @Nullable FlowSaturationRecipe fromNetwork(ResourceLocation pRecipeId, FriendlyByteBuf pBuffer) {
             NonNullList<Ingredient> inputs = NonNullList.withSize(pBuffer.readInt(),Ingredient.EMPTY);
-            for (int i = 0; i<inputs.size();i++){
-                inputs.set(i,Ingredient.fromNetwork(pBuffer));
-            }
+            inputs.replaceAll(ignored -> Ingredient.fromNetwork(pBuffer));
             ItemStack output = pBuffer.readItem();
             boolean flowConsume = pBuffer.readBoolean();
             return new FlowSaturationRecipe(inputs,output,pRecipeId,flowConsume);

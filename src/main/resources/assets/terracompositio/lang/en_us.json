@@ -46,6 +46,7 @@
   "item.terracompositio.flow_cedar_boat": "Flow Cedar Boat",
   "item.terracompositio.flow_cedar_chest_boat": "Flow Cedar Boat with Chest",
   "block.terracompositio.creative_cfe_source": "Creative CFE Source",
+  "block.terracompositio.cfe_trash_can": "CFE Trash Can",
   "item.terracompositio.flow_infuser_kit.tooltip": "Use on flow infused log with axe in offhand to create a Flow Infuser",
   "item.terracompositio.flow_infuser_kit": "Flow Infuser Kit",
   "item.terracompositio.copper_nugget": "Copper Nugget",
@@ -103,5 +104,7 @@
   "item.terracompositio.shielded_bundle": "Shielded Bundle",
   "item.terracompositio.flow_rotating_axe.constructor_near": "Next to the construction desorber it is somehow difficult to do",
   "block.terracompositio.flow_cedar_pedestal": "Flow Cedar Pedestal",
-  "block.terracompositio.flow_cedar_tank": "Flow Cedar Tank"
+  "block.terracompositio.flow_cedar_tank": "Flow Cedar Tank",
+  "item.terracompositio.technetium_ingot": "Stable Technetium Ingot",
+  "block.terracompositio.cfe_saturated_air": "CFE saturated air"
 }

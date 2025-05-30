@@ -29,6 +29,7 @@ public class ModBlockStateProvider extends BlockStateProvider {
 
         blockWithItem(ModBlocks.FLOW_CEDAR_LEAVES);
         blockWithItem(ModBlocks.CREATIVE_CFE_SOURCE);
+        blockWithItem(ModBlocks.CFE_TRASH_CAN);
         flowWoodBlockWithItem(ModBlocks.FLOW_CEDAR_WOOD,
                 ModBlocks.FLOW_CEDAR_LOG);
         blockWithItem(ModBlocks.FLOW_CEDAR_PLANKS);
@@ -154,7 +155,7 @@ public class ModBlockStateProvider extends BlockStateProvider {
     private ResourceLocation extend(ResourceLocation rl, String suffix) {
         String var10002 = rl.getNamespace();
         String var10003 = rl.getPath();
-        return new ResourceLocation(var10002, var10003 + suffix);
+        return ResourceLocation.tryBuild(var10002, var10003 + suffix);
     }
 
 }

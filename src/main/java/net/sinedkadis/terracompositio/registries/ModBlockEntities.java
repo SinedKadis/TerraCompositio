@@ -21,6 +21,10 @@ public class ModBlockEntities {
             BLOCK_ENTITIES.register("creative_cfe_source_be", () ->
                     BlockEntityType.Builder.of(CreativeCFESourceBlockEntity::new,
                             ModBlocks.CREATIVE_CFE_SOURCE.get()).build(null));
+    public static final RegistryObject<BlockEntityType<CFETrashCanBlockEntity>> CFE_TRASH_CAN_BE =
+            BLOCK_ENTITIES.register("cfe_trash_can_be", () ->
+                    BlockEntityType.Builder.of(CFETrashCanBlockEntity::new,
+                            ModBlocks.CFE_TRASH_CAN.get()).build(null));
     public static final RegistryObject<BlockEntityType<FlowInfuserBlockEntity>> FLOW_INFUSER_BE =
             BLOCK_ENTITIES.register("flow_infuser_be", () ->
                     BlockEntityType.Builder.of(FlowInfuserBlockEntity::new,
@@ -65,6 +69,10 @@ public class ModBlockEntities {
             BLOCK_ENTITIES.register("flow_cedar_tank_be", () ->
                     BlockEntityType.Builder.of(FlowCedarTankBlockEntity::new,
                             ModBlocks.FLOW_CEDAR_TANK.get()).build(null));
+    public static final RegistryObject<BlockEntityType<CFESaturatedAirBlockEntity>> CFE_SATURATED_AIR_BE =
+            BLOCK_ENTITIES.register("cfe_saturated_air_be", () ->
+                    BlockEntityType.Builder.of(CFESaturatedAirBlockEntity::new,
+                            ModBlocks.CFE_SATURATED_AIR.get()).build(null));
 
 
 

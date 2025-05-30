@@ -19,7 +19,7 @@ public class ModParticles {
     public static final RegistryObject<SimpleParticleType> FLOW_PARTICLE =
             PARTICLE_TYPES.register("flow_particle",() -> new SimpleParticleType(true));
     public static final RegistryObject<SimpleParticleType> CFE_PARTICLE =
-            PARTICLE_TYPES.register("flow_still_particle",() -> new SimpleParticleType(true));
+            PARTICLE_TYPES.register("cfe_particle",() -> new SimpleParticleType(true));
     public static final RegistryObject<SimpleParticleType> BIRCH_JUICE_PARTICLE =
             PARTICLE_TYPES.register("birch_juice_particle",() -> new SimpleParticleType(true));
     public static final RegistryObject<SimpleParticleType> FLOW_SPLASH_PARTICLE =

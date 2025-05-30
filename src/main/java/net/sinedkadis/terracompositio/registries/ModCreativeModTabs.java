@@ -52,6 +52,7 @@ public class ModCreativeModTabs {
                         pOutput.accept(ModItems.FLOW_CEDAR_LEGGINGS.get());
                         pOutput.accept(ModItems.FLOW_CEDAR_BOOTS.get());
                         pOutput.accept(ModBlocks.CREATIVE_CFE_SOURCE.get());
+                        pOutput.accept(ModBlocks.CFE_TRASH_CAN.get());
                         pOutput.accept(ModBlocks.FLOW_INFUSER.get());
 
                         pOutput.accept(ModItems.INFUSED_IRON_INGOT.get());
@@ -85,6 +86,8 @@ public class ModCreativeModTabs {
 
                         pOutput.accept(ModBlocks.FLOW_CEDAR_PEDESTAL.get());
                         pOutput.accept(ModBlocks.FLOW_CEDAR_TANK.get());
+
+                        pOutput.accept(ModItems.TECHNETIUM_INGOT.get());
 
                     })
                     .build());

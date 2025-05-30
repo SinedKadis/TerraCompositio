@@ -86,6 +86,8 @@ public class ModItemModelProvider extends ItemModelProvider {
         simpleItem(ModItems.OUTPUT_BUS);
         simpleItem(ModItems.COPPER_ROD);
 
+        simpleItem(ModItems.TECHNETIUM_INGOT);
+
 
         saplingItem(ModBlocks.FLOW_CEDAR_SAPLING);
     }
@@ -110,12 +112,13 @@ public class ModItemModelProvider extends ItemModelProvider {
                 String armorItemPath = "item/" + armorItem;
                 String trimPath = "trims/items/" + armorType + "_trim_" + trimMaterial.location().getPath();
                 String currentTrimName = armorItemPath + "_" + trimMaterial.location().getPath() + "_trim";
-                ResourceLocation armorItemResLoc = new ResourceLocation(MOD_ID, armorItemPath);
-                ResourceLocation trimResLoc = new ResourceLocation(trimPath); // minecraft namespace
-                ResourceLocation trimNameResLoc = new ResourceLocation(MOD_ID, currentTrimName);
+                ResourceLocation armorItemResLoc = ResourceLocation.tryBuild(MOD_ID, armorItemPath);
+                ResourceLocation trimResLoc = ResourceLocation.tryParse(trimPath); // minecraft namespace
+                ResourceLocation trimNameResLoc = ResourceLocation.tryBuild(MOD_ID, currentTrimName);
 
                 // This is used for making the ExistingFileHelper acknowledge that this texture exist, so this will
                 // avoid an IllegalArgumentException
+                assert trimResLoc != null;
                 existingFileHelper.trackGenerated(trimResLoc, PackType.CLIENT_RESOURCES, ".png", "textures");
 
                 // Trimmed armorItem files
@@ -131,7 +134,7 @@ public class ModItemModelProvider extends ItemModelProvider {
                         .model(new ModelFile.UncheckedModelFile(trimNameResLoc))
                         .predicate(mcLoc("trim_type"), trimValue).end()
                         .texture("layer0",
-                                new ResourceLocation(MOD_ID,
+                                ResourceLocation.tryBuild(MOD_ID,
                                         "item/" + itemRegistryObject.getId().getPath()));
             });
         }
@@ -140,14 +143,14 @@ public class ModItemModelProvider extends ItemModelProvider {
 
     private ItemModelBuilder simpleItem(RegistryObject<Item> item) {
         return withExistingParent(item.getId().getPath(),
-                new ResourceLocation("item/generated")).texture("layer0",
-                new ResourceLocation(TerraCompositio.MOD_ID,"item/" + item.getId().getPath()));
+                ResourceLocation.tryParse("item/generated")).texture("layer0",
+                ResourceLocation.tryBuild(TerraCompositio.MOD_ID,"item/" + item.getId().getPath()));
     }
 
     private ItemModelBuilder saplingItem(RegistryObject<Block> item) {
         return withExistingParent(item.getId().getPath(),
-                new ResourceLocation("item/generated")).texture("layer0",
-                new ResourceLocation(TerraCompositio.MOD_ID,"block/" + item.getId().getPath()));
+                ResourceLocation.tryParse("item/generated")).texture("layer0",
+                ResourceLocation.tryBuild(TerraCompositio.MOD_ID,"block/" + item.getId().getPath()));
     }
 
     public void evenSimplerBlockItem(RegistryObject<Block> block) {
@@ -170,7 +173,7 @@ public class ModItemModelProvider extends ItemModelProvider {
         ResourceLocation key = ForgeRegistries.BLOCKS.getKey(block.get());
         if (key != null) {
             this.withExistingParent(key.getPath(), mcLoc("block/fence_inventory"))
-                    .texture("texture",  new ResourceLocation(TerraCompositio.MOD_ID, "block/" + Objects.requireNonNull(ForgeRegistries.BLOCKS.getKey(baseBlock.get())).getPath()));
+                    .texture("texture",  ResourceLocation.tryBuild(TerraCompositio.MOD_ID, "block/" + Objects.requireNonNull(ForgeRegistries.BLOCKS.getKey(baseBlock.get())).getPath()));
         }
     }
 
@@ -180,7 +183,7 @@ public class ModItemModelProvider extends ItemModelProvider {
             ResourceLocation key1 = ForgeRegistries.BLOCKS.getKey(baseBlock.get());
             if (key1 != null) {
                 this.withExistingParent(key.getPath(), mcLoc("block/button_inventory"))
-                        .texture("texture",  new ResourceLocation(TerraCompositio.MOD_ID, "block/" + key1.getPath()));
+                        .texture("texture",  ResourceLocation.tryBuild(TerraCompositio.MOD_ID, "block/" + key1.getPath()));
             }
         }
     }
@@ -191,15 +194,15 @@ public class ModItemModelProvider extends ItemModelProvider {
             ResourceLocation key1 = ForgeRegistries.BLOCKS.getKey(baseBlock.get());
             if (key1 != null) {
                 this.withExistingParent(key.getPath(), mcLoc("block/wall_inventory"))
-                        .texture("wall",  new ResourceLocation(TerraCompositio.MOD_ID, "block/" + key1.getPath()));
+                        .texture("wall",  ResourceLocation.tryBuild(TerraCompositio.MOD_ID, "block/" + key1.getPath()));
             }
         }
     }
 
     private ItemModelBuilder simpleBlockItem(RegistryObject<Block> item) {
         return withExistingParent(item.getId().getPath(),
-                new ResourceLocation("item/generated")).texture("layer0",
-                new ResourceLocation(TerraCompositio.MOD_ID,"item/" + item.getId().getPath()));
+                ResourceLocation.tryParse("item/generated")).texture("layer0",
+                ResourceLocation.tryBuild(TerraCompositio.MOD_ID,"item/" + item.getId().getPath()));
     }
 
 }

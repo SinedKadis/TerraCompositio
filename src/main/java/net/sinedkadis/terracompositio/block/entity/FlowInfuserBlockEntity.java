@@ -21,7 +21,7 @@ import java.util.Optional;
 public class FlowInfuserBlockEntity extends ModItemIOCFEBlockEntity {
 
     public FlowInfuserBlockEntity(BlockPos pPos, BlockState pBlockState) {
-        super(ModBlockEntities.FLOW_INFUSER_BE.get(),pPos, pBlockState,100,5);
+        super(ModBlockEntities.FLOW_INFUSER_BE.get(),pPos, pBlockState,100,5,BlockMode.CONSUMER);
     }
 
     @Override

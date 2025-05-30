@@ -32,6 +32,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
+import java.util.function.Predicate;
 
 import static net.sinedkadis.terracompositio.registries.ModBlockStateProperties.INFUSED;
 
@@ -39,10 +40,16 @@ public class TCUtil {
 
     public static int tryCFETransfer(CFENetworkMemberBE target,CFENetworkMemberBE source,int maxTransfer){
         ICFEHandler targetHandler = CFENetwork.getCFEHandler(target).orElse(null);
-        if (targetHandler != null && targetHandler.getCFE() != targetHandler.getMaxCFE()){
+        if (targetHandler != null){
             ICFEHandler sourceHandler = CFENetwork.getCFEHandler(source).orElse(null);
-            if (sourceHandler != null && sourceHandler.getCFE() != sourceHandler.getMinCFE()){
-                return targetHandler.addCFE(sourceHandler.takeCFE(Math.min(maxTransfer,sourceHandler.getCFE())));
+            if (sourceHandler != null){
+                int taken = sourceHandler.takeCFE(maxTransfer,true);
+                int added = targetHandler.addCFE(taken,true);
+                if (added <= taken){
+                    targetHandler.addCFE(added, false);
+                    sourceHandler.takeCFE(added, false);
+                    return added;
+                }
             }
         }
         return 0;
@@ -164,6 +171,39 @@ public class TCUtil {
 
         return result;
     }
+    public static @NotNull List<BlockPos> getTouchingBlocks(@Nullable Level level, BlockPos pPos, @Nullable Predicate<BlockState> predicate, int iteration) {
+        List<BlockPos> result = new ArrayList<>();
+        if (iteration <= 0) {
+            return result;
+        }
+
+        Queue<BlockPos> queue = new LinkedList<>();
+        Set<BlockPos> visited = new HashSet<>();
+
+        queue.add(pPos);
+        visited.add(pPos);
+
+        BlockPos.MutableBlockPos mutablePos = new BlockPos.MutableBlockPos();
+        while (!queue.isEmpty() && iteration > 0) {
+            int size = queue.size();
+            for (int i = 0; i < size; i++) {
+                BlockPos current = queue.poll();
+                result.add(current);
+                if (current == null)
+                    current = pPos;
+                for (Direction dir : Direction.values()) {
+                    mutablePos.set(current.relative(dir));
+                    if (!visited.contains(mutablePos) && (predicate == null || level == null || predicate.test(level.getBlockState(mutablePos)))) {
+                        queue.add(mutablePos.immutable());
+                        visited.add(mutablePos.immutable());
+                    }
+                }
+            }
+            iteration--;
+        }
+
+        return result;
+    }
     public static @NotNull List<BlockPos> getTouchingBlocks(@Nullable Level level, BlockPos pPos, @Nullable TagKey<Block> block, int iteration) {
         List<BlockPos> result = new ArrayList<>();
         if (iteration <= 0) {
@@ -201,18 +241,18 @@ public class TCUtil {
     public static @NotNull List<BlockPos> getNearBlocks(@Nullable Level level, BlockPos pos, @Nullable TagKey<Block> block){
         if (level != null && !level.isClientSide)
             return getNearBlocks(level, pos,block,1);
-        return getNearBlocks(null, pos,null,1);
+        return getNearBlocks(null, pos, null,1);
     }
     public static @NotNull List<BlockPos> getTouchingBlocks(@Nullable Level level, BlockPos pos, @Nullable TagKey<Block> block){
         if (level != null && !level.isClientSide)
             return getTouchingBlocks(level, pos,block,1);
-        return getTouchingBlocks(null, pos,null,1);
+        return getTouchingBlocks(null, pos, (TagKey<Block>) null,1);
     }
     public static @NotNull List<BlockPos> getNearBlocks(BlockPos pos, int iteration){
-        return getNearBlocks(null, pos,null,iteration);
+        return getNearBlocks(null, pos, null,iteration);
     }
     public static @NotNull List<BlockPos> getTouchingBlocks(BlockPos pos, int iteration){
-        return getTouchingBlocks(null, pos,null,iteration);
+        return getTouchingBlocks(null, pos, (TagKey<Block>) null,iteration);
     }
     public static @NotNull List<BlockPos> getNearBlocks(BlockPos pos){
         return getNearBlocks(null, pos,null);

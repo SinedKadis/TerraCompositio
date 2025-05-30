@@ -96,7 +96,7 @@ public class MatterInfusionRecipe implements Recipe<SimpleContainer> {
     }
     public static class Serializer implements RecipeSerializer<MatterInfusionRecipe>{
         public static final Serializer INSTANCE = new Serializer();
-        public static final ResourceLocation ID = new ResourceLocation(TerraCompositio.MOD_ID,"matter_infusion");
+        public static final ResourceLocation ID = ResourceLocation.tryBuild(TerraCompositio.MOD_ID,"matter_infusion");
         @Override
         public @NotNull MatterInfusionRecipe fromJson(@NotNull ResourceLocation pRecipeId, @NotNull JsonObject pSerializedRecipe) {
             ItemStack output = ShapedRecipe.itemStackFromJson(GsonHelper.getAsJsonObject(pSerializedRecipe, "output"));

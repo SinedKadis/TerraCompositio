@@ -120,6 +120,8 @@ public class ModBlocks {
 
     public static final RegistryObject<Block> CREATIVE_CFE_SOURCE = registerBlock("creative_cfe_source",
             () -> new CreativeCFESourceBlock(BlockBehaviour.Properties.copy(Blocks.IRON_BLOCK)));
+    public static final RegistryObject<Block> CFE_TRASH_CAN = registerBlock("cfe_trash_can",
+            () -> new CFETrashCanBlock(BlockBehaviour.Properties.copy(Blocks.IRON_BLOCK)));
     public static final RegistryObject<Block> FLOW_INFUSER = registerBlock("flow_infuser",
             () -> new FlowInfuserBlock(BlockBehaviour.Properties.copy(Blocks.IRON_BLOCK).noOcclusion(), ModBlocks.STRIPPED_FLOW_CEDAR_LOG));
     public static final RegistryObject<Block> TECHNETIUM_ORE = registerUnstableTechnetiumBlock("technetium_ore",
@@ -148,4 +150,7 @@ public class ModBlocks {
             () -> new FlowCedarPedestalBlock(BlockBehaviour.Properties.copy(Blocks.AZALEA).noOcclusion()));
     public static final RegistryObject<Block> FLOW_CEDAR_TANK = registerBlock("flow_cedar_tank",
             () -> new FlowCedarTankBlock(BlockBehaviour.Properties.copy(Blocks.OAK_PLANKS).noOcclusion()));
+
+    public static final RegistryObject<Block> CFE_SATURATED_AIR = registerBlock("cfe_saturated_air",
+            () -> new CFESaturatedAirBlock(BlockBehaviour.Properties.copy(Blocks.AIR).noLootTable()));
 }

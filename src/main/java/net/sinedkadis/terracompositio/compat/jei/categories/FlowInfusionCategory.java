@@ -20,19 +20,20 @@ import net.sinedkadis.terracompositio.recipe.FlowInfusionRecipe;
 import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;
+import java.util.Objects;
 
 public class FlowInfusionCategory implements IRecipeCategory<FlowInfusionRecipe> {
-    public static final ResourceLocation UID = new ResourceLocation(TerraCompositio.MOD_ID,"flow_infusion");
-    public static final ResourceLocation TEXTURE = new ResourceLocation(TerraCompositio.MOD_ID,
+    public static final ResourceLocation UID = ResourceLocation.tryBuild(TerraCompositio.MOD_ID,"flow_infusion");
+    public static final ResourceLocation TEXTURE = ResourceLocation.tryBuild(TerraCompositio.MOD_ID,
             "textures/gui/flow_infuser_gui.png");
 
     public static final RecipeType<FlowInfusionRecipe> FLOW_INFUSION_RECIPE_RECIPE_TYPE=
-            new RecipeType<>(UID, FlowInfusionRecipe.class);
+            new RecipeType<>(Objects.requireNonNull(UID), FlowInfusionRecipe.class);
     private final IDrawable background;
     private final IDrawable icon;
 
     public FlowInfusionCategory(IGuiHelper helper) {
-        this.background = helper.createDrawable(TEXTURE,0,0,176,85);
+        this.background = helper.createDrawable(Objects.requireNonNull(TEXTURE),0,0,176,85);
         this.icon = helper.createDrawableIngredient(VanillaTypes.ITEM_STACK,new ItemStack(ModBlocks.FLOW_INFUSER.get()));
     }
 

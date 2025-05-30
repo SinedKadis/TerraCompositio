@@ -35,7 +35,7 @@ public class FlowCedarCasingBlockEntity extends ModItemIOCFEBlockEntity{
     private int cooldownTime;
 
     public FlowCedarCasingBlockEntity(BlockPos pos, BlockState state) {
-        super(ModBlockEntities.FLOW_CEDAR_CASING_BE.get(), pos, state);
+        super(ModBlockEntities.FLOW_CEDAR_CASING_BE.get(), pos, state,BlockMode.CONSUMER);
     }
 
     protected <T> @Nullable LazyOptional<T> getCap(@NotNull Capability<T> cap, @Nullable Direction side) {

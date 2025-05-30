@@ -19,16 +19,19 @@ public class CFEParticle extends TextureSheetParticle{
         this.targetPos = new Vec3(x + xd, y + yd, z + zd); // Рассчитываем целевую позицию
         this.hasPhysics = false;
         this.gravity = 0.0F;
-        this.lifetime = (int) Math.sqrt(Math.sqrt(
-                TCUtil.distSqr(
-                        new Vec3i((int) x, (int) y, (int) z),
-                        new Vec3i((int) targetPos.x, (int) targetPos.y, (int) targetPos.z))));
-        //this.lifetime = 200;
+        if (xd != 0 && yd != 0 && zd != 0 ) {
+            this.lifetime = (int) Math.sqrt(Math.sqrt(
+                    TCUtil.distSqr(
+                            new Vec3i((int) x, (int) y, (int) z),
+                            new Vec3i((int) targetPos.x, (int) targetPos.y, (int) targetPos.z))));
+        } else {
+            this.lifetime = 40;
+        }
         this.scale(0.5F);
     }
 
     public @NotNull ParticleRenderType getRenderType() {
-        return ParticleRenderType.TERRAIN_SHEET;
+        return ParticleRenderType.PARTICLE_SHEET_OPAQUE;
     }
 
     @Override
@@ -77,7 +80,7 @@ public class CFEParticle extends TextureSheetParticle{
                                        double pYSpeed,
                                        double pZSpeed) {
             CFEParticle $$8 = new CFEParticle(pLevel, pX, pY, pZ, pXSpeed, pYSpeed, pZSpeed);
-            $$8.pickSprite(this.sprite);
+            $$8.setSpriteFromAge(this.sprite);
             return $$8;
         }
     }

@@ -20,19 +20,20 @@ import net.sinedkadis.terracompositio.registries.ModBlocks;
 import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;
+import java.util.Objects;
 
 public class MatterInfusionCategory implements IRecipeCategory<MatterInfusionRecipe> {
-    public static final ResourceLocation UID = new ResourceLocation(TerraCompositio.MOD_ID,"matter_infusion");
-    public static final ResourceLocation TEXTURE = new ResourceLocation(TerraCompositio.MOD_ID,
+    public static final ResourceLocation UID = ResourceLocation.tryBuild(TerraCompositio.MOD_ID,"matter_infusion");
+    public static final ResourceLocation TEXTURE = ResourceLocation.tryBuild(TerraCompositio.MOD_ID,
             "textures/gui/matter_infuser_gui.png");
 
     public static final RecipeType<MatterInfusionRecipe> MATTER_INFUSION_RECIPE_RECIPE_TYPE =
-            new RecipeType<>(UID, MatterInfusionRecipe.class);
+            new RecipeType<>(Objects.requireNonNull(UID), MatterInfusionRecipe.class);
     private final IDrawable background;
     private final IDrawable icon;
 
     public MatterInfusionCategory(IGuiHelper helper) {
-        this.background = helper.createDrawable(TEXTURE,0,0,176,150);
+        this.background = helper.createDrawable(Objects.requireNonNull(TEXTURE),0,0,176,150);
         this.icon = helper.createDrawableIngredient(VanillaTypes.ITEM_STACK,new ItemStack(ModBlocks.MATTER_INFUSER_IO.get()));
     }
 

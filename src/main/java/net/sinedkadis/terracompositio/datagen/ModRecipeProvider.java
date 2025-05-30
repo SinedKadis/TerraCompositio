@@ -13,6 +13,7 @@ import net.minecraftforge.common.crafting.conditions.IConditionBuilder;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.sinedkadis.terracompositio.TerraCompositio;
 import net.sinedkadis.terracompositio.datagen.builders.MatterInfusionRecipeBuilder;
+import net.sinedkadis.terracompositio.datagen.builders.TechnetiumFiringRecipeBuilder;
 import net.sinedkadis.terracompositio.registries.ModBlocks;
 import net.sinedkadis.terracompositio.registries.ModItems;
 import net.sinedkadis.terracompositio.registries.ModTags;
@@ -242,8 +243,8 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                 .define('I', ModItems.INFUSED_IRON_INGOT.get())
                 .define('S', Items.STICK)
                 .unlockedBy(getHasName(ModItems.INFUSED_IRON_INGOT.get()), has(Items.STICK))
-                .save(pWriter,new ResourceLocation(Objects.requireNonNull(ForgeRegistries.ITEMS.getKey(ModItems.WRENCH_AXE.get())).getNamespace(),
-                        Objects.requireNonNull(ForgeRegistries.ITEMS.getKey(ModItems.WRENCH_AXE.get())).getPath() + "_mirrored"));
+                .save(pWriter, Objects.requireNonNull(ResourceLocation.tryBuild(Objects.requireNonNull(ForgeRegistries.ITEMS.getKey(ModItems.WRENCH_AXE.get())).getNamespace(),
+                        Objects.requireNonNull(ForgeRegistries.ITEMS.getKey(ModItems.WRENCH_AXE.get())).getPath() + "_mirrored")));
 
 
 
@@ -263,6 +264,48 @@ public class ModRecipeProvider extends RecipeProvider implements IConditionBuild
                         ModItems.HIGH_ENRICHED_TECHNETIUM.get(),1,
                         Items.DIAMOND,10000,2000,30)
                 .save(pWriter);
+
+        oreSmelting(pWriter,
+                List.of(ModItems.RAW_TECHNETIUM.get(),
+                        ModBlocks.TECHNETIUM_ORE.get(),
+                        ModBlocks.TECHNETIUM_DEEPSLATE_ORE.get(),
+                        ModItems.LOW_ENRICHED_TECHNETIUM.get(),
+                        ModItems.MEDIUM_ENRICHED_TECHNETIUM.get(),
+                        ModItems.HIGH_ENRICHED_TECHNETIUM.get()),
+                RecipeCategory.MISC,
+                ModItems.TECHNETIUM_INGOT.get(),
+                0.25f,
+                200,
+                "technetium");
+        oreBlasting(pWriter,
+                List.of(ModItems.RAW_TECHNETIUM.get(),
+                        ModBlocks.TECHNETIUM_ORE.get(),
+                        ModBlocks.TECHNETIUM_DEEPSLATE_ORE.get(),
+                        ModItems.LOW_ENRICHED_TECHNETIUM.get(),
+                        ModItems.MEDIUM_ENRICHED_TECHNETIUM.get(),
+                        ModItems.HIGH_ENRICHED_TECHNETIUM.get()),
+                RecipeCategory.MISC,
+                ModItems.TECHNETIUM_INGOT.get(),
+                0.25f,
+                100,
+                "technetium");
+
+        TechnetiumFiringRecipeBuilder.create(
+                ModItems.LOW_ENRICHED_TECHNETIUM.get(),
+                200
+                )
+                .unlockedBy(getHasName(ModItems.LOW_ENRICHED_TECHNETIUM.get()), has(ModItems.LOW_ENRICHED_TECHNETIUM.get()))
+                .save(pWriter, Objects.requireNonNull(ForgeRegistries.ITEMS.getKey(ModItems.LOW_ENRICHED_TECHNETIUM.get())).withPrefix("recipes/technetium_firing_recipe/"));
+        TechnetiumFiringRecipeBuilder.create(
+                        ModItems.MEDIUM_ENRICHED_TECHNETIUM.get(),
+                        2000)
+                .unlockedBy(getHasName(ModItems.MEDIUM_ENRICHED_TECHNETIUM.get()), has(ModItems.MEDIUM_ENRICHED_TECHNETIUM.get()))
+                .save(pWriter, Objects.requireNonNull(ForgeRegistries.ITEMS.getKey(ModItems.MEDIUM_ENRICHED_TECHNETIUM.get())).withPrefix("recipes/technetium_firing_recipe/"));
+        TechnetiumFiringRecipeBuilder.create(
+                        ModItems.HIGH_ENRICHED_TECHNETIUM.get(),
+                        20000)
+                .unlockedBy(getHasName(ModItems.HIGH_ENRICHED_TECHNETIUM.get()), has(ModItems.HIGH_ENRICHED_TECHNETIUM.get()))
+                .save(pWriter, Objects.requireNonNull(ForgeRegistries.ITEMS.getKey(ModItems.HIGH_ENRICHED_TECHNETIUM.get())).withPrefix("recipes/technetium_firing_recipe/"));
     }
 
     protected static void oreSmelting(@NotNull Consumer<FinishedRecipe> pFinishedRecipeConsumer, List<ItemLike> pIngredients, @NotNull RecipeCategory pCategory, @NotNull ItemLike pResult, float pExperience, int pCookingTIme, @NotNull String pGroup) {

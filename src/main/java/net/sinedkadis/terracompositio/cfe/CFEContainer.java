@@ -3,7 +3,6 @@ package net.sinedkadis.terracompositio.cfe;
 import lombok.Getter;
 import lombok.Setter;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.util.Mth;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
@@ -12,6 +11,7 @@ import net.sinedkadis.terracompositio.api.TerraCompositioAPI;
 import net.sinedkadis.terracompositio.api.networks.NetworkAction;
 import net.sinedkadis.terracompositio.api.networks.cfe.CFENetworkMemberBE;
 import net.sinedkadis.terracompositio.api.networks.cfe.ICFEHandler;
+import net.sinedkadis.terracompositio.block.entity.ModCFEBlockEntity;
 
 @Getter
 @Setter
@@ -19,38 +19,54 @@ public class CFEContainer implements ICFEHandler, INBTSerializable<CompoundTag> 
     private final BlockEntity blockEntity;
     int CFE = 0;
     private int maxCFE;
-    private int minCFE;
 
-    public CFEContainer(BlockEntity blockEntity,int minCFE, int maxCFE) {
+    public CFEContainer(BlockEntity blockEntity, int maxCFE) {
         this.blockEntity = blockEntity;
-        this.minCFE = minCFE;
         this.maxCFE = maxCFE;
     }
 
     public CFEContainer(BlockEntity blockEntity) {
-        this(blockEntity,0,100);
+        this(blockEntity, 100);
     }
 
     @Override
-    public int takeCFE(int cfe) {
-        if (cfe != 0){
-            int deltaCFE = CFE - cfe;
-            if (Mth.clamp(deltaCFE, minCFE, maxCFE) == deltaCFE) {
-                this.CFE = deltaCFE;
-                onContentsChanged();
-                return cfe;
-            } else {
-                if (cfe < 0) {
-                    this.CFE = maxCFE;
-                    onContentsChanged();
-                    return cfe + (deltaCFE - maxCFE);
-                } else {
-                    this.CFE = minCFE;
-                    onContentsChanged();
-                    return cfe + (deltaCFE - minCFE);
-                }
-            }
+    public int takeCFE(int cfe,boolean simulate) {
+        if (CFE <= 0)
+            return 0;
+        int taken;
+        if (cfe > 0){
+            taken = Math.min(CFE,cfe);
+        } else if (cfe < 0){
+            return -addCFE(-cfe,simulate);
+        } else return 0;
+        if (!simulate) {
+            CFE -= taken;
+            onContentsChanged();
+            sendCFEUpdate(false);
         }
+        return taken;
+    }
+
+    @Override
+    public int addCFE(int cfe,boolean simulate) {
+        if (CFE >= maxCFE)
+            return 0;
+        int added;
+        if (cfe > 0){
+            added = Math.min((maxCFE-CFE),cfe);
+        } else if (cfe < 0){
+            return -takeCFE(-cfe,simulate);
+        } else return 0;
+        if (!simulate) {
+            CFE += added;
+            onContentsChanged();
+            sendCFEUpdate(true);
+        }
+        return added;
+    }
+
+    @Override
+    public int getMinCFE() {
         return 0;
     }
 
@@ -61,8 +77,16 @@ public class CFEContainer implements ICFEHandler, INBTSerializable<CompoundTag> 
             BlockState blockState = blockEntity.getBlockState();
             level.sendBlockUpdated(blockEntity.getBlockPos(), blockState, blockState, 3);
         }
-        if (blockEntity instanceof CFENetworkMemberBE cfeNetworkMemberBE){
-            TerraCompositioAPI.INSTANCE.getCFENetworkInstance().fireCFENetworkEvent(cfeNetworkMemberBE, NetworkAction.UPDATE);
+    }
+
+    protected void sendCFEUpdate(boolean onAdd) {
+        if (blockEntity instanceof CFENetworkMemberBE cfeNetworkMemberBE
+                && blockEntity instanceof ModCFEBlockEntity modCFEBlockEntity){
+//            TerraCompositioAPI.INSTANCE.getCFENetworkInstance().fireCFENetworkEvent(cfeNetworkMemberBE, NetworkAction.UPDATE);
+            //TerraCompositioAPI.INSTANCE.getCFENetworkInstance().networkMemberUpdated(cfeNetworkMemberBE);
+            if ((modCFEBlockEntity.getBlockMode().consumer() && !onAdd )
+                    || (modCFEBlockEntity.getBlockMode().source() && onAdd))
+                TerraCompositioAPI.INSTANCE.getCFENetworkInstance().fireCFENetworkEvent(cfeNetworkMemberBE, NetworkAction.UPDATE);
         }
     }
 
@@ -80,7 +104,6 @@ public class CFEContainer implements ICFEHandler, INBTSerializable<CompoundTag> 
         CompoundTag nbt = new CompoundTag();
         nbt.putInt("CFE",CFE);
         nbt.putInt("maxCFE", maxCFE);
-        nbt.putInt("minCFE",minCFE);
         return nbt;
     }
 
@@ -88,6 +111,5 @@ public class CFEContainer implements ICFEHandler, INBTSerializable<CompoundTag> 
     public void deserializeNBT(CompoundTag tag) {
         CFE = tag.getInt("CFE");
         maxCFE = tag.getInt("maxCFE");
-        minCFE = tag.getInt("minCFE");
     }
 }

@@ -21,6 +21,7 @@ import net.sinedkadis.terracompositio.worldgen.tree.custom.FlowCedarFoliagePlace
 import net.sinedkadis.terracompositio.worldgen.tree.custom.FlowCedarTrunkPlacer;
 
 import java.util.List;
+import java.util.Objects;
 
 import static net.sinedkadis.terracompositio.registries.ModBlockStateProperties.INFUSED;
 
@@ -58,7 +59,7 @@ public class ModConfiguredFeatures {
 
 
     public static ResourceKey<ConfiguredFeature<?, ?>> registerKey(String name) {
-        return ResourceKey.create(Registries.CONFIGURED_FEATURE, new ResourceLocation(TerraCompositio.MOD_ID, name));
+        return ResourceKey.create(Registries.CONFIGURED_FEATURE, Objects.requireNonNull(ResourceLocation.tryBuild(TerraCompositio.MOD_ID, name)));
     }
 
     private static <FC extends FeatureConfiguration, F extends Feature<FC>> void register(BootstapContext<ConfiguredFeature<?, ?>> context,

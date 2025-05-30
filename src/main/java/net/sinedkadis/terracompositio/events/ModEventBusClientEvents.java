@@ -45,17 +45,16 @@ public class ModEventBusClientEvents {
         ItemBlockRenderTypes.setRenderLayer(ModFluids.BIRCH_JUICE_FLUID.flowing.get(), RenderType.translucent());
         ItemBlockRenderTypes.setRenderLayer(ModFluids.FLOW_FLUID.source.get(), RenderType.translucent());
         ItemBlockRenderTypes.setRenderLayer(ModFluids.FLOW_FLUID.flowing.get(), RenderType.translucent());
-        ItemBlockRenderTypes.setRenderLayer(ModBlocks.FLOW_CEDAR_PEDESTAL.get(), RenderType.cutout());
-        ItemBlockRenderTypes.setRenderLayer(ModBlocks.FLOW_CEDAR_TANK.get(), RenderType.cutout());
+
 
         event.enqueueWork(() -> ItemProperties.register(
                 ModItems.WRENCH_AXE.get(),
-                new ResourceLocation("wrench_mode"),
+                ResourceLocation.parse("wrench_mode"),
                 (stack, level, entity, seed) -> WrenchAxeItem.getMode(stack).ordinal()
         ));
         event.enqueueWork(() -> ItemProperties.register(
                 ModItems.SHIELDED_BUNDLE.get(),
-                new ResourceLocation("filled"),
+                ResourceLocation.parse("filled"),
                 (stack, level, entity, seed) -> ShieldedBundleItem.getFullnessDisplay(stack)
         ));
     }

@@ -87,11 +87,13 @@ minecraft {
         client {
             // Comma-separated list of namespaces to load gametests from. Empty = all namespaces.
             property 'forge.enabledGameTestNamespaces', mod_id
+            jvmArgs += "-Dfml.earlyprogresswindow=false"
         }
 
         server {
             property 'forge.enabledGameTestNamespaces', mod_id
             args '--nogui'
+            jvmArgs += "-Dfml.earlyprogresswindow=false"
         }
 
         // This run config launches GameTestServer and runs all registered gametests, then exits.
@@ -169,6 +171,9 @@ dependencies {
 
     testCompileOnly 'org.projectlombok:lombok:1.18.34'
     testAnnotationProcessor 'org.projectlombok:lombok:1.18.34'
+
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
     // For more info:
     // http://www.gradle.org/docs/current/userguide/artifact_dependencies_tutorial.html
     // http://www.gradle.org/docs/current/userguide/dependency_management.html
@@ -194,7 +199,7 @@ dependencies {
 mixin {
     // MixinGradle Settings
     add sourceSets.main, 'mixins.terracompositio.refmap.json'
-    //config 'mixins.terracompositio.json'
+    config 'mixins.terracompositio.json'
     debug.verbose = true
     debug.export = true
 }
@@ -256,4 +261,6 @@ publishing {
 
 tasks.withType(JavaCompile).configureEach {
     options.encoding = 'UTF-8' // Use the UTF-8 charset for Java compilation
+    options.compilerArgs << "-Xmaxerrs" << "1000" << "-Xmaxwarns" << "1000"
+    options.incremental = true
 }

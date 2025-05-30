@@ -1,5 +1,7 @@
 package net.sinedkadis.terracompositio.compat.jade;
 
+import net.minecraft.world.level.block.AbstractFurnaceBlock;
+import net.minecraft.world.level.block.entity.AbstractFurnaceBlockEntity;
 import net.sinedkadis.terracompositio.block.custom.*;
 import net.sinedkadis.terracompositio.block.entity.*;
 import net.sinedkadis.terracompositio.compat.jade.providers.MatterInfuserIOComponentProvider;
@@ -18,6 +20,7 @@ public class JadeTerraCompositioPlugin implements IWailaPlugin {
         registration.registerBlockDataProvider(ModCFEBlockEntityComponentProvider.INSTANCE, FlowInfuserBlockEntity.class);
        // registration.registerBlockDataProvider(ModCFEBlockEntityComponentProvider.INSTANCE, MatterInfuserIOBlockEntity.class);
         registration.registerBlockDataProvider(ModCFEBlockEntityComponentProvider.INSTANCE, AbstractDesorberBlockEntity.class);
+        registration.registerBlockDataProvider(ModCFEBlockEntityComponentProvider.INSTANCE, AbstractFurnaceBlockEntity.class);
 
         registration.registerBlockDataProvider(ModItemIOComponentProvider.INSTANCE, ModItemIOCFEBlockEntity.class);
 
@@ -34,6 +37,7 @@ public class JadeTerraCompositioPlugin implements IWailaPlugin {
         registration.registerBlockComponent(ModCFEBlockEntityComponentProvider.INSTANCE, ModCFEBaseEntityBlock.class);
         registration.registerBlockComponent(ModCFEBlockEntityComponentProvider.INSTANCE, FlowInfuserBlock.class);
         registration.registerBlockComponent(ModCFEBlockEntityComponentProvider.INSTANCE, MatterInfuserIOBlock.class);
+        registration.registerBlockComponent(ModCFEBlockEntityComponentProvider.INSTANCE, AbstractFurnaceBlock.class);
 
         registration.registerBlockComponent(ModItemIOComponentProvider.INSTANCE, ModIOBaseEntityBlock.class);
         registration.registerBlockComponent(ModItemIOComponentProvider.INSTANCE, FlowInfuserBlock.class);

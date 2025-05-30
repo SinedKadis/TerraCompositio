@@ -5,13 +5,17 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.sinedkadis.terracompositio.TerraCompositio;
-import net.sinedkadis.terracompositio.block.entity.AbstractDesorberBlockEntity;
+import net.sinedkadis.terracompositio.api.networks.cfe.CFENetwork;
+import net.sinedkadis.terracompositio.api.networks.cfe.CFENetworkMemberBE;
+import net.sinedkadis.terracompositio.api.networks.cfe.ICFEHandler;
 import net.sinedkadis.terracompositio.block.entity.ModCFEBlockEntity;
 import snownee.jade.api.BlockAccessor;
 import snownee.jade.api.IBlockComponentProvider;
 import snownee.jade.api.IServerDataProvider;
 import snownee.jade.api.ITooltip;
 import snownee.jade.api.config.IPluginConfig;
+
+import java.util.Optional;
 
 public enum ModCFEBlockEntityComponentProvider implements IBlockComponentProvider, IServerDataProvider<BlockAccessor> {
     INSTANCE;
@@ -34,8 +38,9 @@ public enum ModCFEBlockEntityComponentProvider implements IBlockComponentProvide
         BlockEntity blockEntity = blockAccessor.getBlockEntity();
         if (blockEntity instanceof ModCFEBlockEntity entity){
             compoundTag.putInt("cfe", entity.getCfeContainer().getCFE());
-        } else if (blockEntity instanceof AbstractDesorberBlockEntity entity) {
-            compoundTag.putInt("cfe", entity.getCfeContainer().getCFE());
+        } else if (blockEntity instanceof CFENetworkMemberBE memberBE){
+            Optional<ICFEHandler> cfeHandler = CFENetwork.getCFEHandler(memberBE);
+            cfeHandler.ifPresent(icfeHandler -> compoundTag.putInt("cfe", icfeHandler.getCFE()));
         }
 
     }

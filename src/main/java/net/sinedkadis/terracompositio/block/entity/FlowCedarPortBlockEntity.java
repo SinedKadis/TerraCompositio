@@ -37,7 +37,7 @@ public class FlowCedarPortBlockEntity extends ModItemIOCFEBlockEntity implements
     }
 
     public FlowCedarPortBlockEntity(BlockPos pPos, BlockState pBlockState) {
-        super(ModBlockEntities.FLOW_PORT_BE.get(),pPos, pBlockState);
+        super(ModBlockEntities.FLOW_PORT_BE.get(),pPos,pBlockState,BlockMode.CONSUMER);
         this.data =new ContainerData() {
             @Override
             public int get(int pIndex) {

@@ -5,7 +5,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.util.Mth;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
@@ -27,18 +26,26 @@ public abstract class ModCFEBlockEntity extends ModBlockEntity implements CFENet
     protected final int connectRange;
     protected final CFEContainer cfeContainer = new CFEContainer(this);
     protected LazyOptional<ICFEHandler> lazyCFEOptional = LazyOptional.empty();
+    protected BlockMode blockMode;
 
-    public ModCFEBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state,int minCFE,int maxCFE,int connectRange) {
+    public ModCFEBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state,int maxCFE,int connectRange,BlockMode blockMode) {
         super(type, pos, state);
+        this.blockMode = blockMode;
         this.connectRange = connectRange;
-        cfeContainer.setMinCFE(minCFE);
         cfeContainer.setMaxCFE(maxCFE);
+
     }
-    public ModCFEBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state,int maxCFE,int connectRange) {
+    public ModCFEBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state,BlockMode blockMode) {
         super(type, pos, state);
-        this.connectRange = connectRange;
-        cfeContainer.setMinCFE(0);
-        cfeContainer.setMaxCFE(maxCFE);
+        if (blockMode.source()) {
+            this.blockMode = blockMode;
+            this.connectRange = 10;
+            cfeContainer.setMaxCFE(100);
+        } else {
+            this.blockMode = blockMode;
+            this.connectRange = 0;
+            cfeContainer.setMaxCFE(0);
+        }
     }
 
     @Override
@@ -78,36 +85,28 @@ public abstract class ModCFEBlockEntity extends ModBlockEntity implements CFENet
         lazyCFEOptional.invalidate();
     }
 
-    public ModCFEBlockEntity(BlockEntityType<?> type, BlockPos pPos, BlockState pBlockState) {
-        this(type,pPos,pBlockState,0,0,0);
-    }
-
     @Override
     public void onCFENetworkMemberUpdate() {
         if (level != null && !level.isClientSide){
-            CFENetwork cfeNetwork = TerraCompositioAPI.instance().getCFENetworkInstance();
-            CFENetworkMemberBE source = cfeNetwork.getClosestSourceWithCFE(getBlockPos(), getLevel(), connectRange * 2,getPriority());
-            if (source != null){
-                int toTransfer = (int) Mth.clamp(
-                        Math.round(
-                                50 - Mth.square(
-                                        Math.abs(
-                                                Math.sqrt(
-                                                    TCUtil.distSqr(this.getBlockPos(), source.getBlockPos())
-                                                ) - connectRange
-                                        )
-                                )
-                        ),0,50);
-                int transferred = TCUtil.tryCFETransfer(this,source,toTransfer);
-                if (transferred > 0)
-                    TCUtil.sendCFEParticles((ServerLevel) level,worldPosition,source.getBlockPos(),transferred);
+            if (blockMode.consumer() || blockMode.container()){
+                CFENetwork cfeNetwork = TerraCompositioAPI.instance().getCFENetworkInstance();
+                CFENetworkMemberBE source = cfeNetwork.getClosestSourceWithCFE(getBlockPos(), getLevel(), connectRange * 2, getPriority());
+                if (source != null) {
+                    int transferred = TCUtil.tryCFETransfer(this, source, Integer.MAX_VALUE);
+                    if (transferred > 0)
+                        TCUtil.sendCFEParticles((ServerLevel) level, worldPosition, source.getBlockPos(), transferred);
+                }
             }
         }
     }
 
     @Override
     public int getPriority() {
-        return Integer.MAX_VALUE;
+        return switch (blockMode){
+            case SOURCE -> Integer.MIN_VALUE;
+            case CONSUMER -> Integer.MAX_VALUE;
+            case CONTAINER -> 0;
+        };
     }
 
     @Override
@@ -125,6 +124,21 @@ public abstract class ModCFEBlockEntity extends ModBlockEntity implements CFENet
     public void load(@NotNull CompoundTag pTag) {
         super.load(pTag);
         cfeContainer.readFromNBT(pTag);
+    }
+
+    public enum BlockMode {
+        SOURCE,CONSUMER,CONTAINER;
+        public boolean source(){
+            return this == SOURCE;
+        }
+        public boolean consumer(){
+            return this == CONSUMER;
+        }
+        public boolean container(){
+            return this == CONTAINER;
+        }
+
+
     }
 
 }

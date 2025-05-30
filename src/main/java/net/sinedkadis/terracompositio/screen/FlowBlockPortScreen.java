@@ -8,10 +8,11 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.player.Inventory;
 import net.sinedkadis.terracompositio.TerraCompositio;
+import org.jetbrains.annotations.NotNull;
 
 public class FlowBlockPortScreen extends AbstractContainerScreen<FlowBlockPortMenu> {
     private static final ResourceLocation TEXTURE =
-            new ResourceLocation(TerraCompositio.MOD_ID, "textures/gui/flow_port_gui.png");
+            ResourceLocation.tryBuild(TerraCompositio.MOD_ID, "textures/gui/flow_port_gui.png");
     public FlowBlockPortScreen(FlowBlockPortMenu pMenu, Inventory pPlayerInventory, Component pTitle) {
         super(pMenu, pPlayerInventory, pTitle);
     }
@@ -27,6 +28,7 @@ public class FlowBlockPortScreen extends AbstractContainerScreen<FlowBlockPortMe
     protected void renderBg(GuiGraphics pGuiGraphics, float pPartialTick, int pMouseX, int pMouseY) {
         RenderSystem.setShader(GameRenderer::getPositionTexShader);
         RenderSystem.setShaderColor(1.0F, 1.0F, 1.0F, 1.0F);
+        assert TEXTURE != null;
         RenderSystem.setShaderTexture(0, TEXTURE);
         int x = (width - imageWidth) / 2;
         int y = (height - imageHeight) / 2;
@@ -37,11 +39,12 @@ public class FlowBlockPortScreen extends AbstractContainerScreen<FlowBlockPortMe
     }
     private void renderProgressArrow(GuiGraphics guiGraphics, int x, int y) {
         if(menu.isCrafting()) {
+            assert TEXTURE != null;
             guiGraphics.blit(TEXTURE, x + 85, y + 30, 176, 0, 8, menu.getScaledProgress());
         }
     }
     @Override
-    public void render(GuiGraphics guiGraphics, int mouseX, int mouseY, float delta) {
+    public void render(@NotNull GuiGraphics guiGraphics, int mouseX, int mouseY, float delta) {
         renderBackground(guiGraphics);
         super.render(guiGraphics, mouseX, mouseY, delta);
         renderTooltip(guiGraphics, mouseX, mouseY);

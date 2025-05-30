@@ -31,11 +31,11 @@ public abstract class ModItemIOCFEBlockEntity extends ModCFEBlockEntity{
     protected float tickCFECost;
     protected LazyOptional<IItemHandler> lazyItemHandler = LazyOptional.empty();
 
-    public ModItemIOCFEBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state, int maxCFE, int connectRange) {
-        super(type, pos, state, maxCFE, connectRange);
+    public ModItemIOCFEBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state, int maxCFE, int connectRange,BlockMode blockMode) {
+        super(type, pos, state, maxCFE, connectRange,blockMode);
     }
-    public ModItemIOCFEBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state){
-        this(type,pos,state,0,0);
+    public ModItemIOCFEBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state,BlockMode blockMode){
+        this(type,pos,state,0,0,blockMode);
     }
 
     protected <T> @Nullable LazyOptional<T> getCap(@NotNull Capability<T> cap,@Nullable Direction side) {

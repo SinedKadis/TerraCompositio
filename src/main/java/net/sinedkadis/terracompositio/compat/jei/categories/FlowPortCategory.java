@@ -16,18 +16,20 @@ import net.sinedkadis.terracompositio.registries.ModBlocks;
 import net.sinedkadis.terracompositio.recipe.FlowSaturationRecipe;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Objects;
+
 public class FlowPortCategory implements IRecipeCategory<FlowSaturationRecipe> {
-    public static final ResourceLocation UID = new ResourceLocation(TerraCompositio.MOD_ID,"flow_saturation");
-    public static final ResourceLocation TEXTURE = new ResourceLocation(TerraCompositio.MOD_ID,
+    public static final ResourceLocation UID = ResourceLocation.tryBuild(TerraCompositio.MOD_ID,"flow_saturation");
+    public static final ResourceLocation TEXTURE = ResourceLocation.tryBuild(TerraCompositio.MOD_ID,
             "textures/gui/flow_port_gui.png");
 
     public static final RecipeType<FlowSaturationRecipe> FLOW_SATURATION_RECIPE_RECIPE_TYPE=
-            new RecipeType<>(UID, FlowSaturationRecipe.class);
+            new RecipeType<>(Objects.requireNonNull(UID), FlowSaturationRecipe.class);
     private final IDrawable background;
     private final IDrawable icon;
 
     public FlowPortCategory(IGuiHelper helper) {
-        this.background = helper.createDrawable(TEXTURE,0,0,176,85);
+        this.background = helper.createDrawable(Objects.requireNonNull(TEXTURE),0,0,176,85);
         this.icon = helper.createDrawableIngredient(VanillaTypes.ITEM_STACK,new ItemStack(ModBlocks.FLOW_CEDAR_PORT.get()));
     }
 

@@ -27,7 +27,7 @@ public class TerraCompositio
 {
     public static final String MOD_ID = "terracompositio";
     public static ResourceLocation modLoc(String location){
-        return new ResourceLocation(MOD_ID,location);
+        return ResourceLocation.tryBuild(MOD_ID,location);
     }
 
     public TerraCompositio() {

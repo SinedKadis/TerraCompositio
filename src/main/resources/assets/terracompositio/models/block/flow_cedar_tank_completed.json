@@ -1,4 +1,5 @@
 {
+	"render_type": "minecraft:cutout",
 	"credit": "Made with Blockbench",
 	"textures": {
 		"1": "terracompositio:block/flow_cedar_tank_infused",

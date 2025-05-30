@@ -15,6 +15,7 @@ import net.minecraft.world.level.levelgen.placement.PlacementModifier;
 import net.sinedkadis.terracompositio.TerraCompositio;
 
 import java.util.List;
+import java.util.Objects;
 
 public class ModPlacedFeatures {
     public static final ResourceKey<PlacedFeature> FLOW_CONTAINING_ORE_PLACED_KEY = registerKey("flow_containing_ore_placed");
@@ -37,7 +38,7 @@ public class ModPlacedFeatures {
 
 
     private static ResourceKey<PlacedFeature> registerKey(String name) {
-        return ResourceKey.create(Registries.PLACED_FEATURE, new ResourceLocation(TerraCompositio.MOD_ID, name));
+        return ResourceKey.create(Registries.PLACED_FEATURE, Objects.requireNonNull(ResourceLocation.tryBuild(TerraCompositio.MOD_ID, name)));
     }
 
     private static void register(BootstapContext<PlacedFeature> context, ResourceKey<PlacedFeature> key, Holder<ConfiguredFeature<?, ?>> configuration,

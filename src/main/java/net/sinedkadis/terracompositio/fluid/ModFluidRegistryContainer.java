@@ -297,7 +297,7 @@ public class ModFluidRegistryContainer implements IForgeBucketPickup{
         }
 
         public ClientExtensions flowing(String name, String folder) {
-            this.flowing = new ResourceLocation(this.modid, folder + "/" + name + "_flowing");
+            this.flowing = ResourceLocation.tryBuild(this.modid, folder + "/" + name + "_flowing");
             return this;
         }
 
@@ -311,8 +311,8 @@ public class ModFluidRegistryContainer implements IForgeBucketPickup{
         }
 
         public ClientExtensions overlay(String name, String folder) {
-            this.overlay = new ResourceLocation(this.modid, folder + "/" + name + "_overlay");
-            return renderOverlay(new ResourceLocation(this.modid, "textures/" + folder + "/" + name + "_overlay.png"));
+            this.overlay = ResourceLocation.tryBuild(this.modid, folder + "/" + name + "_overlay");
+            return renderOverlay(ResourceLocation.tryBuild(this.modid, "textures/" + folder + "/" + name + "_overlay.png"));
         }
 
         public ClientExtensions renderOverlay(ResourceLocation path) {
@@ -325,7 +325,7 @@ public class ModFluidRegistryContainer implements IForgeBucketPickup{
         }
 
         public ClientExtensions still(String name, String folder) {
-            this.still = new ResourceLocation(this.modid, folder + "/" + name + "_still");
+            this.still = ResourceLocation.tryBuild(this.modid, folder + "/" + name + "_still");
             return this;
         }
 

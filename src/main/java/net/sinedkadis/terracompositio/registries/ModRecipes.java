@@ -9,6 +9,7 @@ import net.sinedkadis.terracompositio.TerraCompositio;
 import net.sinedkadis.terracompositio.recipe.FlowInfusionRecipe;
 import net.sinedkadis.terracompositio.recipe.FlowSaturationRecipe;
 import net.sinedkadis.terracompositio.recipe.MatterInfusionRecipe;
+import net.sinedkadis.terracompositio.recipe.TechnetiumFiringRecipe;
 
 public class ModRecipes {
     public static final DeferredRegister<RecipeSerializer<?>> SERIALIZERS =
@@ -19,6 +20,8 @@ public class ModRecipes {
             SERIALIZERS.register("flow_infusion",()->FlowInfusionRecipe.Serializer.INSTANCE);
     public static final RegistryObject<RecipeSerializer<MatterInfusionRecipe>> MATTER_INFUSION_SERIALIZER =
             SERIALIZERS.register("matter_infusion",()-> MatterInfusionRecipe.Serializer.INSTANCE);
+    public static final RegistryObject<RecipeSerializer<TechnetiumFiringRecipe>> TECHNETIUM_FIRING_SERIALIZER =
+            SERIALIZERS.register("technetium_firing",()-> TechnetiumFiringRecipe.Serializer.INSTANCE);
 
 
     public static void register(IEventBus eventBus){
