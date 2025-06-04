@@ -50,7 +50,7 @@ public class CFESaturatedAirBlock extends ModCFEBaseEntityBlock {
                     .toList();
             for (CFEContainer cfeContainer : icfeHandlers){
                 if (cfe > 0) {
-                    int added = cfeContainer.addCFE(cfe, false);
+                    int added = cfeContainer.addCFE(cfe,cfeContainer.getBlockEntity().getBlockPos(), false);
                     cfe -= added;
                 } else break;
             }
@@ -68,7 +68,7 @@ public class CFESaturatedAirBlock extends ModCFEBaseEntityBlock {
                         if (blockEntity != null){
                             CFEContainer cfeContainer = blockEntity.getCfeContainer();
                             cfeContainer.setCFE(0);
-                            int added = cfeContainer.addCFE(cfe,false);
+                            int added = cfeContainer.addCFE(cfe,cfeContainer.getBlockEntity().getBlockPos(),false);
                             cfe -= added;
                         }
                     }
@@ -108,8 +108,14 @@ public class CFESaturatedAirBlock extends ModCFEBaseEntityBlock {
         return ModBlockEntities.CFE_SATURATED_AIR_BE.get().create(pPos, pState);
     }
 
+    private int firstSecond = 20;
+
     @Override
     public void animateTick(BlockState state, Level level, BlockPos pos, RandomSource random) {
+        if (firstSecond > 1){
+            firstSecond--;
+            return;
+        }
         if (level.getBlockEntity(pos) instanceof CFESaturatedAirBlockEntity blockEntity) {
             blockEntity.spawnParticles(level, pos, random);
         }

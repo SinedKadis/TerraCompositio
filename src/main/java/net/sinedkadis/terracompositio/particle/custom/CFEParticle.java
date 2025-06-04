@@ -23,9 +23,9 @@ public class CFEParticle extends TextureSheetParticle{
             this.lifetime = (int) Math.sqrt(Math.sqrt(
                     TCUtil.distSqr(
                             new Vec3i((int) x, (int) y, (int) z),
-                            new Vec3i((int) targetPos.x, (int) targetPos.y, (int) targetPos.z))));
+                            new Vec3i((int) targetPos.x, (int) targetPos.y, (int) targetPos.z))))*20;
         } else {
-            this.lifetime = 40;
+            this.lifetime = 20;
         }
         this.scale(0.5F);
     }
@@ -50,7 +50,7 @@ public class CFEParticle extends TextureSheetParticle{
                 targetPos.x - this.x,
                 targetPos.y - this.y,
                 targetPos.z - this.z
-        ).normalize();//.scale(0.05);  // нормализуем и умножаем на скорость
+        ).normalize().scale(0.05);  // нормализуем и умножаем на скорость
 
         // Обновляем скорость
         this.xd = direction.x;

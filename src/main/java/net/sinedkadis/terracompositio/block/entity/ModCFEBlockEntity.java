@@ -71,6 +71,7 @@ public abstract class ModCFEBlockEntity extends ModBlockEntity implements CFENet
                 cfeNetworkInstance.fireCFENetworkEvent(this, NetworkAction.ADD);
             }
         }
+        cfeContainer.containerTick();
     }
 
     @Override

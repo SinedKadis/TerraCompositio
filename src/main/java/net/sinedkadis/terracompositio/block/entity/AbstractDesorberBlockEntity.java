@@ -41,7 +41,7 @@ public abstract class AbstractDesorberBlockEntity extends ModCFEBlockEntity impl
 
     @Override
     public int getLimit() {
-        return 7;
+        return 5;
     }
 
 

@@ -15,6 +15,12 @@
         "wrench_mode": 2
       },
       "model": "terracompositio:item/flow_wrench"
+    },
+    {
+      "predicate": {
+        "wrench_mode": 3
+      },
+      "model": "terracompositio:item/flow_andiron"
     }
   ]
 }

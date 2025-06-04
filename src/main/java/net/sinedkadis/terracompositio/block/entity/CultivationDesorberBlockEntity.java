@@ -89,7 +89,7 @@ public class CultivationDesorberBlockEntity extends AbstractDesorberBlockEntity 
             FluidTank fluidHandler1 = blockEntity.fluidHandler;
             if (!fluidHandler1.isEmpty() && fluidHandler1.getFluidAmount() >= CFEToAdd) {
                 fluidHandler1.drain(CFEToAdd, IFluidHandler.FluidAction.EXECUTE);
-                int added = blockEntity.cfeContainer.addCFE(CFEToAdd,false);
+                int added = blockEntity.cfeContainer.addCFE(CFEToAdd,blockEntity.cfeContainer.getBlockEntity().getBlockPos(), false);
                 CFEToAdd -= added;
                 if (!level.isClientSide())
                     level.playSound(null,pos, SoundEvents.AZALEA_LEAVES_STEP, SoundSource.BLOCKS);

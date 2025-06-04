@@ -46,9 +46,10 @@ public class MatterInfuserIOBlockEntity extends MatterInfuserBaseBlockEntity{
 
     private float partialCFE = 0;
     private void consumeCFE() {
-        partialCFE += tickCFECost - ((int) tickCFECost);
-        this.cfeContainer.takeCFE((int)tickCFECost,false);
-        if (partialCFE > 1){
+        int tickCFECost1 = (int) tickCFECost;
+        partialCFE += tickCFECost - tickCFECost1;
+        this.cfeContainer.takeCFE(tickCFECost1,false);
+        if (partialCFE >= 1){
             int taken = this.cfeContainer.takeCFE((int) partialCFE, false);
             partialCFE -= taken;
         }

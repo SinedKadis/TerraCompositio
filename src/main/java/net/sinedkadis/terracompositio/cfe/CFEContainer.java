@@ -1,7 +1,9 @@
 package net.sinedkadis.terracompositio.cfe;
 
+
 import lombok.Getter;
 import lombok.Setter;
+import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -12,13 +14,20 @@ import net.sinedkadis.terracompositio.api.networks.NetworkAction;
 import net.sinedkadis.terracompositio.api.networks.cfe.CFENetworkMemberBE;
 import net.sinedkadis.terracompositio.api.networks.cfe.ICFEHandler;
 import net.sinedkadis.terracompositio.block.entity.ModCFEBlockEntity;
+import net.sinedkadis.terracompositio.util.TCUtil;
+import org.apache.commons.lang3.tuple.MutablePair;
+import org.apache.commons.lang3.tuple.Pair;
+
+import java.util.*;
 
 @Getter
 @Setter
 public class CFEContainer implements ICFEHandler, INBTSerializable<CompoundTag> {
+    private final float cfeTravelSpeed = 1/20f;
     private final BlockEntity blockEntity;
     int CFE = 0;
     private int maxCFE;
+    private final List<Pair<Integer,Double>> cfeQueue = new ArrayList<>();
 
     public CFEContainer(BlockEntity blockEntity, int maxCFE) {
         this.blockEntity = blockEntity;
@@ -36,8 +45,6 @@ public class CFEContainer implements ICFEHandler, INBTSerializable<CompoundTag> 
         int taken;
         if (cfe > 0){
             taken = Math.min(CFE,cfe);
-        } else if (cfe < 0){
-            return -addCFE(-cfe,simulate);
         } else return 0;
         if (!simulate) {
             CFE -= taken;
@@ -48,21 +55,46 @@ public class CFEContainer implements ICFEHandler, INBTSerializable<CompoundTag> 
     }
 
     @Override
-    public int addCFE(int cfe,boolean simulate) {
+    public int addCFE(int cfe, BlockPos sourcePos, boolean simulate) {
         if (CFE >= maxCFE)
             return 0;
+        Optional<Pair<Integer, Double>> quequed = cfeQueue.stream().reduce(
+                (integerDoublePair, integerDoublePair2) ->
+                        Pair.of(integerDoublePair.getKey()+integerDoublePair2.getKey(),integerDoublePair.getValue()));
         int added;
         if (cfe > 0){
             added = Math.min((maxCFE-CFE),cfe);
-        } else if (cfe < 0){
-            return -takeCFE(-cfe,simulate);
+            if (quequed.isPresent()){
+                added = Math.min(Math.max(maxCFE - CFE - quequed.get().getKey(),0),added);
+            }
         } else return 0;
+        if (added < 1)
+            return 0;
         if (!simulate) {
-            CFE += added;
-            onContentsChanged();
-            sendCFEUpdate(true);
+            cfeQueue.add(new MutablePair<>(cfe,Math.sqrt(TCUtil.distSqr(sourcePos,this.blockEntity.getBlockPos()))));
         }
         return added;
+    }
+
+    public void containerTick(){
+        Iterator<Pair<Integer,Double>> iterator = cfeQueue.iterator();
+        while (iterator.hasNext()) {
+            Pair<Integer,Double> entry = iterator.next();
+            int cfe = entry.getKey();
+            double dist = entry.getValue();
+            if (dist > cfeTravelSpeed) {
+                entry.setValue(dist-cfeTravelSpeed);
+            } else {
+                actuallyAddCFE(cfe);
+                iterator.remove();
+            }
+        }
+    }
+    
+    public void actuallyAddCFE(int cfe) {
+        CFE += cfe;
+        sendCFEUpdate(true);
+        onContentsChanged();
     }
 
     @Override

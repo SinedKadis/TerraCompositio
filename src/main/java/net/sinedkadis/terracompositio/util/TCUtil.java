@@ -3,9 +3,11 @@ package net.sinedkadis.terracompositio.util;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Vec3i;
+import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.TagKey;
@@ -26,6 +28,7 @@ import net.sinedkadis.terracompositio.block.custom.FlowCedarLikeBlock;
 
 
 import net.sinedkadis.terracompositio.particle.FluidParticleData;
+import net.sinedkadis.terracompositio.registries.ModBlockStateProperties;
 import net.sinedkadis.terracompositio.registries.ModGameRules;
 import net.sinedkadis.terracompositio.registries.ModParticles;
 import org.jetbrains.annotations.NotNull;
@@ -44,9 +47,9 @@ public class TCUtil {
             ICFEHandler sourceHandler = CFENetwork.getCFEHandler(source).orElse(null);
             if (sourceHandler != null){
                 int taken = sourceHandler.takeCFE(maxTransfer,true);
-                int added = targetHandler.addCFE(taken,true);
+                int added = targetHandler.addCFE(taken,source.getBlockPos(),true);
                 if (added <= taken){
-                    targetHandler.addCFE(added, false);
+                    targetHandler.addCFE(added, source.getBlockPos(), false);
                     sourceHandler.takeCFE(added, false);
                     return added;
                 }
@@ -81,14 +84,15 @@ public class TCUtil {
         }
     }
 
-    public static @NotNull InteractionResult handleInWorldBlockCraft(BlockState oldState, BlockState newState, Level pLevel, BlockPos pPos, ItemStack item, int count) {
+    public static @NotNull InteractionResult handleInWorldBlockCraft(BlockState oldState, BlockState newState, Level pLevel, BlockPos pPos, ItemStack item, int count, ParticleOptions type, SoundEvent event) {
         pLevel.setBlock(pPos, Blocks.STRUCTURE_VOID.defaultBlockState(),3);
         pLevel.setBlock(pPos,copyBlockStates(oldState,newState),3);
-        item.shrink(count);
+        if (count != 0)
+            item.shrink(count);
         if (pLevel instanceof ServerLevel level ){
-            level.playSound(null, pPos, SoundEvents.COPPER_PLACE, SoundSource.BLOCKS);
+            level.playSound(null, pPos, event, SoundSource.BLOCKS);
             if (oldState.hasProperty(INFUSED) && oldState.getValue(INFUSED))
-                level.sendParticles(ModParticles.CFE_PARTICLE.get(),
+                level.sendParticles(type,
                     pPos.getX(),
                     pPos.getY(),
                     pPos.getZ(),
@@ -100,8 +104,12 @@ public class TCUtil {
         }
         return InteractionResult.sidedSuccess(pLevel.isClientSide);
     }
+    public static @NotNull InteractionResult handleInWorldBlockCraft(BlockState oldState, BlockState newState, Level pLevel, BlockPos pPos, ItemStack item, int count) {
+        return handleInWorldBlockCraft(oldState,newState,pLevel,pPos,item,count,ModParticles.CFE_PARTICLE.get(),SoundEvents.COPPER_PLACE);
+    }
 
-    public static void spawnParticlesIn(Level pLevel, BlockPos targetPos){
+
+        public static void spawnParticlesIn(Level pLevel, BlockPos targetPos){
         if (pLevel instanceof ServerLevel level)
             level.sendParticles(ModParticles.CFE_PARTICLE.get(),
                 targetPos.getX()+pLevel.getRandom().nextFloat(),
@@ -352,7 +360,9 @@ public class TCUtil {
     }
 
     public static void flowLeak(BlockState pState, Level pLevel, BlockPos pPos,boolean chained) {
-        if (pState.hasProperty(FlowCedarLikeBlock.INFUSED) && pState.getValue(FlowCedarLikeBlock.INFUSED)&&!pLevel.getGameRules().getBoolean(ModGameRules.DISABLE_FLOW_LEAKING)) {
+        if ((!pState.hasProperty(FlowCedarLikeBlock.INFUSED) || pState.getValue(FlowCedarLikeBlock.INFUSED))
+                && !pLevel.getGameRules().getBoolean(ModGameRules.DISABLE_FLOW_LEAKING)
+                && (!pState.hasProperty(ModBlockStateProperties.WAXED) || !pState.getValue(ModBlockStateProperties.WAXED))) {
 
                 BlockPos f_pos;
                 BlockPos b_pos;

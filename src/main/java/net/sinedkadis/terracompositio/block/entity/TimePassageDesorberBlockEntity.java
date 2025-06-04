@@ -59,9 +59,9 @@ public class TimePassageDesorberBlockEntity extends AbstractDesorberBlockEntity 
     private void addingCFEProcess() {
         timeCounter = 0;
         if (timeBuffer > 20) {
-            timeBuffer -= cfeContainer.addCFE(20,false);
+            timeBuffer -= cfeContainer.addCFE(20,cfeContainer.getBlockEntity().getBlockPos(), false);
         } else if (timeBuffer > 0){
-            timeBuffer -= cfeContainer.addCFE(timeBuffer,false);
+            timeBuffer -= cfeContainer.addCFE(timeBuffer,cfeContainer.getBlockEntity().getBlockPos(),false);
         }
     }
 
