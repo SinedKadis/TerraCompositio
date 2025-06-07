@@ -1,0 +1,20 @@
+{
+  "name": "book.terracompositio.creation_flow_journal.entry.wedge.name",
+  "category": "terracompositio:day_2",
+  "icon": "terracompositio:wedge",
+  "pages": [
+    "book.terracompositio.creation_flow_journal.entry.wedge.page1",
+    {
+      "type": "patchouli:image",
+      "images": [
+        "terracompositio:textures/illustrations/wedge_image.png"
+      ],
+      "text": "book.terracompositio.creation_flow_journal.entry.wedge.page2"
+    },
+    {
+      "type": "patchouli:crafting",
+      "recipe": "terracompositio:wedge",
+      "text": "book.terracompositio.creation_flow_journal.entry.wedge.page3"
+    }
+  ]
+}

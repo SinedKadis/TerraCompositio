@@ -1,0 +1,18 @@
+{
+  "name": "book.terracompositio.creation_flow_journal.entry.cedar_armor.name",
+  "category": "terracompositio:day_1",
+  "icon": "terracompositio:textures/item/flow_cedar_chestplate.png",
+  "pages": [
+    "book.terracompositio.creation_flow_journal.entry.cedar_armor.page1",
+    {
+      "type": "patchouli:crafting",
+      "recipe": "terracompositio:flow_cedar_helmet",
+      "recipe2": "terracompositio:flow_cedar_chestplate"
+    },
+    {
+      "type": "patchouli:crafting",
+      "recipe": "terracompositio:flow_cedar_leggings",
+      "recipe2": "terracompositio:flow_cedar_boots"
+    }
+  ]
+}

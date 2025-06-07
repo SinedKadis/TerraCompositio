@@ -1,0 +1,15 @@
+{
+  "name": "book.terracompositio.creation_flow_journal.entry.activated_cedar_armor.name",
+  "category": "terracompositio:day_2",
+  "icon": "terracompositio:flowing_flow_cedar_chestplate",
+  "pages": [
+    "book.terracompositio.creation_flow_journal.entry.activated_cedar_armor.page1",
+    {
+      "type": "patchouli:spotlight",
+      "title": "book.terracompositio.creation_flow_journal.entry.activated_cedar_armor.page2.title",
+      "item": "terracompositio:flow_bottle",
+      "link_recipe": true,
+      "text": "book.terracompositio.creation_flow_journal.entry.activated_cedar_armor.page2"
+    }
+  ]
+}
