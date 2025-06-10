@@ -15,12 +15,12 @@ import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.sinedkadis.terracompositio.registries.ModFluids;
-import net.sinedkadis.terracompositio.registries.ModParticles;
+import net.sinedkadis.terracompositio.registries.TCFluids;
+import net.sinedkadis.terracompositio.registries.TCParticles;
 import org.jetbrains.annotations.NotNull;
 
 public class FlowParticle extends TextureSheetParticle {
-    private final Fluid type = ModFluids.FLOW_FLUID.source.get();
+    private final Fluid type = TCFluids.FLOW_FLUID.source.get();
     protected boolean isGlowing;
     FlowParticle(ClientLevel pLevel, double pX, double pY, double pZ,SpriteSet spriteSet) {
         super(pLevel, pX, pY, pZ);
@@ -73,9 +73,8 @@ public class FlowParticle extends TextureSheetParticle {
     protected void postMoveUpdate() {
     }
     public static TextureSheetParticle createFlowFallParticle(ClientLevel pLevel, double pX, double pY, double pZ,SpriteSet spriteSet) {
-        FlowParticle $$8 = new FlowFallAndLandParticle(pLevel, pX, pY, pZ, ModParticles.FLOW_SPLASH_PARTICLE.get(),spriteSet);
         //$$8.setColor(0.2F, 0.3F, 1.0F);
-        return $$8;
+        return new FlowFallAndLandParticle(pLevel, pX, pY, pZ, TCParticles.FLOW_SPLASH_PARTICLE.get(),spriteSet);
     }
 
     @OnlyIn(Dist.CLIENT)

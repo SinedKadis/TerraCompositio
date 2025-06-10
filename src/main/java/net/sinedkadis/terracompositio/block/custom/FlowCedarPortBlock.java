@@ -39,7 +39,7 @@ import static net.sinedkadis.terracompositio.util.TCUtil.flowLeak;
 import static net.sinedkadis.terracompositio.util.TCUtil.*;
 
 
-public class FlowCedarPortBlock extends ModIOBaseEntityBlock {
+public class FlowCedarPortBlock extends TCIOBaseEntityBlock {
     public static final DirectionProperty FACING;
     public static final BooleanProperty INFUSED;
     private final Supplier<Block> stripPair;
@@ -75,19 +75,19 @@ public class FlowCedarPortBlock extends ModIOBaseEntityBlock {
     }
 
     @Override
-    public @NotNull InteractionResult use(@NotNull BlockState pState, Level pLevel, @NotNull BlockPos pPos, Player pPlayer, @NotNull InteractionHand pHand, @NotNull BlockHitResult pHit) {
+    public @NotNull InteractionResult use(@NotNull BlockState pState, Level pLevel, @NotNull BlockPos pPos, @NotNull Player pPlayer, @NotNull InteractionHand pHand, @NotNull BlockHitResult pHit) {
         ItemStack item = pPlayer.getItemInHand(InteractionHand.MAIN_HAND);
         ItemStack item2 = pPlayer.getItemInHand(InteractionHand.OFF_HAND);
-        if (item.is(ModItems.GOLD_ROD.get())
+        if (item.is(TCItems.GOLD_ROD.get())
                 && item.getCount() > 4
                 && item2.getItem() instanceof WrenchAxeItem) {
             if (WrenchAxeItem.getMode(item2).equals(WrenchAxeItem.WrenchMode.WRENCH)) {
-                return handleInWorldBlockCraft(pState, ModBlocks.FLOW_CEDAR_CASING.get().defaultBlockState(), pLevel, pPos, item, 4);
+                return handleInWorldBlockCraft(pState, TCBlocks.FLOW_CEDAR_CASING.get().defaultBlockState(), pLevel, pPos, item, 4);
             }
             return super.use(pState, pLevel, pPos, pPlayer, pHand, pHit);
-        } else if (item.is(ModItems.FLOW_INFUSER_KIT.get())
+        } else if (item.is(TCItems.FLOW_INFUSER_KIT.get())
                 && item2.is(ItemTags.AXES)) {
-            return handleInWorldBlockCraft(pState, ModBlocks.FLOW_INFUSER.get().defaultBlockState(), pLevel, pPos, item, 1);
+            return handleInWorldBlockCraft(pState, TCBlocks.FLOW_INFUSER.get().defaultBlockState(), pLevel, pPos, item, 1);
         }
         return super.use(pState, pLevel, pPos, pPlayer, pHand, pHit);
     }
@@ -97,8 +97,8 @@ public class FlowCedarPortBlock extends ModIOBaseEntityBlock {
         super.onRemove(pState, pLevel, pPos, pNewState, pIsMoving);
         if (pState.getBlock() != pNewState.getBlock() && onRemoveHandlerBlacklist(pNewState,
                 Blocks.STRUCTURE_VOID,
-                ModBlocks.FLOW_CEDAR_CASING.get(),
-                ModBlocks.FLOW_CEDAR_PORT.get())) {
+                TCBlocks.FLOW_CEDAR_CASING.get(),
+                TCBlocks.FLOW_CEDAR_PORT.get())) {
             flowLeak(pState, pLevel, pPos,false);
         }
     }
@@ -124,7 +124,7 @@ public class FlowCedarPortBlock extends ModIOBaseEntityBlock {
         if (pLevel.isClientSide()) {
             return null;
         }
-        return createTickerHelper(pBlockEntityType, ModBlockEntities.FLOW_PORT_BE.get(),
+        return createTickerHelper(pBlockEntityType, TCBlockEntities.FLOW_PORT_BE.get(),
                 (pLevel1, pPos, pState1, pBlockEntity) -> pBlockEntity.tick(pLevel1,pPos,pState1));
     }
 
@@ -146,6 +146,6 @@ public class FlowCedarPortBlock extends ModIOBaseEntityBlock {
 
     static {
         FACING = BlockStateProperties.HORIZONTAL_FACING;
-        INFUSED = ModBlockStateProperties.INFUSED;
+        INFUSED = TCBlockStateProperties.INFUSED;
     }
 }

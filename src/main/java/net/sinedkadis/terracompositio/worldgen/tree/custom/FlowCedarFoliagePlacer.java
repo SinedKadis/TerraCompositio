@@ -10,7 +10,7 @@ import net.minecraft.world.level.LevelSimulatedReader;
 import net.minecraft.world.level.levelgen.feature.configurations.TreeConfiguration;
 import net.minecraft.world.level.levelgen.feature.foliageplacers.FoliagePlacer;
 import net.minecraft.world.level.levelgen.feature.foliageplacers.FoliagePlacerType;
-import net.sinedkadis.terracompositio.worldgen.tree.ModFoliagePlacers;
+import net.sinedkadis.terracompositio.worldgen.tree.TCFoliagePlacers;
 import org.jetbrains.annotations.NotNull;
 
 public class FlowCedarFoliagePlacer extends FoliagePlacer {
@@ -29,7 +29,7 @@ public class FlowCedarFoliagePlacer extends FoliagePlacer {
 
     @Override
     protected @NotNull FoliagePlacerType<?> type() {
-        return ModFoliagePlacers.FLOW_CEDAR_FOLIAGE_PLACER.get();
+        return TCFoliagePlacers.FLOW_CEDAR_FOLIAGE_PLACER.get();
     }
 
     @Override

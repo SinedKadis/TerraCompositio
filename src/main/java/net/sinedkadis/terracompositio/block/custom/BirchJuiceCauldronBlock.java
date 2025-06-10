@@ -16,7 +16,7 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.phys.BlockHitResult;
-import net.sinedkadis.terracompositio.registries.ModFluids;
+import net.sinedkadis.terracompositio.registries.TCFluids;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;
@@ -24,7 +24,7 @@ import java.util.function.Predicate;
 
 
 
-public class BirchJuiceCauldronBlock extends ModCauldronBlock {
+public class BirchJuiceCauldronBlock extends TCCauldronBlock {
 
 
     public BirchJuiceCauldronBlock(Properties pProperties, Predicate<Biome.Precipitation> pFillPredicate, Map<Item, CauldronInteraction> pInteractions) {
@@ -34,7 +34,7 @@ public class BirchJuiceCauldronBlock extends ModCauldronBlock {
 
     @Override
     public boolean canReceiveWedgeDrip(Fluid fluid) {
-        return fluid == ModFluids.BIRCH_JUICE_FLUID.source.get();
+        return fluid == TCFluids.BIRCH_JUICE_FLUID.source.get();
     }
 
     @Override
@@ -46,15 +46,15 @@ public class BirchJuiceCauldronBlock extends ModCauldronBlock {
             if (itemStack.getItem() == Items.BUCKET) {
                 pLevel.setBlock(pPos, Blocks.CAULDRON.defaultBlockState(), 1);
                 if (itemStack.getCount() > 1||pPlayer.isCreative()) {
-                    if (!pPlayer.addItem(new ItemStack(ModFluids.BIRCH_JUICE_FLUID.bucket.get()))) {
-                        pPlayer.drop(new ItemStack(ModFluids.BIRCH_JUICE_FLUID.bucket.get()), false);
+                    if (!pPlayer.addItem(new ItemStack(TCFluids.BIRCH_JUICE_FLUID.bucket.get()))) {
+                        pPlayer.drop(new ItemStack(TCFluids.BIRCH_JUICE_FLUID.bucket.get()), false);
                     }
                     if (!pPlayer.isCreative()) {
                         itemStack.setCount(itemStack.getCount() - 1);
                     }
                 } else {
                     if (!pPlayer.isCreative()) {
-                        pPlayer.setItemInHand(pHand, new ItemStack(ModFluids.BIRCH_JUICE_FLUID.bucket.get()));
+                        pPlayer.setItemInHand(pHand, new ItemStack(TCFluids.BIRCH_JUICE_FLUID.bucket.get()));
                     }
                 }
                 pPlayer.playSound(SoundEvents.BUCKET_FILL);

@@ -12,7 +12,7 @@ import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.sinedkadis.terracompositio.TerraCompositio;
-import net.sinedkadis.terracompositio.registries.ModTags;
+import net.sinedkadis.terracompositio.registries.TCTags;
 import net.sinedkadis.terracompositio.util.TCUtil;
 import org.jetbrains.annotations.NotNull;
 
@@ -52,7 +52,7 @@ public class UnstableTechnetiumItem extends Item {
             } else {
                 stream = TCUtil.getContainerContents(container).stream();
             }
-            stream.filter(itemStack -> itemStack.is(ModTags.Items.UNSTABLE_TECHNETIUM))
+            stream.filter(itemStack -> itemStack.is(TCTags.Items.UNSTABLE_TECHNETIUM))
                     .forEach(itemStack -> itemStack.inventoryTick(level,player,-1,true));
         }
     }

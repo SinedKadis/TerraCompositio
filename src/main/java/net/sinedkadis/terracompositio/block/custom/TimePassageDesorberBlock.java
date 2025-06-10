@@ -13,7 +13,7 @@ import net.minecraft.world.phys.shapes.BooleanOp;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import net.sinedkadis.terracompositio.registries.ModBlockEntities;
+import net.sinedkadis.terracompositio.registries.TCBlockEntities;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -55,7 +55,7 @@ public class TimePassageDesorberBlock extends AbstractDesorberBlock{
     @Nullable
     @Override
     public BlockEntity newBlockEntity(@NotNull BlockPos blockPos, @NotNull BlockState blockState) {
-        return ModBlockEntities.TIME_PASSAGE_DESORBER_BE.get().create(blockPos,blockState);
+        return TCBlockEntities.TIME_PASSAGE_DESORBER_BE.get().create(blockPos,blockState);
     }
 
     @Nullable
@@ -64,7 +64,7 @@ public class TimePassageDesorberBlock extends AbstractDesorberBlock{
         if (pLevel.isClientSide()) {
             return null;
         }
-        return createTickerHelper(pBlockEntityType, ModBlockEntities.TIME_PASSAGE_DESORBER_BE.get(),
+        return createTickerHelper(pBlockEntityType, TCBlockEntities.TIME_PASSAGE_DESORBER_BE.get(),
                 (pLevel1, pPos, pState1, pBlockEntity) -> pBlockEntity.tick(pLevel1,pPos,pState1));
     }
 }

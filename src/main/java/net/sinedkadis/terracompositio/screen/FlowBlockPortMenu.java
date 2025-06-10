@@ -10,7 +10,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.items.SlotItemHandler;
 import net.sinedkadis.terracompositio.block.entity.FlowCedarPortBlockEntity;
-import net.sinedkadis.terracompositio.registries.ModBlocks;
+import net.sinedkadis.terracompositio.registries.TCBlocks;
 import org.jetbrains.annotations.NotNull;
 
 public class FlowBlockPortMenu extends AbstractContainerMenu {
@@ -22,7 +22,7 @@ public class FlowBlockPortMenu extends AbstractContainerMenu {
         this(pContainerId,inv,inv.player.level().getBlockEntity(extraData.readBlockPos()),new SimpleContainerData(2));
     }
     public FlowBlockPortMenu(int pContainerId, Inventory inv, BlockEntity entity, ContainerData data){
-        super(ModMenuTypes.FLOW_PORT_MENU.get(),pContainerId);
+        super(TCMenuTypes.FLOW_PORT_MENU.get(),pContainerId);
         checkContainerSize(inv,2);
         blockEntity = ((FlowCedarPortBlockEntity) entity);
         this.level =inv.player.level();
@@ -101,7 +101,7 @@ public class FlowBlockPortMenu extends AbstractContainerMenu {
     @Override
     public boolean stillValid(@NotNull Player pPlayer) {
         return stillValid(ContainerLevelAccess.create(level,blockEntity.getBlockPos()),
-                pPlayer, ModBlocks.FLOW_CEDAR_PORT.get());
+                pPlayer, TCBlocks.FLOW_CEDAR_PORT.get());
     }
     private void addPlayerInventory(Inventory playerInventory) {
         for (int i = 0; i < 3; ++i) {

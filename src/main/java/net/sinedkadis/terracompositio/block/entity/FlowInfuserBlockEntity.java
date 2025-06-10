@@ -10,18 +10,18 @@ import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
-import net.sinedkadis.terracompositio.registries.ModBlockEntities;
-import net.sinedkadis.terracompositio.registries.ModParticles;
+import net.sinedkadis.terracompositio.registries.TCBlockEntities;
+import net.sinedkadis.terracompositio.registries.TCParticles;
 import net.sinedkadis.terracompositio.recipe.FlowInfusionRecipe;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
 
-public class FlowInfuserBlockEntity extends ModItemIOCFEBlockEntity {
+public class FlowInfuserBlockEntity extends TCItemIOCFEBlockEntity {
 
     public FlowInfuserBlockEntity(BlockPos pPos, BlockState pBlockState) {
-        super(ModBlockEntities.FLOW_INFUSER_BE.get(),pPos, pBlockState,100,5,BlockMode.CONSUMER);
+        super(TCBlockEntities.FLOW_INFUSER_BE.get(),pPos, pBlockState,100,5,BlockMode.CONSUMER);
     }
 
     @Override
@@ -73,7 +73,7 @@ public class FlowInfuserBlockEntity extends ModItemIOCFEBlockEntity {
     private static void spawnParticles(Level pLevel, BlockPos targetPos) {
         if (!pLevel.isClientSide){
             ((ServerLevel) pLevel).sendParticles(
-                    ModParticles.CFE_PARTICLE.get(),
+                    TCParticles.CFE_PARTICLE.get(),
                     targetPos.getX()+0.5D,
                     targetPos.getY()+0.5D,
                     targetPos.getZ()+0.5D,3,0,-0.1D,0,0.1D);

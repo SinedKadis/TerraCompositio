@@ -28,16 +28,16 @@ import net.sinedkadis.terracompositio.block.custom.FlowCedarLikeBlock;
 
 
 import net.sinedkadis.terracompositio.particle.FluidParticleData;
-import net.sinedkadis.terracompositio.registries.ModBlockStateProperties;
-import net.sinedkadis.terracompositio.registries.ModGameRules;
-import net.sinedkadis.terracompositio.registries.ModParticles;
+import net.sinedkadis.terracompositio.registries.TCBlockStateProperties;
+import net.sinedkadis.terracompositio.registries.TCGameRules;
+import net.sinedkadis.terracompositio.registries.TCParticles;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 import java.util.function.Predicate;
 
-import static net.sinedkadis.terracompositio.registries.ModBlockStateProperties.INFUSED;
+import static net.sinedkadis.terracompositio.registries.TCBlockStateProperties.INFUSED;
 
 public class TCUtil {
 
@@ -66,7 +66,7 @@ public class TCUtil {
         Vec3 sourceCenter = Vec3.atCenterOf(source);
 
         // Создаем данные частицы
-        FluidParticleData particleData = new FluidParticleData(ModParticles.FLUID_FLOW.get(), fluidStack);
+        FluidParticleData particleData = new FluidParticleData(TCParticles.FLUID_FLOW.get(), fluidStack);
 
         for (int i = 0; i < particleAmount; i++) {
             double offsetX = sourceCenter.x + (level.random.nextDouble() - 0.5) * 0.8;
@@ -105,13 +105,13 @@ public class TCUtil {
         return InteractionResult.sidedSuccess(pLevel.isClientSide);
     }
     public static @NotNull InteractionResult handleInWorldBlockCraft(BlockState oldState, BlockState newState, Level pLevel, BlockPos pPos, ItemStack item, int count) {
-        return handleInWorldBlockCraft(oldState,newState,pLevel,pPos,item,count,ModParticles.CFE_PARTICLE.get(),SoundEvents.COPPER_PLACE);
+        return handleInWorldBlockCraft(oldState,newState,pLevel,pPos,item,count, TCParticles.CFE_PARTICLE.get(),SoundEvents.COPPER_PLACE);
     }
 
 
         public static void spawnParticlesIn(Level pLevel, BlockPos targetPos){
         if (pLevel instanceof ServerLevel level)
-            level.sendParticles(ModParticles.CFE_PARTICLE.get(),
+            level.sendParticles(TCParticles.CFE_PARTICLE.get(),
                 targetPos.getX()+pLevel.getRandom().nextFloat(),
                 targetPos.getY()+pLevel.getRandom().nextFloat(),
                 targetPos.getZ()+pLevel.getRandom().nextFloat(),
@@ -269,10 +269,9 @@ public class TCUtil {
         return getTouchingBlocks(null, pos,null);
     }
 
-    public static void sendCFEParticles(ServerLevel level,BlockPos target, BlockPos source,int particleAmount){
+    public static void sendCFEParticles(ServerLevel level,Vec3 target, BlockPos source,int particleAmount){
         if (particleAmount <= 0 || level == null) return;
 
-        Vec3 targetCenter = Vec3.atCenterOf(target);
         Vec3 sourceCenter = Vec3.atCenterOf(source);
 
 
@@ -282,13 +281,13 @@ public class TCUtil {
             double offsetZ = sourceCenter.z + (level.random.nextDouble() - 0.5) * 0.8;
 
             // Отправляем частицу с данными о жидкости
-            level.sendParticles(ModParticles.CFE_PARTICLE.get(),
+            level.sendParticles(TCParticles.CFE_PARTICLE.get(),
                     offsetX, offsetY, offsetZ,
                     0, // count
-                    targetCenter.x - offsetX, // xd (направление к цели)
-                    targetCenter.y - offsetY, // yd
-                    targetCenter.z - offsetZ,// zd
-                    Math.sqrt(TCUtil.distSqr(target,source))); // speed
+                    target.x - offsetX, // xd (направление к цели)
+                    target.y - offsetY, // yd
+                    target.z - offsetZ,// zd
+                    Math.sqrt(target.distanceToSqr(source.getCenter()))); // speed
         }
     }
 
@@ -361,8 +360,8 @@ public class TCUtil {
 
     public static void flowLeak(BlockState pState, Level pLevel, BlockPos pPos,boolean chained) {
         if ((!pState.hasProperty(FlowCedarLikeBlock.INFUSED) || pState.getValue(FlowCedarLikeBlock.INFUSED))
-                && !pLevel.getGameRules().getBoolean(ModGameRules.DISABLE_FLOW_LEAKING)
-                && (!pState.hasProperty(ModBlockStateProperties.WAXED) || !pState.getValue(ModBlockStateProperties.WAXED))) {
+                && !pLevel.getGameRules().getBoolean(TCGameRules.DISABLE_FLOW_LEAKING)
+                && (!pState.hasProperty(TCBlockStateProperties.WAXED) || !pState.getValue(TCBlockStateProperties.WAXED))) {
 
                 BlockPos f_pos;
                 BlockPos b_pos;

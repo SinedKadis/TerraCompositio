@@ -11,17 +11,17 @@ import net.sinedkadis.terracompositio.api.networks.NetworkAction;
 import net.sinedkadis.terracompositio.api.networks.cfe.CFENetwork;
 import net.sinedkadis.terracompositio.cfe.CFECapability;
 import net.sinedkadis.terracompositio.cfe.CFEContainer;
-import net.sinedkadis.terracompositio.registries.ModBlockEntities;
+import net.sinedkadis.terracompositio.registries.TCBlockEntities;
 import net.sinedkadis.terracompositio.api.networks.cfe.CFENetworkMemberBE;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class CreativeCFESourceBlockEntity extends ModBlockEntity implements CFENetworkMemberBE{
+public class CreativeCFESourceBlockEntity extends TCBlockEntity implements CFENetworkMemberBE{
 
     private LazyOptional<CFEContainer> lazyOptional;
 
     public CreativeCFESourceBlockEntity(BlockPos pPos, BlockState pBlockState) {
-        super(ModBlockEntities.CREATIVE_CFE_SOURCE_BE.get(),pPos, pBlockState);
+        super(TCBlockEntities.CREATIVE_CFE_SOURCE_BE.get(),pPos, pBlockState);
     }
 
     public void tick(Level pLevel, BlockPos pPos, BlockState pState) {

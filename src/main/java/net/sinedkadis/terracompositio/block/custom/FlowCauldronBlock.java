@@ -16,14 +16,14 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.Fluid;
 import net.minecraft.world.phys.BlockHitResult;
-import net.sinedkadis.terracompositio.registries.ModFluids;
-import net.sinedkadis.terracompositio.registries.ModItems;
+import net.sinedkadis.terracompositio.registries.TCFluids;
+import net.sinedkadis.terracompositio.registries.TCItems;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Map;
 import java.util.function.Predicate;
 
-public class FlowCauldronBlock extends ModCauldronBlock {
+public class FlowCauldronBlock extends TCCauldronBlock {
 
 
     public FlowCauldronBlock(Properties pProperties, Predicate<Biome.Precipitation> pFillPredicate, Map<Item, CauldronInteraction> pInteractions) {
@@ -33,7 +33,7 @@ public class FlowCauldronBlock extends ModCauldronBlock {
 
     @Override
     public boolean canReceiveWedgeDrip(Fluid fluid) {
-        return fluid == ModFluids.FLOW_FLUID.source.get();
+        return fluid == TCFluids.FLOW_FLUID.source.get();
     }
 
     @Override
@@ -50,15 +50,15 @@ public class FlowCauldronBlock extends ModCauldronBlock {
             if (itemStack.getItem() == Items.BUCKET) {
                 pLevel.setBlock(pPos, Blocks.CAULDRON.defaultBlockState(), 1);
                 if (itemStack.getCount() > 1||pPlayer.isCreative()) {
-                    if (!pPlayer.addItem(new ItemStack(ModFluids.FLOW_FLUID.bucket.get()))) {
-                        pPlayer.drop(new ItemStack(ModFluids.FLOW_FLUID.bucket.get()), false);
+                    if (!pPlayer.addItem(new ItemStack(TCFluids.FLOW_FLUID.bucket.get()))) {
+                        pPlayer.drop(new ItemStack(TCFluids.FLOW_FLUID.bucket.get()), false);
                     }
                     if (!pPlayer.isCreative()) {
                         itemStack.setCount(itemStack.getCount() - 1);
                     }
                 } else {
                     if (!pPlayer.isCreative()) {
-                        pPlayer.setItemInHand(pHand, new ItemStack(ModFluids.FLOW_FLUID.bucket.get()));
+                        pPlayer.setItemInHand(pHand, new ItemStack(TCFluids.FLOW_FLUID.bucket.get()));
                     }
                 }
                 pPlayer.playSound(SoundEvents.BUCKET_FILL);
@@ -69,27 +69,27 @@ public class FlowCauldronBlock extends ModCauldronBlock {
             if (pState.getValue(LEVEL) != 1) {
                 pLevel.setBlock(pPos, pState.setValue(LEVEL, pState.getValue(LEVEL) - 1), 1);
                 if (itemStack.getCount() > 1) {
-                    if (!pPlayer.addItem(new ItemStack(ModItems.FLOW_BOTTLE.get()))) {
-                        pPlayer.drop(new ItemStack(ModItems.FLOW_BOTTLE.get()), false);
+                    if (!pPlayer.addItem(new ItemStack(TCItems.FLOW_BOTTLE.get()))) {
+                        pPlayer.drop(new ItemStack(TCItems.FLOW_BOTTLE.get()), false);
                     }
                     if (!pPlayer.isCreative()) {
                         itemStack.setCount(itemStack.getCount() - 1);
                     }
                 } else {
-                    pPlayer.setItemInHand(pHand, new ItemStack(ModItems.FLOW_BOTTLE.get()));
+                    pPlayer.setItemInHand(pHand, new ItemStack(TCItems.FLOW_BOTTLE.get()));
                 }
                 pPlayer.playSound(SoundEvents.BOTTLE_FILL);
             } else {
                 pLevel.setBlock(pPos, Blocks.CAULDRON.defaultBlockState(), 1);
                 if (itemStack.getCount() > 1) {
-                    if (!pPlayer.addItem(new ItemStack(ModItems.FLOW_BOTTLE.get()))) {
-                        pPlayer.drop(new ItemStack(ModItems.FLOW_BOTTLE.get()), false);
+                    if (!pPlayer.addItem(new ItemStack(TCItems.FLOW_BOTTLE.get()))) {
+                        pPlayer.drop(new ItemStack(TCItems.FLOW_BOTTLE.get()), false);
                     }
                     if (!pPlayer.isCreative()) {
                         itemStack.setCount(itemStack.getCount() - 1);
                     }
                 } else {
-                    pPlayer.setItemInHand(pHand, new ItemStack(ModItems.FLOW_BOTTLE.get()));
+                    pPlayer.setItemInHand(pHand, new ItemStack(TCItems.FLOW_BOTTLE.get()));
                 }
                 pPlayer.playSound(SoundEvents.BOTTLE_FILL);
             }

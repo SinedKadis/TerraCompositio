@@ -16,7 +16,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.sinedkadis.terracompositio.TerraCompositio;
 import net.sinedkadis.terracompositio.recipe.MatterInfusionRecipe;
-import net.sinedkadis.terracompositio.registries.ModBlocks;
+import net.sinedkadis.terracompositio.registries.TCBlocks;
 import org.jetbrains.annotations.NotNull;
 
 import java.awt.*;
@@ -34,7 +34,7 @@ public class MatterInfusionCategory implements IRecipeCategory<MatterInfusionRec
 
     public MatterInfusionCategory(IGuiHelper helper) {
         this.background = helper.createDrawable(Objects.requireNonNull(TEXTURE),0,0,176,150);
-        this.icon = helper.createDrawableIngredient(VanillaTypes.ITEM_STACK,new ItemStack(ModBlocks.MATTER_INFUSER_IO.get()));
+        this.icon = helper.createDrawableIngredient(VanillaTypes.ITEM_STACK,new ItemStack(TCBlocks.MATTER_INFUSER_IO.get()));
     }
 
     @Override

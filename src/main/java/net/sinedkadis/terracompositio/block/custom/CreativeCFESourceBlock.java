@@ -8,7 +8,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
-import net.sinedkadis.terracompositio.registries.ModBlockEntities;
+import net.sinedkadis.terracompositio.registries.TCBlockEntities;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -25,7 +25,7 @@ public class CreativeCFESourceBlock extends BaseEntityBlock {
     @Nullable
     @Override
     public BlockEntity newBlockEntity(@NotNull BlockPos pPos, @NotNull BlockState pState) {
-        return ModBlockEntities.CREATIVE_CFE_SOURCE_BE.get().create(pPos, pState);
+        return TCBlockEntities.CREATIVE_CFE_SOURCE_BE.get().create(pPos, pState);
     }
 
     @Nullable
@@ -34,7 +34,7 @@ public class CreativeCFESourceBlock extends BaseEntityBlock {
         if (pLevel.isClientSide()) {
             return null;
         }
-        return createTickerHelper(pBlockEntityType, ModBlockEntities.CREATIVE_CFE_SOURCE_BE.get(),
+        return createTickerHelper(pBlockEntityType, TCBlockEntities.CREATIVE_CFE_SOURCE_BE.get(),
                 (pLevel1, pPos, pState1, pBlockEntity) -> pBlockEntity.tick(pLevel1,pPos,pState1));
     }
 

@@ -6,7 +6,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.fluids.capability.IFluidHandler;
-import net.sinedkadis.terracompositio.registries.ModBlockEntities;
+import net.sinedkadis.terracompositio.registries.TCBlockEntities;
 import net.sinedkadis.terracompositio.util.TCUtil;
 import org.jetbrains.annotations.NotNull;
 
@@ -20,7 +20,7 @@ public class TimePassageDesorberBlockEntity extends AbstractDesorberBlockEntity 
     private int timeCounter = 0;
     public static final Function<Integer,Double> function = (x) -> (-Math.cos((double) x /50)+1)/1.5f;
     public TimePassageDesorberBlockEntity(BlockPos pos, BlockState state) {
-        super(ModBlockEntities.TIME_PASSAGE_DESORBER_BE.get(), pos, state);
+        super(TCBlockEntities.TIME_PASSAGE_DESORBER_BE.get(), pos, state);
     }
 
     @Override

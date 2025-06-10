@@ -15,8 +15,8 @@ import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.sinedkadis.terracompositio.TerraCompositio;
-import net.sinedkadis.terracompositio.registries.ModItems;
-import net.sinedkadis.terracompositio.registries.ModTags;
+import net.sinedkadis.terracompositio.registries.TCItems;
+import net.sinedkadis.terracompositio.registries.TCTags;
 import net.sinedkadis.terracompositio.util.reflection.BundleItemReflectionHelper;
 import org.jetbrains.annotations.NotNull;
 
@@ -55,7 +55,7 @@ public class ShieldedBundleItem extends BundleItem {
 
     @Override
     public boolean overrideOtherStackedOnMe(@NotNull ItemStack pStack, ItemStack pOther, @NotNull Slot pSlot, @NotNull ClickAction pAction, @NotNull Player pPlayer, @NotNull SlotAccess pAccess) {
-        if (pOther.is(ModTags.Items.UNSTABLE_TECHNETIUM) || pOther.isEmpty()) {
+        if (pOther.is(TCTags.Items.UNSTABLE_TECHNETIUM) || pOther.isEmpty()) {
             return super.overrideOtherStackedOnMe(pStack, pOther, pSlot, pAction, pPlayer, pAccess);
         }
         return false;
@@ -63,7 +63,7 @@ public class ShieldedBundleItem extends BundleItem {
 
     @Override
     public boolean overrideStackedOnOther(ItemStack pStack, @NotNull Slot pSlot, @NotNull ClickAction pAction, @NotNull Player pPlayer) {
-        if (!pStack.is(ModTags.Items.UNSTABLE_TECHNETIUM))
+        if (!pStack.is(TCTags.Items.UNSTABLE_TECHNETIUM))
             return false;
         return super.overrideStackedOnOther(pStack, pSlot, pAction, pPlayer);
     }
@@ -76,11 +76,11 @@ public class ShieldedBundleItem extends BundleItem {
     @SubscribeEvent
     public static void onItemPickUpEvent(PlayerEvent.ItemPickupEvent event) {
         ItemStack stack = event.getStack();
-        if (stack.is(ModTags.Items.UNSTABLE_TECHNETIUM)){
+        if (stack.is(TCTags.Items.UNSTABLE_TECHNETIUM)){
             Player player = event.getEntity();
             Inventory inventory = player.getInventory();
-            ItemStack newBundle = ModItems.SHIELDED_BUNDLE.get().getDefaultInstance();
-            List<ItemStack> bundles = inventory.items.stream().filter(itemStack -> itemStack.is(ModItems.SHIELDED_BUNDLE.get())).toList();
+            ItemStack newBundle = TCItems.SHIELDED_BUNDLE.get().getDefaultInstance();
+            List<ItemStack> bundles = inventory.items.stream().filter(itemStack -> itemStack.is(TCItems.SHIELDED_BUNDLE.get())).toList();
             for (ItemStack bundle : bundles){
                 int added;
                 if (bundle.getCount() > 1){

@@ -20,17 +20,17 @@ import net.minecraftforge.fluids.FluidUtil;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.fluids.capability.templates.FluidTank;
 import net.sinedkadis.terracompositio.api.networks.cfe.CFENetworkMemberBE;
-import net.sinedkadis.terracompositio.registries.ModBlockStateProperties;
-import net.sinedkadis.terracompositio.registries.ModFluids;
+import net.sinedkadis.terracompositio.registries.TCBlockStateProperties;
+import net.sinedkadis.terracompositio.registries.TCFluids;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
 @Getter
-public abstract class AbstractDesorberBlockEntity extends ModCFEBlockEntity implements CFENetworkMemberBE {
+public abstract class AbstractDesorberBlockEntity extends TCCFEBlockEntity implements CFENetworkMemberBE {
 
     protected final FluidTank fluidHandler = new FluidTank(getTankCapacity()){
-        private final FluidStack flow = new FluidStack(ModFluids.FLOW_FLUID.source.get(), 1000);
+        private final FluidStack flow = new FluidStack(TCFluids.FLOW_FLUID.source.get(), 1000);
         @Override
         public int fill(FluidStack resource, FluidAction action) {
             if (resource.isFluidEqual(flow))
@@ -56,10 +56,10 @@ public abstract class AbstractDesorberBlockEntity extends ModCFEBlockEntity impl
 
     public void tick(Level pLevel, BlockPos pPos, BlockState pState) {
         super.tick(pLevel,pPos,pState);
-        if (!fluidHandler.isEmpty() && !pState.getValue(ModBlockStateProperties.INFUSED)) {
-            pLevel.setBlockAndUpdate(pPos, pState.setValue(ModBlockStateProperties.INFUSED, true));
-        } else if (fluidHandler.isEmpty() && pState.getValue(ModBlockStateProperties.INFUSED)) {
-            pLevel.setBlockAndUpdate(pPos, pState.setValue(ModBlockStateProperties.INFUSED, false));
+        if (!fluidHandler.isEmpty() && !pState.getValue(TCBlockStateProperties.INFUSED)) {
+            pLevel.setBlockAndUpdate(pPos, pState.setValue(TCBlockStateProperties.INFUSED, true));
+        } else if (fluidHandler.isEmpty() && pState.getValue(TCBlockStateProperties.INFUSED)) {
+            pLevel.setBlockAndUpdate(pPos, pState.setValue(TCBlockStateProperties.INFUSED, false));
         }
         BlockEntity blockEntity = pLevel.getBlockEntity(pPos.below());
         Optional<IFluidHandler> fluidHandlerOptional = Optional.empty();

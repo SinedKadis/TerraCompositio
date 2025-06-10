@@ -17,8 +17,8 @@ import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemHandlerHelper;
-import net.sinedkadis.terracompositio.registries.ModBlockEntities;
-import net.sinedkadis.terracompositio.registries.ModBlockStateProperties;
+import net.sinedkadis.terracompositio.registries.TCBlockEntities;
+import net.sinedkadis.terracompositio.registries.TCBlockStateProperties;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
@@ -29,21 +29,21 @@ import java.util.stream.IntStream;
 
 import static net.minecraft.world.level.block.entity.HopperBlockEntity.getContainerAt;
 import static net.sinedkadis.terracompositio.block.custom.FlowCedarCasingBlock.*;
-import static net.sinedkadis.terracompositio.registries.ModBlockStateProperties.INPUT_BUS;
+import static net.sinedkadis.terracompositio.registries.TCBlockStateProperties.INPUT_BUS;
 
-public class FlowCedarCasingBlockEntity extends ModItemIOCFEBlockEntity{
+public class FlowCedarCasingBlockEntity extends TCItemIOCFEBlockEntity {
 
     private int cooldownTime;
 
     public FlowCedarCasingBlockEntity(BlockPos pos, BlockState state) {
-        super(ModBlockEntities.FLOW_CEDAR_CASING_BE.get(), pos, state,BlockMode.CONSUMER);
+        super(TCBlockEntities.FLOW_CEDAR_CASING_BE.get(), pos, state,BlockMode.CONSUMER);
     }
 
     protected <T> @Nullable LazyOptional<T> getCap(@NotNull Capability<T> cap, @Nullable Direction side) {
         if ((side == null && cap == ForgeCapabilities.ITEM_HANDLER)
                 || cap == ForgeCapabilities.ITEM_HANDLER
                 && ((side.equals(Direction.UP) && this.getBlockState().getValue(INPUT_BUS))
-                    || (side.equals(Direction.DOWN) && this.getBlockState().getValue(ModBlockStateProperties.OUTPUT_BUS)))) {
+                    || (side.equals(Direction.DOWN) && this.getBlockState().getValue(TCBlockStateProperties.OUTPUT_BUS)))) {
             return lazyItemHandler.cast();
         }
         return null;

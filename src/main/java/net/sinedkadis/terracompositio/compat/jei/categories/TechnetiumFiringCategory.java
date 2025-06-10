@@ -18,7 +18,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.sinedkadis.terracompositio.TerraCompositio;
 import net.sinedkadis.terracompositio.recipe.TechnetiumFiringRecipe;
-import net.sinedkadis.terracompositio.registries.ModItems;
+import net.sinedkadis.terracompositio.registries.TCItems;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -40,7 +40,7 @@ public class TechnetiumFiringCategory implements IRecipeCategory<TechnetiumFirin
 
     public TechnetiumFiringCategory(IGuiHelper helper) {
         this.background = helper.createDrawable(Objects.requireNonNull(TEXTURE),0,0,82,61);
-        this.icon = helper.createDrawableIngredient(VanillaTypes.ITEM_STACK,new ItemStack(ModItems.TECHNETIUM_INGOT.get()));
+        this.icon = helper.createDrawableIngredient(VanillaTypes.ITEM_STACK,new ItemStack(TCItems.TECHNETIUM_INGOT.get()));
         IDrawableStatic staticFlame = helper.createDrawable(TEXTURE, 82, 0, 14, 14);
         IDrawableStatic staticEmittedLeft = helper.createDrawable(TEXTURE,96,0,41,61);
         IDrawableStatic staticEmittedRight = helper.createDrawable(TEXTURE,137,0,41,61);

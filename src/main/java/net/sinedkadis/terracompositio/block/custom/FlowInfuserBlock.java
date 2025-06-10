@@ -17,7 +17,7 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.sinedkadis.terracompositio.block.entity.FlowInfuserBlockEntity;
-import net.sinedkadis.terracompositio.registries.ModBlockEntities;
+import net.sinedkadis.terracompositio.registries.TCBlockEntities;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -66,7 +66,7 @@ public class FlowInfuserBlock extends FlowCedarLikeBaseEntityBlock implements En
     @Override
     @ParametersAreNotNullByDefault
     public BlockEntity newBlockEntity(BlockPos blockPos, BlockState blockState) {
-        return ModBlockEntities.FLOW_INFUSER_BE.get().create(blockPos, blockState);
+        return TCBlockEntities.FLOW_INFUSER_BE.get().create(blockPos, blockState);
     }
 
     @Nullable
@@ -75,7 +75,7 @@ public class FlowInfuserBlock extends FlowCedarLikeBaseEntityBlock implements En
         if (pLevel.isClientSide()) {
             return null;
         }
-        return createTickerHelper(pBlockEntityType, ModBlockEntities.FLOW_INFUSER_BE.get(),
+        return createTickerHelper(pBlockEntityType, TCBlockEntities.FLOW_INFUSER_BE.get(),
                 (pLevel1, pPos, pState1, pBlockEntity) -> pBlockEntity.tick(pLevel1,pPos,pState1));
     }
 }

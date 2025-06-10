@@ -15,12 +15,12 @@ import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.sinedkadis.terracompositio.registries.ModFluids;
-import net.sinedkadis.terracompositio.registries.ModParticles;
+import net.sinedkadis.terracompositio.registries.TCFluids;
+import net.sinedkadis.terracompositio.registries.TCParticles;
 import org.jetbrains.annotations.NotNull;
 
 public class BirchJuiceParticle extends TextureSheetParticle {
-    private final Fluid type = ModFluids.BIRCH_JUICE_FLUID.source.get();
+    private final Fluid type = TCFluids.BIRCH_JUICE_FLUID.source.get();
     protected boolean isGlowing;
     BirchJuiceParticle(ClientLevel pLevel, double pX, double pY, double pZ, SpriteSet spriteSet) {
         super(pLevel, pX, pY, pZ);
@@ -75,9 +75,8 @@ public class BirchJuiceParticle extends TextureSheetParticle {
     protected void postMoveUpdate() {
     }
     public static TextureSheetParticle createBirchJuiceFallParticle(ClientLevel pLevel, double pX, double pY, double pZ, SpriteSet spriteSet) {
-        BirchJuiceParticle $$8 = new BirchJuiceFallAndLandParticle(pLevel, pX, pY, pZ, ModParticles.BIRCH_JUICE_SPLASH_PARTICLE.get(),spriteSet);
         //$$8.setColor(0.2F, 0.3F, 1.0F);
-        return $$8;
+        return new BirchJuiceFallAndLandParticle(pLevel, pX, pY, pZ, TCParticles.BIRCH_JUICE_SPLASH_PARTICLE.get(),spriteSet);
     }
 
     @OnlyIn(Dist.CLIENT)

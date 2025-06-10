@@ -13,7 +13,7 @@ import net.sinedkadis.terracompositio.api.TerraCompositioAPI;
 import net.sinedkadis.terracompositio.api.networks.NetworkAction;
 import net.sinedkadis.terracompositio.api.networks.cfe.CFENetworkMemberBE;
 import net.sinedkadis.terracompositio.api.networks.cfe.ICFEHandler;
-import net.sinedkadis.terracompositio.block.entity.ModCFEBlockEntity;
+import net.sinedkadis.terracompositio.block.entity.TCCFEBlockEntity;
 import net.sinedkadis.terracompositio.util.TCUtil;
 import org.apache.commons.lang3.tuple.MutablePair;
 import org.apache.commons.lang3.tuple.Pair;
@@ -113,11 +113,11 @@ public class CFEContainer implements ICFEHandler, INBTSerializable<CompoundTag> 
 
     protected void sendCFEUpdate(boolean onAdd) {
         if (blockEntity instanceof CFENetworkMemberBE cfeNetworkMemberBE
-                && blockEntity instanceof ModCFEBlockEntity modCFEBlockEntity){
+                && blockEntity instanceof TCCFEBlockEntity tcCFEBlockEntity){
 //            TerraCompositioAPI.INSTANCE.getCFENetworkInstance().fireCFENetworkEvent(cfeNetworkMemberBE, NetworkAction.UPDATE);
             //TerraCompositioAPI.INSTANCE.getCFENetworkInstance().networkMemberUpdated(cfeNetworkMemberBE);
-            if ((modCFEBlockEntity.getBlockMode().consumer() && !onAdd )
-                    || (modCFEBlockEntity.getBlockMode().source() && onAdd))
+            if ((tcCFEBlockEntity.getBlockMode().consumer() && !onAdd )
+                    || (tcCFEBlockEntity.getBlockMode().source() && onAdd))
                 TerraCompositioAPI.INSTANCE.getCFENetworkInstance().fireCFENetworkEvent(cfeNetworkMemberBE, NetworkAction.UPDATE);
         }
     }

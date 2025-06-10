@@ -12,7 +12,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.sinedkadis.terracompositio.TerraCompositio;
-import net.sinedkadis.terracompositio.registries.ModBlocks;
+import net.sinedkadis.terracompositio.registries.TCBlocks;
 import net.sinedkadis.terracompositio.recipe.FlowSaturationRecipe;
 import org.jetbrains.annotations.NotNull;
 
@@ -30,7 +30,7 @@ public class FlowPortCategory implements IRecipeCategory<FlowSaturationRecipe> {
 
     public FlowPortCategory(IGuiHelper helper) {
         this.background = helper.createDrawable(Objects.requireNonNull(TEXTURE),0,0,176,85);
-        this.icon = helper.createDrawableIngredient(VanillaTypes.ITEM_STACK,new ItemStack(ModBlocks.FLOW_CEDAR_PORT.get()));
+        this.icon = helper.createDrawableIngredient(VanillaTypes.ITEM_STACK,new ItemStack(TCBlocks.FLOW_CEDAR_PORT.get()));
     }
 
     @Override

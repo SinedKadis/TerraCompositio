@@ -21,10 +21,10 @@ import net.sinedkadis.terracompositio.compat.jei.categories.MatterInfusionCatego
 import net.sinedkadis.terracompositio.compat.jei.categories.TechnetiumFiringCategory;
 import net.sinedkadis.terracompositio.recipe.MatterInfusionRecipe;
 import net.sinedkadis.terracompositio.recipe.TechnetiumFiringRecipe;
-import net.sinedkadis.terracompositio.registries.ModBlocks;
+import net.sinedkadis.terracompositio.registries.TCBlocks;
 import net.sinedkadis.terracompositio.recipe.FlowInfusionRecipe;
 import net.sinedkadis.terracompositio.recipe.FlowSaturationRecipe;
-import net.sinedkadis.terracompositio.registries.ModItems;
+import net.sinedkadis.terracompositio.registries.TCItems;
 import net.sinedkadis.terracompositio.screen.FlowBlockPortScreen;
 import org.jetbrains.annotations.NotNull;
 
@@ -75,13 +75,13 @@ public class JEITerraCompositioPlugin implements IModPlugin {
         if (Minecraft.getInstance().level != null) {
             RecipeManager recipeManager = Minecraft.getInstance().level.getRecipeManager();
         }
-        registration.addRecipeCatalyst(new ItemStack(ModBlocks.FLOW_INFUSER.get()),FlowInfusionCategory.FLOW_INFUSION_RECIPE_RECIPE_TYPE);
+        registration.addRecipeCatalyst(new ItemStack(TCBlocks.FLOW_INFUSER.get()),FlowInfusionCategory.FLOW_INFUSION_RECIPE_RECIPE_TYPE);
         addCatalysts(registration,MatterInfusionCategory.MATTER_INFUSION_RECIPE_RECIPE_TYPE,
-                ModBlocks.FLOW_CEDAR_CASING.get(),
-                ModBlocks.MATTER_INFUSER_PORT.get(),
-                ModBlocks.MATTER_INFUSER_IO.get(),
-                ModItems.INPUT_BUS.get(),
-                ModItems.OUTPUT_BUS.get());
+                TCBlocks.FLOW_CEDAR_CASING.get(),
+                TCBlocks.MATTER_INFUSER_PORT.get(),
+                TCBlocks.MATTER_INFUSER_IO.get(),
+                TCItems.INPUT_BUS.get(),
+                TCItems.OUTPUT_BUS.get());
         addCatalysts(registration,TechnetiumFiringCategory.TECHNETIUM_FIRING_RECIPE_RECIPE_TYPE, ForgeRegistries.BLOCKS.getValues().stream()
                 .filter(block -> block instanceof AbstractFurnaceBlock)
                 .map(block -> ((ItemLike) block.asItem()))

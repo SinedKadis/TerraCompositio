@@ -12,8 +12,8 @@ import net.minecraft.world.level.levelgen.feature.configurations.TreeConfigurati
 import net.minecraft.world.level.levelgen.feature.foliageplacers.FoliagePlacer;
 import net.minecraft.world.level.levelgen.feature.trunkplacers.TrunkPlacer;
 import net.minecraft.world.level.levelgen.feature.trunkplacers.TrunkPlacerType;
-import net.sinedkadis.terracompositio.registries.ModBlocks;
-import net.sinedkadis.terracompositio.worldgen.tree.ModTrunkPlacers;
+import net.sinedkadis.terracompositio.registries.TCBlocks;
+import net.sinedkadis.terracompositio.worldgen.tree.TCTrunkPlacers;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -32,7 +32,7 @@ public class FlowCedarTrunkPlacer extends TrunkPlacer {
 
     @Override
     protected @NotNull TrunkPlacerType<?> type() {
-        return ModTrunkPlacers.FLOW_CEDAR_TRUNK_PLACER.get();
+        return TCTrunkPlacers.FLOW_CEDAR_TRUNK_PLACER.get();
     }
 
     @Override
@@ -56,7 +56,7 @@ public class FlowCedarTrunkPlacer extends TrunkPlacer {
         if (portHeight < pFreeTreeHeight && pRandom.nextFloat() > 0.5f) {
             BlockPos portalPos = pPos.above(portHeight);
             Direction facing = Direction.Plane.HORIZONTAL.getRandomDirection(pRandom);
-            pBlockSetter.accept(portalPos, ModBlocks.FLOW_CEDAR_PORT.get()
+            pBlockSetter.accept(portalPos, TCBlocks.FLOW_CEDAR_PORT.get()
                     .defaultBlockState()
                     .setValue(BlockStateProperties.HORIZONTAL_FACING, facing));
         }

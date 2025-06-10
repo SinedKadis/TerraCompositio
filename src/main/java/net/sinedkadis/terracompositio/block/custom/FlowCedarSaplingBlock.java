@@ -17,7 +17,7 @@ import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
-import net.sinedkadis.terracompositio.registries.ModBlocks;
+import net.sinedkadis.terracompositio.registries.TCBlocks;
 import net.sinedkadis.terracompositio.worldgen.tree.FlowCedarTreeGrower;
 
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -34,8 +34,8 @@ public class FlowCedarSaplingBlock extends SaplingBlock {
         ItemStack itemInHand = pPlayer.getItemInHand(pHand);
         if (itemInHand.is(Items.BONE_MEAL)){
             BlockState blockState = pLevel.getBlockState(pPos.above());
-            if (blockState.is(ModBlocks.FLOW_CEDAR_TANK.get())){
-                pLevel.setBlockAndUpdate(pPos,ModBlocks.FLOW_CEDAR_PEDESTAL.get().defaultBlockState());
+            if (blockState.is(TCBlocks.FLOW_CEDAR_TANK.get())){
+                pLevel.setBlockAndUpdate(pPos, TCBlocks.FLOW_CEDAR_PEDESTAL.get().defaultBlockState());
                 pLevel.setBlockAndUpdate(pPos.above(),blockState.setValue(FlowCedarTankBlock.STAGE,4));
                 itemInHand.shrink(1);
                 spawnFertilizeParticles(pLevel,pPos,10);

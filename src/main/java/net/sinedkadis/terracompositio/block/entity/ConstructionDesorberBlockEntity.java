@@ -9,6 +9,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.event.level.BlockEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fluids.capability.IFluidHandler;
@@ -18,8 +19,8 @@ import net.sinedkadis.terracompositio.TerraCompositio;
 import net.sinedkadis.terracompositio.api.TerraCompositioAPI;
 import net.sinedkadis.terracompositio.api.networks.cfe.CFENetwork;
 import net.sinedkadis.terracompositio.api.networks.cfe.CFENetworkMemberBE;
-import net.sinedkadis.terracompositio.registries.ModBlockEntities;
-import net.sinedkadis.terracompositio.util.ModItemStackHandler;
+import net.sinedkadis.terracompositio.registries.TCBlockEntities;
+import net.sinedkadis.terracompositio.util.TCItemStackHandler;
 import net.sinedkadis.terracompositio.util.TCUtil;
 import org.jetbrains.annotations.NotNull;
 
@@ -31,10 +32,10 @@ import java.util.stream.Collectors;
 @Mod.EventBusSubscriber(modid = TerraCompositio.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class ConstructionDesorberBlockEntity extends AbstractDesorberBlockEntity {
 
-    private final ModItemStackHandler renderStack = new ModItemStackHandler(this);
+    private final TCItemStackHandler renderStack = new TCItemStackHandler(this);
 
     public ConstructionDesorberBlockEntity(BlockPos pos, BlockState state) {
-        super(ModBlockEntities.CONSTRUCTION_DESORBER_BE.get(), pos, state);
+        super(TCBlockEntities.CONSTRUCTION_DESORBER_BE.get(), pos, state);
     }
 
     @Override
@@ -92,7 +93,13 @@ public class ConstructionDesorberBlockEntity extends AbstractDesorberBlockEntity
                     if (!level.isClientSide()) {
                         BlockPos blockEntityBlockPos = blockEntity.getBlockPos();
                         level.playSound(null, blockEntityBlockPos, SoundEvents.BEACON_ACTIVATE, SoundSource.BLOCKS, 0.1f, 1f);
-                        TCUtil.sendCFEParticles((ServerLevel) level, blockEntityBlockPos,pos,added);
+                        TCUtil.sendCFEParticles((ServerLevel) level,
+                                Vec3.atLowerCornerWithOffset(blockEntityBlockPos,
+                                        blockEntity.particleTargetOffset().x,
+                                        blockEntity.particleTargetOffset().y,
+                                        blockEntity.particleTargetOffset().z),
+                                pos,
+                                added);
                     }
                     break;
                 }

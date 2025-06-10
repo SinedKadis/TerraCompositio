@@ -7,13 +7,14 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.phys.Vec3;
 import net.sinedkadis.terracompositio.recipe.MatterInfusionRecipe;
-import net.sinedkadis.terracompositio.registries.ModBlockEntities;
+import net.sinedkadis.terracompositio.registries.TCBlockEntities;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
 
-import static net.sinedkadis.terracompositio.registries.ModBlockStateProperties.INFUSED;
+import static net.sinedkadis.terracompositio.registries.TCBlockStateProperties.INFUSED;
 
 public class MatterInfuserIOBlockEntity extends MatterInfuserBaseBlockEntity{
 
@@ -23,7 +24,7 @@ public class MatterInfuserIOBlockEntity extends MatterInfuserBaseBlockEntity{
     protected float catalystDecayRate;
 
     public MatterInfuserIOBlockEntity(BlockPos pos, BlockState state) {
-        super(ModBlockEntities.MATTER_INFUSER_IO_BE.get(), pos, state, 100, 10);
+        super(TCBlockEntities.MATTER_INFUSER_IO_BE.get(), pos, state, 100, 10);
     }
 
     public void tick(Level pLevel, BlockPos pPos, BlockState pState) {
@@ -42,6 +43,17 @@ public class MatterInfuserIOBlockEntity extends MatterInfuserBaseBlockEntity{
         }else if(!hasRecipe()) {
             resetProgress();
         }
+    }
+
+    @Override
+    public Vec3 particleTargetOffset() {
+        return switch (getBlockState().getValue(BlockStateProperties.HORIZONTAL_FACING)){
+            case SOUTH -> new Vec3(8.0 / 16, 8.0 / 16, 0.5 / 16);
+            case NORTH -> new Vec3(8.0 / 16, 8.0 / 16, 15.5 / 16);
+            case EAST -> new Vec3(0.5 / 16, 8.0 / 16, 8.0 / 16);
+            case WEST -> new Vec3(15.5 / 16, 8.0 / 16, 8.0 / 16);
+            default -> super.particleTargetOffset();
+        };
     }
 
     private float partialCFE = 0;

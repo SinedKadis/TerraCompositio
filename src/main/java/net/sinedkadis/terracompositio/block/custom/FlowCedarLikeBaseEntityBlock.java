@@ -16,7 +16,7 @@ import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
-import net.sinedkadis.terracompositio.block.entity.ModItemIOCFEBlockEntity;
+import net.sinedkadis.terracompositio.block.entity.TCItemIOCFEBlockEntity;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
@@ -33,7 +33,7 @@ public abstract class FlowCedarLikeBaseEntityBlock extends FlowCedarLikeBlock im
     public void onRemove(@NotNull BlockState pState, @NotNull Level pLevel, @NotNull BlockPos pPos, @NotNull BlockState pNewState, boolean pIsMoving) {
         if (pState.getBlock() != pNewState.getBlock()){
             BlockEntity blockEntity =pLevel.getBlockEntity(pPos);
-            if (blockEntity instanceof ModItemIOCFEBlockEntity entity){
+            if (blockEntity instanceof TCItemIOCFEBlockEntity entity){
                 entity.drops();
             }
         }
@@ -62,7 +62,7 @@ public abstract class FlowCedarLikeBaseEntityBlock extends FlowCedarLikeBlock im
     public @NotNull InteractionResult use(@NotNull BlockState pState, @NotNull Level pLevel, @NotNull BlockPos pPos, @NotNull Player pPlayer, @NotNull InteractionHand pHand, @NotNull BlockHitResult pHit) {
         //if (!pLevel.isClientSide()){
         BlockEntity entity = pLevel.getBlockEntity(pPos);
-        if(entity instanceof ModItemIOCFEBlockEntity blockEntity && infusedTest(pState)){
+        if(entity instanceof TCItemIOCFEBlockEntity blockEntity && infusedTest(pState)){
             ItemStack itemstack = pPlayer.getItemInHand(pHand);
             ItemStack outputSlot = blockEntity.getLastSlot();
             ItemStack inputSlot = blockEntity.getFirstSlot();

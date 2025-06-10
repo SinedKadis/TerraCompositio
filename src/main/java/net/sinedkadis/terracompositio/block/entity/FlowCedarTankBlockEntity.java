@@ -20,11 +20,11 @@ import net.sinedkadis.terracompositio.api.networks.fluid.FluidNetwork;
 import net.sinedkadis.terracompositio.api.networks.fluid.FluidNetworkMemberBE;
 import net.sinedkadis.terracompositio.api.TerraCompositioAPI;
 import net.sinedkadis.terracompositio.api.networks.NetworkAction;
-import net.sinedkadis.terracompositio.fluid.ModFluidTank;
-import net.sinedkadis.terracompositio.registries.ModBlockEntities;
-import net.sinedkadis.terracompositio.registries.ModBlocks;
-import net.sinedkadis.terracompositio.registries.ModFluids;
-import net.sinedkadis.terracompositio.registries.ModTags;
+import net.sinedkadis.terracompositio.fluid.TCFluidTank;
+import net.sinedkadis.terracompositio.registries.TCBlockEntities;
+import net.sinedkadis.terracompositio.registries.TCBlocks;
+import net.sinedkadis.terracompositio.registries.TCFluids;
+import net.sinedkadis.terracompositio.registries.TCTags;
 import net.sinedkadis.terracompositio.util.TCUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -33,19 +33,19 @@ import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
-import static net.sinedkadis.terracompositio.registries.ModBlockStateProperties.INFUSED;
+import static net.sinedkadis.terracompositio.registries.TCBlockStateProperties.INFUSED;
 
-public class FlowCedarTankBlockEntity extends ModBlockEntity implements FluidNetworkMemberBE {
-    protected final ModFluidTank fluidHandler = new ModFluidTank(8000, this);
+public class FlowCedarTankBlockEntity extends TCBlockEntity implements FluidNetworkMemberBE {
+    protected final TCFluidTank fluidHandler = new TCFluidTank(8000, this);
     protected LazyOptional<IFluidHandler> lazyFluidHandler = LazyOptional.empty();
     private int tickCounter = 20;
     private boolean wasActivated = false;
     public FlowCedarTankBlockEntity(BlockPos pos, BlockState state) {
-        super(ModBlockEntities.FLOW_CEDAR_TANK_BE.get(), pos, state);
+        super(TCBlockEntities.FLOW_CEDAR_TANK_BE.get(), pos, state);
     }
 
     public boolean onPedestal(Level level, BlockPos pos) {
-        return level != null && level.getBlockState(pos.below()).is(ModBlocks.FLOW_CEDAR_PEDESTAL.get());
+        return level != null && level.getBlockState(pos.below()).is(TCBlocks.FLOW_CEDAR_PEDESTAL.get());
     }
 
     @Override
@@ -92,10 +92,10 @@ public class FlowCedarTankBlockEntity extends ModBlockEntity implements FluidNet
         tickCounter--;
         if (tickCounter <= 0 && onPedestal(level, pos) && getPriority() > 0){
             tickCounter = 20;
-            FluidStack fluidStack = new FluidStack(ModFluids.FLOW_FLUID.source.get(), 1000);
+            FluidStack fluidStack = new FluidStack(TCFluids.FLOW_FLUID.source.get(), 1000);
             if (fluidHandler.fill(fluidStack, IFluidHandler.FluidAction.SIMULATE)>=1000){
                 List<BlockPos> list = new java.util.ArrayList<>(TCUtil.getNearBlocks(pos, 10).stream()
-                        .filter(pos1 -> level.getBlockState(pos1).is(ModTags.Blocks.FLOW_CEDAR_LOGS))
+                        .filter(pos1 -> level.getBlockState(pos1).is(TCTags.Blocks.FLOW_CEDAR_LOGS))
                         .filter(pos2 -> level.getBlockState(pos2).getValue(INFUSED))
                         .toList());
                 if (!list.isEmpty()) {

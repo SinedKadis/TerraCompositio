@@ -6,12 +6,12 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
-import net.sinedkadis.terracompositio.registries.ModBlocks;
+import net.sinedkadis.terracompositio.registries.TCBlocks;
 import org.jetbrains.annotations.Nullable;
 
 import static net.minecraft.world.level.block.state.properties.BlockStateProperties.HORIZONTAL_FACING;
 
-public abstract class MatterInfuserBaseBlockEntity extends ModCFEBlockEntity{
+public abstract class MatterInfuserBaseBlockEntity extends TCCFEBlockEntity {
     public MatterInfuserBaseBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state, int maxCFE, int connectRange) {
         super(type, pos, state, maxCFE, connectRange,BlockMode.CONSUMER);
     }
@@ -80,7 +80,7 @@ public abstract class MatterInfuserBaseBlockEntity extends ModCFEBlockEntity{
     protected @Nullable FlowCedarCasingBlockEntity getCasingBE() {
         Direction direction = this.getBlockState().getValue(HORIZONTAL_FACING);
         BlockPos blockpos = this.getBlockPos().relative(direction.getOpposite());
-        if (this.level != null && this.level.getBlockState(blockpos).is(ModBlocks.FLOW_CEDAR_CASING.get())){
+        if (this.level != null && this.level.getBlockState(blockpos).is(TCBlocks.FLOW_CEDAR_CASING.get())){
             BlockEntity blockEntity = this.level.getBlockEntity(blockpos);
             if (blockEntity != null){
                 return ((FlowCedarCasingBlockEntity) blockEntity);

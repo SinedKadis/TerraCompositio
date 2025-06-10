@@ -35,10 +35,10 @@ import net.minecraftforge.fluids.FluidUtil;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandlerItem;
 import net.minecraftforge.fluids.capability.templates.FluidTank;
-import net.sinedkadis.terracompositio.registries.ModBlockEntities;
-import net.sinedkadis.terracompositio.registries.ModBlocks;
-import net.sinedkadis.terracompositio.registries.ModFluids;
-import net.sinedkadis.terracompositio.registries.ModItems;
+import net.sinedkadis.terracompositio.registries.TCBlockEntities;
+import net.sinedkadis.terracompositio.registries.TCBlocks;
+import net.sinedkadis.terracompositio.registries.TCFluids;
+import net.sinedkadis.terracompositio.registries.TCItems;
 import net.sinedkadis.terracompositio.util.TCUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -68,7 +68,7 @@ public class FlowCedarTankBlock extends BaseEntityBlock{
         if (pLevel.isClientSide()) {
             return null;
         }
-        return createTickerHelper(pBlockEntityType, ModBlockEntities.FLOW_CEDAR_TANK_BE.get(),
+        return createTickerHelper(pBlockEntityType, TCBlockEntities.FLOW_CEDAR_TANK_BE.get(),
                 (pLevel1, pPos, pState1, pBlockEntity) -> pBlockEntity.tick(pLevel1,pPos,pState1));
     }
 
@@ -125,8 +125,8 @@ public class FlowCedarTankBlock extends BaseEntityBlock{
 
         IFluidHandlerItem fluidHandlerItem = heldItem.getCapability(ForgeCapabilities.FLUID_HANDLER_ITEM).resolve().orElse(null);
         if (fluidHandlerItem == null) {
-            FluidStack fluidStack = new FluidStack(ModFluids.FLOW_FLUID.source.get().getSource(), 250);
-            if (heldItem.is(ModItems.FLOW_BOTTLE.get())){
+            FluidStack fluidStack = new FluidStack(TCFluids.FLOW_FLUID.source.get().getSource(), 250);
+            if (heldItem.is(TCItems.FLOW_BOTTLE.get())){
                 int filled = tank.fill(fluidStack, IFluidHandler.FluidAction.SIMULATE);
                 if (filled == 250){
                     tank.fill(fluidStack, IFluidHandler.FluidAction.EXECUTE);
@@ -143,7 +143,7 @@ public class FlowCedarTankBlock extends BaseEntityBlock{
                 if (drained.isFluidStackIdentical(fluidStack)){
                     tank.drain(fluidStack, IFluidHandler.FluidAction.EXECUTE);
                     heldItem.shrink(1);
-                    pPlayer.getInventory().add(new ItemStack(ModItems.FLOW_BOTTLE.get()));
+                    pPlayer.getInventory().add(new ItemStack(TCItems.FLOW_BOTTLE.get()));
                     if (pLevel instanceof ServerLevel level){
                         level.playSound(null,pPos,SoundEvents.BUCKET_FILL,SoundSource.BLOCKS);
                     }
@@ -210,14 +210,14 @@ public class FlowCedarTankBlock extends BaseEntityBlock{
         }
         switch (pState.getValue(STAGE)){
             case 0,1,2 -> {
-                drops.add(new ItemStack(ModBlocks.FLOW_CEDAR_LOG.get()));
-                drops.add(new ItemStack(ModItems.GOLD_ROD.get(),4));
-                drops.add(new ItemStack(ModItems.INFUSED_IRON_ROD.get(),8));
+                drops.add(new ItemStack(TCBlocks.FLOW_CEDAR_LOG.get()));
+                drops.add(new ItemStack(TCItems.GOLD_ROD.get(),4));
+                drops.add(new ItemStack(TCItems.INFUSED_IRON_ROD.get(),8));
             }
             case 3,4 -> {
-                drops.add(new ItemStack(ModBlocks.FLOW_CEDAR_LOG.get()));
-                drops.add(new ItemStack(ModItems.GOLD_ROD.get(),4));
-                drops.add(new ItemStack(ModItems.INFUSED_IRON_ROD.get(),8));
+                drops.add(new ItemStack(TCBlocks.FLOW_CEDAR_LOG.get()));
+                drops.add(new ItemStack(TCItems.GOLD_ROD.get(),4));
+                drops.add(new ItemStack(TCItems.INFUSED_IRON_ROD.get(),8));
                 drops.add(Items.GLASS.getDefaultInstance());
             }
         }
@@ -227,6 +227,6 @@ public class FlowCedarTankBlock extends BaseEntityBlock{
     @Nullable
     @Override
     public BlockEntity newBlockEntity(@NotNull BlockPos blockPos, @NotNull BlockState blockState) {
-        return ModBlockEntities.FLOW_CEDAR_TANK_BE.get().create(blockPos,blockState);
+        return TCBlockEntities.FLOW_CEDAR_TANK_BE.get().create(blockPos,blockState);
     }
 }

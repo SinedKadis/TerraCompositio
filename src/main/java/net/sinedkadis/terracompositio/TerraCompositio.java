@@ -12,14 +12,14 @@ import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.sinedkadis.terracompositio.events.FluidNetworkEvent;
 import net.sinedkadis.terracompositio.registries.*;
 import net.sinedkadis.terracompositio.cfe.CFENetworkHandler;
-import net.sinedkadis.terracompositio.effect.ModEffects;
-import net.sinedkadis.terracompositio.entity.ModEntities;
+import net.sinedkadis.terracompositio.registries.TCEffects;
+import net.sinedkadis.terracompositio.registries.TCEntities;
 import net.sinedkadis.terracompositio.events.CFENetworkEvent;
-import net.sinedkadis.terracompositio.screen.ModMenuTypes;
-import net.sinedkadis.terracompositio.sound.ModSounds;
+import net.sinedkadis.terracompositio.screen.TCMenuTypes;
+import net.sinedkadis.terracompositio.registries.TCSounds;
 import net.sinedkadis.terracompositio.fluid.FluidNetworkHandler;
-import net.sinedkadis.terracompositio.worldgen.tree.ModFoliagePlacers;
-import net.sinedkadis.terracompositio.worldgen.tree.ModTrunkPlacers;
+import net.sinedkadis.terracompositio.worldgen.tree.TCFoliagePlacers;
+import net.sinedkadis.terracompositio.worldgen.tree.TCTrunkPlacers;
 
 
 @Mod(TerraCompositio.MOD_ID)
@@ -37,24 +37,24 @@ public class TerraCompositio
         modEventBus.addListener(this::addCreative);
 
         MinecraftForge.EVENT_BUS.register(this);
-        ModFluids.FLUIDS.register(modEventBus);
-        ModFluids.FLUID_TYPES.register(modEventBus);
+        TCFluids.FLUIDS.register(modEventBus);
+        TCFluids.FLUID_TYPES.register(modEventBus);
 
-        ModCreativeModTabs.register(modEventBus);
-        ModItems.register(modEventBus);
-        ModBlocks.register(modEventBus);
-        ModParticles.register(modEventBus);
-        ModEffects.register(modEventBus);
-        ModPotions.register(modEventBus);
-        ModSounds.register(modEventBus);
-        ModEntities.register(modEventBus);
-        ModBlockEntities.register(modEventBus);
-        ModRecipes.register(modEventBus);
-        ModMenuTypes.register(modEventBus);
-        ModTrunkPlacers.register(modEventBus);
-        ModFoliagePlacers.register(modEventBus);
+        TCCreativeModeTabs.register(modEventBus);
+        TCItems.register(modEventBus);
+        TCBlocks.register(modEventBus);
+        TCParticles.register(modEventBus);
+        TCEffects.register(modEventBus);
+        TCPotions.register(modEventBus);
+        TCSounds.register(modEventBus);
+        TCEntities.register(modEventBus);
+        TCBlockEntities.register(modEventBus);
+        TCRecipes.register(modEventBus);
+        TCMenuTypes.register(modEventBus);
+        TCTrunkPlacers.register(modEventBus);
+        TCFoliagePlacers.register(modEventBus);
 
-        ModGameRules.init();
+        TCGameRules.init();
     }
 
 

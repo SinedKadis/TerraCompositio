@@ -15,7 +15,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.loot.LootParams;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParamSets;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
-import net.sinedkadis.terracompositio.registries.ModBlocks;
+import net.sinedkadis.terracompositio.registries.TCBlocks;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.ArrayList;
@@ -23,7 +23,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.OptionalInt;
 
-import static net.sinedkadis.terracompositio.registries.ModBlockStateProperties.INFUSED;
+import static net.sinedkadis.terracompositio.registries.TCBlockStateProperties.INFUSED;
 
 public class FlowCedarLeavesBlock extends LeavesBlock {
     public FlowCedarLeavesBlock(Properties pProperties) {
@@ -65,7 +65,7 @@ public class FlowCedarLeavesBlock extends LeavesBlock {
         List<ItemStack> drops = new ArrayList<>();
 
         if (random.nextFloat() < 0.05F) {
-            drops.add(new ItemStack(ModBlocks.FLOW_CEDAR_SAPLING.get()));
+            drops.add(new ItemStack(TCBlocks.FLOW_CEDAR_SAPLING.get()));
         }
 
         if (random.nextFloat() < 0.025F) {

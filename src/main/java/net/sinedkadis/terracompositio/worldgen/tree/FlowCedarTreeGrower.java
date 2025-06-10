@@ -5,7 +5,7 @@ import net.minecraft.resources.ResourceKey;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.block.grower.AbstractTreeGrower;
 import net.minecraft.world.level.levelgen.feature.ConfiguredFeature;
-import net.sinedkadis.terracompositio.worldgen.ModConfiguredFeatures;
+import net.sinedkadis.terracompositio.worldgen.TCConfiguredFeatures;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -13,6 +13,6 @@ public class FlowCedarTreeGrower extends AbstractTreeGrower {
     @Nullable
     @Override
     protected ResourceKey<ConfiguredFeature<?, ?>> getConfiguredFeature(@NotNull RandomSource pRandom, boolean pHasFlowers) {
-        return ModConfiguredFeatures.FLOW_CEDAR_KEY;
+        return TCConfiguredFeatures.FLOW_CEDAR_KEY;
     }
 }

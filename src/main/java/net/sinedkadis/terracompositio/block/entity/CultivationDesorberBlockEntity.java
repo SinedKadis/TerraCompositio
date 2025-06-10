@@ -11,6 +11,7 @@ import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.loot.LootParams;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
+import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.event.level.BlockEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fluids.capability.IFluidHandler;
@@ -20,8 +21,8 @@ import net.sinedkadis.terracompositio.TerraCompositio;
 import net.sinedkadis.terracompositio.api.TerraCompositioAPI;
 import net.sinedkadis.terracompositio.api.networks.cfe.CFENetwork;
 import net.sinedkadis.terracompositio.api.networks.cfe.CFENetworkMemberBE;
-import net.sinedkadis.terracompositio.registries.ModBlockEntities;
-import net.sinedkadis.terracompositio.util.ModItemStackHandler;
+import net.sinedkadis.terracompositio.registries.TCBlockEntities;
+import net.sinedkadis.terracompositio.util.TCItemStackHandler;
 import net.sinedkadis.terracompositio.util.TCUtil;
 import org.jetbrains.annotations.NotNull;
 
@@ -33,10 +34,10 @@ import java.util.stream.Collectors;
 @Mod.EventBusSubscriber(modid = TerraCompositio.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class CultivationDesorberBlockEntity extends AbstractDesorberBlockEntity {
 
-    private final ModItemStackHandler renderStack = new ModItemStackHandler(this);
+    private final TCItemStackHandler renderStack = new TCItemStackHandler(this);
 
     public CultivationDesorberBlockEntity(BlockPos pos, BlockState state) {
-        super(ModBlockEntities.CULTIVATION_DESORBER_BE.get(), pos, state);
+        super(TCBlockEntities.CULTIVATION_DESORBER_BE.get(), pos, state);
     }
 
     public void setRenderStack(ItemStack itemStack) {
@@ -93,7 +94,10 @@ public class CultivationDesorberBlockEntity extends AbstractDesorberBlockEntity 
                 CFEToAdd -= added;
                 if (!level.isClientSide())
                     level.playSound(null,pos, SoundEvents.AZALEA_LEAVES_STEP, SoundSource.BLOCKS);
-                TCUtil.sendCFEParticles((ServerLevel) level,blockEntity.getBlockPos(),pos,added);
+                TCUtil.sendCFEParticles((ServerLevel) level, Vec3.atLowerCornerWithOffset(blockEntity.getBlockPos(),
+                        blockEntity.particleTargetOffset().x,
+                        blockEntity.particleTargetOffset().y,
+                        blockEntity.particleTargetOffset().z),pos,added);
                 blockEntity.setRenderStack(new ItemStack(state.getBlock()
                         .getDrops(state,new LootParams.Builder((ServerLevel) level)
                                 .withParameter(LootContextParams.ORIGIN,pos.getCenter())
@@ -104,5 +108,4 @@ public class CultivationDesorberBlockEntity extends AbstractDesorberBlockEntity 
             }
         }
     }
-
 }

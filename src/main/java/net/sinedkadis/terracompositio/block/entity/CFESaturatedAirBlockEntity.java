@@ -10,8 +10,8 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
-import net.sinedkadis.terracompositio.registries.ModBlockEntities;
-import net.sinedkadis.terracompositio.registries.ModParticles;
+import net.sinedkadis.terracompositio.registries.TCBlockEntities;
+import net.sinedkadis.terracompositio.registries.TCParticles;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -19,12 +19,12 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.function.Supplier;
 
-public class CFESaturatedAirBlockEntity extends ModCFEBlockEntity {
+public class CFESaturatedAirBlockEntity extends TCCFEBlockEntity {
 
     private final List<Vec3> particlePlace = new ArrayList<>();
 
     public CFESaturatedAirBlockEntity(BlockPos pPos, BlockState pBlockState) {
-        super(ModBlockEntities.CFE_SATURATED_AIR_BE.get(),pPos, pBlockState,BlockMode.SOURCE);
+        super(TCBlockEntities.CFE_SATURATED_AIR_BE.get(),pPos, pBlockState,BlockMode.SOURCE);
         this.cfeContainer.setCFE(100);
     }
 
@@ -60,7 +60,7 @@ public class CFESaturatedAirBlockEntity extends ModCFEBlockEntity {
 
             }
             Vec3 cords = particlePlace.get(i);
-            level.addParticle(ModParticles.CFE_PARTICLE.get(), true, cords.x,cords.y,cords.z, 0, 0, 0);
+            level.addParticle(TCParticles.CFE_PARTICLE.get(), true, cords.x,cords.y,cords.z, 0, 0, 0);
         }
     }
 

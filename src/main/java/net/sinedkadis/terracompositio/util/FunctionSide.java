@@ -4,8 +4,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.level.block.RotatedPillarBlock;
 import net.minecraft.world.level.block.state.BlockState;
-import net.sinedkadis.terracompositio.block.custom.FlowCedarCasingBlock;
-import net.sinedkadis.terracompositio.registries.ModBlockStateProperties;
+import net.sinedkadis.terracompositio.registries.TCBlockStateProperties;
 import org.jetbrains.annotations.NotNull;
 
 public enum FunctionSide implements StringRepresentable {
@@ -18,8 +17,8 @@ public enum FunctionSide implements StringRepresentable {
     }
 
     public static Direction getDirectionByFunctionSide(BlockState blockState){
-        if (blockState.hasProperty(RotatedPillarBlock.AXIS) && blockState.hasProperty(ModBlockStateProperties.FUNCTION_SIDE)){
-            FunctionSide functionSide = blockState.getValue(ModBlockStateProperties.FUNCTION_SIDE);
+        if (blockState.hasProperty(RotatedPillarBlock.AXIS) && blockState.hasProperty(TCBlockStateProperties.FUNCTION_SIDE)){
+            FunctionSide functionSide = blockState.getValue(TCBlockStateProperties.FUNCTION_SIDE);
             if (functionSide.equals(NONE))
                 return Direction.DOWN;
             return switch (blockState.getValue(RotatedPillarBlock.AXIS)){
@@ -40,7 +39,7 @@ public enum FunctionSide implements StringRepresentable {
     }
 
     public static FunctionSide getFunctionSideByDirection(BlockState blockState, Direction direction){
-        if (blockState.hasProperty(RotatedPillarBlock.AXIS) && blockState.hasProperty(ModBlockStateProperties.FUNCTION_SIDE)){
+        if (blockState.hasProperty(RotatedPillarBlock.AXIS) && blockState.hasProperty(TCBlockStateProperties.FUNCTION_SIDE)){
             return switch (direction){
                 case WEST -> {
                     if (blockState.getValue(RotatedPillarBlock.AXIS).equals(Direction.Axis.Z))

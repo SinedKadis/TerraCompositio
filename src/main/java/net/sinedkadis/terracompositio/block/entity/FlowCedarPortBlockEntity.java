@@ -1,5 +1,6 @@
 package net.sinedkadis.terracompositio.block.entity;
 
+import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -17,16 +18,19 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.sinedkadis.terracompositio.recipe.FlowSaturationRecipe;
-import net.sinedkadis.terracompositio.registries.ModBlockEntities;
+import net.sinedkadis.terracompositio.registries.TCBlockEntities;
 import net.sinedkadis.terracompositio.screen.FlowBlockPortMenu;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.Optional;
 
-import static net.sinedkadis.terracompositio.registries.ModBlockStateProperties.INFUSED;
+import static net.sinedkadis.terracompositio.registries.TCBlockStateProperties.INFUSED;
 
-public class FlowCedarPortBlockEntity extends ModItemIOCFEBlockEntity implements MenuProvider {
+@MethodsReturnNonnullByDefault
+@ParametersAreNonnullByDefault
+public class FlowCedarPortBlockEntity extends TCItemIOCFEBlockEntity implements MenuProvider {
 
     protected final ContainerData data;
     private int tickForSound = 0;
@@ -37,7 +41,7 @@ public class FlowCedarPortBlockEntity extends ModItemIOCFEBlockEntity implements
     }
 
     public FlowCedarPortBlockEntity(BlockPos pPos, BlockState pBlockState) {
-        super(ModBlockEntities.FLOW_PORT_BE.get(),pPos,pBlockState,BlockMode.CONSUMER);
+        super(TCBlockEntities.FLOW_PORT_BE.get(),pPos,pBlockState,BlockMode.CONSUMER);
         this.data =new ContainerData() {
             @Override
             public int get(int pIndex) {

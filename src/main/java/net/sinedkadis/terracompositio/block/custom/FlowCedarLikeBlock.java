@@ -24,9 +24,9 @@ import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraftforge.common.ToolAction;
-import net.sinedkadis.terracompositio.registries.ModBlockStateProperties;
-import net.sinedkadis.terracompositio.registries.ModBlocks;
-import net.sinedkadis.terracompositio.registries.ModItems;
+import net.sinedkadis.terracompositio.registries.TCBlockStateProperties;
+import net.sinedkadis.terracompositio.registries.TCBlocks;
+import net.sinedkadis.terracompositio.registries.TCItems;
 import net.sinedkadis.terracompositio.item.custom.WrenchAxeItem;
 import net.sinedkadis.terracompositio.util.TCUtil;
 import org.jetbrains.annotations.NotNull;
@@ -109,16 +109,16 @@ public class FlowCedarLikeBlock extends RotatedPillarBlock {
         ItemStack item = pPlayer.getItemInHand(InteractionHand.MAIN_HAND);
         ItemStack item2 = pPlayer.getItemInHand(InteractionHand.OFF_HAND);
         if (this.getClass() == FlowCedarLikeBlock.class) {
-            if (item.is(ModItems.GOLD_ROD.get())
+            if (item.is(TCItems.GOLD_ROD.get())
                     && item.getCount() >= 4
                     && item2.getItem() instanceof WrenchAxeItem) {
                 if (WrenchAxeItem.getMode(item2).equals(WrenchAxeItem.WrenchMode.WRENCH)) {
-                    return handleInWorldBlockCraft(pState, ModBlocks.FLOW_CEDAR_CASING.get().defaultBlockState(), pLevel, pPos, item, 4);
+                    return handleInWorldBlockCraft(pState, TCBlocks.FLOW_CEDAR_CASING.get().defaultBlockState(), pLevel, pPos, item, 4);
                 }
                 return super.use(pState, pLevel, pPos, pPlayer, pHand, pHit);
-            } else if (item.is(ModItems.FLOW_INFUSER_KIT.get())
+            } else if (item.is(TCItems.FLOW_INFUSER_KIT.get())
                     && item2.is(ItemTags.AXES)) {
-                return handleInWorldBlockCraft(pState, ModBlocks.FLOW_INFUSER.get().defaultBlockState(), pLevel, pPos, item, 1);
+                return handleInWorldBlockCraft(pState, TCBlocks.FLOW_INFUSER.get().defaultBlockState(), pLevel, pPos, item, 1);
             }
         }
         if (item.is(Items.HONEYCOMB) && !pState.getValue(WAXED)){
@@ -136,8 +136,8 @@ public class FlowCedarLikeBlock extends RotatedPillarBlock {
         super.onRemove(pState, pLevel, pPos, pNewState, pIsMoving);
         if (pState.getBlock() != pNewState.getBlock() && TCUtil.onRemoveHandlerBlacklist(pNewState,
                 Blocks.STRUCTURE_VOID,
-                ModBlocks.FLOW_CEDAR_CASING.get(),
-                ModBlocks.FLOW_CEDAR_PORT.get())) {
+                TCBlocks.FLOW_CEDAR_CASING.get(),
+                TCBlocks.FLOW_CEDAR_PORT.get())) {
             TCUtil.flowLeak(pState, pLevel, pPos,false);
         }
     }
@@ -165,7 +165,7 @@ public class FlowCedarLikeBlock extends RotatedPillarBlock {
     }
 
     static {
-        WAXED = ModBlockStateProperties.WAXED;
-        INFUSED = ModBlockStateProperties.INFUSED;
+        WAXED = TCBlockStateProperties.WAXED;
+        INFUSED = TCBlockStateProperties.INFUSED;
     }
 }

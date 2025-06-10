@@ -28,12 +28,12 @@ import net.minecraftforge.fluids.FluidUtil;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandlerItem;
 import net.minecraftforge.fluids.capability.templates.FluidTank;
-import net.sinedkadis.terracompositio.registries.ModBlockStateProperties;
-import net.sinedkadis.terracompositio.registries.ModFluids;
-import net.sinedkadis.terracompositio.registries.ModItems;
+import net.sinedkadis.terracompositio.registries.TCBlockStateProperties;
+import net.sinedkadis.terracompositio.registries.TCFluids;
+import net.sinedkadis.terracompositio.registries.TCItems;
 import org.jetbrains.annotations.NotNull;
 
-public abstract class AbstractDesorberBlock extends ModCFEBaseEntityBlock implements SimpleWaterloggedBlock {
+public abstract class AbstractDesorberBlock extends TCCFEBaseEntityBlock implements SimpleWaterloggedBlock {
     protected static final BooleanProperty INFUSED;
     protected static final BooleanProperty WATERLOGGED;
 
@@ -81,8 +81,8 @@ public abstract class AbstractDesorberBlock extends ModCFEBaseEntityBlock implem
 
         IFluidHandlerItem fluidHandlerItem = heldItem.getCapability(ForgeCapabilities.FLUID_HANDLER_ITEM).resolve().orElse(null);
         if (fluidHandlerItem == null) {
-            FluidStack fluidStack = new FluidStack(ModFluids.FLOW_FLUID.source.get().getSource(), 250);
-            if (heldItem.is(ModItems.FLOW_BOTTLE.get())){
+            FluidStack fluidStack = new FluidStack(TCFluids.FLOW_FLUID.source.get().getSource(), 250);
+            if (heldItem.is(TCItems.FLOW_BOTTLE.get())){
                 int filled = tank.fill(fluidStack, IFluidHandler.FluidAction.SIMULATE);
                 if (filled == 250){
                     tank.fill(fluidStack, IFluidHandler.FluidAction.EXECUTE);
@@ -99,7 +99,7 @@ public abstract class AbstractDesorberBlock extends ModCFEBaseEntityBlock implem
                 if (drained.isFluidStackIdentical(fluidStack)){
                     tank.drain(fluidStack, IFluidHandler.FluidAction.EXECUTE);
                     heldItem.shrink(1);
-                    pPlayer.getInventory().add(new ItemStack(ModItems.FLOW_BOTTLE.get()));
+                    pPlayer.getInventory().add(new ItemStack(TCItems.FLOW_BOTTLE.get()));
                     if (pLevel instanceof ServerLevel level){
                         level.playSound(null,pPos,SoundEvents.BUCKET_FILL,SoundSource.BLOCKS);
                     }
@@ -149,7 +149,7 @@ public abstract class AbstractDesorberBlock extends ModCFEBaseEntityBlock implem
     }
 
     static {
-        INFUSED = ModBlockStateProperties.INFUSED;
+        INFUSED = TCBlockStateProperties.INFUSED;
         WATERLOGGED = BlockStateProperties.WATERLOGGED;
     }
 }

@@ -39,9 +39,9 @@ import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.registries.ForgeRegistries;
-import net.sinedkadis.terracompositio.registries.ModBlockStateProperties;
-import net.sinedkadis.terracompositio.registries.ModBlocks;
-import net.sinedkadis.terracompositio.registries.ModItems;
+import net.sinedkadis.terracompositio.registries.TCBlockStateProperties;
+import net.sinedkadis.terracompositio.registries.TCBlocks;
+import net.sinedkadis.terracompositio.registries.TCItems;
 import net.sinedkadis.terracompositio.util.FunctionSide;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -51,7 +51,7 @@ import java.util.function.Predicate;
 
 import static net.minecraft.world.level.block.Block.dropResources;
 import static net.minecraft.world.level.block.state.properties.BlockStateProperties.*;
-import static net.sinedkadis.terracompositio.registries.ModBlockStateProperties.*;
+import static net.sinedkadis.terracompositio.registries.TCBlockStateProperties.*;
 import static net.sinedkadis.terracompositio.util.TCUtil.getNearBlocks;
 import static net.sinedkadis.terracompositio.util.TCUtil.getTouchingBlocks;
 
@@ -66,7 +66,7 @@ public class WrenchAxeItem extends AxeItem {
 
     @Override
     public boolean isValidRepairItem(@NotNull ItemStack pToRepair, ItemStack pRepair) {
-        return pRepair.is(ModItems.INFUSED_IRON_INGOT.get()) || pRepair.is(ModItems.WRENCH_AXE.get());
+        return pRepair.is(TCItems.INFUSED_IRON_INGOT.get()) || pRepair.is(TCItems.WRENCH_AXE.get());
     }
 
     @Override
@@ -262,17 +262,17 @@ public class WrenchAxeItem extends AxeItem {
         }
         BlockState blockState = level.getBlockState(pos);
         if (player.isCrouching()){
-            ItemStack itemStack = ModItems.INFUSED_IRON_ROD.get().getDefaultInstance();
+            ItemStack itemStack = TCItems.INFUSED_IRON_ROD.get().getDefaultInstance();
             if (blockState.hasProperty(HORIZONTAL_FACING)){
                 BlockPos casingPos = pos.relative(blockState.getValue(HORIZONTAL_FACING).getOpposite());
                 BlockState casingState = level.getBlockState(casingPos);
-                if (casingState.is(ModBlocks.FLOW_CEDAR_CASING.get())) {
+                if (casingState.is(TCBlocks.FLOW_CEDAR_CASING.get())) {
                     if (undoBlockState(blockState, UP_CONNECTION, player, itemStack)) {
-                        level.setBlock(casingPos, casingState.setValue(ModBlockStateProperties.INPUT_BUS_CONNECTION, false), 3);
+                        level.setBlock(casingPos, casingState.setValue(TCBlockStateProperties.INPUT_BUS_CONNECTION, false), 3);
                         return true;
                     }
                     if (undoBlockState(blockState, DOWN_CONNECTION, player, itemStack)) {
-                        level.setBlock(casingPos, casingState.setValue(ModBlockStateProperties.OUTPUT_BUS_CONNECTION, false), 3);
+                        level.setBlock(casingPos, casingState.setValue(TCBlockStateProperties.OUTPUT_BUS_CONNECTION, false), 3);
                         return true;
                     }
                 }
@@ -281,18 +281,18 @@ public class WrenchAxeItem extends AxeItem {
             if (directionByFunctionSide != Direction.DOWN) {
                 BlockPos matInfPos = pos.relative(directionByFunctionSide);
                 BlockState matInfState = level.getBlockState(matInfPos);
-                if (undoBlockState(blockState, ModBlockStateProperties.INPUT_BUS_CONNECTION, player, itemStack)) {
+                if (undoBlockState(blockState, TCBlockStateProperties.INPUT_BUS_CONNECTION, player, itemStack)) {
                     level.setBlock(matInfPos, matInfState.setValue(UP_CONNECTION, false), 3);
                     return true;
                 }
-                if (undoBlockState(blockState, ModBlockStateProperties.OUTPUT_BUS_CONNECTION, player, itemStack)) {
+                if (undoBlockState(blockState, TCBlockStateProperties.OUTPUT_BUS_CONNECTION, player, itemStack)) {
                     level.setBlock(matInfPos, matInfState.setValue(DOWN_CONNECTION, false), 3);
                     return true;
                 }
-                if (undoBlockState(blockState, INPUT_BUS, player, ModItems.INPUT_BUS.get().getDefaultInstance())) {
+                if (undoBlockState(blockState, INPUT_BUS, player, TCItems.INPUT_BUS.get().getDefaultInstance())) {
                     return true;
                 }
-                if (undoBlockState(blockState, OUTPUT_BUS, player, ModItems.OUTPUT_BUS.get().getDefaultInstance())) {
+                if (undoBlockState(blockState, OUTPUT_BUS, player, TCItems.OUTPUT_BUS.get().getDefaultInstance())) {
                     return true;
                 }
             }
@@ -463,8 +463,8 @@ public class WrenchAxeItem extends AxeItem {
     }
 
     private BlockState rotateBlockState(BlockState state, Direction pushDirection) {
-        if (state.is(ModBlocks.FLOW_CEDAR_PORT.get()))
-            state = ModBlocks.FLOW_CEDAR_LOG.get().defaultBlockState().setValue(INFUSED,state.getValue(INFUSED));
+        if (state.is(TCBlocks.FLOW_CEDAR_PORT.get()))
+            state = TCBlocks.FLOW_CEDAR_LOG.get().defaultBlockState().setValue(INFUSED,state.getValue(INFUSED));
 
         if (!state.hasProperty(AXIS))
             return state;

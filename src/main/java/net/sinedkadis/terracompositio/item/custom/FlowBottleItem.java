@@ -18,10 +18,10 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.gameevent.GameEvent;
-import net.sinedkadis.terracompositio.registries.ModBlocks;
-import net.sinedkadis.terracompositio.effect.ModEffects;
-import net.sinedkadis.terracompositio.registries.ModArmorMaterials;
-import net.sinedkadis.terracompositio.registries.ModItems;
+import net.sinedkadis.terracompositio.registries.TCBlocks;
+import net.sinedkadis.terracompositio.registries.TCEffects;
+import net.sinedkadis.terracompositio.registries.TCArmorMaterials;
+import net.sinedkadis.terracompositio.registries.TCItems;
 import org.jetbrains.annotations.NotNull;
 
 import static net.minecraft.world.level.block.LayeredCauldronBlock.LEVEL;
@@ -59,22 +59,22 @@ public class FlowBottleItem extends Item {
                     helmetDamagePercentage,
             };
 
-            ItemStack boots = new ItemStack(((FlowArmorItem) ModItems.FLOWING_FLOW_CEDAR_BOOTS.get())
+            ItemStack boots = new ItemStack(((FlowArmorItem) TCItems.FLOWING_FLOW_CEDAR_BOOTS.get())
                     .setOldDamage(tags));
             boots.setTag(player.getInventory().getArmor(0).getTag());
             boots.setDamageValue((int) (bootsDamagePercentage * boots.getMaxDamage()));
 
-            ItemStack leggings = new ItemStack(((FlowArmorItem) ModItems.FLOWING_FLOW_CEDAR_LEGGINGS.get())
+            ItemStack leggings = new ItemStack(((FlowArmorItem) TCItems.FLOWING_FLOW_CEDAR_LEGGINGS.get())
                     .setOldDamage(tags));
             leggings.setTag(player.getInventory().getArmor(1).getTag());
             leggings.setDamageValue((int) (leggingsDamagePercentage * leggings.getMaxDamage()));
 
-            ItemStack chestplate = new ItemStack(((FlowArmorItem) ModItems.FLOWING_FLOW_CEDAR_CHESTPLATE.get())
+            ItemStack chestplate = new ItemStack(((FlowArmorItem) TCItems.FLOWING_FLOW_CEDAR_CHESTPLATE.get())
                     .setOldDamage(tags));
             chestplate.setTag(player.getInventory().getArmor(2).getTag());
             chestplate.setDamageValue((int) (chestplateDamagePercentage * chestplate.getMaxDamage()));
 
-            ItemStack helmet = new ItemStack(((FlowArmorItem) ModItems.FLOWING_FLOW_CEDAR_HELMET.get())
+            ItemStack helmet = new ItemStack(((FlowArmorItem) TCItems.FLOWING_FLOW_CEDAR_HELMET.get())
                     .setOldDamage(tags));
             helmet.setTag(player.getInventory().getArmor(3).getTag());
             helmet.setDamageValue((int) (helmetDamagePercentage * helmet.getMaxDamage()));
@@ -84,7 +84,7 @@ public class FlowBottleItem extends Item {
             player.setItemSlot(EquipmentSlot.CHEST,chestplate);
             player.setItemSlot(EquipmentSlot.HEAD,helmet);
         }else {
-            pEntityLiving.addEffect(new MobEffectInstance(ModEffects.FLOW_SATURATION.get(),200));
+            pEntityLiving.addEffect(new MobEffectInstance(TCEffects.FLOW_SATURATION.get(),200));
         }
         if (player != null) {
             player.awardStat(Stats.ITEM_USED.get(this));
@@ -133,7 +133,7 @@ public class FlowBottleItem extends Item {
             }
 
         }else if (player != null && blockState == Blocks.CAULDRON.defaultBlockState()){
-            pContext.getLevel().setBlock(pContext.getClickedPos(), ModBlocks.FLOW_CAULDRON.get().defaultBlockState().setValue(LEVEL,1),1);
+            pContext.getLevel().setBlock(pContext.getClickedPos(), TCBlocks.FLOW_CAULDRON.get().defaultBlockState().setValue(LEVEL,1),1);
             if (itemStack.getCount()==1){
                 player.setItemInHand(pContext.getHand(),new ItemStack(Items.GLASS_BOTTLE));
             }else {
@@ -165,8 +165,8 @@ public class FlowBottleItem extends Item {
         ArmorItem breastplate = ((ArmorItem)player.getInventory().getArmor(2).getItem());
         ArmorItem helmet = ((ArmorItem)player.getInventory().getArmor(3).getItem());
 
-        return helmet.getMaterial() == ModArmorMaterials.FLOW_CEDAR && breastplate.getMaterial() == ModArmorMaterials.FLOW_CEDAR &&
-                leggings.getMaterial() == ModArmorMaterials.FLOW_CEDAR && boots.getMaterial() == ModArmorMaterials.FLOW_CEDAR;
+        return helmet.getMaterial() == TCArmorMaterials.FLOW_CEDAR && breastplate.getMaterial() == TCArmorMaterials.FLOW_CEDAR &&
+                leggings.getMaterial() == TCArmorMaterials.FLOW_CEDAR && boots.getMaterial() == TCArmorMaterials.FLOW_CEDAR;
     }
 
 }

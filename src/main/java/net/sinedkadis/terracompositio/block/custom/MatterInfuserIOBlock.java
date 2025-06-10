@@ -19,10 +19,10 @@ import net.minecraft.world.level.storage.loot.LootParams;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import net.sinedkadis.terracompositio.registries.ModBlockEntities;
-import net.sinedkadis.terracompositio.registries.ModBlockStateProperties;
-import net.sinedkadis.terracompositio.registries.ModBlocks;
-import net.sinedkadis.terracompositio.registries.ModItems;
+import net.sinedkadis.terracompositio.registries.TCBlockEntities;
+import net.sinedkadis.terracompositio.registries.TCBlockStateProperties;
+import net.sinedkadis.terracompositio.registries.TCBlocks;
+import net.sinedkadis.terracompositio.registries.TCItems;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -66,12 +66,12 @@ public class MatterInfuserIOBlock extends MatterInfuserBaseBaseEntityBlock{
             BlockPos blockpos = pPos.relative(pState.getValue(HORIZONTAL_FACING).getOpposite());
             BlockState blockState = pLevel.getBlockState(blockpos);
             if (pState.getValue(UP_CONNECTION)) {
-                if (blockState.is(ModBlocks.FLOW_CEDAR_CASING.get())) {
+                if (blockState.is(TCBlocks.FLOW_CEDAR_CASING.get())) {
                     pLevel.setBlock(blockpos, blockState.setValue(INPUT_BUS_CONNECTION,false),3);
                 }
             }
             if (pState.getValue(DOWN_CONNECTION)) {
-                if (blockState.is(ModBlocks.FLOW_CEDAR_CASING.get())) {
+                if (blockState.is(TCBlocks.FLOW_CEDAR_CASING.get())) {
                     pLevel.setBlock(blockpos, blockState.setValue(OUTPUT_BUS_CONNECTION, false), 3);
                 }
             }
@@ -82,16 +82,16 @@ public class MatterInfuserIOBlock extends MatterInfuserBaseBaseEntityBlock{
     public @NotNull List<ItemStack> getDrops(@NotNull BlockState pState, LootParams.@NotNull Builder pParams) {
         List<ItemStack> drops = super.getDrops(pState, pParams);
         if (pState.getValue(RIGHT_CONNECTION)) {
-            drops.add(new ItemStack(ModItems.INFUSED_IRON_ROD.get(), 2));
+            drops.add(new ItemStack(TCItems.INFUSED_IRON_ROD.get(), 2));
         }
         if (pState.getValue(LEFT_CONNECTION)) {
-            drops.add(new ItemStack(ModItems.INFUSED_IRON_ROD.get(), 2));
+            drops.add(new ItemStack(TCItems.INFUSED_IRON_ROD.get(), 2));
         }
         if (pState.getValue(UP_CONNECTION)) {
-            drops.add(ModItems.INFUSED_IRON_ROD.get().getDefaultInstance());
+            drops.add(TCItems.INFUSED_IRON_ROD.get().getDefaultInstance());
         }
         if (pState.getValue(DOWN_CONNECTION)) {
-            drops.add(ModItems.INFUSED_IRON_ROD.get().getDefaultInstance());
+            drops.add(TCItems.INFUSED_IRON_ROD.get().getDefaultInstance());
         }
         return drops;
     }
@@ -106,9 +106,9 @@ public class MatterInfuserIOBlock extends MatterInfuserBaseBaseEntityBlock{
         BlockState rightState = pLevel.getBlockState(rightPos);
         BlockPos leftPos = pPos.relative(facing.getClockWise());
         BlockState leftState = pLevel.getBlockState(leftPos);
-        Block casing = ModBlocks.FLOW_CEDAR_CASING.get();
-        Block io = ModBlocks.MATTER_INFUSER_IO.get();
-        if (item.is(ModItems.INFUSED_IRON_ROD.get())){
+        Block casing = TCBlocks.FLOW_CEDAR_CASING.get();
+        Block io = TCBlocks.MATTER_INFUSER_IO.get();
+        if (item.is(TCItems.INFUSED_IRON_ROD.get())){
             if (!pState.getValue(UP_CONNECTION) && casingState.is(casing) && hasInputBus(casingState)){
                 pLevel.setBlock(pPos,pState.setValue(UP_CONNECTION,true),3);
                 pLevel.setBlock(casingPos,casingState.setValue(INPUT_BUS_CONNECTION, true),3);
@@ -130,7 +130,7 @@ public class MatterInfuserIOBlock extends MatterInfuserBaseBaseEntityBlock{
                 }
             }
             if (!pState.getValue(LEFT_CONNECTION)) {
-                if (leftState.is(io) || leftState.is(ModBlocks.MATTER_INFUSER_PORT.get())) {
+                if (leftState.is(io) || leftState.is(TCBlocks.MATTER_INFUSER_PORT.get())) {
                     if (item.getCount() >= 2) {
                         pLevel.setBlock(pPos, pState.setValue(LEFT_CONNECTION, true), 3);
                         pLevel.setBlock(leftPos, leftState.setValue(RIGHT_CONNECTION, true), 3);
@@ -146,7 +146,7 @@ public class MatterInfuserIOBlock extends MatterInfuserBaseBaseEntityBlock{
     @Nullable
     @Override
     public BlockEntity newBlockEntity(@NotNull BlockPos blockPos, @NotNull BlockState blockState) {
-        return ModBlockEntities.MATTER_INFUSER_IO_BE.get().create(blockPos, blockState);
+        return TCBlockEntities.MATTER_INFUSER_IO_BE.get().create(blockPos, blockState);
     }
 
     @Nullable
@@ -155,7 +155,7 @@ public class MatterInfuserIOBlock extends MatterInfuserBaseBaseEntityBlock{
         if (pLevel.isClientSide()) {
             return null;
         }
-        return createTickerHelper(pBlockEntityType, ModBlockEntities.MATTER_INFUSER_IO_BE.get(),
+        return createTickerHelper(pBlockEntityType, TCBlockEntities.MATTER_INFUSER_IO_BE.get(),
                 (pLevel1, pPos, pState1, pBlockEntity) -> pBlockEntity.tick(pLevel1,pPos,pState1));
     }
 
@@ -166,18 +166,18 @@ public class MatterInfuserIOBlock extends MatterInfuserBaseBaseEntityBlock{
     @Override
     public @NotNull VoxelShape getShape(BlockState pState, @NotNull BlockGetter pLevel, @NotNull BlockPos pPos, @NotNull CollisionContext pContext) {
         return switch (pState.getValue(FACING)) {
-            default -> EAST_AABB;
             case WEST -> WEST_AABB;
             case SOUTH -> SOUTH_AABB;
             case NORTH -> NORTH_AABB;
+            default -> EAST_AABB;
         };
     }
 
     static {
-        UP_CONNECTION = ModBlockStateProperties.UP_CONNECTION;
-        RIGHT_CONNECTION = ModBlockStateProperties.RIGHT_CONNECTION;
-        DOWN_CONNECTION = ModBlockStateProperties.DOWN_CONNECTION;
-        LEFT_CONNECTION = ModBlockStateProperties.LEFT_CONNECTION;
+        UP_CONNECTION = TCBlockStateProperties.UP_CONNECTION;
+        RIGHT_CONNECTION = TCBlockStateProperties.RIGHT_CONNECTION;
+        DOWN_CONNECTION = TCBlockStateProperties.DOWN_CONNECTION;
+        LEFT_CONNECTION = TCBlockStateProperties.LEFT_CONNECTION;
         SOUTH_AABB = Block.box(4, 3, 0, 12, 13, 1);
         NORTH_AABB = Block.box(4, 3, 15, 12, 13, 16);
         EAST_AABB = Block.box(0, 3, 4, 1, 13, 12);

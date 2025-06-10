@@ -14,10 +14,10 @@ import net.minecraft.world.level.material.PushReaction;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import net.sinedkadis.terracompositio.block.entity.CFESaturatedAirBlockEntity;
-import net.sinedkadis.terracompositio.block.entity.ModCFEBlockEntity;
+import net.sinedkadis.terracompositio.block.entity.TCCFEBlockEntity;
 import net.sinedkadis.terracompositio.cfe.CFEContainer;
-import net.sinedkadis.terracompositio.registries.ModBlockEntities;
-import net.sinedkadis.terracompositio.registries.ModBlocks;
+import net.sinedkadis.terracompositio.registries.TCBlockEntities;
+import net.sinedkadis.terracompositio.registries.TCBlocks;
 import net.sinedkadis.terracompositio.util.TCUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -27,14 +27,14 @@ import java.util.List;
 import java.util.Objects;
 
 @ParametersAreNonnullByDefault
-public class CFESaturatedAirBlock extends ModCFEBaseEntityBlock {
+public class CFESaturatedAirBlock extends TCCFEBaseEntityBlock {
     public CFESaturatedAirBlock(Properties pProperties) {
         super(pProperties);
     }
 
     public static void placeCFECloud(Level pLevel, BlockPos airPos, int cfe) {
         if (cfe <= 100){
-        pLevel.setBlockAndUpdate(airPos, ModBlocks.CFE_SATURATED_AIR.get().defaultBlockState());
+        pLevel.setBlockAndUpdate(airPos, TCBlocks.CFE_SATURATED_AIR.get().defaultBlockState());
         CFESaturatedAirBlockEntity blockEntity = (CFESaturatedAirBlockEntity) pLevel.getBlockEntity(airPos);
         assert blockEntity != null;
         blockEntity.getCfeContainer().setCFE(cfe);
@@ -42,11 +42,11 @@ public class CFESaturatedAirBlock extends ModCFEBaseEntityBlock {
             List<BlockPos> list = TCUtil.getTouchingBlocks(pLevel,airPos, BlockStateBase::isAir,10);
 
             List<CFEContainer> icfeHandlers = list.stream()
-                    .filter(blockPos -> (pLevel.getBlockState(blockPos).is(ModBlocks.CFE_SATURATED_AIR.get())))
+                    .filter(blockPos -> (pLevel.getBlockState(blockPos).is(TCBlocks.CFE_SATURATED_AIR.get())))
                     .map(pLevel::getBlockEntity)
                     .filter(Objects::nonNull)
                     .map(blockEntity1 -> ((CFESaturatedAirBlockEntity) blockEntity1))
-                    .map(ModCFEBlockEntity::getCfeContainer)
+                    .map(TCCFEBlockEntity::getCfeContainer)
                     .toList();
             for (CFEContainer cfeContainer : icfeHandlers){
                 if (cfe > 0) {
@@ -56,14 +56,14 @@ public class CFESaturatedAirBlock extends ModCFEBaseEntityBlock {
             }
             if (cfe > 0) {
                 List<BlockPos> emptyAirs = list.stream()
-                        .filter(blockPos -> !(pLevel.getBlockState(blockPos).is(ModBlocks.CFE_SATURATED_AIR.get())))
+                        .filter(blockPos -> !(pLevel.getBlockState(blockPos).is(TCBlocks.CFE_SATURATED_AIR.get())))
                         .toList();
                 for (BlockPos blockPos : emptyAirs) {
                     if (cfe >= 100){
-                        pLevel.setBlockAndUpdate(blockPos, ModBlocks.CFE_SATURATED_AIR.get().defaultBlockState());
+                        pLevel.setBlockAndUpdate(blockPos, TCBlocks.CFE_SATURATED_AIR.get().defaultBlockState());
                         cfe -= 100;
                     } else {
-                        pLevel.setBlockAndUpdate(blockPos, ModBlocks.CFE_SATURATED_AIR.get().defaultBlockState());
+                        pLevel.setBlockAndUpdate(blockPos, TCBlocks.CFE_SATURATED_AIR.get().defaultBlockState());
                         CFESaturatedAirBlockEntity blockEntity = (CFESaturatedAirBlockEntity) pLevel.getBlockEntity(blockPos);
                         if (blockEntity != null){
                             CFEContainer cfeContainer = blockEntity.getCfeContainer();
@@ -105,7 +105,7 @@ public class CFESaturatedAirBlock extends ModCFEBaseEntityBlock {
     @Nullable
     @Override
     public BlockEntity newBlockEntity(@NotNull BlockPos pPos, @NotNull BlockState pState) {
-        return ModBlockEntities.CFE_SATURATED_AIR_BE.get().create(pPos, pState);
+        return TCBlockEntities.CFE_SATURATED_AIR_BE.get().create(pPos, pState);
     }
 
     private int firstSecond = 20;
@@ -127,7 +127,7 @@ public class CFESaturatedAirBlock extends ModCFEBaseEntityBlock {
         if (pLevel.isClientSide()) {
             return null;
         }
-        return createTickerHelper(pBlockEntityType, ModBlockEntities.CFE_SATURATED_AIR_BE.get(),
+        return createTickerHelper(pBlockEntityType, TCBlockEntities.CFE_SATURATED_AIR_BE.get(),
                 (pLevel1, pPos, pState1, pBlockEntity) -> pBlockEntity.tick(pLevel1,pPos,pState1));
     }
 

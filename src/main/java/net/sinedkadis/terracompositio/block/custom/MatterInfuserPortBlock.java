@@ -16,10 +16,10 @@ import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.storage.loot.LootParams;
 import net.minecraft.world.phys.BlockHitResult;
-import net.sinedkadis.terracompositio.registries.ModBlockStateProperties;
-import net.sinedkadis.terracompositio.registries.ModBlocks;
-import net.sinedkadis.terracompositio.registries.ModBlockEntities;
-import net.sinedkadis.terracompositio.registries.ModItems;
+import net.sinedkadis.terracompositio.registries.TCBlockStateProperties;
+import net.sinedkadis.terracompositio.registries.TCBlocks;
+import net.sinedkadis.terracompositio.registries.TCBlockEntities;
+import net.sinedkadis.terracompositio.registries.TCItems;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -27,7 +27,7 @@ import java.util.List;
 
 import static net.minecraft.world.level.block.state.properties.BlockStateProperties.HORIZONTAL_FACING;
 import static net.sinedkadis.terracompositio.block.custom.FlowCedarCasingBlock.*;
-import static net.sinedkadis.terracompositio.registries.ModBlockStateProperties.LEFT_CONNECTION;
+import static net.sinedkadis.terracompositio.registries.TCBlockStateProperties.LEFT_CONNECTION;
 
 
 public class MatterInfuserPortBlock extends MatterInfuserBaseBaseEntityBlock {
@@ -66,10 +66,10 @@ public class MatterInfuserPortBlock extends MatterInfuserBaseBaseEntityBlock {
     public @NotNull List<ItemStack> getDrops(@NotNull BlockState pState, LootParams.@NotNull Builder pParams) {
         List<ItemStack> drops =  super.getDrops(pState, pParams);
         if (pState.getValue(RIGHT_CONNECTION)) {
-            drops.add(new ItemStack(ModItems.INFUSED_IRON_ROD.get(), 2));
+            drops.add(new ItemStack(TCItems.INFUSED_IRON_ROD.get(), 2));
         }
         if (pState.getValue(UP_CONNECTION)) {
-            drops.add(new ItemStack(ModItems.INFUSED_IRON_ROD.get(), 2));
+            drops.add(new ItemStack(TCItems.INFUSED_IRON_ROD.get(), 2));
         }
         return drops;
     }
@@ -87,8 +87,8 @@ public class MatterInfuserPortBlock extends MatterInfuserBaseBaseEntityBlock {
         BlockState casingState = pLevel.getBlockState(casingPos);
         BlockPos rightPos = pPos.relative(facing.getCounterClockWise());
         BlockState rightState = pLevel.getBlockState(rightPos);
-        if (item.is(ModItems.INFUSED_IRON_ROD.get())){
-            if (!pState.getValue(RIGHT_CONNECTION) && rightState.is(ModBlocks.MATTER_INFUSER_IO.get())){
+        if (item.is(TCItems.INFUSED_IRON_ROD.get())){
+            if (!pState.getValue(RIGHT_CONNECTION) && rightState.is(TCBlocks.MATTER_INFUSER_IO.get())){
                 if (item.getCount() >= 2){
                     pLevel.setBlock(pPos,pState.setValue(RIGHT_CONNECTION,true),3);
                     pLevel.setBlock(rightPos,rightState.setValue(LEFT_CONNECTION, true),3);
@@ -103,7 +103,7 @@ public class MatterInfuserPortBlock extends MatterInfuserBaseBaseEntityBlock {
     @Nullable
     @Override
     public BlockEntity newBlockEntity(@NotNull BlockPos blockPos, @NotNull BlockState blockState) {
-        return ModBlockEntities.MATTER_INFUSER_PORT_BE.get().create(blockPos, blockState);
+        return TCBlockEntities.MATTER_INFUSER_PORT_BE.get().create(blockPos, blockState);
     }
 
     @Nullable
@@ -112,12 +112,12 @@ public class MatterInfuserPortBlock extends MatterInfuserBaseBaseEntityBlock {
         if (pLevel.isClientSide()) {
             return null;
         }
-        return createTickerHelper(pBlockEntityType, ModBlockEntities.MATTER_INFUSER_PORT_BE.get(),
+        return createTickerHelper(pBlockEntityType, TCBlockEntities.MATTER_INFUSER_PORT_BE.get(),
                 (pLevel1, pPos, pState1, pBlockEntity) -> pBlockEntity.tick(pLevel1,pPos,pState1));
     }
 
     static {
-        UP_CONNECTION = ModBlockStateProperties.UP_CONNECTION;
-        RIGHT_CONNECTION = ModBlockStateProperties.RIGHT_CONNECTION;
+        UP_CONNECTION = TCBlockStateProperties.UP_CONNECTION;
+        RIGHT_CONNECTION = TCBlockStateProperties.RIGHT_CONNECTION;
     }
 }

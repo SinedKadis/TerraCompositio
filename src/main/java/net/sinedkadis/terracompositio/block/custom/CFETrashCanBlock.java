@@ -6,11 +6,11 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
-import net.sinedkadis.terracompositio.registries.ModBlockEntities;
+import net.sinedkadis.terracompositio.registries.TCBlockEntities;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-public class CFETrashCanBlock extends ModCFEBaseEntityBlock {
+public class CFETrashCanBlock extends TCCFEBaseEntityBlock {
     public CFETrashCanBlock(Properties pProperties) {
         super(pProperties);
     }
@@ -18,7 +18,7 @@ public class CFETrashCanBlock extends ModCFEBaseEntityBlock {
     @Nullable
     @Override
     public BlockEntity newBlockEntity(@NotNull BlockPos pPos, @NotNull BlockState pState) {
-        return ModBlockEntities.CFE_TRASH_CAN_BE.get().create(pPos, pState);
+        return TCBlockEntities.CFE_TRASH_CAN_BE.get().create(pPos, pState);
     }
 
     @Nullable
@@ -27,7 +27,7 @@ public class CFETrashCanBlock extends ModCFEBaseEntityBlock {
         if (pLevel.isClientSide()) {
             return null;
         }
-        return createTickerHelper(pBlockEntityType, ModBlockEntities.CFE_TRASH_CAN_BE.get(),
+        return createTickerHelper(pBlockEntityType, TCBlockEntities.CFE_TRASH_CAN_BE.get(),
                 (pLevel1, pPos, pState1, pBlockEntity) -> pBlockEntity.tick(pLevel1,pPos,pState1));
     }
 
