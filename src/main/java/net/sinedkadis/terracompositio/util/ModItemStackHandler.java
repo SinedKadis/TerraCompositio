@@ -46,6 +46,13 @@ public class ModItemStackHandler extends ItemStackHandler {
         return stack;
     }
 
+    @Override
+    public @NotNull ItemStack extractItem(int slot, int amount, boolean simulate) {
+        if (slot != 0)
+            return super.extractItem(slot, amount, simulate);
+        return ItemStack.EMPTY;
+    }
+
     public ItemStack forceInsertItem(int slot, @NotNull ItemStack stack, boolean simulate){
         return super.insertItem(slot,stack,simulate);
     }

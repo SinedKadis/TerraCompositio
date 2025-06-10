@@ -1,0 +1,15 @@
+{
+  "name": "book.terracompositio.creation_flow_journal.entry.flow_infusion.name",
+  "category": "terracompositio:day_1",
+  "icon": "terracompositio:textures/block/flow_cedar_log_infused.png",
+  "pages": [
+    "book.terracompositio.creation_flow_journal.entry.flow_infusion.page1",
+    {
+      "type": "patchouli:image",
+      "images": [
+          "terracompositio:textures/illustrations/flow_leak_image.png"
+      ],
+      "text": "book.terracompositio.creation_flow_journal.entry.flow_infusion.page2"
+    }
+  ]
+}

@@ -18,6 +18,7 @@ import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemHandlerHelper;
 import net.sinedkadis.terracompositio.registries.ModBlockEntities;
+import net.sinedkadis.terracompositio.registries.ModBlockStateProperties;
 import org.apache.commons.lang3.tuple.ImmutablePair;
 import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
@@ -39,7 +40,10 @@ public class FlowCedarCasingBlockEntity extends ModItemIOCFEBlockEntity{
     }
 
     protected <T> @Nullable LazyOptional<T> getCap(@NotNull Capability<T> cap, @Nullable Direction side) {
-        if (side != null && cap == ForgeCapabilities.ITEM_HANDLER && side.equals(Direction.UP) && this.getBlockState().getValue(INPUT_BUS)) {
+        if ((side == null && cap == ForgeCapabilities.ITEM_HANDLER)
+                || cap == ForgeCapabilities.ITEM_HANDLER
+                && ((side.equals(Direction.UP) && this.getBlockState().getValue(INPUT_BUS))
+                    || (side.equals(Direction.DOWN) && this.getBlockState().getValue(ModBlockStateProperties.OUTPUT_BUS)))) {
             return lazyItemHandler.cast();
         }
         return null;
@@ -91,7 +95,7 @@ public class FlowCedarCasingBlockEntity extends ModItemIOCFEBlockEntity{
         } else {
             Container container = getAttachedContainer(level, blockPos);
             if (container != null) {
-                Direction direction = Direction.DOWN;
+                Direction direction = Direction.DOWN.getOpposite();
                 if (!isFullContainer(container, direction)) {
                     if (!this.itemHandler.getStackInSlot(1).isEmpty()) {
                         ItemStack itemstack = this.itemHandler.getStackInSlot(1).copy();

@@ -12,6 +12,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
@@ -43,6 +44,7 @@ public class FlowCedarCasingBlock extends FlowCedarLikeBlock implements EntityBl
     protected static final EnumProperty<FunctionSide> FUNCTION_SIDE;
     protected static final BooleanProperty INPUT_BUS_CONNECTION;
     protected static final BooleanProperty OUTPUT_BUS_CONNECTION;
+
     public FlowCedarCasingBlock(Properties pProperties) {
         super(pProperties);
         registerDefaultState(defaultBlockState()
@@ -60,7 +62,7 @@ public class FlowCedarCasingBlock extends FlowCedarLikeBlock implements EntityBl
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> pBuilder) {
-        pBuilder.add(AXIS, INPUT_BUS, OUTPUT_BUS, FUNCTION_SIDE, INPUT_BUS_CONNECTION, OUTPUT_BUS_CONNECTION, INFUSED);
+        pBuilder.add(AXIS, INPUT_BUS, OUTPUT_BUS, FUNCTION_SIDE, INPUT_BUS_CONNECTION, OUTPUT_BUS_CONNECTION, INFUSED,WAXED);
     }
 
     @Override
@@ -120,7 +122,8 @@ public class FlowCedarCasingBlock extends FlowCedarLikeBlock implements EntityBl
     @Override
     public void onRemove(@NotNull BlockState pState, @NotNull Level pLevel, @NotNull BlockPos pPos, @NotNull BlockState pNewState, boolean pIsMoving) {
         super.onRemove(pState, pLevel, pPos, pNewState, pIsMoving);
-        if (pState.getBlock() != pNewState.getBlock()){
+        if (pState.getBlock() != pNewState.getBlock()
+                && pNewState.getBlock() != Blocks.STRUCTURE_VOID){
             Direction direction = FunctionSide.getDirectionByFunctionSide(pState);
             if (direction != Direction.DOWN) {
                 BlockPos blockPos = pPos.relative(direction);
@@ -134,9 +137,13 @@ public class FlowCedarCasingBlock extends FlowCedarLikeBlock implements EntityBl
             if (blockEntity != null) {
                 blockEntity.drops();
             }
+        } else if (pNewState.getBlock() == Blocks.STRUCTURE_VOID){
+            FlowCedarCasingBlockEntity blockEntity = (FlowCedarCasingBlockEntity) pLevel.getBlockEntity(pPos);
+            if (blockEntity != null) {
+                blockEntity.drops();
+            }
         }
     }
-
     @Override
     public @NotNull List<ItemStack> getDrops(@NotNull BlockState pState, LootParams.@NotNull Builder pParams) {
         List<ItemStack> drops = super.getDrops(pState,pParams);

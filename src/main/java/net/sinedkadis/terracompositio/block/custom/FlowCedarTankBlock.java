@@ -115,6 +115,10 @@ public class FlowCedarTankBlock extends BaseEntityBlock{
             return InteractionResult.PASS;
         }
 
+        if (tank.getSpace() <= 0){
+            return InteractionResult.SUCCESS;
+        }
+
         if (pPlayer.isShiftKeyDown()) {
             return InteractionResult.PASS;
         }

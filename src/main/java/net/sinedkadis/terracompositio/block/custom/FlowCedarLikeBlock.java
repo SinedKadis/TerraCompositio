@@ -2,7 +2,9 @@ package net.sinedkadis.terracompositio.block.custom;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundEvents;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
@@ -10,6 +12,7 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.AxeItem;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
@@ -39,20 +42,20 @@ public class FlowCedarLikeBlock extends RotatedPillarBlock {
     public static final BooleanProperty INFUSED;
     @Nullable
     private final Supplier<Block> stripPair;
-
+    protected static final BooleanProperty WAXED;
     public FlowCedarLikeBlock(Properties pProperties, @Nullable Supplier<Block> stripPair) {
         super(pProperties);
-        this.registerDefaultState(this.defaultBlockState().setValue(INFUSED, false));
+        this.registerDefaultState(this.defaultBlockState().setValue(INFUSED, false).setValue(WAXED,false));
         this.stripPair = stripPair;
     }
     public FlowCedarLikeBlock(Properties pProperties) {
         super(pProperties);
-        this.registerDefaultState(this.defaultBlockState().setValue(INFUSED, false));
+        this.registerDefaultState(this.defaultBlockState().setValue(INFUSED, false).setValue(WAXED,false));
         this.stripPair = null;
     }
 
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> pBuilder) {
-        pBuilder.add(AXIS,INFUSED);
+        pBuilder.add(AXIS,INFUSED,WAXED);
     }
 
     @Override
@@ -118,6 +121,13 @@ public class FlowCedarLikeBlock extends RotatedPillarBlock {
                 return handleInWorldBlockCraft(pState, ModBlocks.FLOW_INFUSER.get().defaultBlockState(), pLevel, pPos, item, 1);
             }
         }
+        if (item.is(Items.HONEYCOMB) && !pState.getValue(WAXED)){
+            return handleInWorldBlockCraft(pState, pState.setValue(WAXED, true), pLevel, pPos, item, 1, ParticleTypes.WAX_ON, SoundEvents.HONEYCOMB_WAX_ON);
+        }
+        if (item.getItem() instanceof AxeItem && pState.getValue(WAXED)){
+            item.hurtAndBreak(1,pPlayer,player1 -> player1.broadcastBreakEvent(InteractionHand.MAIN_HAND));
+            return handleInWorldBlockCraft(pState, pState.setValue(WAXED, false), pLevel, pPos, item, 0, ParticleTypes.WAX_OFF,SoundEvents.AXE_WAX_OFF);
+        }
         return super.use(pState, pLevel, pPos, pPlayer, pHand, pHit);
     }
 
@@ -155,6 +165,7 @@ public class FlowCedarLikeBlock extends RotatedPillarBlock {
     }
 
     static {
+        WAXED = ModBlockStateProperties.WAXED;
         INFUSED = ModBlockStateProperties.INFUSED;
     }
 }

@@ -30,7 +30,7 @@ public class CFESaturatedAirBlockEntity extends ModCFEBlockEntity {
 
     @Override
     public int getLimit() {
-        return 10;
+        return 5;
     }
 
     @Override

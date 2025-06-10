@@ -15,4 +15,5 @@ public class ModBlockStateProperties {
     public static final BooleanProperty DOWN_CONNECTION = BooleanProperty.create("down_connection");
     public static final BooleanProperty RIGHT_CONNECTION = BooleanProperty.create("right_connection");
     public static final BooleanProperty LEFT_CONNECTION = BooleanProperty.create("left_connection");
+    public static final BooleanProperty WAXED = BooleanProperty.create("waxed");
 }

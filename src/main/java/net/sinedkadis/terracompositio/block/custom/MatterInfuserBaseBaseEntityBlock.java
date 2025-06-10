@@ -62,11 +62,15 @@ public abstract class MatterInfuserBaseBaseEntityBlock extends ModIOBaseEntityBl
     @Override
     public void onRemove(BlockState pState, @NotNull Level pLevel, @NotNull BlockPos pPos, BlockState pNewState, boolean pIsMoving) {
         super.onRemove(pState, pLevel, pPos, pNewState, pIsMoving);
-        Direction direction = pState.getValue(FACING);
-        BlockPos blockpos = pPos.relative(direction.getOpposite());
-        BlockState blockstate = pLevel.getBlockState(blockpos);
-        if (blockstate.is(ModBlocks.FLOW_CEDAR_CASING.get())){
-            ((FlowCedarCasingBlockEntity) Objects.requireNonNull(pLevel.getBlockEntity(blockpos))).setSlotCount(slotCount());
+        if (pState.getBlock() != pNewState.getBlock()) {
+            Direction direction = pState.getValue(FACING);
+            BlockPos blockpos = pPos.relative(direction.getOpposite());
+            BlockState blockstate = pLevel.getBlockState(blockpos);
+            if (blockstate.is(ModBlocks.FLOW_CEDAR_CASING.get())) {
+                FlowCedarCasingBlockEntity blockEntity = (FlowCedarCasingBlockEntity) Objects.requireNonNull(pLevel.getBlockEntity(blockpos));
+                blockEntity.drops();
+                blockEntity.setSlotCount(slotCount());
+            }
         }
     }
 

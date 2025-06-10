@@ -114,35 +114,35 @@
   "book.terracompositio.creation_flow_journal.name": "Creation Flow Journal",
   "book.terracompositio.creation_flow_journal.landing_text": "Observation records about the flow of Creation",
 
-  "book.terracompositio.creation_flow_journal.category.day_1.name": "First day",
-  "book.terracompositio.creation_flow_journal.category.day_1.description": "The unusual cedar tree does its own observations? <br>Nice)",
+  "book.terracompositio.creation_flow_journal.category.day_1.name": "День первый",
+  "book.terracompositio.creation_flow_journal.category.day_1.description": "Необычный кедр сам делает наблюдения? Удобно",
 
-  "book.terracompositio.creation_flow_journal.entry.cedar_book_port.name": "Cedar book port",
-  "book.terracompositio.creation_flow_journal.entry.cedar_book_port.page1": "test",
-  "book.terracompositio.creation_flow_journal.entry.cedar_book_port.page2": "test",
+  "book.terracompositio.creation_flow_journal.entry.cedar_book_port.name": "Кедровый порт для книги",
+  "book.terracompositio.creation_flow_journal.entry.cedar_book_port.page1": " Кто оставил тут такое резьбление по дереву? Кто знает. Раз я это читаю, значит догадался, как правильно им воспользоватся. <br>$(o)Хех, забавно.$(k) Кто же написал книгу, неужели создатель!?$() <br>  Надо будет положить эту же книгу сюда завтра, может еще что-то появится. <br> Еще каким-то образом этот \"порт\" может делать сажанцы кедра из сажанцев дуба.",
+  "book.terracompositio.creation_flow_journal.entry.cedar_book_port.page2": " Поразительно !!!",
 
-  "book.terracompositio.creation_flow_journal.entry.flow_infusion.name": "Flow Infusion",
-  "book.terracompositio.creation_flow_journal.entry.flow_infusion.page1": "test",
-  "book.terracompositio.creation_flow_journal.entry.flow_infusion.page2": "test",
+  "book.terracompositio.creation_flow_journal.entry.flow_infusion.name": "Наполненость потоком",
+  "book.terracompositio.creation_flow_journal.entry.flow_infusion.page1": " Наблюдая за кедровыми деревьями, можно заметить, как в них течет нечто синее и жидкое. Когда касаешься его, можно почувствовать прилив энергии, желание создавать.<br>  Назовем это $(l)потоком созидания$(). Так и хочется вкусить, зарядится энергией этого потока. <br>        $(o)Но ломать нельзя!$() <br>  Разрушение и созедание - противоположности. Если их соединить неправильно, то от них ничего не останется.",
+  "book.terracompositio.creation_flow_journal.entry.flow_infusion.page2": " А еще, дерево не правильно вот так вот повреждать, из его раны вытечет еще больше жидкости, и оно станет просто красивым пиломатериалом.",
 
-  "book.terracompositio.creation_flow_journal.entry.cedar_armor.name": "Cedar book port",
-  "book.terracompositio.creation_flow_journal.entry.cedar_armor.page1": "test",
+  "book.terracompositio.creation_flow_journal.entry.cedar_armor.name": "Броня из потокового кедра",
+  "book.terracompositio.creation_flow_journal.entry.cedar_armor.page1": "Кедровая броня должна обладать какими-то свойсвами. Должна же?",
 
-  "book.terracompositio.creation_flow_journal.category.day_2.name": "First day",
-  "book.terracompositio.creation_flow_journal.category.day_2.description": "The unusual cedar tree does its own observations? <br>Nice)",
+  "book.terracompositio.creation_flow_journal.category.day_2.name": "День второй",
+  "book.terracompositio.creation_flow_journal.category.day_2.description": "Что же мы узнаем сегодня?",
 
-  "book.terracompositio.creation_flow_journal.entry.wedge.name": "Wedge",
-  "book.terracompositio.creation_flow_journal.entry.wedge.page1": "test",
-  "book.terracompositio.creation_flow_journal.entry.wedge.page2": "test",
-  "book.terracompositio.creation_flow_journal.entry.wedge.page3": "test",
+  "book.terracompositio.creation_flow_journal.entry.wedge.name": "Клин",
+  "book.terracompositio.creation_flow_journal.entry.wedge.page1": " Все-таки, жаду потока не преодолеть, но надо другой способ, нежели разрушение. Если создать что-то типа клина, и акуратно, с уважением, вставить его в дерево, то можно добыть немного, особо не навредив ему.",
+  "book.terracompositio.creation_flow_journal.entry.wedge.page2": " Процесс не быстрый, так что надо подставить какую-то тару, и потом можно перелить в бутылочку, ну или в ведро",
+  "book.terracompositio.creation_flow_journal.entry.wedge.page3": " Однако, даже так, дерево все-равно чуть страдает. Иногда придется давать ему восстановится",
 
-  "book.terracompositio.creation_flow_journal.entry.flow_fluid.name": "Flow Fluid",
-  "book.terracompositio.creation_flow_journal.entry.flow_fluid.page1": "test",
-  "book.terracompositio.creation_flow_journal.entry.flow_fluid.page2.title": "test",
-  "book.terracompositio.creation_flow_journal.entry.flow_fluid.page2": "test",
+  "book.terracompositio.creation_flow_journal.entry.flow_fluid.name": "Жидкий поток",
+  "book.terracompositio.creation_flow_journal.entry.flow_fluid.page1": "  Какая прекрасная жидкость, так БОДРИТ!!! <br> Купаться в ней тоже одно удовольствие, правда если она не в стоячем состоянии, то в ней практически невозможно находится, не держась за что-то",
+  "book.terracompositio.creation_flow_journal.entry.flow_fluid.page2.title": "Жидкий поток",
+  "book.terracompositio.creation_flow_journal.entry.flow_fluid.page2": "  Она еще так быстро течет, моргуть не успеешь, как она уже везде. Бедный мой редстоун. Интересно, какие у нее еще есть применения, помимо пить и купаться",
 
-  "book.terracompositio.creation_flow_journal.entry.activated_cedar_armor.name": "Activated Cedar Armor",
-  "book.terracompositio.creation_flow_journal.entry.activated_cedar_armor.page1": "test",
-  "book.terracompositio.creation_flow_journal.entry.activated_cedar_armor.page2.title": "test",
-  "book.terracompositio.creation_flow_journal.entry.activated_cedar_armor.page2": "test"
+  "book.terracompositio.creation_flow_journal.entry.activated_cedar_armor.name": "Активированная броня ",
+  "book.terracompositio.creation_flow_journal.entry.activated_cedar_armor.page1": " Да, таки обладает! <br> Если одеть полный набор, а потом облить потоком из бутылочки, то произойдет чудо: броня впитает в себя его енергию, и вернет себе свойства, что у нее были когда-то. ",
+  "book.terracompositio.creation_flow_journal.entry.activated_cedar_armor.page2.title": "Активированная броня",
+  "book.terracompositio.creation_flow_journal.entry.activated_cedar_armor.page2": " Жаль только, что этот еффект очень хрупок, если снять какой-то элемент брони, или достаточно повредить его, то поток истратит свою силу. Ну ничего, можно же облить еще раз!"
 }

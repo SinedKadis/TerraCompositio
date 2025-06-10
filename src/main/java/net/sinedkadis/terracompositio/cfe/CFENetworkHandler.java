@@ -57,6 +57,7 @@ public class CFENetworkHandler implements CFENetwork {
                 Optional<ICFEHandler> cfeHandlerOptional = source.getBE().getCapability(CFECapability.CFE).resolve();
                 if (distance <= limitSquared
                         && distance < minDist
+                        && distance < source.getLimit()
                         && cfeHandlerOptional.isPresent()
                         && cfeHandlerOptional.get().getCFE() > 0
                         && source.getPriority() < priority) {

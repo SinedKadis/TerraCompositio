@@ -40,8 +40,8 @@ public class JadeTerraCompositioPlugin implements IWailaPlugin {
         registration.registerBlockComponent(ModCFEBlockEntityComponentProvider.INSTANCE, AbstractFurnaceBlock.class);
 
         registration.registerBlockComponent(ModItemIOComponentProvider.INSTANCE, ModIOBaseEntityBlock.class);
-        registration.registerBlockComponent(ModItemIOComponentProvider.INSTANCE, FlowInfuserBlock.class);
-        registration.registerBlockComponent(ModItemIOComponentProvider.INSTANCE, FlowCedarCasingBlock.class);
+        //registration.registerBlockComponent(ModItemIOComponentProvider.INSTANCE, FlowInfuserBlock.class);
+        //registration.registerBlockComponent(ModItemIOComponentProvider.INSTANCE, FlowCedarCasingBlock.class);
         //registration.registerBlockComponent(ModItemIOComponentProvider.INSTANCE, MatterInfuserIOBlock.class);
 
         registration.registerBlockComponent(MatterInfuserIOComponentProvider.INSTANCE, MatterInfuserIOBlock.class);

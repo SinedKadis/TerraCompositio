@@ -85,7 +85,7 @@ public class ConstructionDesorberBlockEntity extends AbstractDesorberBlockEntity
             FluidTank fluidHandler1 = blockEntity.fluidHandler;
             if (!fluidHandler1.isEmpty() && fluidHandler1.getFluidAmount() >= CFEToAdd) {
                 fluidHandler1.drain(CFEToAdd, IFluidHandler.FluidAction.EXECUTE);
-                int added = blockEntity.cfeContainer.addCFE(CFEToAdd,false);
+                int added = blockEntity.cfeContainer.addCFE(CFEToAdd, pos,false);
                 CFEToAdd -= added;
                 blockEntity.setRenderStack(new ItemStack(event.getPlacedBlock().getBlock()));
                 if (CFEToAdd == 0) {

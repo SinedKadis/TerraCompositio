@@ -1,11 +1,12 @@
 package net.sinedkadis.terracompositio.block.entity;
 
+import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.util.Mth;
-import net.minecraft.world.Containers;
-import net.minecraft.world.SimpleContainer;
+import net.minecraft.world.*;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -18,9 +19,15 @@ import net.sinedkadis.terracompositio.util.ModItemStackHandler;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import javax.annotation.ParametersAreNonnullByDefault;
+
+import java.util.List;
+
 import static net.sinedkadis.terracompositio.block.custom.FlowCedarCasingBlock.isPortAttached;
 
-public abstract class ModItemIOCFEBlockEntity extends ModCFEBlockEntity{
+@ParametersAreNonnullByDefault
+@MethodsReturnNonnullByDefault
+public abstract class ModItemIOCFEBlockEntity extends ModCFEBlockEntity implements WorldlyContainer {
 
     protected final ModItemStackHandler itemHandler = new ModItemStackHandler(2,this);
 
@@ -43,6 +50,72 @@ public abstract class ModItemIOCFEBlockEntity extends ModCFEBlockEntity{
             return lazyItemHandler.cast();
         }
         return null;
+    }
+
+    @Override
+    public int[] getSlotsForFace(Direction direction) {
+        return new int[]{0,1};
+    }
+
+    @Override
+    public boolean canPlaceItemThroughFace(int i, ItemStack itemStack, @Nullable Direction direction) {
+        if (direction != null) {
+            return i == SLOT_INPUT && direction.equals(Direction.UP);
+        }
+        return i == SLOT_INPUT;
+    }
+
+    @Override
+    public boolean canTakeItemThroughFace(int i, ItemStack itemStack, Direction direction) {
+        return i == SLOT_OUTPUT && direction.equals(Direction.DOWN);
+    }
+
+    @Override
+    public int getContainerSize() {
+        return 2;
+    }
+
+    @Override
+    public boolean isEmpty() {
+        return itemHandler.getStackInSlot(SLOT_INPUT).isEmpty()
+                && itemHandler.getStackInSlot(SLOT_OUTPUT).isEmpty();
+    }
+
+    @Override
+    public ItemStack getItem(int slot) {
+        if (-1 < slot && slot < itemHandler.getSlots())
+            return itemHandler.getStackInSlot(slot);
+        return ItemStack.EMPTY;
+    }
+
+    @Override
+    public ItemStack removeItem(int slot, int count) {
+        return ContainerHelper.removeItem(List.of(
+                itemHandler.getStackInSlot(SLOT_INPUT),
+                itemHandler.getStackInSlot(SLOT_OUTPUT)), slot, count);
+    }
+
+    @Override
+    public ItemStack removeItemNoUpdate(int slot) {
+        return ContainerHelper.takeItem(List.of(
+                itemHandler.getStackInSlot(SLOT_INPUT),
+                itemHandler.getStackInSlot(SLOT_OUTPUT)), slot);
+    }
+
+    @Override
+    public void setItem(int slot, ItemStack itemStack) {
+        itemHandler.setStackInSlot(slot,itemStack);
+    }
+
+    @Override
+    public boolean stillValid(Player player) {
+        return Container.stillValidBlockEntity(this, player);
+    }
+
+    @Override
+    public void clearContent() {
+        itemHandler.setStackInSlot(SLOT_INPUT,ItemStack.EMPTY);
+        itemHandler.setStackInSlot(SLOT_OUTPUT,ItemStack.EMPTY);
     }
 
     @Override

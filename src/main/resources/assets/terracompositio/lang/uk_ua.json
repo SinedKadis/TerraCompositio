@@ -119,30 +119,7 @@
 
   "book.terracompositio.creation_flow_journal.entry.cedar_book_port.name": "Cedar book port",
   "book.terracompositio.creation_flow_journal.entry.cedar_book_port.page1": "test",
-  "book.terracompositio.creation_flow_journal.entry.cedar_book_port.page2": "test",
 
   "book.terracompositio.creation_flow_journal.entry.flow_infusion.name": "Flow Infusion",
-  "book.terracompositio.creation_flow_journal.entry.flow_infusion.page1": "test",
-  "book.terracompositio.creation_flow_journal.entry.flow_infusion.page2": "test",
-
-  "book.terracompositio.creation_flow_journal.entry.cedar_armor.name": "Cedar book port",
-  "book.terracompositio.creation_flow_journal.entry.cedar_armor.page1": "test",
-
-  "book.terracompositio.creation_flow_journal.category.day_2.name": "First day",
-  "book.terracompositio.creation_flow_journal.category.day_2.description": "The unusual cedar tree does its own observations? <br>Nice)",
-
-  "book.terracompositio.creation_flow_journal.entry.wedge.name": "Wedge",
-  "book.terracompositio.creation_flow_journal.entry.wedge.page1": "test",
-  "book.terracompositio.creation_flow_journal.entry.wedge.page2": "test",
-  "book.terracompositio.creation_flow_journal.entry.wedge.page3": "test",
-
-  "book.terracompositio.creation_flow_journal.entry.flow_fluid.name": "Flow Fluid",
-  "book.terracompositio.creation_flow_journal.entry.flow_fluid.page1": "test",
-  "book.terracompositio.creation_flow_journal.entry.flow_fluid.page2.title": "test",
-  "book.terracompositio.creation_flow_journal.entry.flow_fluid.page2": "test",
-
-  "book.terracompositio.creation_flow_journal.entry.activated_cedar_armor.name": "Activated Cedar Armor",
-  "book.terracompositio.creation_flow_journal.entry.activated_cedar_armor.page1": "test",
-  "book.terracompositio.creation_flow_journal.entry.activated_cedar_armor.page2.title": "test",
-  "book.terracompositio.creation_flow_journal.entry.activated_cedar_armor.page2": "test"
+  "book.terracompositio.creation_flow_journal.entry.flow_infusion.page1": "test"
 }

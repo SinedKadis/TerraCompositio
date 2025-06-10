@@ -27,6 +27,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.*;
@@ -34,10 +35,14 @@ import net.minecraft.world.level.material.PushReaction;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
+import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.util.FakePlayer;
+import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.registries.ForgeRegistries;
+import net.sinedkadis.terracompositio.registries.ModBlockStateProperties;
 import net.sinedkadis.terracompositio.registries.ModBlocks;
 import net.sinedkadis.terracompositio.registries.ModItems;
+import net.sinedkadis.terracompositio.util.FunctionSide;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -46,7 +51,7 @@ import java.util.function.Predicate;
 
 import static net.minecraft.world.level.block.Block.dropResources;
 import static net.minecraft.world.level.block.state.properties.BlockStateProperties.*;
-import static net.sinedkadis.terracompositio.registries.ModBlockStateProperties.INFUSED;
+import static net.sinedkadis.terracompositio.registries.ModBlockStateProperties.*;
 import static net.sinedkadis.terracompositio.util.TCUtil.getNearBlocks;
 import static net.sinedkadis.terracompositio.util.TCUtil.getTouchingBlocks;
 
@@ -223,10 +228,98 @@ public class WrenchAxeItem extends AxeItem {
                 }
                 return super.useOn(context);
             }
+            case ANDIRON -> {
+                if (player != null && !level.isClientSide ) {
+                    if (!this.andironInteraction(player, level,pos)) {
+                        return InteractionResult.FAIL;
+                    }
+                    return InteractionResult.SUCCESS;
+                }
+                return InteractionResult.PASS;
+            }
             default -> {
                 return InteractionResult.PASS;
             }
         }
+    }
+
+    private boolean andironInteraction(Player player, Level level, BlockPos pos) {
+        BlockEntity blockEntity = level.getBlockEntity(pos);
+        if (blockEntity != null) {
+            Optional<IItemHandler> optional = blockEntity.getCapability(ForgeCapabilities.ITEM_HANDLER).resolve();
+            if (optional.isPresent()) {
+                boolean flag = false;
+                for (int i = 0; i < optional.get().getSlots(); i++) {
+                    ItemStack itemStack = optional.get().getStackInSlot(i).copyAndClear();
+                    if (itemStack.isEmpty()) continue;
+                    if (!player.addItem(itemStack)) {
+                        player.drop(itemStack, true);
+                    }
+                    flag = true;
+                }
+                if (flag) return true;
+            }
+        }
+        BlockState blockState = level.getBlockState(pos);
+        if (player.isCrouching()){
+            ItemStack itemStack = ModItems.INFUSED_IRON_ROD.get().getDefaultInstance();
+            if (blockState.hasProperty(HORIZONTAL_FACING)){
+                BlockPos casingPos = pos.relative(blockState.getValue(HORIZONTAL_FACING).getOpposite());
+                BlockState casingState = level.getBlockState(casingPos);
+                if (casingState.is(ModBlocks.FLOW_CEDAR_CASING.get())) {
+                    if (undoBlockState(blockState, UP_CONNECTION, player, itemStack)) {
+                        level.setBlock(casingPos, casingState.setValue(ModBlockStateProperties.INPUT_BUS_CONNECTION, false), 3);
+                        return true;
+                    }
+                    if (undoBlockState(blockState, DOWN_CONNECTION, player, itemStack)) {
+                        level.setBlock(casingPos, casingState.setValue(ModBlockStateProperties.OUTPUT_BUS_CONNECTION, false), 3);
+                        return true;
+                    }
+                }
+            }
+            Direction directionByFunctionSide = FunctionSide.getDirectionByFunctionSide(blockState);
+            if (directionByFunctionSide != Direction.DOWN) {
+                BlockPos matInfPos = pos.relative(directionByFunctionSide);
+                BlockState matInfState = level.getBlockState(matInfPos);
+                if (undoBlockState(blockState, ModBlockStateProperties.INPUT_BUS_CONNECTION, player, itemStack)) {
+                    level.setBlock(matInfPos, matInfState.setValue(UP_CONNECTION, false), 3);
+                    return true;
+                }
+                if (undoBlockState(blockState, ModBlockStateProperties.OUTPUT_BUS_CONNECTION, player, itemStack)) {
+                    level.setBlock(matInfPos, matInfState.setValue(DOWN_CONNECTION, false), 3);
+                    return true;
+                }
+                if (undoBlockState(blockState, INPUT_BUS, player, ModItems.INPUT_BUS.get().getDefaultInstance())) {
+                    return true;
+                }
+                if (undoBlockState(blockState, OUTPUT_BUS, player, ModItems.OUTPUT_BUS.get().getDefaultInstance())) {
+                    return true;
+                }
+            }
+            itemStack.grow(1);
+            if (undoBlockState(blockState, LEFT_CONNECTION, player,itemStack)){
+                BlockPos leftPos = pos.relative(blockState.getValue(FACING).getClockWise());
+                level.setBlock(leftPos,level.getBlockState(leftPos).setValue(RIGHT_CONNECTION,false),3);
+                return true;
+            }
+            if (undoBlockState(blockState, RIGHT_CONNECTION, player,itemStack)){
+                BlockPos leftPos = pos.relative(blockState.getValue(FACING).getCounterClockWise());
+                level.setBlock(leftPos,level.getBlockState(leftPos).setValue(LEFT_CONNECTION,false),3);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private static boolean undoBlockState(BlockState blockState, BooleanProperty connectionProperty, Player player, ItemStack itemStack) {
+        if (blockState.hasProperty(connectionProperty) && blockState.getValue(connectionProperty)) {
+            blockState.setValue(connectionProperty, false);
+            if (!player.addItem(itemStack)) {
+                player.drop(itemStack, true);
+            }
+            return true;
+        }
+        return false;
     }
 
     private void doubleAxeInteraction(Level level, BlockPos pos, Direction face, Player player, ItemStack stack, int usedTicks) {
@@ -542,7 +635,8 @@ public class WrenchAxeItem extends AxeItem {
     public enum WrenchMode {
         AXE("axe"),
         WRENCH_AXE("wrench_axe"),
-        WRENCH("wrench");
+        WRENCH("wrench"),
+        ANDIRON("andiron");
 
         private final String name;
 
