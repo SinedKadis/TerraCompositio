@@ -1,11 +1,13 @@
 package net.sinedkadis.terracompositio.recipe;
 
-import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
-import lombok.Getter;
+import com.google.gson.JsonSyntaxException;
+import com.mojang.brigadier.exceptions.CommandSyntaxException;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.NonNullList;
 import net.minecraft.core.RegistryAccess;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.TagParser;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.GsonHelper;
@@ -13,25 +15,25 @@ import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.*;
 import net.minecraft.world.level.Level;
+import net.minecraftforge.common.crafting.StrictNBTIngredient;
+import net.minecraftforge.registries.ForgeRegistries;
 import net.sinedkadis.terracompositio.TerraCompositio;
 import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.Objects;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class FlowSaturationRecipe implements Recipe<SimpleContainer> {
-    private final NonNullList<Ingredient> inputItems;
+    private final ItemStack input;
     private final ItemStack output;
     private final ResourceLocation id;
-    @Getter
-    private final boolean flowConsume;
 
-    public FlowSaturationRecipe(NonNullList<Ingredient> inputItems, ItemStack output, ResourceLocation id,boolean flowConsume) {
-        this.inputItems = inputItems;
+    public FlowSaturationRecipe(ItemStack input, ItemStack output, ResourceLocation id) {
+        this.input = input;
         this.output = output;
         this.id = id;
-        this.flowConsume = flowConsume;
     }
 
     @Override
@@ -40,12 +42,12 @@ public class FlowSaturationRecipe implements Recipe<SimpleContainer> {
             return false;
         }
 
-        return inputItems.get(0).test(pContainer.getItem(0));
+        return StrictNBTIngredient.of(input).test(pContainer.getItem(0));
     }
 
     @Override
     public NonNullList<Ingredient> getIngredients() {
-        return inputItems;
+        return NonNullList.of(Ingredient.EMPTY,Ingredient.of(input));
     }
 
     @Override
@@ -86,36 +88,50 @@ public class FlowSaturationRecipe implements Recipe<SimpleContainer> {
         public static final ResourceLocation ID = ResourceLocation.tryBuild(TerraCompositio.MOD_ID,"flow_saturation");
         @Override
         public FlowSaturationRecipe fromJson(ResourceLocation pRecipeId, JsonObject pSerializedRecipe) {
-            ItemStack output = ShapedRecipe.itemStackFromJson(GsonHelper.getAsJsonObject(pSerializedRecipe, "output"));
-            JsonArray ingredients = GsonHelper.getAsJsonArray(pSerializedRecipe,"ingredients");
-            NonNullList<Ingredient> inputs = NonNullList.withSize(1,Ingredient.EMPTY);
-            for (int i=0; i < inputs.size();i++){
-                inputs.set(i,Ingredient.fromJson(ingredients.get(i)));
+
+            JsonObject i_outputObject = GsonHelper.getAsJsonObject(pSerializedRecipe, "input");
+            ResourceLocation i_itemId = ResourceLocation.tryParse(GsonHelper.getAsString(i_outputObject, "item"));
+            int i_count = GsonHelper.getAsInt(i_outputObject, "count", 1);
+            ItemStack i_output = new ItemStack(Objects.requireNonNull(ForgeRegistries.ITEMS.getValue(i_itemId)), i_count);
+
+            if (i_outputObject.has("nbt")) {
+                try {
+                    CompoundTag nbt = TagParser.parseTag(GsonHelper.getAsString(i_outputObject, "nbt"));
+                    i_output.setTag(nbt);
+                } catch (CommandSyntaxException e) {
+                    throw new JsonSyntaxException("Invalid NBT tag in recipe input", e);
+                }
             }
-            boolean flowConsume = GsonHelper.getAsBoolean(pSerializedRecipe,"flow_consume");
 
+            JsonObject outputObject = GsonHelper.getAsJsonObject(pSerializedRecipe, "output");
+            ResourceLocation itemId = ResourceLocation.tryParse(GsonHelper.getAsString(outputObject, "item"));
+            int count = GsonHelper.getAsInt(outputObject, "count", 1);
+            ItemStack output = new ItemStack(Objects.requireNonNull(ForgeRegistries.ITEMS.getValue(itemId)), count);
 
+            if (outputObject.has("nbt")) {
+                try {
+                    CompoundTag nbt = TagParser.parseTag(GsonHelper.getAsString(outputObject, "nbt"));
+                    output.setTag(nbt);
+                } catch (CommandSyntaxException e) {
+                    throw new JsonSyntaxException("Invalid NBT tag in recipe output", e);
+                }
+            }
 
-            return new FlowSaturationRecipe(inputs,output,pRecipeId,flowConsume);
+            return new FlowSaturationRecipe(i_output, output, pRecipeId);
         }
+
 
         @Override
         public @Nullable FlowSaturationRecipe fromNetwork(ResourceLocation pRecipeId, FriendlyByteBuf pBuffer) {
-            NonNullList<Ingredient> inputs = NonNullList.withSize(pBuffer.readInt(),Ingredient.EMPTY);
-            inputs.replaceAll(ignored -> Ingredient.fromNetwork(pBuffer));
+            ItemStack input = pBuffer.readItem();
             ItemStack output = pBuffer.readItem();
-            boolean flowConsume = pBuffer.readBoolean();
-            return new FlowSaturationRecipe(inputs,output,pRecipeId,flowConsume);
+            return new FlowSaturationRecipe(input,output,pRecipeId);
         }
 
         @Override
         public void toNetwork(FriendlyByteBuf pBuffer, FlowSaturationRecipe pRecipe) {
-            pBuffer.writeInt(pRecipe.inputItems.size());
-            for (Ingredient ingredient:pRecipe.getIngredients()){
-                ingredient.toNetwork(pBuffer);
-            }
+            pBuffer.writeItemStack(pRecipe.input,false);
             pBuffer.writeItemStack(pRecipe.getResultItem(null),false);
-            pBuffer.writeBoolean(pRecipe.flowConsume);
         }
     }
 }

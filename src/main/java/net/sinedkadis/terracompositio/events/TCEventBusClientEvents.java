@@ -18,6 +18,7 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.sinedkadis.terracompositio.TerraCompositio;
 import net.sinedkadis.terracompositio.block.entity.renderer.*;
+import net.sinedkadis.terracompositio.item.custom.CreationFlowJournalItem;
 import net.sinedkadis.terracompositio.registries.TCEntities;
 import net.sinedkadis.terracompositio.entity.client.TCBoatRenderer;
 import net.sinedkadis.terracompositio.entity.client.TCModelLayers;
@@ -47,16 +48,33 @@ public class TCEventBusClientEvents {
         ItemBlockRenderTypes.setRenderLayer(TCFluids.FLOW_FLUID.flowing.get(), RenderType.translucent());
 
 
-        event.enqueueWork(() -> ItemProperties.register(
+        ItemProperties.register(
                 TCItems.WRENCH_AXE.get(),
                 ResourceLocation.parse("wrench_mode"),
                 (stack, level, entity, seed) -> WrenchAxeItem.getMode(stack).ordinal()
-        ));
-        event.enqueueWork(() -> ItemProperties.register(
+        );
+        ItemProperties.register(
                 TCItems.SHIELDED_BUNDLE.get(),
                 ResourceLocation.parse("filled"),
                 (stack, level, entity, seed) -> ShieldedBundleItem.getFullnessDisplay(stack)
-        ));
+        );
+        ItemProperties.register(
+                TCItems.CREATION_FLOW_JOURNAL.get(),
+                ResourceLocation.parse("in_hand"),
+                (stack, level, entity, seed) ->
+                        CreationFlowJournalItem.isInHand(stack,entity) ? 1.0F : 0.0F
+        );
+        ItemProperties.register(
+                TCItems.CREATION_FLOW_JOURNAL.get(),
+                ResourceLocation.parse("day"),
+                (stack, level, entity, seed) -> CreationFlowJournalItem.getDay(stack)
+        );
+        ItemProperties.register(
+                TCItems.CREATION_FLOW_JOURNAL.get(),
+                ResourceLocation.parse("opened"),
+                (stack, level, entity, seed) ->
+                        CreationFlowJournalItem.isOpen() ? 1.0F : 0.0F
+        );
     }
 
     @SubscribeEvent
@@ -78,4 +96,21 @@ public class TCEventBusClientEvents {
         event.registerBlockEntityRenderer(TCBlockEntities.FLOW_CEDAR_TANK_BE.get(), FlowCedarTankBlockEntityRenderer::new);
 
     }
+
+//    @SubscribeEvent
+//    public static void onBookClosed(PatchouliAPI.BookCloseEvent event) {
+//        Player player = event.getPlayer();
+//        if (player != null) {
+//            // Сбрасываем флаг для всех журналов в инвентаре
+//            for (int i = 0; i < player.getInventory().getContainerSize(); i++) {
+//                ItemStack stack = player.getInventory().getItem(i);
+//                if (stack.getItem() instanceof CreationFlowJournalItem) {
+//                    CompoundTag tag = stack.getTag();
+//                    if (tag != null && tag.contains("open")) {
+//                        tag.putBoolean("open", false);
+//                    }
+//                }
+//            }
+//        }
+//    }
 }

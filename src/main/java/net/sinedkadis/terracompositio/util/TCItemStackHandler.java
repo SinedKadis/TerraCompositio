@@ -56,4 +56,8 @@ public class TCItemStackHandler extends ItemStackHandler {
     public ItemStack forceInsertItem(int slot, @NotNull ItemStack stack, boolean simulate){
         return super.insertItem(slot,stack,simulate);
     }
+
+    public ItemStack forceExtractItem(int slot, int amount, boolean simulate) {
+        return super.extractItem(slot, amount, simulate);
+    }
 }

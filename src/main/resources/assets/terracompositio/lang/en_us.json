@@ -110,6 +110,7 @@
   "block.terracompositio.flow_cedar_tank": "Flow Cedar Tank",
   "item.terracompositio.technetium_ingot": "Stable Technetium Ingot",
   "block.terracompositio.cfe_saturated_air": "CFE saturated air",
+  "item.terracompositio.creation_flow_journal": "Creation Flow Journal",
 
   "book.terracompositio.creation_flow_journal.name": "Creation Flow Journal",
   "book.terracompositio.creation_flow_journal.landing_text": "Observation records about the flow of Creation",

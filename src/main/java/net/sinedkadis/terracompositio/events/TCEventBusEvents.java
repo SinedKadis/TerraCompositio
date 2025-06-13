@@ -25,6 +25,4 @@ public class TCEventBusEvents {
         Minecraft.getInstance().particleEngine.register(TCParticles.FLUID_FLOW.get(),
                 FluidFlowParticle.Provider::new);
     }
-
-
 }

@@ -45,7 +45,8 @@
         "Name": "terracompositio:flow_cedar_log",
         "Properties": {
           "axis": "y",
-          "infused": "true"
+          "infused": "true",
+          "waxed": "false"
         }
       }
     }

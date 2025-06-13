@@ -1,0 +1,7 @@
+{
+  "parent": "terracompositio:item/creation_flow_journal/3d/closed_day1",
+  "textures": {
+    "0": "terracompositio:item/creation_flow_journal/day_5/3d",
+    "particle": "terracompositio:item/creation_flow_journal/day_5/3d"
+  }
+}

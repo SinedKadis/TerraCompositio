@@ -3,9 +3,7 @@ package net.sinedkadis.terracompositio.registries;
 import mekanism.api.annotations.ParametersAreNotNullByDefault;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
-import net.minecraft.world.InteractionResult;
 import net.minecraft.world.item.*;
-import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.registries.DeferredRegister;
@@ -14,7 +12,6 @@ import net.minecraftforge.registries.RegistryObject;
 import net.sinedkadis.terracompositio.TerraCompositio;
 import net.sinedkadis.terracompositio.entity.custom.TCBoatEntity;
 import net.sinedkadis.terracompositio.item.custom.*;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
@@ -23,24 +20,8 @@ public class TCItems {
     public static final DeferredRegister<Item> ITEMS =
             DeferredRegister.create(ForgeRegistries.ITEMS, TerraCompositio.MOD_ID);
 
-    public static final RegistryObject<Item> PEBBLE = ITEMS.register("pebble",
-            () -> new Item(new Item.Properties()));
-    public static final RegistryObject<Item> STONE_STAFF = ITEMS.register("stone_staff",
-            () -> new Item(new Item.Properties().stacksTo(1)){
-                @Override
-                public @NotNull InteractionResult useOn(@NotNull UseOnContext pContext) {
-                    for (int i = 0; i<360;i++){
-                        pContext.getLevel().addParticle(TCParticles.FLOW_PARTICLE.get(),
-                                pContext.getClickedPos().getX() + 16D, pContext.getClickedPos().getY() + 18D, pContext.getClickedPos().getZ() + 18D, 0, -1, 0);
-
-                    }
-                    return InteractionResult.SUCCESS;
-                }
-            });
     public static final RegistryObject<Item> FLOW_BOTTLE = ITEMS.register("flow_bottle",
             () -> new FlowBottleItem(new Item.Properties().stacksTo(16).food(TCFoods.FLOW)));
-    public static final RegistryObject<Item> OAK_STAFF = ITEMS.register("oak_staff",
-            () -> new Item(new Item.Properties().stacksTo(1)));
 
     public static final RegistryObject<Item> FLOW_CEDAR_HELMET = ITEMS.register("flow_cedar_helmet",
             () -> new TCArmorItem(TCArmorMaterials.FLOW_CEDAR, ArmorItem.Type.HELMET,new Item.Properties()));
@@ -109,6 +90,8 @@ public class TCItems {
     public static final RegistryObject<Item> TECHNETIUM_INGOT = ITEMS.register("technetium_ingot",
             () -> new Item(new Item.Properties()));
 
+    public static final RegistryObject<Item> CREATION_FLOW_JOURNAL = ITEMS.register("creation_flow_journal",
+            () -> new CreationFlowJournalItem(new Item.Properties()));
 
     public static void register(IEventBus eventBus){
         ITEMS.register(eventBus);

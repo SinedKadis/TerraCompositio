@@ -3,15 +3,19 @@ package net.sinedkadis.terracompositio.datagen;
 
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.recipes.*;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.AbstractCookingRecipe;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.level.ItemLike;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraftforge.common.crafting.conditions.IConditionBuilder;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.sinedkadis.terracompositio.TerraCompositio;
+import net.sinedkadis.terracompositio.datagen.builders.FlowSaturationRecipeBuilder;
 import net.sinedkadis.terracompositio.datagen.builders.MatterInfusionRecipeBuilder;
 import net.sinedkadis.terracompositio.datagen.builders.TechnetiumFiringRecipeBuilder;
 import net.sinedkadis.terracompositio.registries.TCBlocks;
@@ -247,7 +251,53 @@ public class TCRecipeProvider extends RecipeProvider implements IConditionBuilde
                         Objects.requireNonNull(ForgeRegistries.ITEMS.getKey(TCItems.WRENCH_AXE.get())).getPath() + "_mirrored")));
 
 
+        ItemStack bookLevel1 = createCFJBook(1);
+        ItemStack bookLevel2 = createCFJBook(2);
+        ItemStack bookLevel3 = createCFJBook(3);
+        ItemStack bookLevel4 = createCFJBook(4);
+        ItemStack bookLevel5 = createCFJBook(5);
 
+
+
+        FlowSaturationRecipeBuilder.create(
+                        Items.BOOK.getDefaultInstance(),
+                        bookLevel1
+                )
+                .unlockedBy(getHasName(Items.BOOK), has(Items.BOOK))
+                .save(pWriter, TerraCompositio.modLoc("flow_saturation/upgrade_book_to_day_1"));
+        FlowSaturationRecipeBuilder.create(
+                        bookLevel1,
+                        bookLevel2
+                )
+                .unlockedBy(getHasName(bookLevel1.getItem()), has(bookLevel1.getItem()))
+                .save(pWriter, TerraCompositio.modLoc("flow_saturation/upgrade_book_to_day_2"));
+        FlowSaturationRecipeBuilder.create(
+                        bookLevel2,
+                        bookLevel3
+                )
+                .unlockedBy(getHasName(bookLevel2.getItem()), has(bookLevel2.getItem()))
+                .save(pWriter, TerraCompositio.modLoc("flow_saturation/upgrade_book_to_day_3"));
+        FlowSaturationRecipeBuilder.create(
+                        bookLevel3,
+                        bookLevel4
+                )
+                .unlockedBy(getHasName(bookLevel3.getItem()), has(bookLevel3.getItem()))
+                .save(pWriter, TerraCompositio.modLoc("flow_saturation/upgrade_book_to_day_4"));
+        FlowSaturationRecipeBuilder.create(
+                        bookLevel4,
+                        bookLevel5
+                )
+                .unlockedBy(getHasName(bookLevel4.getItem()), has(bookLevel4.getItem()))
+                .save(pWriter, TerraCompositio.modLoc("flow_saturation/upgrade_book_to_day_5"));
+
+
+
+        FlowSaturationRecipeBuilder.create(
+                        Blocks.OAK_SAPLING.asItem().getDefaultInstance(),
+                        TCBlocks.FLOW_CEDAR_SAPLING.get().asItem().getDefaultInstance()
+                )
+                .unlockedBy(getHasName(Blocks.OAK_SAPLING), has(Blocks.OAK_SAPLING))
+                .save(pWriter, TerraCompositio.modLoc("flow_saturation/cedar_sapling"));
 
         MatterInfusionRecipeBuilder.create(
                 TCItems.RAW_TECHNETIUM.get(),4,
@@ -306,6 +356,14 @@ public class TCRecipeProvider extends RecipeProvider implements IConditionBuilde
                         20000)
                 .unlockedBy(getHasName(TCItems.HIGH_ENRICHED_TECHNETIUM.get()), has(TCItems.HIGH_ENRICHED_TECHNETIUM.get()))
                 .save(pWriter, Objects.requireNonNull(ForgeRegistries.ITEMS.getKey(TCItems.HIGH_ENRICHED_TECHNETIUM.get())).withPrefix("recipes/technetium_firing_recipe/"));
+    }
+
+    private static ItemStack createCFJBook(int day) {
+        ItemStack stack = new ItemStack(TCItems.CREATION_FLOW_JOURNAL.get());
+        CompoundTag nbt = new CompoundTag();
+        nbt.putInt("day", day);
+        stack.setTag(nbt);
+        return stack;
     }
 
     protected static void oreSmelting(@NotNull Consumer<FinishedRecipe> pFinishedRecipeConsumer, List<ItemLike> pIngredients, @NotNull RecipeCategory pCategory, @NotNull ItemLike pResult, float pExperience, int pCookingTIme, @NotNull String pGroup) {

@@ -44,7 +44,6 @@ public class TCItemModelProvider extends ItemModelProvider {
 
     @Override
     protected void registerModels() {
-        simpleItem(TCItems.PEBBLE);
         trapdoorItem(TCBlocks.FLOW_CEDAR_TRAPDOOR);
         fenceItem(TCBlocks.FLOW_CEDAR_FENCE, TCBlocks.FLOW_CEDAR_PLANKS);
         simpleBlockItem(TCBlocks.FLOW_CEDAR_DOOR);

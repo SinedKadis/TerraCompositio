@@ -1,0 +1,7 @@
+{
+  "parent": "item/generated",
+  "textures": {
+    "layer0": "terracompositio:item/creation_flow_journal/day_3/2d"
+  }
+
+}

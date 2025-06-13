@@ -16,9 +16,7 @@ public class TCCreativeModeTabs {
             () -> CreativeModeTab.builder().icon(() -> new ItemStack(TCBlocks.FLOW_CEDAR_LOG.get()))
                     .title(Component.translatable("creativetab.terra_compositio"))
                     .displayItems((pParameters, pOutput) -> {
-                        pOutput.accept(TCItems.PEBBLE.get());
-                        pOutput.accept(TCItems.STONE_STAFF.get());
-                        pOutput.accept(TCItems.OAK_STAFF.get());
+                        pOutput.accept(TCItems.CREATION_FLOW_JOURNAL.get());
                         pOutput.accept(TCItems.WRENCH_AXE.get());
                         pOutput.accept(TCBlocks.FLOW_CEDAR_LOG.get());
                         pOutput.accept(TCBlocks.STRIPPED_FLOW_CEDAR_LOG.get());

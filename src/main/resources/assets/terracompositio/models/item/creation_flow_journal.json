@@ -1,0 +1,26 @@
+{
+  "parent": "item/generated",
+  "textures": {
+    "layer0": "terracompositio:item/creation_flow_journal/day_1/2d"
+  },
+  "overrides": [
+
+    {"predicate": {"in_hand": 0.0, "day": 2.0}, "model": "terracompositio:item/creation_flow_journal/2d/day_2"},
+    {"predicate": {"in_hand": 0.0, "day": 3.0}, "model": "terracompositio:item/creation_flow_journal/2d/day_3"},
+    {"predicate": {"in_hand": 0.0, "day": 4.0}, "model": "terracompositio:item/creation_flow_journal/2d/day_4"},
+    {"predicate": {"in_hand": 0.0, "day": 5.0}, "model": "terracompositio:item/creation_flow_journal/2d/day_5"},
+
+    {"predicate": {"in_hand": 1.0,"opened": 0.0, "day": 1.0}, "model": "terracompositio:item/creation_flow_journal/3d/closed_day1"},
+    {"predicate": {"in_hand": 1.0,"opened": 0.0, "day": 2.0}, "model": "terracompositio:item/creation_flow_journal/3d/closed_day2"},
+    {"predicate": {"in_hand": 1.0,"opened": 0.0, "day": 3.0}, "model": "terracompositio:item/creation_flow_journal/3d/closed_day3"},
+    {"predicate": {"in_hand": 1.0,"opened": 0.0, "day": 4.0}, "model": "terracompositio:item/creation_flow_journal/3d/closed_day4"},
+    {"predicate": {"in_hand": 1.0,"opened": 0.0, "day": 5.0}, "model": "terracompositio:item/creation_flow_journal/3d/closed_day5"},
+
+    {"predicate": {"in_hand": 1.0, "opened": 1.0, "day": 1.0}, "model": "terracompositio:item/creation_flow_journal/3d/opened_day1"},
+    {"predicate": {"in_hand": 1.0, "opened": 1.0, "day": 2.0}, "model": "terracompositio:item/creation_flow_journal/3d/opened_day2"},
+    {"predicate": {"in_hand": 1.0, "opened": 1.0, "day": 3.0}, "model": "terracompositio:item/creation_flow_journal/3d/opened_day3"},
+    {"predicate": {"in_hand": 1.0, "opened": 1.0, "day": 4.0}, "model": "terracompositio:item/creation_flow_journal/3d/opened_day4"},
+    {"predicate": {"in_hand": 1.0, "opened": 1.0, "day": 5.0}, "model": "terracompositio:item/creation_flow_journal/3d/opened_day5"}
+
+    ]
+}
