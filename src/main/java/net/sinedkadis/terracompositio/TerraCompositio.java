@@ -20,6 +20,8 @@ import net.sinedkadis.terracompositio.registries.TCSounds;
 import net.sinedkadis.terracompositio.fluid.FluidNetworkHandler;
 import net.sinedkadis.terracompositio.worldgen.tree.TCFoliagePlacers;
 import net.sinedkadis.terracompositio.worldgen.tree.TCTrunkPlacers;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 
 @Mod(TerraCompositio.MOD_ID)
@@ -29,6 +31,7 @@ public class TerraCompositio
     public static ResourceLocation modLoc(String location){
         return ResourceLocation.tryBuild(MOD_ID,location);
     }
+    public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
 
     public TerraCompositio() {
 

@@ -2,6 +2,7 @@
   "name": "book.terracompositio.creation_flow_journal.entry.flow_fluid.name",
   "category": "terracompositio:day_2",
   "icon": "terracompositio:textures/block/flow_flowing.png",
+  "flag": "terracompositio:day_2",
   "pages": [
     "book.terracompositio.creation_flow_journal.entry.flow_fluid.page1",
     {
