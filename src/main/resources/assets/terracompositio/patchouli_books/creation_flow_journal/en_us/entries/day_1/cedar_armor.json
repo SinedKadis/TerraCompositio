@@ -2,6 +2,7 @@
   "name": "book.terracompositio.creation_flow_journal.entry.cedar_armor.name",
   "category": "terracompositio:day_1",
   "icon": "terracompositio:textures/item/flow_cedar_chestplate.png",
+  "flag": "terracompositio:day_1",
   "pages": [
     "book.terracompositio.creation_flow_journal.entry.cedar_armor.page1",
     {

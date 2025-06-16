@@ -15,9 +15,9 @@ import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.sinedkadis.terracompositio.TerraCompositio;
+import net.sinedkadis.terracompositio.mixin.accessors.BundleItemAccessor;
 import net.sinedkadis.terracompositio.registries.TCItems;
 import net.sinedkadis.terracompositio.registries.TCTags;
-import net.sinedkadis.terracompositio.util.reflection.BundleItemReflectionHelper;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -85,12 +85,12 @@ public class ShieldedBundleItem extends BundleItem {
                 int added;
                 if (bundle.getCount() > 1){
                     bundle.shrink(1);
-                    added = BundleItemReflectionHelper.addToBundle(newBundle, stack);
+                    added = BundleItemAccessor.invokeAdd(newBundle, stack);
                     if (!player.addItem(newBundle)){
                         player.drop(newBundle,false);
                     }
                 } else {
-                    added = BundleItemReflectionHelper.addToBundle(bundle,stack);
+                    added = BundleItemAccessor.invokeAdd(bundle,stack);
                 }
                 if (added != 0){
                     int itemSlot = inventory.findSlotMatchingItem(stack);

@@ -2,6 +2,7 @@
   "name": "book.terracompositio.creation_flow_journal.entry.cedar_book_port.name",
   "category": "terracompositio:day_1",
   "icon": "terracompositio:textures/block/flow_cedar_port_infused.png",
+  "flag": "terracompositio:day_1",
   "pages": [
     "book.terracompositio.creation_flow_journal.entry.cedar_book_port.page1",
     {

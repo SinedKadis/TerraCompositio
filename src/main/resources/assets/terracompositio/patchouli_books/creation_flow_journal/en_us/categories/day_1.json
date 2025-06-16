@@ -1,5 +1,6 @@
 {
   "name": "book.terracompositio.creation_flow_journal.category.day_1.name",
   "description": "book.terracompositio.creation_flow_journal.category.day_1.description",
-  "icon": "terracompositio:flow_cedar_sapling"
+  "icon": "terracompositio:flow_cedar_sapling",
+  "flag": "terracompositio:day_1"
 }

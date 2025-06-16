@@ -2,6 +2,7 @@
   "name": "book.terracompositio.creation_flow_journal.entry.wedge.name",
   "category": "terracompositio:day_2",
   "icon": "terracompositio:wedge",
+  "flag": "terracompositio:day_2",
   "pages": [
     "book.terracompositio.creation_flow_journal.entry.wedge.page1",
     {

@@ -2,14 +2,23 @@
   "required": true,
   "minVersion": "0.8",
   "package": "net.sinedkadis.terracompositio.mixin",
-  "refmap": "mixin.terracompositio.refmap.json",
+  "refmap": "terracompositio.refmap.json",
   "compatibilityLevel": "JAVA_17",
+  "plugin": "net.sinedkadis.terracompositio.mixin.MixinPlugin",
+  "priority": 2000,
   "mixins": [
-    "AbstractFurnaceBlockEntityMixin"
+    "AbstractFurnaceBlockEntityMixin",
+    "accessors.BundleItemAccessor"
   ],
+  "client": [
+    "BookGuiMixin"
+  ],
+  "server": [],
   "injectors": {
     "defaultRequire": 1
   },
-  "client": [
-  ]
+  "overwrites": {
+    "conformVisibility": true,
+    "requireAnnotations": true
+  }
 }
