@@ -28,6 +28,7 @@ import java.util.Optional;
 
 import static net.sinedkadis.terracompositio.registries.TCBlockStateProperties.INFUSED;
 
+@SuppressWarnings("DataFlowIssue")
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
 public class FlowCedarPortBlockEntity extends TCItemIOCFEBlockEntity implements MenuProvider {
@@ -93,8 +94,10 @@ public class FlowCedarPortBlockEntity extends TCItemIOCFEBlockEntity implements 
                 increaseCraftingProgress();
                 setChanged(pLevel, pPos, pState);
                 if (hasProgressFinished()) {
-                    craftItem();
-
+                    ItemStack crafted = craftItem();
+                    Player nearestPlayer = pLevel.getNearestPlayer(pPos.getX(), pPos.getY(), pPos.getZ(), 16, false);
+                    if (nearestPlayer != null)
+                        crafted.onCraftedBy(pLevel, nearestPlayer,crafted.getCount());
                     resetProgress();
                 }
             } else {
@@ -116,13 +119,15 @@ public class FlowCedarPortBlockEntity extends TCItemIOCFEBlockEntity implements 
         return outputTest;
     }
 
-    protected void craftItem() {
+    protected ItemStack craftItem() {
         Optional<FlowSaturationRecipe> recipe = getCurrentRecipe();
         if (recipe.isPresent()) {
             ItemStack result = recipe.get().getResultItem(null);
             this.itemHandler.forceExtractItem(SLOT_INPUT, 1, false);
             this.itemHandler.forceInsertItem(SLOT_OUTPUT, result,false);
+            return result;
         }
+        return ItemStack.EMPTY;
     }
 
     protected Optional<FlowSaturationRecipe> getCurrentRecipe() {

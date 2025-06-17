@@ -16,7 +16,11 @@ public class TCCreativeModeTabs {
             () -> CreativeModeTab.builder().icon(() -> new ItemStack(TCBlocks.FLOW_CEDAR_LOG.get()))
                     .title(Component.translatable("creativetab.terra_compositio"))
                     .displayItems((pParameters, pOutput) -> {
-                        pOutput.accept(TCItems.CREATION_FLOW_JOURNAL.get());
+                        for (int i = 1; i <= 5; i++) {
+                            ItemStack itemStack = new ItemStack(TCItems.CREATION_FLOW_JOURNAL.get());
+                            itemStack.getOrCreateTag().putInt("day", i);
+                            pOutput.accept(itemStack);
+                        }
                         pOutput.accept(TCItems.WRENCH_AXE.get());
                         pOutput.accept(TCBlocks.FLOW_CEDAR_LOG.get());
                         pOutput.accept(TCBlocks.STRIPPED_FLOW_CEDAR_LOG.get());

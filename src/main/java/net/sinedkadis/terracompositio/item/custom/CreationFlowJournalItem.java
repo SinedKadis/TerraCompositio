@@ -32,6 +32,14 @@ public class CreationFlowJournalItem extends Item {
         super(properties);
     }
 
+    @Override
+    public void onCraftedBy(ItemStack pStack, Level pLevel, Player pPlayer) {
+        CompoundTag tag = pStack.getOrCreateTag();
+        long time = pLevel.getLevelData().getGameTime();
+        tag.putLong("tick_crafted",time);
+        super.onCraftedBy(pStack, pLevel, pPlayer);
+    }
+
     public static int getDay(ItemStack stack){
         CompoundTag tag = stack.getTag();
         if (tag != null && stack.hasTag() && tag.contains("day")) {

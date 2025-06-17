@@ -60,8 +60,13 @@ public class TechnetiumFiringCategory implements IRecipeCategory<TechnetiumFirin
     }
 
     @Override
-    public @NotNull IDrawable getBackground() {
-        return this.background;
+    public int getHeight() {
+        return 61;
+    }
+
+    @Override
+    public int getWidth() {
+        return 82;
     }
 
     @Override
@@ -77,6 +82,7 @@ public class TechnetiumFiringCategory implements IRecipeCategory<TechnetiumFirin
     @Override
     @ParametersAreNonnullByDefault
     public void draw(TechnetiumFiringRecipe recipe, @NotNull IRecipeSlotsView recipeSlotsView, GuiGraphics guiGraphics, double mouseX, double mouseY) {
+        background.draw(guiGraphics);
         this.animatedEmittedLeft.draw(guiGraphics,0,0);
         this.animatedEmittedRight.draw(guiGraphics,41,0);
         this.animatedFlame.draw(guiGraphics, 33, 33);

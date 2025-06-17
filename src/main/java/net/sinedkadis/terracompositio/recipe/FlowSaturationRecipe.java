@@ -18,6 +18,7 @@ import net.minecraft.world.level.Level;
 import net.minecraftforge.common.crafting.StrictNBTIngredient;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.sinedkadis.terracompositio.TerraCompositio;
+import net.sinedkadis.terracompositio.registries.TCItems;
 import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -41,8 +42,19 @@ public class FlowSaturationRecipe implements Recipe<SimpleContainer> {
         if(pLevel.isClientSide()){
             return false;
         }
+        ItemStack containerItem = pContainer.getItem(0);
+        if (input.is(TCItems.CREATION_FLOW_JOURNAL.get())){
+            CompoundTag tag = containerItem.getOrCreateTag();
+            long currentTime = pLevel.getGameTime();
+            long savedTime = tag.getLong("tick_crafted");
+            long timeDif = currentTime - savedTime;
+            int tickCap = 20 * 60 * 20;
+            if (timeDif < tickCap) return false;
+        }
 
-        return StrictNBTIngredient.of(input).test(pContainer.getItem(0));
+        if (input.hasTag())
+            return StrictNBTIngredient.of(input).test(containerItem);
+        return Ingredient.of(input).test(containerItem);
     }
 
     @Override
@@ -83,6 +95,7 @@ public class FlowSaturationRecipe implements Recipe<SimpleContainer> {
         public static final Type INSTANCE = new Type();
         public static final String ID = "flow_saturation";
     }
+    @SuppressWarnings("DataFlowIssue")
     public static class Serializer implements RecipeSerializer<FlowSaturationRecipe>{
         public static final Serializer INSTANCE = new Serializer();
         public static final ResourceLocation ID = ResourceLocation.tryBuild(TerraCompositio.MOD_ID,"flow_saturation");

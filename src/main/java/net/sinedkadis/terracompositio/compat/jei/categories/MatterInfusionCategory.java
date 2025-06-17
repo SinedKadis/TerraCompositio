@@ -3,6 +3,8 @@ package net.sinedkadis.terracompositio.compat.jei.categories;
 import mezz.jei.api.constants.VanillaTypes;
 import mezz.jei.api.gui.builder.IRecipeLayoutBuilder;
 import mezz.jei.api.gui.drawable.IDrawable;
+import mezz.jei.api.gui.drawable.IDrawableAnimated;
+import mezz.jei.api.gui.drawable.IDrawableStatic;
 import mezz.jei.api.gui.ingredient.IRecipeSlotsView;
 import mezz.jei.api.helpers.IGuiHelper;
 import mezz.jei.api.recipe.IFocusGroup;
@@ -19,9 +21,11 @@ import net.sinedkadis.terracompositio.recipe.MatterInfusionRecipe;
 import net.sinedkadis.terracompositio.registries.TCBlocks;
 import org.jetbrains.annotations.NotNull;
 
+import javax.annotation.ParametersAreNonnullByDefault;
 import java.awt.*;
 import java.util.Objects;
 
+@ParametersAreNonnullByDefault
 public class MatterInfusionCategory implements IRecipeCategory<MatterInfusionRecipe> {
     public static final ResourceLocation UID = ResourceLocation.tryBuild(TerraCompositio.MOD_ID,"matter_infusion");
     public static final ResourceLocation TEXTURE = ResourceLocation.tryBuild(TerraCompositio.MOD_ID,
@@ -31,10 +35,14 @@ public class MatterInfusionCategory implements IRecipeCategory<MatterInfusionRec
             new RecipeType<>(Objects.requireNonNull(UID), MatterInfusionRecipe.class);
     private final IDrawable background;
     private final IDrawable icon;
+    private final IDrawableAnimated animatedArrow;
 
     public MatterInfusionCategory(IGuiHelper helper) {
-        this.background = helper.createDrawable(Objects.requireNonNull(TEXTURE),0,0,176,150);
+        this.background = helper.createDrawable(Objects.requireNonNull(TEXTURE),0,0,176,99);
         this.icon = helper.createDrawableIngredient(VanillaTypes.ITEM_STACK,new ItemStack(TCBlocks.MATTER_INFUSER_IO.get()));
+        IDrawableStatic staticArrow = helper.createDrawable(TEXTURE, 0, 100, 112, 79);
+        this.animatedArrow = helper.createAnimatedDrawable(staticArrow, 50, IDrawableAnimated.StartDirection.TOP, true);
+
     }
 
     @Override
@@ -48,8 +56,13 @@ public class MatterInfusionCategory implements IRecipeCategory<MatterInfusionRec
     }
 
     @Override
-    public @NotNull IDrawable getBackground() {
-        return this.background;
+    public int getHeight() {
+        return 150;
+    }
+
+    @Override
+    public int getWidth() {
+        return 176;
     }
 
     @Override
@@ -66,6 +79,8 @@ public class MatterInfusionCategory implements IRecipeCategory<MatterInfusionRec
 
     @Override
     public void draw(MatterInfusionRecipe recipe, @NotNull IRecipeSlotsView recipeSlotsView, GuiGraphics guiGraphics, double mouseX, double mouseY) {
+        background.draw(guiGraphics);
+        animatedArrow.draw(guiGraphics,40,16);
         String cfe = "CFE: "+ recipe.getCfe();
         String cfe_t = "CFE/t: "+ recipe.getCFETick();
         Component duration = Component.translatable("block.terracompositio.matter_infuser.duration",(float)(recipe.getTicks()/20));
