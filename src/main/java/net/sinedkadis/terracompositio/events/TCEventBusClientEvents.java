@@ -18,10 +18,12 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.sinedkadis.terracompositio.TerraCompositio;
 import net.sinedkadis.terracompositio.block.entity.renderer.*;
+import net.sinedkadis.terracompositio.entity.client.FlowCedarEntModel;
+import net.sinedkadis.terracompositio.entity.client.FlowCedarEntRenderer;
 import net.sinedkadis.terracompositio.item.custom.CreationFlowJournalItem;
 import net.sinedkadis.terracompositio.registries.TCEntities;
-import net.sinedkadis.terracompositio.entity.client.TCBoatRenderer;
-import net.sinedkadis.terracompositio.entity.client.TCModelLayers;
+import net.sinedkadis.terracompositio.registries.TCBoatRenderer;
+import net.sinedkadis.terracompositio.registries.TCModelLayers;
 import net.sinedkadis.terracompositio.item.custom.ShieldedBundleItem;
 import net.sinedkadis.terracompositio.item.custom.WrenchAxeItem;
 import net.sinedkadis.terracompositio.registries.*;
@@ -40,6 +42,8 @@ public class TCEventBusClientEvents {
 
         EntityRenderers.register(TCEntities.MOD_BOAT.get(), pContext -> new TCBoatRenderer(pContext, false));
         EntityRenderers.register(TCEntities.MOD_CHEST_BOAT.get(), pContext -> new TCBoatRenderer(pContext, true));
+
+        EntityRenderers.register(TCEntities.FLOW_CEDAR_ENT.get(), FlowCedarEntRenderer::new);
 
         MenuScreens.register(TCMenuTypes.FLOW_PORT_MENU.get(), FlowBlockPortScreen::new);
         ItemBlockRenderTypes.setRenderLayer(TCFluids.BIRCH_JUICE_FLUID.source.get(), RenderType.translucent());
@@ -81,6 +85,8 @@ public class TCEventBusClientEvents {
     public static void registerLayer(EntityRenderersEvent.RegisterLayerDefinitions event) {
         event.registerLayerDefinition(TCModelLayers.PINE_BOAT_LAYER, BoatModel::createBodyModel);
         event.registerLayerDefinition(TCModelLayers.PINE_CHEST_BOAT_LAYER, ChestBoatModel::createBodyModel);
+
+        event.registerLayerDefinition(TCModelLayers.FLOW_CEDAR_ENT_LAYER, FlowCedarEntModel::createBodyLayer);
     }
 
     @SubscribeEvent

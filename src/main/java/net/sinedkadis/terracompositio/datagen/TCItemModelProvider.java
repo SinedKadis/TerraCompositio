@@ -89,6 +89,8 @@ public class TCItemModelProvider extends ItemModelProvider {
 
 
         saplingItem(TCBlocks.FLOW_CEDAR_SAPLING);
+
+        withExistingParent(Objects.requireNonNull(TCItems.FLOW_CEDAR_ENT_SPAWN_EGG.getId()).getPath(), mcLoc("item/template_spawn_egg"));
     }
 
     // Shoutout to El_Redstoniano for making this

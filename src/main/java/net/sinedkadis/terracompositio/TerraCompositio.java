@@ -72,6 +72,9 @@ public class TerraCompositio
         if(event.getTabKey() == CreativeModeTabs.TOOLS_AND_UTILITIES) {
             event.accept(Items.BUNDLE);
         }
+        if (event.getTabKey() == CreativeModeTabs.SPAWN_EGGS) {
+            event.accept(TCItems.FLOW_CEDAR_ENT_SPAWN_EGG);
+        }
     }
 
 }

@@ -111,6 +111,16 @@
   "item.terracompositio.technetium_ingot": "Stable Technetium Ingot",
   "block.terracompositio.cfe_saturated_air": "CFE saturated air",
   "item.terracompositio.creation_flow_journal": "Creation Flow Journal",
+  "entity.terracompositio.flow_cedar_ent_entity": "Flow Cedar Ent",
+  "item.terracompositio.flow_cedar_ent_spawn_egg": "Flow Cedar Ent Spawn Egg",
+
+
+
+
+
+
+
+
 
   "book.terracompositio.creation_flow_journal.name": "Creation Flow Journal",
   "book.terracompositio.creation_flow_journal.landing_text": "Observation records about the flow of Creation",

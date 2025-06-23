@@ -1,4 +1,4 @@
-package net.sinedkadis.terracompositio.entity.client;
+package net.sinedkadis.terracompositio.registries;
 
 import com.google.common.collect.ImmutableMap;
 import com.mojang.datafixers.util.Pair;

@@ -91,6 +91,8 @@ public class TCCreativeModeTabs {
 
                         pOutput.accept(TCItems.TECHNETIUM_INGOT.get());
 
+                        pOutput.accept(TCItems.FLOW_CEDAR_ENT_SPAWN_EGG.get());
+
                     })
                     .build());
 

@@ -5,6 +5,7 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.*;
 import net.minecraft.world.level.Level;
+import net.minecraftforge.common.ForgeSpawnEggItem;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -92,6 +93,9 @@ public class TCItems {
 
     public static final RegistryObject<Item> CREATION_FLOW_JOURNAL = ITEMS.register("creation_flow_journal",
             () -> new CreationFlowJournalItem(new Item.Properties()));
+
+    public static final RegistryObject<Item> FLOW_CEDAR_ENT_SPAWN_EGG = ITEMS.register("flow_cedar_ent_spawn_egg",
+            () -> new ForgeSpawnEggItem(TCEntities.FLOW_CEDAR_ENT, 0x352001, 0x015161, new Item.Properties()));
 
     public static void register(IEventBus eventBus){
         ITEMS.register(eventBus);
