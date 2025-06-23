@@ -1,0 +1,13 @@
+{
+  "type": "terracompositio:flow_saturation",
+  "input": {
+    "count": 1,
+    "item": "terracompositio:creation_flow_journal",
+    "nbt": "{day:3}"
+  },
+  "output": {
+    "count": 1,
+    "item": "terracompositio:creation_flow_journal",
+    "nbt": "{day:4}"
+  }
+}

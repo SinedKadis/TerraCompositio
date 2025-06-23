@@ -1,0 +1,11 @@
+{
+  "type": "terracompositio:flow_saturation",
+  "input": {
+    "count": 1,
+    "item": "minecraft:oak_sapling"
+  },
+  "output": {
+    "count": 1,
+    "item": "terracompositio:flow_cedar_sapling"
+  }
+}
