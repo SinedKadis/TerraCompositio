@@ -55,9 +55,9 @@ public class FlowCedarEntModel<T extends Entity> extends HierarchicalModel<T> {
 
 		PartDefinition body = ent.addOrReplaceChild("body", CubeListBuilder.create().texOffs(0, 0).addBox(-2.0F, -8.0F, -2.0F, 4.0F, 8.0F, 4.0F, new CubeDeformation(0.0F)), PartPose.offset(0.0F, -6.0F, 0.0F));
 
-		PartDefinition left_arm = ent.addOrReplaceChild("left_arm", CubeListBuilder.create().texOffs(8, 19).addBox(2.0F, -15.0F, -1.0F, 2.0F, 6.0F, 2.0F, new CubeDeformation(0.0F)), PartPose.offset(0.0F, 0.0F, 0.0F));
+		PartDefinition left_arm = ent.addOrReplaceChild("left_arm", CubeListBuilder.create().texOffs(8, 19).addBox(0.0F, -2.0F, -1.0F, 2.0F, 6.0F, 2.0F, new CubeDeformation(0.0F)), PartPose.offset(2.0F, -13.0F, 0.0F));
 
-		PartDefinition right_arm = ent.addOrReplaceChild("right_arm", CubeListBuilder.create().texOffs(16, 20).addBox(-4.0F, -13.0F, -1.0F, 2.0F, 6.0F, 2.0F, new CubeDeformation(0.0F)), PartPose.offset(0.0F, 0.0F, 0.0F));
+		PartDefinition right_arm = ent.addOrReplaceChild("right_arm", CubeListBuilder.create().texOffs(16, 20).addBox(-2.0F, -1.0F, -1.0F, 2.0F, 6.0F, 2.0F, new CubeDeformation(0.0F)), PartPose.offset(-2.0F, -12.0F, 0.0F));
 
 		PartDefinition left_leg = ent.addOrReplaceChild("left_leg", CubeListBuilder.create().texOffs(16, 0).addBox(2.0F, -8.0F, -1.0F, 2.0F, 8.0F, 2.0F, new CubeDeformation(0.0F)), PartPose.offset(0.0F, 0.0F, 0.0F));
 
@@ -73,8 +73,11 @@ public class FlowCedarEntModel<T extends Entity> extends HierarchicalModel<T> {
 		this.root().getAllParts().forEach(ModelPart::resetPose);
 		this.applyHeadRotation(netHeadYaw, headPitch, ageInTicks);
 
-		this.animateWalk(FlowCedarEntAnimations.WALK, limbSwing, limbSwingAmount, 2f, 2.5f);
-		this.animate(((FlowCedarEntEntity) entity).idleAnimationState, FlowCedarEntAnimations.IDLE, ageInTicks, 1f);
+		FlowCedarEntEntity entity1 = (FlowCedarEntEntity) entity;
+
+		this.animateWalk(FlowCedarEntAnimations.WALK, limbSwing, limbSwingAmount, 2f, 2f);
+		this.animate(entity1.idleAnimationState, FlowCedarEntAnimations.IDLE, ageInTicks, 1f);
+		this.animate(entity1.extractionAnimationState, FlowCedarEntAnimations.TREE_EXTRACT,ageInTicks,1f);
 	}
 
 	private void applyHeadRotation(float pNetHeadYaw, float pHeadPitch, float pAgeInTicks) {

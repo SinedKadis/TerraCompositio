@@ -4,10 +4,8 @@ import net.minecraft.world.level.block.AbstractFurnaceBlock;
 import net.minecraft.world.level.block.entity.AbstractFurnaceBlockEntity;
 import net.sinedkadis.terracompositio.block.custom.*;
 import net.sinedkadis.terracompositio.block.entity.*;
-import net.sinedkadis.terracompositio.compat.jade.providers.MatterInfuserIOComponentProvider;
-import net.sinedkadis.terracompositio.compat.jade.providers.TCCFEBlockEntityComponentProvider;
-import net.sinedkadis.terracompositio.compat.jade.providers.TCItemIOComponentProvider;
-import net.sinedkadis.terracompositio.compat.jade.providers.TimePassageDesorberComponentProvider;
+import net.sinedkadis.terracompositio.compat.jade.providers.*;
+import net.sinedkadis.terracompositio.entity.custom.FlowCedarEntEntity;
 import snownee.jade.api.*;
 
 @WailaPlugin
@@ -27,6 +25,8 @@ public class JadeTerraCompositioPlugin implements IWailaPlugin {
         registration.registerBlockDataProvider(MatterInfuserIOComponentProvider.INSTANCE, MatterInfuserIOBlockEntity.class);
 
         registration.registerBlockDataProvider(TimePassageDesorberComponentProvider.INSTANCE,TimePassageDesorberBlockEntity.class);
+        
+        registration.registerEntityDataProvider(TCCFEEntityComponentProvider.INSTANCE, FlowCedarEntEntity.class);
 
     }
 
@@ -53,6 +53,8 @@ public class JadeTerraCompositioPlugin implements IWailaPlugin {
         registration.registerBlockComponent(TimePassageDesorberComponentProvider.INSTANCE,TimePassageDesorberBlock.class);
         registration.addConfig(TimePassageDesorberComponentProvider.INSTANCE.timeConfigRL(),true);
         registration.addConfig(TimePassageDesorberComponentProvider.INSTANCE.chanceConfigRL(),true);
+
+        registration.registerEntityComponent(TCCFEEntityComponentProvider.INSTANCE, FlowCedarEntEntity.class);
 
     }
 

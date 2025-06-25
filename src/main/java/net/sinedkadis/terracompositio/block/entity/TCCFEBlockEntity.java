@@ -13,6 +13,7 @@ import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
 import net.sinedkadis.terracompositio.api.TerraCompositioAPI;
 import net.sinedkadis.terracompositio.api.networks.NetworkAction;
+import net.sinedkadis.terracompositio.api.networks.cfe.CFENetworkMember;
 import net.sinedkadis.terracompositio.api.networks.cfe.CFENetworkMemberBE;
 import net.sinedkadis.terracompositio.api.networks.cfe.CFENetwork;
 import net.sinedkadis.terracompositio.api.networks.cfe.ICFEHandler;
@@ -53,7 +54,7 @@ public abstract class TCCFEBlockEntity extends TCBlockEntity implements CFENetwo
     public void onLoad() {
         super.onLoad();
         lazyCFEOptional = LazyOptional.of(() -> cfeContainer);
-        this.onCFENetworkMemberUpdate();
+        this.onCFENetworkMemberUpdate(level,worldPosition);
     }
 
     @Override
@@ -88,16 +89,16 @@ public abstract class TCCFEBlockEntity extends TCBlockEntity implements CFENetwo
     }
 
     @Override
-    public void onCFENetworkMemberUpdate() {
+    public void onCFENetworkMemberUpdate(Level level, BlockPos pos) {
         if (level != null && !level.isClientSide){
             if (blockMode.consumer() || blockMode.container()){
                 CFENetwork cfeNetwork = TerraCompositioAPI.instance().getCFENetworkInstance();
-                CFENetworkMemberBE source = cfeNetwork.getClosestSourceWithCFE(getBlockPos(), getLevel(), connectRange * 2, getPriority());
+                CFENetworkMember source = cfeNetwork.getClosestSourceWithCFE(pos, level, connectRange * 2, getPriority());
                 if (source != null) {
                     int transferred = TCUtil.tryCFETransfer(this, source, Integer.MAX_VALUE);
                     if (transferred > 0)
                         TCUtil.sendCFEParticles((ServerLevel) level,
-                                Vec3.atLowerCornerWithOffset(worldPosition,
+                                Vec3.atLowerCornerWithOffset(pos,
                                         this.particleTargetOffset().x,
                                         this.particleTargetOffset().y,
                                         this.particleTargetOffset().z),

@@ -42,7 +42,7 @@ public class CFESaturatedAirBlockEntity extends TCCFEBlockEntity {
     }
 
     @Override
-    public void onCFENetworkMemberUpdate() {
+    public void onCFENetworkMemberUpdate(Level level, BlockPos pos) {
     }
 
     public void spawnParticles(Level level, BlockPos pos, RandomSource random) {

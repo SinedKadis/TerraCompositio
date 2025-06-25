@@ -20,7 +20,7 @@ import net.minecraftforge.fml.common.Mod;
 import net.sinedkadis.terracompositio.TerraCompositio;
 import net.sinedkadis.terracompositio.api.TerraCompositioAPI;
 import net.sinedkadis.terracompositio.api.networks.cfe.CFENetwork;
-import net.sinedkadis.terracompositio.api.networks.cfe.CFENetworkMemberBE;
+import net.sinedkadis.terracompositio.api.networks.cfe.CFENetworkMember;
 import net.sinedkadis.terracompositio.registries.TCBlockEntities;
 import net.sinedkadis.terracompositio.util.TCItemStackHandler;
 import net.sinedkadis.terracompositio.util.TCUtil;
@@ -68,9 +68,9 @@ public class CultivationDesorberBlockEntity extends AbstractDesorberBlockEntity 
         LevelAccessor level = event.getLevel();
         BlockState state = event.getState();
         CFENetwork network = TerraCompositioAPI.instance().getCFENetworkInstance();
-        List<CFENetworkMemberBE> sources = network.getAllCFENetworkMembers((Level) level);
+        List<CFENetworkMember> sources = network.getAllCFENetworkMembers((Level) level);
         List<CultivationDesorberBlockEntity> cultivators = sources.stream()
-                .map(CFENetworkMemberBE::getBlockPos)
+                .map(CFENetworkMember::getBlockPos)
                 .filter(cfeSourceBlockPos -> Math.sqrt(cfeSourceBlockPos.distSqr(pos)) < 7)
                 .map(cfeSourceBlockPos -> {
                     if (level.getBlockEntity(cfeSourceBlockPos) instanceof CultivationDesorberBlockEntity blockEntity)

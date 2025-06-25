@@ -22,7 +22,7 @@ import net.minecraft.world.level.block.state.properties.Property;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.fluids.FluidStack;
 import net.sinedkadis.terracompositio.api.networks.cfe.CFENetwork;
-import net.sinedkadis.terracompositio.api.networks.cfe.CFENetworkMemberBE;
+import net.sinedkadis.terracompositio.api.networks.cfe.CFENetworkMember;
 import net.sinedkadis.terracompositio.api.networks.cfe.ICFEHandler;
 import net.sinedkadis.terracompositio.block.custom.FlowCedarLikeBlock;
 
@@ -41,7 +41,19 @@ import static net.sinedkadis.terracompositio.registries.TCBlockStateProperties.I
 
 public class TCUtil {
 
-    public static int tryCFETransfer(CFENetworkMemberBE target,CFENetworkMemberBE source,int maxTransfer){
+    public static int tryCFETransferWithParticles(CFENetworkMember target, CFENetworkMember source, int maxTransfer){
+        int count = tryCFETransfer(target,source,maxTransfer);
+        if (target.getLevel() != null) {
+            if (target.getLevel() instanceof ServerLevel serverLevel){
+                TCUtil.sendCFEParticles(serverLevel, Vec3.atLowerCornerWithOffset(target.getBlockPos(),
+                        target.particleTargetOffset().x,
+                        target.particleTargetOffset().y,
+                        target.particleTargetOffset().z),source.getBlockPos(),count);
+            }
+        }
+        return count;
+    }
+    public static int tryCFETransfer(CFENetworkMember target, CFENetworkMember source, int maxTransfer){
         ICFEHandler targetHandler = CFENetwork.getCFEHandler(target).orElse(null);
         if (targetHandler != null){
             ICFEHandler sourceHandler = CFENetwork.getCFEHandler(source).orElse(null);

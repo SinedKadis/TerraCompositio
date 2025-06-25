@@ -5,6 +5,7 @@ import net.minecraft.world.level.Level;
 import net.minecraftforge.common.MinecraftForge;
 import net.sinedkadis.terracompositio.api.networks.cfe.CFENetwork;
 import net.sinedkadis.terracompositio.api.networks.NetworkAction;
+import net.sinedkadis.terracompositio.api.networks.cfe.CFENetworkMember;
 import net.sinedkadis.terracompositio.api.networks.cfe.CFENetworkMemberBE;
 import net.sinedkadis.terracompositio.api.networks.cfe.ICFEHandler;
 import net.sinedkadis.terracompositio.events.CFENetworkEvent;
@@ -17,9 +18,9 @@ import static net.sinedkadis.terracompositio.util.TCUtil.distSqr;
 public class CFENetworkHandler implements CFENetwork {
     public static final CFENetworkHandler instance = new CFENetworkHandler();
 
-    private final Map<Level, Set<CFENetworkMemberBE>> cfeSources = new WeakHashMap<>();
+    private final Map<Level, Set<CFENetworkMember>> cfeSources = new WeakHashMap<>();
 
-    public void onNetworkEvent(CFENetworkMemberBE source, NetworkAction action) {
+    public void onNetworkEvent(CFENetworkMember source, NetworkAction action) {
         if (action == NetworkAction.ADD){
             add(cfeSources,source.getLevel(), source);
         } else if (action == NetworkAction.REMOVE){
@@ -29,40 +30,42 @@ public class CFENetworkHandler implements CFENetwork {
         }
     }
 
-    public void networkMemberUpdated(CFENetworkMemberBE updated) {
+    public void networkMemberUpdated(CFENetworkMember updated) {
         cfeSources.get(updated.getLevel()).stream()
                 .filter(member -> {
                     if (updated.getBlockPos() != member.getBlockPos()) {
                         return true;
                     } else {
-                        member.onCFENetworkMemberUpdate();
+                        member.onCFENetworkMemberUpdate(member.getLevel(),member.getBlockPos());
                         return false;
                     }
                 })
                 .filter(member -> updated.getPriority() < member.getPriority())
                 .filter(member -> distSqr(member.getBlockPos(), updated.getBlockPos()) <= ((long) member.getLimit() * member.getLimit()))
-                .forEach(CFENetworkMemberBE::onCFENetworkMemberUpdate);
+                .forEach((member) -> member.onCFENetworkMemberUpdate(member.getLevel(),member.getBlockPos()));
     }
 
     @Override
-    public CFENetworkMemberBE getClosestSourceWithCFE(BlockPos pos, Level level, int limit, int priority) {
+    public CFENetworkMember getClosestSourceWithCFE(BlockPos pos, Level level, int limit, int priority) {
         if (cfeSources.containsKey(level)) {
-            Set<CFENetworkMemberBE> sources = cfeSources.get(level);
+            Set<CFENetworkMember> sources = cfeSources.get(level);
             long minDist = Long.MAX_VALUE;
             long limitSquared = (long) limit * limit;
-            CFENetworkMemberBE closest = null;
+            CFENetworkMember closest = null;
 
-            for (CFENetworkMemberBE source : sources) {
-                long distance = distSqr(source.getBlockPos(), pos);
-                Optional<ICFEHandler> cfeHandlerOptional = source.getBE().getCapability(CFECapability.CFE).resolve();
-                if (distance <= limitSquared
-                        && distance < minDist
-                        && distance < source.getLimit()
-                        && cfeHandlerOptional.isPresent()
-                        && cfeHandlerOptional.get().getCFE() > 0
-                        && source.getPriority() < priority) {
-                    minDist = distance;
-                    closest = source;
+            for (CFENetworkMember source : sources) {
+                if (source instanceof CFENetworkMemberBE memberBE) {
+                    long distance = distSqr(source.getBlockPos(), pos);
+                    Optional<ICFEHandler> cfeHandlerOptional = memberBE.getBE().getCapability(CFECapability.CFE).resolve();
+                    if (distance <= limitSquared
+                            && distance < minDist
+                            && distance < source.getLimit()
+                            && cfeHandlerOptional.isPresent()
+                            && cfeHandlerOptional.get().getCFE() > 0
+                            && source.getPriority() < priority) {
+                        minDist = distance;
+                        closest = memberBE;
+                    }
                 }
             }
 
@@ -72,12 +75,12 @@ public class CFENetworkHandler implements CFENetwork {
     }
 
     @Override
-    public CFENetworkMemberBE getRandomSourceInRange(BlockPos pos, Level level, int limit, int priority) {
+    public CFENetworkMember getRandomSourceInRange(BlockPos pos, Level level, int limit, int priority) {
         if (cfeSources.containsKey(level)) {
             long limitSquared = (long) limit * limit;
-            List<CFENetworkMemberBE> sources = new ArrayList<>(cfeSources.get(level));
+            List<CFENetworkMember> sources = new ArrayList<>(cfeSources.get(level));
             Collections.shuffle(sources);
-            for (CFENetworkMemberBE source : sources) {
+            for (CFENetworkMember source : sources) {
                 long distance = TCUtil.distSqr(source.getBlockPos(), pos);
                 Optional<ICFEHandler> fluidHandler = CFENetwork.getCFEHandler(source);
                 int cfe = 0;
@@ -95,7 +98,7 @@ public class CFENetworkHandler implements CFENetwork {
     }
 
     @Override
-    public List<CFENetworkMemberBE> getAllCFENetworkMembers(Level level) {
+    public List<CFENetworkMember> getAllCFENetworkMembers(Level level) {
         if (cfeSources.containsKey(level)) {
             return cfeSources.get(level).stream().toList();
         }
@@ -103,7 +106,7 @@ public class CFENetworkHandler implements CFENetwork {
     }
 
     @Override
-    public void fireCFENetworkEvent(CFENetworkMemberBE source, NetworkAction action) {
+    public void fireCFENetworkEvent(CFENetworkMember source, NetworkAction action) {
         MinecraftForge.EVENT_BUS.post(new CFENetworkEvent(source,action));
     }
 
@@ -116,7 +119,7 @@ public class CFENetworkHandler implements CFENetwork {
     }
 
     @Override
-    public boolean isIn(Level pLevel, CFENetworkMemberBE cfeHandler) {
+    public boolean isIn(Level pLevel, CFENetworkMember cfeHandler) {
         return cfeSources.getOrDefault(pLevel, Collections.emptySet()).stream().anyMatch(fluidSource -> fluidSource.equals(cfeHandler));
     }
 
@@ -136,6 +139,6 @@ public class CFENetworkHandler implements CFENetwork {
 
     private <T> void add(Map<Level, Set<T>> map, Level level, T thing) {
         map.computeIfAbsent(level, k -> new HashSet<>()).add(thing);
-        networkMemberUpdated((CFENetworkMemberBE) thing);
+        networkMemberUpdated((CFENetworkMember) thing);
     }
 }

@@ -1,6 +1,7 @@
 package net.sinedkadis.terracompositio.api.networks.cfe;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
 
 public interface ICFEHandler {
     int getCFE();
@@ -10,4 +11,6 @@ public interface ICFEHandler {
     int getMaxCFE();
     int getMinCFE();
     void containerTick();
+    void writeToNBT(CompoundTag pTag);
+    void readFromNBT(CompoundTag pTag);
 }

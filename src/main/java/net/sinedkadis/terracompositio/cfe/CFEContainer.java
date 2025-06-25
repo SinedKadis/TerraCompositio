@@ -5,6 +5,7 @@ import lombok.Getter;
 import lombok.Setter;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
@@ -12,6 +13,7 @@ import net.minecraftforge.common.util.INBTSerializable;
 import net.sinedkadis.terracompositio.api.TerraCompositioAPI;
 import net.sinedkadis.terracompositio.api.networks.NetworkAction;
 import net.sinedkadis.terracompositio.api.networks.cfe.CFENetworkMemberBE;
+import net.sinedkadis.terracompositio.api.networks.cfe.CFENetworkMemberEntity;
 import net.sinedkadis.terracompositio.api.networks.cfe.ICFEHandler;
 import net.sinedkadis.terracompositio.block.entity.TCCFEBlockEntity;
 import net.sinedkadis.terracompositio.util.TCUtil;
@@ -25,17 +27,27 @@ import java.util.*;
 public class CFEContainer implements ICFEHandler, INBTSerializable<CompoundTag> {
     private final float cfeTravelSpeed = 1/20f;
     private final BlockEntity blockEntity;
+    private final Entity entity;
     int CFE = 0;
     private int maxCFE;
     private final List<Pair<Integer,Double>> cfeQueue = new ArrayList<>();
 
     public CFEContainer(BlockEntity blockEntity, int maxCFE) {
         this.blockEntity = blockEntity;
+        this.entity = null;
+        this.maxCFE = maxCFE;
+    }
+    public CFEContainer(Entity entity, int maxCFE) {
+        this.entity = entity;
+        this.blockEntity = null;
         this.maxCFE = maxCFE;
     }
 
     public CFEContainer(BlockEntity blockEntity) {
         this(blockEntity, 100);
+    }
+    public CFEContainer(Entity entity) {
+        this(entity, 100);
     }
 
     @Override
@@ -71,7 +83,10 @@ public class CFEContainer implements ICFEHandler, INBTSerializable<CompoundTag> 
         if (added < 1)
             return 0;
         if (!simulate) {
-            cfeQueue.add(new MutablePair<>(cfe,Math.sqrt(TCUtil.distSqr(sourcePos,this.blockEntity.getBlockPos()))));
+            if (blockEntity != null)
+                cfeQueue.add(new MutablePair<>(cfe,Math.sqrt(TCUtil.distSqr(sourcePos,this.blockEntity.getBlockPos()))));
+            else if (entity != null)
+                cfeQueue.add(new MutablePair<>(cfe,Math.sqrt(TCUtil.distSqr(sourcePos,((CFENetworkMemberEntity) this.entity).getBlockPos()))));
         }
         return added;
     }
@@ -103,11 +118,13 @@ public class CFEContainer implements ICFEHandler, INBTSerializable<CompoundTag> 
     }
 
     protected void onContentsChanged(){
-        blockEntity.setChanged();
-        Level level = blockEntity.getLevel();
-        if (level != null && !level.isClientSide()) {
-            BlockState blockState = blockEntity.getBlockState();
-            level.sendBlockUpdated(blockEntity.getBlockPos(), blockState, blockState, 3);
+        if (blockEntity != null) {
+            blockEntity.setChanged();
+            Level level = blockEntity.getLevel();
+            if (level != null && !level.isClientSide()) {
+                BlockState blockState = blockEntity.getBlockState();
+                level.sendBlockUpdated(blockEntity.getBlockPos(), blockState, blockState, 3);
+            }
         }
     }
 
@@ -119,6 +136,9 @@ public class CFEContainer implements ICFEHandler, INBTSerializable<CompoundTag> 
             if ((tcCFEBlockEntity.getBlockMode().consumer() && !onAdd )
                     || (tcCFEBlockEntity.getBlockMode().source() && onAdd))
                 TerraCompositioAPI.INSTANCE.getCFENetworkInstance().fireCFENetworkEvent(cfeNetworkMemberBE, NetworkAction.UPDATE);
+        }
+        if (entity != null){
+            TerraCompositioAPI.INSTANCE.getCFENetworkInstance().fireCFENetworkEvent(((CFENetworkMemberEntity) entity), NetworkAction.UPDATE);
         }
     }
 
