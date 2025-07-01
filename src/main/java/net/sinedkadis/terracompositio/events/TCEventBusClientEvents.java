@@ -18,6 +18,7 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.sinedkadis.terracompositio.TerraCompositio;
 import net.sinedkadis.terracompositio.block.entity.renderer.*;
+import net.sinedkadis.terracompositio.entity.client.CFECubeModel;
 import net.sinedkadis.terracompositio.entity.client.FlowCedarEntModel;
 import net.sinedkadis.terracompositio.entity.client.FlowCedarEntRenderer;
 import net.sinedkadis.terracompositio.item.custom.CreationFlowJournalItem;
@@ -87,6 +88,7 @@ public class TCEventBusClientEvents {
         event.registerLayerDefinition(TCModelLayers.PINE_CHEST_BOAT_LAYER, ChestBoatModel::createBodyModel);
 
         event.registerLayerDefinition(TCModelLayers.FLOW_CEDAR_ENT_LAYER, FlowCedarEntModel::createBodyLayer);
+        event.registerLayerDefinition(TCModelLayers.CFE_CUBE_LAYER, CFECubeModel::createBodyLayer);
     }
 
     @SubscribeEvent
@@ -102,21 +104,4 @@ public class TCEventBusClientEvents {
         event.registerBlockEntityRenderer(TCBlockEntities.FLOW_CEDAR_TANK_BE.get(), FlowCedarTankBlockEntityRenderer::new);
 
     }
-
-//    @SubscribeEvent
-//    public static void onBookClosed(PatchouliAPI.BookCloseEvent event) {
-//        Player player = event.getPlayer();
-//        if (player != null) {
-//            // Сбрасываем флаг для всех журналов в инвентаре
-//            for (int i = 0; i < player.getInventory().getContainerSize(); i++) {
-//                ItemStack stack = player.getInventory().getItem(i);
-//                if (stack.getItem() instanceof CreationFlowJournalItem) {
-//                    CompoundTag tag = stack.getTag();
-//                    if (tag != null && tag.contains("open")) {
-//                        tag.putBoolean("open", false);
-//                    }
-//                }
-//            }
-//        }
-//    }
 }

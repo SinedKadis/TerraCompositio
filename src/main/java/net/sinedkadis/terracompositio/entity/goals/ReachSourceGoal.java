@@ -1,17 +1,12 @@
 package net.sinedkadis.terracompositio.entity.goals;
 
-
-
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.entity.ai.navigation.PathNavigation;
 import net.minecraft.world.level.pathfinder.Path;
 import net.minecraft.world.phys.Vec3;
 import net.sinedkadis.terracompositio.api.TerraCompositioAPI;
-import net.sinedkadis.terracompositio.api.networks.cfe.CFENetwork;
 import net.sinedkadis.terracompositio.api.networks.cfe.CFENetworkMember;
-import net.sinedkadis.terracompositio.api.networks.cfe.CFENetworkMemberEntity;
 import net.sinedkadis.terracompositio.api.networks.cfe.ICFEHandler;
 import net.sinedkadis.terracompositio.entity.custom.FlowCedarEntEntity;
 import net.sinedkadis.terracompositio.registries.TCTags;
@@ -39,10 +34,13 @@ public class ReachSourceGoal extends Goal {
 
     @Override
     public boolean canUse() {
-        CFENetworkMemberEntity networkMemberEntity = mob;
-        Optional<ICFEHandler> cfeHandler = CFENetwork.getCFEHandler(networkMemberEntity);
+        Optional<ICFEHandler> cfeHandler = mob.getInnerCFEOptional().resolve();
         if (cfeHandler.isPresent() && cfeHandler.get().getCFE() <= 60){
-            CFENetworkMember randomSourceInRange = TerraCompositioAPI.instance().getCFENetworkInstance().getRandomSourceInRange(mob.blockPosition(), mob.level(), searchLimit, networkMemberEntity.getPriority());
+            BlockPos sourcePos = mob.getSourcePos();
+            if (sourcePos != null && sourcePos.closerThan(mob.blockPosition(),mob.getLimit())) {
+                return false;
+            }
+            CFENetworkMember randomSourceInRange = TerraCompositioAPI.instance().getCFENetworkInstance().getRandomSourceInRange(mob.blockPosition(), mob.level(), searchLimit, mob.getPriority());
             if (randomSourceInRange != null){
                 BlockPos blockPos = randomSourceInRange.getBlockPos();
                 mob.setSourcePos(blockPos);

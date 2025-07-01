@@ -7,13 +7,11 @@ import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.client.model.HierarchicalModel;
-import net.minecraft.client.model.geom.ModelLayerLocation;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.model.geom.builders.*;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
-import net.sinedkadis.terracompositio.TerraCompositio;
 import net.sinedkadis.terracompositio.entity.animations.FlowCedarEntAnimations;
 import net.sinedkadis.terracompositio.entity.custom.FlowCedarEntEntity;
 
@@ -22,8 +20,6 @@ import javax.annotation.ParametersAreNonnullByDefault;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class FlowCedarEntModel<T extends Entity> extends HierarchicalModel<T> {
-	// This layer location should be baked with EntityRendererProvider.Context in the entity renderer and passed into this model's constructor
-	public static final ModelLayerLocation LAYER_LOCATION = new ModelLayerLocation(TerraCompositio.modLoc( "flow_cedar_ent_entity"), "main");
 	private final ModelPart ent;
 	private final ModelPart head;
 	private final ModelPart body;
@@ -78,6 +74,7 @@ public class FlowCedarEntModel<T extends Entity> extends HierarchicalModel<T> {
 		this.animateWalk(FlowCedarEntAnimations.WALK, limbSwing, limbSwingAmount, 2f, 2f);
 		this.animate(entity1.idleAnimationState, FlowCedarEntAnimations.IDLE, ageInTicks, 1f);
 		this.animate(entity1.extractionAnimationState, FlowCedarEntAnimations.TREE_EXTRACT,ageInTicks,1f);
+		this.animate(entity1.extractionCompleteAnimationState, FlowCedarEntAnimations.EXTRACTION_COMPLETE,ageInTicks,1f);
 	}
 
 	private void applyHeadRotation(float pNetHeadYaw, float pHeadPitch, float pAgeInTicks) {
@@ -91,6 +88,7 @@ public class FlowCedarEntModel<T extends Entity> extends HierarchicalModel<T> {
 	@Override
 	public void renderToBuffer(PoseStack poseStack, VertexConsumer vertexConsumer, int packedLight, int packedOverlay, float red, float green, float blue, float alpha) {
 		ent.render(poseStack, vertexConsumer, packedLight, packedOverlay, red, green, blue, alpha);
+
 	}
 
 	@Override

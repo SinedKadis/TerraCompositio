@@ -5,7 +5,6 @@ import net.minecraft.commands.arguments.EntityAnchorArgument;
 import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.ai.goal.Goal;
-import net.minecraft.world.entity.ai.navigation.PathNavigation;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
@@ -17,6 +16,7 @@ import net.sinedkadis.terracompositio.entity.custom.FlowCedarEntEntity;
 import net.sinedkadis.terracompositio.registries.TCBlockStateProperties;
 import net.sinedkadis.terracompositio.util.TCUtil;
 
+import java.util.EnumSet;
 import java.util.Optional;
 
 public class TreeExtractGoal extends Goal {
@@ -24,36 +24,30 @@ public class TreeExtractGoal extends Goal {
     private final Level level;
     @Getter
     private int extractAnimationTick;
-    private int cd;
     private Vec3 targetPosition;
 
     public TreeExtractGoal(FlowCedarEntEntity pMob) {
         this.mob = pMob;
         this.level = pMob.level();
-        //this.setFlags(EnumSet.of(Flag.MOVE, Flag.LOOK, Flag.JUMP));
+        this.setFlags(EnumSet.of(Flag.MOVE, Flag.LOOK, Flag.JUMP));
     }
 
     @Override
     public boolean canUse() {
-        Optional<ICFEHandler> capability = this.mob.getCapability(CFECapability.CFE).resolve();
-        return capability.filter(icfeHandler -> icfeHandler.getCFE() < 60
+        Optional<ICFEHandler> capability = mob.getInnerCFEOptional().resolve();
+        return capability.filter(icfeHandler -> icfeHandler.getCFE() < 60).isPresent()
                 && ForgeEventFactory.getMobGriefingEvent(this.level, this.mob)
-                && mob.getSourcePos() != null).isPresent();
+                && mob.getSourcePos() != null
+                && mob.getSourcePos().closerThan(mob.blockPosition(),mob.getLimit())
+                && isCFEQueueEmpty();
     }
 
     public void start() {
-        PathNavigation navigation = this.mob.getNavigation();
-        navigation.stop();
-        this.extractAnimationTick = 13*20;
-        this.cd = 5*20;
+        this.mob.getNavigation().stop();
+        this.extractAnimationTick = 5*20;
         assert mob.getSourcePos() != null;
         this.targetPosition = mob.getSourcePos().getCenter();
         mob.setExtracting(true);
-
-
-
-
-
     }
 
     public void stop() {
@@ -63,19 +57,28 @@ public class TreeExtractGoal extends Goal {
     }
 
     public boolean canContinueToUse() {
-        if (this.extractAnimationTick + cd > 0) {
-            return true;
-        } else {
-            this.mob.setExtracting(false);
-            return false;
+        return this.extractAnimationTick > 0 || !isCFEQueueEmpty();
+    }
+
+    private boolean isCFEQueueEmpty() {
+        Optional<ICFEHandler> held = this.mob.getCapability(CFECapability.CFE).resolve();
+        Optional<ICFEHandler> inner = this.mob.getInnerCFEOptional().resolve();
+        if (held.isPresent() && inner.isPresent()){
+            ICFEHandler helded = held.get();
+            ICFEHandler innered = inner.get();
+            return helded.getCfeQueue().isEmpty()
+                    && helded.getCFE() <= 0
+                    && innered.getCfeQueue().isEmpty();
         }
+        return true;
     }
 
 
     public void tick() {
         this.extractAnimationTick = Math.max(0, this.extractAnimationTick - 1);
-        if (this.extractAnimationTick == 9 * 20) {
-            this.mob.lookAt(EntityAnchorArgument.Anchor.EYES,targetPosition);
+        this.mob.getNavigation().stop();
+        this.mob.lookAt(EntityAnchorArgument.Anchor.EYES,targetPosition);
+        if (this.extractAnimationTick == 3*20) {
             BlockPos blockPos = mob.blockPosition();
             BlockPos targetPos = BlockPos.containing(targetPosition);
             if (!targetPos.equals(blockPos)) {
@@ -103,6 +106,9 @@ public class TreeExtractGoal extends Goal {
                     }
                 }
             }
+        }
+        if (this.extractAnimationTick < 20 && isCFEQueueEmpty()){
+            this.mob.setExtracting(false);
         }
     }
 }

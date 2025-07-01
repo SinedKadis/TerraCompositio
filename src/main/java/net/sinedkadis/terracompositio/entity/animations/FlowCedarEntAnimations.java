@@ -108,22 +108,29 @@ public class FlowCedarEntAnimations {
 		))
 		.build();
 
-	public static final AnimationDefinition TREE_EXTRACT = AnimationDefinition.Builder.withLength(13.0F)
+	public static final AnimationDefinition TREE_EXTRACT = AnimationDefinition.Builder.withLength(5.0F)
 			.addAnimation("left_arm", new AnimationChannel(AnimationChannel.Targets.ROTATION,
 					new Keyframe(0.0F, KeyframeAnimations.degreeVec(0.0F, 0.0F, 0.0F), AnimationChannel.Interpolations.LINEAR),
 					new Keyframe(1.0F, KeyframeAnimations.degreeVec(-90.0F, 0.0F, 0.0F), AnimationChannel.Interpolations.LINEAR),
 					new Keyframe(4.0F, KeyframeAnimations.degreeVec(-90.0F, -10.0F, 0.0F), AnimationChannel.Interpolations.LINEAR),
-					new Keyframe(5.0F, KeyframeAnimations.degreeVec(-180.0F, 0.0F, 10.0F), AnimationChannel.Interpolations.LINEAR),
-					new Keyframe(11.0F, KeyframeAnimations.degreeVec(-180.0756F, 0.8672F, 0.0373F), AnimationChannel.Interpolations.LINEAR),
-					new Keyframe(13.0F, KeyframeAnimations.degreeVec(0.0F, 0.0F, 0.0F), AnimationChannel.Interpolations.LINEAR)
+					new Keyframe(5.0F, KeyframeAnimations.degreeVec(-180.0F, 0.0F, 10.0F), AnimationChannel.Interpolations.LINEAR)
 			))
 			.addAnimation("right_arm", new AnimationChannel(AnimationChannel.Targets.ROTATION,
 					new Keyframe(0.0F, KeyframeAnimations.degreeVec(0.0F, 0.0F, 0.0F), AnimationChannel.Interpolations.LINEAR),
 					new Keyframe(1.0F, KeyframeAnimations.degreeVec(-90.0F, 0.0F, 0.0F), AnimationChannel.Interpolations.LINEAR),
 					new Keyframe(4.0F, KeyframeAnimations.degreeVec(-90.0F, 10.0F, 0.0F), AnimationChannel.Interpolations.LINEAR),
-					new Keyframe(5.0F, KeyframeAnimations.degreeVec(-180.0F, 0.0F, -10.0F), AnimationChannel.Interpolations.LINEAR),
-					new Keyframe(11.0F, KeyframeAnimations.degreeVec(-180.0756F, -0.8672F, -0.0373F), AnimationChannel.Interpolations.LINEAR),
-					new Keyframe(13.0F, KeyframeAnimations.degreeVec(0.0F, 0.0F, 0.0F), AnimationChannel.Interpolations.LINEAR)
+					new Keyframe(5.0F, KeyframeAnimations.degreeVec(-180.0F, 0.0F, -10.0F), AnimationChannel.Interpolations.LINEAR)
+			))
+			.build();
+
+	public static final AnimationDefinition EXTRACTION_COMPLETE = AnimationDefinition.Builder.withLength(2.0F)
+			.addAnimation("left_arm", new AnimationChannel(AnimationChannel.Targets.ROTATION,
+					new Keyframe(0.0F, KeyframeAnimations.degreeVec(-180.0F, 0.0F, 10.0F), AnimationChannel.Interpolations.LINEAR),
+					new Keyframe(2.0F, KeyframeAnimations.degreeVec(0.0F, 0.0F, 0.0F), AnimationChannel.Interpolations.LINEAR)
+			))
+			.addAnimation("right_arm", new AnimationChannel(AnimationChannel.Targets.ROTATION,
+					new Keyframe(0.0F, KeyframeAnimations.degreeVec(-180.0F, 0.0F, -10.0F), AnimationChannel.Interpolations.LINEAR),
+					new Keyframe(2.0F, KeyframeAnimations.degreeVec(0.0F, 0.0F, 0.0F), AnimationChannel.Interpolations.LINEAR)
 			))
 			.build();
 }

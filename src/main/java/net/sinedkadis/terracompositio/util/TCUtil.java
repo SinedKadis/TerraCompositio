@@ -53,6 +53,15 @@ public class TCUtil {
         }
         return count;
     }
+    public static int tryCFETransferWithParticles(ICFEHandler target, ICFEHandler source, Level targetLevel, Vec3 targetPos, BlockPos sourcePos, int maxTransfer){
+        int count = tryCFETransfer(target,source,sourcePos,maxTransfer);
+
+        if (targetLevel instanceof ServerLevel serverLevel){
+            TCUtil.sendCFEParticles(serverLevel, targetPos, sourcePos,count);
+        }
+
+        return count;
+    }
     public static int tryCFETransfer(CFENetworkMember target, CFENetworkMember source, int maxTransfer){
         ICFEHandler targetHandler = CFENetwork.getCFEHandler(target).orElse(null);
         if (targetHandler != null){
@@ -66,6 +75,16 @@ public class TCUtil {
                     return added;
                 }
             }
+        }
+        return 0;
+    }
+    public static int tryCFETransfer(ICFEHandler target, ICFEHandler source, BlockPos sourcePos, int maxTransfer){
+        int taken = source.takeCFE(maxTransfer,true);
+        int added = target.addCFE(taken,sourcePos,true);
+        if (added <= taken){
+            target.addCFE(added, sourcePos, false);
+            source.takeCFE(added, false);
+            return added;
         }
         return 0;
     }
