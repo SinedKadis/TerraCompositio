@@ -8,10 +8,12 @@ import net.minecraft.world.phys.Vec3;
 import net.sinedkadis.terracompositio.api.TerraCompositioAPI;
 import net.sinedkadis.terracompositio.api.networks.cfe.CFENetworkMember;
 import net.sinedkadis.terracompositio.api.networks.cfe.ICFEHandler;
+import net.sinedkadis.terracompositio.cfe.CFECapability;
 import net.sinedkadis.terracompositio.entity.custom.FlowCedarEntEntity;
 import net.sinedkadis.terracompositio.registries.TCTags;
 import net.sinedkadis.terracompositio.util.TCUtil;
 
+import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
@@ -40,16 +42,21 @@ public class ReachSourceGoal extends Goal {
             if (sourcePos != null && sourcePos.closerThan(mob.blockPosition(),mob.getLimit())) {
                 return false;
             }
-            CFENetworkMember randomSourceInRange = TerraCompositioAPI.instance().getCFENetworkInstance().getRandomSourceInRange(mob.blockPosition(), mob.level(), searchLimit, mob.getPriority());
+            CFENetworkMember randomSourceInRange = TerraCompositioAPI.instance().getCFENetworkInstance().getRandomSourceInRange(mob.blockPosition(), mob.level(), searchLimit);
             if (randomSourceInRange != null){
-                BlockPos blockPos = randomSourceInRange.getBlockPos();
-                mob.setSourcePos(blockPos);
-                if (TCUtil.distSqr(blockPos, mob.blockPosition()) > (long) stopDistance *stopDistance){
-                    targetPosition = blockPos.getCenter();
-                    return true;
+                boolean targetIsEnt = randomSourceInRange instanceof FlowCedarEntEntity;
+                boolean targetIsAcceptableEnt = targetIsEnt && ((FlowCedarEntEntity) randomSourceInRange).getCapability(CFECapability.CFE)
+                        .filter(icfeHandler -> icfeHandler.getCFE() > 1000).isPresent();
+                if (!targetIsEnt || targetIsAcceptableEnt) {
+                    BlockPos blockPos = randomSourceInRange.getBlockPos();
+                    mob.setSourcePos(blockPos);
+                    if (TCUtil.distSqr(blockPos, mob.blockPosition()) > (long) stopDistance * stopDistance) {
+                        targetPosition = blockPos.getCenter();
+                        return true;
+                    }
                 }
             }
-            List<BlockPos> list = new java.util.ArrayList<>(TCUtil.getNearBlocks(mob.getBlockPos(), 10).stream()
+            List<BlockPos> list = new ArrayList<>(TCUtil.getNearBlocks(mob.getBlockPos(), 10).stream()
                     .filter(pos1 -> mob.level().getBlockState(pos1).is(TCTags.Blocks.FLOW_CEDAR_LOGS))
                     .filter(pos2 -> mob.level().getBlockState(pos2).getValue(INFUSED))
                     .toList());
@@ -95,7 +102,7 @@ public class ReachSourceGoal extends Goal {
 
     private boolean isInStopRange() {
         double distance = this.mob.distanceToSqr(this.targetPosition.x, this.targetPosition.y, this.targetPosition.z);
-        long stop = (long) stopDistance * stopDistance;
+        long stop = (long) (stopDistance-1) * (stopDistance-1);
         return distance <= stop;
     }
 }

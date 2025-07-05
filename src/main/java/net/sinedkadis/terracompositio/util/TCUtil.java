@@ -48,7 +48,7 @@ public class TCUtil {
                 TCUtil.sendCFEParticles(serverLevel, Vec3.atLowerCornerWithOffset(target.getBlockPos(),
                         target.particleTargetOffset().x,
                         target.particleTargetOffset().y,
-                        target.particleTargetOffset().z),source.getBlockPos(),count);
+                        target.particleTargetOffset().z),source.getBlockPos().offset(BlockPos.containing(source.particleTargetOffset())),count);
             }
         }
         return count;
@@ -140,17 +140,31 @@ public class TCUtil {
     }
 
 
-        public static void spawnParticlesIn(Level pLevel, BlockPos targetPos){
+    public static void spawnParticlesIn(Level pLevel, BlockPos targetPos){
         if (pLevel instanceof ServerLevel level)
             level.sendParticles(TCParticles.CFE_PARTICLE.get(),
                 targetPos.getX()+pLevel.getRandom().nextFloat(),
                 targetPos.getY()+pLevel.getRandom().nextFloat(),
                 targetPos.getZ()+pLevel.getRandom().nextFloat(),
-                10,
+                0,
                     targetPos.getX(),
                     targetPos.getY(),
                     targetPos.getZ(),
                 0.5D);
+    }
+    public static void spawnParticlesIn(Level pLevel, BlockPos targetPos, int count){
+        for (int i = 0; i < count; i++) {
+            if (pLevel instanceof ServerLevel level)
+                level.sendParticles(TCParticles.CFE_PARTICLE.get(),
+                        targetPos.getX() + pLevel.getRandom().nextFloat(),
+                        targetPos.getY() + pLevel.getRandom().nextFloat(),
+                        targetPos.getZ() + pLevel.getRandom().nextFloat(),
+                        0,
+                        targetPos.getX(),
+                        targetPos.getY(),
+                        targetPos.getZ(),
+                        0.5D);
+        }
     }
 
     public static BlockState copyBlockStates(BlockState oldState, BlockState newState) {

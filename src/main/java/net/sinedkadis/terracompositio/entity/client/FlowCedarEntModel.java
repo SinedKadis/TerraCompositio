@@ -73,8 +73,10 @@ public class FlowCedarEntModel<T extends Entity> extends HierarchicalModel<T> {
 
 		this.animateWalk(FlowCedarEntAnimations.WALK, limbSwing, limbSwingAmount, 2f, 2f);
 		this.animate(entity1.idleAnimationState, FlowCedarEntAnimations.IDLE, ageInTicks, 1f);
+		this.animate(entity1.cfeHoldState, FlowCedarEntAnimations.CFE_HOLD, ageInTicks, 1f);
 		this.animate(entity1.extractionAnimationState, FlowCedarEntAnimations.TREE_EXTRACT,ageInTicks,1f);
 		this.animate(entity1.extractionCompleteAnimationState, FlowCedarEntAnimations.EXTRACTION_COMPLETE,ageInTicks,1f);
+
 	}
 
 	private void applyHeadRotation(float pNetHeadYaw, float pHeadPitch, float pAgeInTicks) {

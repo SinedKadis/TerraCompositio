@@ -10,6 +10,7 @@ import net.sinedkadis.terracompositio.api.networks.cfe.CFENetworkMemberBE;
 import net.sinedkadis.terracompositio.api.networks.cfe.ICFEHandler;
 import net.sinedkadis.terracompositio.events.CFENetworkEvent;
 import net.sinedkadis.terracompositio.util.TCUtil;
+import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.util.*;
 
@@ -46,7 +47,7 @@ public class CFENetworkHandler implements CFENetwork {
     }
 
     @Override
-    public CFENetworkMember getClosestSourceWithCFE(BlockPos pos, Level level, int limit, int priority) {
+    public CFENetworkMember getClosestSourceWithCFE(BlockPos pos, Level level, int limit, @Nullable Integer priority) {
         if (cfeSources.containsKey(level)) {
             Set<CFENetworkMember> sources = cfeSources.get(level);
             long minDist = Long.MAX_VALUE;
@@ -62,7 +63,7 @@ public class CFENetworkHandler implements CFENetwork {
                             && distance < source.getLimit()
                             && cfeHandlerOptional.isPresent()
                             && cfeHandlerOptional.get().getCFE() > 0
-                            && source.getPriority() < priority) {
+                            && (priority == null || source.getPriority() < priority)) {
                         minDist = distance;
                         closest = memberBE;
                     }
@@ -75,7 +76,7 @@ public class CFENetworkHandler implements CFENetwork {
     }
 
     @Override
-    public CFENetworkMember getRandomSourceInRange(BlockPos pos, Level level, int limit, int priority) {
+    public CFENetworkMember getRandomSourceInRange(BlockPos pos, Level level, int limit, @Nullable Integer priority) {
         if (cfeSources.containsKey(level)) {
             long limitSquared = (long) limit * limit;
             List<CFENetworkMember> sources = new ArrayList<>(cfeSources.get(level));
@@ -89,9 +90,21 @@ public class CFENetworkHandler implements CFENetwork {
                 }
                 if (distance <= limitSquared
                         && cfe > 0
-                        && source.getPriority() < priority) {
+                        && (priority == null || source.getPriority() < priority)) {
                     return source;
                 }
+            }
+        }
+        return null;
+    }
+
+    @Override
+    public @Nullable CFENetworkMember getMemberAt(Level level, BlockPos blockPos) {
+        if (cfeSources.containsKey(level)) {
+            for (CFENetworkMember member : cfeSources.get(level)){
+                if (!member.getBlockPos().equals(blockPos))
+                    continue;
+                return member;
             }
         }
         return null;

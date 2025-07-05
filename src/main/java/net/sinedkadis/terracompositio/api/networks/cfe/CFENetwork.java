@@ -10,8 +10,15 @@ import java.util.List;
 import java.util.Optional;
 
 public interface CFENetwork {
-    @Nullable CFENetworkMember getClosestSourceWithCFE(BlockPos pos, Level level, int limit, int priority);
-    @Nullable CFENetworkMember getRandomSourceInRange(BlockPos pos, Level level, int limit, int priority);
+    @Nullable CFENetworkMember getClosestSourceWithCFE(BlockPos pos, Level level, int limit, @Nullable Integer priority);
+    default @Nullable CFENetworkMember getClosestSourceWithCFE(BlockPos pos, Level level, int limit){
+        return getClosestSourceWithCFE(pos,level,limit,null);
+    }
+    @Nullable CFENetworkMember getRandomSourceInRange(BlockPos pos, Level level, int limit, @Nullable Integer priority);
+    default @Nullable CFENetworkMember getRandomSourceInRange(BlockPos pos, Level level, int limit){
+        return getRandomSourceInRange(pos,level,limit,null);
+    }
+    @Nullable CFENetworkMember getMemberAt(Level level,BlockPos blockPos);
     List<CFENetworkMember> getAllCFENetworkMembers(Level level);
     void fireCFENetworkEvent(CFENetworkMember source, NetworkAction action);
     boolean isIn(Level pLevel, ICFEHandler cfeHandler);

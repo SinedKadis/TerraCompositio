@@ -5,6 +5,7 @@ import net.minecraft.nbt.CompoundTag;
 import org.apache.commons.lang3.tuple.Pair;
 
 import java.util.List;
+import java.util.function.Function;
 
 public interface ICFEHandler {
     int getCFE();
@@ -13,8 +14,8 @@ public interface ICFEHandler {
     int addCFE(int cfe, BlockPos sourcePos, boolean simulate);
     void setCFE(int cfe);
     int getMaxCFE();
-    int getMinCFE();
     void containerTick();
+    Function<BlockPos, BlockPos> getTargetOffset();
     void writeToNBT(CompoundTag pTag);
     void readFromNBT(CompoundTag pTag);
 }

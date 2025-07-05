@@ -29,32 +29,38 @@ import java.util.function.Function;
 @Getter
 @Setter
 public class CFEContainer implements ICFEHandler, INBTSerializable<CompoundTag> {
-    private final float cfeTravelSpeed = 1 / 20f;
-    private final BlockEntity blockEntity;
-    private final Entity entity;
+    private float cfeTravelSpeed = 1 / 20f;
+    private BlockEntity blockEntity = null;
+    private Entity entity = null;
+    private int index = 0;
     int CFE = 0;
-    private int maxCFE;
+    private int maxCFE = 100;
     private final List<Pair<Integer, Double>> cfeQueue = new ArrayList<>();
+    @Getter
     private Function<BlockPos, BlockPos> targetOffset = blockpos -> blockpos;
 
-    public CFEContainer(BlockEntity blockEntity, int maxCFE) {
-        this.blockEntity = blockEntity;
-        this.entity = null;
-        this.maxCFE = maxCFE;
-    }
-
-    public CFEContainer(Entity entity, int maxCFE) {
-        this.entity = entity;
-        this.blockEntity = null;
-        this.maxCFE = maxCFE;
-    }
-
-    public CFEContainer(BlockEntity blockEntity) {
-        this(blockEntity, 100);
+    public CFEContainer(BlockEntity entity) {
+        this.blockEntity = entity;
     }
 
     public CFEContainer(Entity entity) {
-        this(entity, 100);
+        this.entity = entity;
+
+    }
+
+    public CFEContainer setMaxCFE(int maxCFE) {
+        this.maxCFE = maxCFE;
+        return this;
+    }
+
+    public CFEContainer setIndex(int index) {
+        this.index = index;
+        return this;
+    }
+
+    public CFEContainer setTargetOffset(Function<BlockPos,BlockPos> offset){
+        this.targetOffset = offset;
+        return this;
     }
 
     @Override
@@ -98,11 +104,6 @@ public class CFEContainer implements ICFEHandler, INBTSerializable<CompoundTag> 
         return added;
     }
 
-    public CFEContainer setTargetOffset(Function<BlockPos,BlockPos> offset){
-        this.targetOffset = offset;
-        return this;
-    }
-
     public void containerTick() {
         Iterator<Pair<Integer, Double>> iterator = cfeQueue.iterator();
         while (iterator.hasNext()) {
@@ -122,11 +123,6 @@ public class CFEContainer implements ICFEHandler, INBTSerializable<CompoundTag> 
         CFE += cfe;
         sendCFEUpdate(true);
         onContentsChanged();
-    }
-
-    @Override
-    public int getMinCFE() {
-        return 0;
     }
 
     protected void onContentsChanged() {
@@ -155,11 +151,11 @@ public class CFEContainer implements ICFEHandler, INBTSerializable<CompoundTag> 
     }
 
     public void writeToNBT(CompoundTag pTag) {
-        pTag.put("cfeContainer", this.serializeNBT());
+        pTag.put("cfeContainer_"+index, this.serializeNBT());
     }
 
     public void readFromNBT(CompoundTag pTag) {
-        CompoundTag tag = pTag.getCompound("cfeContainer");
+        CompoundTag tag = pTag.getCompound("cfeContainer_"+index);
         this.deserializeNBT(tag);
     }
 

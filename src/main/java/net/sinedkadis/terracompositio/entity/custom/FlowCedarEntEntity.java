@@ -35,12 +35,14 @@ import net.sinedkadis.terracompositio.api.networks.cfe.CFENetworkMemberEntity;
 import net.sinedkadis.terracompositio.api.networks.cfe.ICFEHandler;
 import net.sinedkadis.terracompositio.cfe.CFECapability;
 import net.sinedkadis.terracompositio.cfe.CFEContainer;
+import net.sinedkadis.terracompositio.entity.goals.CFEHoldGoal;
 import net.sinedkadis.terracompositio.entity.goals.ReachSourceGoal;
-import net.sinedkadis.terracompositio.entity.goals.TreeExtractGoal;
+import net.sinedkadis.terracompositio.entity.goals.CFEExtractGoal;
 import net.sinedkadis.terracompositio.util.TCUtil;
 import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.Optional;
 
 // /kill @e[type=terracompositio:flow_cedar_ent_entity]
 
@@ -49,16 +51,18 @@ import javax.annotation.ParametersAreNonnullByDefault;
 public class FlowCedarEntEntity extends AbstractGolem implements CFENetworkMemberEntity {
     private static final EntityDataAccessor<Boolean> EXTRACTING =
             SynchedEntityData.defineId(FlowCedarEntEntity.class, EntityDataSerializers.BOOLEAN);
+    private static final EntityDataAccessor<Boolean> HOLDING =
+            SynchedEntityData.defineId(FlowCedarEntEntity.class, EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<Integer> CFE_DATA =
             SynchedEntityData.defineId(FlowCedarEntEntity.class, EntityDataSerializers.INT);
 
-    protected LazyOptional<ICFEHandler> lazyCFEOptional = LazyOptional.of(() -> new CFEContainer(this,10000).setTargetOffset(BlockPos::above));
+    protected LazyOptional<ICFEHandler> lazyCFEOptional = LazyOptional.of(() -> new CFEContainer(this).setMaxCFE(10000).setTargetOffset(blockPos -> blockPos.above(3)).setIndex(1));
     @Getter
-    protected LazyOptional<ICFEHandler> innerCFEOptional = LazyOptional.of(() -> new CFEContainer(this,5*60+60));
+    protected LazyOptional<ICFEHandler> innerCFEOptional = LazyOptional.of(() -> new CFEContainer(this).setMaxCFE(5 * 60 + 60).setTargetOffset(BlockPos::above).setIndex(2));
     public final AnimationState idleAnimationState = new AnimationState();
     public final AnimationState extractionAnimationState = new AnimationState();
     public final AnimationState extractionCompleteAnimationState = new AnimationState();
-    public final AnimationState walkAnimationState = new AnimationState();
+    public final AnimationState cfeHoldState = new AnimationState();
 
     @Setter @Getter @Nullable
     private BlockPos sourcePos;
@@ -92,8 +96,9 @@ public class FlowCedarEntEntity extends AbstractGolem implements CFENetworkMembe
 
             lazyCFEOptional.ifPresent(icfeHandler -> {
                 icfeHandler.containerTick();
-
                 int currentEnergy = icfeHandler.getCFE();
+
+                if (currentEnergy > 10000) abortCFEConsume();
 
                 if (currentEnergy != lastSyncedEnergy) {
                     setSyncedCFE(currentEnergy);
@@ -117,6 +122,7 @@ public class FlowCedarEntEntity extends AbstractGolem implements CFENetworkMembe
     protected void defineSynchedData() {
         super.defineSynchedData();
         this.entityData.define(EXTRACTING, false);
+        this.entityData.define(HOLDING, false);
         this.entityData.define(CFE_DATA, 0);
     }
 
@@ -126,6 +132,14 @@ public class FlowCedarEntEntity extends AbstractGolem implements CFENetworkMembe
 
     public boolean isExtracting() {
         return this.entityData.get(EXTRACTING);
+    }
+
+    public void setHolding(boolean extracting) {
+        this.entityData.set(HOLDING, extracting);
+    }
+
+    public boolean isHolding() {
+        return this.entityData.get(HOLDING);
     }
 
     public int getSyncedCFE() {
@@ -151,16 +165,17 @@ public class FlowCedarEntEntity extends AbstractGolem implements CFENetworkMembe
         innerCFEOptional.invalidate();
     }
 
-    boolean wasExtracted = false;
+    boolean wasHeld = false;
     private void setupAnimationStates() {
         idleAnimationState.startIfStopped(this.tickCount);
 
         extractionAnimationState.animateWhen(this.isExtracting(),this.tickCount);
-        if (!isExtracting() && wasExtracted){
-            extractionAnimationState.stop();
+        cfeHoldState.animateWhen(this.isHolding(),this.tickCount);
+        if (!isHolding() && wasHeld){
+            cfeHoldState.stop();
             extractionCompleteAnimationState.start(this.tickCount);
         }
-        wasExtracted = isExtracting();
+        wasHeld = isHolding();
 
     }
     @Override
@@ -178,12 +193,12 @@ public class FlowCedarEntEntity extends AbstractGolem implements CFENetworkMembe
     @Override
     protected void registerGoals() {
         this.goalSelector.addGoal(0, new FloatGoal(this));
-
+        this.goalSelector.addGoal(0, new CFEHoldGoal(this));
 //        this.goalSelector.addGoal(1, new BreedGoal(this, 1.15D));
 //        this.goalSelector.addGoal(2, new TemptGoal(this, 1.2D, Ingredient.of(Items.COOKED_BEEF), false));
 
         this.goalSelector.addGoal(3, new ReachSourceGoal(this,1.2D,32,5));
-        this.goalSelector.addGoal(3, new TreeExtractGoal(this));
+        this.goalSelector.addGoal(3, new CFEExtractGoal(this));
         this.goalSelector.addGoal(4, new WaterAvoidingRandomStrollGoal(this, 1.0D));
         this.goalSelector.addGoal(5, new LookAtPlayerGoal(this, Player.class, 3f));
         this.goalSelector.addGoal(6, new RandomLookAroundGoal(this));
@@ -224,7 +239,7 @@ public class FlowCedarEntEntity extends AbstractGolem implements CFENetworkMembe
 
     @Override
     public BlockPos getBlockPos() {
-        return this.getOnPos(1);
+        return this.blockPosition();
     }
 
     @Override
@@ -239,7 +254,12 @@ public class FlowCedarEntEntity extends AbstractGolem implements CFENetworkMembe
 
     @Override
     public Vec3 particleTargetOffset() {
-        return new Vec3(0.5d,3d,0.5d);
+        Optional<ICFEHandler> icfeHandler = lazyCFEOptional.resolve();
+        float scale = 3;
+        if (icfeHandler.isPresent() && icfeHandler.get().getCFE() > 0) {
+            scale = (0.1f + (getSyncedCFE() / (float) icfeHandler.get().getMaxCFE())) * 10;
+        }
+        return new Vec3(0.5d,this.getBbHeight() + scale * 0.2f,0.5d);
     }
 
     @Override
@@ -247,6 +267,8 @@ public class FlowCedarEntEntity extends AbstractGolem implements CFENetworkMembe
         super.addAdditionalSaveData(pCompound);
         lazyCFEOptional.ifPresent(cap -> cap.writeToNBT(pCompound));
         innerCFEOptional.ifPresent(cap -> cap.writeToNBT(pCompound));
+        if (sourcePos != null)
+            pCompound.putIntArray("sourcePos", new int[]{sourcePos.getX(), sourcePos.getY(), sourcePos.getZ()});
     }
 
     @Override
@@ -254,10 +276,20 @@ public class FlowCedarEntEntity extends AbstractGolem implements CFENetworkMembe
         super.readAdditionalSaveData(pCompound);
         lazyCFEOptional.ifPresent(cap -> cap.readFromNBT(pCompound));
         innerCFEOptional.ifPresent(cap -> cap.readFromNBT(pCompound));
+        int[] pos = pCompound.getIntArray("sourcePos");
+        if (pos.length > 0)
+            sourcePos = new BlockPos(pos[0],pos[1],pos[2]);
     }
 
 
     public void abortCFEConsume() {
+        lazyCFEOptional.ifPresent(icfeHandler -> {
+            if (!this.level().isClientSide()){
+                float scale = (0.1f + (icfeHandler.getCFE() / (float) icfeHandler.getMaxCFE())) * 10;
+                TCUtil.spawnParticlesIn(this.level(), BlockPos.containing(this.position().add(0,this.getBbHeight() + scale * 0.2f,0)),icfeHandler.getCFE()/10);
+                icfeHandler.setCFE(0);
+            }
+        });
 
     }
 }

@@ -6,10 +6,10 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.event.ForgeEventFactory;
+import net.sinedkadis.terracompositio.api.TerraCompositioAPI;
 import net.sinedkadis.terracompositio.api.networks.cfe.*;
 import net.sinedkadis.terracompositio.cfe.CFECapability;
 import net.sinedkadis.terracompositio.entity.custom.FlowCedarEntEntity;
@@ -19,14 +19,15 @@ import net.sinedkadis.terracompositio.util.TCUtil;
 import java.util.EnumSet;
 import java.util.Optional;
 
-public class TreeExtractGoal extends Goal {
+public class CFEExtractGoal extends Goal {
     private final FlowCedarEntEntity mob;
     private final Level level;
     @Getter
     private int extractAnimationTick;
     private Vec3 targetPosition;
+    private boolean targetIsAcceptableEnt;
 
-    public TreeExtractGoal(FlowCedarEntEntity pMob) {
+    public CFEExtractGoal(FlowCedarEntEntity pMob) {
         this.mob = pMob;
         this.level = pMob.level();
         this.setFlags(EnumSet.of(Flag.MOVE, Flag.LOOK, Flag.JUMP));
@@ -35,16 +36,16 @@ public class TreeExtractGoal extends Goal {
     @Override
     public boolean canUse() {
         Optional<ICFEHandler> capability = mob.getInnerCFEOptional().resolve();
+
         return capability.filter(icfeHandler -> icfeHandler.getCFE() < 60).isPresent()
                 && ForgeEventFactory.getMobGriefingEvent(this.level, this.mob)
-                && mob.getSourcePos() != null
-                && mob.getSourcePos().closerThan(mob.blockPosition(),mob.getLimit())
+                && isSourcePosValid()
                 && isCFEQueueEmpty();
     }
 
     public void start() {
         this.mob.getNavigation().stop();
-        this.extractAnimationTick = 5*20;
+        this.extractAnimationTick = 6*20;
         assert mob.getSourcePos() != null;
         this.targetPosition = mob.getSourcePos().getCenter();
         mob.setExtracting(true);
@@ -52,7 +53,7 @@ public class TreeExtractGoal extends Goal {
 
     public void stop() {
         this.extractAnimationTick = 0;
-        this.mob.abortCFEConsume();
+        //this.mob.abortCFEConsume();
         this.mob.setExtracting(false);
     }
 
@@ -73,21 +74,35 @@ public class TreeExtractGoal extends Goal {
         return true;
     }
 
+    private boolean isSourcePosValid(){
+        BlockPos blockPos = mob.getSourcePos();
+        CFENetworkMember memberAt = TerraCompositioAPI.instance().getCFENetworkInstance().getMemberAt(level, blockPos);
+        boolean valid = blockPos != null
+                && blockPos.closerThan(mob.blockPosition(), mob.getLimit())
+                && memberAt != null;
+        if (valid){
+            boolean targetIsEnt = memberAt instanceof FlowCedarEntEntity;
+            targetIsAcceptableEnt = targetIsEnt && ((FlowCedarEntEntity) memberAt).getCapability(CFECapability.CFE)
+                    .filter(icfeHandler -> icfeHandler.getCFE() > 1000).isPresent();
+        }
+        return valid;
+    }
+
 
     public void tick() {
         this.extractAnimationTick = Math.max(0, this.extractAnimationTick - 1);
         this.mob.getNavigation().stop();
         this.mob.lookAt(EntityAnchorArgument.Anchor.EYES,targetPosition);
-        if (this.extractAnimationTick == 3*20) {
+        if (this.extractAnimationTick == 4*20) {
             BlockPos blockPos = mob.blockPosition();
             BlockPos targetPos = BlockPos.containing(targetPosition);
             if (!targetPos.equals(blockPos)) {
-                Optional<ICFEHandler> cfeHandler = CFENetwork.getCFEHandler(mob);
-                BlockEntity blockEntity = level.getBlockEntity(targetPos);
+                Optional<ICFEHandler> cfeHandler = this.mob.getCapability(CFECapability.CFE).resolve();
                 if (cfeHandler.isPresent()) {
                     ICFEHandler icfeHandler = cfeHandler.get();
-                    if (blockEntity instanceof CFENetworkMemberBE member) {
-                        TCUtil.tryCFETransferWithParticles(mob, member, icfeHandler.getMaxCFE() - icfeHandler.getCFE());
+                    CFENetworkMember targetMember = TerraCompositioAPI.instance().getCFENetworkInstance().getMemberAt(level,targetPos);
+                    if (targetMember != null) {
+                        TCUtil.tryCFETransferWithParticles(mob, targetMember, targetIsAcceptableEnt ? 100 : icfeHandler.getMaxCFE() - icfeHandler.getCFE());
                         return;
                     }
                     BlockState blockState = level.getBlockState(targetPos);

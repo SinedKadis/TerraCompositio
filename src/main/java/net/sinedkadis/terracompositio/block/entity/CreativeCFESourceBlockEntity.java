@@ -46,7 +46,7 @@ public class CreativeCFESourceBlockEntity extends TCBlockEntity implements CFENe
     public void onLoad() {
         super.onLoad();
         lazyOptional = LazyOptional.of(() -> {
-            CFEContainer cfeContainer = new CFEContainer(this, Integer.MAX_VALUE);
+            CFEContainer cfeContainer = new CFEContainer(this).setMaxCFE(Integer.MAX_VALUE);
             cfeContainer.setCFE(Integer.MAX_VALUE);
             return cfeContainer;
         });
