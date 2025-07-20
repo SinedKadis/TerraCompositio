@@ -9,6 +9,7 @@ import net.minecraftforge.registries.RegistryObject;
 import net.sinedkadis.terracompositio.TerraCompositio;
 import net.sinedkadis.terracompositio.block.entity.*;
 
+@SuppressWarnings("DataFlowIssue")
 public class TCBlockEntities {
     public static final DeferredRegister<BlockEntityType<?>> BLOCK_ENTITIES =
             DeferredRegister.create(ForgeRegistries.BLOCK_ENTITY_TYPES, TerraCompositio.MOD_ID);
@@ -73,6 +74,15 @@ public class TCBlockEntities {
             BLOCK_ENTITIES.register("cfe_saturated_air_be", () ->
                     BlockEntityType.Builder.of(CFESaturatedAirBlockEntity::new,
                             TCBlocks.CFE_SATURATED_AIR.get()).build(null));
+
+    public static final RegistryObject<BlockEntityType<PathPointerBlockEntity>> PATH_POINTER_BE =
+            BLOCK_ENTITIES.register("path_pointer_be", () ->
+                    BlockEntityType.Builder.of(PathPointerBlockEntity::new,
+                            TCBlocks.PP_RECEIVER.get(),
+                            TCBlocks.PP_COLLECTOR.get(),
+                            TCBlocks.PP_EMITTER.get(),
+                            TCBlocks.PP_SENDER.get()
+                    ).build(null));
 
 
 

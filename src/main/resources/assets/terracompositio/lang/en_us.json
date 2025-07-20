@@ -114,8 +114,18 @@
   "item.terracompositio.creation_flow_journal": "Creation Flow Journal",
   "entity.terracompositio.flow_cedar_ent_entity": "Flow Cedar Ent",
   "item.terracompositio.flow_cedar_ent_spawn_egg": "Flow Cedar Ent Spawn Egg",
-
-
+  "block.terracompositio.path_pointer": "Path Pointer",
+  "block.terracompositio.pp_receiver": "Path Pointer Receiver",
+  "block.terracompositio.pp_sender": "Path Pointer Sender",
+  "block.terracompositio.pp_emitter": "Path Pointer Emitter",
+  "block.terracompositio.pp_collector": "Path Pointer Collector",
+  "item.terracompositio.flow_rotating_axe.bind_success": "Binding passed successful",
+  "item.terracompositio.flow_rotating_axe.bind_fail_too_far": "I can't bind it. Too far",
+  "item.terracompositio.flow_rotating_axe.bind_fail_incompatible": "I can't bind it. I should try another parts",
+  "item.terracompositio.flow_rotating_axe.bind_begin": "I'll bind it to...",
+  "block.terracompositio.pp.yaw": "Yaw: %s",
+  "block.terracompositio.pp.pitch": "Pitch: %s",
+  "block.terracompositio.pp.roll": "Roll: %s",
 
 
 
@@ -157,4 +167,5 @@
   "book.terracompositio.creation_flow_journal.entry.activated_cedar_armor.page1": "test",
   "book.terracompositio.creation_flow_journal.entry.activated_cedar_armor.page2.title": "test",
   "book.terracompositio.creation_flow_journal.entry.activated_cedar_armor.page2": "test"
+
 }

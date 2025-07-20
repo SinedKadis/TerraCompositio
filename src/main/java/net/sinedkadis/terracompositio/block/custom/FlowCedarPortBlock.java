@@ -47,6 +47,7 @@ public class FlowCedarPortBlock extends TCIOBaseEntityBlock {
     public FlowCedarPortBlock(Properties pProperties, Supplier<Block> stripPair) {
         super(pProperties);
         this.stripPair = stripPair;
+        this.registerDefaultState(this.defaultBlockState().setValue(INFUSED,false));
     }
 
     @Override
@@ -128,6 +129,7 @@ public class FlowCedarPortBlock extends TCIOBaseEntityBlock {
                 (pLevel1, pPos, pState1, pBlockEntity) -> pBlockEntity.tick(pLevel1,pPos,pState1));
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     public void tick(BlockState pState, @NotNull ServerLevel pLevel, @NotNull BlockPos pPos, @NotNull RandomSource pRandom) {
         if (pState.getValue(INFUSED)) {

@@ -153,4 +153,13 @@ public class TCBlocks {
 
     public static final RegistryObject<Block> CFE_SATURATED_AIR = registerBlock("cfe_saturated_air",
             () -> new CFESaturatedAirBlock(BlockBehaviour.Properties.copy(Blocks.AIR).noLootTable()));
+
+    public static final RegistryObject<Block> PP_RECEIVER = registerBlock("pp_receiver",
+            () -> new PathPointerBlock(BlockBehaviour.Properties.copy(Blocks.OAK_PLANKS).noOcclusion(), PathPointerBlock.PPPart.RECEIVER));
+    public static final RegistryObject<Block> PP_COLLECTOR = registerBlock("pp_collector",
+            () -> new PathPointerBlock(BlockBehaviour.Properties.copy(Blocks.OAK_PLANKS).noOcclusion(), PathPointerBlock.PPPart.COLLECTOR));
+    public static final RegistryObject<Block> PP_SENDER = registerBlock("pp_sender",
+            () -> new PathPointerBlock(BlockBehaviour.Properties.copy(Blocks.OAK_PLANKS).noOcclusion(), PathPointerBlock.PPPart.SENDER));
+    public static final RegistryObject<Block> PP_EMITTER = registerBlock("pp_emitter",
+            () -> new PathPointerBlock(BlockBehaviour.Properties.copy(Blocks.OAK_PLANKS).noOcclusion(), PathPointerBlock.PPPart.EMITTER));
 }

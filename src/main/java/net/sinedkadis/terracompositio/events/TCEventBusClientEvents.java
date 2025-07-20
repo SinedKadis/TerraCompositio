@@ -102,6 +102,7 @@ public class TCEventBusClientEvents {
         event.registerBlockEntityRenderer(TCBlockEntities.CULTIVATION_DESORBER_BE.get(), CultivationDesorberBlockEntityRenderer::new);
         event.registerBlockEntityRenderer(TCBlockEntities.TIME_PASSAGE_DESORBER_BE.get(), TimePassageDesorberBlockEntityRenderer::new);
         event.registerBlockEntityRenderer(TCBlockEntities.FLOW_CEDAR_TANK_BE.get(), FlowCedarTankBlockEntityRenderer::new);
+        event.registerBlockEntityRenderer(TCBlockEntities.PATH_POINTER_BE.get(), PathPointerBlockEntityRenderer::new);
 
     }
 }

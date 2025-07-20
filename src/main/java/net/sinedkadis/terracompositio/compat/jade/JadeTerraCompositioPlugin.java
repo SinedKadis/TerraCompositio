@@ -28,6 +28,9 @@ public class JadeTerraCompositioPlugin implements IWailaPlugin {
         
         registration.registerEntityDataProvider(TCCFEEntityComponentProvider.INSTANCE, FlowCedarEntEntity.class);
 
+        registration.registerBlockDataProvider(PPComponentProvider.INSTANCE, PathPointerBlockEntity.class);
+
+
     }
 
     @Override
@@ -55,6 +58,8 @@ public class JadeTerraCompositioPlugin implements IWailaPlugin {
         registration.addConfig(TimePassageDesorberComponentProvider.INSTANCE.chanceConfigRL(),true);
 
         registration.registerEntityComponent(TCCFEEntityComponentProvider.INSTANCE, FlowCedarEntEntity.class);
+
+        registration.registerBlockComponent(PPComponentProvider.INSTANCE, PathPointerBlock.class);
 
     }
 

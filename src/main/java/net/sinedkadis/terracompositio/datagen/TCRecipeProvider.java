@@ -209,28 +209,28 @@ public class TCRecipeProvider extends RecipeProvider implements IConditionBuilde
                 .pattern("III")
                 .define('I', Items.IRON_INGOT)
                 .define('L', TCTags.Items.FLOW_CEDAR_LOGS)
-                .unlockedBy(getHasName(TCBlocks.FLOW_CEDAR_LOG.get()), has(Items.IRON_INGOT))
+                .unlockedBy(getHasName(TCBlocks.FLOW_CEDAR_LOG.get()), has(TCBlocks.FLOW_CEDAR_LOG.get()))
                 .save(pWriter);
         ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, TCBlocks.CULTIVATION_DESORBER.get())
                 .pattern("ILI")
                 .pattern("III")
                 .define('I', Items.COPPER_INGOT)
                 .define('L', TCTags.Items.FLOW_CEDAR_LOGS)
-                .unlockedBy(getHasName(TCBlocks.FLOW_CEDAR_LOG.get()), has(Items.COPPER_INGOT))
+                .unlockedBy(getHasName(TCBlocks.FLOW_CEDAR_LOG.get()), has(TCBlocks.FLOW_CEDAR_LOG.get()))
                 .save(pWriter);
         ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, TCBlocks.TIME_PASSAGE_DESORBER.get())
                 .pattern("ILI")
                 .pattern("III")
                 .define('I', Items.GOLD_INGOT)
                 .define('L', TCTags.Items.FLOW_CEDAR_LOGS)
-                .unlockedBy(getHasName(TCBlocks.FLOW_CEDAR_LOG.get()), has(Items.GOLD_INGOT))
+                .unlockedBy(getHasName(TCBlocks.FLOW_CEDAR_LOG.get()), has(TCBlocks.FLOW_CEDAR_LOG.get()))
                 .save(pWriter);
         ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, Items.BUNDLE)
                 .pattern("S")
                 .pattern("L")
                 .define('S', Items.STRING)
                 .define('L',Items.LEATHER)
-                .unlockedBy(getHasName(Items.STRING), has(Items.LEATHER))
+                .unlockedBy(getHasName(Items.STRING), has(Items.STRING))
                 .save(pWriter);
         ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, TCItems.WRENCH_AXE.get())
                 .pattern("II")
@@ -238,7 +238,7 @@ public class TCRecipeProvider extends RecipeProvider implements IConditionBuilde
                 .pattern(" S")
                 .define('I', TCItems.INFUSED_IRON_INGOT.get())
                 .define('S', Items.STICK)
-                .unlockedBy(getHasName(TCItems.INFUSED_IRON_INGOT.get()), has(Items.STICK))
+                .unlockedBy(getHasName(TCItems.INFUSED_IRON_INGOT.get()), has(TCItems.INFUSED_IRON_INGOT.get()))
                 .save(pWriter);
         ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, TCItems.WRENCH_AXE.get())
                 .pattern("II")
@@ -246,9 +246,45 @@ public class TCRecipeProvider extends RecipeProvider implements IConditionBuilde
                 .pattern("S ")
                 .define('I', TCItems.INFUSED_IRON_INGOT.get())
                 .define('S', Items.STICK)
-                .unlockedBy(getHasName(TCItems.INFUSED_IRON_INGOT.get()), has(Items.STICK))
+                .unlockedBy(getHasName(TCItems.INFUSED_IRON_INGOT.get()), has(TCItems.INFUSED_IRON_INGOT.get()))
                 .save(pWriter, Objects.requireNonNull(ResourceLocation.tryBuild(Objects.requireNonNull(ForgeRegistries.ITEMS.getKey(TCItems.WRENCH_AXE.get())).getNamespace(),
                         Objects.requireNonNull(ForgeRegistries.ITEMS.getKey(TCItems.WRENCH_AXE.get())).getPath() + "_mirrored")));
+
+        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, TCBlocks.PP_COLLECTOR.get())
+                .pattern(" T ")
+                .pattern("LLT")
+                .pattern(" T ")
+                .define('T', TCItems.TECHNETIUM_INGOT.get())
+                .define('L', TCTags.Items.FLOW_CEDAR_LOGS)
+                .unlockedBy(getHasName(TCItems.TECHNETIUM_INGOT.get()), has(TCItems.TECHNETIUM_INGOT.get()))
+                .save(pWriter);
+        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, TCBlocks.PP_EMITTER.get())
+                .pattern(" TR")
+                .pattern("TLI")
+                .pattern(" TR")
+                .define('T', TCItems.TECHNETIUM_INGOT.get())
+                .define('I', TCItems.INFUSED_IRON_INGOT.get())
+                .define('R', TCItems.INFUSED_IRON_ROD.get())
+                .define('L', TCTags.Items.FLOW_CEDAR_LOGS)
+                .unlockedBy(getHasName(TCItems.TECHNETIUM_INGOT.get()), has(TCItems.TECHNETIUM_INGOT.get()))
+                .save(pWriter);
+        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, TCBlocks.PP_SENDER.get())
+                .pattern(" TC")
+                .pattern("TC ")
+                .pattern(" TC")
+                .define('T', TCItems.TECHNETIUM_INGOT.get())
+                .define('C', Items.COPPER_INGOT)
+                .unlockedBy(getHasName(TCItems.TECHNETIUM_INGOT.get()), has(TCItems.TECHNETIUM_INGOT.get()))
+                .save(pWriter);
+        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, TCBlocks.PP_RECEIVER.get())
+                .pattern("LT ")
+                .pattern(" LT")
+                .pattern("LT ")
+                .define('T', TCItems.TECHNETIUM_INGOT.get())
+                .define('L', Items.LAPIS_LAZULI)
+                .unlockedBy(getHasName(TCItems.TECHNETIUM_INGOT.get()), has(TCItems.TECHNETIUM_INGOT.get()))
+                .save(pWriter);
+
 
 
         ItemStack bookLevel1 = createCFJBook(1);

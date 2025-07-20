@@ -39,7 +39,8 @@ import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.registries.ForgeRegistries;
-import net.sinedkadis.terracompositio.registries.TCBlockStateProperties;
+import net.sinedkadis.terracompositio.block.custom.PathPointerBlock;
+import net.sinedkadis.terracompositio.block.entity.PathPointerBlockEntity;
 import net.sinedkadis.terracompositio.registries.TCBlocks;
 import net.sinedkadis.terracompositio.registries.TCItems;
 import net.sinedkadis.terracompositio.util.FunctionSide;
@@ -73,7 +74,7 @@ public class WrenchAxeItem extends AxeItem {
     public @NotNull InteractionResultHolder<ItemStack> use(@NotNull Level pLevel, Player pPlayer, @NotNull InteractionHand pUsedHand) {
         ItemStack stack = pPlayer.getItemInHand(pUsedHand);
         if (pPlayer.isCrouching() && !isPlayerLookingAtBlock(pPlayer,pLevel)) {
-            setWrenchMode(stack,getWrenchMode(stack).next()); // Переключаем режим
+            setWrenchMode(stack,getWrenchMode(stack).next());
             if (!stack.hasTag()) {
                 stack.setTag(new CompoundTag());
             }
@@ -126,8 +127,7 @@ public class WrenchAxeItem extends AxeItem {
         return WrenchMode.AXE;
     }
 
-    // Метод для установки режима в NBT
-    public void setWrenchMode(ItemStack stack, WrenchMode mode) {
+    public static void setWrenchMode(ItemStack stack, WrenchMode mode) {
         CompoundTag tag = stack.getOrCreateTag();
         tag.putInt("WrenchMode", mode.ordinal());
     }
@@ -268,11 +268,11 @@ public class WrenchAxeItem extends AxeItem {
                 BlockState casingState = level.getBlockState(casingPos);
                 if (casingState.is(TCBlocks.FLOW_CEDAR_CASING.get())) {
                     if (undoBlockState(blockState, UP_CONNECTION, player, itemStack)) {
-                        level.setBlock(casingPos, casingState.setValue(TCBlockStateProperties.INPUT_BUS_CONNECTION, false), 3);
+                        level.setBlock(casingPos, casingState.setValue(INPUT_BUS_CONNECTION, false), 3);
                         return true;
                     }
                     if (undoBlockState(blockState, DOWN_CONNECTION, player, itemStack)) {
-                        level.setBlock(casingPos, casingState.setValue(TCBlockStateProperties.OUTPUT_BUS_CONNECTION, false), 3);
+                        level.setBlock(casingPos, casingState.setValue(OUTPUT_BUS_CONNECTION, false), 3);
                         return true;
                     }
                 }
@@ -281,11 +281,11 @@ public class WrenchAxeItem extends AxeItem {
             if (directionByFunctionSide != Direction.DOWN) {
                 BlockPos matInfPos = pos.relative(directionByFunctionSide);
                 BlockState matInfState = level.getBlockState(matInfPos);
-                if (undoBlockState(blockState, TCBlockStateProperties.INPUT_BUS_CONNECTION, player, itemStack)) {
+                if (undoBlockState(blockState, INPUT_BUS_CONNECTION, player, itemStack)) {
                     level.setBlock(matInfPos, matInfState.setValue(UP_CONNECTION, false), 3);
                     return true;
                 }
-                if (undoBlockState(blockState, TCBlockStateProperties.OUTPUT_BUS_CONNECTION, player, itemStack)) {
+                if (undoBlockState(blockState, OUTPUT_BUS_CONNECTION, player, itemStack)) {
                     level.setBlock(matInfPos, matInfState.setValue(DOWN_CONNECTION, false), 3);
                     return true;
                 }
@@ -323,7 +323,7 @@ public class WrenchAxeItem extends AxeItem {
     }
 
     private void doubleAxeInteraction(Level level, BlockPos pos, Direction face, Player player, ItemStack stack, int usedTicks) {
-        BlockPos anchor = getAnchor(level, pos,LOGS_TAG, face);
+        BlockPos anchor = getAnchor(level, pos, face);
         List<BlockPos> tree = new ArrayList<>(getNearBlocks(level, anchor, LOGS_TAG, 32).stream().filter(blockPos -> blockPos.getY() >= anchor.getY()).toList());
         Collections.reverse(tree);
         List<BlockPos> peaks = tree.stream().filter(blockPos -> !level.getBlockState(blockPos.above()).is(BlockTags.LOGS)).toList();
@@ -372,7 +372,7 @@ public class WrenchAxeItem extends AxeItem {
 
     private void wrenchAxeInteraction(Level level, BlockPos pos, Direction face, Player player, ItemStack stack, int usedTicks) {
         if (usedTicks > 20){
-            BlockPos anchor = getAnchor(level, pos, LOGS_TAG, face);
+            BlockPos anchor = getAnchor(level, pos, face);
             List<BlockPos> tree = getNearBlocks(level, anchor, LOGS_TAG, 64).stream().filter(blockPos -> blockPos.getY() >= anchor.getY()).toList();
 //            if (tree.size() > 32 && player != null) {
 //                player.displayClientMessage(Component.translatable("item.terracompositio.flow_rotating_axe.too_massive_tree").withStyle(ChatFormatting.BOLD), true);
@@ -429,7 +429,7 @@ public class WrenchAxeItem extends AxeItem {
                 case Z -> blockPos.getZ();
                 default -> 0;
             });
-            Block.dropResources(state,level,blockPos);
+            dropResources(state,level,blockPos);
             return;
         }
         BlockPos copyPos = new BlockPos(blockPos.getX(),blockPos.getY(),blockPos.getZ());
@@ -447,7 +447,7 @@ public class WrenchAxeItem extends AxeItem {
             default -> true;
         };
         if (wall){
-            Block.dropResources(state,level,blockPos);
+            dropResources(state,level,blockPos);
             return;
         }
         blockPos.set(copyPos);
@@ -549,11 +549,11 @@ public class WrenchAxeItem extends AxeItem {
         return hitResult.getType() == HitResult.Type.BLOCK ? hitResult.getBlockPos() : null;
     }
 
-    private BlockPos getAnchor(Level level, BlockPos origin, TagKey<Block> tag, Direction face) {
+    private BlockPos getAnchor(Level level, BlockPos origin, Direction face) {
         BlockPos.MutableBlockPos mutablePos = new BlockPos.MutableBlockPos().set(origin);
         int maxDistance = 8;
         while (true) {
-            if (maxDistance-- <= 0 || !level.getBlockState(mutablePos.move(face)).is(tag))
+            if (maxDistance-- <= 0 || !level.getBlockState(mutablePos.move(face)).is(WrenchAxeItem.LOGS_TAG))
                 break;
         }
         return mutablePos.immutable();
@@ -572,8 +572,9 @@ public class WrenchAxeItem extends AxeItem {
         return WrenchMode.AXE; // Default mode
     }
 
-    private boolean wrenchInteraction(@Nullable Player pPlayer, BlockState pStateClicked, LevelAccessor level, BlockPos pos, boolean pShouldCycleState, ItemStack pDebugStack) {
+    private boolean wrenchInteraction(@Nullable Player pPlayer, BlockState pStateClicked, LevelAccessor level, BlockPos pos, boolean pShouldCycleState, ItemStack wrenchStack) {
         Block block = pStateClicked.getBlock();
+        if (block instanceof PathPointerBlock) return ppWrenchInteraction(pPlayer,pStateClicked,level,pos,wrenchStack);
         StateDefinition<Block, BlockState> blockStateDefinition = block.getStateDefinition();
         Collection<Property<?>> properties = blockStateDefinition.getProperties().stream().filter(SURVIVAL_SAFE_PROPERTIES::contains).toList();
         String name = Objects.requireNonNull(ForgeRegistries.BLOCKS.getKey(block)).toString();
@@ -582,7 +583,7 @@ public class WrenchAxeItem extends AxeItem {
                 message(pPlayer, Component.translatable("item.terracompositio.flow_rotating_axe.no_change").withStyle(ChatFormatting.BOLD));
             return false;
         } else {
-            CompoundTag debugProperty = pDebugStack.getOrCreateTagElement("DebugProperty");
+            CompoundTag debugProperty = wrenchStack.getOrCreateTagElement("DebugProperty");
             String debugPropertyName = debugProperty.getString(name);
             Property<?> blockStateDefinitionProperty = blockStateDefinition.getProperty(debugPropertyName);
             if (pShouldCycleState) {
@@ -592,12 +593,12 @@ public class WrenchAxeItem extends AxeItem {
                 BlockState newState;
                 if (pPlayer != null) {
                     newState = cycleState(pStateClicked, blockStateDefinitionProperty, pPlayer.isSecondaryUseActive());
-                    pDebugStack.hurtAndBreak(1,pPlayer,player1 -> player1.broadcastBreakEvent(InteractionHand.MAIN_HAND));
+                    wrenchStack.hurtAndBreak(1,pPlayer,player1 -> player1.broadcastBreakEvent(InteractionHand.MAIN_HAND));
                 } else {
                     newState = cycleState(pStateClicked, blockStateDefinitionProperty, false);
-                    if (pDebugStack.hurt(1,level.getRandom(),null)){
-                        pDebugStack.shrink(1);
-                        pDebugStack.setDamageValue(0);
+                    if (wrenchStack.hurt(1,level.getRandom(),null)){
+                        wrenchStack.shrink(1);
+                        wrenchStack.setDamageValue(0);
                     }
                 }
                 level.getChunkSource().getLightEngine().checkBlock(pos);
@@ -617,6 +618,114 @@ public class WrenchAxeItem extends AxeItem {
             return true;
         }
     }
+
+    private boolean ppWrenchInteraction(@Nullable Player pPlayer, BlockState pStateClicked, LevelAccessor level, BlockPos pos, ItemStack wrenchStack) {
+        CompoundTag tag = wrenchStack.getOrCreateTag();
+        PathPointerBlock.PPPart[] parts = PathPointerBlock.getParts(pStateClicked);
+        List<PathPointerBlock.PPPart> partsList = Arrays.asList(parts);
+
+        if (!tag.contains("BindPos")) {
+            boolean isSender = partsList.contains(PathPointerBlock.PPPart.SENDER);
+            boolean isReceiver = partsList.contains(PathPointerBlock.PPPart.RECEIVER);
+
+            tag.putLong("BindPos", pos.asLong());
+
+            if (!(isSender && isReceiver)) {
+                tag.putBoolean("BindMode", !isSender && isReceiver);
+            }
+
+            if (pPlayer != null) {
+                message(pPlayer, Component.translatable("item.terracompositio.flow_rotating_axe.bind_begin").withStyle(ChatFormatting.BOLD));
+                wrenchStack.hurtAndBreak(1,pPlayer,player1 -> player1.broadcastBreakEvent(InteractionHand.MAIN_HAND));
+            }
+            return true;
+        }
+
+        BlockPos bindPos = BlockPos.of(tag.getLong("BindPos"));
+        boolean hasBindMode = tag.contains("BindMode");
+        boolean bindMode = hasBindMode && tag.getBoolean("BindMode");
+
+        boolean isSender = partsList.contains(PathPointerBlock.PPPart.SENDER);
+        boolean isReceiver = partsList.contains(PathPointerBlock.PPPart.RECEIVER);
+
+        boolean allowBind = !hasBindMode ||
+                (bindMode ? isSender : isReceiver);
+
+        if (!allowBind) {
+            sendBindFailMessage(pPlayer, "item.terracompositio.flow_rotating_axe.bind_fail_incompatible");
+            clearBindTags(tag);
+            return false;
+        }
+
+        BlockPos inputPos;
+        BlockPos outputPos;
+
+        if (hasBindMode) {
+            inputPos = bindMode ? pos : bindPos;
+            outputPos = bindMode ? bindPos : pos;
+        } else {
+            if (isReceiver && isSender){
+                inputPos = bindPos;
+                outputPos = pos;
+            } else if (isReceiver) {
+                inputPos = bindPos;
+                outputPos = pos;
+            } else if (isSender) {
+                inputPos = pos;
+                outputPos = bindPos;
+            } else {
+                sendBindFailMessage(pPlayer, "item.terracompositio.flow_rotating_axe.bind_fail_incompatible");
+                clearBindTags(tag);
+                return false;
+            }
+        }
+
+        if (!inputPos.closerThan(outputPos, 7)) {
+            sendBindFailMessage(pPlayer, "item.terracompositio.flow_rotating_axe.bind_fail_too_far");
+            clearBindTags(tag);
+            return false;
+        }
+
+        return applyBind(level, inputPos, outputPos, wrenchStack, pPlayer);
+    }
+
+    private void sendBindFailMessage(@Nullable Player player, String messageKey) {
+        if (player != null) {
+            message(player, Component.translatable(messageKey).withStyle(ChatFormatting.BOLD));
+        }
+    }
+
+    private void clearBindTags(CompoundTag tag) {
+        tag.remove("BindPos");
+        tag.remove("BindMode");
+    }
+
+    private boolean applyBind(LevelAccessor level, BlockPos inputPos, BlockPos outputPos, ItemStack wrenchStack, Player player) {
+        PathPointerBlockEntity inputBE = ((PathPointerBlockEntity) level.getBlockEntity(inputPos));
+        PathPointerBlockEntity outputBE = ((PathPointerBlockEntity) level.getBlockEntity(outputPos));
+
+        CompoundTag tag = wrenchStack.getTag();
+
+        assert inputBE != null;
+        assert outputBE != null;
+        assert tag != null;
+
+        inputBE.nextNode = outputPos;
+        outputBE.lastNode = inputPos;
+
+        inputBE.updateRotation();
+        outputBE.updateRotation();
+
+        tag.remove("BindPos");
+        tag.remove("BindMode");
+
+        if (player != null) {
+            message(player, Component.translatable("item.terracompositio.flow_rotating_axe.bind_success").withStyle(ChatFormatting.BOLD));
+            wrenchStack.hurtAndBreak(1,player,player1 -> player1.broadcastBreakEvent(InteractionHand.MAIN_HAND));
+        }
+        return true;
+    }
+
     private static <T extends Comparable<T>> BlockState cycleState(BlockState pState, Property<T> pProperty, boolean pBackwards) {
         return pState.setValue(pProperty, getRelative(pProperty.getPossibleValues(), pState.getValue(pProperty), pBackwards));
     }

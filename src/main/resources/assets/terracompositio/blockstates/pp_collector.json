@@ -1,0 +1,7 @@
+{
+  "variants": {
+    "": {
+      "model": "terracompositio:block/path_pointer/pp_collector"
+    }
+  }
+}

@@ -32,7 +32,11 @@ public class TCBlockTagGenerator extends BlockTagsProvider {
                         TCBlocks.MATTER_INFUSER_IO.get(),
                         TCBlocks.CONSTRUCTION_DESORBER.get(),
                         TCBlocks.CULTIVATION_DESORBER.get(),
-                        TCBlocks.TIME_PASSAGE_DESORBER.get());
+                        TCBlocks.TIME_PASSAGE_DESORBER.get(),
+                        TCBlocks.PP_SENDER.get(),
+                        TCBlocks.PP_EMITTER.get(),
+                        TCBlocks.PP_COLLECTOR.get(),
+                        TCBlocks.PP_RECEIVER.get());
         this.tag(BlockTags.MINEABLE_WITH_AXE)
                 .add(TCBlocks.FLOW_CEDAR_LOG.get(),
                         TCBlocks.FLOW_CEDAR_LEAVES.get(),
@@ -44,7 +48,11 @@ public class TCBlockTagGenerator extends BlockTagsProvider {
                         TCBlocks.STRIPPED_FLOW_CEDAR_WOOD.get(),
                         TCBlocks.FLOW_CEDAR_CASING.get(),
                         TCBlocks.FLOW_CEDAR_PEDESTAL.get(),
-                        TCBlocks.FLOW_CEDAR_TANK.get());
+                        TCBlocks.FLOW_CEDAR_TANK.get(),
+                        TCBlocks.PP_SENDER.get(),
+                        TCBlocks.PP_EMITTER.get(),
+                        TCBlocks.PP_COLLECTOR.get(),
+                        TCBlocks.PP_RECEIVER.get());
 
 
         this.tag(BlockTags.NEEDS_IRON_TOOL)
@@ -52,6 +60,12 @@ public class TCBlockTagGenerator extends BlockTagsProvider {
                         TCBlocks.FLOW_CEDAR_LEAVES.get(),
                         TCBlocks.FLOW_CEDAR_PORT.get(),
                         TCBlocks.FLOW_CEDAR_WOOD.get());
+
+        this.tag(BlockTags.NEEDS_STONE_TOOL)
+                .add(TCBlocks.PP_SENDER.get(),
+                        TCBlocks.PP_EMITTER.get(),
+                        TCBlocks.PP_COLLECTOR.get(),
+                        TCBlocks.PP_RECEIVER.get());
         this.tag(BlockTags.LOGS_THAT_BURN)
                 .add(TCBlocks.FLOW_CEDAR_LOG.get(),
                         TCBlocks.FLOW_CEDAR_WOOD.get(),

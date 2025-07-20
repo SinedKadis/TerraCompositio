@@ -7,6 +7,10 @@
     "terracompositio:matter_infuser_io",
     "terracompositio:construction_desorber",
     "terracompositio:cultivation_desorber",
-    "terracompositio:time_passage_desorber"
+    "terracompositio:time_passage_desorber",
+    "terracompositio:pp_sender",
+    "terracompositio:pp_emitter",
+    "terracompositio:pp_collector",
+    "terracompositio:pp_receiver"
   ]
 }

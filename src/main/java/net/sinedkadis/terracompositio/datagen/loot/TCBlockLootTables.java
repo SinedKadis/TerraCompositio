@@ -89,6 +89,12 @@ public class TCBlockLootTables extends BlockLootSubProvider {
                 createSingleItemTable(TCItems.FLOW_CEDAR_HANGING_SIGN.get()));
         this.add(TCBlocks.FLOW_CEDAR_WALL_HANGING_SIGN.get(), block ->
                 createSingleItemTable(TCItems.FLOW_CEDAR_HANGING_SIGN.get()));
+
+        this.dropSelf(TCBlocks.PP_COLLECTOR.get());
+        this.dropSelf(TCBlocks.PP_EMITTER.get());
+        this.dropSelf(TCBlocks.PP_RECEIVER.get());
+        this.dropSelf(TCBlocks.PP_SENDER.get());
+
     }
 
     protected LootTable.Builder createCopperLikeOreDrops(Block pBlock, Item item) {
