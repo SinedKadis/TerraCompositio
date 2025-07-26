@@ -229,7 +229,7 @@ public class WrenchAxeItem extends AxeItem {
                 }
                 return super.useOn(context);
             }
-            case ANDIRON -> {
+            case CROWBAR -> {
                 if (player != null && !level.isClientSide ) {
                     if (!this.andironInteraction(player, level,pos)) {
                         return InteractionResult.FAIL;
@@ -804,7 +804,7 @@ public class WrenchAxeItem extends AxeItem {
         AXE("axe"),
         WRENCH_AXE("wrench_axe"),
         WRENCH("wrench"),
-        ANDIRON("andiron");
+        CROWBAR("crowbar");
 
         private final String name;
 

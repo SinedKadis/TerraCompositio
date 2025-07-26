@@ -64,7 +64,7 @@
   "item.terracompositio.flow_rotating_axe.axe": "Axe Mode",
   "item.terracompositio.flow_rotating_axe.wrench_axe": "Wrench-Axe Mode",
   "item.terracompositio.flow_rotating_axe.wrench": "Wrench Mode",
-  "item.terracompositio.flow_rotating_axe.andiron": "Andiron Mode",
+  "item.terracompositio.flow_rotating_axe.crowbar": "Crowbar Mode",
   "message.terracompositio.wrench_mode": "Switched to %s",
   "item.terracompositio.flow_rotating_axe": "Infused Iron Axe",
   "item.terracompositio.flow_rotating_axe.mode": "Mode: %s",

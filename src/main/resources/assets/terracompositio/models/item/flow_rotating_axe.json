@@ -20,7 +20,7 @@
       "predicate": {
         "wrench_mode": 3
       },
-      "model": "terracompositio:item/flow_andiron"
+      "model": "terracompositio:item/flow_crowbar"
     }
   ]
 }
