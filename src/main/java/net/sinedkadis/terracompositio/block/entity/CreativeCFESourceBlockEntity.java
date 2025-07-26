@@ -11,6 +11,7 @@ import net.sinedkadis.terracompositio.api.networks.NetworkAction;
 import net.sinedkadis.terracompositio.api.networks.cfe.CFENetwork;
 import net.sinedkadis.terracompositio.cfe.CFECapability;
 import net.sinedkadis.terracompositio.cfe.CFEContainer;
+import net.sinedkadis.terracompositio.cfe.LimitlessCFEContainer;
 import net.sinedkadis.terracompositio.registries.TCBlockEntities;
 import net.sinedkadis.terracompositio.api.networks.cfe.CFENetworkMemberBE;
 import org.jetbrains.annotations.NotNull;
@@ -46,7 +47,7 @@ public class CreativeCFESourceBlockEntity extends TCBlockEntity implements CFENe
     public void onLoad() {
         super.onLoad();
         lazyOptional = LazyOptional.of(() -> {
-            CFEContainer cfeContainer = new CFEContainer(this).setMaxCFE(Integer.MAX_VALUE);
+            CFEContainer cfeContainer = new LimitlessCFEContainer(this);
             cfeContainer.setCFE(Integer.MAX_VALUE);
             return cfeContainer;
         });

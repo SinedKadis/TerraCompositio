@@ -27,6 +27,8 @@ import net.sinedkadis.terracompositio.api.networks.cfe.ICFEHandler;
 import net.sinedkadis.terracompositio.block.custom.FlowCedarLikeBlock;
 
 
+import net.sinedkadis.terracompositio.block.entity.TCCFEBlockEntity;
+import net.sinedkadis.terracompositio.particle.CFEParticleData;
 import net.sinedkadis.terracompositio.particle.FluidParticleData;
 import net.sinedkadis.terracompositio.registries.TCBlockStateProperties;
 import net.sinedkadis.terracompositio.registries.TCGameRules;
@@ -136,13 +138,23 @@ public class TCUtil {
         return InteractionResult.sidedSuccess(pLevel.isClientSide);
     }
     public static @NotNull InteractionResult handleInWorldBlockCraft(BlockState oldState, BlockState newState, Level pLevel, BlockPos pPos, ItemStack item, int count) {
-        return handleInWorldBlockCraft(oldState,newState,pLevel,pPos,item,count, TCParticles.CFE_PARTICLE.get(),SoundEvents.COPPER_PLACE);
+        TCCFEBlockEntity be = (TCCFEBlockEntity) pLevel.getBlockEntity(pPos);
+        float speed = 1/20f;
+        if (be != null) {
+            speed = be.getCfeContainer().getCfeTravelSpeed();
+        }
+        return handleInWorldBlockCraft(oldState,newState,pLevel,pPos,item,count, new CFEParticleData(speed),SoundEvents.COPPER_PLACE);
     }
 
 
     public static void spawnParticlesIn(Level pLevel, BlockPos targetPos){
-        if (pLevel instanceof ServerLevel level)
-            level.sendParticles(TCParticles.CFE_PARTICLE.get(),
+        if (pLevel instanceof ServerLevel level) {
+            TCCFEBlockEntity be = (TCCFEBlockEntity) pLevel.getBlockEntity(targetPos);
+            float speed = 1/20f;
+            if (be != null) {
+                speed = be.getCfeContainer().getCfeTravelSpeed();
+            }
+            level.sendParticles(new CFEParticleData(speed),
                 targetPos.getX()+pLevel.getRandom().nextFloat(),
                 targetPos.getY()+pLevel.getRandom().nextFloat(),
                 targetPos.getZ()+pLevel.getRandom().nextFloat(),
@@ -151,11 +163,17 @@ public class TCUtil {
                     targetPos.getY(),
                     targetPos.getZ(),
                 0.5D);
+        }
     }
     public static void spawnParticlesIn(Level pLevel, BlockPos targetPos, int count){
         for (int i = 0; i < count; i++) {
-            if (pLevel instanceof ServerLevel level)
-                level.sendParticles(TCParticles.CFE_PARTICLE.get(),
+            if (pLevel instanceof ServerLevel level) {
+                TCCFEBlockEntity be = (TCCFEBlockEntity) pLevel.getBlockEntity(targetPos);
+                float speed = 1/20f;
+                if (be != null) {
+                    speed = be.getCfeContainer().getCfeTravelSpeed();
+                }
+                level.sendParticles(new CFEParticleData(speed),
                         targetPos.getX() + pLevel.getRandom().nextFloat(),
                         targetPos.getY() + pLevel.getRandom().nextFloat(),
                         targetPos.getZ() + pLevel.getRandom().nextFloat(),
@@ -164,6 +182,7 @@ public class TCUtil {
                         targetPos.getY(),
                         targetPos.getZ(),
                         0.5D);
+            }
         }
     }
 
@@ -325,8 +344,12 @@ public class TCUtil {
             double offsetY = sourceCenter.y + (level.random.nextDouble() - 0.5) * 0.8;
             double offsetZ = sourceCenter.z + (level.random.nextDouble() - 0.5) * 0.8;
 
-            // Отправляем частицу с данными о жидкости
-            level.sendParticles(TCParticles.CFE_PARTICLE.get(),
+            TCCFEBlockEntity be = (TCCFEBlockEntity) level.getBlockEntity(BlockPos.containing(target));
+            float speed = 1/20f;
+            if (be != null) {
+                speed = be.getCfeContainer().getCfeTravelSpeed();
+            }
+            level.sendParticles(new CFEParticleData(speed),
                     offsetX, offsetY, offsetZ,
                     0, // count
                     target.x - offsetX, // xd (направление к цели)

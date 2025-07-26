@@ -8,6 +8,7 @@ import net.sinedkadis.terracompositio.api.networks.NetworkAction;
 import net.sinedkadis.terracompositio.api.networks.cfe.CFENetworkMember;
 import net.sinedkadis.terracompositio.api.networks.cfe.CFENetworkMemberBE;
 import net.sinedkadis.terracompositio.api.networks.cfe.ICFEHandler;
+import net.sinedkadis.terracompositio.block.entity.PathPointerBlockEntity;
 import net.sinedkadis.terracompositio.events.CFENetworkEvent;
 import net.sinedkadis.terracompositio.util.TCUtil;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -32,18 +33,24 @@ public class CFENetworkHandler implements CFENetwork {
     }
 
     public void networkMemberUpdated(CFENetworkMember updated) {
-        cfeSources.get(updated.getLevel()).stream()
-                .filter(member -> {
-                    if (updated.getBlockPos() != member.getBlockPos()) {
-                        return true;
-                    } else {
-                        member.onCFENetworkMemberUpdate(member.getLevel(),member.getBlockPos());
-                        return false;
-                    }
-                })
-                .filter(member -> updated.getPriority() < member.getPriority())
-                .filter(member -> distSqr(member.getBlockPos(), updated.getBlockPos()) <= ((long) member.getLimit() * member.getLimit()))
-                .forEach((member) -> member.onCFENetworkMemberUpdate(member.getLevel(),member.getBlockPos()));
+        if (cfeSources.containsKey(updated.getLevel())) {
+            cfeSources.get(updated.getLevel()).stream()
+                    .filter(member -> distSqr(member.getBlockPos(), updated.getBlockPos()) <= ((long) member.getLimit() * member.getLimit()))
+                    .filter(member -> !updated.getBlockPos().equals(member.getBlockPos()))
+                    .peek(member -> {
+                        if (member instanceof PathPointerBlockEntity && !(updated.getPriority() < member.getPriority())) {
+                            member.onCFENetworkMemberUpdate(member.getLevel(),member.getBlockPos());
+                        }
+                    })
+                    .filter(member -> updated.getPriority() < member.getPriority())
+                    .forEach((member) -> member.onCFENetworkMemberUpdate(member.getLevel(),member.getBlockPos()));
+            if (updated instanceof PathPointerBlockEntity blockEntity) {
+                List<PathPointerBlockEntity> nodes = blockEntity.getNodes();
+                nodes.remove(blockEntity);
+                nodes.forEach(member -> member.onCFENetworkMemberUpdate(updated.getLevel(),member.getBlockPos()));
+            }
+        }
+
     }
 
     @Override
@@ -60,7 +67,7 @@ public class CFENetworkHandler implements CFENetwork {
                     Optional<ICFEHandler> cfeHandlerOptional = memberBE.getBE().getCapability(CFECapability.CFE).resolve();
                     if (distance <= limitSquared
                             && distance < minDist
-                            && distance < source.getLimit()
+                            && distance < (long) source.getLimit() * source.getLimit()
                             && cfeHandlerOptional.isPresent()
                             && cfeHandlerOptional.get().getCFE() > 0
                             && (priority == null || source.getPriority() < priority)) {
@@ -142,12 +149,13 @@ public class CFENetworkHandler implements CFENetwork {
         if (!map.containsKey(level)) {
             return;
         }
-
+        networkMemberUpdated((CFENetworkMember) thing);
         var set = map.get(level);
         set.remove(thing);
         if (set.isEmpty()) {
             map.remove(level);
         }
+
     }
 
     private <T> void add(Map<Level, Set<T>> map, Level level, T thing) {

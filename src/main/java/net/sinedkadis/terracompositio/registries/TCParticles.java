@@ -9,6 +9,7 @@ import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
 import net.sinedkadis.terracompositio.TerraCompositio;
+import net.sinedkadis.terracompositio.particle.CFEParticleData;
 import net.sinedkadis.terracompositio.particle.FluidParticleData;
 import org.jetbrains.annotations.NotNull;
 
@@ -18,8 +19,13 @@ public class TCParticles {
 
     public static final RegistryObject<SimpleParticleType> FLOW_PARTICLE =
             PARTICLE_TYPES.register("flow_particle",() -> new SimpleParticleType(true));
-    public static final RegistryObject<SimpleParticleType> CFE_PARTICLE =
-            PARTICLE_TYPES.register("cfe_particle",() -> new SimpleParticleType(true));
+    public static final RegistryObject<ParticleType<CFEParticleData>> CFE_PARTICLE =
+            PARTICLE_TYPES.register("cfe_particle",() -> new ParticleType<>(false, CFEParticleData.DESERIALIZER) {
+                @Override
+                public @NotNull Codec<CFEParticleData> codec() {
+                    return CFEParticleData.CODEC;
+                }
+            });
     public static final RegistryObject<SimpleParticleType> BIRCH_JUICE_PARTICLE =
             PARTICLE_TYPES.register("birch_juice_particle",() -> new SimpleParticleType(true));
     public static final RegistryObject<SimpleParticleType> FLOW_SPLASH_PARTICLE =

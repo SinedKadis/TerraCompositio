@@ -10,9 +10,9 @@ import net.minecraftforge.event.entity.living.LivingEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.sinedkadis.terracompositio.TerraCompositio;
+import net.sinedkadis.terracompositio.particle.CFEParticleData;
 import net.sinedkadis.terracompositio.registries.TCEffects;
 import net.sinedkadis.terracompositio.registries.TCFluids;
-import net.sinedkadis.terracompositio.registries.TCParticles;
 
 @Mod.EventBusSubscriber(modid = TerraCompositio.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class ForgeEventBusEvents {
@@ -25,7 +25,7 @@ public class ForgeEventBusEvents {
                     Vec3 pos = player.getEyePosition();
                     if (player.hasEffect(TCEffects.FLOW_SATURATION.get()) && counter++ > 5) {
                         counter = 0;
-                        serverLevel.sendParticles(player, TCParticles.CFE_PARTICLE.get(),
+                        serverLevel.sendParticles(player, new CFEParticleData(1/20f),
                                 true, pos.x, pos.y, pos.z, 10, 0.1, 0.1, 0.1, 0.0);
                     }
                 }

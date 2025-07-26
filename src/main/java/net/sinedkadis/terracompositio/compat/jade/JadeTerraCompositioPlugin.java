@@ -1,7 +1,9 @@
 package net.sinedkadis.terracompositio.compat.jade;
 
+import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.AbstractFurnaceBlock;
 import net.minecraft.world.level.block.entity.AbstractFurnaceBlockEntity;
+import net.sinedkadis.terracompositio.TerraCompositio;
 import net.sinedkadis.terracompositio.block.custom.*;
 import net.sinedkadis.terracompositio.block.entity.*;
 import net.sinedkadis.terracompositio.compat.jade.providers.*;
@@ -61,7 +63,14 @@ public class JadeTerraCompositioPlugin implements IWailaPlugin {
 
         registration.registerBlockComponent(PPComponentProvider.INSTANCE, PathPointerBlock.class);
 
+        registration.addConfig(PPComponentProvider.partsConfigRL(),true);
+        registration.addConfig(debugConfigRL(),false);
     }
+
+    public static ResourceLocation debugConfigRL() {
+        return TerraCompositio.modLoc("debug_config");
+    }
+
 
 
 }

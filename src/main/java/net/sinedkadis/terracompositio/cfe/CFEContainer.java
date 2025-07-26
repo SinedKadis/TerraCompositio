@@ -15,7 +15,6 @@ import net.sinedkadis.terracompositio.api.networks.NetworkAction;
 import net.sinedkadis.terracompositio.api.networks.cfe.CFENetworkMemberBE;
 import net.sinedkadis.terracompositio.api.networks.cfe.CFENetworkMemberEntity;
 import net.sinedkadis.terracompositio.api.networks.cfe.ICFEHandler;
-import net.sinedkadis.terracompositio.block.entity.TCCFEBlockEntity;
 import net.sinedkadis.terracompositio.util.TCUtil;
 import org.apache.commons.lang3.tuple.MutablePair;
 import org.apache.commons.lang3.tuple.Pair;
@@ -29,15 +28,14 @@ import java.util.function.Function;
 @Getter
 @Setter
 public class CFEContainer implements ICFEHandler, INBTSerializable<CompoundTag> {
-    private float cfeTravelSpeed = 1 / 20f;
-    private BlockEntity blockEntity = null;
-    private Entity entity = null;
-    private int index = 0;
+    protected float cfeTravelSpeed = 1 / 20f;
+    protected BlockEntity blockEntity = null;
+    protected Entity entity = null;
+    protected int index = 0;
     int CFE = 0;
-    private int maxCFE = 100;
-    private final List<Pair<Integer, Double>> cfeQueue = new ArrayList<>();
-    @Getter
-    private Function<BlockPos, BlockPos> targetOffset = blockpos -> blockpos;
+    protected int maxCFE = 100;
+    protected final List<Pair<Integer, Double>> cfeQueue = new ArrayList<>();
+    protected Function<BlockPos, BlockPos> targetOffset = blockpos -> blockpos;
 
     public CFEContainer(BlockEntity entity) {
         this.blockEntity = entity;
@@ -48,8 +46,13 @@ public class CFEContainer implements ICFEHandler, INBTSerializable<CompoundTag> 
 
     }
 
-    public CFEContainer setMaxCFE(int maxCFE) {
-        this.maxCFE = maxCFE;
+    public CFEContainer setCfeTravelSpeed(float cfeTravelSpeed) {
+        this.cfeTravelSpeed = cfeTravelSpeed;
+        return this;
+    }
+
+    public CFEContainer setMaxCFE(int max) {
+        this.maxCFE = max;
         return this;
     }
 
@@ -58,7 +61,7 @@ public class CFEContainer implements ICFEHandler, INBTSerializable<CompoundTag> 
         return this;
     }
 
-    public CFEContainer setTargetOffset(Function<BlockPos,BlockPos> offset){
+    public CFEContainer setTargetOffset(Function<BlockPos, BlockPos> offset) {
         this.targetOffset = offset;
         return this;
     }
@@ -74,7 +77,7 @@ public class CFEContainer implements ICFEHandler, INBTSerializable<CompoundTag> 
         if (!simulate) {
             CFE -= taken;
             onContentsChanged();
-            sendCFEUpdate(false);
+            sendCFEUpdate();
         }
         return taken;
     }
@@ -104,6 +107,20 @@ public class CFEContainer implements ICFEHandler, INBTSerializable<CompoundTag> 
         return added;
     }
 
+    public int getQueued() {
+        int queued = 0;
+        for (Pair<Integer, Double> pair : cfeQueue) {
+            queued += pair.getKey();
+        }
+        return queued;
+    }
+
+    @Override
+    public BlockPos getBlockPos() {
+        if (blockEntity != null) return blockEntity.getBlockPos();
+        return entity.getOnPos();
+    }
+
     public void containerTick() {
         Iterator<Pair<Integer, Double>> iterator = cfeQueue.iterator();
         while (iterator.hasNext()) {
@@ -121,7 +138,7 @@ public class CFEContainer implements ICFEHandler, INBTSerializable<CompoundTag> 
 
     public void actuallyAddCFE(int cfe) {
         CFE += cfe;
-        sendCFEUpdate(true);
+        sendCFEUpdate();
         onContentsChanged();
     }
 
@@ -136,14 +153,13 @@ public class CFEContainer implements ICFEHandler, INBTSerializable<CompoundTag> 
         }
     }
 
-    protected void sendCFEUpdate(boolean onAdd) {
-        if (blockEntity instanceof CFENetworkMemberBE cfeNetworkMemberBE
-                && blockEntity instanceof TCCFEBlockEntity tcCFEBlockEntity) {
+    protected void sendCFEUpdate() {
+        if (blockEntity instanceof CFENetworkMemberBE cfeNetworkMemberBE) {
 //            TerraCompositioAPI.INSTANCE.getCFENetworkInstance().fireCFENetworkEvent(cfeNetworkMemberBE, NetworkAction.UPDATE);
             //TerraCompositioAPI.INSTANCE.getCFENetworkInstance().networkMemberUpdated(cfeNetworkMemberBE);
-            if ((tcCFEBlockEntity.getBlockMode().consumer() && !onAdd)
-                    || (tcCFEBlockEntity.getBlockMode().source() && onAdd))
-                TerraCompositioAPI.INSTANCE.getCFENetworkInstance().fireCFENetworkEvent(cfeNetworkMemberBE, NetworkAction.UPDATE);
+
+            TerraCompositioAPI.INSTANCE.getCFENetworkInstance().fireCFENetworkEvent(cfeNetworkMemberBE, NetworkAction.UPDATE);
+
         }
         if (entity != null) {
             TerraCompositioAPI.INSTANCE.getCFENetworkInstance().fireCFENetworkEvent(((CFENetworkMemberEntity) entity), NetworkAction.UPDATE);
@@ -151,25 +167,49 @@ public class CFEContainer implements ICFEHandler, INBTSerializable<CompoundTag> 
     }
 
     public void writeToNBT(CompoundTag pTag) {
-        pTag.put("cfeContainer_"+index, this.serializeNBT());
+        pTag.put("cfeContainer_" + index, this.serializeNBT());
     }
 
     public void readFromNBT(CompoundTag pTag) {
-        CompoundTag tag = pTag.getCompound("cfeContainer_"+index);
+        CompoundTag tag = pTag.getCompound("cfeContainer_" + index);
         this.deserializeNBT(tag);
+    }
+
+    @Override
+    public boolean isEmpty() {
+        return !(this.CFE > 0 || !cfeQueue.isEmpty());
+    }
+
+    @Override
+    public int getFreeSpace() {
+        int queued = 0;
+        for (Pair<Integer, Double> pair : cfeQueue) {
+            queued += pair.getKey();
+        }
+        return maxCFE - (CFE + queued);
     }
 
     @Override
     public CompoundTag serializeNBT() {
         CompoundTag nbt = new CompoundTag();
         nbt.putInt("CFE", CFE);
-        nbt.putInt("maxCFE", maxCFE);
+        nbt.putInt("queue_size", cfeQueue.size());
+        for (int i = 0; i < cfeQueue.size(); i++) {
+            Pair<Integer, Double> pair = cfeQueue.get(i);
+            nbt.putInt("queued_int_" + i, pair.getKey());
+            nbt.putDouble("queued_double_" + i, pair.getValue());
+        }
         return nbt;
     }
 
     @Override
     public void deserializeNBT(CompoundTag tag) {
         CFE = tag.getInt("CFE");
-        maxCFE = tag.getInt("maxCFE");
+        int size = tag.getInt("queue_size");
+        if (size > 0) cfeQueue.clear();
+        for (int i = 0; i < size; i++) {
+            cfeQueue.add(new MutablePair<>(tag.getInt("queued_int_" + i), tag.getDouble("queued_double_" + i)));
+        }
     }
+
 }

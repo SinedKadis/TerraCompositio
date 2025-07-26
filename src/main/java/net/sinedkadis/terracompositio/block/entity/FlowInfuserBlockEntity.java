@@ -1,20 +1,14 @@
 package net.sinedkadis.terracompositio.block.entity;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.protocol.Packet;
-import net.minecraft.network.protocol.game.ClientGamePacketListener;
-import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
+import net.sinedkadis.terracompositio.particle.CFEParticleData;
 import net.sinedkadis.terracompositio.registries.TCBlockEntities;
-import net.sinedkadis.terracompositio.registries.TCParticles;
 import net.sinedkadis.terracompositio.recipe.FlowInfusionRecipe;
-import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.Optional;
 
@@ -72,8 +66,12 @@ public class FlowInfuserBlockEntity extends TCItemIOCFEBlockEntity {
 
     private static void spawnParticles(Level pLevel, BlockPos targetPos) {
         if (!pLevel.isClientSide){
-            ((ServerLevel) pLevel).sendParticles(
-                    TCParticles.CFE_PARTICLE.get(),
+            TCCFEBlockEntity be = (TCCFEBlockEntity) pLevel.getBlockEntity(targetPos);
+            float speed = 1/20f;
+            if (be != null) {
+                speed = be.getCfeContainer().getCfeTravelSpeed();
+            }
+            ((ServerLevel) pLevel).sendParticles(new CFEParticleData(speed),
                     targetPos.getX()+0.5D,
                     targetPos.getY()+0.5D,
                     targetPos.getZ()+0.5D,3,0,-0.1D,0,0.1D);
@@ -91,14 +89,4 @@ public class FlowInfuserBlockEntity extends TCItemIOCFEBlockEntity {
         }
     }
 
-    @Nullable
-    @Override
-    public Packet<ClientGamePacketListener> getUpdatePacket() {
-        return ClientboundBlockEntityDataPacket.create(this);
-    }
-
-    @Override
-    public @NotNull CompoundTag getUpdateTag() {
-        return saveWithoutMetadata();
-    }
 }

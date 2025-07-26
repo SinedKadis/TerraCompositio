@@ -6,6 +6,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
@@ -25,8 +26,8 @@ import org.jetbrains.annotations.Nullable;
 
 @Getter
 public abstract class TCCFEBlockEntity extends TCBlockEntity implements CFENetworkMemberBE{
-    protected final int connectRange;
-    protected final CFEContainer cfeContainer = new CFEContainer(this);
+    protected int connectRange;
+    protected ICFEHandler cfeContainer = new CFEContainer(this);
     protected LazyOptional<ICFEHandler> lazyCFEOptional = LazyOptional.empty();
     protected BlockMode blockMode;
 
@@ -48,6 +49,34 @@ public abstract class TCCFEBlockEntity extends TCBlockEntity implements CFENetwo
             this.connectRange = 0;
             cfeContainer.setMaxCFE(0);
         }
+    }
+
+    public TCCFEBlockEntity setCfeContainer(CFEContainer cfeContainer) {
+        boolean sameClass = cfeContainer.getClass().equals(this.cfeContainer.getClass());
+        boolean sameClassAndDiffTag = false;
+        if (sameClass) {
+            CompoundTag oldTag = new CompoundTag();
+            CompoundTag newTag = new CompoundTag();
+
+            this.cfeContainer.writeToNBT(oldTag);
+            cfeContainer.writeToNBT(newTag);
+
+            if (!oldTag.equals(newTag)){
+                sameClassAndDiffTag = true;
+            }
+        }
+        if (!sameClass || sameClassAndDiffTag) {
+            CompoundTag tag = new CompoundTag();
+            this.cfeContainer.writeToNBT(tag);
+            this.cfeContainer = cfeContainer;
+            this.cfeContainer.readFromNBT(tag);
+            setChanged();
+            if (level != null && !level.isClientSide()) {
+                level.sendBlockUpdated(getBlockPos(), getBlockState(), getBlockState(), Block.UPDATE_ALL);
+            }
+            lazyCFEOptional = LazyOptional.of(() -> cfeContainer);
+        }
+        return this;
     }
 
     @Override
@@ -112,15 +141,15 @@ public abstract class TCCFEBlockEntity extends TCBlockEntity implements CFENetwo
     @Override
     public int getPriority() {
         return switch (blockMode){
-            case SOURCE -> Integer.MIN_VALUE;
-            case CONSUMER -> Integer.MAX_VALUE;
+            case SOURCE -> -100;
+            case CONSUMER -> 100;
             case CONTAINER -> 0;
         };
     }
 
     @Override
     public int getLimit() {
-        return connectRange*2;
+        return connectRange;
     }
 
     @Override

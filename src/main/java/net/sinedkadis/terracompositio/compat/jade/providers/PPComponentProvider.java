@@ -3,8 +3,12 @@ package net.sinedkadis.terracompositio.compat.jade.providers;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.block.state.BlockState;
 import net.sinedkadis.terracompositio.TerraCompositio;
+import net.sinedkadis.terracompositio.block.custom.PathPointerBlock;
 import net.sinedkadis.terracompositio.block.entity.PathPointerBlockEntity;
+import net.sinedkadis.terracompositio.compat.jade.JadeTerraCompositioPlugin;
+import net.sinedkadis.terracompositio.registries.TCBlockStateProperties;
 import snownee.jade.api.BlockAccessor;
 import snownee.jade.api.IBlockComponentProvider;
 import snownee.jade.api.IServerDataProvider;
@@ -18,29 +22,48 @@ public enum PPComponentProvider implements IBlockComponentProvider, IServerDataP
     @Override
     public void appendTooltip(ITooltip iTooltip, BlockAccessor blockAccessor, IPluginConfig iPluginConfig) {
 
-        if (blockAccessor.getServerData().contains("yaw")) {
+        if (blockAccessor.getServerData().contains("base") && iPluginConfig.get(partsConfigRL())) {
+            iTooltip.add(Component.translatable("block.terracompositio.pp."+
+                    PathPointerBlock.PPPart.values()[blockAccessor.getServerData().getInt("base")]
+                            .getSerializedName()));
+        }
+        if (blockAccessor.getServerData().contains("add") && iPluginConfig.get(partsConfigRL())) {
+            iTooltip.append(Component.literal(", "));
+            iTooltip.append(Component.translatable("block.terracompositio.pp."+
+                    PathPointerBlock.PPPart.values()[blockAccessor.getServerData().getInt("add")]
+                            .getSerializedName()));
+        }
+
+        if (blockAccessor.getServerData().contains("yaw")  && iPluginConfig.get(JadeTerraCompositioPlugin.debugConfigRL())) {
             iTooltip.add(Component.translatable("block.terracompositio.pp." + "yaw", blockAccessor.getServerData().getFloat("yaw")));
         }
-        if (blockAccessor.getServerData().contains("pitch")) {
+        if (blockAccessor.getServerData().contains("pitch")  && iPluginConfig.get(JadeTerraCompositioPlugin.debugConfigRL())) {
             iTooltip.add(Component.translatable("block.terracompositio.pp." + "pitch", blockAccessor.getServerData().getFloat("pitch")));
         }
-        if (blockAccessor.getServerData().contains("roll")) {
+        if (blockAccessor.getServerData().contains("roll")  && iPluginConfig.get(JadeTerraCompositioPlugin.debugConfigRL())) {
             iTooltip.add(Component.translatable("block.terracompositio.pp." + "roll", blockAccessor.getServerData().getFloat("roll")));
         }
     }
 
     @Override
     public ResourceLocation getUid() {
-        return TerraCompositio.modLoc("matter_infuser_tooltip");
+        return TerraCompositio.modLoc("pp_tooltip");
     }
 
     @Override
     public void appendServerData(CompoundTag compoundTag, BlockAccessor blockAccessor) {
         PathPointerBlockEntity blockEntity = (PathPointerBlockEntity) blockAccessor.getBlockEntity();
+        BlockState blockState = blockAccessor.getBlockState();
+        compoundTag.putInt("base", blockState.getValue(TCBlockStateProperties.BASE_PART).ordinal());
+        compoundTag.putInt("add", blockState.getValue(TCBlockStateProperties.ADDITIONAL_PART).ordinal());
         compoundTag.putFloat("yaw", blockEntity.rotationYaw);
         compoundTag.putFloat("pitch", blockEntity.rotationPitch);
         compoundTag.putFloat("roll", blockEntity.rotationRoll);
 
+    }
+
+    public static ResourceLocation partsConfigRL() {
+        return TerraCompositio.modLoc("parts_config");
     }
 
 }

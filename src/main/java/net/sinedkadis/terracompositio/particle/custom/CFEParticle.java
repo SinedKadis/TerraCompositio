@@ -3,19 +3,27 @@ package net.sinedkadis.terracompositio.particle.custom;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.*;
 import net.minecraft.core.Vec3i;
-import net.minecraft.core.particles.SimpleParticleType;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.sinedkadis.terracompositio.particle.CFEParticleData;
 import net.sinedkadis.terracompositio.util.TCUtil;
 import org.jetbrains.annotations.NotNull;
 
 public class CFEParticle extends TextureSheetParticle{
     private final Vec3 targetPos;
+    private final float speed;
 
-    CFEParticle(ClientLevel level, double x, double y, double z,
-                double xd, double yd, double zd) {
+    CFEParticle(ClientLevel level,
+                double x,
+                double y,
+                double z,
+                double xd,
+                double yd,
+                double zd,
+                CFEParticleData data) {
         super(level, x, y, z, xd, yd, zd);
+        this.speed = data.speed();
         this.targetPos = new Vec3(x + xd, y + yd, z + zd); // Рассчитываем целевую позицию
         this.hasPhysics = false;
         this.gravity = 0.0F;
@@ -50,7 +58,7 @@ public class CFEParticle extends TextureSheetParticle{
                 targetPos.x - this.x,
                 targetPos.y - this.y,
                 targetPos.z - this.z
-        ).normalize().scale(0.05);  // нормализуем и умножаем на скорость
+        ).normalize().scale(speed);  // нормализуем и умножаем на скорость
 
         // Обновляем скорость
         this.xd = direction.x;
@@ -64,14 +72,14 @@ public class CFEParticle extends TextureSheetParticle{
     }
 
     @OnlyIn(Dist.CLIENT)
-    public static class Provider implements ParticleProvider<SimpleParticleType> {
+    public static class Provider implements ParticleProvider<CFEParticleData> {
         private final SpriteSet sprite;
 
         public Provider(SpriteSet pSprites) {
             this.sprite = pSprites;
         }
 
-        public Particle createParticle(@NotNull SimpleParticleType pType,
+        public Particle createParticle(@NotNull CFEParticleData pType,
                                        @NotNull ClientLevel pLevel,
                                        double pX,
                                        double pY,
@@ -79,7 +87,7 @@ public class CFEParticle extends TextureSheetParticle{
                                        double pXSpeed,
                                        double pYSpeed,
                                        double pZSpeed) {
-            CFEParticle $$8 = new CFEParticle(pLevel, pX, pY, pZ, pXSpeed, pYSpeed, pZSpeed);
+            CFEParticle $$8 = new CFEParticle(pLevel, pX, pY, pZ, pXSpeed, pYSpeed, pZSpeed,pType);
             $$8.setSpriteFromAge(this.sprite);
             return $$8;
         }

@@ -13,9 +13,9 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.PushReaction;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import net.sinedkadis.terracompositio.api.networks.cfe.ICFEHandler;
 import net.sinedkadis.terracompositio.block.entity.CFESaturatedAirBlockEntity;
 import net.sinedkadis.terracompositio.block.entity.TCCFEBlockEntity;
-import net.sinedkadis.terracompositio.cfe.CFEContainer;
 import net.sinedkadis.terracompositio.registries.TCBlockEntities;
 import net.sinedkadis.terracompositio.registries.TCBlocks;
 import net.sinedkadis.terracompositio.util.TCUtil;
@@ -26,6 +26,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.List;
 import java.util.Objects;
 
+@SuppressWarnings("deprecation")
 @ParametersAreNonnullByDefault
 public class CFESaturatedAirBlock extends TCCFEBaseEntityBlock {
     public CFESaturatedAirBlock(Properties pProperties) {
@@ -41,16 +42,16 @@ public class CFESaturatedAirBlock extends TCCFEBaseEntityBlock {
         } else {
             List<BlockPos> list = TCUtil.getTouchingBlocks(pLevel,airPos, BlockStateBase::isAir,10);
 
-            List<CFEContainer> icfeHandlers = list.stream()
+            List<ICFEHandler> icfeHandlers = list.stream()
                     .filter(blockPos -> (pLevel.getBlockState(blockPos).is(TCBlocks.CFE_SATURATED_AIR.get())))
                     .map(pLevel::getBlockEntity)
                     .filter(Objects::nonNull)
                     .map(blockEntity1 -> ((CFESaturatedAirBlockEntity) blockEntity1))
                     .map(TCCFEBlockEntity::getCfeContainer)
                     .toList();
-            for (CFEContainer cfeContainer : icfeHandlers){
+            for (ICFEHandler cfeContainer : icfeHandlers){
                 if (cfe > 0) {
-                    int added = cfeContainer.addCFE(cfe,cfeContainer.getBlockEntity().getBlockPos(), false);
+                    int added = cfeContainer.addCFE(cfe,cfeContainer.getBlockPos(), false);
                     cfe -= added;
                 } else break;
             }
@@ -66,9 +67,9 @@ public class CFESaturatedAirBlock extends TCCFEBaseEntityBlock {
                         pLevel.setBlockAndUpdate(blockPos, TCBlocks.CFE_SATURATED_AIR.get().defaultBlockState());
                         CFESaturatedAirBlockEntity blockEntity = (CFESaturatedAirBlockEntity) pLevel.getBlockEntity(blockPos);
                         if (blockEntity != null){
-                            CFEContainer cfeContainer = blockEntity.getCfeContainer();
+                            ICFEHandler cfeContainer = blockEntity.getCfeContainer();
                             cfeContainer.setCFE(0);
-                            int added = cfeContainer.addCFE(cfe,cfeContainer.getBlockEntity().getBlockPos(),false);
+                            int added = cfeContainer.addCFE(cfe,cfeContainer.getBlockPos(),false);
                             cfe -= added;
                         }
                     }

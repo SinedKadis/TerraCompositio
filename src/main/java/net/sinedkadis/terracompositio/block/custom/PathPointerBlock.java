@@ -18,6 +18,8 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityTicker;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
@@ -31,6 +33,7 @@ import net.sinedkadis.terracompositio.block.entity.PathPointerBlockEntity;
 import net.sinedkadis.terracompositio.registries.TCBlockEntities;
 import net.sinedkadis.terracompositio.registries.TCBlockStateProperties;
 import net.sinedkadis.terracompositio.registries.TCBlocks;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -121,43 +124,42 @@ public class PathPointerBlock extends TCCFEBaseEntityBlock {
             case WEST -> {}
             case EAST -> pp.rotationYaw = 180F;
         }
+        pp.updateContainer();
         for (int i = 1; i < 7; i++){
             BlockEntity blockEntity = world.getBlockEntity(pos.relative(orientation, i));
             if (blockEntity instanceof PathPointerBlockEntity entity && entity.lastNode == null){
-                pp.nextNode = entity.getBlockPos();
-                entity.lastNode = pos;
-                entity.updateRotation();
-                break;
+                if (entity.updateRotation(true)) {
+                    pp.nextNode = entity.getBlockPos();
+                    entity.lastNode = pos;
+                    entity.updateRotation(false);
+                    break;
+                }
             }
         }
         for (int i = 1; i < 7; i++){
             BlockEntity blockEntity = world.getBlockEntity(pos.relative(orientation.getOpposite(), i));
             if (blockEntity instanceof PathPointerBlockEntity entity && entity.nextNode == null){
-                pp.lastNode = entity.getBlockPos();
-                entity.nextNode = pos;
-                pp.updateRotation();
-                break;
-            }
-        }
-    }
-
-    @SuppressWarnings("deprecation")
-    @Override
-    public void onRemove(BlockState pState, Level pLevel, BlockPos pPos, BlockState pNewState, boolean pMovedByPiston) {
-        super.onRemove(pState, pLevel, pPos, pNewState, pMovedByPiston);
-        if (pState.getBlock() != pNewState.getBlock()){
-            PathPointerBlockEntity blockEntity = ((PathPointerBlockEntity) pLevel.getBlockEntity(pPos));
-            if (blockEntity != null){
-                if (blockEntity.lastNode != null){
-                    PathPointerBlockEntity last = ((PathPointerBlockEntity) pLevel.getBlockEntity(blockEntity.lastNode));
-                    if (last != null){
-                        last.nextNode = null;
-                        last.updateRotation();
-                    }
+                if (entity.updateRotation(true)) {
+                    pp.lastNode = entity.getBlockPos();
+                    entity.nextNode = pos;
+                    entity.updateRotation(false);
+                    break;
                 }
             }
         }
     }
+
+    @Nullable
+    @Override
+    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(@NotNull Level pLevel, @NotNull BlockState pState, @NotNull BlockEntityType<T> pBlockEntityType) {
+        if (pLevel.isClientSide()) {
+            return null;
+        }
+        return createTickerHelper(pBlockEntityType, TCBlockEntities.PATH_POINTER_BE.get(),
+                (pLevel1, pPos, pState1, pBlockEntity) -> pBlockEntity.tick(pLevel1,pPos,pState1));
+    }
+
+
 
     @SuppressWarnings("deprecation")
     @Override
@@ -168,6 +170,10 @@ public class PathPointerBlock extends TCCFEBaseEntityBlock {
             if (addPart(pLevel, pPos, getPart(hand))) {
                 if (!pPlayer.isCreative()) {
                     hand.shrink(1);
+                }
+                PathPointerBlockEntity pp = (PathPointerBlockEntity) pLevel.getBlockEntity(pPos);
+                if (pp != null) {
+                    pp.updateContainer();
                 }
                 return InteractionResult.SUCCESS;
             }

@@ -90,7 +90,7 @@ public class CultivationDesorberBlockEntity extends AbstractDesorberBlockEntity 
             FluidTank fluidHandler1 = blockEntity.fluidHandler;
             if (!fluidHandler1.isEmpty() && fluidHandler1.getFluidAmount() >= CFEToAdd) {
                 fluidHandler1.drain(CFEToAdd, IFluidHandler.FluidAction.EXECUTE);
-                int added = blockEntity.cfeContainer.addCFE(CFEToAdd,blockEntity.cfeContainer.getBlockEntity().getBlockPos(), false);
+                int added = blockEntity.cfeContainer.addCFE(CFEToAdd,blockEntity.getBlockPos(), false);
                 CFEToAdd -= added;
                 if (!level.isClientSide())
                     level.playSound(null,pos, SoundEvents.AZALEA_LEAVES_STEP, SoundSource.BLOCKS);
@@ -98,6 +98,7 @@ public class CultivationDesorberBlockEntity extends AbstractDesorberBlockEntity 
                         blockEntity.particleTargetOffset().x,
                         blockEntity.particleTargetOffset().y,
                         blockEntity.particleTargetOffset().z),pos,added);
+                //noinspection deprecation
                 blockEntity.setRenderStack(new ItemStack(state.getBlock()
                         .getDrops(state,new LootParams.Builder((ServerLevel) level)
                                 .withParameter(LootContextParams.ORIGIN,pos.getCenter())
