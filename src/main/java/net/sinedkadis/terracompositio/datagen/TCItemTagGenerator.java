@@ -85,5 +85,7 @@ public class TCItemTagGenerator extends ItemTagsProvider {
                         TCBlocks.TECHNETIUM_ORE.get().asItem(),
                         TCBlocks.TECHNETIUM_DEEPSLATE_ORE.get().asItem(),
                         TCBlocks.TECHNETIUM_RAW_ORE_BLOCK.get().asItem());
+        this.tag(TCTags.Items.WRENCHES)
+                .add(TCItems.WRENCH_TAG_HOLDER.get());
     }
 }

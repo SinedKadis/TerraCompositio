@@ -74,6 +74,8 @@ public class TCItems {
             () -> new UnstableTechnetiumItem(new Item.Properties(),3));
     public static final RegistryObject<Item> WRENCH_AXE = ITEMS.register("flow_rotating_axe",
             () -> new WrenchAxeItem(Tiers.IRON, 6.0F, -3.1F, new Item.Properties().durability(330)));
+    public static final RegistryObject<Item> WRENCH_TAG_HOLDER = ITEMS.register("wrench_tag_holder",
+            () -> new Item(new Item.Properties()));
     public static final RegistryObject<Item> GOLD_ROD = ITEMS.register("gold_rod",
             () -> new Item(new Item.Properties()));
     public static final RegistryObject<Item> INFUSED_IRON_ROD = ITEMS.register("infused_iron_rod",
