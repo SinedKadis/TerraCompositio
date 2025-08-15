@@ -9,7 +9,7 @@ import net.minecraftforge.common.util.LazyOptional;
 import net.sinedkadis.terracompositio.api.TerraCompositioAPI;
 import net.sinedkadis.terracompositio.api.networks.NetworkAction;
 import net.sinedkadis.terracompositio.api.networks.cfe.CFENetwork;
-import net.sinedkadis.terracompositio.cfe.CFECapability;
+import net.sinedkadis.terracompositio.api.networks.cfe.CFECapability;
 import net.sinedkadis.terracompositio.cfe.CFEContainer;
 import net.sinedkadis.terracompositio.cfe.LimitlessCFEContainer;
 import net.sinedkadis.terracompositio.registries.TCBlockEntities;

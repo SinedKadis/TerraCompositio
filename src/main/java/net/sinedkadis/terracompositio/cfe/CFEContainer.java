@@ -46,6 +46,7 @@ public class CFEContainer implements ICFEHandler, INBTSerializable<CompoundTag> 
 
     }
 
+    @Override
     public CFEContainer setCfeTravelSpeed(float cfeTravelSpeed) {
         this.cfeTravelSpeed = cfeTravelSpeed;
         return this;
@@ -56,12 +57,14 @@ public class CFEContainer implements ICFEHandler, INBTSerializable<CompoundTag> 
         return this;
     }
 
-    public CFEContainer setIndex(int index) {
+    @Override
+    public ICFEHandler setIndex(int index) {
         this.index = index;
         return this;
     }
 
-    public CFEContainer setTargetOffset(Function<BlockPos, BlockPos> offset) {
+    @Override
+    public ICFEHandler setTargetOffset(Function<BlockPos, BlockPos> offset) {
         this.targetOffset = offset;
         return this;
     }

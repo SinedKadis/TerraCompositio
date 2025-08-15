@@ -1,9 +1,8 @@
 package net.sinedkadis.terracompositio.entity.goals;
 
 import net.minecraft.world.entity.ai.goal.Goal;
-import net.minecraft.world.level.Level;
 import net.sinedkadis.terracompositio.api.networks.cfe.ICFEHandler;
-import net.sinedkadis.terracompositio.cfe.CFECapability;
+import net.sinedkadis.terracompositio.api.networks.cfe.CFECapability;
 import net.sinedkadis.terracompositio.entity.custom.FlowCedarEntEntity;
 
 import java.util.EnumSet;
@@ -11,11 +10,9 @@ import java.util.Optional;
 
 public class CFEHoldGoal extends Goal {
     private final FlowCedarEntEntity mob;
-    private final Level level;
 
     public CFEHoldGoal(FlowCedarEntEntity pMob) {
         this.mob = pMob;
-        this.level = pMob.level();
         this.setFlags(EnumSet.of(Flag.MOVE, Flag.LOOK, Flag.JUMP));
     }
 

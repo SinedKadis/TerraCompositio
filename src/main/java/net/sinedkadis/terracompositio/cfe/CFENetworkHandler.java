@@ -1,13 +1,12 @@
 package net.sinedkadis.terracompositio.cfe;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.common.MinecraftForge;
-import net.sinedkadis.terracompositio.api.networks.cfe.CFENetwork;
+import net.sinedkadis.terracompositio.api.networks.cfe.*;
 import net.sinedkadis.terracompositio.api.networks.NetworkAction;
-import net.sinedkadis.terracompositio.api.networks.cfe.CFENetworkMember;
-import net.sinedkadis.terracompositio.api.networks.cfe.CFENetworkMemberBE;
-import net.sinedkadis.terracompositio.api.networks.cfe.ICFEHandler;
 import net.sinedkadis.terracompositio.block.entity.PathPointerBlockEntity;
 import net.sinedkadis.terracompositio.events.CFENetworkEvent;
 import net.sinedkadis.terracompositio.util.TCUtil;
@@ -143,6 +142,14 @@ public class CFENetworkHandler implements CFENetwork {
         return cfeSources.getOrDefault(pLevel, Collections.emptySet()).stream().anyMatch(fluidSource -> fluidSource.equals(cfeHandler));
     }
 
+    @Override
+    public ICFEHandler createCFEHandler(BlockEntity entity) {
+        return new CFEContainer(entity);
+    }
+    @Override
+    public ICFEHandler createCFEHandler(Entity entity) {
+        return new CFEContainer(entity);
+    }
 
 
     private <T> void remove(Map<Level, Set<T>> map, Level level, T thing) {

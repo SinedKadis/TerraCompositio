@@ -1,9 +1,10 @@
 package net.sinedkadis.terracompositio.api.networks.cfe;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.sinedkadis.terracompositio.api.networks.NetworkAction;
-import net.sinedkadis.terracompositio.cfe.CFECapability;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.util.List;
@@ -30,4 +31,7 @@ public interface CFENetwork {
             return cfeNetworkMemberEntity.getEntity().getCapability(CFECapability.CFE).resolve();
         return Optional.empty();
     }
+
+    ICFEHandler createCFEHandler(BlockEntity entity);
+    ICFEHandler createCFEHandler(Entity entity);
 }
