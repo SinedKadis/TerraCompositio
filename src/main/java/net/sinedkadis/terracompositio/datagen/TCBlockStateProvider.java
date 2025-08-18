@@ -39,6 +39,7 @@ public class TCBlockStateProvider extends BlockStateProvider {
         blockWithItem(TCBlocks.TECHNETIUM_ORE);
         blockWithItem(TCBlocks.TECHNETIUM_DEEPSLATE_ORE);
         blockWithItem(TCBlocks.TECHNETIUM_RAW_ORE_BLOCK);
+        blockWithItem(TCBlocks.TECHNETIUM_BLOCK);
 
 
 

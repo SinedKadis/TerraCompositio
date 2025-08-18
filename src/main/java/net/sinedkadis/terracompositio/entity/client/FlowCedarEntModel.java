@@ -46,6 +46,9 @@ public class FlowCedarEntModel<T extends Entity> extends HierarchicalModel<T> {
 
 		PartDefinition ent = partdefinition.addOrReplaceChild("ent", CubeListBuilder.create(), PartPose.offset(0.0F, 24.0F, 0.0F));
 
+		//partdefinition.addOrReplaceChild("hat", CubeListBuilder.create().texOffs(32, 0).addBox(-4.0F, -8.0F, -4.0F, 8.0F, 8.0F, 8.0F, new CubeDeformation(0.0F).extend(0.5F)), PartPose.offset(0.0F, 0.5F, 0.0F));
+		partdefinition.addOrReplaceChild("hat", CubeListBuilder.create(), PartPose.ZERO);
+		
 		PartDefinition head = ent.addOrReplaceChild("head", CubeListBuilder.create().texOffs(0, 12).addBox(-2.0F, -3.0F, -2.0F, 4.0F, 3.0F, 4.0F, new CubeDeformation(0.0F))
 				.texOffs(24, 0).addBox(-2.0F, -7.0F, -2.0F, 2.0F, 4.0F, 2.0F, new CubeDeformation(0.0F)), PartPose.offset(0.0F, -14.0F, 0.0F));
 

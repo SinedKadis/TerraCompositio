@@ -162,4 +162,8 @@ public class TCBlocks {
             () -> new PathPointerBlock(BlockBehaviour.Properties.copy(Blocks.OAK_PLANKS).noOcclusion(), PathPointerBlock.PPPart.SENDER));
     public static final RegistryObject<Block> PP_EMITTER = registerBlock("pp_emitter",
             () -> new PathPointerBlock(BlockBehaviour.Properties.copy(Blocks.OAK_PLANKS).noOcclusion(), PathPointerBlock.PPPart.EMITTER));
+
+    public static final RegistryObject<Block> TECHNETIUM_BLOCK = registerBlock("technetium_block",
+            () -> new Block(BlockBehaviour.Properties.copy(Blocks.NETHERITE_BLOCK)));
+
 }

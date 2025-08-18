@@ -13,4 +13,7 @@ public class TCModelLayers {
             TerraCompositio.modLoc( "flow_cedar_ent_entity"), "main");
     public static final ModelLayerLocation CFE_CUBE_LAYER = new ModelLayerLocation(
             TerraCompositio.modLoc("cfe_cube"), "main");
+
+    public static final ModelLayerLocation TECHNETIUM_CROWN_LAYER = new ModelLayerLocation(
+            TerraCompositio.modLoc( "technetium_crown"), "main");
 }

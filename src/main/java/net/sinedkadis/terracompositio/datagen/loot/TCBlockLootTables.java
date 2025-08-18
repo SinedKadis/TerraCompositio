@@ -95,6 +95,8 @@ public class TCBlockLootTables extends BlockLootSubProvider {
         this.dropSelf(TCBlocks.PP_RECEIVER.get());
         this.dropSelf(TCBlocks.PP_SENDER.get());
 
+        this.dropSelf(TCBlocks.TECHNETIUM_BLOCK.get());
+
     }
 
     protected LootTable.Builder createCopperLikeOreDrops(Block pBlock, Item item) {

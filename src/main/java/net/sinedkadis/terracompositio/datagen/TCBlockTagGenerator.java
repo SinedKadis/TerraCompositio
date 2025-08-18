@@ -36,7 +36,8 @@ public class TCBlockTagGenerator extends BlockTagsProvider {
                         TCBlocks.PP_SENDER.get(),
                         TCBlocks.PP_EMITTER.get(),
                         TCBlocks.PP_COLLECTOR.get(),
-                        TCBlocks.PP_RECEIVER.get());
+                        TCBlocks.PP_RECEIVER.get(),
+                        TCBlocks.TECHNETIUM_BLOCK.get());
         this.tag(BlockTags.MINEABLE_WITH_AXE)
                 .add(TCBlocks.FLOW_CEDAR_LOG.get(),
                         TCBlocks.FLOW_CEDAR_LEAVES.get(),

@@ -90,12 +90,15 @@ public class TCCreativeModeTabs {
                         pOutput.accept(TCBlocks.FLOW_CEDAR_TANK.get());
 
                         pOutput.accept(TCItems.TECHNETIUM_INGOT.get());
+                        pOutput.accept(TCBlocks.TECHNETIUM_BLOCK.get());
 
                         pOutput.accept(TCItems.FLOW_CEDAR_ENT_SPAWN_EGG.get());
                         pOutput.accept(TCBlocks.PP_COLLECTOR.get());
                         pOutput.accept(TCBlocks.PP_EMITTER.get());
                         pOutput.accept(TCBlocks.PP_RECEIVER.get());
                         pOutput.accept(TCBlocks.PP_SENDER.get());
+
+                        pOutput.accept(TCItems.TECHNETIUM_CROWN.get());
                     })
                     .build());
 

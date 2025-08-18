@@ -99,6 +99,9 @@ public class TCItems {
     public static final RegistryObject<Item> FLOW_CEDAR_ENT_SPAWN_EGG = ITEMS.register("flow_cedar_ent_spawn_egg",
             () -> new ForgeSpawnEggItem(TCEntities.FLOW_CEDAR_ENT, 0x352001, 0x015161, new Item.Properties()));
 
+    public static final RegistryObject<Item> TECHNETIUM_CROWN = ITEMS.register("technetium_crown",
+            () -> new TechnetiumArmorItem(ArmorItem.Type.HELMET,new Item.Properties()));
+
     public static void register(IEventBus eventBus){
         ITEMS.register(eventBus);
     }
