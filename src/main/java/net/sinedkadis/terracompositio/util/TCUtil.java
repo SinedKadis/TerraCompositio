@@ -11,19 +11,19 @@ import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.TagKey;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.RotatedPillarBlock;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.Property;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.fluids.FluidStack;
-import net.sinedkadis.terracompositio.api.networks.cfe.CFENetwork;
-import net.sinedkadis.terracompositio.api.networks.cfe.CFENetworkMember;
-import net.sinedkadis.terracompositio.api.networks.cfe.ICFEHandler;
+import net.sinedkadis.terracompositio.api.networks.cfe.*;
 import net.sinedkadis.terracompositio.block.custom.FlowCedarLikeBlock;
 
 
@@ -43,52 +43,32 @@ import static net.sinedkadis.terracompositio.registries.TCBlockStateProperties.I
 
 public class TCUtil {
 
-    public static int tryCFETransferWithParticles(CFENetworkMember target, CFENetworkMember source, int maxTransfer){
-        int count = tryCFETransfer(target,source,maxTransfer);
-        if (target.getLevel() != null) {
-            if (target.getLevel() instanceof ServerLevel serverLevel){
-                TCUtil.sendCFEParticles(serverLevel, Vec3.atLowerCornerWithOffset(target.getBlockPos(),
-                        target.particleTargetOffset().x,
-                        target.particleTargetOffset().y,
-                        target.particleTargetOffset().z),source.getBlockPos().offset(BlockPos.containing(source.particleTargetOffset())),count);
-            }
-        }
-        return count;
-    }
-    public static int tryCFETransferWithParticles(ICFEHandler target, ICFEHandler source, Level targetLevel, Vec3 targetPos, BlockPos sourcePos, int maxTransfer){
-        int count = tryCFETransfer(target,source,sourcePos,maxTransfer);
 
-        if (targetLevel instanceof ServerLevel serverLevel){
-            TCUtil.sendCFEParticles(serverLevel, targetPos, sourcePos,count);
-        }
-
-        return count;
-    }
-    public static int tryCFETransfer(CFENetworkMember target, CFENetworkMember source, int maxTransfer){
+    public static void tryCFETransfer(CFENetworkMember target, CFENetworkMember source, int maxTransfer, boolean doRender){
         ICFEHandler targetHandler = CFENetwork.getCFEHandler(target).orElse(null);
+        int added;
         if (targetHandler != null){
             ICFEHandler sourceHandler = CFENetwork.getCFEHandler(source).orElse(null);
             if (sourceHandler != null){
                 int taken = sourceHandler.takeCFE(maxTransfer,true);
-                int added = targetHandler.addCFE(taken,source.getBlockPos(),true);
+                added = targetHandler.addCFE(taken,sourceHandler,true,true);
                 if (added <= taken){
-                    targetHandler.addCFE(added, source.getBlockPos(), false);
+                    added = targetHandler.addCFE(added, sourceHandler, false,doRender);
                     sourceHandler.takeCFE(added, false);
-                    return added;
                 }
             }
         }
-        return 0;
     }
-    public static int tryCFETransfer(ICFEHandler target, ICFEHandler source, BlockPos sourcePos, int maxTransfer){
+    public static void tryCFETransfer(CFENetworkMember target, CFENetworkMember source, int maxTransfer) {
+        tryCFETransfer(target, source, maxTransfer, true);
+    }
+    public static void tryCFETransfer(ICFEHandler target, ICFEHandler source, int maxTransfer){
         int taken = source.takeCFE(maxTransfer,true);
-        int added = target.addCFE(taken,sourcePos,true);
+        int added = target.addCFE(taken,source,true,true);
         if (added <= taken){
-            target.addCFE(added, sourcePos, false);
+            added = target.addCFE(added, source, false,true);
             source.takeCFE(added, false);
-            return added;
         }
-        return 0;
     }
 
     public static void sendFluidParticles(ServerLevel level, BlockPos target, BlockPos source,
@@ -162,7 +142,7 @@ public class TCUtil {
                     targetPos.getX(),
                     targetPos.getY(),
                     targetPos.getZ(),
-                0.5D);
+                1);
         }
     }
     public static void spawnParticlesIn(Level pLevel, BlockPos targetPos, int count){
@@ -181,7 +161,7 @@ public class TCUtil {
                         targetPos.getX(),
                         targetPos.getY(),
                         targetPos.getZ(),
-                        0.5D);
+                        1);
             }
         }
     }
@@ -333,31 +313,71 @@ public class TCUtil {
         return getTouchingBlocks(null, pos,null);
     }
 
-    public static void sendCFEParticles(ServerLevel level,Vec3 target, BlockPos source,int particleAmount){
+    public static void sendCFEParticles(ServerLevel level, Vec3 target, Vec3 source, int particleAmount, List<Vec3> offsets){
         if (particleAmount <= 0 || level == null) return;
 
-        Vec3 sourceCenter = Vec3.atCenterOf(source);
+        BlockEntity be = level.getBlockEntity(BlockPos.containing(target));
+        float speed = 1/20f;
+        if (be instanceof TCCFEBlockEntity tccfeBlockEntity) {
+            speed = tccfeBlockEntity.getCfeContainer().getCfeTravelSpeed();
+        }
+        if (offsets == null) {
+            offsets = new ArrayList<>();
+        }
+        if (offsets.isEmpty()) {
+            int count = Math.min(particleAmount, 1000);
+            RandomSource random = level.random;
 
+            for (int i = 0; i < count; i++) {
+                Vec3 vec3 = getSpreadParticleOffset(random,particleAmount);
+                offsets.add(vec3);
+            }
+        }
 
         for (int i = 0; i < particleAmount; i++) {
-            double offsetX = sourceCenter.x + (level.random.nextDouble() - 0.5) * 0.8;
-            double offsetY = sourceCenter.y + (level.random.nextDouble() - 0.5) * 0.8;
-            double offsetZ = sourceCenter.z + (level.random.nextDouble() - 0.5) * 0.8;
+            double offsetX;
+            double offsetY;
+            double offsetZ;
 
-            TCCFEBlockEntity be = (TCCFEBlockEntity) level.getBlockEntity(BlockPos.containing(target));
-            float speed = 1/20f;
-            if (be != null) {
-                speed = be.getCfeContainer().getCfeTravelSpeed();
-            }
+            Vec3 vec3 = offsets.get(i);
+
+            offsetX = vec3.x + source.x;
+            offsetY = vec3.y + source.y;
+            offsetZ = vec3.z + source.z;
+
             level.sendParticles(new CFEParticleData(speed),
                     offsetX, offsetY, offsetZ,
                     0, // count
-                    target.x - offsetX, // xd (направление к цели)
-                    target.y - offsetY, // yd
-                    target.z - offsetZ,// zd
-                    Math.sqrt(target.distanceToSqr(source.getCenter()))); // speed
+                    target.x - offsetX + vec3.x, // xd (направление к цели)
+                    target.y - offsetY + vec3.y, // yd
+                    target.z - offsetZ + vec3.z,// zd
+                    1); // speed
         }
     }
+
+    public static @NotNull Vec3 getSpreadParticleOffset(RandomSource random, int count) {
+        double baseRadius = 0.2 + 0.3 * Math.log1p(count * 0.1);
+
+        double u = random.nextDouble();
+        double v = random.nextDouble();
+        double w = random.nextDouble();
+
+        double theta = 2 * Math.PI * u;
+        double phi = Math.acos(2 * v - 1);
+
+        double r = baseRadius * Math.sqrt(w);
+
+        double x = r * Math.sin(phi) * Math.cos(theta);
+        double y = r * Math.sin(phi) * Math.sin(theta);
+        double z = r * Math.cos(phi);
+
+        return new Vec3(x, y, z);
+    }
+
+    public static void sendCFEParticles(ServerLevel level,Vec3 target, Vec3 source,int particleAmount){
+        sendCFEParticles(level,target,source,particleAmount, null);
+    }
+
 
 //    public static void sendCFEParticles(ServerLevel level, BlockPos target, BlockPos source, int particleAmount){
 //        if (particleAmount <= 0 || level == null) return;
@@ -460,4 +480,5 @@ public class TCUtil {
         long dz = a.getZ() - b.getZ();
         return dx * dx + dy * dy + dz * dz;
     }
+
 }

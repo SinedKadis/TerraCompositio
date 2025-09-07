@@ -39,7 +39,7 @@ public class ReachSourceGoal extends Goal {
         Optional<ICFEHandler> cfeHandler = mob.getInnerCFEOptional().resolve();
         if (cfeHandler.isPresent() && cfeHandler.get().getCFE() <= 60){
             BlockPos sourcePos = mob.getSourcePos();
-            if (sourcePos != null && sourcePos.closerThan(mob.blockPosition(),mob.getLimit())) {
+            if (sourcePos != null && sourcePos.closerThan(mob.blockPosition(),mob.getLimit()-1)) {
                 return false;
             }
             CFENetworkMember randomSourceInRange = TerraCompositioAPI.instance().getCFENetworkInstance().getRandomSourceInRange(mob.blockPosition(), mob.level(), searchLimit);

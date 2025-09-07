@@ -98,7 +98,7 @@ public class ConstructionDesorberBlockEntity extends AbstractDesorberBlockEntity
                                         blockEntity.particleTargetOffset().x,
                                         blockEntity.particleTargetOffset().y,
                                         blockEntity.particleTargetOffset().z),
-                                pos,
+                                pos.getCenter(),
                                 added);
                     }
                     break;

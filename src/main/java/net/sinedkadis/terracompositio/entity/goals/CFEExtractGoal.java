@@ -3,7 +3,6 @@ package net.sinedkadis.terracompositio.entity.goals;
 import lombok.Getter;
 import net.minecraft.commands.arguments.EntityAnchorArgument;
 import net.minecraft.core.BlockPos;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
@@ -67,9 +66,7 @@ public class CFEExtractGoal extends Goal {
         if (held.isPresent() && inner.isPresent()){
             ICFEHandler helded = held.get();
             ICFEHandler innered = inner.get();
-            return helded.getCfeQueue().isEmpty()
-                    && helded.getCFE() <= 0
-                    && innered.getCfeQueue().isEmpty();
+            return helded.getQueued() + innered.getQueued() + helded.getCFE() <= 0;
         }
         return true;
     }
@@ -102,22 +99,15 @@ public class CFEExtractGoal extends Goal {
                     ICFEHandler icfeHandler = cfeHandler.get();
                     CFENetworkMember targetMember = TerraCompositioAPI.instance().getCFENetworkInstance().getMemberAt(level,targetPos);
                     if (targetMember != null) {
-                        TCUtil.tryCFETransferWithParticles(mob, targetMember, targetIsAcceptableEnt ? 100 : icfeHandler.getMaxCFE() - icfeHandler.getCFE());
+                        TCUtil.tryCFETransfer(mob, targetMember, targetIsAcceptableEnt ? 100 : icfeHandler.getMaxCFE() - icfeHandler.getCFE());
                         return;
                     }
                     BlockState blockState = level.getBlockState(targetPos);
                     if (blockState.hasProperty(TCBlockStateProperties.INFUSED) && blockState.getValue(TCBlockStateProperties.INFUSED)) {
                         //this.level.levelEvent(2001, blockpos1, Block.getId(Blocks.GRASS_BLOCK.defaultBlockState()));
                         level.setBlockAndUpdate(targetPos, blockState.setValue(TCBlockStateProperties.INFUSED, false));
-                        int count = icfeHandler.addCFE(100, targetPos, false);
-                        FlowCedarEntEntity target = mob;
-                        target.getLevel();
-                        if (target.getLevel() instanceof ServerLevel serverLevel) {
-                            TCUtil.sendCFEParticles(serverLevel, Vec3.atLowerCornerWithOffset(target.getBlockPos(),
-                                    target.particleTargetOffset().x,
-                                    target.particleTargetOffset().y,
-                                    target.particleTargetOffset().z), targetPos, count);
-                        }
+                        icfeHandler.addCFE(100, targetPos, false);
+
                     }
                 }
             }

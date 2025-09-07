@@ -43,7 +43,7 @@ public class CFETrashCanBlockEntity extends TCCFEBlockEntity {
                     return true;
                 })
                 .filter(cfeNetworkMemberBE -> cfeNetworkMemberBE != this)
-                .forEach(cfeNetworkMemberBE -> TCUtil.tryCFETransferWithParticles(this, cfeNetworkMemberBE, Integer.MAX_VALUE));
+                .forEach(cfeNetworkMemberBE -> TCUtil.tryCFETransfer(this, cfeNetworkMemberBE, Integer.MAX_VALUE));
     }
 
     @Override

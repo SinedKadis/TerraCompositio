@@ -2,17 +2,13 @@ package net.sinedkadis.terracompositio.particle.custom;
 
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.*;
-import net.minecraft.core.Vec3i;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.sinedkadis.terracompositio.particle.CFEParticleData;
-import net.sinedkadis.terracompositio.util.TCUtil;
 import org.jetbrains.annotations.NotNull;
 
 public class CFEParticle extends TextureSheetParticle{
-    private final Vec3 targetPos;
-    private final float speed;
 
     CFEParticle(ClientLevel level,
                 double x,
@@ -23,19 +19,26 @@ public class CFEParticle extends TextureSheetParticle{
                 double zd,
                 CFEParticleData data) {
         super(level, x, y, z, xd, yd, zd);
-        this.speed = data.speed();
-        this.targetPos = new Vec3(x + xd, y + yd, z + zd); // Рассчитываем целевую позицию
+        float speed = data.speed();
+        Vec3 targetPos = new Vec3(x + xd, y + yd, z + zd); // Рассчитываем целевую позицию
         this.hasPhysics = false;
         this.gravity = 0.0F;
-        if (xd != 0 && yd != 0 && zd != 0 ) {
-            this.lifetime = (int) Math.sqrt(Math.sqrt(
-                    TCUtil.distSqr(
-                            new Vec3i((int) x, (int) y, (int) z),
-                            new Vec3i((int) targetPos.x, (int) targetPos.y, (int) targetPos.z))))*20;
+        if (!(xd == 0 && yd == 0 && zd == 0) ) {
+            this.lifetime = (int) ((targetPos.distanceTo(new Vec3(x,y,z))/ speed));
         } else {
             this.lifetime = 20;
         }
         this.scale(0.5F);
+        Vec3 direction = new Vec3(
+                targetPos.x - this.x,
+                targetPos.y - this.y,
+                targetPos.z - this.z
+        ).normalize().scale(speed);  // нормализуем и умножаем на скорость
+
+        // Обновляем скорость
+        this.xd = direction.x;
+        this.yd = direction.y;
+        this.zd = direction.z;
     }
 
     public @NotNull ParticleRenderType getRenderType() {
@@ -52,20 +55,6 @@ public class CFEParticle extends TextureSheetParticle{
             this.remove();
             return;
         }
-
-        // Пересчитываем направление к targetPos (если нужно)
-        Vec3 direction = new Vec3(
-                targetPos.x - this.x,
-                targetPos.y - this.y,
-                targetPos.z - this.z
-        ).normalize().scale(speed);  // нормализуем и умножаем на скорость
-
-        // Обновляем скорость
-        this.xd = direction.x;
-        this.yd = direction.y;
-        this.zd = direction.z;
-
-        // Двигаем частицу
         this.x += this.xd;
         this.y += this.yd;
         this.z += this.zd;
@@ -87,9 +76,9 @@ public class CFEParticle extends TextureSheetParticle{
                                        double pXSpeed,
                                        double pYSpeed,
                                        double pZSpeed) {
-            CFEParticle $$8 = new CFEParticle(pLevel, pX, pY, pZ, pXSpeed, pYSpeed, pZSpeed,pType);
-            $$8.setSpriteFromAge(this.sprite);
-            return $$8;
+            CFEParticle particle = new CFEParticle(pLevel, pX, pY, pZ, pXSpeed, pYSpeed, pZSpeed,pType);
+            particle.setSpriteFromAge(this.sprite);
+            return particle;
         }
     }
 

@@ -58,6 +58,7 @@ import java.util.function.Predicate;
 
 import static net.minecraft.world.level.block.Block.dropResources;
 import static net.minecraft.world.level.block.state.properties.BlockStateProperties.*;
+import static net.sinedkadis.terracompositio.block.entity.PathPointerBlockEntity.simulateUpdateRotation;
 import static net.sinedkadis.terracompositio.registries.TCBlockStateProperties.*;
 import static net.sinedkadis.terracompositio.util.TCUtil.getNearBlocks;
 import static net.sinedkadis.terracompositio.util.TCUtil.getTouchingBlocks;
@@ -849,31 +850,23 @@ public class WrenchAxeItem extends AxeItem {
 
         if (inputBE != null && outputBE != null && tag != null) {
 
-            BlockPos lastNext = null;
-            if (inputBE.nextNode != null) {
-                lastNext = new BlockPos(inputBE.nextNode);
-            }
-            BlockPos lastLast = null;
-            if (inputBE.nextNode != null) {
-                lastLast = new BlockPos(inputBE.nextNode);
-            }
-
-            inputBE.nextNode = outputPos;
-            outputBE.lastNode = inputPos;
-
-            boolean flag1 = inputBE.updateRotation(true);
-            boolean flag2 = outputBE.updateRotation(true);
+            boolean flag1 = simulateUpdateRotation(inputBE.lastNode,inputPos,outputPos);
+            boolean flag2 = simulateUpdateRotation(inputPos,outputPos,outputBE.nextNode);
 
             if (!(flag1 && flag2)) {
                 if (player != null) {
                     message(player, Component.translatable("item.terracompositio.flow_rotating_axe.bind_fail_angle").withStyle(ChatFormatting.BOLD));
                 }
-                inputBE.nextNode = lastNext;
-                outputBE.lastNode = lastLast;
                 tag.remove("BindPos");
                 tag.remove("BindMode");
                 return false;
             }
+            inputBE.nextNode = outputPos;
+            outputBE.lastNode = inputPos;
+
+            inputBE.bindedEntity = null;
+            outputBE.bindedEntity = null;
+
             inputBE.updateRotation(false);
             outputBE.updateRotation(false);
 

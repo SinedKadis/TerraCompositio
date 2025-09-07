@@ -1,32 +1,38 @@
 package net.sinedkadis.terracompositio.block.entity;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.Nameable;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.sinedkadis.terracompositio.api.TerraCompositioAPI;
+import net.sinedkadis.terracompositio.api.dummies.DummyCFEHandler;
 import net.sinedkadis.terracompositio.api.networks.NetworkAction;
-import net.sinedkadis.terracompositio.api.networks.cfe.CFENetwork;
-import net.sinedkadis.terracompositio.api.networks.cfe.CFENetworkMember;
-import net.sinedkadis.terracompositio.api.networks.cfe.ICFEHandler;
+import net.sinedkadis.terracompositio.api.networks.cfe.*;
 import net.sinedkadis.terracompositio.block.custom.PathPointerBlock;
 import net.sinedkadis.terracompositio.cfe.CFEContainer;
 import net.sinedkadis.terracompositio.cfe.LimitlessCFEContainer;
-import net.sinedkadis.terracompositio.particle.CFEParticleData;
+import net.sinedkadis.terracompositio.item.custom.TechnetiumArmorItem;
 import net.sinedkadis.terracompositio.registries.TCBlockEntities;
+import net.sinedkadis.terracompositio.registries.TCItems;
 import net.sinedkadis.terracompositio.util.TCUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class PathPointerBlockEntity extends TCCFEBlockEntity implements Nameable {
 
@@ -37,6 +43,7 @@ public class PathPointerBlockEntity extends TCCFEBlockEntity implements Nameable
     public @Nullable BlockPos nextNode;
     public @Nullable BlockPos lastNode;
     public @Nullable BlockPos collectorPos;
+    public @Nullable Entity bindedEntity;
 
     public PathPointerBlockEntity(BlockPos pos, BlockState state) {
         super(TCBlockEntities.PATH_POINTER_BE.get(), pos, state, BlockMode.CONTAINER);
@@ -76,6 +83,33 @@ public class PathPointerBlockEntity extends TCCFEBlockEntity implements Nameable
         timer = 100;
         BlockState pState = level.getBlockState(pos);
         List<PathPointerBlock.PPPart> parts = Arrays.asList(PathPointerBlock.getParts(pState));
+        if (nextNode != null) {
+            boolean nextNodeIsPP = level.getBlockState(nextNode).getBlock() instanceof PathPointerBlock;
+            if (!nextNodeIsPP && bindedEntity == null) {
+                nextNode = null;
+            }
+        }
+        if (parts.contains(PathPointerBlock.PPPart.SENDER)) {
+            if (bindedEntity == null && nextNode == null) {
+                searchAndBindToEntity(level);
+            }
+            if (bindedEntity != null && nextNode != null) {
+                BlockPos currentEntityPos = bindedEntity.blockPosition();
+                if (!(nextNode.equals(currentEntityPos))) {
+                    if (simulateUpdateRotation(lastNode,getBlockPos(), currentEntityPos)) {
+                        nextNode = currentEntityPos;
+                    } else {
+                        nextNode = null;
+                        if (bindedEntity instanceof LivingEntity livingEntity) {
+                            ItemStack item = livingEntity.getItemBySlot(EquipmentSlot.HEAD);
+                            TechnetiumArmorItem.setBendSender(item,null);
+                        }
+                        bindedEntity = null;
+                    }
+                    updateRotation(false);
+                }
+            }
+        }
         if (parts.contains(PathPointerBlock.PPPart.COLLECTOR)) {
             this.connectRange = 7;
             int toAdd = this.cfeContainer.getMaxCFE() - this.getInSystem();
@@ -85,15 +119,8 @@ public class PathPointerBlockEntity extends TCCFEBlockEntity implements Nameable
                     CFENetwork cfeNetwork = TerraCompositioAPI.instance().getCFENetworkInstance();
                     CFENetworkMember source = cfeNetwork.getClosestSourceWithCFE(pos, level, connectRange * 2, getPriority());
                     if (source != null) {
-                        int transferred = TCUtil.tryCFETransfer(this, source, toAdd);
-                        if (transferred > 0)
-                            TCUtil.sendCFEParticles((ServerLevel) level,
-                                    Vec3.atLowerCornerWithOffset(pos,
-                                            this.particleTargetOffset().x,
-                                            this.particleTargetOffset().y,
-                                            this.particleTargetOffset().z),
-                                    source.getBlockPos(),
-                                    transferred);
+                        TCUtil.tryCFETransfer(this, source, toAdd);
+
                     }
 
                 }
@@ -118,6 +145,39 @@ public class PathPointerBlockEntity extends TCCFEBlockEntity implements Nameable
         transferCFE(level, parts);
     }
 
+    private void searchAndBindToEntity(Level level) {
+        List<Entity> entities = level.getEntities(null,
+                new AABB(this.worldPosition
+                                .relative(Direction.WEST, 7)
+                                .relative(Direction.SOUTH, 7)
+                                .relative(Direction.DOWN, 7),
+                        this.worldPosition
+                                .relative(Direction.EAST,7)
+                                .relative(Direction.NORTH,7)
+                                .relative(Direction.UP,7)));
+        List<LivingEntity> canBindTo = entities.stream()
+                .map(entity -> entity instanceof LivingEntity livingEntity ? livingEntity : null)
+                .filter(Objects::nonNull)
+                .filter(livingEntity -> livingEntity.hasItemInSlot(EquipmentSlot.HEAD))
+                .filter(livingEntity -> livingEntity.getItemBySlot(EquipmentSlot.HEAD)
+                        .is(TCItems.TECHNETIUM_CROWN.get()))
+                .filter(livingEntity -> simulateUpdateRotation(lastNode,getBlockPos(), livingEntity.blockPosition()))
+                .filter(livingEntity -> !livingEntity.getItemBySlot(EquipmentSlot.HEAD).getOrCreateTag().contains(TechnetiumArmorItem.BEND_SENDER_TAG))
+                .collect(Collectors.toList());
+        if (!canBindTo.isEmpty()) {
+            Collections.shuffle(canBindTo);
+            Entity chosen = canBindTo.get(0);
+            bindedEntity = chosen;
+            nextNode = chosen.blockPosition();
+            if (chosen instanceof LivingEntity livingEntity) {
+                ItemStack item = livingEntity.getItemBySlot(EquipmentSlot.HEAD);
+                TechnetiumArmorItem.setBendSender(item,getBlockPos());
+            }
+            updateRotation(false);
+            this.updateContainer();
+        }
+    }
+
     private void transferCFE(Level level, List<PathPointerBlock.PPPart> currentParts) {
         if (lastNode != null) {
             PathPointerBlockEntity lastNodeBE = ((PathPointerBlockEntity) level.getBlockEntity(lastNode));
@@ -126,36 +186,7 @@ public class PathPointerBlockEntity extends TCCFEBlockEntity implements Nameable
             if (lastParts.contains(PathPointerBlock.PPPart.SENDER) && currentParts.contains(PathPointerBlock.PPPart.RECEIVER)) {
                 if (lastNodeBE != null) {
                     if (level.isClientSide) return;
-                    int cfeTransfer = TCUtil.tryCFETransfer(this, lastNodeBE, Integer.MAX_VALUE);
-                    if (cfeTransfer > 0) {
-                        Vec3 sourceCenter = lastNodeBE.getBlockPos().getCenter();
-                        Vec3 target = this.getBlockPos().getCenter();
-                        for (int i = 0; i < cfeTransfer; i++) {
-
-                            double x = (level.random.nextDouble() - 0.3) * 0.4;
-                            double y = (level.random.nextDouble() - 0.3) * 0.4;
-                            double z = (level.random.nextDouble() - 0.3) * 0.4;
-
-                            double sourceOffsetX = sourceCenter.x + x;
-                            double sourceOffsetY = sourceCenter.y + y;
-                            double sourceOffsetZ = sourceCenter.z + z;
-
-                            double targetOffsetX = target.x + x;
-                            double targetOffsetY = target.y + y;
-                            double targetOffsetZ = target.z + z;
-
-
-                            float speed = this.getCfeContainer().getCfeTravelSpeed();
-
-                            ((ServerLevel) level).sendParticles(new CFEParticleData(speed),
-                                    sourceOffsetX, sourceOffsetY, sourceOffsetZ,
-                                    0, // count
-                                    targetOffsetX - sourceOffsetX, // xd (направление к цели)
-                                    targetOffsetY - sourceOffsetY, // yd
-                                    targetOffsetZ - sourceOffsetZ,// zd
-                                    Math.sqrt(target.distanceToSqr(sourceCenter)) * 5); // speed
-                        }
-                    }
+                    TCUtil.tryCFETransfer(this, lastNodeBE, Integer.MAX_VALUE);
                 }
             }
         }
@@ -168,7 +199,7 @@ public class PathPointerBlockEntity extends TCCFEBlockEntity implements Nameable
 
             List<PathPointerBlock.PPPart> currentParts = Arrays.asList(PathPointerBlock.getParts(pState));
 
-            if (currentParts.contains(PathPointerBlock.PPPart.SENDER) && currentParts.contains(PathPointerBlock.PPPart.RECEIVER)) {
+            if (currentParts.contains(PathPointerBlock.PPPart.SENDER) && currentParts.contains(PathPointerBlock.PPPart.RECEIVER) && bindedEntity == null) {
                 this.setCfeContainer(new LimitlessCFEContainer(this).setCfeTravelSpeed((float) 5 / 20));
             } else {
                 this.setCfeContainer(new CFEContainer(this).setCfeTravelSpeed((float) 5 / 20));
@@ -239,12 +270,20 @@ public class PathPointerBlockEntity extends TCCFEBlockEntity implements Nameable
             PathPointerBlockEntity currentBE = blockEntityQueue.poll();
             if (currentBE != null
                     && currentPart.contains(PathPointerBlock.PPPart.SENDER)
-                    && currentBE.nextNode != null
-                    && !currentBE.getBlockPos().equals(currentBE.nextNode) ){
-                if (level == null) break;
-                BlockState state = level.getBlockState(currentBE.nextNode);
-                partQueue.add(Arrays.asList(PathPointerBlock.getParts(state)));
-                blockEntityQueue.add((PathPointerBlockEntity) level.getBlockEntity(currentBE.nextNode));
+                    && currentBE.nextNode != null) {
+                boolean bendToItself = currentBE.getBlockPos().equals(currentBE.nextNode);
+                if (!bendToItself || bindedEntity != null) {
+                    if (level == null) break;
+                    if (bindedEntity != null) {
+                        int max = bindedEntity.getCapability(CFECapability.CFE).orElseGet(() -> DummyCFEHandler.instance).getFreeSpace();
+                        this.cfeContainer.setMaxCFE(max);
+                        currentBE.cfeContainer.setMaxCFE(max).setCfeTravelSpeed(5/20f);
+                        break;
+                    }
+                    BlockState state = level.getBlockState(currentBE.nextNode);
+                    partQueue.add(Arrays.asList(PathPointerBlock.getParts(state)));
+                    blockEntityQueue.add((PathPointerBlockEntity) level.getBlockEntity(currentBE.nextNode));
+                }
             }
             if (currentBE != null && currentPart.contains(PathPointerBlock.PPPart.EMITTER)){
                 if (level == null) break;
@@ -448,6 +487,30 @@ public class PathPointerBlockEntity extends TCCFEBlockEntity implements Nameable
         }
         return true;
     }
+    @SuppressWarnings("SuspiciousNameCombination")
+    public static boolean simulateUpdateRotation(BlockPos lastNode,BlockPos currentPos, BlockPos nextNode) {
+        if (nextNode == null && lastNode == null) return false;
+
+        boolean ignorAngle = Objects.equals(nextNode, currentPos) || Objects.equals(lastNode, currentPos);
+        Vec3 pos = Vec3.atCenterOf(currentPos);
+        Vec3 dirForward;
+        if (nextNode == null) {
+            dirForward = pos.subtract(Vec3.atCenterOf(lastNode)).normalize();
+        } else {
+            dirForward = Vec3.atCenterOf(nextNode).subtract(pos).normalize();
+        }
+
+        Vec3 dirBackward = lastNode == null ?
+                dirForward :
+                pos.subtract(Vec3.atCenterOf(lastNode)).normalize();
+
+        float forward = ((float) Mth.atan2(dirForward.x, dirForward.z));
+        float backward = ((float) Mth.atan2(dirBackward.x, dirBackward.z));
+
+        float diff = ((float) Math.toDegrees(Math.abs(forward - backward)));
+
+        return (!(diff > 91) || !(diff - 360 < -91)) || ignorAngle;
+    }
 
     @Override
     public void setRemoved() {
@@ -466,6 +529,10 @@ public class PathPointerBlockEntity extends TCCFEBlockEntity implements Nameable
                     next.lastNode = null;
                     next.updateRotation(false);
                 }
+            }
+            if (bindedEntity != null && bindedEntity instanceof LivingEntity livingEntity) {
+                ItemStack stack = livingEntity.getItemBySlot(EquipmentSlot.HEAD);
+                TechnetiumArmorItem.setBendSender(stack,null);
             }
         }
     }

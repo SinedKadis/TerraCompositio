@@ -97,7 +97,7 @@ public class CultivationDesorberBlockEntity extends AbstractDesorberBlockEntity 
                 TCUtil.sendCFEParticles((ServerLevel) level, Vec3.atLowerCornerWithOffset(blockEntity.getBlockPos(),
                         blockEntity.particleTargetOffset().x,
                         blockEntity.particleTargetOffset().y,
-                        blockEntity.particleTargetOffset().z),pos,added);
+                        blockEntity.particleTargetOffset().z),pos.getCenter(),added);
                 //noinspection deprecation
                 blockEntity.setRenderStack(new ItemStack(state.getBlock()
                         .getDrops(state,new LootParams.Builder((ServerLevel) level)

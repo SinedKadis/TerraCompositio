@@ -5,45 +5,34 @@ import lombok.Getter;
 import lombok.Setter;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.world.entity.Entity;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.util.INBTSerializable;
 import net.sinedkadis.terracompositio.api.TerraCompositioAPI;
 import net.sinedkadis.terracompositio.api.networks.NetworkAction;
-import net.sinedkadis.terracompositio.api.networks.cfe.CFENetworkMemberBE;
-import net.sinedkadis.terracompositio.api.networks.cfe.CFENetworkMemberEntity;
-import net.sinedkadis.terracompositio.api.networks.cfe.ICFEHandler;
-import net.sinedkadis.terracompositio.util.TCUtil;
-import org.apache.commons.lang3.tuple.MutablePair;
-import org.apache.commons.lang3.tuple.Pair;
+import net.sinedkadis.terracompositio.api.networks.cfe.*;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 import java.util.function.Function;
 
 @Getter
 @Setter
 public class CFEContainer implements ICFEHandler, INBTSerializable<CompoundTag> {
     protected float cfeTravelSpeed = 1 / 20f;
-    protected BlockEntity blockEntity = null;
-    protected Entity entity = null;
+    protected CFENetworkMember attachedMember;
+    protected boolean isEntity = false;
     protected int index = 0;
     int CFE = 0;
     protected int maxCFE = 100;
-    protected final List<Pair<Integer, Double>> cfeQueue = new ArrayList<>();
-    protected Function<BlockPos, BlockPos> targetOffset = blockpos -> blockpos;
+    protected final List<CfeQueueMember> cfeQueue = new ArrayList<>();
+    protected Function<Vec3, Vec3> offset = t -> t;
 
-    public CFEContainer(BlockEntity entity) {
-        this.blockEntity = entity;
-    }
-
-    public CFEContainer(Entity entity) {
-        this.entity = entity;
-
+    public CFEContainer(CFENetworkMember attachedMember) {
+        this.attachedMember = attachedMember;
+        if (attachedMember instanceof  CFENetworkMemberEntity) isEntity = true;
     }
 
     @Override
@@ -63,9 +52,8 @@ public class CFEContainer implements ICFEHandler, INBTSerializable<CompoundTag> 
         return this;
     }
 
-    @Override
-    public ICFEHandler setTargetOffset(Function<BlockPos, BlockPos> offset) {
-        this.targetOffset = offset;
+    public ICFEHandler setOffset(Function<Vec3, Vec3> offset) {
+        this.offset = offset;
         return this;
     }
 
@@ -89,53 +77,69 @@ public class CFEContainer implements ICFEHandler, INBTSerializable<CompoundTag> 
     public int addCFE(int cfe, BlockPos sourcePos, boolean simulate) {
         if (CFE >= maxCFE)
             return 0;
-        Optional<Pair<Integer, Double>> quequed = cfeQueue.stream().reduce(
-                (integerDoublePair, integerDoublePair2) ->
-                        Pair.of(integerDoublePair.getKey() + integerDoublePair2.getKey(), integerDoublePair.getValue()));
+        int queued = getQueued();
         int added;
         if (cfe > 0) {
             added = Math.min((maxCFE - CFE), cfe);
-            if (quequed.isPresent()) {
-                added = Math.min(Math.max(maxCFE - CFE - quequed.get().getKey(), 0), added);
-            }
+            added = Math.min(Math.max(maxCFE - CFE - queued, 0), added);
         } else return 0;
         if (added < 1)
             return 0;
         if (!simulate) {
-            if (blockEntity != null)
-                cfeQueue.add(new MutablePair<>(cfe, Math.sqrt(TCUtil.distSqr(sourcePos, this.blockEntity.getBlockPos()))));
-            else if (entity != null)
-                cfeQueue.add(new MutablePair<>(cfe, Math.sqrt(TCUtil.distSqr(sourcePos, targetOffset.apply(((CFENetworkMemberEntity) this.entity).getBlockPos())))));
+            cfeQueue.add(new CfeQueueMember(cfe,this,sourcePos,((ServerLevel) this.getAttachedMember().getLevel())));
+        }
+        return added;
+    }
+
+    @Override
+    public int addCFE(int cfe, ICFEHandler source, boolean simulate,boolean doRender) {
+        if (CFE >= maxCFE)
+            return 0;
+        int queued = getQueued();
+        int added;
+        if (cfe > 0) {
+            added = Math.min((maxCFE - CFE), cfe);
+            added = Math.min(Math.max(maxCFE - CFE - queued, 0), added);
+        } else return 0;
+        if (added < 1)
+            return 0;
+        if (!simulate) {
+            Level level = this.getAttachedMember().getLevel();
+
+            if (!level.isClientSide()) {
+                CfeQueueMember  member = new CfeQueueMember(added, this, source, ((ServerLevel) level),doRender);
+                cfeQueue.add(member);
+            }
+
         }
         return added;
     }
 
     public int getQueued() {
         int queued = 0;
-        for (Pair<Integer, Double> pair : cfeQueue) {
-            queued += pair.getKey();
+        for (CfeQueueMember member : cfeQueue) {
+            queued += member.getCfeCount();
         }
         return queued;
     }
 
     @Override
     public BlockPos getBlockPos() {
-        if (blockEntity != null) return blockEntity.getBlockPos();
-        return entity.getOnPos();
+        return attachedMember.getBlockPos();
     }
 
     public void containerTick() {
-        Iterator<Pair<Integer, Double>> iterator = cfeQueue.iterator();
+        Iterator<CfeQueueMember> iterator = cfeQueue.iterator();
         while (iterator.hasNext()) {
-            Pair<Integer, Double> entry = iterator.next();
-            int cfe = entry.getKey();
-            double dist = entry.getValue();
-            if (dist > cfeTravelSpeed) {
-                entry.setValue(dist - cfeTravelSpeed);
-            } else {
-                actuallyAddCFE(cfe);
+            CfeQueueMember entry = iterator.next();
+            entry.memberTick();
+            if (entry.isEnded()) {
+                if (entry.isReached()) {
+                    actuallyAddCFE(entry.getCfeCount());
+                }
                 iterator.remove();
             }
+
         }
     }
 
@@ -146,7 +150,7 @@ public class CFEContainer implements ICFEHandler, INBTSerializable<CompoundTag> 
     }
 
     protected void onContentsChanged() {
-        if (blockEntity != null) {
+        if (attachedMember instanceof BlockEntity blockEntity) {
             blockEntity.setChanged();
             Level level = blockEntity.getLevel();
             if (level != null && !level.isClientSide()) {
@@ -157,15 +161,15 @@ public class CFEContainer implements ICFEHandler, INBTSerializable<CompoundTag> 
     }
 
     protected void sendCFEUpdate() {
-        if (blockEntity instanceof CFENetworkMemberBE cfeNetworkMemberBE) {
+        if (attachedMember instanceof CFENetworkMemberBE cfeNetworkMemberBE) {
 //            TerraCompositioAPI.INSTANCE.getCFENetworkInstance().fireCFENetworkEvent(cfeNetworkMemberBE, NetworkAction.UPDATE);
             //TerraCompositioAPI.INSTANCE.getCFENetworkInstance().networkMemberUpdated(cfeNetworkMemberBE);
 
             TerraCompositioAPI.INSTANCE.getCFENetworkInstance().fireCFENetworkEvent(cfeNetworkMemberBE, NetworkAction.UPDATE);
 
         }
-        if (entity != null) {
-            TerraCompositioAPI.INSTANCE.getCFENetworkInstance().fireCFENetworkEvent(((CFENetworkMemberEntity) entity), NetworkAction.UPDATE);
+        if (isEntity) {
+            TerraCompositioAPI.INSTANCE.getCFENetworkInstance().fireCFENetworkEvent(attachedMember, NetworkAction.UPDATE);
         }
     }
 
@@ -185,10 +189,7 @@ public class CFEContainer implements ICFEHandler, INBTSerializable<CompoundTag> 
 
     @Override
     public int getFreeSpace() {
-        int queued = 0;
-        for (Pair<Integer, Double> pair : cfeQueue) {
-            queued += pair.getKey();
-        }
+        int queued = getQueued();
         return maxCFE - (CFE + queued);
     }
 
@@ -198,9 +199,8 @@ public class CFEContainer implements ICFEHandler, INBTSerializable<CompoundTag> 
         nbt.putInt("CFE", CFE);
         nbt.putInt("queue_size", cfeQueue.size());
         for (int i = 0; i < cfeQueue.size(); i++) {
-            Pair<Integer, Double> pair = cfeQueue.get(i);
-            nbt.putInt("queued_int_" + i, pair.getKey());
-            nbt.putDouble("queued_double_" + i, pair.getValue());
+            CfeQueueMember member = cfeQueue.get(i);
+            nbt.put("member_"+i,member.serializeNBT());
         }
         return nbt;
     }
@@ -211,7 +211,10 @@ public class CFEContainer implements ICFEHandler, INBTSerializable<CompoundTag> 
         int size = tag.getInt("queue_size");
         if (size > 0) cfeQueue.clear();
         for (int i = 0; i < size; i++) {
-            cfeQueue.add(new MutablePair<>(tag.getInt("queued_int_" + i), tag.getDouble("queued_double_" + i)));
+            CfeQueueMember member = new CfeQueueMember();
+            member.deserializeNBT(tag.getCompound("member_"+i));
+            cfeQueue.add(member);
+
         }
     }
 

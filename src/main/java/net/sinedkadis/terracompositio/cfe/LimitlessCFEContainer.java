@@ -1,23 +1,28 @@
 package net.sinedkadis.terracompositio.cfe;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.world.level.block.entity.BlockEntity;
-import net.sinedkadis.terracompositio.api.networks.cfe.CFENetworkMemberEntity;
-import net.sinedkadis.terracompositio.util.TCUtil;
-import org.apache.commons.lang3.tuple.MutablePair;
+import net.minecraft.server.level.ServerLevel;
+import net.sinedkadis.terracompositio.api.networks.cfe.CFENetworkMember;
+import net.sinedkadis.terracompositio.api.networks.cfe.ICFEHandler;
 
 public class LimitlessCFEContainer extends CFEContainer{
-    public LimitlessCFEContainer(BlockEntity entity) {
+    public LimitlessCFEContainer(CFENetworkMember entity) {
         super(entity);
     }
 
     @Override
-    public int addCFE(int cfe, BlockPos sourcePos, boolean simulate) {
+    public int addCFE(int cfe, BlockPos source, boolean simulate) {
         if (!simulate && cfe > 0) {
-            if (blockEntity != null)
-                cfeQueue.add(new MutablePair<>(cfe, Math.sqrt(TCUtil.distSqr(sourcePos, this.blockEntity.getBlockPos()))));
-            else if (entity != null)
-                cfeQueue.add(new MutablePair<>(cfe, Math.sqrt(TCUtil.distSqr(sourcePos, targetOffset.apply(((CFENetworkMemberEntity) this.entity).getBlockPos())))));
+            CfeQueueMember member = new CfeQueueMember(cfe, this, source, ((ServerLevel) this.getAttachedMember().getLevel()));
+            cfeQueue.add(member);
+        }
+        return cfe;
+    }
+
+    @Override
+    public int addCFE(int cfe, ICFEHandler source, boolean simulate, boolean doRender) {
+        if (!simulate && cfe > 0) {
+            cfeQueue.add(new CfeQueueMember(cfe, this, source, ((ServerLevel) this.getAttachedMember().getLevel()),doRender));
         }
         return cfe;
     }

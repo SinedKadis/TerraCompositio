@@ -12,10 +12,7 @@ import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.damagesource.DamageSource;
-import net.minecraft.world.entity.AnimationState;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.entity.Pose;
+import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
 import net.minecraft.world.entity.ai.attributes.Attributes;
 import net.minecraft.world.entity.ai.goal.FloatGoal;
@@ -24,6 +21,7 @@ import net.minecraft.world.entity.ai.goal.RandomLookAroundGoal;
 import net.minecraft.world.entity.ai.goal.WaterAvoidingRandomStrollGoal;
 import net.minecraft.world.entity.animal.AbstractGolem;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.capabilities.Capability;
@@ -38,10 +36,12 @@ import net.sinedkadis.terracompositio.cfe.CFEContainer;
 import net.sinedkadis.terracompositio.entity.goals.CFEHoldGoal;
 import net.sinedkadis.terracompositio.entity.goals.ReachSourceGoal;
 import net.sinedkadis.terracompositio.entity.goals.CFEExtractGoal;
+import net.sinedkadis.terracompositio.registries.TCItems;
 import net.sinedkadis.terracompositio.util.TCUtil;
 import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.List;
 import java.util.Optional;
 
 // /kill @e[type=terracompositio:flow_cedar_ent_entity]
@@ -56,9 +56,18 @@ public class FlowCedarEntEntity extends AbstractGolem implements CFENetworkMembe
     private static final EntityDataAccessor<Integer> CFE_DATA =
             SynchedEntityData.defineId(FlowCedarEntEntity.class, EntityDataSerializers.INT);
 
-    protected LazyOptional<ICFEHandler> lazyCFEOptional = LazyOptional.of(() -> new CFEContainer(this).setMaxCFE(10000).setTargetOffset(blockPos -> blockPos.above(3)).setIndex(1));
+    protected LazyOptional<ICFEHandler> lazyCFEOptional = LazyOptional.of(() -> new CFEContainer(this)
+            .setMaxCFE(10000)
+            .setOffset(vec3 -> vec3.add(0,this.getBbHeight() + (0.1f + (this.getSyncedCFE() / 10000d)) * 10 * 0.2f,0))
+            .setIndex(0));
     @Getter
-    protected LazyOptional<ICFEHandler> innerCFEOptional = LazyOptional.of(() -> new CFEContainer(this).setMaxCFE(5 * 60 + 60).setTargetOffset(BlockPos::above).setIndex(2));
+    protected LazyOptional<ICFEHandler> innerCFEOptional = LazyOptional.of(() -> new CFEContainer(this)
+            .setMaxCFE(5 * 60 + 60)
+            .setOffset(vec3 -> vec3.add(0,1,0))
+            .setIndex(1));
+
+    @Getter
+    public final List<LazyOptional<ICFEHandler>> cfeHandlers = List.of(lazyCFEOptional,innerCFEOptional);
     public final AnimationState idleAnimationState = new AnimationState();
     public final AnimationState extractionAnimationState = new AnimationState();
     public final AnimationState extractionCompleteAnimationState = new AnimationState();
@@ -69,6 +78,11 @@ public class FlowCedarEntEntity extends AbstractGolem implements CFENetworkMembe
 
     public FlowCedarEntEntity(EntityType<? extends AbstractGolem> pEntityType, Level pLevel) {
         super(pEntityType, pLevel);
+    }
+
+    @Override
+    public boolean canTakeItem(ItemStack pItemstack) {
+        return pItemstack.is(TCItems.TECHNETIUM_CROWN.get());
     }
 
     @Override
@@ -83,7 +97,8 @@ public class FlowCedarEntEntity extends AbstractGolem implements CFENetworkMembe
     @Override
     public void tick() {
         super.tick();
-
+        ItemStack item = this.getItemBySlot(EquipmentSlot.HEAD);
+        item.getItem().inventoryTick(item,level(),this,3,false);
         if (this.level().isClientSide()) {
             setupAnimationStates();
         } else {
@@ -109,7 +124,7 @@ public class FlowCedarEntEntity extends AbstractGolem implements CFENetworkMembe
                     icfeHandler1.containerTick();
                     tickCounter--;
                     if (tickCounter <= 0) {
-                        TCUtil.tryCFETransferWithParticles(icfeHandler1, icfeHandler, this.level(), this.position(), this.blockPosition().above(), 10);
+                        TCUtil.tryCFETransfer(icfeHandler1, icfeHandler, 10);
                         tickCounter = 20;
                         icfeHandler1.takeCFE(1, false);
                     }

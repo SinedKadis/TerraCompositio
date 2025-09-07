@@ -51,7 +51,7 @@ public class CFESaturatedAirBlock extends TCCFEBaseEntityBlock {
                     .toList();
             for (ICFEHandler cfeContainer : icfeHandlers){
                 if (cfe > 0) {
-                    int added = cfeContainer.addCFE(cfe,cfeContainer.getBlockPos(), false);
+                    int added = cfeContainer.addCFE(cfe,cfeContainer, false,true);
                     cfe -= added;
                 } else break;
             }
@@ -69,7 +69,7 @@ public class CFESaturatedAirBlock extends TCCFEBaseEntityBlock {
                         if (blockEntity != null){
                             ICFEHandler cfeContainer = blockEntity.getCfeContainer();
                             cfeContainer.setCFE(0);
-                            int added = cfeContainer.addCFE(cfe,cfeContainer.getBlockPos(),false);
+                            int added = cfeContainer.addCFE(cfe,cfeContainer,false,true);
                             cfe -= added;
                         }
                     }

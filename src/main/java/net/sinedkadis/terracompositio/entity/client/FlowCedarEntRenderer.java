@@ -42,6 +42,10 @@ public class FlowCedarEntRenderer extends MobRenderer<FlowCedarEntEntity,FlowCed
     public void render(FlowCedarEntEntity entity, float entityYaw, float partialTicks, PoseStack poseStack, MultiBufferSource buffer, int packedLight) {
         super.render(entity, entityYaw, partialTicks, poseStack, buffer, packedLight);
 
+
+
+
+
         int energy = entity.getSyncedCFE();
         Optional<ICFEHandler> icfeHandler = entity.getCapability(CFECapability.CFE).resolve();
         if (energy > 0 && icfeHandler.isPresent()) {

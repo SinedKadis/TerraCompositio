@@ -2,12 +2,10 @@ package net.sinedkadis.terracompositio.api.dummies;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.phys.Vec3;
+import net.sinedkadis.terracompositio.api.networks.cfe.CFENetworkMember;
 import net.sinedkadis.terracompositio.api.networks.cfe.ICFEHandler;
-import org.apache.commons.lang3.tuple.Pair;
 
-import java.util.List;
 import java.util.function.Function;
 
 public class DummyCFEHandler implements ICFEHandler {
@@ -18,10 +16,6 @@ public class DummyCFEHandler implements ICFEHandler {
         return 0;
     }
 
-    @Override
-    public List<Pair<Integer, Double>> getCfeQueue() {
-        return List.of();
-    }
 
     @Override
     public ICFEHandler setIndex(int index) {
@@ -29,14 +23,21 @@ public class DummyCFEHandler implements ICFEHandler {
     }
 
     @Override
-    public ICFEHandler setTargetOffset(Function<BlockPos, BlockPos> offset) {
-        return instance;
+    public ICFEHandler setOffset(Function<Vec3, Vec3> offset) {
+        return null;
     }
+
 
     @Override
     public int takeCFE(int cfe, boolean simulate) {
         return 0;
     }
+
+    @Override
+    public int addCFE(int cfe, ICFEHandler source, boolean simulate, boolean doRender) {
+        return 0;
+    }
+
 
     @Override
     public int addCFE(int cfe, BlockPos sourcePos, boolean simulate) {
@@ -104,27 +105,30 @@ public class DummyCFEHandler implements ICFEHandler {
     }
 
     @Override
-    public BlockEntity getBlockEntity() {
+    public CFENetworkMember getAttachedMember() {
         return null;
     }
 
     @Override
-    public Entity getEntity() {
+    public Function<Vec3, Vec3> getOffset() {
         return null;
     }
 
-    @Override
-    public Function<BlockPos, BlockPos> getTargetOffset() {
-        return null;
-    }
 
     @Override
-    public void setBlockEntity(BlockEntity blockEntity) {
+    public void setAttachedMember(CFENetworkMember member) {
 
     }
 
     @Override
-    public void setEntity(Entity entity) {
-
+    public boolean isEntity() {
+        return false;
     }
+
+    @Override
+    public int getIndex() {
+        return 0;
+    }
+
+
 }

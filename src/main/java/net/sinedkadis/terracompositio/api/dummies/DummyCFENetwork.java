@@ -1,9 +1,7 @@
 package net.sinedkadis.terracompositio.api.dummies;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import net.sinedkadis.terracompositio.api.networks.NetworkAction;
 import net.sinedkadis.terracompositio.api.networks.cfe.CFENetwork;
 import net.sinedkadis.terracompositio.api.networks.cfe.CFENetworkMember;
@@ -51,11 +49,7 @@ public class DummyCFENetwork implements CFENetwork {
     }
 
     @Override
-    public ICFEHandler createCFEHandler(BlockEntity entity) {
-        return DummyCFEHandler.instance;
-    }
-    @Override
-    public ICFEHandler createCFEHandler(Entity entity) {
-        return DummyCFEHandler.instance;
+    public ICFEHandler createCFEHandler(CFENetworkMember entity) {
+        return null;
     }
 }

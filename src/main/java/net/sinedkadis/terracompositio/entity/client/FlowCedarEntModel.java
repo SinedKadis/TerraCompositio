@@ -6,38 +6,43 @@ package net.sinedkadis.terracompositio.entity.client;// Made with Blockbench 4.1
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.client.model.HeadedModel;
 import net.minecraft.client.model.HierarchicalModel;
 import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.model.geom.builders.*;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.item.ItemStack;
 import net.sinedkadis.terracompositio.entity.animations.FlowCedarEntAnimations;
 import net.sinedkadis.terracompositio.entity.custom.FlowCedarEntEntity;
+import net.sinedkadis.terracompositio.registries.TCItems;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class FlowCedarEntModel<T extends Entity> extends HierarchicalModel<T> {
+public class FlowCedarEntModel<T extends Entity> extends HierarchicalModel<T> implements HeadedModel {
 	private final ModelPart ent;
 	private final ModelPart head;
-	private final ModelPart body;
-	private final ModelPart left_arm;
-	private final ModelPart right_arm;
-	private final ModelPart left_leg;
-	private final ModelPart front_leg;
-	private final ModelPart back_leg;
+	private final ModelPart mini_crown;
 
-	public FlowCedarEntModel(ModelPart root) {
+    public FlowCedarEntModel(ModelPart root) {
 		this.ent = root.getChild("ent");
 		this.head = this.ent.getChild("head");
-		this.body = this.ent.getChild("body");
-		this.left_arm = this.ent.getChild("left_arm");
-		this.right_arm = this.ent.getChild("right_arm");
-		this.left_leg = this.ent.getChild("left_leg");
-		this.front_leg = this.ent.getChild("front_leg");
-		this.back_leg = this.ent.getChild("back_leg");
+		this.mini_crown = this.head.getChild("mini_crown");
+		this.ent.getChild("body");
+		this.ent.getChild("left_arm");
+		this.ent.getChild("right_arm");
+		this.ent.getChild("left_leg");
+		this.ent.getChild("front_leg");
+		this.ent.getChild("back_leg");
+//        ModelPart body =      this.ent.getChild("body");
+//        ModelPart left_arm =  this.ent.getChild("left_arm");
+//        ModelPart right_arm = this.ent.getChild("right_arm");
+//        ModelPart left_leg =  this.ent.getChild("left_leg");
+//        ModelPart front_leg = this.ent.getChild("front_leg");
+//        ModelPart back_leg =  this.ent.getChild("back_leg");
 	}
 
 	public static LayerDefinition createBodyLayer() {
@@ -46,33 +51,62 @@ public class FlowCedarEntModel<T extends Entity> extends HierarchicalModel<T> {
 
 		PartDefinition ent = partdefinition.addOrReplaceChild("ent", CubeListBuilder.create(), PartPose.offset(0.0F, 24.0F, 0.0F));
 
-		//partdefinition.addOrReplaceChild("hat", CubeListBuilder.create().texOffs(32, 0).addBox(-4.0F, -8.0F, -4.0F, 8.0F, 8.0F, 8.0F, new CubeDeformation(0.0F).extend(0.5F)), PartPose.offset(0.0F, 0.5F, 0.0F));
-		partdefinition.addOrReplaceChild("hat", CubeListBuilder.create(), PartPose.ZERO);
-		
-		PartDefinition head = ent.addOrReplaceChild("head", CubeListBuilder.create().texOffs(0, 12).addBox(-2.0F, -3.0F, -2.0F, 4.0F, 3.0F, 4.0F, new CubeDeformation(0.0F))
-				.texOffs(24, 0).addBox(-2.0F, -7.0F, -2.0F, 2.0F, 4.0F, 2.0F, new CubeDeformation(0.0F)), PartPose.offset(0.0F, -14.0F, 0.0F));
+		CubeDeformation pCubeDeformation = new CubeDeformation(0.0F);
 
-		PartDefinition body = ent.addOrReplaceChild("body", CubeListBuilder.create().texOffs(0, 0).addBox(-2.0F, -8.0F, -2.0F, 4.0F, 8.0F, 4.0F, new CubeDeformation(0.0F)), PartPose.offset(0.0F, -6.0F, 0.0F));
+		PartDefinition head = ent.addOrReplaceChild("head", CubeListBuilder.create().texOffs(0, 12).addBox(-2.0F, -3.0F, -2.0F, 4.0F, 3.0F, 4.0F, pCubeDeformation)
+				.texOffs(24, 0).addBox(-2.0F, -7.0F, -2.0F, 2.0F, 4.0F, 2.0F, pCubeDeformation), PartPose.offset(0.0F, -14.0F, 0.0F));
 
-		PartDefinition left_arm = ent.addOrReplaceChild("left_arm", CubeListBuilder.create().texOffs(8, 19).addBox(0.0F, -2.0F, -1.0F, 2.0F, 6.0F, 2.0F, new CubeDeformation(0.0F)), PartPose.offset(2.0F, -13.0F, 0.0F));
+		PartDefinition mini_crown = head.addOrReplaceChild("mini_crown", CubeListBuilder.create().texOffs(50, 2).addBox(-3.0F, 0.0F, -3.0F, 6.0F, 1.0F, 1.0F, pCubeDeformation)
+				.texOffs(52, 12).addBox(-3.0F, -1.0F, -3.0F, 6.0F, 1.0F, 0.0F, pCubeDeformation)
+				.texOffs(46, 2).addBox(-3.0F, -2.0F, -3.0F, 1.0F, 1.0F, 0.0F, pCubeDeformation)
+				.texOffs(46, 0).addBox(0.0F, -2.0F, -3.0F, 3.0F, 1.0F, 0.0F, pCubeDeformation)
+				.texOffs(52, 1).addBox(-3.0F, -1.0F, 3.0F, 6.0F, 1.0F, 0.0F, pCubeDeformation)
+				.texOffs(46, 1).addBox(-1.0F, -2.0F, 3.0F, 3.0F, 1.0F, 0.0F, pCubeDeformation)
+				.texOffs(50, 9).addBox(-3.0F, 0.0F, 2.0F, 6.0F, 1.0F, 1.0F, pCubeDeformation)
+				.texOffs(54, 13).addBox(2.0F, 0.0F, -2.0F, 1.0F, 1.0F, 4.0F, pCubeDeformation)
+				.texOffs(54, 4).addBox(-3.0F, 0.0F, -2.0F, 1.0F, 1.0F, 4.0F, pCubeDeformation), PartPose.offsetAndRotation(-0.75F, -4.0F, -0.5F, 0.1705F, 0.0376F, -0.215F));
 
-		PartDefinition right_arm = ent.addOrReplaceChild("right_arm", CubeListBuilder.create().texOffs(16, 20).addBox(-2.0F, -1.0F, -1.0F, 2.0F, 6.0F, 2.0F, new CubeDeformation(0.0F)), PartPose.offset(-2.0F, -12.0F, 0.0F));
+        mini_crown.addOrReplaceChild("cube_r1", CubeListBuilder.create().texOffs(46, 4).addBox(-5.0F, -1.0F, -1.0F, 2.0F, 1.0F, 0.0F, pCubeDeformation), PartPose.offsetAndRotation(-2.0F, -1.0F, -6.0F, 0.0F, 1.5708F, 0.0F));
 
-		PartDefinition left_leg = ent.addOrReplaceChild("left_leg", CubeListBuilder.create().texOffs(16, 0).addBox(2.0F, -8.0F, -1.0F, 2.0F, 8.0F, 2.0F, new CubeDeformation(0.0F)), PartPose.offset(0.0F, 0.0F, 0.0F));
+        mini_crown.addOrReplaceChild("cube_r2", CubeListBuilder.create().texOffs(46, 6).addBox(-5.0F, -1.0F, -1.0F, 2.0F, 1.0F, 0.0F, pCubeDeformation)
+                .texOffs(52, 0).addBox(-5.0F, 0.0F, -1.0F, 6.0F, 1.0F, 0.0F, pCubeDeformation), PartPose.offsetAndRotation(-2.0F, -1.0F, -2.0F, 0.0F, 1.5708F, 0.0F));
 
-		PartDefinition front_leg = ent.addOrReplaceChild("front_leg", CubeListBuilder.create().texOffs(16, 10).addBox(-1.0F, 0.0F, -2.0F, 2.0F, 8.0F, 2.0F, new CubeDeformation(0.0F)), PartPose.offset(-2.0F, -8.0F, -2.0F));
+        mini_crown.addOrReplaceChild("cube_r3", CubeListBuilder.create().texOffs(46, 5).addBox(-2.0F, -1.0F, -1.0F, 2.0F, 1.0F, 0.0F, pCubeDeformation), PartPose.offsetAndRotation(4.0F, -1.0F, 1.0F, 0.0F, 1.5708F, 0.0F));
 
-		PartDefinition back_leg = ent.addOrReplaceChild("back_leg", CubeListBuilder.create().texOffs(0, 19).addBox(-1.0F, 0.0F, 0.0F, 2.0F, 8.0F, 2.0F, new CubeDeformation(0.0F)), PartPose.offset(-1.0F, -8.0F, 2.0F));
+        mini_crown.addOrReplaceChild("cube_r4", CubeListBuilder.create().texOffs(46, 3).addBox(-2.0F, -1.0F, -1.0F, 2.0F, 1.0F, 0.0F, pCubeDeformation)
+                .texOffs(52, 11).addBox(-5.0F, 0.0F, -1.0F, 6.0F, 1.0F, 0.0F, pCubeDeformation), PartPose.offsetAndRotation(4.0F, -1.0F, -2.0F, 0.0F, 1.5708F, 0.0F));
 
-		return LayerDefinition.create(meshdefinition, 32, 32);
+        ent.addOrReplaceChild("body", CubeListBuilder.create().texOffs(0, 0).addBox(-2.0F, -8.0F, -2.0F, 4.0F, 8.0F, 4.0F, pCubeDeformation), PartPose.offset(0.0F, -6.0F, 0.0F));
+
+        ent.addOrReplaceChild("left_arm", CubeListBuilder.create().texOffs(8, 19).addBox(0.0F, -2.0F, -1.0F, 2.0F, 6.0F, 2.0F, pCubeDeformation), PartPose.offset(2.0F, -13.0F, 0.0F));
+
+        ent.addOrReplaceChild("right_arm", CubeListBuilder.create().texOffs(16, 20).addBox(-2.0F, -1.0F, -1.0F, 2.0F, 6.0F, 2.0F, pCubeDeformation), PartPose.offset(-2.0F, -12.0F, 0.0F));
+
+        ent.addOrReplaceChild("left_leg", CubeListBuilder.create().texOffs(16, 0).addBox(2.0F, -8.0F, -1.0F, 2.0F, 8.0F, 2.0F, pCubeDeformation), PartPose.offset(0.0F, 0.0F, 0.0F));
+
+        ent.addOrReplaceChild("front_leg", CubeListBuilder.create().texOffs(16, 10).addBox(-1.0F, 0.0F, -2.0F, 2.0F, 8.0F, 2.0F, pCubeDeformation), PartPose.offset(-2.0F, -8.0F, -2.0F));
+
+        ent.addOrReplaceChild("back_leg", CubeListBuilder.create().texOffs(0, 19).addBox(-1.0F, 0.0F, 0.0F, 2.0F, 8.0F, 2.0F, pCubeDeformation), PartPose.offset(-1.0F, -8.0F, 2.0F));
+
+        return LayerDefinition.create(meshdefinition, 64, 64);
 	}
+
 
 	@Override
 	public void setupAnim(Entity entity, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {
 		this.root().getAllParts().forEach(ModelPart::resetPose);
-		this.applyHeadRotation(netHeadYaw, headPitch, ageInTicks);
+		this.applyHeadRotation(netHeadYaw, headPitch);
 
 		FlowCedarEntEntity entity1 = (FlowCedarEntEntity) entity;
+
+		boolean flag = false;
+
+		for (ItemStack stack : entity1.getArmorSlots()) {
+			if (stack.is(TCItems.TECHNETIUM_CROWN.get())){
+				flag = true;
+			}
+        }
+		this.mini_crown.visible = flag;
 
 		this.animateWalk(FlowCedarEntAnimations.WALK, limbSwing, limbSwingAmount, 2f, 2f);
 		this.animate(entity1.idleAnimationState, FlowCedarEntAnimations.IDLE, ageInTicks, 1f);
@@ -82,7 +116,7 @@ public class FlowCedarEntModel<T extends Entity> extends HierarchicalModel<T> {
 
 	}
 
-	private void applyHeadRotation(float pNetHeadYaw, float pHeadPitch, float pAgeInTicks) {
+	private void applyHeadRotation(float pNetHeadYaw, float pHeadPitch) {
 		pNetHeadYaw = Mth.clamp(pNetHeadYaw, -30.0F, 30.0F);
 		pHeadPitch = Mth.clamp(pHeadPitch, -25.0F, 45.0F);
 
@@ -99,5 +133,10 @@ public class FlowCedarEntModel<T extends Entity> extends HierarchicalModel<T> {
 	@Override
 	public ModelPart root() {
 		return ent;
+	}
+
+	@Override
+	public ModelPart getHead() {
+		return head;
 	}
 }

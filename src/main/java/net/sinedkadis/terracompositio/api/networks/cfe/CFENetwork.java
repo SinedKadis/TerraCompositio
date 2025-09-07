@@ -1,9 +1,7 @@
 package net.sinedkadis.terracompositio.api.networks.cfe;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import net.sinedkadis.terracompositio.api.networks.NetworkAction;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -32,6 +30,5 @@ public interface CFENetwork {
         return Optional.empty();
     }
 
-    ICFEHandler createCFEHandler(BlockEntity entity);
-    ICFEHandler createCFEHandler(Entity entity);
+    ICFEHandler createCFEHandler(CFENetworkMember entity);
 }

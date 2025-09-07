@@ -2,20 +2,19 @@ package net.sinedkadis.terracompositio.api.networks.cfe;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
-import org.apache.commons.lang3.tuple.Pair;
+import net.minecraft.world.phys.Vec3;
 
-import java.util.List;
 import java.util.function.Function;
 
 public interface ICFEHandler {
     int getCFE();
-    List<Pair<Integer, Double>> getCfeQueue();
 
     ICFEHandler setIndex(int index);
 
-    ICFEHandler setTargetOffset(Function<BlockPos, BlockPos> offset);
+    ICFEHandler setOffset(Function<Vec3, Vec3> offset);
 
     int takeCFE(int cfe, boolean simulate);
+    int addCFE(int cfe, ICFEHandler source, boolean simulate,boolean doRender);
     int addCFE(int cfe, BlockPos sourcePos, boolean simulate);
     void setCFE(int cfe);
     int getMaxCFE();
@@ -36,13 +35,13 @@ public interface ICFEHandler {
 
     float getCfeTravelSpeed();
 
-    net.minecraft.world.level.block.entity.BlockEntity getBlockEntity();
+    CFENetworkMember getAttachedMember();
 
-    net.minecraft.world.entity.Entity getEntity();
+    Function<Vec3, Vec3> getOffset();
 
-    Function<BlockPos, BlockPos> getTargetOffset();
+    void setAttachedMember(CFENetworkMember member);
 
-    void setBlockEntity(net.minecraft.world.level.block.entity.BlockEntity blockEntity);
+    boolean isEntity();
 
-    void setEntity(net.minecraft.world.entity.Entity entity);
+    int getIndex();
 }
