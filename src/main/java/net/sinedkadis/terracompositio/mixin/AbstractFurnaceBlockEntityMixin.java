@@ -1,9 +1,9 @@
 package net.sinedkadis.terracompositio.mixin;
 
+import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.SimpleContainer;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.AbstractFurnaceBlockEntity;
@@ -13,7 +13,6 @@ import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
-import org.spongepowered.asm.mixin.injection.callback.LocalCapture;
 
 import java.util.Optional;
 
@@ -27,8 +26,7 @@ public class AbstractFurnaceBlockEntityMixin {
                     value = "INVOKE",
                     target = "Lnet/minecraft/world/level/block/entity/AbstractFurnaceBlockEntity;getTotalCookTime(Lnet/minecraft/world/level/Level;Lnet/minecraft/world/level/block/entity/AbstractFurnaceBlockEntity;)I",
                     shift = At.Shift.AFTER
-            ),
-            locals = LocalCapture.CAPTURE_FAILHARD
+            )
     )
     private static void beforeSetRecipeUsed(
             Level pLevel,
@@ -36,13 +34,7 @@ public class AbstractFurnaceBlockEntityMixin {
             BlockState pState,
             AbstractFurnaceBlockEntity pBlockEntity,
             CallbackInfo ci,
-            boolean flag,
-            boolean flag1,
-            ItemStack itemstack,
-            boolean flag2,
-            boolean flag3,
-            Recipe<?> recipe,
-            int i
+            @Local Recipe<?> recipe
     ) {
         if (recipe != null) {
             for (Direction direction : Direction.values()){

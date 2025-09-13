@@ -850,8 +850,8 @@ public class WrenchAxeItem extends AxeItem {
 
         if (inputBE != null && outputBE != null && tag != null) {
 
-            boolean flag1 = simulateUpdateRotation(inputBE.lastNode,inputPos,outputPos);
-            boolean flag2 = simulateUpdateRotation(inputPos,outputPos,outputBE.nextNode);
+            boolean flag1 = simulateUpdateRotation(inputBE.lastNode,inputPos,outputPos,inputBE.bindedEntity != null);
+            boolean flag2 = simulateUpdateRotation(inputPos,outputPos,outputBE.nextNode,outputBE.bindedEntity != null);
 
             if (!(flag1 && flag2)) {
                 if (player != null) {
@@ -864,8 +864,11 @@ public class WrenchAxeItem extends AxeItem {
             inputBE.nextNode = outputPos;
             outputBE.lastNode = inputPos;
 
+//            if (inputBE.bindedEntity instanceof LivingEntity livingEntity) {
+//                ItemStack stack = livingEntity.getItemBySlot(EquipmentSlot.HEAD);
+//                TechnetiumArmorItem.removeBendSender(stack,inputPos);
+//            }
             inputBE.bindedEntity = null;
-            outputBE.bindedEntity = null;
 
             inputBE.updateRotation(false);
             outputBE.updateRotation(false);

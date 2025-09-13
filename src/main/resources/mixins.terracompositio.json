@@ -8,6 +8,7 @@
   "priority": 2000,
   "mixins": [
     "AbstractFurnaceBlockEntityMixin",
+    "PlayerMixin",
     "accessors.BundleItemAccessor"
   ],
   "client": [

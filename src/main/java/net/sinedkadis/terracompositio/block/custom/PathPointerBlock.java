@@ -125,28 +125,7 @@ public class PathPointerBlock extends TCCFEBaseEntityBlock {
             case EAST -> pp.rotationYaw = 180F;
         }
         pp.updateContainer();
-        for (int i = 1; i < 7; i++){
-            BlockEntity blockEntity = world.getBlockEntity(pos.relative(orientation, i));
-            if (blockEntity instanceof PathPointerBlockEntity entity && entity.lastNode == null){
-                if (entity.updateRotation(true)) {
-                    pp.nextNode = entity.getBlockPos();
-                    entity.lastNode = pos;
-                    entity.updateRotation(false);
-                    break;
-                }
-            }
-        }
-        for (int i = 1; i < 7; i++){
-            BlockEntity blockEntity = world.getBlockEntity(pos.relative(orientation.getOpposite(), i));
-            if (blockEntity instanceof PathPointerBlockEntity entity && entity.nextNode == null){
-                if (entity.updateRotation(true)) {
-                    pp.lastNode = entity.getBlockPos();
-                    entity.nextNode = pos;
-                    entity.updateRotation(false);
-                    break;
-                }
-            }
-        }
+
     }
 
     @Nullable

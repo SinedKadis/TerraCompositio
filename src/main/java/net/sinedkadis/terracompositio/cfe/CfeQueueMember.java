@@ -7,6 +7,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.phys.Vec3;
 import net.sinedkadis.terracompositio.api.dummies.DummyCFEHandler;
 import net.sinedkadis.terracompositio.api.networks.cfe.CFENetworkMemberEntity;
@@ -31,7 +32,7 @@ public class CfeQueueMember {
     private boolean isEnded = false;
     private boolean isReached;
     private boolean isDynamicTarget = false;
-    private ServerLevel level;
+    private final ServerLevel level;
     private boolean doRender;
     private float cfeTravelSpeed;
     private double lastPassed = 0;
@@ -41,7 +42,8 @@ public class CfeQueueMember {
 
     public CfeQueueMember(int cfeCount, ICFEHandler target, ICFEHandler source, ServerLevel level,boolean doRender) {
         this.cfeCount = cfeCount;
-        this.isDynamicTarget = target.getAttachedMember() instanceof CFENetworkMemberEntity;
+        this.isDynamicTarget = target.getAttachedMember() instanceof CFENetworkMemberEntity
+                || target.getAttachedMember() instanceof Player;
         this.level = level;
         this.doRender = doRender;
         boolean isDynamicSource = source.getAttachedMember() instanceof CFENetworkMemberEntity;
@@ -79,7 +81,8 @@ public class CfeQueueMember {
 
     public CfeQueueMember(int cfeCount, ICFEHandler target, BlockPos sourcePos, ServerLevel level) {
         this.cfeCount = cfeCount;
-        this.isDynamicTarget = target.getAttachedMember() instanceof CFENetworkMemberEntity;
+        this.isDynamicTarget = target.getAttachedMember() instanceof CFENetworkMemberEntity
+                || target.getAttachedMember() instanceof Player;
         this.limit = target.getAttachedMember().getLimit();
         this.cfeTravelSpeed = target.getCfeTravelSpeed();
         this.startMiddlePoint = sourcePos.getCenter();
@@ -99,8 +102,8 @@ public class CfeQueueMember {
         }
     }
 
-    public CfeQueueMember() {
-
+    public CfeQueueMember(ServerLevel level) {
+        this.level = level;
     }
 
 
@@ -116,14 +119,15 @@ public class CfeQueueMember {
         if (level != null){
             if (isDynamicTarget) {
                 double newPassed = passedDistance - lastPassed;
+                if (target == null) target = (CFENetworkMemberEntity) level.getEntity(targetUUID);
+                if (target == null) {
+                    isEnded = true;
+                    isReached = false;
+                    return;
+                }
+                if (target instanceof Player && limit <= 0) limit = 10;
                 if (newPassed >= 1) {
 
-                    if (target == null) target = (CFENetworkMemberEntity) level.getEntity(targetUUID);
-                    if (target == null) {
-                        isEnded = true;
-                        isReached = false;
-                        return;
-                    }
                     if (targetHandler == null) {
                         List<ICFEHandler> list = target.getCfeHandlers().stream()
                                 .map(icfeHandlerLazyOptional -> icfeHandlerLazyOptional.orElse(DummyCFEHandler.instance))

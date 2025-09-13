@@ -79,10 +79,6 @@ public class DummyCFEHandler implements ICFEHandler {
 
     }
 
-    @Override
-    public boolean isEmpty() {
-        return false;
-    }
 
     @Override
     public int getFreeSpace() {
@@ -114,16 +110,6 @@ public class DummyCFEHandler implements ICFEHandler {
         return null;
     }
 
-
-    @Override
-    public void setAttachedMember(CFENetworkMember member) {
-
-    }
-
-    @Override
-    public boolean isEntity() {
-        return false;
-    }
 
     @Override
     public int getIndex() {

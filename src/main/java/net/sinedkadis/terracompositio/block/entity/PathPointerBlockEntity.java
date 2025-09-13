@@ -11,7 +11,6 @@ import net.minecraft.world.Nameable;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
@@ -24,7 +23,6 @@ import net.sinedkadis.terracompositio.api.networks.cfe.*;
 import net.sinedkadis.terracompositio.block.custom.PathPointerBlock;
 import net.sinedkadis.terracompositio.cfe.CFEContainer;
 import net.sinedkadis.terracompositio.cfe.LimitlessCFEContainer;
-import net.sinedkadis.terracompositio.item.custom.TechnetiumArmorItem;
 import net.sinedkadis.terracompositio.registries.TCBlockEntities;
 import net.sinedkadis.terracompositio.registries.TCItems;
 import net.sinedkadis.terracompositio.util.TCUtil;
@@ -76,8 +74,11 @@ public class PathPointerBlockEntity extends TCCFEBlockEntity implements Nameable
         if (timer <= 0) {
             onCFENetworkMemberUpdate(pLevel,pPos);
         }
+        if (bindedEntity != null && !(bindedEntity.blockPosition().equals(nextNode)) && bindedEntity.blockPosition() != this.getBlockPos()) {
+            onCFENetworkMemberUpdate(pLevel,pPos);
+        }
     }
-
+//todo Fix bug: walking on pp kills server
     @Override
     public void onCFENetworkMemberUpdate(Level level, BlockPos pos) {
         timer = 100;
@@ -85,6 +86,7 @@ public class PathPointerBlockEntity extends TCCFEBlockEntity implements Nameable
         List<PathPointerBlock.PPPart> parts = Arrays.asList(PathPointerBlock.getParts(pState));
         if (nextNode != null) {
             boolean nextNodeIsPP = level.getBlockState(nextNode).getBlock() instanceof PathPointerBlock;
+            if (bindedEntity != null && bindedEntity.isRemoved()) bindedEntity = null;
             if (!nextNodeIsPP && bindedEntity == null) {
                 nextNode = null;
             }
@@ -93,20 +95,27 @@ public class PathPointerBlockEntity extends TCCFEBlockEntity implements Nameable
             if (bindedEntity == null && nextNode == null) {
                 searchAndBindToEntity(level);
             }
-            if (bindedEntity != null && nextNode != null) {
+            if (nextNode != null && bindedEntity != null ) {
                 BlockPos currentEntityPos = bindedEntity.blockPosition();
                 if (!(nextNode.equals(currentEntityPos))) {
-                    if (simulateUpdateRotation(lastNode,getBlockPos(), currentEntityPos)) {
+                    if (simulateUpdateRotation(lastNode,getBlockPos(), currentEntityPos,false)) {
                         nextNode = currentEntityPos;
                     } else {
                         nextNode = null;
-                        if (bindedEntity instanceof LivingEntity livingEntity) {
-                            ItemStack item = livingEntity.getItemBySlot(EquipmentSlot.HEAD);
-                            TechnetiumArmorItem.setBendSender(item,null);
-                        }
+//                        if (bindedEntity instanceof LivingEntity livingEntity) {
+//                            ItemStack item = livingEntity.getItemBySlot(EquipmentSlot.HEAD);
+//                            TechnetiumArmorItem.removeBendSender(item,getBlockPos());
+//                        }
                         bindedEntity = null;
                     }
                     updateRotation(false);
+                }
+                if (bindedEntity instanceof CFENetworkMemberEntity member) {
+                    ICFEHandler handler = bindedEntity.getCapability(CFECapability.CFE)
+                            .filter(icfeHandler -> icfeHandler.getFreeSpace() > 0).orElse(DummyCFEHandler.instance);
+                    if (!(handler instanceof DummyCFEHandler)) {
+                        TCUtil.tryCFETransfer(member,this,Integer.MAX_VALUE);
+                    }
                 }
             }
         }
@@ -161,18 +170,17 @@ public class PathPointerBlockEntity extends TCCFEBlockEntity implements Nameable
                 .filter(livingEntity -> livingEntity.hasItemInSlot(EquipmentSlot.HEAD))
                 .filter(livingEntity -> livingEntity.getItemBySlot(EquipmentSlot.HEAD)
                         .is(TCItems.TECHNETIUM_CROWN.get()))
-                .filter(livingEntity -> simulateUpdateRotation(lastNode,getBlockPos(), livingEntity.blockPosition()))
-                .filter(livingEntity -> !livingEntity.getItemBySlot(EquipmentSlot.HEAD).getOrCreateTag().contains(TechnetiumArmorItem.BEND_SENDER_TAG))
+                .filter(livingEntity -> simulateUpdateRotation(lastNode,getBlockPos(), livingEntity.blockPosition(),false))
                 .collect(Collectors.toList());
         if (!canBindTo.isEmpty()) {
             Collections.shuffle(canBindTo);
             Entity chosen = canBindTo.get(0);
             bindedEntity = chosen;
             nextNode = chosen.blockPosition();
-            if (chosen instanceof LivingEntity livingEntity) {
-                ItemStack item = livingEntity.getItemBySlot(EquipmentSlot.HEAD);
-                TechnetiumArmorItem.setBendSender(item,getBlockPos());
-            }
+//            if (chosen instanceof LivingEntity livingEntity) {
+//                ItemStack item = livingEntity.getItemBySlot(EquipmentSlot.HEAD);
+//                TechnetiumArmorItem.addBendSender(item,getBlockPos());
+//            }
             updateRotation(false);
             this.updateContainer();
         }
@@ -272,10 +280,10 @@ public class PathPointerBlockEntity extends TCCFEBlockEntity implements Nameable
                     && currentPart.contains(PathPointerBlock.PPPart.SENDER)
                     && currentBE.nextNode != null) {
                 boolean bendToItself = currentBE.getBlockPos().equals(currentBE.nextNode);
-                if (!bendToItself || bindedEntity != null) {
+                if (!bendToItself || currentBE.bindedEntity != null) {
                     if (level == null) break;
-                    if (bindedEntity != null) {
-                        int max = bindedEntity.getCapability(CFECapability.CFE).orElseGet(() -> DummyCFEHandler.instance).getFreeSpace();
+                    if (currentBE.bindedEntity != null) {
+                        int max = currentBE.bindedEntity.getCapability(CFECapability.CFE).orElseGet(() -> DummyCFEHandler.instance).getFreeSpace();
                         this.cfeContainer.setMaxCFE(max);
                         currentBE.cfeContainer.setMaxCFE(max).setCfeTravelSpeed(5/20f);
                         break;
@@ -435,11 +443,12 @@ public class PathPointerBlockEntity extends TCCFEBlockEntity implements Nameable
     }
 
     @SuppressWarnings("SuspiciousNameCombination")
-    public boolean updateRotation(boolean simulate) {
-        if (nextNode == null && lastNode == null) return false;
+    public void updateRotation(boolean simulate) {
+        if (nextNode == null && lastNode == null) return;
 
         BlockPos blockPos = getBlockPos();
         boolean ignorAngle = Objects.equals(nextNode, blockPos) || Objects.equals(lastNode, blockPos);
+        ignorAngle |= bindedEntity != null;
         Vec3 pos = Vec3.atCenterOf(blockPos);
         Vec3 dirForward;
         if (nextNode == null) {
@@ -456,9 +465,10 @@ public class PathPointerBlockEntity extends TCCFEBlockEntity implements Nameable
         float forward = ((float) Mth.atan2(dirForward.x, dirForward.z));
         float backward = ((float) Mth.atan2(dirBackward.x, dirBackward.z));
 
-        float diff = ((float) Math.toDegrees(Math.abs(forward - backward)));
+        float diff = ((float) Math.toDegrees(forward - backward));
+        float abs_diff = Math.abs(diff);
 
-        if ((diff > 91 && diff - 360 < -91) && !ignorAngle) return false;
+        if ((abs_diff > 91 && abs_diff - 360 < -91) && !ignorAngle) return;
 
         if (!simulate) {
 
@@ -485,13 +495,13 @@ public class PathPointerBlockEntity extends TCCFEBlockEntity implements Nameable
                 level.sendBlockUpdated(blockPos, getBlockState(), getBlockState(), Block.UPDATE_ALL);
             }
         }
-        return true;
     }
     @SuppressWarnings("SuspiciousNameCombination")
-    public static boolean simulateUpdateRotation(BlockPos lastNode,BlockPos currentPos, BlockPos nextNode) {
+    public static boolean simulateUpdateRotation(BlockPos lastNode,BlockPos currentPos, BlockPos nextNode,boolean ignorAngle) {
         if (nextNode == null && lastNode == null) return false;
 
-        boolean ignorAngle = Objects.equals(nextNode, currentPos) || Objects.equals(lastNode, currentPos);
+        boolean ignorAngle1 = Objects.equals(nextNode, currentPos) || Objects.equals(lastNode, currentPos);
+        ignorAngle1 |= ignorAngle;
         Vec3 pos = Vec3.atCenterOf(currentPos);
         Vec3 dirForward;
         if (nextNode == null) {
@@ -509,7 +519,7 @@ public class PathPointerBlockEntity extends TCCFEBlockEntity implements Nameable
 
         float diff = ((float) Math.toDegrees(Math.abs(forward - backward)));
 
-        return (!(diff > 91) || !(diff - 360 < -91)) || ignorAngle;
+        return (!(diff > 91) || !(diff - 360 < -91)) || ignorAngle1;
     }
 
     @Override
@@ -530,10 +540,10 @@ public class PathPointerBlockEntity extends TCCFEBlockEntity implements Nameable
                     next.updateRotation(false);
                 }
             }
-            if (bindedEntity != null && bindedEntity instanceof LivingEntity livingEntity) {
-                ItemStack stack = livingEntity.getItemBySlot(EquipmentSlot.HEAD);
-                TechnetiumArmorItem.setBendSender(stack,null);
-            }
+//            if (bindedEntity instanceof LivingEntity livingEntity) {
+//                ItemStack stack = livingEntity.getItemBySlot(EquipmentSlot.HEAD);
+//                TechnetiumArmorItem.removeBendSender(stack,getBlockPos());
+//            }
         }
     }
 

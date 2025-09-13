@@ -129,18 +129,19 @@ public class CFEContainer implements ICFEHandler, INBTSerializable<CompoundTag> 
     }
 
     public void containerTick() {
-        Iterator<CfeQueueMember> iterator = cfeQueue.iterator();
-        while (iterator.hasNext()) {
-            CfeQueueMember entry = iterator.next();
+
+        List<CfeQueueMember> queue = getCfeQueue();
+        List<CfeQueueMember> toRemove = new ArrayList<>();
+        for (CfeQueueMember entry : queue) {
             entry.memberTick();
             if (entry.isEnded()) {
                 if (entry.isReached()) {
                     actuallyAddCFE(entry.getCfeCount());
                 }
-                iterator.remove();
+                toRemove.add(entry);
             }
-
         }
+        queue.removeAll(toRemove);
     }
 
     public void actuallyAddCFE(int cfe) {
@@ -182,7 +183,6 @@ public class CFEContainer implements ICFEHandler, INBTSerializable<CompoundTag> 
         this.deserializeNBT(tag);
     }
 
-    @Override
     public boolean isEmpty() {
         return !(this.CFE > 0 || !cfeQueue.isEmpty());
     }
@@ -210,11 +210,13 @@ public class CFEContainer implements ICFEHandler, INBTSerializable<CompoundTag> 
         CFE = tag.getInt("CFE");
         int size = tag.getInt("queue_size");
         if (size > 0) cfeQueue.clear();
-        for (int i = 0; i < size; i++) {
-            CfeQueueMember member = new CfeQueueMember();
-            member.deserializeNBT(tag.getCompound("member_"+i));
-            cfeQueue.add(member);
+        if (getAttachedMember().getLevel() instanceof ServerLevel serverLevel) {
+            for (int i = 0; i < size; i++) {
+                CfeQueueMember member = new CfeQueueMember(serverLevel);
+                member.deserializeNBT(tag.getCompound("member_" + i));
+                cfeQueue.add(member);
 
+            }
         }
     }
 

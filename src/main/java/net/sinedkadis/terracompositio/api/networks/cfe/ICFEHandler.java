@@ -27,7 +27,7 @@ public interface ICFEHandler {
     void writeToNBT(CompoundTag pTag);
     void readFromNBT(CompoundTag pTag);
 
-    boolean isEmpty();
+    //boolean isEmpty();
     int getFreeSpace();
     int getQueued();
 
@@ -39,9 +39,7 @@ public interface ICFEHandler {
 
     Function<Vec3, Vec3> getOffset();
 
-    void setAttachedMember(CFENetworkMember member);
-
-    boolean isEntity();
+    //boolean isEntity();
 
     int getIndex();
 }

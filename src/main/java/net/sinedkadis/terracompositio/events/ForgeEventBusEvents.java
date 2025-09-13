@@ -1,15 +1,24 @@
 package net.sinedkadis.terracompositio.events;
 
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.Entity;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.util.FakePlayer;
+import net.minecraftforge.event.AttachCapabilitiesEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.living.LivingEvent;
+import net.minecraftforge.event.entity.player.PlayerEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.sinedkadis.terracompositio.TerraCompositio;
+import net.sinedkadis.terracompositio.api.networks.cfe.CFECapability;
+import net.sinedkadis.terracompositio.api.networks.cfe.ICFEHandler;
+import net.sinedkadis.terracompositio.cfe.PlayerCFEProvider;
 import net.sinedkadis.terracompositio.particle.CFEParticleData;
 import net.sinedkadis.terracompositio.registries.TCEffects;
 import net.sinedkadis.terracompositio.registries.TCFluids;
@@ -34,16 +43,43 @@ public class ForgeEventBusEvents {
     }
     @SubscribeEvent
     public static void onLivingTickEvent(LivingEvent.LivingTickEvent event){
-        FluidState fluidstate = event.getEntity().level().getFluidState(event.getEntity().blockPosition());
-        if (fluidstate.getFluidType() == TCFluids.FLOW_FLUID.type.get()  && !event.getEntity().canStandOnFluid(fluidstate) || event.getEntity().hasEffect(TCEffects.FLOW_SATURATION.get())) {
-            if (fluidstate.getFluidType() == TCFluids.FLOW_FLUID.type.get() && !event.getEntity().canStandOnFluid(fluidstate) && event.getEntity().hasEffect(TCEffects.FLOW_SATURATION.get())) {
-                event.getEntity().setDeltaMovement(event.getEntity().getDeltaMovement().scale(1.4F)); //todo: Achievement to both
-            }else if (event.getEntity().hasEffect(TCEffects.FLOW_SATURATION.get())) {
-                if (event.getEntity().onGround() || event.getEntity().onClimbable())
-                    event.getEntity().setDeltaMovement(event.getEntity().getDeltaMovement().scale(1.2F));
+        LivingEntity livingEntity = event.getEntity();
+        FluidState fluidstate = livingEntity.level().getFluidState(livingEntity.blockPosition());
+        if (fluidstate.getFluidType() == TCFluids.FLOW_FLUID.type.get()  && !livingEntity.canStandOnFluid(fluidstate) || livingEntity.hasEffect(TCEffects.FLOW_SATURATION.get())) {
+            if (fluidstate.getFluidType() == TCFluids.FLOW_FLUID.type.get() && !livingEntity.canStandOnFluid(fluidstate) && livingEntity.hasEffect(TCEffects.FLOW_SATURATION.get())) {
+                livingEntity.setDeltaMovement(livingEntity.getDeltaMovement().scale(1.4F)); //todo: Achievement to both
+            }else if (livingEntity.hasEffect(TCEffects.FLOW_SATURATION.get())) {
+                if (livingEntity.onGround() || livingEntity.onClimbable())
+                    livingEntity.setDeltaMovement(livingEntity.getDeltaMovement().scale(1.2F));
             }else {
-                event.getEntity().setDeltaMovement(event.getEntity().getDeltaMovement().scale(1.2F));
+                livingEntity.setDeltaMovement(livingEntity.getDeltaMovement().scale(1.2F));
             }
+        }
+        if (livingEntity instanceof Player player) {
+            player.getCapability(CFECapability.CFE).ifPresent(ICFEHandler::containerTick);
+        }
+
+    }
+    @SubscribeEvent
+    public static void onAttachCapabilities(AttachCapabilitiesEvent<Entity> event) {
+        if (event.getObject() instanceof Player player) {
+            if (!player.getCapability(CFECapability.CFE).isPresent()) {
+                event.addCapability(TerraCompositio.modLoc("cfe_stored"), new PlayerCFEProvider(player));
+            }
+        }
+    }
+
+    @SubscribeEvent
+    public static void onPlayerCloned(PlayerEvent.Clone event) {
+        if(event.isWasDeath()) {
+            event.getOriginal().reviveCaps();
+            event.getOriginal().getCapability(CFECapability.CFE).ifPresent(oldStore ->
+                    event.getEntity().getCapability(CFECapability.CFE).ifPresent(newStore -> {
+                CompoundTag tag = new CompoundTag();
+                oldStore.writeToNBT(tag);
+                newStore.readFromNBT(tag);
+            }));
+            event.getOriginal().invalidateCaps();
         }
     }
 }
