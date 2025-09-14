@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "C": {
+      "item": "minecraft:copper_ingot"
+    },
+    "T": {
+      "item": "terracompositio:technetium_ingot"
+    }
+  },
+  "pattern": [
+    " TC",
+    "TC ",
+    " TC"
+  ],
+  "result": {
+    "item": "terracompositio:pp_sender"
+  },
+  "show_notification": true
+}

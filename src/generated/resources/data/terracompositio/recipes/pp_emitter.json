@@ -1,0 +1,27 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "I": {
+      "item": "terracompositio:infused_iron_ingot"
+    },
+    "L": {
+      "tag": "terracompositio:flow_cedar_logs_items"
+    },
+    "R": {
+      "item": "terracompositio:infused_iron_rod"
+    },
+    "T": {
+      "item": "terracompositio:technetium_ingot"
+    }
+  },
+  "pattern": [
+    " TR",
+    "TLI",
+    " TR"
+  ],
+  "result": {
+    "item": "terracompositio:pp_emitter"
+  },
+  "show_notification": true
+}

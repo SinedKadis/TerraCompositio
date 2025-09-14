@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "L": {
+      "tag": "terracompositio:flow_cedar_logs_items"
+    },
+    "T": {
+      "item": "terracompositio:technetium_ingot"
+    }
+  },
+  "pattern": [
+    " T ",
+    "LLT",
+    " T "
+  ],
+  "result": {
+    "item": "terracompositio:pp_collector"
+  },
+  "show_notification": true
+}

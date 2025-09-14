@@ -1,0 +1,21 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "L": {
+      "item": "minecraft:lapis_lazuli"
+    },
+    "T": {
+      "item": "terracompositio:technetium_ingot"
+    }
+  },
+  "pattern": [
+    "LT ",
+    " LT",
+    "LT "
+  ],
+  "result": {
+    "item": "terracompositio:pp_receiver"
+  },
+  "show_notification": true
+}
