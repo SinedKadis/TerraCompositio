@@ -1,5 +1,6 @@
 package net.sinedkadis.terracompositio.block.entity;
 
+import lombok.extern.slf4j.Slf4j;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
@@ -11,6 +12,7 @@ import net.minecraft.world.Nameable;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
@@ -32,6 +34,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.*;
 import java.util.stream.Collectors;
 
+@Slf4j
 public class PathPointerBlockEntity extends TCCFEBlockEntity implements Nameable {
 
     // rotationYaw: вокруг Y (в горизонтальной плоскости — блок "смотрит")
@@ -41,7 +44,8 @@ public class PathPointerBlockEntity extends TCCFEBlockEntity implements Nameable
     public @Nullable BlockPos nextNode;
     public @Nullable BlockPos lastNode;
     public @Nullable BlockPos collectorPos;
-    public @Nullable Entity bindedEntity;
+    public @Nullable LivingEntity toSendEntity;
+    public @Nullable LivingEntity toReceiveEntity;
 
     public PathPointerBlockEntity(BlockPos pos, BlockState state) {
         super(TCBlockEntities.PATH_POINTER_BE.get(), pos, state, BlockMode.CONTAINER);
@@ -74,47 +78,78 @@ public class PathPointerBlockEntity extends TCCFEBlockEntity implements Nameable
         if (timer <= 0) {
             onCFENetworkMemberUpdate(pLevel,pPos);
         }
-        if (bindedEntity != null && !(bindedEntity.blockPosition().equals(nextNode)) && bindedEntity.blockPosition() != this.getBlockPos()) {
+        if (toSendEntity != null && !(toSendEntity.blockPosition().equals(nextNode)) && toSendEntity.blockPosition() != this.getBlockPos()) {
+            onCFENetworkMemberUpdate(pLevel,pPos);
+        }
+        if (toReceiveEntity != null && !(toReceiveEntity.blockPosition().equals(lastNode)) && toReceiveEntity.blockPosition() != this.getBlockPos()) {
             onCFENetworkMemberUpdate(pLevel,pPos);
         }
     }
 //todo Fix bug: walking on pp kills server
     @Override
     public void onCFENetworkMemberUpdate(Level level, BlockPos pos) {
-        timer = 100;
         BlockState pState = level.getBlockState(pos);
         List<PathPointerBlock.PPPart> parts = Arrays.asList(PathPointerBlock.getParts(pState));
         if (nextNode != null) {
             boolean nextNodeIsPP = level.getBlockState(nextNode).getBlock() instanceof PathPointerBlock;
-            if (bindedEntity != null && bindedEntity.isRemoved()) bindedEntity = null;
-            if (!nextNodeIsPP && bindedEntity == null) {
+            if (toSendEntity != null && toSendEntity.isRemoved()) toSendEntity = null;
+            if (!nextNodeIsPP && toSendEntity == null) {
                 nextNode = null;
             }
         }
-        if (parts.contains(PathPointerBlock.PPPart.SENDER)) {
-            if (bindedEntity == null && nextNode == null) {
-                searchAndBindToEntity(level);
+        if (lastNode != null) {
+            boolean lastNodeIsPP = level.getBlockState(lastNode).getBlock() instanceof PathPointerBlock;
+            if (toReceiveEntity != null && toReceiveEntity.isRemoved()) toReceiveEntity = null;
+            if (!lastNodeIsPP && toReceiveEntity == null) {
+                lastNode = null;
             }
-            if (nextNode != null && bindedEntity != null ) {
-                BlockPos currentEntityPos = bindedEntity.blockPosition();
+        }
+        if (parts.contains(PathPointerBlock.PPPart.SENDER)) {
+            if (toSendEntity == null && nextNode == null) {
+                searchAndBindToEntity(level,true);
+            }
+            if (nextNode != null && toSendEntity != null ) {
+                BlockPos currentEntityPos = toSendEntity.blockPosition();
                 if (!(nextNode.equals(currentEntityPos))) {
-                    if (simulateUpdateRotation(lastNode,getBlockPos(), currentEntityPos,false)) {
+                    if (toSendEntity.getItemBySlot(EquipmentSlot.HEAD).is(TCItems.TECHNETIUM_CROWN.get())
+                            && simulateUpdateRotation(lastNode,getBlockPos(), currentEntityPos,false)) {
                         nextNode = currentEntityPos;
                     } else {
                         nextNode = null;
-//                        if (bindedEntity instanceof LivingEntity livingEntity) {
-//                            ItemStack item = livingEntity.getItemBySlot(EquipmentSlot.HEAD);
-//                            TechnetiumArmorItem.removeBendSender(item,getBlockPos());
-//                        }
-                        bindedEntity = null;
+                        toSendEntity = null;
                     }
                     updateRotation(false);
                 }
-                if (bindedEntity instanceof CFENetworkMemberEntity member) {
-                    ICFEHandler handler = bindedEntity.getCapability(CFECapability.CFE)
+                if (toSendEntity instanceof CFENetworkMemberEntity member) {
+                    ICFEHandler handler = toSendEntity.getCapability(CFECapability.CFE)
                             .filter(icfeHandler -> icfeHandler.getFreeSpace() > 0).orElse(DummyCFEHandler.instance);
                     if (!(handler instanceof DummyCFEHandler)) {
-                        TCUtil.tryCFETransfer(member,this,Integer.MAX_VALUE);
+                        TCUtil.tryCFETransfer(member,this,100);
+                    }
+                }
+            }
+        }
+        if (parts.contains(PathPointerBlock.PPPart.RECEIVER)) {
+            if (toReceiveEntity == null && lastNode == null) {
+                searchAndBindToEntity(level,false);
+            }
+            if (toReceiveEntity != null && lastNode != null ) {
+                BlockPos currentEntityPos = toReceiveEntity.blockPosition();
+                if (!(lastNode.equals(currentEntityPos))) {
+                    if (toReceiveEntity.getItemBySlot(EquipmentSlot.HEAD).is(TCItems.TECHNETIUM_CROWN.get())
+                            && simulateUpdateRotation(nextNode,getBlockPos(), currentEntityPos,false)) {
+                        lastNode = currentEntityPos;
+                    } else {
+                        lastNode = null;
+                        toReceiveEntity = null;
+                    }
+                    updateRotation(false);
+                }
+                if (toReceiveEntity instanceof CFENetworkMemberEntity member) {
+                    ICFEHandler handler = toReceiveEntity.getCapability(CFECapability.CFE)
+                            .filter(icfeHandler -> icfeHandler.getCFE() > 0).orElse(DummyCFEHandler.instance);
+                    if (!(handler instanceof DummyCFEHandler)) {
+                        TCUtil.tryCFETransfer(this,member,100);
                     }
                 }
             }
@@ -141,20 +176,25 @@ public class PathPointerBlockEntity extends TCCFEBlockEntity implements Nameable
         }
 
         PathPointerBlockEntity blockEntity = null;
-        if (collectorPos == null) {
-            collectorPos = getCollector();
-        }
-        if (collectorPos != null) {
-            blockEntity = ((PathPointerBlockEntity) level.getBlockEntity(collectorPos));
-        }
-        if (blockEntity != null) {
-            blockEntity.updateMax();
+        if (toReceiveEntity == null){
+            if (collectorPos == null) {
+                collectorPos = getCollector();
+            }
+            if (collectorPos != null) {
+                blockEntity = ((PathPointerBlockEntity) level.getBlockEntity(collectorPos));
+            }
+            if (blockEntity != null) {
+                blockEntity.updateMax();
+            }
+        } else {
+            this.updateMax();
         }
 
         transferCFE(level, parts);
+        timer = 100;
     }
 
-    private void searchAndBindToEntity(Level level) {
+    private void searchAndBindToEntity(Level level,boolean isToSend) {
         List<Entity> entities = level.getEntities(null,
                 new AABB(this.worldPosition
                                 .relative(Direction.WEST, 7)
@@ -167,20 +207,24 @@ public class PathPointerBlockEntity extends TCCFEBlockEntity implements Nameable
         List<LivingEntity> canBindTo = entities.stream()
                 .map(entity -> entity instanceof LivingEntity livingEntity ? livingEntity : null)
                 .filter(Objects::nonNull)
+                .filter(livingEntity -> isToSend || !livingEntity.equals(toSendEntity))
+                .filter(livingEntity -> isToSend || !(livingEntity instanceof Player))
                 .filter(livingEntity -> livingEntity.hasItemInSlot(EquipmentSlot.HEAD))
                 .filter(livingEntity -> livingEntity.getItemBySlot(EquipmentSlot.HEAD)
                         .is(TCItems.TECHNETIUM_CROWN.get()))
-                .filter(livingEntity -> simulateUpdateRotation(lastNode,getBlockPos(), livingEntity.blockPosition(),false))
+                .filter(livingEntity ->
+                        simulateUpdateRotation(isToSend ? lastNode : nextNode,getBlockPos(), livingEntity.blockPosition(),false))
                 .collect(Collectors.toList());
         if (!canBindTo.isEmpty()) {
             Collections.shuffle(canBindTo);
-            Entity chosen = canBindTo.get(0);
-            bindedEntity = chosen;
-            nextNode = chosen.blockPosition();
-//            if (chosen instanceof LivingEntity livingEntity) {
-//                ItemStack item = livingEntity.getItemBySlot(EquipmentSlot.HEAD);
-//                TechnetiumArmorItem.addBendSender(item,getBlockPos());
-//            }
+            LivingEntity chosen = canBindTo.get(0);
+            if (isToSend) {
+                toSendEntity = chosen;
+                nextNode = chosen.blockPosition();
+            } else {
+                toReceiveEntity = chosen;
+                lastNode = chosen.blockPosition();
+            }
             updateRotation(false);
             this.updateContainer();
         }
@@ -207,7 +251,10 @@ public class PathPointerBlockEntity extends TCCFEBlockEntity implements Nameable
 
             List<PathPointerBlock.PPPart> currentParts = Arrays.asList(PathPointerBlock.getParts(pState));
 
-            if (currentParts.contains(PathPointerBlock.PPPart.SENDER) && currentParts.contains(PathPointerBlock.PPPart.RECEIVER) && bindedEntity == null) {
+            if (currentParts.contains(PathPointerBlock.PPPart.SENDER)
+                    && currentParts.contains(PathPointerBlock.PPPart.RECEIVER)
+                    && toSendEntity == null
+                    && toReceiveEntity == null) {
                 this.setCfeContainer(new LimitlessCFEContainer(this).setCfeTravelSpeed((float) 5 / 20));
             } else {
                 this.setCfeContainer(new CFEContainer(this).setCfeTravelSpeed((float) 5 / 20));
@@ -263,7 +310,7 @@ public class PathPointerBlockEntity extends TCCFEBlockEntity implements Nameable
         return null;
     }
 
-    // Call only from collector instance
+    // Call from first member of chain
     public void updateMax() {
         Queue<List<PathPointerBlock.PPPart>> partQueue = new LinkedList<>();
         Queue<PathPointerBlockEntity> blockEntityQueue = new LinkedList<>();
@@ -280,10 +327,10 @@ public class PathPointerBlockEntity extends TCCFEBlockEntity implements Nameable
                     && currentPart.contains(PathPointerBlock.PPPart.SENDER)
                     && currentBE.nextNode != null) {
                 boolean bendToItself = currentBE.getBlockPos().equals(currentBE.nextNode);
-                if (!bendToItself || currentBE.bindedEntity != null) {
+                if (!bendToItself || currentBE.toSendEntity != null) {
                     if (level == null) break;
-                    if (currentBE.bindedEntity != null) {
-                        int max = currentBE.bindedEntity.getCapability(CFECapability.CFE).orElseGet(() -> DummyCFEHandler.instance).getFreeSpace();
+                    if (currentBE.toSendEntity != null) {
+                        int max = currentBE.toSendEntity.getCapability(CFECapability.CFE).orElseGet(() -> DummyCFEHandler.instance).getFreeSpace();
                         this.cfeContainer.setMaxCFE(max);
                         currentBE.cfeContainer.setMaxCFE(max).setCfeTravelSpeed(5/20f);
                         break;
@@ -306,23 +353,27 @@ public class PathPointerBlockEntity extends TCCFEBlockEntity implements Nameable
     private int getInSystem() {
         int inSystem = 0;
 
-        if (collectorPos == null) collectorPos = getCollector();
+        if (level != null) {
+            Queue<PathPointerBlockEntity> blockEntityQueue = new LinkedList<>();
+            if (toReceiveEntity == null){
+                if (collectorPos == null) collectorPos = getCollector();
+            } else {
+                blockEntityQueue.add(this);
+            }
 
-        if (collectorPos != null && level != null) {
-            PathPointerBlockEntity collector = (PathPointerBlockEntity) level.getBlockEntity(collectorPos);
-            if (collector != null) {
-                Queue<PathPointerBlockEntity> blockEntityQueue = new LinkedList<>();
+            if (collectorPos != null) {
+                PathPointerBlockEntity collector = (PathPointerBlockEntity) level.getBlockEntity(collectorPos);
+                if (collector != null) {
+                    blockEntityQueue.add(collector);
+                }
+            }
 
-                blockEntityQueue.add(collector);
-
-
-                while (!blockEntityQueue.isEmpty()) {
-                    PathPointerBlockEntity currentBE = blockEntityQueue.poll();
-                    if (currentBE != null) {
-                        inSystem += currentBE.cfeContainer.getCFE() + currentBE.cfeContainer.getQueued();
-                        if (currentBE.nextNode != null) {
-                            blockEntityQueue.add((PathPointerBlockEntity) level.getBlockEntity(currentBE.nextNode));
-                        }
+            while (!blockEntityQueue.isEmpty()) {
+                PathPointerBlockEntity currentBE = blockEntityQueue.poll();
+                if (currentBE != null) {
+                    inSystem += currentBE.cfeContainer.getCFE() + currentBE.cfeContainer.getQueued();
+                    if (currentBE.nextNode != null) {
+                        blockEntityQueue.add((PathPointerBlockEntity) level.getBlockEntity(currentBE.nextNode));
                     }
                 }
             }
@@ -334,22 +385,26 @@ public class PathPointerBlockEntity extends TCCFEBlockEntity implements Nameable
     public List<PathPointerBlockEntity> getNodes() {
         List<PathPointerBlockEntity> nodes = new ArrayList<>();
 
-        if (collectorPos == null) collectorPos = getCollector();
-        if (collectorPos != null && level != null) {
-            PathPointerBlockEntity collector = (PathPointerBlockEntity) level.getBlockEntity(collectorPos);
-            if (collector != null) {
-                Queue<PathPointerBlockEntity> blockEntityQueue = new LinkedList<>();
 
-                blockEntityQueue.add(collector);
-
-
-                while (!blockEntityQueue.isEmpty()) {
-                    PathPointerBlockEntity currentBE = blockEntityQueue.poll();
-                    if (currentBE != null) {
-                        nodes.add(currentBE);
-                        if (currentBE.nextNode != null) {
-                            blockEntityQueue.add((PathPointerBlockEntity) level.getBlockEntity(currentBE.nextNode));
-                        }
+        if (level != null) {
+            Queue<PathPointerBlockEntity> blockEntityQueue = new LinkedList<>();
+            if (toReceiveEntity == null){
+                if (collectorPos == null) collectorPos = getCollector();
+            } else {
+                blockEntityQueue.add(this);
+            }
+            if (collectorPos != null) {
+                PathPointerBlockEntity collector = (PathPointerBlockEntity) level.getBlockEntity(collectorPos);
+                if (collector != null) {
+                    blockEntityQueue.add(collector);
+                }
+            }
+            while (!blockEntityQueue.isEmpty()) {
+                PathPointerBlockEntity currentBE = blockEntityQueue.poll();
+                if (currentBE != null) {
+                    nodes.add(currentBE);
+                    if (currentBE.nextNode != null) {
+                        blockEntityQueue.add((PathPointerBlockEntity) level.getBlockEntity(currentBE.nextNode));
                     }
                 }
             }
@@ -361,8 +416,12 @@ public class PathPointerBlockEntity extends TCCFEBlockEntity implements Nameable
     public void onLoad() {
         super.onLoad();
         PathPointerBlockEntity blockEntity = null;
-        if (collectorPos == null) collectorPos = getCollector();
         if (level != null) {
+            if (toReceiveEntity == null){
+                if (collectorPos == null) collectorPos = getCollector();
+            } else {
+                blockEntity = this;
+            }
             if (collectorPos != null) {
                 blockEntity = ((PathPointerBlockEntity) level.getBlockEntity(collectorPos));
             }
@@ -448,7 +507,8 @@ public class PathPointerBlockEntity extends TCCFEBlockEntity implements Nameable
 
         BlockPos blockPos = getBlockPos();
         boolean ignorAngle = Objects.equals(nextNode, blockPos) || Objects.equals(lastNode, blockPos);
-        ignorAngle |= bindedEntity != null;
+        ignorAngle |= toSendEntity != null;
+        ignorAngle |= toReceiveEntity != null;
         Vec3 pos = Vec3.atCenterOf(blockPos);
         Vec3 dirForward;
         if (nextNode == null) {
@@ -540,10 +600,6 @@ public class PathPointerBlockEntity extends TCCFEBlockEntity implements Nameable
                     next.updateRotation(false);
                 }
             }
-//            if (bindedEntity instanceof LivingEntity livingEntity) {
-//                ItemStack stack = livingEntity.getItemBySlot(EquipmentSlot.HEAD);
-//                TechnetiumArmorItem.removeBendSender(stack,getBlockPos());
-//            }
         }
     }
 

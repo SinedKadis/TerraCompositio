@@ -76,7 +76,8 @@ public class CFEExtractGoal extends Goal {
         CFENetworkMember memberAt = TerraCompositioAPI.instance().getCFENetworkInstance().getMemberAt(level, blockPos);
         boolean valid = blockPos != null
                 && blockPos.closerThan(mob.blockPosition(), mob.getLimit())
-                && memberAt != null;
+                && memberAt != null
+                && CFENetwork.getCFEHandler(memberAt).filter(icfeHandler -> icfeHandler.getCFE() > 0).isPresent();
         if (valid){
             boolean targetIsEnt = memberAt instanceof FlowCedarEntEntity;
             targetIsAcceptableEnt = targetIsEnt && ((FlowCedarEntEntity) memberAt).getCapability(CFECapability.CFE)

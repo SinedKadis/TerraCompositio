@@ -129,9 +129,8 @@ public class CFEContainer implements ICFEHandler, INBTSerializable<CompoundTag> 
     }
 
     public void containerTick() {
-
-        List<CfeQueueMember> queue = getCfeQueue();
         List<CfeQueueMember> toRemove = new ArrayList<>();
+        List<CfeQueueMember> queue = List.copyOf(cfeQueue);
         for (CfeQueueMember entry : queue) {
             entry.memberTick();
             if (entry.isEnded()) {
@@ -141,7 +140,7 @@ public class CFEContainer implements ICFEHandler, INBTSerializable<CompoundTag> 
                 toRemove.add(entry);
             }
         }
-        queue.removeAll(toRemove);
+        cfeQueue.removeAll(toRemove);
     }
 
     public void actuallyAddCFE(int cfe) {
@@ -196,28 +195,13 @@ public class CFEContainer implements ICFEHandler, INBTSerializable<CompoundTag> 
     @Override
     public CompoundTag serializeNBT() {
         CompoundTag nbt = new CompoundTag();
-        nbt.putInt("CFE", CFE);
-        nbt.putInt("queue_size", cfeQueue.size());
-        for (int i = 0; i < cfeQueue.size(); i++) {
-            CfeQueueMember member = cfeQueue.get(i);
-            nbt.put("member_"+i,member.serializeNBT());
-        }
+        nbt.putInt("CFE", CFE + getQueued());
         return nbt;
     }
 
     @Override
     public void deserializeNBT(CompoundTag tag) {
         CFE = tag.getInt("CFE");
-        int size = tag.getInt("queue_size");
-        if (size > 0) cfeQueue.clear();
-        if (getAttachedMember().getLevel() instanceof ServerLevel serverLevel) {
-            for (int i = 0; i < size; i++) {
-                CfeQueueMember member = new CfeQueueMember(serverLevel);
-                member.deserializeNBT(tag.getCompound("member_" + i));
-                cfeQueue.add(member);
-
-            }
-        }
     }
 
 }

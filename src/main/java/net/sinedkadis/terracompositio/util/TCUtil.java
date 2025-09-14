@@ -313,22 +313,22 @@ public class TCUtil {
         return getTouchingBlocks(null, pos,null);
     }
 
-    public static void sendCFEParticles(ServerLevel level, Vec3 target, Vec3 source, int particleAmount, List<Vec3> offsets){
+    public static void sendCFEParticles(ServerLevel level, Vec3 target, Vec3 source, int particleAmount, List<Vec3> offsets,float speed){
         if (particleAmount <= 0 || level == null) return;
+        if (target == null) return;
 
         BlockEntity be = level.getBlockEntity(BlockPos.containing(target));
-        float speed = 1/20f;
         if (be instanceof TCCFEBlockEntity tccfeBlockEntity) {
             speed = tccfeBlockEntity.getCfeContainer().getCfeTravelSpeed();
         }
+
         if (offsets == null) {
             offsets = new ArrayList<>();
         }
         if (offsets.isEmpty()) {
-            int count = Math.min(particleAmount, 1000);
             RandomSource random = level.random;
 
-            for (int i = 0; i < count; i++) {
+            for (int i = 0; i < particleAmount; i++) {
                 Vec3 vec3 = getSpreadParticleOffset(random,particleAmount);
                 offsets.add(vec3);
             }
@@ -353,6 +353,9 @@ public class TCUtil {
                     target.z - offsetZ + vec3.z,// zd
                     1); // speed
         }
+    }
+    public static void sendCFEParticles(ServerLevel level, Vec3 target, Vec3 source, int particleAmount, List<Vec3> offsets){
+        sendCFEParticles(level,target,source,particleAmount,offsets,1/20f);
     }
 
     public static @NotNull Vec3 getSpreadParticleOffset(RandomSource random, int count) {

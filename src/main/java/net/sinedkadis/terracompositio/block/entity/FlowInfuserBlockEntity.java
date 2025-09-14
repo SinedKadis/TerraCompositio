@@ -83,7 +83,7 @@ public class FlowInfuserBlockEntity extends TCItemIOCFEBlockEntity {
         Optional<FlowInfusionRecipe> recipe = getCurrentRecipe();
         if (recipe.isPresent()) {
             ItemStack result = recipe.get().getResultItem(null);
-            this.itemHandler.extractItem(SLOT_INPUT, 1, false);
+            this.itemHandler.forceExtractItem(SLOT_INPUT, 1, false);
             this.itemHandler.forceInsertItem(SLOT_OUTPUT, new ItemStack(result.getItem(),
                     this.itemHandler.getStackInSlot(SLOT_OUTPUT).getCount() + result.getCount()),false);
         }

@@ -749,7 +749,6 @@ public class WrenchAxeItem extends AxeItem {
 
             if (pPlayer != null) {
                 message(pPlayer, Component.translatable("item.terracompositio.flow_rotating_axe.bind_begin").withStyle(ChatFormatting.BOLD));
-                wrenchStack.hurtAndBreak(1,pPlayer,player1 -> player1.broadcastBreakEvent(InteractionHand.MAIN_HAND));
             }
             return true;
         }
@@ -850,8 +849,8 @@ public class WrenchAxeItem extends AxeItem {
 
         if (inputBE != null && outputBE != null && tag != null) {
 
-            boolean flag1 = simulateUpdateRotation(inputBE.lastNode,inputPos,outputPos,inputBE.bindedEntity != null);
-            boolean flag2 = simulateUpdateRotation(inputPos,outputPos,outputBE.nextNode,outputBE.bindedEntity != null);
+            boolean flag1 = simulateUpdateRotation(inputBE.lastNode,inputPos,outputPos,inputBE.toSendEntity != null);
+            boolean flag2 = simulateUpdateRotation(inputPos,outputPos,outputBE.nextNode,outputBE.toReceiveEntity != null);
 
             if (!(flag1 && flag2)) {
                 if (player != null) {
@@ -868,10 +867,14 @@ public class WrenchAxeItem extends AxeItem {
 //                ItemStack stack = livingEntity.getItemBySlot(EquipmentSlot.HEAD);
 //                TechnetiumArmorItem.removeBendSender(stack,inputPos);
 //            }
-            inputBE.bindedEntity = null;
+            inputBE.toSendEntity = null;
+            outputBE.toReceiveEntity = null;
 
             inputBE.updateRotation(false);
             outputBE.updateRotation(false);
+
+            inputBE.updateContainer();
+            outputBE.updateContainer();
 
             tag.remove("BindPos");
             tag.remove("BindMode");

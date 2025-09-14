@@ -12,6 +12,9 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.client.extensions.common.IClientItemExtensions;
 import net.sinedkadis.terracompositio.TerraCompositio;
+import net.sinedkadis.terracompositio.api.TerraCompositioAPI;
+import net.sinedkadis.terracompositio.api.networks.NetworkAction;
+import net.sinedkadis.terracompositio.api.networks.cfe.CFENetworkMemberEntity;
 import net.sinedkadis.terracompositio.entity.custom.FlowCedarEntEntity;
 import net.sinedkadis.terracompositio.item.models.TechnetiumCrownModel;
 import net.sinedkadis.terracompositio.registries.TCArmorMaterials;
@@ -25,6 +28,8 @@ import java.util.function.Consumer;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class TechnetiumArmorItem extends TCArmorItem {
+    private boolean needsToUpdate;
+
     @Override
     public @NotNull Type getType() {
         return type;
@@ -52,11 +57,23 @@ public class TechnetiumArmorItem extends TCArmorItem {
         return InteractionResult.SUCCESS;
     }
 
+    @Override
+    public boolean canEquip(ItemStack stack, EquipmentSlot armorType, Entity entity) {
+        if (armorType.equals(EquipmentSlot.HEAD))
+            this.needsToUpdate = true;
+        return super.canEquip(stack, armorType, entity);
+    }
 
     @Override
-    public void inventoryTick(ItemStack pStack, Level pLevel, Entity pEntity, int pSlotId, boolean pIsSelected) {
-        super.inventoryTick(pStack, pLevel, pEntity, pSlotId, pIsSelected);
-
+    public void inventoryTick(ItemStack pStack, Level pLevel, Entity entity, int pSlotId, boolean pIsSelected) {
+        super.inventoryTick(pStack, pLevel, entity, pSlotId, pIsSelected);
+        if (needsToUpdate) {
+            if (entity instanceof Player || entity instanceof CFENetworkMemberEntity) {
+                CFENetworkMemberEntity member = ((CFENetworkMemberEntity) entity);
+                TerraCompositioAPI.INSTANCE.getCFENetworkInstance().fireCFENetworkEvent(member, NetworkAction.UPDATE);
+            }
+            needsToUpdate = false;
+        }
     }
 
     @Override

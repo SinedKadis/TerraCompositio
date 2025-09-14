@@ -31,8 +31,11 @@ public class CFENetworkHandler implements CFENetwork {
 
     public void networkMemberUpdated(CFENetworkMember updated) {
         if (cfeSources.containsKey(updated.getLevel())) {
+//            if (updated instanceof Player) {
+//                updated.getLimit()
+//            }
             cfeSources.get(updated.getLevel()).stream()
-                    .filter(member -> distSqr(member.getBlockPos(), updated.getBlockPos()) <= ((long) member.getLimit() * member.getLimit()))
+                    .filter(member -> updated.getBlockPos().closerThan(member.getBlockPos(),updated.getLimit()))
                     .filter(member -> !updated.getBlockPos().equals(member.getBlockPos()))
                     .peek(member -> {
                         if (member instanceof PathPointerBlockEntity && !(updated.getPriority() < member.getPriority())) {
