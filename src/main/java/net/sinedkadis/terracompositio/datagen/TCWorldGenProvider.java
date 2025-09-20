@@ -7,6 +7,7 @@ import net.minecraft.data.PackOutput;
 import net.minecraftforge.common.data.DatapackBuiltinEntriesProvider;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.sinedkadis.terracompositio.TerraCompositio;
+import net.sinedkadis.terracompositio.worldgen.biome.TCBiomes;
 import net.sinedkadis.terracompositio.worldgen.TCBiomeModifiers;
 import net.sinedkadis.terracompositio.worldgen.TCConfiguredFeatures;
 import net.sinedkadis.terracompositio.worldgen.TCPlacedFeatures;
@@ -19,7 +20,9 @@ public class TCWorldGenProvider extends DatapackBuiltinEntriesProvider {
             //.add(Registries.DIMENSION_TYPE, ModDimensions::bootstrapType)
             .add(Registries.CONFIGURED_FEATURE, TCConfiguredFeatures::bootstrap)
             .add(Registries.PLACED_FEATURE, TCPlacedFeatures::bootstrap)
-            .add(ForgeRegistries.Keys.BIOME_MODIFIERS, TCBiomeModifiers::bootstrap);
+            .add(ForgeRegistries.Keys.BIOME_MODIFIERS, TCBiomeModifiers::bootstrap)
+            .add(Registries.BIOME, TCBiomes::boostrap);;
+
             //.add(Registries.BIOME, ModBiomes::boostrap)
             //.add(Registries.LEVEL_STEM, ModDimensions::bootstrapStem);
 
