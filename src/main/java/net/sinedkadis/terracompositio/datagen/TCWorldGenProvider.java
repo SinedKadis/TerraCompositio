@@ -21,7 +21,7 @@ public class TCWorldGenProvider extends DatapackBuiltinEntriesProvider {
             .add(Registries.CONFIGURED_FEATURE, TCConfiguredFeatures::bootstrap)
             .add(Registries.PLACED_FEATURE, TCPlacedFeatures::bootstrap)
             .add(ForgeRegistries.Keys.BIOME_MODIFIERS, TCBiomeModifiers::bootstrap)
-            .add(Registries.BIOME, TCBiomes::boostrap);;
+            .add(Registries.BIOME, TCBiomes::boostrap);
 
             //.add(Registries.BIOME, ModBiomes::boostrap)
             //.add(Registries.LEVEL_STEM, ModDimensions::bootstrapStem);

@@ -4,9 +4,6 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.network.protocol.Packet;
-import net.minecraft.network.protocol.game.ClientGamePacketListener;
-import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.*;
@@ -104,6 +101,9 @@ public class FlowCedarPortBlockEntity extends TCItemIOCFEBlockEntity implements 
                 resetProgress();
             }
         }
+        if (pLevel.getRandom().nextFloat() < 0.005f && itemHandler.getStackInSlot(SLOT_INPUT).isEmpty()) {
+            pLevel.playSound(null, pPos, SoundEvents.ITEM_FRAME_ADD_ITEM, SoundSource.BLOCKS,2,1);
+        }
     }
 
     protected boolean hasRecipe() {
@@ -149,17 +149,6 @@ public class FlowCedarPortBlockEntity extends TCItemIOCFEBlockEntity implements 
     @Override
     public AbstractContainerMenu createMenu(int pContainerId, @NotNull Inventory pPlayerInventory, @NotNull Player pPlayer) {
         return new FlowBlockPortMenu(pContainerId,pPlayerInventory,this,this.data);
-    }
-
-    @Nullable
-    @Override
-    public Packet<ClientGamePacketListener> getUpdatePacket() {
-        return ClientboundBlockEntityDataPacket.create(this);
-    }
-
-    @Override
-    public @NotNull CompoundTag getUpdateTag() {
-        return saveWithoutMetadata();
     }
 
 

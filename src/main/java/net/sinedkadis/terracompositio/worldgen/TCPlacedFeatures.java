@@ -39,7 +39,7 @@ public class TCPlacedFeatures {
                 ModOrePlacement.commonOrePlacement(12,
                         HeightRangePlacement.uniform(VerticalAnchor.absolute(-64), VerticalAnchor.absolute(80))));*/
         register(context, FLOW_CEDAR_PLACED_KEY, configuredFeatures.getOrThrow(TCConfiguredFeatures.FLOW_CEDAR_KEY),
-                VegetationPlacements.treePlacement(PlacementUtils.countExtra(3, 0.1f, 2),
+                VegetationPlacements.treePlacement(PlacementUtils.countExtra(10, 0.1F, 1),
                         TCBlocks.FLOW_CEDAR_SAPLING.get()));
     }
 

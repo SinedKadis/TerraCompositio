@@ -18,13 +18,11 @@ import net.sinedkadis.terracompositio.events.CFENetworkEvent;
 import net.sinedkadis.terracompositio.screen.TCMenuTypes;
 import net.sinedkadis.terracompositio.registries.TCSounds;
 import net.sinedkadis.terracompositio.fluid.FluidNetworkHandler;
-import net.sinedkadis.terracompositio.worldgen.biome.TCSurfaceRules;
 import net.sinedkadis.terracompositio.worldgen.biome.TCTerrablender;
 import net.sinedkadis.terracompositio.worldgen.tree.TCFoliagePlacers;
 import net.sinedkadis.terracompositio.worldgen.tree.TCTrunkPlacers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import terrablender.api.SurfaceRuleManager;
 
 //6011371823902440939
 @Mod(TerraCompositio.MOD_ID)
