@@ -13,6 +13,7 @@ import net.sinedkadis.terracompositio.api.networks.cfe.*;
 import net.sinedkadis.terracompositio.api.networks.cfe.CFECapability;
 import net.sinedkadis.terracompositio.entity.custom.FlowCedarEntEntity;
 import net.sinedkadis.terracompositio.registries.TCBlockStateProperties;
+import net.sinedkadis.terracompositio.registries.TCTags;
 import net.sinedkadis.terracompositio.util.TCUtil;
 
 import java.util.EnumSet;
@@ -78,6 +79,10 @@ public class CFEExtractGoal extends Goal {
                 && blockPos.closerThan(mob.blockPosition(), mob.getLimit())
                 && memberAt != null
                 && CFENetwork.getCFEHandler(memberAt).filter(icfeHandler -> icfeHandler.getCFE() > 0).isPresent();
+        if (blockPos != null) {
+            valid |= level.getBlockState(blockPos).is(TCTags.Blocks.FLOW_CEDAR_LOGS)
+                    && blockPos.closerThan(mob.blockPosition(), mob.getLimit());
+        }
         if (valid){
             boolean targetIsEnt = memberAt instanceof FlowCedarEntEntity;
             targetIsAcceptableEnt = targetIsEnt && ((FlowCedarEntEntity) memberAt).getCapability(CFECapability.CFE)

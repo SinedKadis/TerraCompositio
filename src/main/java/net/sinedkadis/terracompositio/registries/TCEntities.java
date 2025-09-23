@@ -24,7 +24,7 @@ public class TCEntities {
                     .sized(1.375f, 0.5625f).build("mod_chest_boat"));
 
     public static final RegistryObject<EntityType<FlowCedarEntEntity>> FLOW_CEDAR_ENT =
-            ENTITY_TYPES.register("flow_cedar_ent_entity", () -> EntityType.Builder.of(FlowCedarEntEntity::new, MobCategory.MISC)
+            ENTITY_TYPES.register("flow_cedar_ent_entity", () -> EntityType.Builder.of(FlowCedarEntEntity::new, MobCategory.CREATURE)
                     .sized(0.5f, 1.5f).build("flow_cedar_ent_entity"));
 
 

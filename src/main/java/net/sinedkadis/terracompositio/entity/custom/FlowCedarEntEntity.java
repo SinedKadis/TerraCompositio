@@ -11,6 +11,7 @@ import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
+import net.minecraft.world.DifficultyInstance;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
@@ -23,6 +24,7 @@ import net.minecraft.world.entity.animal.AbstractGolem;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.ServerLevelAccessor;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
@@ -127,10 +129,20 @@ public class FlowCedarEntEntity extends AbstractGolem implements CFENetworkMembe
                         TCUtil.tryCFETransfer(icfeHandler1, icfeHandler, 10);
                         tickCounter = 20;
                         icfeHandler1.takeCFE(1, false);
+//                        if (icfeHandler1.getCFE() <= 0) {
+//                            this.turnIntoStatue();
+//                        }
                     }
                 });
             });
         }
+    }
+
+    @SuppressWarnings("deprecation")
+    @Override
+    public @Nullable SpawnGroupData finalizeSpawn(ServerLevelAccessor pLevel, DifficultyInstance pDifficulty, MobSpawnType pReason, @Nullable SpawnGroupData pSpawnData, @Nullable CompoundTag pDataTag) {
+        this.innerCFEOptional.ifPresent(icfeHandler -> icfeHandler.setCFE(level().getRandom().nextInt(60,360)));
+        return super.finalizeSpawn(pLevel, pDifficulty, pReason, pSpawnData, pDataTag);
     }
 
     @Override
@@ -212,7 +224,7 @@ public class FlowCedarEntEntity extends AbstractGolem implements CFENetworkMembe
 //        this.goalSelector.addGoal(1, new BreedGoal(this, 1.15D));
 //        this.goalSelector.addGoal(2, new TemptGoal(this, 1.2D, Ingredient.of(Items.COOKED_BEEF), false));
 
-        this.goalSelector.addGoal(3, new ReachSourceGoal(this,1.2D,32,5));
+        this.goalSelector.addGoal(3, new ReachSourceGoal(this,1.2D,32,3));
         this.goalSelector.addGoal(3, new CFEExtractGoal(this));
         this.goalSelector.addGoal(4, new WaterAvoidingRandomStrollGoal(this, 1.0D));
         this.goalSelector.addGoal(5, new LookAtPlayerGoal(this, Player.class, 3f));

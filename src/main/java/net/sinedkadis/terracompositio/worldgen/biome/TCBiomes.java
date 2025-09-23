@@ -35,11 +35,12 @@ public class TCBiomes extends OverworldBiomes{
 
     public static Biome flowCedarBiome(BootstapContext<Biome> context) {
         MobSpawnSettings.Builder spawnBuilder = new MobSpawnSettings.Builder();
+        spawnBuilder.addSpawn(MobCategory.CREATURE, new MobSpawnSettings.SpawnerData(EntityType.WOLF, 6, 4, 6));
+        spawnBuilder.addSpawn(MobCategory.CREATURE, new MobSpawnSettings.SpawnerData(EntityType.FOX, 4, 2, 3));
+        spawnBuilder.addSpawn(MobCategory.CREATURE, new MobSpawnSettings.SpawnerData(EntityType.RABBIT, 6, 2, 3));
         spawnBuilder.addSpawn(MobCategory.CREATURE,
-                new MobSpawnSettings.SpawnerData(TCEntities.FLOW_CEDAR_ENT.get(), 1, 1, 3));
-        spawnBuilder.addSpawn(MobCategory.CREATURE, new MobSpawnSettings.SpawnerData(EntityType.WOLF, 3, 4, 6));
-        spawnBuilder.addSpawn(MobCategory.CREATURE, new MobSpawnSettings.SpawnerData(EntityType.FOX, 2, 2, 3));
-        spawnBuilder.addSpawn(MobCategory.CREATURE, new MobSpawnSettings.SpawnerData(EntityType.RABBIT, 1, 2, 3));
+                new MobSpawnSettings.SpawnerData(TCEntities.FLOW_CEDAR_ENT.get(), 20, 1, 3));
+
         BiomeDefaultFeatures.farmAnimals(spawnBuilder);
         BiomeDefaultFeatures.commonSpawns(spawnBuilder);
         BiomeGenerationSettings.Builder biomeBuilder =

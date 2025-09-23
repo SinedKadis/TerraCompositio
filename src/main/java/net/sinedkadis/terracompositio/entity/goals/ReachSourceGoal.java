@@ -13,8 +13,6 @@ import net.sinedkadis.terracompositio.entity.custom.FlowCedarEntEntity;
 import net.sinedkadis.terracompositio.registries.TCTags;
 import net.sinedkadis.terracompositio.util.TCUtil;
 
-import java.util.ArrayList;
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -56,15 +54,15 @@ public class ReachSourceGoal extends Goal {
                     }
                 }
             }
-            List<BlockPos> list = new ArrayList<>(TCUtil.getNearBlocks(mob.getBlockPos(), 10).stream()
+            List<BlockPos> list = TCUtil.getNearBlocks(mob.getBlockPos(), 10).stream()
                     .filter(pos1 -> mob.level().getBlockState(pos1).is(TCTags.Blocks.FLOW_CEDAR_LOGS))
                     .filter(pos2 -> mob.level().getBlockState(pos2).getValue(INFUSED))
-                    .toList());
+                    .toList();
             if (!list.isEmpty()) {
-                Collections.shuffle(list);
-                BlockPos pos = list.get(0);
+                int index = mob.level().getRandom().nextInt(list.size());
+                BlockPos pos = list.get(index);
                 mob.setSourcePos(pos);
-                if (TCUtil.distSqr(pos, mob.blockPosition()) > (long) stopDistance *stopDistance) {
+                if (!pos.closerThan(mob.blockPosition(),stopDistance)) {
                     targetPosition = pos.getCenter();
                     return true;
                 }
