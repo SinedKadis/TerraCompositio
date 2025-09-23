@@ -16,7 +16,6 @@ import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.IItemHandler;
 import net.sinedkadis.terracompositio.util.TCItemStackHandler;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -45,7 +44,7 @@ public abstract class TCItemIOCFEBlockEntity extends TCCFEBlockEntity implements
         this(type,pos,state,0,0,blockMode);
     }
 
-    protected <T> @Nullable LazyOptional<T> getCap(@NotNull Capability<T> cap,@Nullable Direction side) {
+    protected <T> @Nullable LazyOptional<T> getCap(Capability<T> cap, @Nullable Direction side) {
         if(cap == ForgeCapabilities.ITEM_HANDLER && side != null){
             return lazyItemHandler.cast();
         }
@@ -141,17 +140,19 @@ public abstract class TCItemIOCFEBlockEntity extends TCCFEBlockEntity implements
     }
 
     @Override
-    protected void saveAdditional(@NotNull CompoundTag pTag) {
+    protected void saveAdditional(CompoundTag pTag) {
         pTag.put("inventory", itemHandler.serializeNBT());
-        pTag.putInt("progress", progress);
+        if (progress > 0)
+            pTag.putInt("progress", progress);
         super.saveAdditional(pTag);
     }
 
     @Override
-    public void load(@NotNull CompoundTag pTag) {
+    public void load(CompoundTag pTag) {
         super.load(pTag);
         itemHandler.deserializeNBT(pTag.getCompound("inventory"));
-        progress = pTag.getInt("progress");
+        if (pTag.contains("progress"))
+            progress = pTag.getInt("progress");
     }
 
     protected boolean enoughCFE() {
@@ -228,6 +229,9 @@ public abstract class TCItemIOCFEBlockEntity extends TCCFEBlockEntity implements
     }
 
     public int getSlotLimit(int slot) {
-        return isPortAttached(this.getLevel(),this.getBlockState(),this.getBlockPos()) ? 1 : 64;
+        if (this.getLevel() != null) {
+            return isPortAttached(this.getLevel(),this.getBlockState(),this.getBlockPos()) ? 1 : 64;
+        }
+        return 0;
     }
 }

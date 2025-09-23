@@ -75,7 +75,7 @@ public class ForgeEventBusEvents {
             ItemStack head = entity.getItemBySlot(EquipmentSlot.HEAD);
             if (pStack.is(TCItems.TECHNETIUM_CROWN.get())) {
                 if (head.isEmpty()) {
-                    entity.setItemSlot(EquipmentSlot.HEAD,TCItems.TECHNETIUM_CROWN.get().getDefaultInstance());
+                    entity.setItemSlot(EquipmentSlot.HEAD,pStack.copy());
                     pStack.shrink(1);
                     entity.setDropChance(EquipmentSlot.HEAD, 2.0F);
                     entity.setPersistenceRequired();
@@ -86,8 +86,8 @@ public class ForgeEventBusEvents {
             }
             if (pStack.isEmpty()) {
                 if (!head.isEmpty()) {
+                    event.getEntity().setItemInHand(InteractionHand.MAIN_HAND,head.copy());
                     head.shrink(1);
-                    event.getEntity().setItemInHand(InteractionHand.MAIN_HAND,TCItems.TECHNETIUM_CROWN.get().getDefaultInstance());
                     event.setCancellationResult(InteractionResult.SUCCESS);
                     event.setCanceled(true);
                 }

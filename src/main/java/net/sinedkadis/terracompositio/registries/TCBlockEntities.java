@@ -84,6 +84,11 @@ public class TCBlockEntities {
                             TCBlocks.PP_SENDER.get()
                     ).build(null));
 
+    public static final RegistryObject<BlockEntityType<EntStatueBlockEntity>> ENT_STATUE_BE =
+            BLOCK_ENTITIES.register("ent_statue_be", () ->
+                    BlockEntityType.Builder.of(EntStatueBlockEntity::new,
+                            TCBlocks.FLOW_CEDAR_ENT_STATUE.get()).build(null));
+
 
 
     public static void register(IEventBus eventBus){

@@ -133,7 +133,7 @@ public abstract class TCCFEBlockEntity extends TCBlockEntity implements CFENetwo
         return switch (blockMode){
             case SOURCE -> -100;
             case CONSUMER -> 100;
-            case CONTAINER -> 0;
+            case CONTAINER, NONE -> 0;
         };
     }
 
@@ -155,7 +155,7 @@ public abstract class TCCFEBlockEntity extends TCBlockEntity implements CFENetwo
     }
 
     public enum BlockMode {
-        SOURCE,CONSUMER,CONTAINER;
+        SOURCE,CONSUMER,CONTAINER,NONE;
         public boolean source(){
             return this == SOURCE;
         }

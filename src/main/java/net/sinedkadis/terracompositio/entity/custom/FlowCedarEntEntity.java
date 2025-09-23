@@ -25,6 +25,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.ServerLevelAccessor;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
@@ -34,6 +35,7 @@ import net.sinedkadis.terracompositio.api.networks.cfe.CFENetwork;
 import net.sinedkadis.terracompositio.api.networks.cfe.CFENetworkMemberEntity;
 import net.sinedkadis.terracompositio.api.networks.cfe.ICFEHandler;
 import net.sinedkadis.terracompositio.api.networks.cfe.CFECapability;
+import net.sinedkadis.terracompositio.block.entity.EntStatueBlockEntity;
 import net.sinedkadis.terracompositio.cfe.CFEContainer;
 import net.sinedkadis.terracompositio.entity.goals.CFEHoldGoal;
 import net.sinedkadis.terracompositio.entity.goals.ReachSourceGoal;
@@ -46,8 +48,6 @@ import org.jetbrains.annotations.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.List;
 import java.util.Optional;
-
-import static net.sinedkadis.terracompositio.block.custom.EntStatueBlock.CROWN_EQUIPPED;
 
 // /kill @e[type=terracompositio:flow_cedar_ent_entity]
 
@@ -142,10 +142,13 @@ public class FlowCedarEntEntity extends AbstractGolem implements CFENetworkMembe
     }
 
     public void turnIntoStatue() {
-        boolean addCrown = this.getItemBySlot(EquipmentSlot.HEAD).is(TCItems.TECHNETIUM_CROWN.get());
+        ItemStack crown = this.getItemBySlot(EquipmentSlot.HEAD);
         this.level().setBlock(this.blockPosition(),
-                TCBlocks.FLOW_CEDAR_ENT_STATUE.get().defaultBlockState()
-                        .setValue(CROWN_EQUIPPED,addCrown),3);
+                TCBlocks.FLOW_CEDAR_ENT_STATUE.get().defaultBlockState(),3);
+        BlockEntity blockEntity = this.level().getBlockEntity(this.blockPosition());
+        if (blockEntity instanceof EntStatueBlockEntity entStatueBlockEntity) {
+            entStatueBlockEntity.setItem(0,crown);
+        }
         this.remove(RemovalReason.CHANGED_DIMENSION);
     }
 
