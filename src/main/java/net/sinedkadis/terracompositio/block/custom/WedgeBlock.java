@@ -15,6 +15,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.*;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
@@ -27,6 +28,7 @@ import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
+import net.sinedkadis.terracompositio.block.entity.EntStatueBlockEntity;
 import net.sinedkadis.terracompositio.registries.TCBlocks;
 import net.sinedkadis.terracompositio.registries.TCFluids;
 import net.sinedkadis.terracompositio.registries.TCParticles;
@@ -41,6 +43,7 @@ import java.util.function.Predicate;
 import static net.minecraft.world.level.block.LayeredCauldronBlock.LEVEL;
 import static net.sinedkadis.terracompositio.registries.TCBlockStateProperties.INFUSED;
 
+@SuppressWarnings("deprecation")
 public class WedgeBlock extends Block {
     public static final DirectionProperty FACING = HorizontalDirectionalBlock.FACING;
     public static final BooleanProperty ATTACHED = BlockStateProperties.ATTACHED;
@@ -51,30 +54,31 @@ public class WedgeBlock extends Block {
     private int AnimTick = 0;
     private static final VoxelShape REQUIRED_SPACE_TO_DRIP_THROUGH_NON_SOLID_BLOCK = Block.box(6.0, 0.0, 6.0, 10.0, 16.0, 10.0);
     //private static final Logger LOGGER = LogUtils.getLogger();
-//TODO achievement don't repeat at home
+//TODO achievement don't repeat at home(stack multiple on each other)
     public WedgeBlock(Properties properties) {
         super(properties);
         this.registerDefaultState(this.stateDefinition.any().setValue(FACING, Direction.NORTH).setValue(ATTACHED,false));
     }
     @Nullable
     private static BlockPos findFillableCauldronBelowWedge(Level pLevel, BlockPos pPos, Fluid pFluid) {
-        Predicate<BlockState> $$3 = (blockState) -> (blockState.getBlock() instanceof TCCauldronBlock && ((TCCauldronBlock) blockState.getBlock()).canReceiveWedgeDrip(pFluid))
-                ||blockState.is(Blocks.CAULDRON);
-        BiPredicate<BlockPos, BlockState> $$4 = (blockPos, blockState) -> canDripThrough(pLevel, blockPos, blockState);
-        return findBlockVertical(pLevel, pPos, Direction.DOWN.getAxisDirection(), $$4, $$3).orElse(null);
+        Predicate<BlockState> isCauldron = (blockState) -> (blockState.getBlock() instanceof TCCauldronBlock && ((TCCauldronBlock) blockState.getBlock()).canReceiveWedgeDrip(pFluid))
+                ||blockState.is(Blocks.CAULDRON)
+                ||(blockState.is(TCBlocks.FLOW_CEDAR_ENT_STATUE.get()) && pFluid == TCFluids.FLOW_FLUID.source.get());
+        BiPredicate<BlockPos, BlockState> isDripableThrough = (blockPos, blockState) -> canDripThrough(pLevel, blockPos, blockState);
+        return findBlockVertical(pLevel, pPos, Direction.DOWN.getAxisDirection(), isDripableThrough, isCauldron).orElse(null);
     }
-    private static Optional<BlockPos> findBlockVertical(LevelAccessor pLevel, BlockPos pPos, Direction.AxisDirection pAxis, BiPredicate<BlockPos, BlockState> pPositionalStatePredicate, Predicate<BlockState> pStatePredicate) {
-        Direction $$6 = Direction.get(pAxis, Direction.Axis.Y);
-        BlockPos.MutableBlockPos $$7 = pPos.mutable();
+    private static Optional<BlockPos> findBlockVertical(LevelAccessor pLevel, BlockPos pPos, Direction.AxisDirection pAxis, BiPredicate<BlockPos, BlockState> isDripableThrough, Predicate<BlockState> isCauldron) {
+        Direction direction = Direction.get(pAxis, Direction.Axis.Y);
+        BlockPos.MutableBlockPos checkPos = pPos.mutable();
 
-        for(int $$8 = 1; $$8 < 11; ++$$8) {
-            $$7.move($$6);
-            BlockState $$9 = pLevel.getBlockState($$7);
-            if (pStatePredicate.test($$9)) {
-                return Optional.of($$7.immutable());
+        for(int i = 1; i < 11; ++i) {
+            checkPos.move(direction);
+            BlockState blockStateAt = pLevel.getBlockState(checkPos);
+            if (isCauldron.test(blockStateAt)) {
+                return Optional.of(checkPos.immutable());
             }
 
-            if (pLevel.isOutsideBuildHeight($$7.getY()) || !pPositionalStatePredicate.test($$7, $$9)) {
+            if (pLevel.isOutsideBuildHeight(checkPos.getY()) || !isDripableThrough.test(checkPos, blockStateAt)) {
                 return Optional.empty();
             }
         }
@@ -170,30 +174,32 @@ public class WedgeBlock extends Block {
     public void tick(@NotNull BlockState pState, @NotNull ServerLevel pLevel, @NotNull BlockPos pPos, @NotNull RandomSource pRandom) {
         this.calculateState(pState, pLevel, pPos);
         if (pState.getValue(ATTACHED)) {
-            //LOGGER.debug("Test");
             double random = Math.random();
             BlockPos cauldronPos = findFillableCauldronBelowWedge(pLevel, pPos, TCFluids.FLOW_FLUID.source.get());
             BlockPos cauldronPos1 = findFillableCauldronBelowWedge(pLevel, pPos, TCFluids.BIRCH_JUICE_FLUID.source.get());
             if (cauldronPos != null||cauldronPos1 != null) {
-               // LOGGER.debug("Wedge attached, cauldron at "+cauldronPos);
                 if (pLevel.getBlockState(pPos.relative(pState.getValue(FACING).getOpposite())).hasProperty(INFUSED)
                         && pLevel.getBlockState(pPos.relative(pState.getValue(FACING).getOpposite())).getValue(INFUSED)
                         && cauldronPos != null) {
                     if (pLevel.getBlockState(cauldronPos).is(TCBlocks.FLOW_CAULDRON.get())) {
-                       // LOGGER.debug("Flow Cauldron detected, trying increase level");
                         int levelValue = pLevel.getBlockState(cauldronPos).getValue(LEVEL);
                         if (random < 0.7D) {
                             if (levelValue != 3) {
                                 pLevel.setBlock(cauldronPos, TCBlocks.FLOW_CAULDRON.get().defaultBlockState().setValue(LEVEL, levelValue + 1), 2);
-                                //LOGGER.debug(random + " - Success " + success);
-                            } //else LOGGER.debug(random + " - Fail");
+
+                            }
                         }
                     } else if (pLevel.getBlockState(cauldronPos).is(Blocks.CAULDRON)) {
-                       // LOGGER.debug("Vanilla Cauldron detected, trying increase level");
                         if (random < 0.7D) {
                             pLevel.setBlock(cauldronPos, TCBlocks.FLOW_CAULDRON.get().defaultBlockState().setValue(LEVEL, 1), 2);
-                            // LOGGER.debug(random + " - Success " + success);
-                        }// else LOGGER.debug(random + " - Fail");
+                        }
+                    } else if (pLevel.getBlockState(cauldronPos).is(TCBlocks.FLOW_CEDAR_ENT_STATUE.get())) {
+                        if (random < 0.3D) {
+                            BlockEntity blockEntity = pLevel.getBlockEntity(cauldronPos);
+                            if (blockEntity instanceof EntStatueBlockEntity entStatueBlockEntity) {
+                                entStatueBlockEntity.jojoReference();
+                            }
+                        }
                     }
 
                 }
@@ -204,14 +210,14 @@ public class WedgeBlock extends Block {
                         int levelValue = pLevel.getBlockState(cauldronPos1).getValue(LEVEL);
                         if (random < 0.7D) {
                             if (levelValue != 3) {
-                                boolean success = pLevel.setBlock(cauldronPos1, TCBlocks.BIRCH_JUICE_CAULDRON.get().defaultBlockState().setValue(LEVEL, levelValue + 1), 2);
+                                pLevel.setBlock(cauldronPos1, TCBlocks.BIRCH_JUICE_CAULDRON.get().defaultBlockState().setValue(LEVEL, levelValue + 1), 2);
                                 //LOGGER.debug(random + " - Success " + success);
                             } //else LOGGER.debug(random + " - Fail");
                         }
                     } else if (pLevel.getBlockState(cauldronPos1).is(Blocks.CAULDRON)) {
                         //LOGGER.debug("Vanilla Cauldron detected, trying increase level");
                         if (random < 0.7D) {
-                            boolean success = pLevel.setBlock(cauldronPos1, TCBlocks.BIRCH_JUICE_CAULDRON.get().defaultBlockState().setValue(LEVEL, 1), 2);
+                            pLevel.setBlock(cauldronPos1, TCBlocks.BIRCH_JUICE_CAULDRON.get().defaultBlockState().setValue(LEVEL, 1), 2);
                             //LOGGER.debug(random + " - Success " + success);
                         } //else LOGGER.debug(random + " - Fail");
                     }
