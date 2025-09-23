@@ -40,6 +40,7 @@ public class TCBlockStateProvider extends BlockStateProvider {
         blockWithItem(TCBlocks.TECHNETIUM_DEEPSLATE_ORE);
         blockWithItem(TCBlocks.TECHNETIUM_RAW_ORE_BLOCK);
         blockWithItem(TCBlocks.TECHNETIUM_BLOCK);
+        blockWithItem(TCBlocks.FLOW_CEDAR_ENT_STATUE);
 
 
 

@@ -96,6 +96,7 @@ public class TCBlockLootTables extends BlockLootSubProvider {
         this.dropSelf(TCBlocks.PP_SENDER.get());
 
         this.dropSelf(TCBlocks.TECHNETIUM_BLOCK.get());
+        this.dropSelf(TCBlocks.FLOW_CEDAR_ENT_STATUE.get());
 
     }
 

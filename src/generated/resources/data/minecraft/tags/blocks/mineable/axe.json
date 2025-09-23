@@ -14,6 +14,7 @@
     "terracompositio:pp_sender",
     "terracompositio:pp_emitter",
     "terracompositio:pp_collector",
-    "terracompositio:pp_receiver"
+    "terracompositio:pp_receiver",
+    "terracompositio:flow_cedar_ent_statue"
   ]
 }

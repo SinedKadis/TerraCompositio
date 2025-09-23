@@ -38,6 +38,7 @@ import net.sinedkadis.terracompositio.cfe.CFEContainer;
 import net.sinedkadis.terracompositio.entity.goals.CFEHoldGoal;
 import net.sinedkadis.terracompositio.entity.goals.ReachSourceGoal;
 import net.sinedkadis.terracompositio.entity.goals.CFEExtractGoal;
+import net.sinedkadis.terracompositio.registries.TCBlocks;
 import net.sinedkadis.terracompositio.registries.TCItems;
 import net.sinedkadis.terracompositio.util.TCUtil;
 import org.jetbrains.annotations.Nullable;
@@ -45,6 +46,8 @@ import org.jetbrains.annotations.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.List;
 import java.util.Optional;
+
+import static net.sinedkadis.terracompositio.block.custom.EntStatueBlock.CROWN_EQUIPPED;
 
 // /kill @e[type=terracompositio:flow_cedar_ent_entity]
 
@@ -129,13 +132,21 @@ public class FlowCedarEntEntity extends AbstractGolem implements CFENetworkMembe
                         TCUtil.tryCFETransfer(icfeHandler1, icfeHandler, 10);
                         tickCounter = 20;
                         icfeHandler1.takeCFE(1, false);
-//                        if (icfeHandler1.getCFE() <= 0) {
-//                            this.turnIntoStatue();
-//                        }
+                        if (icfeHandler1.getCFE() <= 0) {
+                            this.turnIntoStatue();
+                        }
                     }
                 });
             });
         }
+    }
+
+    public void turnIntoStatue() {
+        boolean addCrown = this.getItemBySlot(EquipmentSlot.HEAD).is(TCItems.TECHNETIUM_CROWN.get());
+        this.level().setBlock(this.blockPosition(),
+                TCBlocks.FLOW_CEDAR_ENT_STATUE.get().defaultBlockState()
+                        .setValue(CROWN_EQUIPPED,addCrown),3);
+        this.remove(RemovalReason.CHANGED_DIMENSION);
     }
 
     @SuppressWarnings("deprecation")

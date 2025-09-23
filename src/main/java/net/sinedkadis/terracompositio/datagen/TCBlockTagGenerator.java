@@ -53,7 +53,8 @@ public class TCBlockTagGenerator extends BlockTagsProvider {
                         TCBlocks.PP_SENDER.get(),
                         TCBlocks.PP_EMITTER.get(),
                         TCBlocks.PP_COLLECTOR.get(),
-                        TCBlocks.PP_RECEIVER.get());
+                        TCBlocks.PP_RECEIVER.get(),
+                        TCBlocks.FLOW_CEDAR_ENT_STATUE.get());
 
 
         this.tag(BlockTags.NEEDS_IRON_TOOL)
