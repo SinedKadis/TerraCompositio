@@ -3,9 +3,6 @@ package net.sinedkadis.terracompositio.block.entity;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.protocol.Packet;
-import net.minecraft.network.protocol.game.ClientGamePacketListener;
-import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
@@ -29,7 +26,6 @@ import net.sinedkadis.terracompositio.util.TCUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import java.util.Collections;
 import java.util.List;
 import java.util.Optional;
 
@@ -99,8 +95,8 @@ public class FlowCedarTankBlockEntity extends TCBlockEntity implements FluidNetw
                         .filter(pos2 -> level.getBlockState(pos2).getValue(INFUSED))
                         .toList());
                 if (!list.isEmpty()) {
-                    Collections.shuffle(list);
-                    BlockPos blockPos = list.get(0);
+                    int index = level.getRandom().nextInt(list.size());
+                    BlockPos blockPos = list.get(index);
                     level.setBlockAndUpdate(blockPos, level.getBlockState(blockPos).setValue(INFUSED, false));
                     fluidHandler.fill(fluidStack, IFluidHandler.FluidAction.EXECUTE);
                     TCUtil.sendFluidParticles((ServerLevel) level, pos, blockPos, 100, fluidStack);
@@ -164,14 +160,4 @@ public class FlowCedarTankBlockEntity extends TCBlockEntity implements FluidNetw
         }
     }
 
-    @Nullable
-    @Override
-    public Packet<ClientGamePacketListener> getUpdatePacket() {
-        return ClientboundBlockEntityDataPacket.create(this);
-    }
-
-    @Override
-    public @NotNull CompoundTag getUpdateTag() {
-        return saveWithoutMetadata();
-    }
 }

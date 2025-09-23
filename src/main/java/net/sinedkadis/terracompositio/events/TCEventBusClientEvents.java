@@ -89,6 +89,7 @@ public class TCEventBusClientEvents {
         event.registerLayerDefinition(TCModelLayers.PINE_CHEST_BOAT_LAYER, ChestBoatModel::createBodyModel);
 
         event.registerLayerDefinition(TCModelLayers.FLOW_CEDAR_ENT_LAYER, FlowCedarEntModel::createBodyLayer);
+        event.registerLayerDefinition(TCModelLayers.FLOW_CEDAR_ENT_STATUE_LAYER, FlowCedarEntStatueModel::createBodyLayer);
         event.registerLayerDefinition(TCModelLayers.CFE_CUBE_LAYER, CFECubeModel::createBodyLayer);
 
         event.registerLayerDefinition(TCModelLayers.TECHNETIUM_CROWN_LAYER, TechnetiumCrownModel::createBodyLayer);
@@ -106,6 +107,7 @@ public class TCEventBusClientEvents {
         event.registerBlockEntityRenderer(TCBlockEntities.TIME_PASSAGE_DESORBER_BE.get(), TimePassageDesorberBlockEntityRenderer::new);
         event.registerBlockEntityRenderer(TCBlockEntities.FLOW_CEDAR_TANK_BE.get(), FlowCedarTankBlockEntityRenderer::new);
         event.registerBlockEntityRenderer(TCBlockEntities.PATH_POINTER_BE.get(), PathPointerBlockEntityRenderer::new);
+        event.registerBlockEntityRenderer(TCBlockEntities.ENT_STATUE_BE.get(), EntStatueBlockEntityRenderer::new);
 
     }
 }

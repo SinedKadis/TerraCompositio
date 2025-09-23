@@ -11,6 +11,8 @@ public class TCModelLayers {
 
     public static final ModelLayerLocation FLOW_CEDAR_ENT_LAYER = new ModelLayerLocation(
             TerraCompositio.modLoc( "flow_cedar_ent_entity"), "main");
+    public static final ModelLayerLocation FLOW_CEDAR_ENT_STATUE_LAYER = new ModelLayerLocation(
+            TerraCompositio.modLoc( "flow_cedar_ent_statue"), "main");
     public static final ModelLayerLocation CFE_CUBE_LAYER = new ModelLayerLocation(
             TerraCompositio.modLoc("cfe_cube"), "main");
 
