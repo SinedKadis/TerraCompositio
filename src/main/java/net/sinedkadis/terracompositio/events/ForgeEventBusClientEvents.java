@@ -3,10 +3,12 @@ package net.sinedkadis.terracompositio.events;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.ItemInHandRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.AxeItem;
 import net.minecraft.world.item.ItemDisplayContext;
@@ -15,15 +17,20 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
+import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.RenderHandEvent;
 import net.minecraftforge.event.TickEvent;
+import net.minecraftforge.event.entity.living.LivingEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.sinedkadis.terracompositio.TerraCompositio;
 import net.sinedkadis.terracompositio.block.entity.PathPointerBlockEntity;
 import net.sinedkadis.terracompositio.item.custom.WrenchAxeItem;
+import net.sinedkadis.terracompositio.particle.CFEParticleData;
+import net.sinedkadis.terracompositio.registries.TCEffects;
 import net.sinedkadis.terracompositio.registries.TCItems;
+import net.sinedkadis.terracompositio.registries.TCParticles;
 
 @Mod.EventBusSubscriber(modid = TerraCompositio.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE,value = Dist.CLIENT)
 public class ForgeEventBusClientEvents {
@@ -62,6 +69,22 @@ public class ForgeEventBusClientEvents {
         BlockEntity be = level.getBlockEntity(pos);
         if (be instanceof PathPointerBlockEntity pointer) {
             pointer.highlightNodes();
+        }
+    }
+
+    @SubscribeEvent
+    public static void onLivingTick(LivingEvent.LivingTickEvent event) {
+        if (event.getEntity().level() instanceof ClientLevel clientLevel) {
+            LivingEntity livingEntity = event.getEntity();
+            Vec3 pos = livingEntity.getEyePosition();
+            if (livingEntity.hasEffect(TCEffects.FLOW_SATURATION.get())) {
+                clientLevel.addParticle(new CFEParticleData(1/20f),
+                        pos.x,
+                        pos.y,
+                        pos.z,
+                        pos.x + clientLevel.random.nextFloat(),
+                        pos.y + clientLevel.random.nextFloat(),
+                        pos.z + clientLevel.random.nextFloat());}
         }
     }
 

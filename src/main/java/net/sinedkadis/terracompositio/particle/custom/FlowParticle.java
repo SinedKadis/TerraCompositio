@@ -47,8 +47,8 @@ public class FlowParticle extends TextureSheetParticle {
         this.zo = this.z;
         this.preMoveUpdate();
         if (!this.removed) {
-            //this.move(this.xd, this.yd, this.zd);
-            this.postMoveUpdate();
+            this.yd -= this.gravity;
+            this.move(this.xd, this.yd, this.zd);            this.postMoveUpdate();
             if (!this.removed) {
                 this.xd *= 0.9800000190734863;
                 this.yd *= 0.9800000190734863;
@@ -78,17 +78,12 @@ public class FlowParticle extends TextureSheetParticle {
     }
 
     @OnlyIn(Dist.CLIENT)
-    public static class Provider implements ParticleProvider<SimpleParticleType> {
-        private final SpriteSet sprites;
-
-        public Provider(SpriteSet spriteSet) {
-            this.sprites = spriteSet;
-        }
+    public record Provider(SpriteSet sprites) implements ParticleProvider<SimpleParticleType> {
         @ParametersAreNotNullByDefault
         public Particle createParticle(SimpleParticleType particleType, ClientLevel level,
-                                       double x, double y, double z,
-                                       double dx, double dy, double dz) {
-            return createFlowFallParticle(level,x,y,z,sprites);
+                                   double x, double y, double z,
+                                   double dx, double dy, double dz) {
+            return createFlowFallParticle(level, x, y, z, sprites);
         }
     }
     @OnlyIn(Dist.CLIENT)
