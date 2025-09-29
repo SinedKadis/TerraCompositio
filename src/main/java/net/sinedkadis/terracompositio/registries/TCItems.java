@@ -101,6 +101,8 @@ public class TCItems {
 
     public static final RegistryObject<Item> TECHNETIUM_CROWN = ITEMS.register("technetium_crown",
             () -> new TechnetiumArmorItem(ArmorItem.Type.HELMET,new Item.Properties()));
+    public static final RegistryObject<Item> FLUID_APPLIER = ITEMS.register("fluid_applier",
+            () -> new FluidApplierItem(new Item.Properties()));
 
     public static void register(IEventBus eventBus){
         ITEMS.register(eventBus);

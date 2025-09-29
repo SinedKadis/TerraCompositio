@@ -100,6 +100,7 @@ public class TCCreativeModeTabs {
 
                         pOutput.accept(TCItems.TECHNETIUM_CROWN.get());
                         pOutput.accept(TCBlocks.FLOW_CEDAR_ENT_STATUE.get());
+                        pOutput.accept(TCItems.FLUID_APPLIER.get());
                     })
                     .build());
 

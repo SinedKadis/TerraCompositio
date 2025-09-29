@@ -53,11 +53,11 @@ import net.sinedkadis.terracompositio.block.custom.FlowCauldronBlock;
 import net.sinedkadis.terracompositio.registries.TCFluids;
 import net.sinedkadis.terracompositio.registries.TCItems;
 import org.apache.commons.lang3.function.TriFunction;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 
 import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.function.Consumer;
 import java.util.function.Supplier;
@@ -107,7 +107,12 @@ public class TCFluidRegistryContainer implements IForgeBucketPickup{
                     .slopeFindDistance(additionalProperties.slopeFindDistance).tickRate(additionalProperties.tickRate);
         }
 
-        this.block = TCBlocks.BLOCKS.register(name, () -> new LiquidBlock(this.source, blockProperties.noLootTable()));
+        this.block = TCBlocks.BLOCKS.register(name, () -> new LiquidBlock(this.source, blockProperties.noLootTable()){
+            @Override
+            public Optional<SoundEvent> getPickupSound() {
+                return Optional.of(SoundEvents.BUCKET_FILL);
+            }
+        });
         this.properties.block(this.block);
 
         this.bucket = TCItems.ITEMS.register(name + "_bucket", () -> new BucketItem(this.source, itemProperties){
@@ -135,7 +140,7 @@ public class TCFluidRegistryContainer implements IForgeBucketPickup{
                 return super.onItemUseFirst(stack, context);
             }
             @Override
-            public @NotNull UseAnim getUseAnimation(@NotNull ItemStack pStack) {
+            public UseAnim getUseAnimation(ItemStack pStack) {
                 if (pStack.is(TCFluids.BIRCH_JUICE_FLUID.bucket.get())) {
                     return UseAnim.DRINK;
                 }
@@ -144,7 +149,7 @@ public class TCFluidRegistryContainer implements IForgeBucketPickup{
 
             @Override
             @ParametersAreNotNullByDefault
-            public @NotNull InteractionResultHolder<ItemStack> use(Level pLevel, Player pPlayer, InteractionHand pHand) {
+            public InteractionResultHolder<ItemStack> use(Level pLevel, Player pPlayer, InteractionHand pHand) {
                 BlockHitResult blockhitresult = getPlayerPOVHitResult(pLevel, pPlayer, super.getFluid() == Fluids.EMPTY ? net.minecraft.world.level.ClipContext.Fluid.SOURCE_ONLY : net.minecraft.world.level.ClipContext.Fluid.NONE);
                 if (blockhitresult.getType() == HitResult.Type.MISS) {
                     return ItemUtils.startUsingInstantly(pLevel, pPlayer, pHand);
@@ -153,13 +158,13 @@ public class TCFluidRegistryContainer implements IForgeBucketPickup{
             }
 
             @Override
-            public int getUseDuration(@NotNull ItemStack pStack) {
+            public int getUseDuration(ItemStack pStack) {
                 return pStack.is(TCFluids.BIRCH_JUICE_FLUID.bucket.get()) ? 32 : 1;
             }
 
             @Override
             @ParametersAreNotNullByDefault
-            public @NotNull ItemStack finishUsingItem(ItemStack pStack, Level pLevel, LivingEntity pLivingEntity) {
+            public ItemStack finishUsingItem(ItemStack pStack, Level pLevel, LivingEntity pLivingEntity) {
                 super.finishUsingItem(pStack, pLevel, pLivingEntity);
                 if (pStack.is(TCFluids.BIRCH_JUICE_FLUID.bucket.get())) {
                     Player player = pLivingEntity instanceof Player ? (Player) pLivingEntity : null;
@@ -187,7 +192,7 @@ public class TCFluidRegistryContainer implements IForgeBucketPickup{
                 }
                 return pStack;
             }
-            public ICapabilityProvider initCapabilities(@NotNull ItemStack stack, @javax.annotation.Nullable CompoundTag nbt) {
+            public ICapabilityProvider initCapabilities(ItemStack stack, @javax.annotation.Nullable CompoundTag nbt) {
                 return new FluidBucketWrapper(stack);
             }
         });
@@ -229,8 +234,8 @@ public class TCFluidRegistryContainer implements IForgeBucketPickup{
             }
 
             @Override
-            public @NotNull Vector3f modifyFogColor(Camera camera, float partialTick, ClientLevel level,
-                                                    int renderDistance, float darkenWorldAmount, Vector3f fluidFogColor) {
+            public Vector3f modifyFogColor(Camera camera, float partialTick, ClientLevel level,
+                                           int renderDistance, float darkenWorldAmount, Vector3f fluidFogColor) {
                 return extensions.fogColor == null
                         ? IClientFluidTypeExtensions.super.modifyFogColor(camera, partialTick, level, renderDistance,
                         darkenWorldAmount, fluidFogColor)
@@ -316,7 +321,7 @@ public class TCFluidRegistryContainer implements IForgeBucketPickup{
 
         public ClientExtensions overlay(String name, String folder) {
             this.overlay = ResourceLocation.tryBuild(this.modid, folder + "/" + name + "_overlay");
-            return renderOverlay(ResourceLocation.tryBuild(this.modid, "textures/" + folder + "/" + name + "_overlay.png"));
+            return renderOverlay(Objects.requireNonNull(ResourceLocation.tryBuild(this.modid, "textures/" + folder + "/" + name + "_overlay.png")));
         }
 
         public ClientExtensions renderOverlay(ResourceLocation path) {

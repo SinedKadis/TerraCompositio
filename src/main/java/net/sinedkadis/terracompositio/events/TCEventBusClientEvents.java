@@ -22,6 +22,7 @@ import net.sinedkadis.terracompositio.entity.client.CFECubeModel;
 import net.sinedkadis.terracompositio.entity.client.FlowCedarEntModel;
 import net.sinedkadis.terracompositio.entity.client.FlowCedarEntRenderer;
 import net.sinedkadis.terracompositio.item.custom.CreationFlowJournalItem;
+import net.sinedkadis.terracompositio.item.custom.FluidApplierItem;
 import net.sinedkadis.terracompositio.item.models.TechnetiumCrownModel;
 import net.sinedkadis.terracompositio.registries.TCEntities;
 import net.sinedkadis.terracompositio.registries.TCBoatRenderer;
@@ -80,6 +81,12 @@ public class TCEventBusClientEvents {
                 ResourceLocation.parse("opened"),
                 (stack, level, entity, seed) ->
                         CreationFlowJournalItem.isOpen() ? 1.0F : 0.0F
+        );
+        ItemProperties.register(
+                TCItems.FLUID_APPLIER.get(),
+                ResourceLocation.parse("amount"),
+                (stack, level, entity, seed) ->
+                        FluidApplierItem.getRenderAmount(stack)
         );
     }
 

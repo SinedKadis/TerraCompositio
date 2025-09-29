@@ -1,10 +1,12 @@
 package net.sinedkadis.terracompositio.item.custom;
 
+import net.minecraft.ChatFormatting;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
@@ -31,6 +33,7 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.SoundActions;
+import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.event.ForgeEventFactory;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidUtil;
@@ -40,6 +43,7 @@ import net.minecraftforge.fluids.capability.templates.FluidTank;
 
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.List;
 import java.util.Optional;
 
 @SuppressWarnings("deprecation")
@@ -52,9 +56,22 @@ public class FluidApplierItem extends Item implements IFluidHandlerItem, Dispens
         super(pProperties);
     }
 
+    public static int getRenderAmount(ItemStack stack) {
+        Optional<IFluidHandlerItem> resolve = stack.getCapability(ForgeCapabilities.FLUID_HANDLER_ITEM).resolve();
+        int amount = 0;
+        if (resolve.isPresent()) {
+            IFluidHandlerItem item = resolve.get();
+            FluidStack tank1 = item.getFluidInTank(0);
+
+            amount = (int) Math.floor(tank1.getAmount()/1000f);
+        }
+        return amount;
+    }
+
     public InteractionResultHolder<ItemStack> use(Level pLevel, Player pPlayer, InteractionHand pHand) {
         ItemStack itemstack = pPlayer.getItemInHand(pHand);
-        Fluid fluid = this.tank.getFluid().getFluid();
+        IFluidHandlerItem fluidHandlerItem = (IFluidHandlerItem) itemstack.getItem();
+        Fluid fluid = fluidHandlerItem.getFluidInTank(0).getFluid();
         BlockHitResult blockhitresult = getPlayerPOVHitResult(pLevel, pPlayer, fluid == Fluids.EMPTY ? ClipContext.Fluid.SOURCE_ONLY : ClipContext.Fluid.NONE);
         InteractionResultHolder<ItemStack> ret = ForgeEventFactory.onBucketUse(pPlayer, pLevel, itemstack, blockhitresult);
         if (ret != null) return ret;
@@ -72,14 +89,14 @@ public class FluidApplierItem extends Item implements IFluidHandlerItem, Dispens
                     if (blockstate1.getBlock() instanceof BucketPickup bucketpickup) {
                         Fluid fluid1 = ((BucketItem) bucketpickup.pickupBlock(pLevel, blockpos, blockstate1)
                                 .getItem()).getFluid();
-                        if (this.tank.fill(new FluidStack(fluid1,1000),FluidAction.SIMULATE) == 1000) {
+                        if (fluidHandlerItem.fill(new FluidStack(fluid1,1000),FluidAction.SIMULATE) == 1000) {
                             pPlayer.awardStat(Stats.ITEM_USED.get(this));
                             bucketpickup.getPickupSound(blockstate1).ifPresent((p_150709_) -> pPlayer.playSound(p_150709_, 1.0F, 1.0F));
                             pLevel.gameEvent(pPlayer, GameEvent.FLUID_PICKUP, blockpos);
                             if (!pLevel.isClientSide) {
                                 CriteriaTriggers.FILLED_BUCKET.trigger((ServerPlayer)pPlayer, itemstack);
                             }
-                            this.tank.fill(new FluidStack(fluid1,1000),FluidAction.EXECUTE);
+                            fluidHandlerItem.fill(new FluidStack(fluid1,1000),FluidAction.EXECUTE);
                             return InteractionResultHolder.sidedSuccess(itemstack, pLevel.isClientSide());
                         }
                     }
@@ -87,7 +104,7 @@ public class FluidApplierItem extends Item implements IFluidHandlerItem, Dispens
                     return InteractionResultHolder.fail(itemstack);
                 } else {
                     BlockState blockstate = pLevel.getBlockState(blockpos);
-                    BlockPos blockpos2 = canBlockContainFluid(pLevel, blockpos, blockstate) ? blockpos : blockpos1;
+                    BlockPos blockpos2 = canBlockContainFluid(pLevel, blockpos, blockstate, itemstack) ? blockpos : blockpos1;
                     if (this.emptyContents(pPlayer, pLevel, blockpos2, blockhitresult, itemstack)) {
                         this.checkExtraContent(pPlayer, pLevel, itemstack, blockpos2);
                         if (pPlayer instanceof ServerPlayer) {
@@ -122,9 +139,16 @@ public class FluidApplierItem extends Item implements IFluidHandlerItem, Dispens
     }
 
     public boolean emptyContents(@Nullable Player pPlayer, Level pLevel, BlockPos pPos, @Nullable BlockHitResult pResult, @Nullable ItemStack container) {
-        Fluid content = tank.getFluid().getFluid();
-        if(tank.drain(1000, FluidAction.SIMULATE).getAmount() != 1000) return false;
-        Runnable drain = () -> tank.drain(1000, FluidAction.EXECUTE);
+        Optional<ItemStack> itemStack = Optional.ofNullable(container);
+        Optional<FluidStack> containedFluidStack = itemStack.flatMap(FluidUtil::getFluidContained);
+        Fluid content = containedFluidStack.isPresent() ? containedFluidStack.get().getFluid() : Fluids.EMPTY;
+        Optional<IFluidHandlerItem> handlerItem;
+        handlerItem = itemStack.map(stack -> (IFluidHandlerItem) stack.getItem());
+        if (handlerItem.isPresent()
+                && handlerItem.get()
+                    .drain(1000, FluidAction.SIMULATE).getAmount() != 1000) return false;
+        Runnable drain = () -> handlerItem.ifPresent(iFluidHandlerItem
+                -> iFluidHandlerItem.drain(1000, FluidAction.EXECUTE));
         if (!(content instanceof FlowingFluid)) {
             return false;
         } else {
@@ -132,7 +156,7 @@ public class FluidApplierItem extends Item implements IFluidHandlerItem, Dispens
             Block block = blockstate.getBlock();
             boolean canBeReplaced = blockstate.canBeReplaced(content);
             boolean canBeFilled = blockstate.isAir() || canBeReplaced || block instanceof LiquidBlockContainer && ((LiquidBlockContainer)block).canPlaceLiquid(pLevel, pPos, blockstate, content);
-            Optional<FluidStack> containedFluidStack = Optional.ofNullable(container).flatMap(FluidUtil::getFluidContained);
+
             if (!canBeFilled) {
                 return pResult != null && this.emptyContents(pPlayer, pLevel, pResult.getBlockPos().relative(pResult.getDirection()), null, container);
             } else if (containedFluidStack.isPresent() && content.getFluidType().isVaporizedOnPlacement(pLevel, pPos, containedFluidStack.get())) {
@@ -152,7 +176,7 @@ public class FluidApplierItem extends Item implements IFluidHandlerItem, Dispens
                 return true;
             } else if (block instanceof LiquidBlockContainer && ((LiquidBlockContainer)block).canPlaceLiquid(pLevel,pPos,blockstate, content)) {
                 ((LiquidBlockContainer)block).placeLiquid(pLevel, pPos, blockstate, ((FlowingFluid) content).getSource(false));
-                this.playEmptySound(pPlayer, pLevel, pPos);
+                handlerItem.ifPresent(iFluidHandlerItem -> this.playEmptySound(pPlayer, pLevel, pPos, iFluidHandlerItem));
                 drain.run();
                 return true;
             } else {
@@ -163,19 +187,29 @@ public class FluidApplierItem extends Item implements IFluidHandlerItem, Dispens
                 if (!pLevel.setBlock(pPos, content.defaultFluidState().createLegacyBlock(), 11) && !blockstate.getFluidState().isSource()) {
                     return false;
                 } else {
-                    this.playEmptySound(pPlayer, pLevel, pPos);
+                    handlerItem.ifPresent(iFluidHandlerItem -> this.playEmptySound(pPlayer, pLevel, pPos, iFluidHandlerItem));
                     return true;
                 }
             }
         }
     }
 
-    protected void playEmptySound(@Nullable Player pPlayer, LevelAccessor pLevel, BlockPos pPos) {
-        Fluid content = this.tank.getFluid().getFluid();
+    protected void playEmptySound(@Nullable Player pPlayer, LevelAccessor pLevel, BlockPos pPos, IFluidHandlerItem handlerItem) {
+        Fluid content = handlerItem.getFluidInTank(0).getFluid();
         SoundEvent soundevent = content.getFluidType().getSound(pPlayer, pLevel, pPos, SoundActions.BUCKET_EMPTY);
-        if(soundevent == null) soundevent = content.is(FluidTags.LAVA) ? SoundEvents.BUCKET_EMPTY_LAVA : SoundEvents.BUCKET_EMPTY;
+        if (soundevent == null)
+            soundevent = content.is(FluidTags.LAVA) ? SoundEvents.BUCKET_EMPTY_LAVA : SoundEvents.BUCKET_EMPTY;
         pLevel.playSound(pPlayer, pPos, soundevent, SoundSource.BLOCKS, 1.0F, 1.0F);
         pLevel.gameEvent(pPlayer, GameEvent.FLUID_PLACE, pPos);
+
+    }
+
+    @Override
+    public void appendHoverText(ItemStack pStack, @org.jetbrains.annotations.Nullable Level pLevel, List<Component> pTooltipComponents, TooltipFlag pIsAdvanced) {
+        FluidStack fluidStack = ((IFluidHandlerItem) pStack.getItem()).getFluidInTank(0);
+        pTooltipComponents.add(Component.translatable(fluidStack.getTranslationKey()).withStyle(ChatFormatting.GRAY));
+        pTooltipComponents.add(Component.literal(fluidStack.getAmount()+"mB").withStyle(ChatFormatting.GRAY));
+        super.appendHoverText(pStack, pLevel, pTooltipComponents, pIsAdvanced);
     }
 
     @Override
@@ -223,9 +257,9 @@ public class FluidApplierItem extends Item implements IFluidHandlerItem, Dispens
         return emptyContents(pPlayer,pLevel,pPos,pResult,null);
     }
 
-    protected boolean canBlockContainFluid(Level worldIn, BlockPos posIn, BlockState blockstate) {
+    protected boolean canBlockContainFluid(Level worldIn, BlockPos posIn, BlockState blockstate, ItemStack itemstack) {
         return blockstate.getBlock() instanceof LiquidBlockContainer
                 && ((LiquidBlockContainer)blockstate.getBlock())
-                .canPlaceLiquid(worldIn, posIn, blockstate, this.tank.getFluid().getFluid());
+                .canPlaceLiquid(worldIn, posIn, blockstate, ((IFluidHandlerItem) itemstack.getItem()).getFluidInTank(0).getFluid());
     }
 }
