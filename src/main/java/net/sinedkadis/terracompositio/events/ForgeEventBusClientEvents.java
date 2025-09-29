@@ -7,6 +7,8 @@ import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.renderer.ItemInHandRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.core.BlockPos;
+import net.minecraft.util.Mth;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
@@ -30,7 +32,6 @@ import net.sinedkadis.terracompositio.item.custom.WrenchAxeItem;
 import net.sinedkadis.terracompositio.particle.CFEParticleData;
 import net.sinedkadis.terracompositio.registries.TCEffects;
 import net.sinedkadis.terracompositio.registries.TCItems;
-import net.sinedkadis.terracompositio.registries.TCParticles;
 
 @Mod.EventBusSubscriber(modid = TerraCompositio.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE,value = Dist.CLIENT)
 public class ForgeEventBusClientEvents {
@@ -76,15 +77,21 @@ public class ForgeEventBusClientEvents {
     public static void onLivingTick(LivingEvent.LivingTickEvent event) {
         if (event.getEntity().level() instanceof ClientLevel clientLevel) {
             LivingEntity livingEntity = event.getEntity();
-            Vec3 pos = livingEntity.getEyePosition();
+            RandomSource random = clientLevel.getRandom();
+            Vec3 pos = livingEntity.position().add(
+                    0,
+                    Mth.lerp(random.nextFloat(),0, livingEntity.getBbHeight()),
+                    0
+            );
             if (livingEntity.hasEffect(TCEffects.FLOW_SATURATION.get())) {
+
                 clientLevel.addParticle(new CFEParticleData(1/20f),
                         pos.x,
                         pos.y,
                         pos.z,
-                        pos.x + clientLevel.random.nextFloat(),
-                        pos.y + clientLevel.random.nextFloat(),
-                        pos.z + clientLevel.random.nextFloat());}
+                        random.nextFloat(),
+                        random.nextFloat(),
+                        random.nextFloat());}
         }
     }
 
