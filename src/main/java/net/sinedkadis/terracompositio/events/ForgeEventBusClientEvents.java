@@ -1,23 +1,25 @@
 package net.sinedkadis.terracompositio.events;
 
+import com.google.common.base.MoreObjects;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
-import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
+import net.minecraft.client.model.ArmedModel;
+import net.minecraft.client.model.EntityModel;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.client.renderer.GameRenderer;
 import net.minecraft.client.renderer.ItemInHandRenderer;
 import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.entity.LivingEntityRenderer;
+import net.minecraft.client.renderer.entity.layers.ItemInHandLayer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
+import net.minecraft.world.entity.HumanoidArm;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.AxeItem;
-import net.minecraft.world.item.ItemDisplayContext;
-import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.*;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.phys.BlockHitResult;
@@ -25,6 +27,7 @@ import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.RenderHandEvent;
+import net.minecraftforge.client.event.RenderLivingEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.living.LivingEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
@@ -39,6 +42,7 @@ import net.sinedkadis.terracompositio.particle.CFEParticleData;
 import net.sinedkadis.terracompositio.registries.TCEffects;
 import net.sinedkadis.terracompositio.registries.TCItems;
 
+import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.Optional;
 
 @Mod.EventBusSubscriber(modid = TerraCompositio.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE,value = Dist.CLIENT)
@@ -56,7 +60,7 @@ public class ForgeEventBusClientEvents {
             renderAxes(event.getPoseStack(), event.getMultiBufferSource(), event.getPackedLight(), event.getHand());
         }
         if (player.getItemInHand(event.getHand()).is(TCItems.FLUID_APPLIER.get())) {
-            renderOriginalBucket(event.getPoseStack(), event.getMultiBufferSource(), event.getPackedLight(), event.getHand(),event.getPartialTick());
+            renderOriginalBucket(event.getPoseStack(), event.getPackedLight(), event.getHand(),event.getPartialTick());
         }
     }
 
@@ -107,7 +111,110 @@ public class ForgeEventBusClientEvents {
         }
     }
 
-    private static void renderOriginalBucket(PoseStack poseStack, MultiBufferSource multiBufferSource, int packedLight, InteractionHand hand, float partialTick) {
+    @SubscribeEvent
+    public static <M extends EntityModel<LivingEntity> & ArmedModel> void onRenderEntity(RenderLivingEvent<LivingEntity, M> event) {
+        Minecraft minecraft = Minecraft.getInstance();
+        LocalPlayer player = minecraft.player;
+        if (player == null) return;
+
+        LivingEntityRenderer<LivingEntity, M> renderer = event.getRenderer();
+        ItemInHandRenderer itemInHandRenderer = minecraft.getEntityRenderDispatcher().getItemInHandRenderer();
+
+        renderer.addLayer(new ItemInHandLayer<>(renderer, itemInHandRenderer){
+            @Override
+            @ParametersAreNonnullByDefault
+            public void render(PoseStack pPoseStack, MultiBufferSource pBuffer, int pPackedLight, LivingEntity pLivingEntity, float pLimbSwing, float pLimbSwingAmount, float pPartialTicks, float pAgeInTicks, float pNetHeadYaw, float pHeadPitch) {
+                boolean flag = pLivingEntity.getMainArm() == HumanoidArm.RIGHT;
+                ItemStack itemstack = flag ? pLivingEntity.getOffhandItem() : pLivingEntity.getMainHandItem();
+                ItemStack itemstack1 = flag ? pLivingEntity.getMainHandItem() : pLivingEntity.getOffhandItem();
+                if (itemstack.is(TCItems.FLUID_APPLIER.get()) || itemstack1.is(TCItems.FLUID_APPLIER.get())) {
+                    pPoseStack.pushPose();
+                    if (this.getParentModel().young) {
+                        pPoseStack.translate(0.0F, 0.75F, 0.0F);
+                        pPoseStack.scale(0.5F, 0.5F, 0.5F);
+                    }
+
+                    Optional<IFluidHandlerItem> fluidHandler = FluidUtil.getFluidHandler(itemstack1).resolve();
+                    if (fluidHandler.isPresent()) {
+                        FluidStack fluidStack = fluidHandler.get().getFluidInTank(0);
+                        ItemStack toRender = fluidStack.getFluid().getBucket().getDefaultInstance();
+                        this.renderArmWithItem(pLivingEntity, toRender, ItemDisplayContext.THIRD_PERSON_RIGHT_HAND, HumanoidArm.RIGHT, pPoseStack, pBuffer, pPackedLight);
+
+                    }
+
+                    Optional<IFluidHandlerItem> fluidHandler1 = FluidUtil.getFluidHandler(itemstack).resolve();
+                    if (fluidHandler1.isPresent()) {
+                        FluidStack fluidStack = fluidHandler1.get().getFluidInTank(0);
+                        ItemStack toRender = fluidStack.getFluid().getBucket().getDefaultInstance();
+                        this.renderArmWithItem(pLivingEntity, toRender, ItemDisplayContext.THIRD_PERSON_LEFT_HAND, HumanoidArm.LEFT, pPoseStack, pBuffer, pPackedLight);
+
+                    }
+
+                    pPoseStack.popPose();
+                }
+            }
+        });
+//        ItemStack stackL = entity.getItemInHand(InteractionHand.OFF_HAND);
+//        ItemStack stackR = entity.getItemInHand(InteractionHand.MAIN_HAND);
+//
+//        boolean isRightHand = stackR.is(TCItems.FLUID_APPLIER.get());
+//        boolean isLeftHand = stackL.is(TCItems.FLUID_APPLIER.get());
+//        if (!isLeftHand && !isRightHand) return;
+//
+//        if (isRightHand) {
+//            Optional<IFluidHandlerItem> fluidHandler = FluidUtil.getFluidHandler(stackR).resolve();
+//            if (fluidHandler.isPresent()) {
+//                FluidStack fluidStack = fluidHandler.get().getFluidInTank(0);
+//                ItemStack toRender = fluidStack.getFluid().getBucket().getDefaultInstance();
+////                itemInHandRenderer.renderItem(player,
+////                        toRender,
+////                        ItemDisplayContext.THIRD_PERSON_RIGHT_HAND,
+////                        false,
+////                        event.getPoseStack(),
+////                        event.getMultiBufferSource(),
+////                        event.getPackedLight());
+//                ItemRenderer itemRenderer = minecraft.getItemRenderer();
+//                itemRenderer.render(toRender,
+//                        ItemDisplayContext.THIRD_PERSON_RIGHT_HAND,
+//                        false,
+//                        event.getPoseStack(),
+//                        event.getMultiBufferSource(),
+//                        event.getPackedLight(),
+//                        getOverlayCoords(entity, 0.0F),
+//                        itemRenderer.getModel(toRender,entity.level(),entity,0));
+//            }
+//        }
+//
+//        if (isLeftHand) {
+//            Optional<IFluidHandlerItem> fluidHandler = FluidUtil.getFluidHandler(stackL).resolve();
+//            if (fluidHandler.isPresent()) {
+//                FluidStack fluidStack = fluidHandler.get().getFluidInTank(0);
+//                ItemStack toRender = fluidStack.getFluid().getBucket().getDefaultInstance();
+//                ItemInHandRenderer itemInHandRenderer = minecraft.getEntityRenderDispatcher().getItemInHandRenderer();
+////                itemInHandRenderer.renderItem(player,
+////                        toRender,
+////                        ItemDisplayContext.THIRD_PERSON_LEFT_HAND,
+////                        true,
+////                        event.getPoseStack(),
+////                        event.getMultiBufferSource(),
+////                        event.getPackedLight());
+//                ItemRenderer itemRenderer = minecraft.getItemRenderer();
+//                itemRenderer.render(toRender,
+//                        ItemDisplayContext.THIRD_PERSON_LEFT_HAND,
+//                        true,
+//                        event.getPoseStack(),
+//                        event.getMultiBufferSource(),
+//                        event.getPackedLight(),
+//                        getOverlayCoords(entity, 0.0F),
+//                        itemRenderer.getModel(toRender,entity.level(),entity,entity.level().random.nextInt()));
+//
+//            }
+//        }
+
+
+    }
+
+    private static void renderOriginalBucket(PoseStack poseStack, int packedLight, InteractionHand hand, float partialTick) {
         Minecraft minecraft = Minecraft.getInstance();
         LocalPlayer player = minecraft.player;
         if (player == null) return;
@@ -118,108 +225,41 @@ public class ForgeEventBusClientEvents {
         Optional<IFluidHandlerItem> fluidHandler = FluidUtil.getFluidHandler(stack).resolve();
         if (fluidHandler.isPresent()) {
             FluidStack fluidStack = fluidHandler.get().getFluidInTank(0);
+            if (fluidStack.isEmpty()) return;
             ItemStack toRender = fluidStack.getFluid().getBucket().getDefaultInstance();
             ItemInHandRenderer itemInHandRenderer = minecraft.getEntityRenderDispatcher().getItemInHandRenderer();
 
+            renderItem(partialTick,poseStack, minecraft.renderBuffers().bufferSource(),player,packedLight,toRender,itemInHandRenderer,hand);
 
-            poseStack.pushPose();
-            player.setItemInHand(hand,toRender);
-            GameRenderer gameRenderer = minecraft.gameRenderer;
-            Camera camera = gameRenderer.getMainCamera();
-            poseStack.mulPose(Axis.XP.rotationDegrees(camera.getXRot()));
-            poseStack.mulPose(Axis.YP.rotationDegrees(camera.getYRot()));
-
-            itemInHandRenderer.renderHandsWithItems(partialTick,poseStack, minecraft.renderBuffers().bufferSource(),player,minecraft.getEntityRenderDispatcher().getPackedLightCoords(player, partialTick));
-            player.setItemInHand(hand,stack);
-            poseStack.popPose();
-
-
-//            poseStack.pushPose();
-//
-//
-//            GameRenderer gameRenderer = minecraft.gameRenderer;
-//            Camera camera = gameRenderer.getMainCamera();
-////
-////            poseStack.mulPose(Axis.XP.rotationDegrees(camera.getXRot()));
-////            poseStack.mulPose(Axis.YP.rotationDegrees(camera.getYRot()));
-////            poseStack.mulPose(Axis.XP.rotationDegrees(camera.getXRot()));
-//            //poseStack.mulPose(Axis.YP.rotationDegrees(camera.getYRot()));
-//            //poseStack.mulPose(Axis.YP.rotationDegrees(camera.getYRot() + 180.0F));
-//
-//
-//            if (minecraft.getCameraEntity() instanceof LivingEntity livingentity) {
-//                float f = (float)livingentity.hurtTime - partialTick;
-//                if (livingentity.isDeadOrDying()) {
-//                    float f1 = Math.min((float)livingentity.deathTime + partialTick, 20.0F);
-//                    poseStack.mulPose(Axis.ZP.rotationDegrees(40.0F - 8000.0F / (f1 + 200.0F)));
-//                }
-//
-////                if (f < 0.0F) {
-////                    return;
-////                }
-//
-//                f /= (float)livingentity.hurtDuration;
-//                f = Mth.sin(f * f * f * f * (float)Math.PI);
-//                float f3 = livingentity.getHurtDir();
-//                poseStack.mulPose(Axis.YP.rotationDegrees(-f3));
-//                float f2 = (float)((double)(-f) * 14.0D * minecraft.options.damageTiltStrength().get());
-//                poseStack.mulPose(Axis.ZP.rotationDegrees(f2));
-//                poseStack.mulPose(Axis.YP.rotationDegrees(f3));
-//            }
-//            if (minecraft.options.bobView().get()) {
-//                if (minecraft.getCameraEntity() instanceof Player player1) {
-//                    float f = player1.walkDist - player1.walkDistO;
-//                    float f1 = -(player1.walkDist + f * partialTick);
-//                    float f2 = Mth.lerp(partialTick, player1.oBob, player1.bob);
-//                    poseStack.translate(Mth.sin(f1 * (float)Math.PI) * f2 * 0.5F, -Math.abs(Mth.cos(f1 * (float)Math.PI) * f2), 0.0F);
-//                    poseStack.mulPose(Axis.ZP.rotationDegrees(Mth.sin(f1 * (float)Math.PI) * f2 * 3.0F));
-//                    poseStack.mulPose(Axis.XP.rotationDegrees(Math.abs(Mth.cos(f1 * (float)Math.PI - 0.2F) * f2) * 5.0F));
-//                }
-//            }
-//            float f2 = Mth.lerp(partialTick, player.xBobO, player.xBob);
-//            float f3 = Mth.lerp(partialTick, player.yBobO, player.yBob);
-//            poseStack.mulPose(Axis.XP.rotationDegrees((player.getViewXRot(partialTick) - f2) * 0.1F));
-//            poseStack.mulPose(Axis.YP.rotationDegrees((player.getViewYRot(partialTick) - f3) * 0.1F));
-//
-//
-//            int i = hand == InteractionHand.MAIN_HAND ? 1 : -1;
-//            poseStack.translate((float)i * 0.56F, -0.52F + 1 * -0.6F, -0.72F);
-//
-//            poseStack.translate(0,0.4f,-0.4f);
-//
-//            poseStack.translate((float)i * -0.4785682F, -0.094387F, 0.05731531F);
-//            poseStack.mulPose(Axis.XP.rotationDegrees(-11.935F));
-//            poseStack.mulPose(Axis.YP.rotationDegrees((float)i * 65.3F));
-//            poseStack.mulPose(Axis.ZP.rotationDegrees((float)i * -9.785F));
-//            float f9 = (float)toRender.getUseDuration() - ((float)minecraft.player.getUseItemRemainingTicks() - partialTick + 1.0F);
-//            float f13 = f9 / (float) CrossbowItem.getChargeDuration(toRender);
-//            if (f13 > 1.0F) {
-//                f13 = 1.0F;
-//            }
-//
-//            if (f13 > 0.1F) {
-//                float f16 = Mth.sin((f9 - 0.1F) * 1.3F);
-//                float f10 = f13 - 0.1F;
-//                float f4 = f16 * f10;
-//                poseStack.translate(f4 * 0.0F, f4 * 0.004F, f4 * 0.0F);
-//            }
-//
-//            poseStack.translate(f13 * 0.0F, f13 * 0.0F, f13 * 0.04F);
-//            poseStack.scale(1.0F, 1.0F, 1.0F + f13 * 0.2F);
-//            poseStack.mulPose(Axis.YN.rotationDegrees((float)i * 45.0F));
-//
-//            if (hand.equals(InteractionHand.MAIN_HAND)) {
-//                itemInHandRenderer.renderItem(player, toRender, ItemDisplayContext.FIRST_PERSON_RIGHT_HAND,
-//                        false, poseStack, multiBufferSource, packedLight);
-//            } else {
-//                itemInHandRenderer.renderItem(player, toRender, ItemDisplayContext.FIRST_PERSON_LEFT_HAND,
-//                        true, poseStack, multiBufferSource, packedLight);
-//            }
-//            poseStack.popPose();
         }
 
 
     }
+
+    public static void renderItem(float pPartialTicks, PoseStack pPoseStack, MultiBufferSource.BufferSource pBuffer, LocalPlayer pPlayerEntity, int pCombinedLight,ItemStack item,ItemInHandRenderer renderer,InteractionHand hand) {
+        float f = pPlayerEntity.getAttackAnim(pPartialTicks);
+        InteractionHand interactionhand = MoreObjects.firstNonNull(pPlayerEntity.swingingArm, InteractionHand.MAIN_HAND);
+        float f1 = Mth.lerp(pPartialTicks, pPlayerEntity.xRotO, pPlayerEntity.getXRot());
+        ItemInHandRenderer.HandRenderSelection iteminhandrenderer$handrenderselection = ItemInHandRenderer.HandRenderSelection.onlyForHand(hand);
+        float f2 = Mth.lerp(pPartialTicks, pPlayerEntity.xBobO, pPlayerEntity.xBob);
+        float f3 = Mth.lerp(pPartialTicks, pPlayerEntity.yBobO, pPlayerEntity.yBob);
+        pPoseStack.mulPose(Axis.XP.rotationDegrees((pPlayerEntity.getViewXRot(pPartialTicks) - f2) * 0.1F));
+        pPoseStack.mulPose(Axis.YP.rotationDegrees((pPlayerEntity.getViewYRot(pPartialTicks) - f3) * 0.1F));
+        if (iteminhandrenderer$handrenderselection.renderMainHand) {
+            float f4 = interactionhand == InteractionHand.MAIN_HAND ? f : 0.0F;
+            float f5 = 1.0F - Mth.lerp(pPartialTicks, renderer.oMainHandHeight, renderer.mainHandHeight);
+            renderer.renderArmWithItem(pPlayerEntity, pPartialTicks, f1, InteractionHand.MAIN_HAND, f4, item, f5, pPoseStack, pBuffer, pCombinedLight);
+        }
+
+        if (iteminhandrenderer$handrenderselection.renderOffHand) {
+            float f6 = interactionhand == InteractionHand.OFF_HAND ? f : 0.0F;
+            float f7 = 1.0F - Mth.lerp(pPartialTicks, renderer.oOffHandHeight, renderer.offHandHeight);
+            renderer.renderArmWithItem(pPlayerEntity, pPartialTicks, f1, InteractionHand.OFF_HAND, f6, item, f7, pPoseStack, pBuffer, pCombinedLight);
+        }
+
+        pBuffer.endBatch();
+    }
+
 
     private static void renderAxes(PoseStack poseStack, MultiBufferSource bufferSource, int packedLight, InteractionHand hand) {
         Minecraft minecraft = Minecraft.getInstance();
