@@ -43,6 +43,7 @@ import net.minecraftforge.fluids.ForgeFlowingFluid;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandlerItem;
 import net.minecraftforge.fluids.capability.wrappers.FluidBucketWrapper;
+import net.sinedkadis.terracompositio.block.IFluidApplicable;
 
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -88,9 +89,15 @@ public class FluidApplierItem extends Item implements DispensibleContainerItem {
                 BlockPos blockpos = blockhitresult.getBlockPos();
                 Direction direction = blockhitresult.getDirection();
                 BlockPos blockpos1 = blockpos.relative(direction);
+                BlockState blockstate1 = pLevel.getBlockState(blockpos);
+                if (blockstate1.getBlock() instanceof IFluidApplicable fluidApplicable) {
+                    IFluidApplicable.FluidApplyResult result = fluidApplicable.tryApply(pLevel,blockpos,itemstack,fluidHandlerItem);
+                    if (result.cancel()) return InteractionResultHolder.pass(itemstack);
+                    if (result.success()) return InteractionResultHolder.sidedSuccess(itemstack, pLevel.isClientSide);
+                }
                 if (pLevel.mayInteract(pPlayer, blockpos) && pPlayer.mayUseItemAt(blockpos1, direction, itemstack)) {
                     if (fluidStack.getAmount() < fluidHandlerItem.getTankCapacity(0)) {
-                        BlockState blockstate1 = pLevel.getBlockState(blockpos);
+
                         if (blockstate1.getBlock() instanceof BucketPickup bucketpickup && !pPlayer.isShiftKeyDown()) {
                             Item item = bucketpickup.pickupBlock(pLevel, blockpos, blockstate1)
                                     .getItem();

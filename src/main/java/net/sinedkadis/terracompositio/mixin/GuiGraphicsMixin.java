@@ -29,6 +29,8 @@ public class GuiGraphicsMixin {
                 ItemStack toRender = fluidStack.getFluid().getBucket().getDefaultInstance();
                 GuiGraphics guiGraphics = (GuiGraphics) (Object) this;
                 guiGraphics.renderItem(Minecraft.getInstance().player, Minecraft.getInstance().level, toRender, pX, pY, pSeed);
+                guiGraphics.renderItemDecorations(Minecraft.getInstance().font,toRender,pX,pY, String.valueOf((fluidStack.getAmount()/1000f)));
+
             }
         }
     }

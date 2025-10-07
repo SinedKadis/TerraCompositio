@@ -1,5 +1,6 @@
 package net.sinedkadis.terracompositio.mixin;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Gui;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.world.entity.player.Player;
@@ -37,7 +38,7 @@ public class GuiMixin {
                 if (fluidStack.isEmpty()) return;
                 ItemStack toRender = fluidStack.getFluid().getBucket().getDefaultInstance();
                 pGuiGraphics.renderItem(pPlayer, toRender, pX, pY, pSeed);
-
+                pGuiGraphics.renderItemDecorations(Minecraft.getInstance().font,toRender,pX,pY, String.valueOf((fluidStack.getAmount()/1000f)));
                 if (f > 0.0F) {
                     pGuiGraphics.pose().popPose();
                 }

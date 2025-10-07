@@ -1,5 +1,6 @@
 package net.sinedkadis.terracompositio.mixin;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.gui.screens.Screen;
 import net.minecraft.client.gui.screens.inventory.AbstractContainerScreen;
@@ -43,6 +44,7 @@ public class AbstractContainerScreenMixin extends Screen {
                 pGuiGraphics.renderItem(toRender, pX, pY);
                 var font = net.minecraftforge.client.extensions.common.IClientItemExtensions.of(pStack).getFont(pStack, net.minecraftforge.client.extensions.common.IClientItemExtensions.FontContext.ITEM_COUNT);
                 pGuiGraphics.renderItemDecorations(font == null ? this.font : font, pStack, pX, pY - (this.draggingItem.isEmpty() ? 0 : 8), pText);
+                pGuiGraphics.renderItemDecorations(Minecraft.getInstance().font,toRender,pX,pY, String.valueOf((fluidStack.getAmount()/1000f)));
                 pGuiGraphics.pose().popPose();
             }
         }
