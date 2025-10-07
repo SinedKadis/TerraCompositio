@@ -154,64 +154,7 @@ public class ForgeEventBusClientEvents {
                 }
             }
         });
-//        ItemStack stackL = entity.getItemInHand(InteractionHand.OFF_HAND);
-//        ItemStack stackR = entity.getItemInHand(InteractionHand.MAIN_HAND);
-//
-//        boolean isRightHand = stackR.is(TCItems.FLUID_APPLIER.get());
-//        boolean isLeftHand = stackL.is(TCItems.FLUID_APPLIER.get());
-//        if (!isLeftHand && !isRightHand) return;
-//
-//        if (isRightHand) {
-//            Optional<IFluidHandlerItem> fluidHandler = FluidUtil.getFluidHandler(stackR).resolve();
-//            if (fluidHandler.isPresent()) {
-//                FluidStack fluidStack = fluidHandler.get().getFluidInTank(0);
-//                ItemStack toRender = fluidStack.getFluid().getBucket().getDefaultInstance();
-////                itemInHandRenderer.renderItem(player,
-////                        toRender,
-////                        ItemDisplayContext.THIRD_PERSON_RIGHT_HAND,
-////                        false,
-////                        event.getPoseStack(),
-////                        event.getMultiBufferSource(),
-////                        event.getPackedLight());
-//                ItemRenderer itemRenderer = minecraft.getItemRenderer();
-//                itemRenderer.render(toRender,
-//                        ItemDisplayContext.THIRD_PERSON_RIGHT_HAND,
-//                        false,
-//                        event.getPoseStack(),
-//                        event.getMultiBufferSource(),
-//                        event.getPackedLight(),
-//                        getOverlayCoords(entity, 0.0F),
-//                        itemRenderer.getModel(toRender,entity.level(),entity,0));
-//            }
-//        }
-//
-//        if (isLeftHand) {
-//            Optional<IFluidHandlerItem> fluidHandler = FluidUtil.getFluidHandler(stackL).resolve();
-//            if (fluidHandler.isPresent()) {
-//                FluidStack fluidStack = fluidHandler.get().getFluidInTank(0);
-//                ItemStack toRender = fluidStack.getFluid().getBucket().getDefaultInstance();
-//                ItemInHandRenderer itemInHandRenderer = minecraft.getEntityRenderDispatcher().getItemInHandRenderer();
-////                itemInHandRenderer.renderItem(player,
-////                        toRender,
-////                        ItemDisplayContext.THIRD_PERSON_LEFT_HAND,
-////                        true,
-////                        event.getPoseStack(),
-////                        event.getMultiBufferSource(),
-////                        event.getPackedLight());
-//                ItemRenderer itemRenderer = minecraft.getItemRenderer();
-//                itemRenderer.render(toRender,
-//                        ItemDisplayContext.THIRD_PERSON_LEFT_HAND,
-//                        true,
-//                        event.getPoseStack(),
-//                        event.getMultiBufferSource(),
-//                        event.getPackedLight(),
-//                        getOverlayCoords(entity, 0.0F),
-//                        itemRenderer.getModel(toRender,entity.level(),entity,entity.level().random.nextInt()));
-//
-//            }
-//        }
-
-
+        renderer.addLayer(new ItemInHandLayer<>(renderer, itemInHandRenderer));
     }
 
     private static void renderOriginalBucket(PoseStack poseStack, int packedLight, InteractionHand hand, float partialTick) {
