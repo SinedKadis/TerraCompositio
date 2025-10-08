@@ -13,6 +13,7 @@ import net.minecraft.client.renderer.item.ItemProperties;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.EntityRenderersEvent;
+import net.minecraftforge.client.event.RegisterKeyMappingsEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
@@ -88,6 +89,11 @@ public class TCEventBusClientEvents {
                 (stack, level, entity, seed) ->
                         FluidApplierItem.getRenderAmount(stack)
         );
+    }
+
+    @SubscribeEvent
+    public static void registerKeyMapping(RegisterKeyMappingsEvent event) {
+        TCKeyMappings.register(event);
     }
 
     @SubscribeEvent

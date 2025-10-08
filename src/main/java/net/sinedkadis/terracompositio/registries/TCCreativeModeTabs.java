@@ -99,6 +99,10 @@ public class TCCreativeModeTabs {
                         pOutput.accept(TCBlocks.PP_SENDER.get());
 
                         pOutput.accept(TCItems.TECHNETIUM_CROWN.get());
+                        pOutput.accept(TCItems.TECHNETIUM_CLOAK.get());
+                        pOutput.accept(TCItems.TECHNETIUM_ACCUMULATORS.get());
+                        pOutput.accept(TCItems.TECHNETIUM_BOOTS.get());
+
                         pOutput.accept(TCBlocks.FLOW_CEDAR_ENT_STATUE.get());
                         pOutput.accept(TCItems.FLUID_APPLIER.get());
                     })

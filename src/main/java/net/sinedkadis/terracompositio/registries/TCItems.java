@@ -99,10 +99,18 @@ public class TCItems {
     public static final RegistryObject<Item> FLOW_CEDAR_ENT_SPAWN_EGG = ITEMS.register("flow_cedar_ent_spawn_egg",
             () -> new ForgeSpawnEggItem(TCEntities.FLOW_CEDAR_ENT, 0x352001, 0x015161, new Item.Properties()));
 
-    public static final RegistryObject<Item> TECHNETIUM_CROWN = ITEMS.register("technetium_crown",
-            () -> new TechnetiumArmorItem(ArmorItem.Type.HELMET,new Item.Properties()));
     public static final RegistryObject<Item> FLUID_APPLIER = ITEMS.register("fluid_applier",
             () -> new FluidApplierItem(new Item.Properties()));
+
+    public static final RegistryObject<Item> TECHNETIUM_CROWN = ITEMS.register("technetium_crown",
+            () -> new TechnetiumArmorItem(ArmorItem.Type.HELMET,new Item.Properties()));
+    public static final RegistryObject<Item> TECHNETIUM_CLOAK = ITEMS.register("technetium_cloak",
+            () -> new TechnetiumArmorItem(ArmorItem.Type.CHESTPLATE,new Item.Properties()));
+    public static final RegistryObject<Item> TECHNETIUM_ACCUMULATORS = ITEMS.register("technetium_accumulators",
+            () -> new TechnetiumArmorItem(ArmorItem.Type.LEGGINGS,new Item.Properties()));
+    public static final RegistryObject<Item> TECHNETIUM_BOOTS = ITEMS.register("technetium_boots",
+            () -> new TechnetiumArmorItem(ArmorItem.Type.BOOTS,new Item.Properties()));
+
 
     public static void register(IEventBus eventBus){
         ITEMS.register(eventBus);
