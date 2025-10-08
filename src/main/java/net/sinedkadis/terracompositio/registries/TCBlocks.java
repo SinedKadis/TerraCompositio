@@ -167,5 +167,7 @@ public class TCBlocks {
             () -> new Block(BlockBehaviour.Properties.copy(Blocks.NETHERITE_BLOCK)));
     public static final RegistryObject<Block> FLOW_CEDAR_ENT_STATUE = registerBlock("flow_cedar_ent_statue",
             () -> new EntStatueBlock(BlockBehaviour.Properties.copy(Blocks.OAK_PLANKS)));
+    public static final RegistryObject<Block> TECHNETIUM_BOARD = registerBlock("technetium_board",
+            () -> new TechnetiumBoardBlock(BlockBehaviour.Properties.copy(Blocks.GLASS).noLootTable().noParticlesOnBreak()));
 
 }
