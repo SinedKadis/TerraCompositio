@@ -1,8 +1,12 @@
 package net.sinedkadis.terracompositio.item.custom;
 
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.client.KeyMapping;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.HumanoidModel;
+import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.tags.BlockTags;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
@@ -10,6 +14,8 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Blocks;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.client.extensions.common.IClientItemExtensions;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.sinedkadis.terracompositio.TerraCompositio;
@@ -23,6 +29,7 @@ import net.sinedkadis.terracompositio.cfe.CFEItemWrapper;
 import net.sinedkadis.terracompositio.item.models.TechnetiumCrownModel;
 import net.sinedkadis.terracompositio.registries.TCArmorMaterials;
 import net.sinedkadis.terracompositio.registries.TCItems;
+import net.sinedkadis.terracompositio.registries.TCKeyMappings;
 import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -53,9 +60,14 @@ public class TechnetiumArmorItem extends TCArmorItem {
         if (entity instanceof Player || entity instanceof CFENetworkMemberEntity) {
             if (canEquip) {
                 if (armorType.equals(EquipmentSlot.HEAD)) {
-
                     CFENetworkMemberEntity member = ((CFENetworkMemberEntity) entity);
                     TerraCompositioAPI.INSTANCE.getCFENetworkInstance().fireCFENetworkEvent(member, NetworkAction.UPDATE);
+                }
+                if (armorType.equals(EquipmentSlot.FEET)) {
+                    CompoundTag tag = stack.getOrCreateTag();
+                    if (!tag.contains("boot_height")) {
+                        tag.putInt("boot_height", entity.getOnPos().getY());
+                    }
                 }
             }
         }
@@ -80,6 +92,51 @@ public class TechnetiumArmorItem extends TCArmorItem {
     }
 
     private void bootTick(ItemStack pStack, Level pLevel, Entity entity, ICFEHandler icfeHandler) {
+        CompoundTag tag = pStack.getOrCreateTag();
+        if (pLevel.isClientSide) {
+            if (Minecraft.getInstance().options.keyJump.consumeClick()
+                && Minecraft.getInstance().options.keyJump.consumeClick()) {
+                tag.putInt("boot_height", (int) (entity.position().y-2));
+            }
+            if (TCKeyMappings.BOOT_RAISE.getKeyMapping().consumeClick()) {
+                tag.putInt("boot_height",tag.getInt("boot_height")+1);
+                KeyMapping.click(Minecraft.getInstance().options.keyJump.getKey());
+            }
+            if (TCKeyMappings.BOOT_REDUCE.getKeyMapping().consumeClick()) {
+                tag.putInt("boot_height",tag.getInt("boot_height")-1);
+            }
+        }
+        int height;
+        if (tag.contains("boot_height")) {
+            height = tag.getInt("boot_height");
+            BlockPos onPos = BlockPos.containing(entity.position().add(0,-1,0));
+            BlockState blockState = pLevel.getBlockState(onPos);
+            BlockState boardState = Blocks.FROSTED_ICE.defaultBlockState();
+            if (blockState.is(BlockTags.REPLACEABLE)) {
+                if (!entity.isShiftKeyDown()) {
+                    if (onPos.getY() == height) {
+                        pLevel.setBlockAndUpdate(onPos, boardState);
+                        if (tag.contains("lastBlockPos")) {
+                            pLevel.setBlockAndUpdate(BlockPos.of(tag.getLong("lastBlockPos")),
+                                    Blocks.AIR.defaultBlockState());
+                        }
+                        tag.putLong("lastBlockPos", onPos.asLong());
+                    } else if (onPos.getY() - 1 == height) {
+                        pLevel.setBlockAndUpdate(onPos.below(), boardState);
+                        if (tag.contains("lastBlockPos")) {
+                            pLevel.setBlockAndUpdate(BlockPos.of(tag.getLong("lastBlockPos")),
+                                    Blocks.AIR.defaultBlockState());
+                        }
+                        tag.putLong("lastBlockPos", onPos.asLong());
+                    }
+                }
+            } else if (!blockState.is(boardState.getBlock()) && tag.contains("lastBlockPos")) {
+                pLevel.setBlockAndUpdate(BlockPos.of(tag.getLong("lastBlockPos")),
+                        Blocks.AIR.defaultBlockState());
+                tag.remove("lastBlockPos");
+            }
+
+        }
 
     }
 
@@ -91,7 +148,7 @@ public class TechnetiumArmorItem extends TCArmorItem {
             if (!type.equals(Type.LEGGINGS)) {
                 ICFEHandler leggings = DummyCFEHandler.instance;
                 for (ItemStack armor : entity.getArmorSlots()) {
-                    if (((ArmorItem) armor.getItem()).getType().equals(Type.LEGGINGS)) {
+                    if (armor.getItem() instanceof ArmorItem armorItem &&  armorItem.getType().equals(Type.LEGGINGS)) {
                         leggings = armor.getCapability(CFECapability.CFE).orElse(DummyCFEHandler.instance);
                     }
                 }

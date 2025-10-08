@@ -112,12 +112,14 @@ public class ForgeEventBusClientEvents {
     }
 
     @SubscribeEvent
-    public static <M extends EntityModel<LivingEntity> & ArmedModel> void onRenderEntity(RenderLivingEvent<LivingEntity, M> event) {
+    public static <M extends EntityModel<LivingEntity> & ArmedModel> void onRenderEntity(RenderLivingEvent<LivingEntity, EntityModel<LivingEntity>> event) {
         Minecraft minecraft = Minecraft.getInstance();
         LocalPlayer player = minecraft.player;
         if (player == null) return;
-
-        LivingEntityRenderer<LivingEntity, M> renderer = event.getRenderer();
+        LivingEntityRenderer<LivingEntity, EntityModel<LivingEntity>> renderer0 = event.getRenderer();
+        if (!(renderer0.getModel() instanceof ArmedModel)) return;
+        @SuppressWarnings("unchecked")
+        LivingEntityRenderer<LivingEntity, M> renderer = (LivingEntityRenderer<LivingEntity, M>)(Object)renderer0;
         ItemInHandRenderer itemInHandRenderer = minecraft.getEntityRenderDispatcher().getItemInHandRenderer();
 
         renderer.addLayer(new ItemInHandLayer<>(renderer, itemInHandRenderer){

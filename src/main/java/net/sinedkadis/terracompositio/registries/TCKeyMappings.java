@@ -1,6 +1,7 @@
 package net.sinedkadis.terracompositio.registries;
 
 import com.mojang.blaze3d.platform.InputConstants;
+import lombok.Getter;
 import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.player.LocalPlayer;
@@ -30,6 +31,7 @@ public enum TCKeyMappings {
             InputConstants.Type.KEYSYM,
             GLFW.GLFW_KEY_LEFT_SHIFT,
             "key.terracompositio.categories.main"));
+    @Getter
     private final KeyMapping keyMapping;
 
     TCKeyMappings(KeyMapping keyMapping) {
