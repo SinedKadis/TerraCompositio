@@ -9,6 +9,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidUtil;
 import net.minecraftforge.fluids.capability.IFluidHandlerItem;
+import net.sinedkadis.terracompositio.registries.TCItems;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.injection.At;
@@ -33,7 +34,7 @@ public class AbstractContainerScreenMixin extends Screen {
             at = @At("HEAD")
     )
     private void onRenderItemHead(GuiGraphics pGuiGraphics, ItemStack pStack, int pX, int pY, String pText, CallbackInfo ci) {
-        if (!pStack.isEmpty()) {
+        if (pStack.is(TCItems.FLUID_APPLIER.get())) {
             Optional<IFluidHandlerItem> fluidHandler = FluidUtil.getFluidHandler(pStack).resolve();
             if (fluidHandler.isPresent()) {
                 FluidStack fluidStack = fluidHandler.get().getFluidInTank(0);

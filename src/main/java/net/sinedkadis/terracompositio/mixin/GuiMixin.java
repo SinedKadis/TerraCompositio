@@ -8,6 +8,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidUtil;
 import net.minecraftforge.fluids.capability.IFluidHandlerItem;
+import net.sinedkadis.terracompositio.registries.TCItems;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
@@ -23,7 +24,7 @@ public class GuiMixin {
             at = @At("HEAD")
     )
     private void beforeRenderItem(GuiGraphics pGuiGraphics, int pX, int pY, float pPartialTick, Player pPlayer, ItemStack pStack, int pSeed, CallbackInfo ci) {
-        if (!pStack.isEmpty()) {
+        if (pStack.is(TCItems.FLUID_APPLIER.get())) {
             Optional<IFluidHandlerItem> fluidHandler = FluidUtil.getFluidHandler(pStack).resolve();
             if (fluidHandler.isPresent()) {
                 float f = (float)pStack.getPopTime() - pPartialTick;

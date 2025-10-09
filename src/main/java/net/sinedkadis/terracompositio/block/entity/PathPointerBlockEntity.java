@@ -15,6 +15,7 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
@@ -313,7 +314,7 @@ public class PathPointerBlockEntity extends TCCFEBlockEntity implements Nameable
     // Call from first member of chain
     public void updateMax() {
         Queue<List<PathPointerBlock.PPPart>> partQueue = new LinkedList<>();
-        Queue<PathPointerBlockEntity> blockEntityQueue = new LinkedList<>();
+        Queue<BlockEntity> blockEntityQueue = new LinkedList<>();
 
         List<PathPointerBlock.PPPart> parts = Arrays.asList(PathPointerBlock.getParts(getBlockState()));
         partQueue.add(parts);
@@ -322,29 +323,29 @@ public class PathPointerBlockEntity extends TCCFEBlockEntity implements Nameable
 
         while (!partQueue.isEmpty() && !blockEntityQueue.isEmpty()){
             List<PathPointerBlock.PPPart> currentPart = partQueue.poll();
-            PathPointerBlockEntity currentBE = blockEntityQueue.poll();
-            if (currentBE != null
+            BlockEntity currentBE = blockEntityQueue.poll();
+            if (currentBE instanceof PathPointerBlockEntity currentPPBE
                     && currentPart.contains(PathPointerBlock.PPPart.SENDER)
-                    && currentBE.nextNode != null) {
-                boolean bendToItself = currentBE.getBlockPos().equals(currentBE.nextNode);
-                if (!bendToItself || currentBE.toSendEntity != null) {
+                    && currentPPBE.nextNode != null) {
+                boolean bendToItself = currentPPBE.getBlockPos().equals(currentPPBE.nextNode);
+                if (!bendToItself || currentPPBE.toSendEntity != null) {
                     if (level == null) break;
-                    if (currentBE.toSendEntity != null) {
-                        int max = currentBE.toSendEntity.getCapability(CFECapability.CFE).orElseGet(() -> DummyCFEHandler.instance).getFreeSpace();
+                    if (currentPPBE.toSendEntity != null) {
+                        int max = currentPPBE.toSendEntity.getCapability(CFECapability.CFE).orElseGet(() -> DummyCFEHandler.instance).getFreeSpace();
                         this.cfeContainer.setMaxCFE(max);
-                        currentBE.cfeContainer.setMaxCFE(max).setCfeTravelSpeed(5/20f);
+                        currentPPBE.cfeContainer.setMaxCFE(max).setCfeTravelSpeed(5/20f);
                         break;
                     }
-                    BlockState state = level.getBlockState(currentBE.nextNode);
+                    BlockState state = level.getBlockState(currentPPBE.nextNode);
                     partQueue.add(Arrays.asList(PathPointerBlock.getParts(state)));
-                    blockEntityQueue.add((PathPointerBlockEntity) level.getBlockEntity(currentBE.nextNode));
+                    blockEntityQueue.add(level.getBlockEntity(currentPPBE.nextNode));
                 }
             }
-            if (currentBE != null && currentPart.contains(PathPointerBlock.PPPart.EMITTER)){
+            if (currentBE  instanceof PathPointerBlockEntity currentPPBE && currentPart.contains(PathPointerBlock.PPPart.EMITTER)){
                 if (level == null) break;
-                int max = currentBE.getMaxToEmit();
+                int max = currentPPBE.getMaxToEmit();
                 this.cfeContainer.setMaxCFE(max);
-                currentBE.cfeContainer.setMaxCFE(max).setCfeTravelSpeed(5/20f);
+                currentPPBE.cfeContainer.setMaxCFE(max).setCfeTravelSpeed(5/20f);
                 break;
             }
         }
@@ -354,7 +355,7 @@ public class PathPointerBlockEntity extends TCCFEBlockEntity implements Nameable
         int inSystem = 0;
 
         if (level != null) {
-            Queue<PathPointerBlockEntity> blockEntityQueue = new LinkedList<>();
+            Queue<BlockEntity> blockEntityQueue = new LinkedList<>();
             if (toReceiveEntity == null){
                 if (collectorPos == null) collectorPos = getCollector();
             } else {
@@ -369,11 +370,11 @@ public class PathPointerBlockEntity extends TCCFEBlockEntity implements Nameable
             }
 
             while (!blockEntityQueue.isEmpty()) {
-                PathPointerBlockEntity currentBE = blockEntityQueue.poll();
-                if (currentBE != null) {
-                    inSystem += currentBE.cfeContainer.getCFE() + currentBE.cfeContainer.getQueued();
-                    if (currentBE.nextNode != null) {
-                        blockEntityQueue.add((PathPointerBlockEntity) level.getBlockEntity(currentBE.nextNode));
+                BlockEntity currentBE = blockEntityQueue.poll();
+                if (currentBE instanceof CFENetworkMember member) {
+                    inSystem += CFENetwork.getCFEHandler(member).stream().mapToInt(icfeHandler -> icfeHandler.getCFE()+icfeHandler.getQueued()).sum();
+                    if (currentBE instanceof PathPointerBlockEntity pp && pp.nextNode != null) {
+                        blockEntityQueue.add(level.getBlockEntity(pp.nextNode));
                     }
                 }
             }
@@ -587,17 +588,17 @@ public class PathPointerBlockEntity extends TCCFEBlockEntity implements Nameable
         super.setRemoved();
         if (level != null) {
             if (this.lastNode != null) {
-                PathPointerBlockEntity last = ((PathPointerBlockEntity) level.getBlockEntity(this.lastNode));
-                if (last != null) {
-                    last.nextNode = null;
-                    last.updateRotation(false);
+                BlockEntity last = level.getBlockEntity(this.lastNode);
+                if (last instanceof PathPointerBlockEntity last1) {
+                    last1.nextNode = null;
+                    last1.updateRotation(false);
                 }
             }
             if (this.nextNode != null) {
-                PathPointerBlockEntity next = ((PathPointerBlockEntity) level.getBlockEntity(this.nextNode));
-                if (next != null) {
-                    next.lastNode = null;
-                    next.updateRotation(false);
+                BlockEntity next = level.getBlockEntity(this.nextNode);
+                if (next instanceof PathPointerBlockEntity next1) {
+                    next1.lastNode = null;
+                    next1.updateRotation(false);
                 }
             }
         }
