@@ -24,6 +24,7 @@ import net.sinedkadis.terracompositio.entity.client.FlowCedarEntModel;
 import net.sinedkadis.terracompositio.entity.client.FlowCedarEntRenderer;
 import net.sinedkadis.terracompositio.item.custom.CreationFlowJournalItem;
 import net.sinedkadis.terracompositio.item.custom.FluidApplierItem;
+import net.sinedkadis.terracompositio.item.models.TechnetiumCloakModel;
 import net.sinedkadis.terracompositio.item.models.TechnetiumCrownModel;
 import net.sinedkadis.terracompositio.registries.TCEntities;
 import net.sinedkadis.terracompositio.registries.TCBoatRenderer;
@@ -106,6 +107,8 @@ public class TCEventBusClientEvents {
         event.registerLayerDefinition(TCModelLayers.CFE_CUBE_LAYER, CFECubeModel::createBodyLayer);
 
         event.registerLayerDefinition(TCModelLayers.TECHNETIUM_CROWN_LAYER, TechnetiumCrownModel::createBodyLayer);
+        event.registerLayerDefinition(TCModelLayers.TECHNETIUM_CLOAK_LAYER, TechnetiumCloakModel::createBodyLayer);
+
     }
 
     @SubscribeEvent

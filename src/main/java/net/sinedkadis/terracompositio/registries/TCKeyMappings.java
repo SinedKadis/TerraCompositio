@@ -12,19 +12,6 @@ import net.minecraftforge.client.settings.KeyModifier;
 import org.lwjgl.glfw.GLFW;
 
 public enum TCKeyMappings {
-    BOOT_HEIGHT(new KeyMapping("item.terracompositio.technetium_boots.height",
-            new BootKeyConflictContext(),
-            KeyModifier.ALT,
-            InputConstants.Type.KEYSYM,
-            GLFW.GLFW_KEY_LEFT_CONTROL,
-            "key.terracompositio.categories.main")),
-
-    BOOT_RAISE(new KeyMapping("item.terracompositio.technetium_boots.raise",
-            new BootKeyConflictContext(),
-            KeyModifier.ALT,
-            InputConstants.Type.KEYSYM,
-            GLFW.GLFW_KEY_SPACE,
-            "key.terracompositio.categories.main")),
     BOOT_REDUCE(new KeyMapping("item.terracompositio.technetium_boots.reduce",
             new BootKeyConflictContext(),
             KeyModifier.ALT,

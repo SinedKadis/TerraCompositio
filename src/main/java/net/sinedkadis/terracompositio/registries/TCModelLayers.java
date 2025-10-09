@@ -18,4 +18,6 @@ public class TCModelLayers {
 
     public static final ModelLayerLocation TECHNETIUM_CROWN_LAYER = new ModelLayerLocation(
             TerraCompositio.modLoc( "technetium_crown"), "main");
+    public static final ModelLayerLocation TECHNETIUM_CLOAK_LAYER = new ModelLayerLocation(
+            TerraCompositio.modLoc( "technetium_cloak"), "main");
 }

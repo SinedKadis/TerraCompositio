@@ -1,7 +1,6 @@
 package net.sinedkadis.terracompositio.item.custom;
 
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.client.KeyMapping;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.core.BlockPos;
@@ -26,6 +25,7 @@ import net.sinedkadis.terracompositio.api.networks.cfe.CFECapability;
 import net.sinedkadis.terracompositio.api.networks.cfe.CFENetworkMemberEntity;
 import net.sinedkadis.terracompositio.api.networks.cfe.ICFEHandler;
 import net.sinedkadis.terracompositio.cfe.CFEItemWrapper;
+import net.sinedkadis.terracompositio.item.models.TechnetiumCloakModel;
 import net.sinedkadis.terracompositio.item.models.TechnetiumCrownModel;
 import net.sinedkadis.terracompositio.registries.TCArmorMaterials;
 import net.sinedkadis.terracompositio.registries.TCBlocks;
@@ -82,12 +82,17 @@ public class TechnetiumArmorItem extends TCArmorItem {
     public void inventoryTick(ItemStack pStack, Level pLevel, Entity entity, int pSlotId, boolean pIsSelected) {
         super.inventoryTick(pStack, pLevel, entity, pSlotId, pIsSelected);
         ICFEHandler icfeHandler = pStack.getCapability(CFECapability.CFE).orElse(DummyCFEHandler.instance);
-        transferCFE(pStack, entity, icfeHandler);
-        Type type = ((ArmorItem) pStack.getItem()).getType();
         switch (type) {
-            case BOOTS -> this.bootTick(pStack,pLevel,entity,icfeHandler);
-            case CHESTPLATE -> this.cloakTick(pStack,pLevel,entity,icfeHandler);
+            case BOOTS -> this.bootTick(pStack, pLevel, entity, icfeHandler);
+            case CHESTPLATE -> this.cloakTick(pStack, pLevel, entity, icfeHandler);
+            default -> {
+                return;
+            }
+
         }
+        transferCFE(pStack, entity, icfeHandler);
+//        Type type = ((ArmorItem) pStack.getItem()).getType();
+
     }
 
     private void cloakTick(ItemStack pStack, Level pLevel, Entity entity, ICFEHandler icfeHandler) {
@@ -102,17 +107,12 @@ public class TechnetiumArmorItem extends TCArmorItem {
                 && pLevel.getBlockState(onPos).is(BlockTags.REPLACEABLE)) {
                 tag.putInt("boot_height", entity.blockPosition().getY()-1);
             }
-            if (TCKeyMappings.BOOT_RAISE.getKeyMapping().consumeClick()) {
-                tag.putInt("boot_height",tag.getInt("boot_height")+1);
-                KeyMapping.click(Minecraft.getInstance().options.keyJump.getKey());
-            }
             if (TCKeyMappings.BOOT_REDUCE.getKeyMapping().consumeClick()) {
                 tag.putInt("boot_height",tag.getInt("boot_height")-1);
+                tag.putBoolean("update_block",true);
             }
         }
-        int height;
         if (tag.contains("boot_height")) {
-            height = tag.getInt("boot_height");
             BlockPos onPos = BlockPos.containing(entity.position().add(0,-1,0));
             BlockState blockState = pLevel.getBlockState(onPos);
             BlockState boardState = TCBlocks.TECHNETIUM_BOARD.get().defaultBlockState().setValue(WATERLOGGED,
@@ -121,24 +121,51 @@ public class TechnetiumArmorItem extends TCArmorItem {
             BlockState replaceState = boardState.getValue(WATERLOGGED)
                     ? Blocks.WATER.defaultBlockState()
                     : Blocks.AIR.defaultBlockState();
-            if (blockState.is(BlockTags.REPLACEABLE)) {
-                if (!entity.isShiftKeyDown()) {
-                    if (onPos.getY() == height) {
-                        pLevel.setBlockAndUpdate(onPos, boardState);
-                        if (tag.contains("lastBlockPos")) {
-                            pLevel.setBlockAndUpdate(BlockPos.of(tag.getLong("lastBlockPos")),
-                                    replaceState);
+            if (!pLevel.isClientSide){
+                if (blockState.is(BlockTags.REPLACEABLE)) {
+                    if (!entity.isShiftKeyDown()) {
+                        if (onPos.getY() == tag.getInt("boot_height")) {
+                            pLevel.setBlockAndUpdate(onPos, boardState);
+                            if (tag.contains("lastBlockPos")) {
+                                pLevel.setBlockAndUpdate(BlockPos.of(tag.getLong("lastBlockPos")),
+                                        replaceState);
+                            }
+                            tag.putLong("lastBlockPos", onPos.asLong());
                         }
-                        tag.putLong("lastBlockPos", onPos.asLong());
+                    }
+                } else if (!blockState.is(boardState.getBlock()) && tag.contains("lastBlockPos")) {
+                    pLevel.setBlockAndUpdate(BlockPos.of(tag.getLong("lastBlockPos")),
+                            replaceState);
+                    tag.remove("lastBlockPos");
+                }
+                if (tag.contains("update_block")
+                        && tag.getBoolean("update_block")) {
+                    pLevel.setBlockAndUpdate(onPos, boardState);
+                    if (tag.contains("lastBlockPos")) {
+                        pLevel.setBlockAndUpdate(BlockPos.of(tag.getLong("lastBlockPos")),
+                                replaceState);
+                    }
+                    tag.putLong("lastBlockPos", onPos.asLong());
+                    tag.putBoolean("update_block",false);
+                }
+                boolean isOn = false;
+                for (ItemStack armorSlot : entity.getArmorSlots()) {
+                    if (armorSlot == pStack) {
+                        isOn = true;
+                        break;
                     }
                 }
-            } else if (!blockState.is(boardState.getBlock()) && tag.contains("lastBlockPos")) {
-                pLevel.setBlockAndUpdate(BlockPos.of(tag.getLong("lastBlockPos")),
-                        replaceState);
-                tag.remove("lastBlockPos");
-            }
 
+                if (!isOn) {
+                    if (tag.contains("lastBlockPos")) {
+                        pLevel.setBlockAndUpdate(BlockPos.of(tag.getLong("lastBlockPos")),
+                                replaceState);
+                    }
+                }
+            }
         }
+
+
 
     }
 
@@ -174,7 +201,11 @@ public class TechnetiumArmorItem extends TCArmorItem {
 
     @Override
     public @Nullable String getArmorTexture(ItemStack stack, Entity entity, EquipmentSlot slot, String type) {
-        return TerraCompositio.MOD_ID + ":textures/models/armor/technetium_crown.png";
+        return switch (slot) {
+            case HEAD -> TerraCompositio.MOD_ID + ":textures/models/armor/technetium_crown.png";
+            case CHEST -> TerraCompositio.MOD_ID + ":textures/models/armor/technetium_cloak.png";
+            default -> null;
+        };
     }
 
     @Override
@@ -183,6 +214,7 @@ public class TechnetiumArmorItem extends TCArmorItem {
             @Override
             public HumanoidModel<?> getHumanoidArmorModel(LivingEntity living, ItemStack stack, EquipmentSlot slot, HumanoidModel<?> defaultModel) {
                 if (stack.is(TCItems.TECHNETIUM_CROWN.get())) return TechnetiumCrownModel.bakedInstance;
+                if (stack.is(TCItems.TECHNETIUM_CLOAK.get())) return TechnetiumCloakModel.bakedInstance;
                 return defaultModel;
             }
         });

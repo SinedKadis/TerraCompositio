@@ -73,10 +73,8 @@ public class ForgeEventBusClientEvents {
         Player player = event.player;
         Level level = player.level();
 
-        // Проверяем, что в руке палка
         if (!player.getMainHandItem().is(TCItems.WRENCH_AXE.get())) return;
 
-        // Получаем блок, на который смотрит игрок
         HitResult hit = Minecraft.getInstance().hitResult;
         if (!(hit instanceof BlockHitResult blockHit)) return;
 

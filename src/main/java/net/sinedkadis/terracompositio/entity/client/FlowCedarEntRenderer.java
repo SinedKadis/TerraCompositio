@@ -12,6 +12,7 @@ import net.sinedkadis.terracompositio.TerraCompositio;
 import net.sinedkadis.terracompositio.api.networks.cfe.ICFEHandler;
 import net.sinedkadis.terracompositio.api.networks.cfe.CFECapability;
 import net.sinedkadis.terracompositio.entity.custom.FlowCedarEntEntity;
+import net.sinedkadis.terracompositio.item.models.TechnetiumCloakModel;
 import net.sinedkadis.terracompositio.item.models.TechnetiumCrownModel;
 import net.sinedkadis.terracompositio.registries.TCModelLayers;
 
@@ -31,6 +32,7 @@ public class FlowCedarEntRenderer extends MobRenderer<FlowCedarEntEntity,FlowCed
         this.cfeCubeModel = new CFECubeModel<>(pContext.bakeLayer(TCModelLayers.CFE_CUBE_LAYER));
 
         TechnetiumCrownModel.bake(pContext);
+        TechnetiumCloakModel.bake(pContext);
     }
 
     @Override
