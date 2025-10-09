@@ -40,8 +40,7 @@ public class TCBlockStateProvider extends BlockStateProvider {
         blockWithItem(TCBlocks.TECHNETIUM_DEEPSLATE_ORE);
         blockWithItem(TCBlocks.TECHNETIUM_RAW_ORE_BLOCK);
         blockWithItem(TCBlocks.TECHNETIUM_BLOCK);
-        blockWithItem(TCBlocks.TECHNETIUM_BOARD);
-
+        blockSideTopBottom(TCBlocks.TECHNETIUM_BOARD);
 
 
         stairsBlock(((StairBlock) TCBlocks.FLOW_CEDAR_STAIRS.get()),blockTexture(TCBlocks.FLOW_CEDAR_PLANKS.get()));
@@ -58,6 +57,22 @@ public class TCBlockStateProvider extends BlockStateProvider {
 
 
         saplingBlock(TCBlocks.FLOW_CEDAR_SAPLING);
+    }
+
+    private void blockSideTopBottom(RegistryObject<Block> blockRegistryObject) {
+        Block block = blockRegistryObject.get();
+        simpleBlockWithItem(block,
+                models().cubeBottomTop(name(block),
+                        Objects.requireNonNull(TerraCompositio.modLoc("block/"+
+                                Objects.requireNonNull(ForgeRegistries.BLOCKS.getKey(
+                                        block)).getPath()+"_side")),
+                        Objects.requireNonNull(TerraCompositio.modLoc("block/"+
+                                Objects.requireNonNull(ForgeRegistries.BLOCKS.getKey(
+                                        block)).getPath()+"_bottom")),
+                        Objects.requireNonNull(TerraCompositio.modLoc("block/"+
+                                Objects.requireNonNull(ForgeRegistries.BLOCKS.getKey(
+                                        block)).getPath()+"_top")))
+                        .renderType("translucent"));
     }
 
     private void saplingBlock(RegistryObject<Block> blockRegistryObject) {

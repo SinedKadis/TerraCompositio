@@ -97,9 +97,10 @@ public class TechnetiumArmorItem extends TCArmorItem {
     private void bootTick(ItemStack pStack, Level pLevel, Entity entity, ICFEHandler icfeHandler) {
         CompoundTag tag = pStack.getOrCreateTag();
         if (pLevel.isClientSide) {
+            BlockPos onPos = BlockPos.containing(entity.position().add(0,-1,0));
             if (Minecraft.getInstance().options.keyJump.consumeClick()
-                && Minecraft.getInstance().options.keyJump.consumeClick()) {
-                tag.putInt("boot_height", (int) (entity.position().y-2));
+                && pLevel.getBlockState(onPos).is(BlockTags.REPLACEABLE)) {
+                tag.putInt("boot_height", entity.blockPosition().getY()-1);
             }
             if (TCKeyMappings.BOOT_RAISE.getKeyMapping().consumeClick()) {
                 tag.putInt("boot_height",tag.getInt("boot_height")+1);
@@ -114,30 +115,26 @@ public class TechnetiumArmorItem extends TCArmorItem {
             height = tag.getInt("boot_height");
             BlockPos onPos = BlockPos.containing(entity.position().add(0,-1,0));
             BlockState blockState = pLevel.getBlockState(onPos);
-            BlockState boardState = TCBlocks.TECHNETIUM_BOARD.get().defaultBlockState();
+            BlockState boardState = TCBlocks.TECHNETIUM_BOARD.get().defaultBlockState().setValue(WATERLOGGED,
+                    (blockState.hasProperty(WATERLOGGED) && blockState.getValue(WATERLOGGED))
+                            || (blockState.getFluidState().isSource() && blockState.is(Blocks.WATER)));
+            BlockState replaceState = boardState.getValue(WATERLOGGED)
+                    ? Blocks.WATER.defaultBlockState()
+                    : Blocks.AIR.defaultBlockState();
             if (blockState.is(BlockTags.REPLACEABLE)) {
                 if (!entity.isShiftKeyDown()) {
                     if (onPos.getY() == height) {
-                        pLevel.setBlockAndUpdate(onPos, boardState.setValue(WATERLOGGED,
-                                blockState.hasProperty(WATERLOGGED) && blockState.getValue(WATERLOGGED)));
+                        pLevel.setBlockAndUpdate(onPos, boardState);
                         if (tag.contains("lastBlockPos")) {
                             pLevel.setBlockAndUpdate(BlockPos.of(tag.getLong("lastBlockPos")),
-                                    Blocks.AIR.defaultBlockState());
+                                    replaceState);
                         }
                         tag.putLong("lastBlockPos", onPos.asLong());
                     }
-//                    else if (onPos.getY() - 1 == height) {
-//                        pLevel.setBlockAndUpdate(onPos.below(), boardState);
-//                        if (tag.contains("lastBlockPos")) {
-//                            pLevel.setBlockAndUpdate(BlockPos.of(tag.getLong("lastBlockPos")),
-//                                    Blocks.AIR.defaultBlockState());
-//                        }
-//                        tag.putLong("lastBlockPos", onPos.asLong());
-//                    }
                 }
             } else if (!blockState.is(boardState.getBlock()) && tag.contains("lastBlockPos")) {
                 pLevel.setBlockAndUpdate(BlockPos.of(tag.getLong("lastBlockPos")),
-                        Blocks.AIR.defaultBlockState());
+                        replaceState);
                 tag.remove("lastBlockPos");
             }
 

@@ -1,0 +1,9 @@
+{
+  "parent": "minecraft:block/cube_bottom_top",
+  "render_type": "minecraft:translucent",
+  "textures": {
+    "bottom": "terracompositio:block/technetium_board_bottom",
+    "side": "terracompositio:block/technetium_board_side",
+    "top": "terracompositio:block/technetium_board_top"
+  }
+}
