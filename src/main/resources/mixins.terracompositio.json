@@ -16,7 +16,7 @@
     "BookGuiMixin",
     "GuiGraphicsMixin",
     "GuiMixin",
-    "ItemRendererMixin"
+    "ItemEntityRendererMixin"
   ],
   "server": [],
   "injectors": {
