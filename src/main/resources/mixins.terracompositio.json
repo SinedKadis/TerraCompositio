@@ -15,7 +15,8 @@
     "AbstractContainerScreenMixin",
     "BookGuiMixin",
     "GuiGraphicsMixin",
-    "GuiMixin"
+    "GuiMixin",
+    "ItemRendererMixin"
   ],
   "server": [],
   "injectors": {

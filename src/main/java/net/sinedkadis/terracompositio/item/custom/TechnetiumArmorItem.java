@@ -14,6 +14,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.material.Fluids;
 import net.minecraftforge.client.extensions.common.IClientItemExtensions;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.sinedkadis.terracompositio.TerraCompositio;
@@ -99,28 +100,23 @@ public class TechnetiumArmorItem extends TCArmorItem {
 
     private void bootTick(ItemStack pStack, Level pLevel, Entity entity, ICFEHandler icfeHandler) {
         CompoundTag tag = pStack.getOrCreateTag();
-//        if (pLevel.isClientSide) {
-//            BlockPos onPos = BlockPos.containing(entity.position().add(0,-1,0));
-//            if (Minecraft.getInstance().options.keyJump.consumeClick()
-//                && pLevel.getBlockState(onPos).is(BlockTags.REPLACEABLE)) {
-//                tag.putInt("boot_height", (int) (entity.position().y-1));
-//            }
-//            if (TCKeyMappings.BOOT_REDUCE.getKeyMapping().consumeClick()) {
-//                tag.putInt("boot_height",tag.getInt("boot_height")-1);
-//                tag.putBoolean("update_block",true);
-//            }
-//        }
         BlockPos onPos = BlockPos.containing(entity.position().add(0,-1,0));
-        BlockState blockState = pLevel.getBlockState(onPos);
+        BlockState blockStateOn = pLevel.getBlockState(onPos);
+        //pLevel.getBlockState(onPos.below(2)).is(BlockTags.REPLACEABLE)
+        if (blockStateOn.is(BlockTags.REPLACEABLE)
+                && ((LivingEntity) entity).jumping) {
+            if (!tag.contains("boot_height")) {
+                tag.putInt("boot_height", (int) Math.round(entity.position().y-1));
+            }
+        }
         if (tag.contains("boot_height")) {
             BlockState boardState = TCBlocks.TECHNETIUM_BOARD.get().defaultBlockState().setValue(WATERLOGGED,
-                    (blockState.hasProperty(WATERLOGGED) && blockState.getValue(WATERLOGGED))
-                            || (blockState.getFluidState().isSource() && blockState.is(Blocks.WATER)));
+                    blockStateOn.getFluidState().is(Fluids.WATER));
             BlockState replaceState = boardState.getValue(WATERLOGGED)
                     ? Blocks.WATER.defaultBlockState()
                     : Blocks.AIR.defaultBlockState();
 
-                if (blockState.is(BlockTags.REPLACEABLE)) {
+                if (blockStateOn.is(BlockTags.REPLACEABLE)) {
                     if (!entity.isShiftKeyDown()) {
                         if (onPos.getY() == tag.getInt("boot_height")) {
                             pLevel.setBlockAndUpdate(onPos, boardState);
@@ -131,7 +127,7 @@ public class TechnetiumArmorItem extends TCArmorItem {
                             tag.putLong("lastBlockPos", onPos.asLong());
                         }
                     }
-                } else if (!blockState.is(boardState.getBlock()) && tag.contains("lastBlockPos")) {
+                } else if (!blockStateOn.is(boardState.getBlock()) && tag.contains("lastBlockPos")) {
                     pLevel.setBlockAndUpdate(BlockPos.of(tag.getLong("lastBlockPos")),
                             replaceState);
                     tag.remove("lastBlockPos");
@@ -152,14 +148,6 @@ public class TechnetiumArmorItem extends TCArmorItem {
                     }
                 }
 
-        } else {
-
-            if (blockState.is(BlockTags.REPLACEABLE)
-                    && pLevel.getBlockState(onPos.below(2)).is(BlockTags.REPLACEABLE)) {
-                if (!tag.contains("boot_height")) {
-                    tag.putInt("boot_height", (int) (entity.position().y-1));
-                }
-            }
         }
 
 

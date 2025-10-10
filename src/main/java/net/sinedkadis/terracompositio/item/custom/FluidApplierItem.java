@@ -89,8 +89,8 @@ public class FluidApplierItem extends Item implements DispensibleContainerItem {
                 BlockPos blockpos = blockhitresult.getBlockPos();
                 Direction direction = blockhitresult.getDirection();
                 BlockPos blockpos1 = blockpos.relative(direction);
-                BlockState blockstate1 = pLevel.getBlockState(blockpos);
-                if (blockstate1.getBlock() instanceof IFluidApplicable fluidApplicable) {
+                BlockState blockState = pLevel.getBlockState(blockpos);
+                if (blockState.getBlock() instanceof IFluidApplicable fluidApplicable) {
                     IFluidApplicable.FluidApplyResult result = fluidApplicable.tryApply(pLevel,blockpos,itemstack,fluidHandlerItem);
                     if (result.cancel()) return InteractionResultHolder.pass(itemstack);
                     if (result.success()) return InteractionResultHolder.sidedSuccess(itemstack, pLevel.isClientSide);
@@ -98,15 +98,15 @@ public class FluidApplierItem extends Item implements DispensibleContainerItem {
                 if (pLevel.mayInteract(pPlayer, blockpos) && pPlayer.mayUseItemAt(blockpos1, direction, itemstack)) {
                     if (fluidStack.getAmount() < fluidHandlerItem.getTankCapacity(0)) {
 
-                        if (blockstate1.getBlock() instanceof BucketPickup bucketpickup && !pPlayer.isShiftKeyDown()) {
-                            Item item = bucketpickup.pickupBlock(pLevel, blockpos, blockstate1)
+                        if (blockState.getBlock() instanceof BucketPickup bucketpickup && !pPlayer.isShiftKeyDown()) {
+                            Item item = bucketpickup.pickupBlock(pLevel, blockpos, blockState)
                                     .getItem();
                             if (item instanceof AirItem) return InteractionResultHolder.fail(itemstack);
                             Fluid fluid1 = ((BucketItem) item).getFluid();
                             FluidStack resource = new FluidStack(fluid1, 1000);
                             if (fluidHandlerItem.fill(resource, IFluidHandler.FluidAction.SIMULATE) == 1000) {
                                 pPlayer.awardStat(Stats.ITEM_USED.get(this));
-                                bucketpickup.getPickupSound(blockstate1).ifPresent((p_150709_) -> pPlayer.playSound(p_150709_, 1.0F, 1.0F));
+                                bucketpickup.getPickupSound(blockState).ifPresent((p_150709_) -> pPlayer.playSound(p_150709_, 1.0F, 1.0F));
                                 pLevel.gameEvent(pPlayer, GameEvent.FLUID_PICKUP, blockpos);
                                 if (!pLevel.isClientSide) {
                                     CriteriaTriggers.FILLED_BUCKET.trigger((ServerPlayer) pPlayer, itemstack);
