@@ -1,17 +1,7 @@
 {
   "parent": "item/generated",
   "textures": {
-    "layer0": "terracompositio:item/fluid_applier_empty"
-  },
-  "overrides": [
-
-    {"predicate": {"amount": 1.0}, "model": "terracompositio:item/fluid_applier_filled"},
-    {"predicate": {"amount": 2.0}, "model": "terracompositio:item/fluid_applier_filled"},
-    {"predicate": {"amount": 3.0}, "model": "terracompositio:item/fluid_applier_filled"},
-    {"predicate": {"amount": 4.0}, "model": "terracompositio:item/fluid_applier_filled"},
-    {"predicate": {"amount": 5.0}, "model": "terracompositio:item/fluid_applier_filled"},
-    {"predicate": {"amount": 6.0}, "model": "terracompositio:item/fluid_applier_filled"},
-    {"predicate": {"amount": 7.0}, "model": "terracompositio:item/fluid_applier_filled"},
-    {"predicate": {"amount": 8.0}, "model": "terracompositio:item/fluid_applier_filled"}
-    ]
+    "layer0": "terracompositio:item/fluid_applier_base",
+    "layer1": "terracompositio:item/fluid_applier_overlay"
+  }
 }

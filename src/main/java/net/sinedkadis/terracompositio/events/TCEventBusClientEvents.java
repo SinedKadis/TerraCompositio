@@ -1,5 +1,6 @@
 package net.sinedkadis.terracompositio.events;
 
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.client.model.BoatModel;
 import net.minecraft.client.model.ChestBoatModel;
@@ -10,11 +11,16 @@ import net.minecraft.client.renderer.blockentity.HangingSignRenderer;
 import net.minecraft.client.renderer.blockentity.SignRenderer;
 import net.minecraft.client.renderer.entity.EntityRenderers;
 import net.minecraft.client.renderer.item.ItemProperties;
+import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.EntityRenderersEvent;
+import net.minecraftforge.client.event.RegisterColorHandlersEvent;
 import net.minecraftforge.client.event.RegisterKeyMappingsEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
+import net.minecraftforge.fluids.FluidStack;
+import net.minecraftforge.fluids.FluidUtil;
+import net.minecraftforge.fluids.capability.IFluidHandlerItem;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.sinedkadis.terracompositio.TerraCompositio;
@@ -34,6 +40,8 @@ import net.sinedkadis.terracompositio.item.custom.WrenchAxeItem;
 import net.sinedkadis.terracompositio.registries.*;
 import net.sinedkadis.terracompositio.screen.FlowBlockPortScreen;
 import net.sinedkadis.terracompositio.screen.TCMenuTypes;
+
+import java.util.Optional;
 
 @Mod.EventBusSubscriber(modid = TerraCompositio.MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD,value = Dist.CLIENT)
 public class TCEventBusClientEvents {
@@ -90,6 +98,30 @@ public class TCEventBusClientEvents {
                 (stack, level, entity, seed) ->
                         FluidApplierItem.getRenderAmount(stack)
         );
+    }
+
+    @SubscribeEvent
+    public static void registerColorHandlers(RegisterColorHandlersEvent.Item event) {
+        event.register((pStack, pTintIndex) -> {
+            if (pTintIndex == 1) {
+                Optional<IFluidHandlerItem> fluidHandler = FluidUtil.getFluidHandler(pStack).resolve();
+                if (fluidHandler.isPresent()) {
+                    FluidStack fluid = fluidHandler.get().getFluidInTank(0);
+                    if (!fluid.isEmpty()) {
+                         // 0 = base, 1 = overlay
+                            if (Minecraft.getInstance().level != null) {
+                                return event.getBlockColors().getColor(
+                                                fluid.getFluid().defaultFluidState().createLegacyBlock(),
+                                                Minecraft.getInstance().level,
+                                                BlockPos.ZERO.above(100));
+                            }
+                        }
+                    }
+                    return 0x000000;
+                }
+
+            return 0xFFFFFF;
+        },TCItems.FLUID_APPLIER.get());
     }
 
     @SubscribeEvent
