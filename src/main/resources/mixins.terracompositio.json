@@ -12,11 +12,7 @@
     "accessors.BundleItemAccessor"
   ],
   "client": [
-    "AbstractContainerScreenMixin",
-    "BookGuiMixin",
-    "GuiGraphicsMixin",
-    "GuiMixin",
-    "ItemEntityRendererMixin"
+    "BookGuiMixin"
   ],
   "server": [],
   "injectors": {
