@@ -181,7 +181,7 @@
   "book.terracompositio.creation_flow_journal.entry.cedar_armor.name": "Cedar book port",
   "book.terracompositio.creation_flow_journal.entry.cedar_armor.page1": "test",
 
-  "book.terracompositio.creation_flow_journal.category.day_2.name": "First day",
+  "book.terracompositio.creation_flow_journal.category.day_2.name": "Second day",
   "book.terracompositio.creation_flow_journal.category.day_2.description": "The unusual cedar tree does its own observations? <br>Nice)",
 
   "book.terracompositio.creation_flow_journal.entry.wedge.name": "Wedge",
@@ -197,6 +197,23 @@
   "book.terracompositio.creation_flow_journal.entry.activated_cedar_armor.name": "Activated Cedar Armor",
   "book.terracompositio.creation_flow_journal.entry.activated_cedar_armor.page1": "test",
   "book.terracompositio.creation_flow_journal.entry.activated_cedar_armor.page2.title": "test",
-  "book.terracompositio.creation_flow_journal.entry.activated_cedar_armor.page2": "test"
+  "book.terracompositio.creation_flow_journal.entry.activated_cedar_armor.page2": "test",
+
+  "book.terracompositio.creation_flow_journal.entry.desorbers.name": "Flow Desorbers",
+  "book.terracompositio.creation_flow_journal.entry.desorbers.page1": "test",
+  "book.terracompositio.creation_flow_journal.entry.desorbers.page2.title": "test",
+  "book.terracompositio.creation_flow_journal.entry.desorbers.page2": "test",
+  "book.terracompositio.creation_flow_journal.entry.desorbers.page3.title": "test",
+  "book.terracompositio.creation_flow_journal.entry.desorbers.page3": "test",
+  "book.terracompositio.creation_flow_journal.entry.desorbers.page4.title": "test",
+  "book.terracompositio.creation_flow_journal.entry.desorbers.page4": "test",
+
+  "book.terracompositio.creation_flow_journal.category.day_3.name": "Third day",
+  "book.terracompositio.creation_flow_journal.category.day_3.description": "The unusual cedar tree does its own observations? <br>Nice)",
+
+  "book.terracompositio.creation_flow_journal.entry.flow_infuser.name": "Flow infuser",
+  "book.terracompositio.creation_flow_journal.entry.flow_infuser.page1": "test",
+  "book.terracompositio.creation_flow_journal.entry.flow_infuser.page2": "test",
+  "book.terracompositio.creation_flow_journal.entry.flow_infuser.page3": "test"
 
 }

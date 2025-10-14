@@ -219,9 +219,11 @@ public class TCRecipeProvider extends RecipeProvider implements IConditionBuilde
                 .unlockedBy(getHasName(TCBlocks.FLOW_CEDAR_LOG.get()), has(TCBlocks.FLOW_CEDAR_LOG.get()))
                 .save(pWriter);
         ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, TCBlocks.TIME_PASSAGE_DESORBER.get())
+                .pattern(" R ")
                 .pattern("ILI")
                 .pattern("III")
                 .define('I', Items.GOLD_INGOT)
+                .define('R', Items.REDSTONE)
                 .define('L', TCTags.Items.FLOW_CEDAR_LOGS)
                 .unlockedBy(getHasName(TCBlocks.FLOW_CEDAR_LOG.get()), has(TCBlocks.FLOW_CEDAR_LOG.get()))
                 .save(pWriter);

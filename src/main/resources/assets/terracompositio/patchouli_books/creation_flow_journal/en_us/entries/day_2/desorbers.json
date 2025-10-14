@@ -1,0 +1,25 @@
+{
+  "name": "book.terracompositio.creation_flow_journal.entry.desorbers.name",
+  "category": "terracompositio:day_2",
+  "icon": "terracompositio:time_passage_desorber",
+  "flag": "terracompositio:day_2",
+  "pages": [
+    "book.terracompositio.creation_flow_journal.entry.desorbers.page1",
+    {
+      "type": "patchouli:crafting",
+      "recipe": "terracompositio:construction_desorber",
+      "text": "book.terracompositio.creation_flow_journal.entry.desorbers.page2"
+    },
+    {
+      "type": "patchouli:crafting",
+      "recipe": "terracompositio:cultivation_desorber",
+      "text": "book.terracompositio.creation_flow_journal.entry.desorbers.page3"
+    },
+    {
+      "type": "patchouli:crafting",
+      "recipe": "terracompositio:time_passage_desorber",
+      "text": "book.terracompositio.creation_flow_journal.entry.desorbers.page4"
+    }
+
+  ]
+}

@@ -1,0 +1,21 @@
+{
+  "name": "book.terracompositio.creation_flow_journal.entry.flow_infuser.name",
+  "category": "terracompositio:day_3",
+  "icon": "terracompositio:flow_infuser",
+  "flag": "terracompositio:day_3",
+  "pages": [
+    "book.terracompositio.creation_flow_journal.entry.flow_infuser.page1",
+    {
+      "type": "patchouli:crafting",
+      "recipe": "terracompositio:construction_desorber",
+      "text": "book.terracompositio.creation_flow_journal.entry.flow_infuser.page2"
+    },
+    {
+      "type": "patchouli:image",
+      "images": [
+        "terracompositio:textures/illustrations/flow_infuser_image.png"
+      ],
+      "text": "book.terracompositio.creation_flow_journal.entry.flow_infuser.page3"
+    }
+  ]
+}
