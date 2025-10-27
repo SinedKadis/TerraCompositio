@@ -92,12 +92,12 @@ public class TCEventBusClientEvents {
                 (stack, level, entity, seed) ->
                         CreationFlowJournalItem.isOpen() ? 1.0F : 0.0F
         );
-        ItemProperties.register(
-                TCItems.FLUID_APPLIER.get(),
-                ResourceLocation.parse("amount"),
-                (stack, level, entity, seed) ->
-                        FluidApplierItem.getRenderAmount(stack)
-        );
+//        ItemProperties.register(
+//                TCItems.FLUID_APPLIER.get(),
+//                ResourceLocation.parse("amount"),
+//                (stack, level, entity, seed) ->
+//                        FluidApplierItem.getRenderAmount(stack)
+//        );
     }
 
     @SubscribeEvent

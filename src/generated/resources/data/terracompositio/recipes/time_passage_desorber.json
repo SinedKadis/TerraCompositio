@@ -7,9 +7,13 @@
     },
     "L": {
       "tag": "terracompositio:flow_cedar_logs_items"
+    },
+    "R": {
+      "item": "minecraft:redstone"
     }
   },
   "pattern": [
+    " R ",
     "ILI",
     "III"
   ],

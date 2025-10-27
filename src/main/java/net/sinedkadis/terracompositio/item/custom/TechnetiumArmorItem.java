@@ -1,7 +1,9 @@
 package net.sinedkadis.terracompositio.item.custom;
 
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.HumanoidModel;
+import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.tags.BlockTags;
@@ -102,56 +104,101 @@ public class TechnetiumArmorItem extends TCArmorItem {
         CompoundTag tag = pStack.getOrCreateTag();
         BlockPos onPos = BlockPos.containing(entity.position().add(0,-1,0));
         BlockState blockStateOn = pLevel.getBlockState(onPos);
-        //pLevel.getBlockState(onPos.below(2)).is(BlockTags.REPLACEABLE)
-        if (blockStateOn.is(BlockTags.REPLACEABLE)
-                && ((LivingEntity) entity).jumping) {
-            if (!tag.contains("boot_height")) {
-                tag.putInt("boot_height", (int) Math.round(entity.position().y-1));
+        LivingEntity livingEntity = (LivingEntity) entity;
+        CompoundTag persistentData = livingEntity.getPersistentData();
+
+
+
+
+
+
+
+
+
+
+
+
+
+//        if (persistentData.contains("isJumping") && persistentData.getBoolean("isJumping")) {
+//            changeHeightfromAngle(tag, livingEntity);
+//        }
+//
+//
+//        if (blockStateOn.is(BlockTags.REPLACEABLE)) {
+//
+//            if (!tag.contains("boot_height")) {
+//                tag.putInt("boot_height", (int) Math.round(entity.position().y-1));
+//            }
+//
+//        }
+//        if (tag.contains("boot_height")) {
+//            BlockState boardState = TCBlocks.TECHNETIUM_BOARD.get().defaultBlockState().setValue(WATERLOGGED,
+//                    blockStateOn.getFluidState().is(Fluids.WATER));
+//            BlockState replaceState = boardState.getValue(WATERLOGGED)
+//                    ? Blocks.WATER.defaultBlockState()
+//                    : Blocks.AIR.defaultBlockState();
+//
+//                if (blockStateOn.is(BlockTags.REPLACEABLE)) {
+//                    if (!entity.isShiftKeyDown()) {
+//                        if (onPos.getY() == tag.getInt("boot_height")) {
+//                            if (persistentData.contains("isJumping") && persistentData.getBoolean("isJumping")) {
+//                                changeHeightfromAngle(tag, livingEntity);
+//                            }
+//                            pLevel.setBlockAndUpdate(onPos, boardState);
+//                            if (tag.contains("lastBlockPos")) {
+//                                pLevel.setBlockAndUpdate(BlockPos.of(tag.getLong("lastBlockPos")),
+//                                        replaceState);
+//                            }
+//                            tag.putLong("lastBlockPos", onPos.asLong());
+//                            tag.putBoolean("allow_height_change",true);
+//                        }
+//                    }
+//                } else if (!blockStateOn.is(boardState.getBlock()) && tag.contains("lastBlockPos")) {
+//                    pLevel.setBlockAndUpdate(BlockPos.of(tag.getLong("lastBlockPos")),
+//                            replaceState);
+//                    tag.remove("lastBlockPos");
+//                    tag.remove("boot_height");
+//                }
+//                boolean isOn = false;
+//                for (ItemStack armorSlot : entity.getArmorSlots()) {
+//                    if (armorSlot == pStack) {
+//                        isOn = true;
+//                        break;
+//                    }
+//                }
+//
+//                if (!isOn) {
+//                    if (tag.contains("lastBlockPos")) {
+//                        pLevel.setBlockAndUpdate(BlockPos.of(tag.getLong("lastBlockPos")),
+//                                replaceState);
+//                    }
+//                    tag.remove("lastBlockPos");
+//                    tag.remove("boot_height");
+//                    tag.remove("allow_height_change");
+//                }
+//
+//        }
+
+
+
+    }
+
+    private static void changeHeightfromAngle(CompoundTag tag, LivingEntity livingEntity) {
+        if (tag.contains("boot_height")
+                && tag.contains("allow_height_change")
+                && tag.getBoolean("allow_height_change")) {
+            float viewXRot = -livingEntity.getXRot();
+            boolean b = true;
+            if (viewXRot > 30) {
+                tag.putInt("boot_height", tag.getInt("boot_height")+1);
+                b = false;
             }
+            if (viewXRot < -30) {
+                tag.putInt("boot_height", tag.getInt("boot_height")-1);
+                b = false;
+            }
+            tag.putBoolean("allow_height_change",b);
         }
-        if (tag.contains("boot_height")) {
-            BlockState boardState = TCBlocks.TECHNETIUM_BOARD.get().defaultBlockState().setValue(WATERLOGGED,
-                    blockStateOn.getFluidState().is(Fluids.WATER));
-            BlockState replaceState = boardState.getValue(WATERLOGGED)
-                    ? Blocks.WATER.defaultBlockState()
-                    : Blocks.AIR.defaultBlockState();
-
-                if (blockStateOn.is(BlockTags.REPLACEABLE)) {
-                    if (!entity.isShiftKeyDown()) {
-                        if (onPos.getY() == tag.getInt("boot_height")) {
-                            pLevel.setBlockAndUpdate(onPos, boardState);
-                            if (tag.contains("lastBlockPos")) {
-                                pLevel.setBlockAndUpdate(BlockPos.of(tag.getLong("lastBlockPos")),
-                                        replaceState);
-                            }
-                            tag.putLong("lastBlockPos", onPos.asLong());
-                        }
-                    }
-                } else if (!blockStateOn.is(boardState.getBlock()) && tag.contains("lastBlockPos")) {
-                    pLevel.setBlockAndUpdate(BlockPos.of(tag.getLong("lastBlockPos")),
-                            replaceState);
-                    tag.remove("lastBlockPos");
-                    tag.remove("boot_height");
-                }
-                boolean isOn = false;
-                for (ItemStack armorSlot : entity.getArmorSlots()) {
-                    if (armorSlot == pStack) {
-                        isOn = true;
-                        break;
-                    }
-                }
-
-                if (!isOn) {
-                    if (tag.contains("lastBlockPos")) {
-                        pLevel.setBlockAndUpdate(BlockPos.of(tag.getLong("lastBlockPos")),
-                                replaceState);
-                    }
-                }
-
-        }
-
-
-
     }
 
     private static void transferCFE(ItemStack pStack, Entity entity, ICFEHandler icfeHandler) {
@@ -189,6 +236,8 @@ public class TechnetiumArmorItem extends TCArmorItem {
         return switch (slot) {
             case HEAD -> TerraCompositio.MOD_ID + ":textures/models/armor/technetium_crown.png";
             case CHEST -> TerraCompositio.MOD_ID + ":textures/models/armor/technetium_cloak.png";
+            case FEET -> TerraCompositio.MOD_ID + ":textures/models/armor/technetium_boots.png";
+            case LEGS -> TerraCompositio.MOD_ID + ":textures/models/armor/technetium_leggings.png";
             default -> null;
         };
     }

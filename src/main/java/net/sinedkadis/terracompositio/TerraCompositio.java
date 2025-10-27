@@ -10,6 +10,7 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.sinedkadis.terracompositio.events.FluidNetworkEvent;
+import net.sinedkadis.terracompositio.network.TCPackets;
 import net.sinedkadis.terracompositio.registries.*;
 import net.sinedkadis.terracompositio.cfe.CFENetworkHandler;
 import net.sinedkadis.terracompositio.registries.TCEffects;
@@ -68,6 +69,7 @@ public class TerraCompositio
         IEventBus bus = MinecraftForge.EVENT_BUS;
         bus.addListener((CFENetworkEvent e) -> CFENetworkHandler.instance.onNetworkEvent(e.getSource(),e.getAction()));
         bus.addListener((FluidNetworkEvent e) -> FluidNetworkHandler.instance.onNetworkEvent(e.getSource(),e.getAction()));
+        TCPackets.register();
         //SurfaceRuleManager.addSurfaceRules(SurfaceRuleManager.RuleCategory.OVERWORLD, MOD_ID, TCSurfaceRules.makeRules());
     }
 
