@@ -26,6 +26,7 @@ import net.sinedkadis.terracompositio.registries.TCItems;
 
 @Mod.EventBusSubscriber(modid = TerraCompositio.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class ForgeEventBusEvents {
+
     @SubscribeEvent
     public static void onLivingTickEvent(LivingEvent.LivingTickEvent event){
         LivingEntity livingEntity = event.getEntity();

@@ -27,8 +27,6 @@ import net.minecraftforge.fml.common.Mod;
 import net.sinedkadis.terracompositio.TerraCompositio;
 import net.sinedkadis.terracompositio.block.entity.PathPointerBlockEntity;
 import net.sinedkadis.terracompositio.item.custom.WrenchAxeItem;
-import net.sinedkadis.terracompositio.network.TCPackets;
-import net.sinedkadis.terracompositio.network.packets.C2SJumpStatePacket;
 import net.sinedkadis.terracompositio.particle.CFEParticleData;
 import net.sinedkadis.terracompositio.registries.TCEffects;
 import net.sinedkadis.terracompositio.registries.TCItems;
@@ -61,8 +59,8 @@ public class ForgeEventBusClientEvents {
         boolean jumping = Minecraft.getInstance().options.keyJump.isDown();
 
         if (jumping != lastState) {
-            TCPackets.CHANNEL.sendToServer(new C2SJumpStatePacket(jumping));
-            player.getPersistentData().putBoolean("isJumping",jumping);
+            //TCPackets.CHANNEL.sendToServer(new C2SJumpStatePacket(jumping));
+            //player.getPersistentData().putBoolean("isJumping",jumping);
             lastState = jumping;
         }
 
