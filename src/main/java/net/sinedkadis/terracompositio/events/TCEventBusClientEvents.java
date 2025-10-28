@@ -16,7 +16,9 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.EntityRenderersEvent;
 import net.minecraftforge.client.event.RegisterColorHandlersEvent;
+import net.minecraftforge.client.event.RegisterGuiOverlaysEvent;
 import net.minecraftforge.client.event.RegisterKeyMappingsEvent;
+import net.minecraftforge.client.gui.overlay.VanillaGuiOverlay;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidUtil;
@@ -28,8 +30,8 @@ import net.sinedkadis.terracompositio.block.entity.renderer.*;
 import net.sinedkadis.terracompositio.entity.client.CFECubeModel;
 import net.sinedkadis.terracompositio.entity.client.FlowCedarEntModel;
 import net.sinedkadis.terracompositio.entity.client.FlowCedarEntRenderer;
+import net.sinedkadis.terracompositio.gui.TCGui;
 import net.sinedkadis.terracompositio.item.custom.CreationFlowJournalItem;
-import net.sinedkadis.terracompositio.item.custom.FluidApplierItem;
 import net.sinedkadis.terracompositio.item.models.TechnetiumCloakModel;
 import net.sinedkadis.terracompositio.item.models.TechnetiumCrownModel;
 import net.sinedkadis.terracompositio.registries.TCEntities;
@@ -127,6 +129,11 @@ public class TCEventBusClientEvents {
     @SubscribeEvent
     public static void registerKeyMapping(RegisterKeyMappingsEvent event) {
         TCKeyMappings.register(event);
+    }
+
+    @SubscribeEvent
+    public static void onRegisterGuiOverlays(RegisterGuiOverlaysEvent event) {
+        event.registerAbove(VanillaGuiOverlay.HOTBAR.id(),"cfe_hud", TCGui::cfeHud);
     }
 
     @SubscribeEvent

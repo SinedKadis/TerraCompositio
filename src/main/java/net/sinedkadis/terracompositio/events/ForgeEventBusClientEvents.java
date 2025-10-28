@@ -48,21 +48,12 @@ public class ForgeEventBusClientEvents {
     }
 
 
-    private static boolean lastState = false;
     @SubscribeEvent
     public static void onPlayerTick(TickEvent.PlayerTickEvent event) {
         if (event.phase != TickEvent.Phase.END) return;
 
         Player player = event.player;
         Level level = player.level();
-
-        boolean jumping = Minecraft.getInstance().options.keyJump.isDown();
-
-        if (jumping != lastState) {
-            //TCPackets.CHANNEL.sendToServer(new C2SJumpStatePacket(jumping));
-            //player.getPersistentData().putBoolean("isJumping",jumping);
-            lastState = jumping;
-        }
 
         if (!player.getMainHandItem().is(TCItems.WRENCH_AXE.get())) return;
 
