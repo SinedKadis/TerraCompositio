@@ -112,8 +112,7 @@ public class TechnetiumArmorItem extends TCArmorItem {
 
         ICFEHandler handler = stack.getCapability(CFECapability.CFE).orElse(DummyCFEHandler.instance);
 
-        if (livingEntity.fallDistance > 5 && !livingEntity.isShiftKeyDown() &&
-                handler instanceof DummyCFEHandler
+        if (livingEntity.fallDistance > 5 && !livingEntity.isShiftKeyDown()
                 && handler.getCFE() < 1) {
             BlockState blockStateOn = pLevel.getBlockState(onPos);
             BlockState blockStateOn1 = pLevel.getBlockState(onPos.below(2));
