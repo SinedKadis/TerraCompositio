@@ -105,6 +105,7 @@ public class TCCreativeModeTabs {
 
                         pOutput.accept(TCBlocks.FLOW_CEDAR_ENT_STATUE.get());
                         pOutput.accept(TCItems.FLUID_APPLIER.get());
+                        pOutput.accept(TCItems.CFE_BALL.get());
                     })
                     .build());
 

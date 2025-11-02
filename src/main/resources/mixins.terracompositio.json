@@ -8,8 +8,10 @@
   "priority": 2000,
   "mixins": [
     "AbstractFurnaceBlockEntityMixin",
+    "LivingEntityMixin",
     "PlayerMixin",
-    "accessors.BundleItemAccessor"
+    "accessors.BundleItemAccessor",
+    "accessors.LivingEntityAccessor"
   ],
   "client": [
     "BookGuiMixin"

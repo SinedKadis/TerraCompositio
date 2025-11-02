@@ -111,6 +111,9 @@ public class TCItems {
     public static final RegistryObject<Item> TECHNETIUM_BOOTS = ITEMS.register("technetium_boots",
             () -> new TechnetiumArmorItem(ArmorItem.Type.BOOTS,new Item.Properties()));
 
+    public static final RegistryObject<Item> CFE_BALL = ITEMS.register("cfe_ball",
+            () -> new CFEBallItem(new Item.Properties()));
+
 
     public static void register(IEventBus eventBus){
         ITEMS.register(eventBus);

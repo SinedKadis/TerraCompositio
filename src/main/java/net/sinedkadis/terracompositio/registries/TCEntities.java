@@ -7,9 +7,7 @@ import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
 import net.sinedkadis.terracompositio.TerraCompositio;
-import net.sinedkadis.terracompositio.entity.custom.FlowCedarEntEntity;
-import net.sinedkadis.terracompositio.entity.custom.TCBoatEntity;
-import net.sinedkadis.terracompositio.entity.custom.TCChestBoatEntity;
+import net.sinedkadis.terracompositio.entity.custom.*;
 
 public class TCEntities {
     public static final DeferredRegister<EntityType<?>> ENTITY_TYPES =
@@ -26,6 +24,13 @@ public class TCEntities {
     public static final RegistryObject<EntityType<FlowCedarEntEntity>> FLOW_CEDAR_ENT =
             ENTITY_TYPES.register("flow_cedar_ent_entity", () -> EntityType.Builder.of(FlowCedarEntEntity::new, MobCategory.CREATURE)
                     .sized(0.5f, 1.5f).build("flow_cedar_ent_entity"));
+
+    public static final RegistryObject<EntityType<CFEBallProjectileEntity>> CFE_BALL_PROJECTILE =
+            ENTITY_TYPES.register("cfe_ball_projectile", () -> EntityType.Builder.<CFEBallProjectileEntity>of(CFEBallProjectileEntity::new, MobCategory.MISC)
+                    .sized(0.5f, 0.5f).build("cfe_ball_projectile"));
+    public static final RegistryObject<EntityType<CFEDropProjectileEntity>> CFE_DROP_PROJECTILE =
+            ENTITY_TYPES.register("cfe_drop_projectile", () -> EntityType.Builder.<CFEDropProjectileEntity>of(CFEDropProjectileEntity::new, MobCategory.MISC)
+                    .sized(0.5f, 0.5f).build("cfe_drop_projectile"));
 
 
     public static void register(IEventBus eventBus) {
