@@ -29,6 +29,7 @@ import net.sinedkadis.terracompositio.api.networks.cfe.CFECapability;
 import net.sinedkadis.terracompositio.api.networks.cfe.CFENetworkMemberEntity;
 import net.sinedkadis.terracompositio.api.networks.cfe.ICFEHandler;
 import net.sinedkadis.terracompositio.cfe.CFEItemWrapper;
+import net.sinedkadis.terracompositio.item.models.TechnetiumBootsModel;
 import net.sinedkadis.terracompositio.item.models.TechnetiumCloakModel;
 import net.sinedkadis.terracompositio.item.models.TechnetiumCrownModel;
 import net.sinedkadis.terracompositio.registries.TCArmorMaterials;
@@ -312,6 +313,7 @@ public class TechnetiumArmorItem extends TCArmorItem {
             public HumanoidModel<?> getHumanoidArmorModel(LivingEntity living, ItemStack stack, EquipmentSlot slot, HumanoidModel<?> defaultModel) {
                 if (stack.is(TCItems.TECHNETIUM_CROWN.get())) return TechnetiumCrownModel.bakedInstance;
                 if (stack.is(TCItems.TECHNETIUM_CLOAK.get())) return TechnetiumCloakModel.bakedInstance;
+                if (stack.is(TCItems.TECHNETIUM_BOOTS.get())) return TechnetiumBootsModel.Humanoid.bakedInstance;
                 return defaultModel;
             }
         });

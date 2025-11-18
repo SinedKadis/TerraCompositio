@@ -27,6 +27,7 @@ import net.minecraftforge.fml.common.Mod;
 import net.sinedkadis.terracompositio.TerraCompositio;
 import net.sinedkadis.terracompositio.block.entity.PathPointerBlockEntity;
 import net.sinedkadis.terracompositio.item.custom.WrenchAxeItem;
+import net.sinedkadis.terracompositio.util.LivingEntityAnimationAccessor;
 import net.sinedkadis.terracompositio.particle.CFEParticleData;
 import net.sinedkadis.terracompositio.registries.TCEffects;
 import net.sinedkadis.terracompositio.registries.TCItems;
@@ -89,6 +90,7 @@ public class ForgeEventBusClientEvents {
                         random.nextFloat(),
                         random.nextFloat(),
                         random.nextFloat());}
+            ((LivingEntityAnimationAccessor) livingEntity).terraCompositio$getIdleAnimationState().startIfStopped(livingEntity.tickCount);
         }
     }
 

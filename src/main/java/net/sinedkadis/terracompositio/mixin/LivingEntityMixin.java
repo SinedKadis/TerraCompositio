@@ -1,6 +1,7 @@
 package net.sinedkadis.terracompositio.mixin;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.world.entity.AnimationState;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.LivingEntity;
@@ -9,9 +10,11 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.sinedkadis.terracompositio.mixin.accessors.LivingEntityAccessor;
+import net.sinedkadis.terracompositio.util.LivingEntityAnimationAccessor;
 import net.sinedkadis.terracompositio.registries.TCBlocks;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
+import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
@@ -23,7 +26,7 @@ import static net.minecraft.world.level.block.state.properties.BlockStatePropert
 import static org.objectweb.asm.Opcodes.PUTFIELD;
 
 @Mixin(LivingEntity.class)
-public abstract class LivingEntityMixin extends Entity {
+public abstract class LivingEntityMixin extends Entity implements LivingEntityAnimationAccessor {
     public LivingEntityMixin(EntityType<?> pEntityType, Level pLevel) {
         super(pEntityType, pLevel);
     }
@@ -54,5 +57,13 @@ public abstract class LivingEntityMixin extends Entity {
         accessor.setLastPos(value);
     }
 
+    @Unique
+    public final AnimationState terraCompositio$idleAnimationState = new AnimationState();
+
+    @Unique
+    @Override
+    public AnimationState terraCompositio$getIdleAnimationState() {
+        return this.terraCompositio$idleAnimationState;
+    }
 
 }
