@@ -277,8 +277,9 @@ public class TechnetiumArmorItem extends TCArmorItem {
                 }
                 if (cfe < 1) {
                     if (leggings.takeCFE(1,true)>0) {
+                        int cfe1 = leggings.takeCFE(1, false);
                         icfeHandler.addCFE(
-                                leggings.takeCFE(1,false),null,false);
+                                cfe1,null,false);
                     } else if (playerCap.takeCFE(1,true)>0) {
                         icfeHandler.addCFE(
                                 playerCap.takeCFE(1,false),null,false);

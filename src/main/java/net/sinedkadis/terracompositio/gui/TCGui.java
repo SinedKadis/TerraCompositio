@@ -45,7 +45,8 @@ public class TCGui {
         if (cfeMaxTotal == 0) {
             width = 0;
         } else {
-            width *= (int) ((double) cfeTotal / (double) cfeMaxTotal);
+            float width1 = width * ( (float) cfeTotal /  cfeMaxTotal);
+            width = Math.round(width1);
         }
 
         if (width == 0) {
@@ -64,7 +65,7 @@ public class TCGui {
 
         RenderSystem.enableBlend();
         RenderSystem.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-        guiGraphics.blit(CFE_HUD, x, y, 0, 0, width, 10, 256, 256);
+        guiGraphics.blit(CFE_HUD, x+10, y, 0, 0, 0, width,40, 256, 256);
         RenderSystem.disableBlend();
         RenderSystem.setShaderColor(1, 1, 1, 1);
     }

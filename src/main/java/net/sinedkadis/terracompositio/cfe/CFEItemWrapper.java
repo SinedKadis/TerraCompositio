@@ -50,9 +50,10 @@ public class CFEItemWrapper implements ICFEHandler, ICapabilityProvider {
 
     @Override
     public int takeCFE(int cfe, boolean simulate) {
-        int toTake = Math.min(cfe,this.getCFE());
+        int cfe1 = this.getCFE();
+        int toTake = Math.min(cfe, cfe1);
         if (!simulate) {
-            this.setCFE(this.getCFE()-toTake);
+            this.setCFE(cfe1 -toTake);
         }
         return toTake;
     }
@@ -70,7 +71,8 @@ public class CFEItemWrapper implements ICFEHandler, ICapabilityProvider {
     public int addCFE(int cfe, BlockPos sourcePos, boolean simulate) {
         int toAdd = Math.min(this.getFreeSpace(),cfe);
         if (!simulate) {
-            this.setCFE(this.getCFE()+toAdd);
+            int cfe1 = this.getCFE();
+            this.setCFE(cfe1 +toAdd);
         }
         return toAdd;
     }

@@ -6,14 +6,18 @@ import lombok.Setter;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.util.INBTSerializable;
+import net.minecraftforge.network.PacketDistributor;
 import net.sinedkadis.terracompositio.api.TerraCompositioAPI;
 import net.sinedkadis.terracompositio.api.networks.NetworkAction;
 import net.sinedkadis.terracompositio.api.networks.cfe.*;
+import net.sinedkadis.terracompositio.network.TCPackets;
+import net.sinedkadis.terracompositio.network.packets.S2CPlayerCfeContainerSync;
 
 import java.util.*;
 import java.util.function.Function;
@@ -170,6 +174,9 @@ public class CFEContainer implements ICFEHandler, INBTSerializable<CompoundTag> 
         }
         if (isEntity) {
             TerraCompositioAPI.INSTANCE.getCFENetworkInstance().fireCFENetworkEvent(attachedMember, NetworkAction.UPDATE);
+            if (attachedMember instanceof ServerPlayer serverPlayer) {
+                TCPackets.CHANNEL.send(PacketDistributor.PLAYER.with(() -> serverPlayer),new S2CPlayerCfeContainerSync(getCFE()));
+            }
         }
     }
 
