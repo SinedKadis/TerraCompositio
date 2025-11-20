@@ -1,15 +1,13 @@
 package net.sinedkadis.terracompositio.mixin;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.world.entity.AnimationState;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.*;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.sinedkadis.terracompositio.mixin.accessors.LivingEntityAccessor;
+import net.sinedkadis.terracompositio.registries.TCItems;
 import net.sinedkadis.terracompositio.util.LivingEntityAnimationAccessor;
 import net.sinedkadis.terracompositio.registries.TCBlocks;
 import org.spongepowered.asm.mixin.Mixin;
@@ -43,7 +41,9 @@ public abstract class LivingEntityMixin extends Entity implements LivingEntityAn
         }
         oldPos = oldPos.below();
         BlockState blockState = level().getBlockState(oldPos);
-        if (blockState.is(TCBlocks.TECHNETIUM_BOARD.get())){
+        if (!instance.isShiftKeyDown()
+                && blockState.is(TCBlocks.TECHNETIUM_BOARD.get())
+                && instance.getItemBySlot(EquipmentSlot.FEET).is(TCItems.TECHNETIUM_BOOTS.get())){
             List<Entity> entities = level().getEntities(null, new AABB(oldPos.above(), oldPos.above(2)));
             if (entities.isEmpty()) {
                 BlockState replaceState = blockState.hasProperty(WATERLOGGED)

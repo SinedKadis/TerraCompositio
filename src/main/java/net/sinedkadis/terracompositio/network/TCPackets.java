@@ -1,5 +1,6 @@
 package net.sinedkadis.terracompositio.network;
 
+import net.minecraftforge.network.NetworkDirection;
 import net.minecraftforge.network.NetworkRegistry;
 import net.minecraftforge.network.simple.SimpleChannel;
 import net.sinedkadis.terracompositio.TerraCompositio;
@@ -16,9 +17,10 @@ public class TCPackets {
 
     public static void register() {
         int id = 0;
-        CHANNEL.registerMessage(id++, S2CPlayerCfeContainerSync.class,
-                S2CPlayerCfeContainerSync::encode,
-                S2CPlayerCfeContainerSync::decode,
-                S2CPlayerCfeContainerSync::handle);
+        CHANNEL.messageBuilder(S2CPlayerCfeContainerSync.class,id++,NetworkDirection.PLAY_TO_CLIENT)
+                .encoder(S2CPlayerCfeContainerSync::encode)
+                .decoder(S2CPlayerCfeContainerSync::decode)
+                .consumerMainThread(S2CPlayerCfeContainerSync::handle)
+                .add();
     }
 }

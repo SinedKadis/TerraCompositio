@@ -15,10 +15,7 @@ import net.minecraft.client.renderer.item.ItemProperties;
 import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
-import net.minecraftforge.client.event.EntityRenderersEvent;
-import net.minecraftforge.client.event.RegisterColorHandlersEvent;
-import net.minecraftforge.client.event.RegisterGuiOverlaysEvent;
-import net.minecraftforge.client.event.RegisterKeyMappingsEvent;
+import net.minecraftforge.client.event.*;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidUtil;
@@ -35,6 +32,7 @@ import net.sinedkadis.terracompositio.item.custom.CreationFlowJournalItem;
 import net.sinedkadis.terracompositio.item.models.TechnetiumBootsModel;
 import net.sinedkadis.terracompositio.item.models.TechnetiumCloakModel;
 import net.sinedkadis.terracompositio.item.models.TechnetiumCrownModel;
+import net.sinedkadis.terracompositio.particle.custom.*;
 import net.sinedkadis.terracompositio.registries.TCEntities;
 import net.sinedkadis.terracompositio.registries.TCBoatRenderer;
 import net.sinedkadis.terracompositio.registries.TCModelLayers;
@@ -168,6 +166,23 @@ public class TCEventBusClientEvents {
         event.registerBlockEntityRenderer(TCBlockEntities.PATH_POINTER_BE.get(), PathPointerBlockEntityRenderer::new);
         event.registerBlockEntityRenderer(TCBlockEntities.ENT_STATUE_BE.get(), EntStatueBlockEntityRenderer::new);
 
+    }
+
+    @SuppressWarnings("deprecation")
+    @SubscribeEvent
+    public static void registerParticleFactories(final RegisterParticleProvidersEvent event) {
+        Minecraft.getInstance().particleEngine.register(TCParticles.FLOW_PARTICLE.get(),
+                FlowParticle.Provider::new);
+        Minecraft.getInstance().particleEngine.register(TCParticles.CFE_PARTICLE.get(),
+                CFEParticle.Provider::new);
+        Minecraft.getInstance().particleEngine.register(TCParticles.BIRCH_JUICE_PARTICLE.get(),
+                BirchJuiceParticle.Provider::new);
+        Minecraft.getInstance().particleEngine.register(TCParticles.FLOW_SPLASH_PARTICLE.get(),
+                FlowSplashParticle.Provider::new);
+        Minecraft.getInstance().particleEngine.register(TCParticles.BIRCH_JUICE_SPLASH_PARTICLE.get(),
+                BirchJuiceSplashParticle.Provider::new);
+        Minecraft.getInstance().particleEngine.register(TCParticles.FLUID_FLOW.get(),
+                FluidFlowParticle.Provider::new);
     }
 }
 
