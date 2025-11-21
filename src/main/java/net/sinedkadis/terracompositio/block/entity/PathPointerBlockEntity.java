@@ -47,6 +47,7 @@ public class PathPointerBlockEntity extends TCCFEBlockEntity implements Nameable
     public @Nullable BlockPos collectorPos;
     public @Nullable LivingEntity toSendEntity;
     public @Nullable LivingEntity toReceiveEntity;
+    private List<LivingEntity> lastToSendScan = List.of();
 
     public PathPointerBlockEntity(BlockPos pos, BlockState state) {
         super(TCBlockEntities.PATH_POINTER_BE.get(), pos, state, BlockMode.CONTAINER);
@@ -85,22 +86,30 @@ public class PathPointerBlockEntity extends TCCFEBlockEntity implements Nameable
         if (toReceiveEntity != null && !(toReceiveEntity.blockPosition().equals(lastNode)) && toReceiveEntity.blockPosition() != this.getBlockPos()) {
             onCFENetworkMemberUpdate(pLevel,pPos);
         }
+        if (toSendEntity == null || toReceiveEntity == null) {
+            lastToSendScan = scanCompatibleEntities(pLevel);
+            if (!lastToSendScan.isEmpty()) {
+                onCFENetworkMemberUpdate(pLevel,pPos);
+            }
+        }
     }
-//todo Fix bug: walking on pp kills server
+
     @Override
     public void onCFENetworkMemberUpdate(Level level, BlockPos pos) {
         BlockState pState = level.getBlockState(pos);
         List<PathPointerBlock.PPPart> parts = Arrays.asList(PathPointerBlock.getParts(pState));
         if (nextNode != null) {
             boolean nextNodeIsPP = level.getBlockState(nextNode).getBlock() instanceof PathPointerBlock;
-            if (toSendEntity != null && toSendEntity.isRemoved()) toSendEntity = null;
+            if (toSendEntity != null && (toSendEntity.isRemoved() || !toSendEntity.blockPosition().closerThan(pos,getLimit())))
+                toSendEntity = null;
             if (!nextNodeIsPP && toSendEntity == null) {
                 nextNode = null;
             }
         }
         if (lastNode != null) {
             boolean lastNodeIsPP = level.getBlockState(lastNode).getBlock() instanceof PathPointerBlock;
-            if (toReceiveEntity != null && toReceiveEntity.isRemoved()) toReceiveEntity = null;
+            if (toReceiveEntity != null && (toReceiveEntity.isRemoved() || !toReceiveEntity.blockPosition().closerThan(pos,getLimit())))
+                toReceiveEntity = null;
             if (!lastNodeIsPP && toReceiveEntity == null) {
                 lastNode = null;
             }
@@ -196,26 +205,7 @@ public class PathPointerBlockEntity extends TCCFEBlockEntity implements Nameable
     }
 
     private void searchAndBindToEntity(Level level,boolean isToSend) {
-        List<Entity> entities = level.getEntities(null,
-                new AABB(this.worldPosition
-                                .relative(Direction.WEST, 7)
-                                .relative(Direction.SOUTH, 7)
-                                .relative(Direction.DOWN, 7),
-                        this.worldPosition
-                                .relative(Direction.EAST,7)
-                                .relative(Direction.NORTH,7)
-                                .relative(Direction.UP,7)));
-        List<LivingEntity> canBindTo = entities.stream()
-                .map(entity -> entity instanceof LivingEntity livingEntity ? livingEntity : null)
-                .filter(Objects::nonNull)
-                .filter(livingEntity -> isToSend || !livingEntity.equals(toSendEntity))
-                .filter(livingEntity -> isToSend || !(livingEntity instanceof Player))
-                .filter(livingEntity -> livingEntity.hasItemInSlot(EquipmentSlot.HEAD))
-                .filter(livingEntity -> livingEntity.getItemBySlot(EquipmentSlot.HEAD)
-                        .is(TCItems.TECHNETIUM_CROWN.get()))
-                .filter(livingEntity ->
-                        simulateUpdateRotation(isToSend ? lastNode : nextNode,getBlockPos(), livingEntity.blockPosition(),false))
-                .collect(Collectors.toList());
+        List<LivingEntity> canBindTo = scanCompatibleEntities(level, isToSend);
         if (!canBindTo.isEmpty()) {
             Collections.shuffle(canBindTo);
             LivingEntity chosen = canBindTo.get(0);
@@ -229,6 +219,40 @@ public class PathPointerBlockEntity extends TCCFEBlockEntity implements Nameable
             updateRotation(false);
             this.updateContainer();
         }
+    }
+
+
+    private @NotNull List<LivingEntity> scanCompatibleEntities(Level level) {
+        return scanCompatibleEntities(level, true, true);
+    }
+
+    private @NotNull List<LivingEntity> scanCompatibleEntities(Level level, boolean isToSend) {
+        return scanCompatibleEntities(level, isToSend, false);
+    }
+
+    private @NotNull List<LivingEntity> scanCompatibleEntities(Level level, boolean isToSend, boolean recalk) {
+        if (isToSend && !lastToSendScan.isEmpty() && !recalk) return lastToSendScan;
+
+        List<Entity> entities = level.getEntities(null,
+                new AABB(this.worldPosition
+                                .relative(Direction.WEST, 7)
+                                .relative(Direction.SOUTH, 7)
+                                .relative(Direction.DOWN, 7),
+                        this.worldPosition
+                                .relative(Direction.EAST,7)
+                                .relative(Direction.NORTH,7)
+                                .relative(Direction.UP,7)));
+        return entities.stream()
+                .map(entity -> entity instanceof LivingEntity livingEntity ? livingEntity : null)
+                .filter(Objects::nonNull)
+                .filter(livingEntity -> isToSend || !livingEntity.equals(toSendEntity))
+                .filter(livingEntity -> isToSend || !(livingEntity instanceof Player))
+                .filter(livingEntity -> livingEntity.hasItemInSlot(EquipmentSlot.HEAD))
+                .filter(livingEntity -> livingEntity.getItemBySlot(EquipmentSlot.HEAD)
+                        .is(TCItems.TECHNETIUM_CROWN.get()))
+                .filter(livingEntity ->
+                        simulateUpdateRotation(isToSend ? lastNode : nextNode,getBlockPos(), livingEntity.blockPosition(),false))
+                .collect(Collectors.toList());
     }
 
     private void transferCFE(Level level, List<PathPointerBlock.PPPart> currentParts) {

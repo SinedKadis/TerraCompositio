@@ -116,13 +116,13 @@ public class TechnetiumArmorItem extends TCArmorItem {
 
         BlockState blockStateOn = pLevel.getBlockState(onPos);
 
-        if (livingEntity.fallDistance > 5 && !livingEntity.isShiftKeyDown()
-                && handler.getCFE() < 1) {
+        if (livingEntity.fallDistance > 3 && !livingEntity.isShiftKeyDown()
+                && handler.getCFE() >= 1) {
 
-            BlockState blockStateOn1 = pLevel.getBlockState(onPos.below(2));
+            BlockState blockStateOn1 = pLevel.getBlockState(onPos.below(3));
 
             if (blockStateOn.is(BlockTags.REPLACEABLE)
-                    && !persistentData.contains(blockPosBelow)
+//                    && !persistentData.contains(blockPosBelow)
                     && !blockStateOn1.isAir()) {
                 persistentData.putLong(blockPosBelow, onPos.asLong());
                 persistentData.putInt(height,onPos.getY()-1);

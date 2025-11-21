@@ -35,7 +35,7 @@ public record C2SBoardSync(int x, short y, int z) {
                     BlockPos pPos = new BlockPos(msg.x, msg.y, msg.z);
 
                     level.setBlock(pPos, TCBlocks.TECHNETIUM_BOARD.get().defaultBlockState(), 3);
-                    level.scheduleTick(pPos,TCBlocks.TECHNETIUM_BOARD.get(),20);
+                    level.scheduleTick(pPos,TCBlocks.TECHNETIUM_BOARD.get(),100);
                 }
             }
         });

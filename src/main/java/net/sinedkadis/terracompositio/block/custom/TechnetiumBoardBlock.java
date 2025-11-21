@@ -43,13 +43,15 @@ public class TechnetiumBoardBlock extends Block implements SimpleWaterloggedBloc
     @Override
     public void tick(BlockState pState, ServerLevel level, BlockPos pPos, RandomSource pRandom) {
         super.tick(pState, level, pPos, pRandom);
-        List<Entity> entities = level.getEntities(null, new AABB(pPos.above(), pPos.above(2)));
+        List<Entity> entities = level.getEntities(null, new AABB(
+                pPos.above().relative(Direction.EAST).relative(Direction.SOUTH),
+                pPos.above(2).relative(Direction.WEST).relative(Direction.NORTH)));
         if (entities.isEmpty()) {
             BlockState replaceState =
                     Blocks.AIR.defaultBlockState();
             level.setBlockAndUpdate(pPos, replaceState);
         } else {
-            level.scheduleTick(pPos, TCBlocks.TECHNETIUM_BLOCK.get(), 20);
+            level.scheduleTick(pPos, TCBlocks.TECHNETIUM_BLOCK.get(), 100);
         }
     }
 
