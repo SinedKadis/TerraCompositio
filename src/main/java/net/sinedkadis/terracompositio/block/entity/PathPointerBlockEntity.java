@@ -303,7 +303,7 @@ public class PathPointerBlockEntity extends TCCFEBlockEntity implements Nameable
                 if (lastNode != null && !currentBE.getBlockPos().equals(lastNode) ) {
                     if (level == null) break;
                     PathPointerBlockEntity nextBE = (PathPointerBlockEntity) level.getBlockEntity(lastNode);
-                    if (nextBE != null && nextBE.nextNode != null && nextBE.nextNode.equals(currentBE.getBlockPos()))
+                    if (nextBE != null && nextBE.nextNode != null && !nextBE.nextNode.equals(currentBE.getBlockPos()))
                         blockEntityQueue.add(nextBE);
                 }
             }
@@ -373,7 +373,9 @@ public class PathPointerBlockEntity extends TCCFEBlockEntity implements Nameable
                 BlockEntity currentBE = blockEntityQueue.poll();
                 if (currentBE instanceof CFENetworkMember member) {
                     inSystem += CFENetwork.getCFEHandler(member).stream().mapToInt(icfeHandler -> icfeHandler.getCFE()+icfeHandler.getQueued()).sum();
-                    if (currentBE instanceof PathPointerBlockEntity pp && pp.nextNode != null) {
+                    if (currentBE instanceof PathPointerBlockEntity pp
+                            && pp.nextNode != null
+                            && !pp.nextNode.equals(pp.getBlockPos())) {
                         blockEntityQueue.add(level.getBlockEntity(pp.nextNode));
                     }
                 }
@@ -404,7 +406,7 @@ public class PathPointerBlockEntity extends TCCFEBlockEntity implements Nameable
                 PathPointerBlockEntity currentBE = blockEntityQueue.poll();
                 if (currentBE != null) {
                     nodes.add(currentBE);
-                    if (currentBE.nextNode != null) {
+                    if (currentBE.nextNode != null && !currentBE.nextNode.equals(currentBE.getBlockPos())) {
                         blockEntityQueue.add((PathPointerBlockEntity) level.getBlockEntity(currentBE.nextNode));
                     }
                 }
