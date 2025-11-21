@@ -26,6 +26,7 @@ public class TechnetiumBoardBlock extends Block implements SimpleWaterloggedBloc
 
     public TechnetiumBoardBlock(Properties pProperties) {
         super(pProperties);
+        registerDefaultState(defaultBlockState().setValue(WATERLOGGED,false));
     }
 
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> pBuilder) {

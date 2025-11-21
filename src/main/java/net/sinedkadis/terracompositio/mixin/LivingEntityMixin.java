@@ -43,7 +43,7 @@ public abstract class LivingEntityMixin extends Entity implements LivingEntityAn
         BlockState blockState = level().getBlockState(oldPos);
         if (!instance.isShiftKeyDown()
                 && blockState.is(TCBlocks.TECHNETIUM_BOARD.get())
-                && instance.getItemBySlot(EquipmentSlot.FEET).is(TCItems.TECHNETIUM_BOOTS.get())){
+                && !instance.getItemBySlot(EquipmentSlot.FEET).is(TCItems.TECHNETIUM_BOOTS.get())){
             List<Entity> entities = level().getEntities(null, new AABB(oldPos.above(), oldPos.above(2)));
             if (entities.isEmpty()) {
                 BlockState replaceState = blockState.hasProperty(WATERLOGGED)

@@ -19,6 +19,7 @@ import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.event.entity.living.LivingEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.network.PacketDistributor;
 import net.sinedkadis.terracompositio.TerraCompositio;
 import net.sinedkadis.terracompositio.api.TerraCompositioAPI;
 import net.sinedkadis.terracompositio.api.dummies.DummyCFEHandler;
@@ -30,6 +31,8 @@ import net.sinedkadis.terracompositio.cfe.CFEItemWrapper;
 import net.sinedkadis.terracompositio.item.models.TechnetiumBootsModel;
 import net.sinedkadis.terracompositio.item.models.TechnetiumCloakModel;
 import net.sinedkadis.terracompositio.item.models.TechnetiumCrownModel;
+import net.sinedkadis.terracompositio.network.TCPackets;
+import net.sinedkadis.terracompositio.network.packets.C2SBoardSync;
 import net.sinedkadis.terracompositio.registries.TCArmorMaterials;
 import net.sinedkadis.terracompositio.registries.TCBlocks;
 import net.sinedkadis.terracompositio.registries.TCItems;
@@ -126,10 +129,6 @@ public class TechnetiumArmorItem extends TCArmorItem {
             }
         }
 
-//        if (livingEntity.tickCount%20==0) {
-//            livingEntity.setNoGravity(blockStateOn.is(TCBlocks.TECHNETIUM_BOARD.get()));
-//        }
-
 
         if (!stack.is(TCItems.TECHNETIUM_BOOTS.get())
                 || handler instanceof DummyCFEHandler
@@ -203,6 +202,7 @@ public class TechnetiumArmorItem extends TCArmorItem {
                         if (pLevel.isClientSide) {
                             pLevel.destroyBlock(target, true);
                             pLevel.setBlockAndUpdate(target, boardState);
+                            TCPackets.CHANNEL.send(PacketDistributor.SERVER.noArg(),new C2SBoardSync(target));
                         } else {
                             handler.takeCFE(1, false);
                         }
