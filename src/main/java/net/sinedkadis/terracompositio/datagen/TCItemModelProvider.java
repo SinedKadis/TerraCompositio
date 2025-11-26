@@ -89,6 +89,9 @@ public class TCItemModelProvider extends ItemModelProvider {
         simpleItem(TCItems.WRENCH_TAG_HOLDER);
 
         simpleItem(TCItems.CFE_BALL);
+        simpleItem(TCItems.TECHNETIUM_CHESTPLATE);
+        simpleItem(TCItems.TECHNETIUM_LEGGINGS);
+        simpleItem(TCItems.TECHNETIUM_BOOTS);
 
 
         saplingItem(TCBlocks.FLOW_CEDAR_SAPLING);

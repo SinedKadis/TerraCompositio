@@ -303,7 +303,7 @@ public class TechnetiumArmorItem extends TCArmorItem {
     public @Nullable String getArmorTexture(ItemStack stack, Entity entity, EquipmentSlot slot, String type) {
         return switch (slot) {
             case HEAD -> TerraCompositio.MOD_ID + ":textures/models/armor/technetium_crown.png";
-            case CHEST -> TerraCompositio.MOD_ID + ":textures/models/armor/technetium_cloak.png";
+            case CHEST -> TerraCompositio.MOD_ID + ":textures/models/armor/technetium_chestplate.png";
             case FEET -> TerraCompositio.MOD_ID + ":textures/models/armor/technetium_boots.png";
             case LEGS -> TerraCompositio.MOD_ID + ":textures/models/armor/technetium_leggings.png";
             default -> null;
@@ -316,7 +316,7 @@ public class TechnetiumArmorItem extends TCArmorItem {
             @Override
             public HumanoidModel<?> getHumanoidArmorModel(LivingEntity living, ItemStack stack, EquipmentSlot slot, HumanoidModel<?> defaultModel) {
                 if (stack.is(TCItems.TECHNETIUM_CROWN.get())) return TechnetiumCrownModel.bakedInstance;
-                if (stack.is(TCItems.TECHNETIUM_CLOAK.get())) return TechnetiumCloakModel.bakedInstance;
+                if (stack.is(TCItems.TECHNETIUM_CHESTPLATE.get())) return TechnetiumCloakModel.bakedInstance;
                 if (stack.is(TCItems.TECHNETIUM_BOOTS.get())) return TechnetiumBootsModel.Humanoid.bakedInstance;
                 return defaultModel;
             }

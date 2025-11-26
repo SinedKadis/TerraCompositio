@@ -46,13 +46,11 @@ public class TechnetiumCloakModel extends HumanoidModel<LivingEntity> {
         partdefinition.addOrReplaceChild("hat", CubeListBuilder.create(), PartPose.ZERO);
         partdefinition.addOrReplaceChild("head", CubeListBuilder.create(), PartPose.ZERO);
         partdefinition.addOrReplaceChild("hat", CubeListBuilder.create(), PartPose.ZERO);
-        partdefinition.addOrReplaceChild("left_arm", CubeListBuilder.create(), PartPose.ZERO);
-        partdefinition.addOrReplaceChild("right_arm", CubeListBuilder.create(), PartPose.ZERO);
+        PartDefinition left_arm = partdefinition.addOrReplaceChild("left_arm", CubeListBuilder.create().texOffs(48, 0).mirror().addBox(-1.0F, -2.0F, -2.0F, 4.0F, 12.0F, 4.0F, new CubeDeformation(0.75F)).mirror(false), PartPose.offset(5.0F, 2.0F, 0.0F));
 
-        var body = partdefinition.addOrReplaceChild("body", CubeListBuilder.create()
-                .addBox(-1.0F, 0.0F, -1.0F, 2, 2, 2, deformation), PartPose.ZERO);
-        body.addOrReplaceChild("belt", CubeListBuilder.create().texOffs(0, 65)
-                .addBox(-4.5F, 8.0F, -3.0F, 9, 5, 6, deformation), PartPose.ZERO);
+        PartDefinition right_arm = partdefinition.addOrReplaceChild("right_arm", CubeListBuilder.create().texOffs(48, 0).addBox(-3.0F, -2.0F, -2.0F, 4.0F, 12.0F, 4.0F, new CubeDeformation(0.75F)), PartPose.offset(-5.0F, 2.0F, 0.0F));
+
+        PartDefinition body = partdefinition.addOrReplaceChild("body", CubeListBuilder.create().texOffs(40, 16).addBox(-4.0F, 0.0F, -2.0F, 8.0F, 12.0F, 4.0F, new CubeDeformation(0.75F)), PartPose.offset(0.0F, 0.0F, 0.0F));
 
         partdefinition.addOrReplaceChild("left_leg", CubeListBuilder.create().texOffs(0, 76)
                         .mirror()
@@ -62,17 +60,16 @@ public class TechnetiumCloakModel extends HumanoidModel<LivingEntity> {
                         .addBox(-2.61F, -0.01F, -2.51F, 5, 6, 5, deformation),
                 PartPose.offset(-1.9F, 12.0F, 0.0F));
 
-        PartDefinition cloakPart = body.addOrReplaceChild("cloak", CubeListBuilder.create(), PartPose.offset(0.0F, 0.0F, 0.0F));
+        PartDefinition cloak = body.addOrReplaceChild("cloak", CubeListBuilder.create(), PartPose.offset(0.0F, 0.0F, 0.0F));
 
-        cloakPart.addOrReplaceChild("collar", CubeListBuilder.create()
-                        .addBox(-5.5F, 0.0F, -1.5F, 11, 5, 11, deformation),
-                PartPose.offsetAndRotation(0.0F, -3.0F, -4.5F, 0.0873F, 0.0F, 0.0F));
-        cloakPart.addOrReplaceChild("sideL", CubeListBuilder.create().texOffs(0, 16).mirror()
-                        .addBox(-0.5F, -0.5F, -5.5F, 11, 21, 10, deformation),
-                PartPose.rotation(0.0873F, -0.0873F, -0.1745F));
-        cloakPart.addOrReplaceChild("sideR", CubeListBuilder.create().texOffs(0, 16)
-                        .addBox(-10.5F, -0.5F, -5.5F, 11, 21, 10, deformation),
-                PartPose.rotation(0.0873F, 0.0873F, 0.1745F));
+        PartDefinition left = cloak.addOrReplaceChild("left",
+                CubeListBuilder.create().texOffs(0, 35).addBox(0.0F, -2.0F, -6.0F, 12.0F, 17.0F, 12.0F, new CubeDeformation(0.0F)),
+                PartPose.offsetAndRotation(0.0F, 0.0F, 0.0F, 0.0F, 0.0F, -0.1745F));
+
+        PartDefinition right = cloak.addOrReplaceChild("right",
+                CubeListBuilder.create().texOffs(0, 35).mirror().addBox(-12.0F, -2.0F, -6.0F, 12.0F, 17.0F, 12.0F, new CubeDeformation(0.0F)).mirror(false),
+                PartPose.offsetAndRotation(0.0F, 0.0F, 0.0F, 0.0F, 0.0F, 0.1745F));
+
         return LayerDefinition.create(meshdefinition, 64, 64);
 
     }
@@ -123,6 +120,7 @@ public class TechnetiumCloakModel extends HumanoidModel<LivingEntity> {
     private void setPartVisibility() {
         setAllVisible(false);
         body.visible = true;
-
+        leftArm.visible = true;
+        rightArm.visible = true;
     }
 }

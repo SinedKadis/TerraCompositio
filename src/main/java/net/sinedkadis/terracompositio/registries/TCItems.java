@@ -104,9 +104,9 @@ public class TCItems {
 
     public static final RegistryObject<Item> TECHNETIUM_CROWN = ITEMS.register("technetium_crown",
             () -> new TechnetiumArmorItem(ArmorItem.Type.HELMET,new Item.Properties()));
-    public static final RegistryObject<Item> TECHNETIUM_CLOAK = ITEMS.register("technetium_cloak",
+    public static final RegistryObject<Item> TECHNETIUM_CHESTPLATE = ITEMS.register("technetium_chestplate",
             () -> new TechnetiumArmorItem(ArmorItem.Type.CHESTPLATE,new Item.Properties()));
-    public static final RegistryObject<Item> TECHNETIUM_ACCUMULATORS = ITEMS.register("technetium_accumulators",
+    public static final RegistryObject<Item> TECHNETIUM_LEGGINGS = ITEMS.register("technetium_leggings",
             () -> new TechnetiumArmorItem(ArmorItem.Type.LEGGINGS,new Item.Properties()));
     public static final RegistryObject<Item> TECHNETIUM_BOOTS = ITEMS.register("technetium_boots",
             () -> new TechnetiumArmorItem(ArmorItem.Type.BOOTS,new Item.Properties()));
