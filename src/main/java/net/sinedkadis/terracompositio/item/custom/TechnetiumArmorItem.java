@@ -202,13 +202,13 @@ public class TechnetiumArmorItem extends TCArmorItem {
                         if (pLevel.isClientSide) {
                             pLevel.destroyBlock(target, true);
                             pLevel.setBlockAndUpdate(target, boardState);
-                            TCPackets.CHANNEL.send(PacketDistributor.SERVER.noArg(),new C2SBoardSync(target));
+                            TCPackets.CHANNEL.send(PacketDistributor.SERVER.noArg(),new C2SBoardSync(target,last));
                         } else {
                             handler.takeCFE(1, false);
                         }
                     }
                     if (lastBlockState.is(TCBlocks.TECHNETIUM_BOARD.get())) {
-                        pLevel.setBlockAndUpdate(last, replaceState);
+                        pLevel.setBlock(last, replaceState,0);
                     }
                 }
             }

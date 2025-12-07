@@ -13,10 +13,7 @@ import net.minecraft.client.model.geom.ModelPart;
 import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.model.geom.builders.*;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
-import net.minecraft.world.entity.AnimationState;
 import net.minecraft.world.entity.LivingEntity;
-import net.sinedkadis.terracompositio.item.models.amimations.TechnetiumArmorAnimations;
-import net.sinedkadis.terracompositio.util.LivingEntityAnimationAccessor;
 import net.sinedkadis.terracompositio.registries.TCModelLayers;
 
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -26,9 +23,18 @@ import javax.annotation.ParametersAreNonnullByDefault;
 public class TechnetiumBootsModel extends HierarchicalModel<LivingEntity> {
 
     private final ModelPart root;
+	private final ModelPart leftWing;
+	private final ModelPart rightWing;
+	private final float oLeft;
+	private final float oRight;
 
+	@SuppressWarnings("SuspiciousNameCombination")
     public TechnetiumBootsModel(ModelPart root) {
         this.root = root;
+		this.leftWing = root.getChild("left_leg").getChild("left_shoe").getChild("left_wing");
+		this.rightWing = root.getChild("right_leg").getChild("right_shoe").getChild("right_wing");
+		this.oLeft = leftWing.yRot;
+		this.oRight = rightWing.yRot;
     }
 
 	public static LayerDefinition createBodyLayer() {
@@ -62,9 +68,12 @@ public class TechnetiumBootsModel extends HierarchicalModel<LivingEntity> {
 
 	@Override
 	public void setupAnim(LivingEntity entity, float limbSwing, float limbSwingAmount, float ageInTicks, float netHeadYaw, float headPitch) {
-		AnimationState pAnimationState = ((LivingEntityAnimationAccessor) entity).terraCompositio$getIdleAnimationState();
-		this.animate(pAnimationState,
-				TechnetiumArmorAnimations.BOOTS_IDLE, ageInTicks, 1f);
+
+		float amplitude = 0.1f;
+		float speed = 0.3f;
+		double k = Math.sin(ageInTicks*speed)* amplitude;
+		leftWing.yRot = (float) (oLeft + k);
+		rightWing.yRot = (float) (oRight - k);
 	}
 
 	@Override
