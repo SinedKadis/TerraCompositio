@@ -72,7 +72,7 @@ public class TCBlockStateProvider extends BlockStateProvider {
                         Objects.requireNonNull(TerraCompositio.modLoc("block/"+
                                 Objects.requireNonNull(ForgeRegistries.BLOCKS.getKey(
                                         block)).getPath()+"_top")))
-                        .renderType("translucent"));
+                        .renderType("cutout"));
     }
 
     private void saplingBlock(RegistryObject<Block> blockRegistryObject) {

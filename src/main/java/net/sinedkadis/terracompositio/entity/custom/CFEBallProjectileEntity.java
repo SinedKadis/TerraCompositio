@@ -2,6 +2,7 @@ package net.sinedkadis.terracompositio.entity.custom;
 
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.BlockSource;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -30,7 +31,7 @@ public class CFEBallProjectileEntity extends ThrowableItemProjectile {
 
     public CFEBallProjectileEntity( double pX, double pY, double pZ, Level pLevel) {
         super(TCEntities.CFE_BALL_PROJECTILE.get(), pX, pY, pZ, pLevel);
-        setTargetHeight((int) pY);
+        setTargetHeight((int) pY-1);
         setNoGravity(true);
     }
 
@@ -41,6 +42,10 @@ public class CFEBallProjectileEntity extends ThrowableItemProjectile {
             setTargetHeight((int) (owner.position().y-1));
         }
         setNoGravity(true);
+    }
+
+    public CFEBallProjectileEntity(BlockSource pSource) {
+        this(pSource.x(),pSource.y(),pSource.z(),pSource.getLevel());
     }
 
 

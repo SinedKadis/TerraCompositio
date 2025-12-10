@@ -30,6 +30,7 @@ import java.util.List;
 public class TechnetiumBoardBlock extends Block implements SimpleWaterloggedBlock {
     public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
 
+
     public TechnetiumBoardBlock(Properties pProperties) {
         super(pProperties);
         registerDefaultState(defaultBlockState().setValue(WATERLOGGED,false));
@@ -73,6 +74,11 @@ public class TechnetiumBoardBlock extends Block implements SimpleWaterloggedBloc
     @Override
     public @NotNull VoxelShape getShape(BlockState pState, BlockGetter pLevel, BlockPos pPos, CollisionContext pContext) {
         return Block.box(0,12,0,16,16,16);
+    }
+
+    @Override
+    public boolean propagatesSkylightDown(BlockState pState, BlockGetter pLevel, BlockPos pPos) {
+        return true;
     }
 
     @Override

@@ -3,6 +3,7 @@ package net.sinedkadis.terracompositio.entity.custom;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.tags.BlockTags;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.projectile.ItemSupplier;
@@ -52,7 +53,7 @@ public class CFEDropProjectileEntity extends ThrowableProjectile implements Item
     @Override
     protected void onHitBlock(BlockHitResult pResult) {
         BlockPos blockPos = pResult.getBlockPos();
-        if (!level().isClientSide() && blockPos.getY() == getTargetHeight()) {
+        if (!level().isClientSide() && blockPos.getY() == getTargetHeight() && level().getBlockState(blockPos).is(BlockTags.REPLACEABLE)) {
             level().setBlockAndUpdate(blockPos, TCBlocks.TECHNETIUM_BOARD.get().defaultBlockState()
                     .setValue(BlockStateProperties.WATERLOGGED,false));
         }
