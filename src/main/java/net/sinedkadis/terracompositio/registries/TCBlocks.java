@@ -170,4 +170,7 @@ public class TCBlocks {
     public static final RegistryObject<Block> TECHNETIUM_BOARD = registerBlock("technetium_board",
             () -> new TechnetiumBoardBlock(BlockBehaviour.Properties.copy(Blocks.GLASS).noLootTable().noParticlesOnBreak().noOcclusion()));
 
+    public static final RegistryObject<Block> AIR_SATURATOR = registerBlock("air_saturator",
+            () -> new AirSaturatorBlock(BlockBehaviour.Properties.copy(Blocks.OAK_PLANKS).strength(3f)));
+
 }

@@ -1,0 +1,58 @@
+{
+  "variants": {
+    "facing=east,infused=false": {
+      "model": "terracompositio:block/air_saturator",
+      "y": 90,
+      "x": 90
+    },
+    "facing=east,infused=true": {
+      "model": "terracompositio:block/air_saturator_infused",
+      "y": 90,
+      "x": 90
+    },
+    "facing=north,infused=false": {
+      "model": "terracompositio:block/air_saturator",
+      "x": 90
+    },
+    "facing=north,infused=true": {
+      "model": "terracompositio:block/air_saturator_infused",
+      "x": 90
+    },
+    "facing=south,infused=false": {
+      "model": "terracompositio:block/air_saturator",
+      "y": 180,
+      "x": 90
+    },
+    "facing=south,infused=true": {
+      "model": "terracompositio:block/air_saturator_infused",
+      "y": 180,
+      "x": 90
+    },
+    "facing=west,infused=false": {
+      "model": "terracompositio:block/air_saturator",
+      "y": 270,
+      "x": 90
+    },
+    "facing=west,infused=true": {
+      "model": "terracompositio:block/air_saturator_infused",
+      "y": 270,
+      "x": 90
+    },
+    "facing=up,infused=false": {
+      "model": "terracompositio:block/air_saturator",
+      "x": 0
+    },
+    "facing=up,infused=true": {
+      "model": "terracompositio:block/air_saturator_infused",
+      "x": 0
+    },
+    "facing=down,infused=false": {
+      "model": "terracompositio:block/air_saturator",
+      "x": 180
+    },
+    "facing=down,infused=true": {
+      "model": "terracompositio:block/air_saturator_infused",
+      "x": 180
+    }
+  }
+}
