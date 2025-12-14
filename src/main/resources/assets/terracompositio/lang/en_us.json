@@ -143,8 +143,8 @@
   "block.terracompositio.pp.roll": "Roll: %s",
   "block.terracompositio.technetium_block": "Technetium Block",
   "item.terracompositio.technetium_crown": "Technetium Crown",
-  "item.terracompositio.technetium_cloak": "Technetium Cloak",
-  "item.terracompositio.technetium_accumulators": "Technetium Accumulators",
+  "item.terracompositio.technetium_chestplate": "Technetium Chestplate",
+  "item.terracompositio.technetium_leggings": "Technetium Leggings",
   "item.terracompositio.technetium_boots": "Technetium Boots",
   "item.terracompositio.technetium_boots.height": "Set Boot Height",
   "item.terracompositio.technetium_boots.raise": "Raise Boot Height",
@@ -154,6 +154,7 @@
   "item.terracompositio.fluid_applier": "Fluid Applier",
 
   "block.terracompositio.technetium_board": "Technetium Board",
+  "block.terracompositio.air_saturator": "Air Saturator",
 
   "key.terracompositio.categories.main": "Terra Compositio",
 

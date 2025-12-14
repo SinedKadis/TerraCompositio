@@ -3,6 +3,8 @@ package net.sinedkadis.terracompositio.mixin;
 import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.level.Level;
@@ -45,7 +47,10 @@ public class AbstractFurnaceBlockEntityMixin {
                             new SimpleContainer(pBlockEntity.getItem(0)),pLevel);
                     if (firingRecipe.isPresent()) {
                         int cfe = firingRecipe.get().getCfe();
-                        placeCFECloud(pLevel, airPos, cfe);
+                        int placed = placeCFECloud(pLevel, airPos, cfe);
+                        if (placed < cfe) {
+                            pLevel.playSound(null,pPos, SoundEvents.FIRECHARGE_USE, SoundSource.BLOCKS);
+                        }
                     }
                     break;
                 }

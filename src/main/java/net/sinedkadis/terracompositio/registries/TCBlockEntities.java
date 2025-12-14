@@ -88,6 +88,10 @@ public class TCBlockEntities {
             BLOCK_ENTITIES.register("ent_statue_be", () ->
                     BlockEntityType.Builder.of(EntStatueBlockEntity::new,
                             TCBlocks.FLOW_CEDAR_ENT_STATUE.get()).build(null));
+    public static final RegistryObject<BlockEntityType<AirSaturatorBlockEntity>> AIR_SATURATOR_BE =
+            BLOCK_ENTITIES.register("air_saturator_be", () ->
+                    BlockEntityType.Builder.of(AirSaturatorBlockEntity::new,
+                            TCBlocks.AIR_SATURATOR.get()).build(null));
 
 
 

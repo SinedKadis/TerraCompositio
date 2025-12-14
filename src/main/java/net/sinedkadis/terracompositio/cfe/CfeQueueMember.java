@@ -90,7 +90,7 @@ public class CfeQueueMember {
             this.target = null;
             this.targetHandler = null;
             this.distanceToTarget = startMiddlePoint.distanceTo(target.getOffset().apply(target.getBlockPos().getCenter()));
-            TCUtil.sendCFEParticles(level, lastEndPos, startMiddlePoint, cfeCount);
+            TCUtil.sendCFEParticles(level, target.getOffset().apply(target.getBlockPos().getCenter()), startMiddlePoint, cfeCount);
         }
     }
 

@@ -5,7 +5,11 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.entity.BlockEntityTicker;
+import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
@@ -13,7 +17,9 @@ import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.properties.DirectionProperty;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import net.sinedkadis.terracompositio.registries.TCBlockEntities;
 import net.sinedkadis.terracompositio.registries.TCBlockStateProperties;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -21,7 +27,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 @SuppressWarnings("deprecation")
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
-public class AirSaturatorBlock extends Block {
+public class AirSaturatorBlock extends TCCFEBaseEntityBlock {
     private static final BooleanProperty INFUSED = TCBlockStateProperties.INFUSED;
     private static final DirectionProperty FACING = BlockStateProperties.FACING;
 
@@ -50,5 +56,21 @@ public class AirSaturatorBlock extends Block {
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> pBuilder) {
         pBuilder.add(INFUSED,FACING);
+    }
+
+
+    @Override
+    public @Nullable BlockEntity newBlockEntity(BlockPos pPos, BlockState pState) {
+        return TCBlockEntities.AIR_SATURATOR_BE.get().create(pPos,pState);
+    }
+
+    @Nullable
+    @Override
+    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(@NotNull Level pLevel, @NotNull BlockState pState, @NotNull BlockEntityType<T> pBlockEntityType) {
+        if (pLevel.isClientSide()) {
+            return null;
+        }
+        return createTickerHelper(pBlockEntityType, TCBlockEntities.AIR_SATURATOR_BE.get(),
+                (pLevel1, pPos, pState1, pBlockEntity) -> pBlockEntity.tick(pLevel1,pPos,pState1));
     }
 }

@@ -19,7 +19,6 @@ public class CFESaturatedAirBlockEntity extends TCCFEBlockEntity {
 
     public CFESaturatedAirBlockEntity(BlockPos pPos, BlockState pBlockState) {
         super(TCBlockEntities.CFE_SATURATED_AIR_BE.get(),pPos, pBlockState,BlockMode.SOURCE);
-        this.cfeContainer.setCFE(100);
     }
 
     @Override
@@ -27,12 +26,14 @@ public class CFESaturatedAirBlockEntity extends TCCFEBlockEntity {
         return 5;
     }
 
+    private int firstSecond = 20;
     @Override
     public void tick(Level pLevel, BlockPos pPos, BlockState pState) {
         super.tick(pLevel, pPos, pState);
-        if (this.cfeContainer.getCFE() <= 0){
+        if (this.cfeContainer.getFreeSpace() == this.cfeContainer.getMaxCFE() && firstSecond <=0 ){
             pLevel.setBlock(pPos, Blocks.AIR.defaultBlockState(),3);
         }
+        if (firstSecond>0)firstSecond--;
     }
 
     @Override

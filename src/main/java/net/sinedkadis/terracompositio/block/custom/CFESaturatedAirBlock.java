@@ -15,7 +15,6 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import net.sinedkadis.terracompositio.api.networks.cfe.ICFEHandler;
 import net.sinedkadis.terracompositio.block.entity.CFESaturatedAirBlockEntity;
-import net.sinedkadis.terracompositio.block.entity.TCCFEBlockEntity;
 import net.sinedkadis.terracompositio.registries.TCBlockEntities;
 import net.sinedkadis.terracompositio.registries.TCBlocks;
 import net.sinedkadis.terracompositio.util.TCUtil;
@@ -23,8 +22,9 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.HashSet;
 import java.util.List;
-import java.util.Objects;
+import java.util.Set;
 
 @SuppressWarnings("deprecation")
 @ParametersAreNonnullByDefault
@@ -33,49 +33,48 @@ public class CFESaturatedAirBlock extends TCCFEBaseEntityBlock {
         super(pProperties);
     }
 
-    public static void placeCFECloud(Level pLevel, BlockPos airPos, int cfe) {
-        if (cfe <= 100){
-        pLevel.setBlockAndUpdate(airPos, TCBlocks.CFE_SATURATED_AIR.get().defaultBlockState());
-        CFESaturatedAirBlockEntity blockEntity = (CFESaturatedAirBlockEntity) pLevel.getBlockEntity(airPos);
-        assert blockEntity != null;
-        blockEntity.getCfeContainer().setCFE(cfe);
-        } else {
-            List<BlockPos> list = TCUtil.getTouchingBlocks(pLevel,airPos, BlockStateBase::isAir,10);
+    public static int placeCFECloud(Level pLevel, BlockPos targetPos, int cfe) {
+        if (pLevel.isClientSide()) return cfe;
 
-            List<ICFEHandler> icfeHandlers = list.stream()
-                    .filter(blockPos -> (pLevel.getBlockState(blockPos).is(TCBlocks.CFE_SATURATED_AIR.get())))
-                    .map(pLevel::getBlockEntity)
-                    .filter(Objects::nonNull)
-                    .map(blockEntity1 -> ((CFESaturatedAirBlockEntity) blockEntity1))
-                    .map(TCCFEBlockEntity::getCfeContainer)
-                    .toList();
-            for (ICFEHandler cfeContainer : icfeHandlers){
-                if (cfe > 0) {
-                    int added = cfeContainer.addCFE(cfe,cfeContainer, false,true);
-                    cfe -= added;
-                } else break;
-            }
-            if (cfe > 0) {
-                List<BlockPos> emptyAirs = list.stream()
-                        .filter(blockPos -> !(pLevel.getBlockState(blockPos).is(TCBlocks.CFE_SATURATED_AIR.get())))
-                        .toList();
-                for (BlockPos blockPos : emptyAirs) {
-                    if (cfe >= 100){
-                        pLevel.setBlockAndUpdate(blockPos, TCBlocks.CFE_SATURATED_AIR.get().defaultBlockState());
-                        cfe -= 100;
-                    } else {
-                        pLevel.setBlockAndUpdate(blockPos, TCBlocks.CFE_SATURATED_AIR.get().defaultBlockState());
-                        CFESaturatedAirBlockEntity blockEntity = (CFESaturatedAirBlockEntity) pLevel.getBlockEntity(blockPos);
-                        if (blockEntity != null){
-                            ICFEHandler cfeContainer = blockEntity.getCfeContainer();
-                            cfeContainer.setCFE(0);
-                            int added = cfeContainer.addCFE(cfe,cfeContainer,false,true);
-                            cfe -= added;
-                        }
+        int oCFE = cfe;
+        int lastListSize = -1;
+
+
+        Set<BlockPos> visited = new HashSet<>();
+
+        for (int i = 1; cfe > 0; i++){
+            List<BlockPos> list = TCUtil.getTouchingBlocks(pLevel, targetPos, BlockStateBase::isAir, i);
+            if (lastListSize != -1 && lastListSize == list.size()) return oCFE - cfe;
+            for (BlockPos pos : list) {
+                if (visited.contains(pos)) continue;
+
+                BlockEntity blockEntity = pLevel.getBlockEntity(pos);
+                if ((blockEntity instanceof CFESaturatedAirBlockEntity airBE)) {
+                    ICFEHandler cfeContainer = airBE.getCfeContainer();
+                    if (cfeContainer.getFreeSpace()>0) {
+                        int cfeWas = cfeContainer.getQueued() + cfeContainer.getCFE();
+                        int set = Math.min(cfe + cfeWas, cfeContainer.getFreeSpace());
+                        cfeContainer.setCFE(set);
+                        cfe -= set-cfeWas;
                     }
                 }
+                else {
+                    pLevel.setBlockAndUpdate(pos, TCBlocks.CFE_SATURATED_AIR.get().defaultBlockState());
+                    blockEntity = pLevel.getBlockEntity(pos);
+                    if (blockEntity instanceof CFESaturatedAirBlockEntity airBE) {
+                        int added = Math.min(cfe, airBE.getCfeContainer().getFreeSpace());
+                        airBE.getCfeContainer().setCFE(added);
+                        cfe -= added;
+                    }
+                }
+
+                visited.add(pos);
+                if (cfe <= 0) break;
             }
+            lastListSize = list.size();
         }
+
+        return oCFE - cfe;
     }
 
     @Override
@@ -109,14 +108,10 @@ public class CFESaturatedAirBlock extends TCCFEBaseEntityBlock {
         return TCBlockEntities.CFE_SATURATED_AIR_BE.get().create(pPos, pState);
     }
 
-    private int firstSecond = 20;
+
 
     @Override
     public void animateTick(BlockState state, Level level, BlockPos pos, RandomSource random) {
-        if (firstSecond > 1){
-            firstSecond--;
-            return;
-        }
         if (level.getBlockEntity(pos) instanceof CFESaturatedAirBlockEntity blockEntity) {
             blockEntity.spawnParticles(level, pos, random);
         }

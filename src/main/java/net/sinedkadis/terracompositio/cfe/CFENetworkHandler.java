@@ -2,11 +2,14 @@ package net.sinedkadis.terracompositio.cfe;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.MinecraftForge;
 import net.sinedkadis.terracompositio.api.networks.cfe.*;
 import net.sinedkadis.terracompositio.api.networks.NetworkAction;
+import net.sinedkadis.terracompositio.block.entity.CFESaturatedAirBlockEntity;
 import net.sinedkadis.terracompositio.block.entity.PathPointerBlockEntity;
 import net.sinedkadis.terracompositio.events.CFENetworkEvent;
+import net.sinedkadis.terracompositio.registries.TCBlocks;
 import net.sinedkadis.terracompositio.util.TCUtil;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -60,9 +63,12 @@ public class CFENetworkHandler implements CFENetwork {
             long minDist = Long.MAX_VALUE;
             long limitSquared = (long) limit * limit;
             CFENetworkMember closest = null;
+            BlockState blockState = level.getBlockState(pos);
+            boolean skipAir = blockState.is(TCBlocks.AIR_SATURATOR.get());
 
             for (CFENetworkMember source : sources) {
                 if (source instanceof CFENetworkMemberBE memberBE) {
+                    if (memberBE instanceof CFESaturatedAirBlockEntity && skipAir) continue;
                     long distance = distSqr(source.getBlockPos(), pos);
                     Optional<ICFEHandler> cfeHandlerOptional = memberBE.getBE().getCapability(CFECapability.CFE).resolve();
                     if (distance <= limitSquared
