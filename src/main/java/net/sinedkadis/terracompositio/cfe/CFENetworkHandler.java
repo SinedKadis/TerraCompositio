@@ -34,6 +34,7 @@ public class CFENetworkHandler implements CFENetwork {
 
     public void networkMemberUpdated(CFENetworkMember updated) {
         if (cfeSources.containsKey(updated.getLevel())) {
+            if (updated instanceof CFESaturatedAirBlockEntity) return;
 //            if (updated instanceof Player) {
 //                updated.getLimit()
 //            }

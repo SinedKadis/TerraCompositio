@@ -44,11 +44,4 @@ public class AirSaturatorBlockEntity extends TCCFEBlockEntity{
         }
         wasActivated = isActivated;
     }
-
-    @Override
-    public void onCFENetworkMemberUpdate(Level level, BlockPos pos) {
-        if (level != null && !level.isClientSide){
-            if (level.hasNeighborSignal(pos)) super.onCFENetworkMemberUpdate(level,pos);
-        }
-    }
 }

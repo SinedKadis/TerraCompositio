@@ -298,7 +298,7 @@ public class TCUtil {
     public static @NotNull List<BlockPos> getTouchingBlocks(@Nullable Level level, BlockPos pos, @Nullable TagKey<Block> block){
         if (level != null && !level.isClientSide)
             return getTouchingBlocks(level, pos,block,1);
-        return getTouchingBlocks(null, pos, (TagKey<Block>) null,1);
+        return getTouchingBlocks(null, pos, (TagKey<Block>) null,2);
     }
     public static @NotNull List<BlockPos> getNearBlocks(BlockPos pos, int iteration){
         return getNearBlocks(null, pos, null,iteration);
@@ -483,5 +483,4 @@ public class TCUtil {
         long dz = a.getZ() - b.getZ();
         return dx * dx + dy * dy + dz * dz;
     }
-
 }

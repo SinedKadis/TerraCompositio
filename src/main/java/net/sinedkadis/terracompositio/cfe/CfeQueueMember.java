@@ -73,6 +73,10 @@ public class CfeQueueMember {
     }
 
     public CfeQueueMember(int cfeCount, ICFEHandler target, BlockPos sourcePos, ServerLevel level) {
+        if (sourcePos.equals(target.getBlockPos())) {
+            isEnded = true;
+            isReached = true;
+        }
         this.cfeCount = cfeCount;
         this.isDynamicTarget = target.getAttachedMember() instanceof CFENetworkMemberEntity
                 || target.getAttachedMember() instanceof Player;
@@ -104,7 +108,7 @@ public class CfeQueueMember {
 
 
     public void memberTick() {
-        if (level != null){
+        if (level != null && !isEnded){
             if (isDynamicTarget) {
                 double newPassed = passedDistance - lastPassed;
                 if (target == null) {

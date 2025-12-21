@@ -126,6 +126,7 @@ public class TCBlockTagGenerator extends BlockTagsProvider {
                 .add(TCBlocks.FLOW_CEDAR_SAPLING.get());
 //        this.tag(TCTags.Blocks.CREATE_WRENCH_PICKUP)
 //                .add(Blocks.PISTON);
-
+        this.tag(TCTags.Blocks.ENERGY_CONTAINING_AIR)
+                .add(TCBlocks.CFE_SATURATED_AIR.get());
     }
 }
