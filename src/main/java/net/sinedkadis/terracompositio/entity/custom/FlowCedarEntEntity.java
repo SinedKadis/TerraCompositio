@@ -30,6 +30,7 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
 import net.sinedkadis.terracompositio.api.TerraCompositioAPI;
+import net.sinedkadis.terracompositio.api.dummies.DummyCFEHandler;
 import net.sinedkadis.terracompositio.api.networks.NetworkAction;
 import net.sinedkadis.terracompositio.api.networks.cfe.CFENetwork;
 import net.sinedkadis.terracompositio.api.networks.cfe.CFENetworkMemberEntity;
@@ -102,6 +103,7 @@ public class FlowCedarEntEntity extends AbstractGolem implements CFENetworkMembe
     @Override
     public void tick() {
         super.tick();
+        updateIfScheduled();
         ItemStack item = this.getItemBySlot(EquipmentSlot.HEAD);
         item.getItem().inventoryTick(item,level(),this,3,false);
         if (this.level().isClientSide()) {
@@ -115,7 +117,6 @@ public class FlowCedarEntEntity extends AbstractGolem implements CFENetworkMembe
             }
 
             lazyCFEOptional.ifPresent(icfeHandler -> {
-                icfeHandler.containerTick();
                 int currentEnergy = icfeHandler.getCFE();
 
                 if (currentEnergy > 10000) abortCFEConsume();
@@ -126,7 +127,6 @@ public class FlowCedarEntEntity extends AbstractGolem implements CFENetworkMembe
                 }
 
                 innerCFEOptional.ifPresent(icfeHandler1 -> {
-                    icfeHandler1.containerTick();
                     tickCounter--;
                     if (tickCounter <= 0) {
                         TCUtil.tryCFETransfer(icfeHandler1, icfeHandler, 10);
@@ -279,7 +279,7 @@ public class FlowCedarEntEntity extends AbstractGolem implements CFENetworkMembe
     }
 
     @Override
-    public BlockPos getBlockPos() {
+    public BlockPos getPos() {
         return this.blockPosition();
     }
 
@@ -301,6 +301,11 @@ public class FlowCedarEntEntity extends AbstractGolem implements CFENetworkMembe
             scale = (0.1f + (getSyncedCFE() / (float) icfeHandler.get().getMaxCFE())) * 10;
         }
         return new Vec3(0.5d,this.getBbHeight() + scale * 0.2f,0.5d);
+    }
+
+    @Override
+    public ICFEHandler getMainHandler() {
+        return lazyCFEOptional.orElse(DummyCFEHandler.instance);
     }
 
     @Override

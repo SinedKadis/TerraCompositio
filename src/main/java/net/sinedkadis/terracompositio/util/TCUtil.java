@@ -1,5 +1,8 @@
 package net.sinedkadis.terracompositio.util;
 
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.blaze3d.vertex.VertexConsumer;
+import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.Vec3i;
@@ -44,29 +47,25 @@ import static net.sinedkadis.terracompositio.registries.TCBlockStateProperties.I
 public class TCUtil {
 
 
-    public static void tryCFETransfer(CFENetworkMember target, CFENetworkMember source, int maxTransfer, boolean doRender){
-        ICFEHandler targetHandler = CFENetwork.getCFEHandler(target).orElse(null);
-        int added;
-        if (targetHandler != null){
-            ICFEHandler sourceHandler = CFENetwork.getCFEHandler(source).orElse(null);
-            if (sourceHandler != null){
-                int taken = sourceHandler.takeCFE(maxTransfer,true);
-                added = targetHandler.addCFE(taken,sourceHandler,true,true);
-                if (added <= taken){
-                    added = targetHandler.addCFE(added, sourceHandler, false,doRender);
-                    sourceHandler.takeCFE(added, false);
-                }
-            }
+    public static void tryCFETransfer(CFENetworkMember target, CFENetworkMember source, int maxTransfer){
+        int taken = source.getMainHandler().takeCFE(maxTransfer,true);
+        int added = source.getMainHandler().sendCFE(taken, target.getMainHandler(), true);
+
+        if (added <= taken){
+            added = source.getMainHandler().sendCFE(added, target.getMainHandler(), false);
+            source.getMainHandler().takeCFE(added, false);
         }
-    }
-    public static void tryCFETransfer(CFENetworkMember target, CFENetworkMember source, int maxTransfer) {
-        tryCFETransfer(target, source, maxTransfer, true);
+
+
     }
     public static void tryCFETransfer(ICFEHandler target, ICFEHandler source, int maxTransfer){
         int taken = source.takeCFE(maxTransfer,true);
-        int added = target.addCFE(taken,source,true,true);
+        int added = source.sendCFE(taken,target,true);
         if (added <= taken){
-            added = target.addCFE(added, source, false,true);
+            if (target.getPos().closerThan(source.getPos(),2))
+                added = target.addCFE(added, false);
+            else
+                added = source.sendCFE(added, target, false);
             source.takeCFE(added, false);
         }
     }
@@ -482,5 +481,48 @@ public class TCUtil {
         long dy = a.getY() - b.getY();
         long dz = a.getZ() - b.getZ();
         return dx * dx + dy * dy + dz * dz;
+    }
+
+    public static void drawCfeParticle(PoseStack pPoseStack, int pPackedLight, VertexConsumer buffer) {
+        PoseStack.Pose pose = pPoseStack.last();
+        var matrix = pose.pose();
+        var normal = pose.normal();
+
+        pPackedLight = 0xF000F0;
+
+        float size = 0.1f;
+
+        int pAlpha = 200;
+        buffer.vertex(matrix, -size, -size, 0)
+                .color(255, 255, 255, pAlpha)
+                .uv(0, 1)
+                .overlayCoords(OverlayTexture.NO_OVERLAY)
+                .uv2(pPackedLight)
+                .normal(normal, 0, 0, 1)
+                .endVertex();
+
+        buffer.vertex(matrix, size, -size, 0)
+                .color(255, 255, 255, pAlpha)
+                .uv(1, 1)
+                .overlayCoords(OverlayTexture.NO_OVERLAY)
+                .uv2(pPackedLight)
+                .normal(normal, 0, 0, 1)
+                .endVertex();
+
+        buffer.vertex(matrix, size, size, 0)
+                .color(255, 255, 255, pAlpha)
+                .uv(1, 0)
+                .overlayCoords(OverlayTexture.NO_OVERLAY)
+                .uv2(pPackedLight)
+                .normal(normal, 0, 0, 1)
+                .endVertex();
+
+        buffer.vertex(matrix, -size, size, 0)
+                .color(255, 255, 255, pAlpha)
+                .uv(0, 0)
+                .overlayCoords(OverlayTexture.NO_OVERLAY)
+                .uv2(pPackedLight)
+                .normal(normal, 0, 0, 1)
+                .endVertex();
     }
 }

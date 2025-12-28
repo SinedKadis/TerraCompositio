@@ -67,7 +67,7 @@ public class CFEExtractGoal extends Goal {
         if (held.isPresent() && inner.isPresent()){
             ICFEHandler helded = held.get();
             ICFEHandler innered = inner.get();
-            return helded.getQueued() + innered.getQueued() + helded.getCFE() <= 0;
+            return helded.getCFE() + helded.getQueued() + innered.getQueued() <= 0;
         }
         return true;
     }
@@ -112,7 +112,7 @@ public class CFEExtractGoal extends Goal {
                     if (blockState.hasProperty(TCBlockStateProperties.INFUSED) && blockState.getValue(TCBlockStateProperties.INFUSED)) {
                         //this.level.levelEvent(2001, blockpos1, Block.getId(Blocks.GRASS_BLOCK.defaultBlockState()));
                         level.setBlockAndUpdate(targetPos, blockState.setValue(TCBlockStateProperties.INFUSED, false));
-                        icfeHandler.addCFE(100, targetPos, false);
+                        icfeHandler.addCFE(100, false);
 
                     }
                 }

@@ -75,70 +75,87 @@ public class PathPointerBlockEntity extends TCCFEBlockEntity implements Nameable
                 cfeNetworkInstance.fireCFENetworkEvent(this, NetworkAction.ADD);
             }
         }
-        cfeContainer.containerTick();
         timer--;
         if (timer <= 0) {
-            onCFENetworkMemberUpdate(pLevel,pPos);
+            scheduleMemberUpdate();
         }
         if (toSendEntity != null && !(toSendEntity.blockPosition().equals(nextNode)) && toSendEntity.blockPosition() != this.getBlockPos()) {
-            onCFENetworkMemberUpdate(pLevel,pPos);
+            scheduleMemberUpdate();
         }
         if (toReceiveEntity != null && !(toReceiveEntity.blockPosition().equals(lastNode)) && toReceiveEntity.blockPosition() != this.getBlockPos()) {
-            onCFENetworkMemberUpdate(pLevel,pPos);
+            scheduleMemberUpdate();
         }
         if (toSendEntity == null || toReceiveEntity == null) {
             lastToSendScan = scanCompatibleEntities(pLevel);
             if (!lastToSendScan.isEmpty()) {
-                onCFENetworkMemberUpdate(pLevel,pPos);
+                scheduleMemberUpdate();
+            }
+        }
+        updateIfScheduled();
+    }
+
+    @Override
+    public void onCFENetworkMemberUpdate() {
+        if (level == null) return;
+        BlockState pState = level.getBlockState(worldPosition);
+        List<PathPointerBlock.PPPart> parts = Arrays.asList(PathPointerBlock.getParts(pState));
+
+        verifyNodes();
+        computeSender(parts);
+        computeReceiver(parts);
+        computeCollector(parts);
+        computeEmitter(parts);
+
+        computeMax();
+
+        transferCFE(level, parts);
+        timer = 100;
+    }
+
+    private void computeMax() {
+        if (level == null) return;
+        PathPointerBlockEntity blockEntity = null;
+        if (toReceiveEntity == null){
+            if (collectorPos == null) {
+                collectorPos = getCollector();
+            }
+            if (collectorPos != null) {
+                blockEntity = ((PathPointerBlockEntity) level.getBlockEntity(collectorPos));
+            }
+            if (blockEntity != null) {
+                blockEntity.updateMax();
+            }
+        } else {
+            this.updateMax();
+        }
+    }
+
+    private void computeEmitter(List<PathPointerBlock.PPPart> parts) {
+        if (parts.contains(PathPointerBlock.PPPart.EMITTER)) {
+            this.connectRange = 7;
+        }
+    }
+
+    private void computeCollector(List<PathPointerBlock.PPPart> parts) {
+        if (level == null) return;
+        if (parts.contains(PathPointerBlock.PPPart.COLLECTOR)) {
+            this.connectRange = 7;
+            int toAdd = this.cfeContainer.getMaxCFE() - this.getInSystem();
+            if (toAdd > 0) {
+                if (!level.isClientSide()){
+
+                    CFENetwork cfeNetwork = TerraCompositioAPI.instance().getCFENetworkInstance();
+                    CFENetworkMember source = cfeNetwork.getClosestSourceWithCFE(worldPosition, level, connectRange * 2, getPriority());
+                    if (source != null) {
+                        TCUtil.tryCFETransfer(this, source, toAdd);
+
+                    }
+                }
             }
         }
     }
 
-    @Override
-    public void onCFENetworkMemberUpdate(Level level, BlockPos pos) {
-        BlockState pState = level.getBlockState(pos);
-        List<PathPointerBlock.PPPart> parts = Arrays.asList(PathPointerBlock.getParts(pState));
-        if (nextNode != null) {
-            boolean nextNodeIsPP = level.getBlockState(nextNode).getBlock() instanceof PathPointerBlock;
-            if (toSendEntity != null && (toSendEntity.isRemoved() || !toSendEntity.blockPosition().closerThan(pos,getLimit())))
-                toSendEntity = null;
-            if (!nextNodeIsPP && toSendEntity == null) {
-                nextNode = null;
-            }
-        }
-        if (lastNode != null) {
-            boolean lastNodeIsPP = level.getBlockState(lastNode).getBlock() instanceof PathPointerBlock;
-            if (toReceiveEntity != null && (toReceiveEntity.isRemoved() || !toReceiveEntity.blockPosition().closerThan(pos,getLimit())))
-                toReceiveEntity = null;
-            if (!lastNodeIsPP && toReceiveEntity == null) {
-                lastNode = null;
-            }
-        }
-        if (parts.contains(PathPointerBlock.PPPart.SENDER)) {
-            if (toSendEntity == null && nextNode == null) {
-                searchAndBindToEntity(level,true);
-            }
-            if (nextNode != null && toSendEntity != null ) {
-                BlockPos currentEntityPos = toSendEntity.blockPosition();
-                if (!(nextNode.equals(currentEntityPos))) {
-                    if (toSendEntity.getItemBySlot(EquipmentSlot.HEAD).is(TCItems.TECHNETIUM_CROWN.get())
-                            && simulateUpdateRotation(lastNode,getBlockPos(), currentEntityPos,false)) {
-                        nextNode = currentEntityPos;
-                    } else {
-                        nextNode = null;
-                        toSendEntity = null;
-                    }
-                    updateRotation(false);
-                }
-                if (toSendEntity instanceof CFENetworkMemberEntity member) {
-                    ICFEHandler handler = toSendEntity.getCapability(CFECapability.CFE)
-                            .filter(icfeHandler -> icfeHandler.getFreeSpace() > 0).orElse(DummyCFEHandler.instance);
-                    if (!(handler instanceof DummyCFEHandler)) {
-                        TCUtil.tryCFETransfer(member,this,100);
-                    }
-                }
-            }
-        }
+    private void computeReceiver(List<PathPointerBlock.PPPart> parts) {
         if (parts.contains(PathPointerBlock.PPPart.RECEIVER)) {
             if (toReceiveEntity == null && lastNode == null) {
                 searchAndBindToEntity(level,false);
@@ -164,44 +181,54 @@ public class PathPointerBlockEntity extends TCCFEBlockEntity implements Nameable
                 }
             }
         }
-        if (parts.contains(PathPointerBlock.PPPart.COLLECTOR)) {
-            this.connectRange = 7;
-            int toAdd = this.cfeContainer.getMaxCFE() - this.getInSystem();
-            if (toAdd > 0) {
-                if (!level.isClientSide()){
+    }
 
-                    CFENetwork cfeNetwork = TerraCompositioAPI.instance().getCFENetworkInstance();
-                    CFENetworkMember source = cfeNetwork.getClosestSourceWithCFE(pos, level, connectRange * 2, getPriority());
-                    if (source != null) {
-                        TCUtil.tryCFETransfer(this, source, toAdd);
-
+    private void computeSender(List<PathPointerBlock.PPPart> parts) {
+        if (parts.contains(PathPointerBlock.PPPart.SENDER)) {
+            if (toSendEntity == null && nextNode == null) {
+                searchAndBindToEntity(level,true);
+            }
+            if (nextNode != null && toSendEntity != null ) {
+                BlockPos currentEntityPos = toSendEntity.blockPosition();
+                if (!(nextNode.equals(currentEntityPos))) {
+                    if (toSendEntity.getItemBySlot(EquipmentSlot.HEAD).is(TCItems.TECHNETIUM_CROWN.get())
+                            && simulateUpdateRotation(lastNode,getBlockPos(), currentEntityPos,false)) {
+                        nextNode = currentEntityPos;
+                    } else {
+                        nextNode = null;
+                        toSendEntity = null;
                     }
-
+                    updateRotation(false);
+                }
+                if (toSendEntity instanceof CFENetworkMemberEntity member) {
+                    ICFEHandler handler = toSendEntity.getCapability(CFECapability.CFE)
+                            .filter(icfeHandler -> icfeHandler.getFreeSpace() > 0).orElse(DummyCFEHandler.instance);
+                    if (!(handler instanceof DummyCFEHandler)) {
+                        TCUtil.tryCFETransfer(member,this,100);
+                    }
                 }
             }
-
         }
-        if (parts.contains(PathPointerBlock.PPPart.EMITTER)) {
-            this.connectRange = 7;
-        }
+    }
 
-        PathPointerBlockEntity blockEntity = null;
-        if (toReceiveEntity == null){
-            if (collectorPos == null) {
-                collectorPos = getCollector();
+    private void verifyNodes() {
+        if (level == null) return;
+        if (nextNode != null) {
+            boolean nextNodeIsPP = level.getBlockState(nextNode).getBlock() instanceof PathPointerBlock;
+            if (toSendEntity != null && (toSendEntity.isRemoved() || !toSendEntity.blockPosition().closerThan(worldPosition,getLimit())))
+                toSendEntity = null;
+            if (!nextNodeIsPP && toSendEntity == null) {
+                nextNode = null;
             }
-            if (collectorPos != null) {
-                blockEntity = ((PathPointerBlockEntity) level.getBlockEntity(collectorPos));
-            }
-            if (blockEntity != null) {
-                blockEntity.updateMax();
-            }
-        } else {
-            this.updateMax();
         }
-
-        transferCFE(level, parts);
-        timer = 100;
+        if (lastNode != null) {
+            boolean lastNodeIsPP = level.getBlockState(lastNode).getBlock() instanceof PathPointerBlock;
+            if (toReceiveEntity != null && (toReceiveEntity.isRemoved() || !toReceiveEntity.blockPosition().closerThan(worldPosition,getLimit())))
+                toReceiveEntity = null;
+            if (!lastNodeIsPP && toReceiveEntity == null) {
+                lastNode = null;
+            }
+        }
     }
 
     private void searchAndBindToEntity(Level level,boolean isToSend) {
@@ -257,10 +284,10 @@ public class PathPointerBlockEntity extends TCCFEBlockEntity implements Nameable
 
     private void transferCFE(Level level, List<PathPointerBlock.PPPart> currentParts) {
         if (lastNode != null) {
-            PathPointerBlockEntity lastNodeBE = ((PathPointerBlockEntity) level.getBlockEntity(lastNode));
             BlockState lastNodeBlockState = level.getBlockState(lastNode);
             List<PathPointerBlock.PPPart> lastParts = Arrays.asList(PathPointerBlock.getParts(lastNodeBlockState));
             if (lastParts.contains(PathPointerBlock.PPPart.SENDER) && currentParts.contains(PathPointerBlock.PPPart.RECEIVER)) {
+                PathPointerBlockEntity lastNodeBE = ((PathPointerBlockEntity) level.getBlockEntity(lastNode));
                 if (lastNodeBE != null) {
                     if (level.isClientSide) return;
                     TCUtil.tryCFETransfer(this, lastNodeBE, Integer.MAX_VALUE);
@@ -289,19 +316,19 @@ public class PathPointerBlockEntity extends TCCFEBlockEntity implements Nameable
 
     private int getMaxToEmit() {
         List<CFENetworkMember> members = TerraCompositioAPI.instance().getCFENetworkInstance().getAllCFENetworkMembers(level).stream()
-                .filter(cfeNetworkMember -> cfeNetworkMember.getBlockPos().closerThan(this.getBlockPos(),this.getLimit()))
+                .filter(cfeNetworkMember -> cfeNetworkMember.getPos().closerThan(this.getBlockPos(),this.getLimit()))
                 .filter(cfeNetworkMember -> cfeNetworkMember.getPriority() > this.getPriority())
                 .filter(cfeNetworkMember -> {
                     if (cfeNetworkMember instanceof PathPointerBlockEntity){
                         List<PathPointerBlock.PPPart> parts = Arrays.asList(PathPointerBlock
-                                .getParts(cfeNetworkMember.getLevel().getBlockState(cfeNetworkMember.getBlockPos())));
+                                .getParts(cfeNetworkMember.getLevel().getBlockState(cfeNetworkMember.getPos())));
                         return parts.contains(PathPointerBlock.PPPart.COLLECTOR);
                     }
                     return true;
                 })
                 .filter(cfeNetworkMember -> CFENetwork.getCFEHandler(cfeNetworkMember)
                         .filter(icfeHandler -> icfeHandler.getFreeSpace() > 0).isPresent())
-                .filter(cfeNetworkMember -> cfeNetworkMember.getBlockPos() != collectorPos)
+                .filter(cfeNetworkMember -> cfeNetworkMember.getPos() != collectorPos)
                 .toList();
         int max = 0;
         for (CFENetworkMember member : members){
@@ -365,11 +392,13 @@ public class PathPointerBlockEntity extends TCCFEBlockEntity implements Nameable
                     blockEntityQueue.add(level.getBlockEntity(currentPPBE.nextNode));
                 }
             }
-            if (currentBE  instanceof PathPointerBlockEntity currentPPBE && currentPart.contains(PathPointerBlock.PPPart.EMITTER)){
+            if (currentBE instanceof PathPointerBlockEntity currentPPBE && currentPart.contains(PathPointerBlock.PPPart.EMITTER)){
                 if (level == null) break;
+                currentPPBE.connectRange = 7;
                 int max = currentPPBE.getMaxToEmit();
                 this.cfeContainer.setMaxCFE(max);
                 currentPPBE.cfeContainer.setMaxCFE(max).setCfeTravelSpeed(5/20f);
+                currentPPBE.scheduleMemberUpdate();
                 break;
             }
         }
@@ -396,7 +425,7 @@ public class PathPointerBlockEntity extends TCCFEBlockEntity implements Nameable
             while (!blockEntityQueue.isEmpty()) {
                 BlockEntity currentBE = blockEntityQueue.poll();
                 if (currentBE instanceof CFENetworkMember member) {
-                    inSystem += CFENetwork.getCFEHandler(member).stream().mapToInt(icfeHandler -> icfeHandler.getCFE()+icfeHandler.getQueued()).sum();
+                    inSystem += CFENetwork.getCFEHandler(member).stream().mapToInt(ICFEHandler::getCFEWithQueue).sum();
                     if (currentBE instanceof PathPointerBlockEntity pp
                             && pp.nextNode != null
                             && !pp.nextNode.equals(pp.getBlockPos())) {

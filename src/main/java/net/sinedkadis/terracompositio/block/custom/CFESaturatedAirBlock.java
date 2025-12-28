@@ -1,7 +1,6 @@
 package net.sinedkadis.terracompositio.block.custom;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
@@ -38,7 +37,7 @@ public class CFESaturatedAirBlock extends TCCFEBaseEntityBlock {
 
         BlockEntity blockEntity = pLevel.getBlockEntity(targetPos);
         if (blockEntity instanceof CFESaturatedAirBlockEntity airBlockEntity) {
-            return airBlockEntity.getCfeContainer().addCFE(cfe, targetPos, false);
+            return airBlockEntity.getCfeContainer().addCFE(cfe, false);
         }
         return 0;
     }
@@ -72,15 +71,6 @@ public class CFESaturatedAirBlock extends TCCFEBaseEntityBlock {
     @Override
     public BlockEntity newBlockEntity(@NotNull BlockPos pPos, @NotNull BlockState pState) {
         return TCBlockEntities.CFE_SATURATED_AIR_BE.get().create(pPos, pState);
-    }
-
-
-
-    @Override
-    public void animateTick(BlockState state, Level level, BlockPos pos, RandomSource random) {
-        if (level.getBlockEntity(pos) instanceof CFESaturatedAirBlockEntity blockEntity) {
-            blockEntity.spawnParticles(level, pos, random);
-        }
     }
 
     @Nullable

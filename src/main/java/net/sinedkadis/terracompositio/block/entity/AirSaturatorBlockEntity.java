@@ -22,7 +22,7 @@ public class AirSaturatorBlockEntity extends TCCFEBlockEntity{
         super.tick(pLevel, pPos, pState);
         boolean isActivated = pLevel.hasNeighborSignal(pPos);
         if (isActivated && !wasActivated) {
-            onCFENetworkMemberUpdate(pLevel,pPos);
+            scheduleMemberUpdate();
         }
         int cfe = cfeContainer.getCFE();
         if (isActivated && cfe > 0) {
@@ -31,13 +31,13 @@ public class AirSaturatorBlockEntity extends TCCFEBlockEntity{
             if (pState.getValue(TCBlockStateProperties.INFUSED)) {
                 cfe = CFESaturatedAirBlock.placeCFECloud(pLevel, toPlace, cfe);
                 cfeContainer.takeCFE(cfe,false);
-                onCFENetworkMemberUpdate(pLevel,pPos);
+                scheduleMemberUpdate();
                 pLevel.playSound(null,toPlace, SoundEvents.WOOL_PLACE, SoundSource.BLOCKS,0.5f,1f);
             } else if (timer <= 0){
                 int toSaturate = cfeContainer.takeCFE(10,true);
                 toSaturate = CFESaturatedAirBlock.placeCFECloud(pLevel, toPlace, toSaturate);
                 cfeContainer.takeCFE(toSaturate,false);
-                onCFENetworkMemberUpdate(pLevel,pPos);
+                scheduleMemberUpdate();
                 timer = 20;
                 pLevel.playSound(null,toPlace, SoundEvents.WOOL_PLACE, SoundSource.BLOCKS,0.5f,1f);
             } else timer--;

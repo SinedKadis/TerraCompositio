@@ -283,16 +283,16 @@ public class TechnetiumArmorItem extends TCArmorItem {
                 if (cfe < 1) {
                     if (leggings.takeCFE(1,true)>0) {
                         int cfe1 = leggings.takeCFE(1, false);
-                        icfeHandler.addCFE(
+                        icfeHandler.sendCFE(
                                 cfe1,null,false);
                     } else if (playerCap.takeCFE(1,true)>0) {
-                        icfeHandler.addCFE(
+                        icfeHandler.sendCFE(
                                 playerCap.takeCFE(1,false),null,false);
                     }
                 }
             } else {
                 if (playerCap.takeCFE(icfeHandler.getFreeSpace(),true)>0) {
-                    icfeHandler.addCFE(
+                    icfeHandler.sendCFE(
                             playerCap.takeCFE(icfeHandler.getFreeSpace(),false),null,false);
                 }
             }

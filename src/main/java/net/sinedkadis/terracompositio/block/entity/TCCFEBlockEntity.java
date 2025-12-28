@@ -81,7 +81,12 @@ public abstract class TCCFEBlockEntity extends TCBlockEntity implements CFENetwo
     public void onLoad() {
         super.onLoad();
         lazyCFEOptional = LazyOptional.of(() -> cfeContainer);
-        this.onCFENetworkMemberUpdate(level,worldPosition);
+        scheduleMemberUpdate();
+    }
+
+    @Override
+    public ICFEHandler getMainHandler() {
+        return cfeContainer;
     }
 
     @Override
@@ -100,7 +105,7 @@ public abstract class TCCFEBlockEntity extends TCBlockEntity implements CFENetwo
                 cfeNetworkInstance.fireCFENetworkEvent(this, NetworkAction.ADD);
             }
         }
-        cfeContainer.containerTick();
+        updateIfScheduled();
     }
 
     @Override
@@ -116,11 +121,11 @@ public abstract class TCCFEBlockEntity extends TCBlockEntity implements CFENetwo
     }
 
     @Override
-    public void onCFENetworkMemberUpdate(Level level, BlockPos pos) {
+    public void onCFENetworkMemberUpdate() {
         if (level != null && !level.isClientSide){
             if (blockMode.consumer() || blockMode.container()){
                 CFENetwork cfeNetwork = TerraCompositioAPI.instance().getCFENetworkInstance();
-                CFENetworkMember source = cfeNetwork.getClosestSourceWithCFE(pos, level, connectRange * 2, getPriority());
+                CFENetworkMember source = cfeNetwork.getClosestSourceWithCFE(worldPosition, level, connectRange, getPriority());
                 if (source != null) {
                     TCUtil.tryCFETransfer(this, source, Integer.MAX_VALUE);
                 }

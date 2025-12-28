@@ -25,17 +25,17 @@ public class CFETrashCanBlockEntity extends TCCFEBlockEntity {
     }
 
     @Override
-    public void onCFENetworkMemberUpdate(Level level, BlockPos pos) {
+    public void onCFENetworkMemberUpdate() {
         TerraCompositioAPI.instance().getCFENetworkInstance().getAllCFENetworkMembers(level).stream()
-                .filter(cfeNetworkMemberBE -> TCUtil.distSqr(cfeNetworkMemberBE.getBlockPos(),worldPosition) <= 100)
+                .filter(cfeNetworkMemberBE -> TCUtil.distSqr(cfeNetworkMemberBE.getPos(),worldPosition) <= 100)
                 .filter(cfeNetworkMemberBE -> {
                     if (cfeNetworkMemberBE instanceof CFENetworkMemberBE cfeNetworkMemberBE1)
-                        return !(cfeNetworkMemberBE1.getBE() instanceof CreativeCFESourceBlockEntity);
+                        return !(cfeNetworkMemberBE1.getEntity() instanceof CreativeCFESourceBlockEntity);
                     return true;
                 })
                 .filter(cfeNetworkMemberBE -> {
                     if (cfeNetworkMemberBE instanceof CFENetworkMemberBE cfeNetworkMemberBE1)
-                        return ((TCCFEBlockEntity) cfeNetworkMemberBE1.getBE()).getCfeContainer().getCFE() > 0;
+                        return ((TCCFEBlockEntity) cfeNetworkMemberBE1.getEntity()).getCfeContainer().getCFE() > 0;
                     if (cfeNetworkMemberBE instanceof CFENetworkMemberEntity cfeNetworkMemberEntity) {
                         Optional<ICFEHandler> icfeHandler = cfeNetworkMemberEntity.getEntity().getCapability(CFECapability.CFE).resolve();
                         return icfeHandler.isPresent() && icfeHandler.get().getCFE() > 0;

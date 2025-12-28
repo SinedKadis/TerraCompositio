@@ -17,7 +17,6 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.sinedkadis.terracompositio.TerraCompositio;
 import net.sinedkadis.terracompositio.api.networks.cfe.CFECapability;
-import net.sinedkadis.terracompositio.api.networks.cfe.ICFEHandler;
 import net.sinedkadis.terracompositio.cfe.PlayerCFEProvider;
 import net.sinedkadis.terracompositio.entity.custom.FlowCedarEntEntity;
 import net.sinedkadis.terracompositio.registries.TCEffects;
@@ -40,9 +39,6 @@ public class ForgeEventBusEvents {
             }else {
                 livingEntity.setDeltaMovement(livingEntity.getDeltaMovement().scale(1.2F));
             }
-        }
-        if (livingEntity instanceof Player player) {
-            player.getCapability(CFECapability.CFE).ifPresent(ICFEHandler::containerTick);
         }
 
     }

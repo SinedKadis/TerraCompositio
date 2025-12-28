@@ -66,8 +66,8 @@ public class ConstructionDesorberBlockEntity extends AbstractDesorberBlockEntity
         CFENetwork network = TerraCompositioAPI.instance().getCFENetworkInstance();
         List<CFENetworkMember> members = network.getAllCFENetworkMembers((Level) level);
         List<ConstructionDesorberBlockEntity> constructors = members.stream()
-                .filter(cfeSource -> Math.sqrt(cfeSource.getBlockPos().distSqr(pos)) < cfeSource.getLimit())
-                .map(CFENetworkMember::getBlockPos)
+                .filter(cfeSource -> Math.sqrt(cfeSource.getPos().distSqr(pos)) < cfeSource.getLimit())
+                .map(CFENetworkMember::getPos)
                 .map(cfeSourceBlockPos -> {
                     if (level.getBlockEntity(cfeSourceBlockPos) instanceof ConstructionDesorberBlockEntity blockEntity)
                         return blockEntity;
@@ -86,7 +86,7 @@ public class ConstructionDesorberBlockEntity extends AbstractDesorberBlockEntity
             FluidTank fluidHandler1 = blockEntity.fluidHandler;
             if (!fluidHandler1.isEmpty() && fluidHandler1.getFluidAmount() >= CFEToAdd) {
                 fluidHandler1.drain(CFEToAdd, IFluidHandler.FluidAction.EXECUTE);
-                int added = blockEntity.cfeContainer.addCFE(CFEToAdd, pos,false);
+                int added = blockEntity.cfeContainer.addCFE(CFEToAdd,false);
                 CFEToAdd -= added;
                 blockEntity.setRenderStack(new ItemStack(event.getPlacedBlock().getBlock()));
                 if (CFEToAdd == 0) {
@@ -113,7 +113,7 @@ public class ConstructionDesorberBlockEntity extends AbstractDesorberBlockEntity
         CFENetwork network = TerraCompositioAPI.instance().getCFENetworkInstance();
         List<CFENetworkMember> sources = network.getAllCFENetworkMembers((Level) level);
         List<ConstructionDesorberBlockEntity> constructors = sources.stream()
-                .map(CFENetworkMember::getBlockPos)
+                .map(CFENetworkMember::getPos)
                 .filter(cfeSourceBlockPos -> Math.sqrt(cfeSourceBlockPos.distSqr(pos)) < 7)
                 .map(cfeSourceBlockPos -> {
                     if (level.getBlockEntity(cfeSourceBlockPos) instanceof ConstructionDesorberBlockEntity blockEntity)

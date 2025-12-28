@@ -70,7 +70,7 @@ public class CultivationDesorberBlockEntity extends AbstractDesorberBlockEntity 
         CFENetwork network = TerraCompositioAPI.instance().getCFENetworkInstance();
         List<CFENetworkMember> sources = network.getAllCFENetworkMembers((Level) level);
         List<CultivationDesorberBlockEntity> cultivators = sources.stream()
-                .map(CFENetworkMember::getBlockPos)
+                .map(CFENetworkMember::getPos)
                 .filter(cfeSourceBlockPos -> Math.sqrt(cfeSourceBlockPos.distSqr(pos)) < 7)
                 .map(cfeSourceBlockPos -> {
                     if (level.getBlockEntity(cfeSourceBlockPos) instanceof CultivationDesorberBlockEntity blockEntity)
@@ -90,7 +90,7 @@ public class CultivationDesorberBlockEntity extends AbstractDesorberBlockEntity 
             FluidTank fluidHandler1 = blockEntity.fluidHandler;
             if (!fluidHandler1.isEmpty() && fluidHandler1.getFluidAmount() >= CFEToAdd) {
                 fluidHandler1.drain(CFEToAdd, IFluidHandler.FluidAction.EXECUTE);
-                int added = blockEntity.cfeContainer.addCFE(CFEToAdd,blockEntity.getBlockPos(), false);
+                int added = blockEntity.cfeContainer.addCFE(CFEToAdd, false);
                 CFEToAdd -= added;
                 if (!level.isClientSide())
                     level.playSound(null,pos, SoundEvents.AZALEA_LEAVES_STEP, SoundSource.BLOCKS);

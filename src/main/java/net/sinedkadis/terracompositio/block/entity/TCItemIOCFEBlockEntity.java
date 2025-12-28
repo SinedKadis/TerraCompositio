@@ -167,8 +167,13 @@ public abstract class TCItemIOCFEBlockEntity extends TCCFEBlockEntity implements
         return progress>=maxProgress;
     }
 
+    private float partialCFE = 0;
     protected void consumeCFE() {
-        this.cfeContainer.setCFE((int) (this.cfeContainer.getCFE()-tickCFECost));
+        int floorCFE = (int) Math.floor(tickCFECost);
+        partialCFE += tickCFECost- floorCFE;
+        int floorPart = (int) Math.floor(partialCFE);
+        partialCFE += partialCFE- floorPart;
+        this.cfeContainer.takeCFE(floorCFE+floorPart,false);
     }
 
     protected void increaseCraftingProgress() {

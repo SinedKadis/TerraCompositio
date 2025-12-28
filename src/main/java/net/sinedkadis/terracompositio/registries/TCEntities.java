@@ -7,6 +7,7 @@ import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
 import net.sinedkadis.terracompositio.TerraCompositio;
+import net.sinedkadis.terracompositio.cfe.CFEBurstProjectileEntity;
 import net.sinedkadis.terracompositio.entity.custom.*;
 
 public class TCEntities {
@@ -31,6 +32,10 @@ public class TCEntities {
     public static final RegistryObject<EntityType<CFEDropProjectileEntity>> CFE_DROP_PROJECTILE =
             ENTITY_TYPES.register("cfe_drop_projectile", () -> EntityType.Builder.<CFEDropProjectileEntity>of(CFEDropProjectileEntity::new, MobCategory.MISC)
                     .sized(0.5f, 0.5f).build("cfe_drop_projectile"));
+
+    public static final RegistryObject<EntityType<CFEBurstProjectileEntity>> CFE_BURST_PROJECTILE =
+            ENTITY_TYPES.register("cfe_burst_projectile", () -> EntityType.Builder.<CFEBurstProjectileEntity>of(CFEBurstProjectileEntity::new, MobCategory.MISC)
+                    .sized(0.5f, 0.5f).build("cfe_burst_projectile"));
 
 
     public static void register(IEventBus eventBus) {

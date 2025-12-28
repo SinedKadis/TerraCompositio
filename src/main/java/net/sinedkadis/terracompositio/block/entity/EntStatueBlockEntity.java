@@ -22,6 +22,7 @@ import net.sinedkadis.terracompositio.registries.TCEntities;
 import net.sinedkadis.terracompositio.registries.TCFluids;
 import net.sinedkadis.terracompositio.registries.TCItems;
 import net.sinedkadis.terracompositio.util.TCUtil;
+import org.jetbrains.annotations.NotNull;
 
 import java.util.Optional;
 
@@ -36,7 +37,7 @@ public class EntStatueBlockEntity extends TCItemIOCFEBlockEntity implements Flui
     }
 
     @Override
-    public BlockEntity getBE() {
+    public @NotNull BlockEntity getEntity() {
         return this;
     }
 

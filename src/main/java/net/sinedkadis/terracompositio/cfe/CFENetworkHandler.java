@@ -34,24 +34,24 @@ public class CFENetworkHandler implements CFENetwork {
 
     public void networkMemberUpdated(CFENetworkMember updated) {
         if (cfeSources.containsKey(updated.getLevel())) {
-            if (updated instanceof CFESaturatedAirBlockEntity) return;
+            //if (updated instanceof CFESaturatedAirBlockEntity) return;
 //            if (updated instanceof Player) {
 //                updated.getLimit()
 //            }
             cfeSources.get(updated.getLevel()).stream()
-                    .filter(member -> updated.getBlockPos().closerThan(member.getBlockPos(),updated.getLimit()))
-                    .filter(member -> !updated.getBlockPos().equals(member.getBlockPos()))
+                    .filter(member -> updated.getPos().closerThan(member.getPos(),updated.getLimit()))
+                    .filter(member -> !updated.getPos().equals(member.getPos()))
                     .peek(member -> {
                         if (member instanceof PathPointerBlockEntity && !(updated.getPriority() < member.getPriority())) {
-                            member.onCFENetworkMemberUpdate(member.getLevel(),member.getBlockPos());
+                            member.scheduleMemberUpdate();
                         }
                     })
                     .filter(member -> updated.getPriority() < member.getPriority())
-                    .forEach((member) -> member.onCFENetworkMemberUpdate(member.getLevel(),member.getBlockPos()));
+                    .forEach(CFENetworkMember::scheduleMemberUpdate);
             if (updated instanceof PathPointerBlockEntity blockEntity) {
                 List<PathPointerBlockEntity> nodes = blockEntity.getNodes();
                 nodes.remove(blockEntity);
-                nodes.forEach(member -> member.onCFENetworkMemberUpdate(updated.getLevel(),member.getBlockPos()));
+                nodes.forEach(PathPointerBlockEntity::scheduleMemberUpdate);
             }
         }
 
@@ -70,8 +70,8 @@ public class CFENetworkHandler implements CFENetwork {
             for (CFENetworkMember source : sources) {
                 if (source instanceof CFENetworkMemberBE memberBE) {
                     if (memberBE instanceof CFESaturatedAirBlockEntity && skipAir) continue;
-                    long distance = distSqr(source.getBlockPos(), pos);
-                    Optional<ICFEHandler> cfeHandlerOptional = memberBE.getBE().getCapability(CFECapability.CFE).resolve();
+                    long distance = distSqr(source.getPos(), pos);
+                    Optional<ICFEHandler> cfeHandlerOptional = memberBE.getEntity().getCapability(CFECapability.CFE).resolve();
                     if (distance <= limitSquared
                             && distance < minDist
                             && distance < (long) source.getLimit() * source.getLimit()
@@ -96,7 +96,7 @@ public class CFENetworkHandler implements CFENetwork {
             List<CFENetworkMember> sources = new ArrayList<>(cfeSources.get(level));
             Collections.shuffle(sources);
             for (CFENetworkMember source : sources) {
-                long distance = TCUtil.distSqr(source.getBlockPos(), pos);
+                long distance = TCUtil.distSqr(source.getPos(), pos);
                 Optional<ICFEHandler> fluidHandler = CFENetwork.getCFEHandler(source);
                 int cfe = 0;
                 if (fluidHandler.isPresent()) {
@@ -116,7 +116,7 @@ public class CFENetworkHandler implements CFENetwork {
     public @Nullable CFENetworkMember getMemberAt(Level level, BlockPos blockPos) {
         if (cfeSources.containsKey(level)) {
             for (CFENetworkMember member : cfeSources.get(level)){
-                if (!member.getBlockPos().equals(blockPos))
+                if (!member.getPos().equals(blockPos))
                     continue;
                 return member;
             }

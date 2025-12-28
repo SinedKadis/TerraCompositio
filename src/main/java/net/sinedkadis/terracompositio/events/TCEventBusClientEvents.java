@@ -24,6 +24,7 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.sinedkadis.terracompositio.TerraCompositio;
 import net.sinedkadis.terracompositio.block.entity.renderer.*;
+import net.sinedkadis.terracompositio.entity.client.CFEBurstRenderer;
 import net.sinedkadis.terracompositio.entity.client.CFECubeModel;
 import net.sinedkadis.terracompositio.entity.client.FlowCedarEntModel;
 import net.sinedkadis.terracompositio.entity.client.FlowCedarEntRenderer;
@@ -58,6 +59,7 @@ public class TCEventBusClientEvents {
         EntityRenderers.register(TCEntities.MOD_CHEST_BOAT.get(), pContext -> new TCBoatRenderer(pContext, true));
 
         EntityRenderers.register(TCEntities.FLOW_CEDAR_ENT.get(), FlowCedarEntRenderer::new);
+        EntityRenderers.register(TCEntities.CFE_BURST_PROJECTILE.get(), CFEBurstRenderer::new);
         EntityRenderers.register(TCEntities.CFE_BALL_PROJECTILE.get(), ThrownItemRenderer::new);
         EntityRenderers.register(TCEntities.CFE_DROP_PROJECTILE.get(), ThrownItemRenderer::new);
 
@@ -165,6 +167,7 @@ public class TCEventBusClientEvents {
         event.registerBlockEntityRenderer(TCBlockEntities.FLOW_CEDAR_TANK_BE.get(), FlowCedarTankBlockEntityRenderer::new);
         event.registerBlockEntityRenderer(TCBlockEntities.PATH_POINTER_BE.get(), PathPointerBlockEntityRenderer::new);
         event.registerBlockEntityRenderer(TCBlockEntities.ENT_STATUE_BE.get(), EntStatueBlockEntityRenderer::new);
+        event.registerBlockEntityRenderer(TCBlockEntities.CFE_SATURATED_AIR_BE.get(), CFESaturatedAirRenderer::new);
 
     }
 

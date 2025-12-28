@@ -1,9 +1,15 @@
 package net.sinedkadis.terracompositio.cfe;
 
+import lombok.Getter;
+import lombok.Setter;
+import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
@@ -16,7 +22,12 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Function;
 
+@SuppressWarnings("DataFlowIssue")
+@MethodsReturnNonnullByDefault
 public class CFEItemWrapper implements ICFEHandler, ICapabilityProvider {
+    @Getter
+    @Setter
+    protected int queued = 0;
     private final LazyOptional<ICFEHandler> holder = LazyOptional.of(() -> this);
     @NotNull
     protected ItemStack container;
@@ -59,22 +70,19 @@ public class CFEItemWrapper implements ICFEHandler, ICapabilityProvider {
     }
 
     @Override
-    public int addCFE(int cfe, ICFEHandler source, boolean simulate, boolean doRender) {
-        int toAdd = Math.min(this.getFreeSpace(),cfe);
-        if (!simulate) {
-            this.setCFE(this.getCFE()+toAdd);
-        }
-        return toAdd;
-    }
-
-    @Override
-    public int addCFE(int cfe, BlockPos sourcePos, boolean simulate) {
+    public int addCFE(int cfe, boolean simulate) {
         int toAdd = Math.min(this.getFreeSpace(),cfe);
         if (!simulate) {
             int cfe1 = this.getCFE();
             this.setCFE(cfe1 +toAdd);
         }
         return toAdd;
+    }
+
+
+    @Override
+    public int sendCFE(int cfe, ICFEHandler target, boolean simulate) {
+        return 0;
     }
 
     @Override
@@ -103,11 +111,6 @@ public class CFEItemWrapper implements ICFEHandler, ICapabilityProvider {
     }
 
     @Override
-    public void containerTick() {
-
-    }
-
-    @Override
     public void writeToNBT(CompoundTag pTag) {
 
     }
@@ -118,17 +121,52 @@ public class CFEItemWrapper implements ICFEHandler, ICapabilityProvider {
     }
 
     @Override
-    public int getFreeSpace() {
-        return this.getMaxCFE()-this.getCFE();
+    public int getCFEWithQueue() {
+        return getCFE()+getQueued();
     }
 
     @Override
-    public int getQueued() {
+    public boolean isEmpty() {
+        return getCFEWithQueue() <= 0;
+    }
+
+    @Override
+    public int getFreeSpace() {
+        return this.getMaxCFE()-this.getCFEWithQueue();
+    }
+
+    @Override
+    public double x() {
         return 0;
     }
 
     @Override
-    public BlockPos getBlockPos() {
+    public double y() {
+        return 0;
+    }
+
+    @Override
+    public double z() {
+        return 0;
+    }
+
+    @Override
+    public BlockPos getPos() {
+        return null;
+    }
+
+    @Override
+    public BlockState getBlockState() {
+        return null;
+    }
+
+    @Override
+    public <T extends BlockEntity> T getEntity() {
+        return null;
+    }
+
+    @Override
+    public ServerLevel getLevel() {
         return null;
     }
 

@@ -1,13 +1,19 @@
 package net.sinedkadis.terracompositio.api.dummies;
 
+import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.server.level.ServerLevel;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import net.sinedkadis.terracompositio.api.networks.cfe.CFENetworkMember;
 import net.sinedkadis.terracompositio.api.networks.cfe.ICFEHandler;
 
 import java.util.function.Function;
 
+@SuppressWarnings("DataFlowIssue")
+@MethodsReturnNonnullByDefault
 public class DummyCFEHandler implements ICFEHandler {
     public static final DummyCFEHandler instance = new DummyCFEHandler();
 
@@ -34,15 +40,15 @@ public class DummyCFEHandler implements ICFEHandler {
     }
 
     @Override
-    public int addCFE(int cfe, ICFEHandler source, boolean simulate, boolean doRender) {
+    public int addCFE(int cfe, boolean simulate) {
         return 0;
     }
-
 
     @Override
-    public int addCFE(int cfe, BlockPos sourcePos, boolean simulate) {
+    public int sendCFE(int cfe, ICFEHandler target, boolean simulate) {
         return 0;
     }
+
 
     @Override
     public void setCFE(int cfe) {
@@ -64,10 +70,7 @@ public class DummyCFEHandler implements ICFEHandler {
         return instance;
     }
 
-    @Override
-    public void containerTick() {
 
-    }
 
     @Override
     public void writeToNBT(CompoundTag pTag) {
@@ -79,19 +82,65 @@ public class DummyCFEHandler implements ICFEHandler {
 
     }
 
-
-    @Override
-    public int getFreeSpace() {
-        return 0;
-    }
-
     @Override
     public int getQueued() {
         return 0;
     }
 
     @Override
-    public BlockPos getBlockPos() {
+    public void setQueued(int queued) {
+
+    }
+
+    @Override
+    public int getCFEWithQueue() {
+        return 0;
+    }
+
+    @Override
+    public boolean isEmpty() {
+        return false;
+    }
+
+
+    @Override
+    public int getFreeSpace() {
+        return 0;
+    }
+
+
+    @Override
+    public double x() {
+        return 0;
+    }
+
+    @Override
+    public double y() {
+        return 0;
+    }
+
+    @Override
+    public double z() {
+        return 0;
+    }
+
+    @Override
+    public BlockPos getPos() {
+        return null;
+    }
+
+    @Override
+    public BlockState getBlockState() {
+        return null;
+    }
+
+    @Override
+    public <T extends BlockEntity> T getEntity() {
+        return null;
+    }
+
+    @Override
+    public ServerLevel getLevel() {
         return null;
     }
 
@@ -115,6 +164,8 @@ public class DummyCFEHandler implements ICFEHandler {
     public int getIndex() {
         return 0;
     }
+
+
 
 
 }

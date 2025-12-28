@@ -46,7 +46,7 @@ public class ReachSourceGoal extends Goal {
                 boolean targetIsAcceptableEnt = targetIsEnt && ((FlowCedarEntEntity) randomSourceInRange).getCapability(CFECapability.CFE)
                         .filter(icfeHandler -> icfeHandler.getCFE() > 1000).isPresent();
                 if (!targetIsEnt || targetIsAcceptableEnt) {
-                    BlockPos blockPos = randomSourceInRange.getBlockPos();
+                    BlockPos blockPos = randomSourceInRange.getPos();
                     mob.setSourcePos(blockPos);
                     if (TCUtil.distSqr(blockPos, mob.blockPosition()) > (long) stopDistance * stopDistance) {
                         targetPosition = blockPos.getCenter();
@@ -54,7 +54,7 @@ public class ReachSourceGoal extends Goal {
                     }
                 }
             }
-            List<BlockPos> list = TCUtil.getNearBlocks(mob.getBlockPos(), 10).stream()
+            List<BlockPos> list = TCUtil.getNearBlocks(mob.getPos(), 10).stream()
                     .filter(pos1 -> mob.level().getBlockState(pos1).is(TCTags.Blocks.FLOW_CEDAR_LOGS))
                     .filter(pos2 -> mob.level().getBlockState(pos2).getValue(INFUSED))
                     .toList();

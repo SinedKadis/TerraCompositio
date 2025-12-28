@@ -37,8 +37,7 @@ public class CFEHoldGoal extends Goal {
         if (held.isPresent() && inner.isPresent()){
             ICFEHandler helded = held.get();
             ICFEHandler innered = inner.get();
-            return helded.getCFE() <= 0
-                    && innered.getQueued() <= 0;
+            return helded.getCFE()+helded.getQueued()+innered.getQueued() <= 0;
         }
         return true;
     }
