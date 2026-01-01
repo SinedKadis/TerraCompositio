@@ -1,11 +1,11 @@
 package net.sinedkadis.terracompositio.block.custom;
 
-import lombok.Getter;
 import lombok.NonNull;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.util.StringRepresentable;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.Entity;
@@ -16,22 +16,19 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.RenderShape;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.state.StateDefinition;
-import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.level.storage.loot.LootParams;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import net.minecraftforge.registries.RegistryObject;
 import net.sinedkadis.terracompositio.block.entity.PathPointerBlockEntity;
 import net.sinedkadis.terracompositio.registries.TCBlockEntities;
-import net.sinedkadis.terracompositio.registries.TCBlockStateProperties;
 import net.sinedkadis.terracompositio.registries.TCBlocks;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -43,12 +40,12 @@ import java.util.List;
 @MethodsReturnNonnullByDefault
 public class PathPointerBlock extends TCCFEBaseEntityBlock {
 
-    protected static final EnumProperty<PPPart> BASE_PART;
-    protected static final EnumProperty<PPPart> ADDITIONAL_PART;
 
-    public PathPointerBlock(Properties pProperties, PPPart part) {
+    private final PathPointerBlockEntity.PPPart basePart;
+
+    public PathPointerBlock(Properties pProperties, PathPointerBlockEntity.PPPart part) {
         super(pProperties);
-        this.registerDefaultState(this.defaultBlockState().setValue(BASE_PART,part).setValue(ADDITIONAL_PART, PPPart.NONE));
+        basePart = part;
 
     }
 
@@ -59,11 +56,6 @@ public class PathPointerBlock extends TCCFEBaseEntityBlock {
     }
 
     @Override
-    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> pBuilder) {
-        pBuilder.add(BASE_PART,ADDITIONAL_PART);
-    }
-
-    @Override
     public boolean propagatesSkylightDown(BlockState pState, BlockGetter pLevel, BlockPos pPos) {
         return true;
     }
@@ -71,9 +63,9 @@ public class PathPointerBlock extends TCCFEBaseEntityBlock {
     @SuppressWarnings("deprecation")
     @Override
     public VoxelShape getShape(BlockState pState, BlockGetter pLevel, BlockPos pPos, CollisionContext pContext) {
-        PPPart base = pState.getValue(TCBlockStateProperties.BASE_PART);
-        PPPart add = pState.getValue(TCBlockStateProperties.ADDITIONAL_PART);
-        if (base.equals(PPPart.EMITTER)||add.equals(PPPart.EMITTER)){
+        PathPointerBlockEntity blockEntity = (PathPointerBlockEntity) pLevel.getBlockEntity(pPos);
+
+        if (blockEntity != null && blockEntity.parts.contains(PathPointerBlockEntity.PPPart.EMITTER)){
             return Block.box(1, 2, 1, 15, 14, 15);
         }
         return Block.box(3, 3, 3, 13, 13, 13);
@@ -85,31 +77,6 @@ public class PathPointerBlock extends TCCFEBaseEntityBlock {
         return super.getDescriptionId();
     }
 
-    public boolean addPart(Level level, BlockPos pos, @NonNull PathPointerBlock.PPPart part){
-        BlockState state = level.getBlockState(pos);
-        if (part == PPPart.NONE) return false;
-        if (!state.hasProperty(ADDITIONAL_PART)) return false;
-        if (state.getValue(ADDITIONAL_PART) != PPPart.NONE) return false;
-
-        assert state.hasProperty(BASE_PART);
-        PPPart base = state.getValue(BASE_PART);
-
-        if (base.isInput() != part.isInput()){
-            level.setBlockAndUpdate(pos,state.setValue(ADDITIONAL_PART,part));
-            return true;
-        }
-        return false;
-    }
-
-    public static PPPart[] getParts(BlockState state){
-        if (state.hasProperty(BASE_PART)){
-            assert state.hasProperty(ADDITIONAL_PART);
-            PPPart base = state.getValue(BASE_PART);
-            PPPart add = state.getValue(ADDITIONAL_PART);
-            return new PPPart[]{base, add};
-        }
-        return new PPPart[]{};
-    }
 
     @Override
     public void setPlacedBy(Level world, BlockPos pos, BlockState state, @Nullable LivingEntity placer, ItemStack stack) {
@@ -144,28 +111,34 @@ public class PathPointerBlock extends TCCFEBaseEntityBlock {
     @Override
     public InteractionResult use(BlockState pState, Level pLevel, BlockPos pPos, Player pPlayer, InteractionHand pHand, BlockHitResult pHit) {
         ItemStack hand = pPlayer.getItemInHand(pHand);
-
-        if (!pPlayer.isCrouching()) {
-            if (addPart(pLevel, pPos, getPart(hand))) {
-                if (!pPlayer.isCreative()) {
-                    hand.shrink(1);
-                }
-                PathPointerBlockEntity pp = (PathPointerBlockEntity) pLevel.getBlockEntity(pPos);
-                if (pp != null) {
-                    pp.updateContainer();
-                }
-                return InteractionResult.SUCCESS;
+        PathPointerBlockEntity pp = (PathPointerBlockEntity) pLevel.getBlockEntity(pPos);
+        PathPointerBlockEntity.PPPart newPart = getPart(hand);
+        if (!pPlayer.isCrouching()
+                && pp != null
+                && pp.parts.get(1).equals(PathPointerBlockEntity.PPPart.NONE)
+                && pp.parts.get(0).isInput() != newPart.isInput()) {
+            pp.parts.set(1, newPart);
+            if (!pPlayer.isCreative()) {
+                hand.shrink(1);
             }
+            pp.updateContainer();
+            pLevel.playSound(null,pPos, SoundEvents.WOOD_PLACE, SoundSource.BLOCKS);
+            return InteractionResult.SUCCESS;
+
         }
 
         return super.use(pState, pLevel, pPos, pPlayer, pHand, pHit);
     }
 
-    private static @NonNull PathPointerBlock.PPPart getPart(ItemStack hand) {
+    private static @NonNull PathPointerBlockEntity.PPPart getPart(ItemStack hand) {
         if (hand.getItem() instanceof BlockItem item && item.getBlock() instanceof PathPointerBlock block){
-            return block.defaultBlockState().getValue(BASE_PART);
+            return block.getBasePart();
         }
-        return PPPart.NONE;
+        return PathPointerBlockEntity.PPPart.NONE;
+    }
+
+    public PathPointerBlockEntity.@NonNull PPPart getBasePart() {
+        return this.basePart;
     }
 
     @Override
@@ -177,61 +150,21 @@ public class PathPointerBlock extends TCCFEBaseEntityBlock {
     @Override
     public List<ItemStack> getDrops(BlockState pState, LootParams.Builder pParams) {
         List<ItemStack> drops = super.getDrops(pState, pParams);
-        PPPart value = pState.getValue(ADDITIONAL_PART);
-        Entity killer = pParams.getOptionalParameter(LootContextParams.DIRECT_KILLER_ENTITY);
-        if (!value.equals(PPPart.NONE)) {
-            boolean validKiller = !(killer instanceof Player)
-                    || !((Player) killer).isCreative();
-            if (validKiller) {
-                for (RegistryObject<Block> block : TCBlocks.BLOCKS.getEntries().stream()
-                        .filter(blockRegistryObject ->
-                                blockRegistryObject.get() instanceof PathPointerBlock).toList()) {
-                    BlockState blockState = block.get().defaultBlockState();
-                    if (value.equals(blockState.getValue(BASE_PART))) {
-                        drops.add(block.get().asItem().getDefaultInstance());
-                    }
-                }
-            }
+
+        Entity entity = pParams.getOptionalParameter(LootContextParams.KILLER_ENTITY);
+        if (!(entity instanceof Player player) || !player.isCreative()) {
+            PathPointerBlockEntity blockEntity = (PathPointerBlockEntity) pParams.getParameter(LootContextParams.BLOCK_ENTITY);
+            ItemStack toDrop = new ItemStack(switch (blockEntity.parts.get(1)) {
+                case COLLECTOR -> TCBlocks.PP_COLLECTOR.get();
+                case SENDER -> TCBlocks.PP_SENDER.get();
+                case EMITTER -> TCBlocks.PP_EMITTER.get();
+                case RECEIVER -> TCBlocks.PP_RECEIVER.get();
+                default -> Blocks.AIR;
+            });
+            drops.add(toDrop);
         }
+
         return drops;
     }
 
-
-
-
-    public enum PPPart implements StringRepresentable {
-        COLLECTOR(true, "collector"),
-        RECEIVER(true, "receiver"),
-        SENDER(false, "sender"),
-        EMITTER(false, "emitter"),
-        NONE(false, "none");
-
-        @Getter
-        private final boolean input;
-        private final String name;
-
-        PPPart(boolean isInput, String name) {
-            this.input = isInput;
-            this.name = name;
-        }
-
-        @Override
-        public String toString() {
-            return "PPParts{" +
-                    "name='" + name + '\'' +
-                    '}';
-        }
-
-        @Override
-        public String getSerializedName() {
-            return name;
-        }
-    }
-
-
-
-    static {
-        BASE_PART = TCBlockStateProperties.BASE_PART;
-        ADDITIONAL_PART = TCBlockStateProperties.ADDITIONAL_PART;
-    }
 }

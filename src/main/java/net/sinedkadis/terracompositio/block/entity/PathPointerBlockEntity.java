@@ -1,13 +1,16 @@
 package net.sinedkadis.terracompositio.block.entity;
 
+import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.NonNullList;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
+import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.Nameable;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
@@ -48,18 +51,20 @@ public class PathPointerBlockEntity extends TCCFEBlockEntity implements Nameable
     public @Nullable LivingEntity toSendEntity;
     public @Nullable LivingEntity toReceiveEntity;
     private List<LivingEntity> lastToSendScan = List.of();
+    public List<PPPart> parts = NonNullList.withSize(2,PPPart.NONE);
 
     public PathPointerBlockEntity(BlockPos pos, BlockState state) {
         super(TCBlockEntities.PATH_POINTER_BE.get(), pos, state, BlockMode.CONTAINER);
         this.setCfeContainer(new CFEContainer(this).setCfeTravelSpeed((float) 5 /20));
+        if (state.getBlock() instanceof PathPointerBlock pathPointerBlock) {
+            parts.set(0,pathPointerBlock.getBasePart());
+        }
     }
 
     @Override
     public int getPriority() {
         if (level == null) return 100;
-        BlockState pState = level.getBlockState(worldPosition);
-        List<PathPointerBlock.PPPart> parts = Arrays.asList(PathPointerBlock.getParts(pState));
-        if (parts.contains(PathPointerBlock.PPPart.EMITTER)) {
+        if (parts.contains(PPPart.EMITTER)) {
             return -100;
         }
         return 100;
@@ -97,18 +102,21 @@ public class PathPointerBlockEntity extends TCCFEBlockEntity implements Nameable
     @Override
     public void onCFENetworkMemberUpdate() {
         if (level == null) return;
-        BlockState pState = level.getBlockState(worldPosition);
-        List<PathPointerBlock.PPPart> parts = Arrays.asList(PathPointerBlock.getParts(pState));
 
         verifyNodes();
-        computeSender(parts);
-        computeReceiver(parts);
-        computeCollector(parts);
-        computeEmitter(parts);
+
+        computeSender();
+        computeReceiver();
+        computeEmitter();
 
         computeMax();
 
-        transferCFE(level, parts);
+        computeCollector();
+
+
+
+
+        transferCFE();
         timer = 100;
     }
 
@@ -130,15 +138,15 @@ public class PathPointerBlockEntity extends TCCFEBlockEntity implements Nameable
         }
     }
 
-    private void computeEmitter(List<PathPointerBlock.PPPart> parts) {
-        if (parts.contains(PathPointerBlock.PPPart.EMITTER)) {
-            this.connectRange = 7;
+    private void computeEmitter() {
+        if (parts.contains(PPPart.EMITTER)) {
+            this.connectRange = 5;
         }
     }
 
-    private void computeCollector(List<PathPointerBlock.PPPart> parts) {
+    private void computeCollector() {
         if (level == null) return;
-        if (parts.contains(PathPointerBlock.PPPart.COLLECTOR)) {
+        if (parts.contains(PPPart.COLLECTOR)) {
             this.connectRange = 7;
             int toAdd = this.cfeContainer.getMaxCFE() - this.getInSystem();
             if (toAdd > 0) {
@@ -155,8 +163,8 @@ public class PathPointerBlockEntity extends TCCFEBlockEntity implements Nameable
         }
     }
 
-    private void computeReceiver(List<PathPointerBlock.PPPart> parts) {
-        if (parts.contains(PathPointerBlock.PPPart.RECEIVER)) {
+    private void computeReceiver() {
+        if (parts.contains(PPPart.RECEIVER)) {
             if (toReceiveEntity == null && lastNode == null) {
                 searchAndBindToEntity(level,false);
             }
@@ -183,8 +191,8 @@ public class PathPointerBlockEntity extends TCCFEBlockEntity implements Nameable
         }
     }
 
-    private void computeSender(List<PathPointerBlock.PPPart> parts) {
-        if (parts.contains(PathPointerBlock.PPPart.SENDER)) {
+    private void computeSender() {
+        if (parts.contains(PPPart.SENDER)) {
             if (toSendEntity == null && nextNode == null) {
                 searchAndBindToEntity(level,true);
             }
@@ -282,16 +290,14 @@ public class PathPointerBlockEntity extends TCCFEBlockEntity implements Nameable
                 .collect(Collectors.toList());
     }
 
-    private void transferCFE(Level level, List<PathPointerBlock.PPPart> currentParts) {
+    private void transferCFE() {
         if (lastNode != null) {
-            BlockState lastNodeBlockState = level.getBlockState(lastNode);
-            List<PathPointerBlock.PPPart> lastParts = Arrays.asList(PathPointerBlock.getParts(lastNodeBlockState));
-            if (lastParts.contains(PathPointerBlock.PPPart.SENDER) && currentParts.contains(PathPointerBlock.PPPart.RECEIVER)) {
-                PathPointerBlockEntity lastNodeBE = ((PathPointerBlockEntity) level.getBlockEntity(lastNode));
-                if (lastNodeBE != null) {
-                    if (level.isClientSide) return;
-                    TCUtil.tryCFETransfer(this, lastNodeBE, Integer.MAX_VALUE);
-                }
+            if (level == null || level.isClientSide) return;
+            PathPointerBlockEntity lastNodeBE = (PathPointerBlockEntity) level.getBlockEntity(lastNode);
+            if (lastNodeBE == null) return;
+            List<PPPart> lastParts = lastNodeBE.parts;
+            if (lastParts.contains(PPPart.SENDER) && parts.contains(PPPart.RECEIVER)) {
+                TCUtil.tryCFETransfer(this, lastNodeBE, Integer.MAX_VALUE);
             }
         }
     }
@@ -299,12 +305,8 @@ public class PathPointerBlockEntity extends TCCFEBlockEntity implements Nameable
 
     public void updateContainer() {
         if (level != null){
-            BlockState pState = level.getBlockState(getBlockPos());
-
-            List<PathPointerBlock.PPPart> currentParts = Arrays.asList(PathPointerBlock.getParts(pState));
-
-            if (currentParts.contains(PathPointerBlock.PPPart.SENDER)
-                    && currentParts.contains(PathPointerBlock.PPPart.RECEIVER)
+            if (parts.contains(PPPart.SENDER)
+                    && parts.contains(PPPart.RECEIVER)
                     && toSendEntity == null
                     && toReceiveEntity == null) {
                 this.setCfeContainer(new LimitlessCFEContainer(this).setCfeTravelSpeed((float) 5 / 20));
@@ -319,10 +321,8 @@ public class PathPointerBlockEntity extends TCCFEBlockEntity implements Nameable
                 .filter(cfeNetworkMember -> cfeNetworkMember.getPos().closerThan(this.getBlockPos(),this.getLimit()))
                 .filter(cfeNetworkMember -> cfeNetworkMember.getPriority() > this.getPriority())
                 .filter(cfeNetworkMember -> {
-                    if (cfeNetworkMember instanceof PathPointerBlockEntity){
-                        List<PathPointerBlock.PPPart> parts = Arrays.asList(PathPointerBlock
-                                .getParts(cfeNetworkMember.getLevel().getBlockState(cfeNetworkMember.getPos())));
-                        return parts.contains(PathPointerBlock.PPPart.COLLECTOR);
+                    if (cfeNetworkMember instanceof PathPointerBlockEntity be){
+                        return be.parts.contains(PPPart.COLLECTOR);
                     }
                     return true;
                 })
@@ -332,8 +332,7 @@ public class PathPointerBlockEntity extends TCCFEBlockEntity implements Nameable
                 .toList();
         int max = 0;
         for (CFENetworkMember member : members){
-            @SuppressWarnings("OptionalGetWithoutIsPresent")
-            ICFEHandler handler = CFENetwork.getCFEHandler(member).get();
+            ICFEHandler handler = member.getMainHandler();
             max += handler.getFreeSpace();
         }
         return max;
@@ -346,8 +345,8 @@ public class PathPointerBlockEntity extends TCCFEBlockEntity implements Nameable
             PathPointerBlockEntity currentBE = blockEntityQueue.poll();
 
             if (currentBE != null) {
-                List<PathPointerBlock.PPPart> parts = Arrays.asList(PathPointerBlock.getParts(currentBE.getBlockState()));
-                if (parts.contains(PathPointerBlock.PPPart.COLLECTOR)){
+                List<PPPart> parts = currentBE.parts;
+                if (parts.contains(PPPart.COLLECTOR)){
                     return currentBE.getBlockPos();
                 }
                 BlockPos lastNode = currentBE.lastNode;
@@ -364,42 +363,38 @@ public class PathPointerBlockEntity extends TCCFEBlockEntity implements Nameable
 
     // Call from first member of chain
     public void updateMax() {
-        Queue<List<PathPointerBlock.PPPart>> partQueue = new LinkedList<>();
+
+        if (level == null) return;
         Queue<BlockEntity> blockEntityQueue = new LinkedList<>();
 
-        List<PathPointerBlock.PPPart> parts = Arrays.asList(PathPointerBlock.getParts(getBlockState()));
-        partQueue.add(parts);
 
         blockEntityQueue.add(this);
 
-        while (!partQueue.isEmpty() && !blockEntityQueue.isEmpty()){
-            List<PathPointerBlock.PPPart> currentPart = partQueue.poll();
+        while (!blockEntityQueue.isEmpty()){
             BlockEntity currentBE = blockEntityQueue.poll();
-            if (currentBE instanceof PathPointerBlockEntity currentPPBE
-                    && currentPart.contains(PathPointerBlock.PPPart.SENDER)
-                    && currentPPBE.nextNode != null) {
-                boolean bendToItself = currentPPBE.getBlockPos().equals(currentPPBE.nextNode);
-                if (!bendToItself || currentPPBE.toSendEntity != null) {
-                    if (level == null) break;
-                    if (currentPPBE.toSendEntity != null) {
-                        int max = currentPPBE.toSendEntity.getCapability(CFECapability.CFE).orElseGet(() -> DummyCFEHandler.instance).getFreeSpace();
-                        this.cfeContainer.setMaxCFE(max);
-                        currentPPBE.cfeContainer.setMaxCFE(max).setCfeTravelSpeed(5/20f);
-                        break;
+
+            if (currentBE instanceof PathPointerBlockEntity currentPPBE) {
+                List<PPPart> currentPart = currentPPBE.parts;
+                if (currentPart.contains(PPPart.SENDER) && currentPPBE.nextNode != null) {
+                    boolean bendToItself = currentPPBE.getBlockPos().equals(currentPPBE.nextNode);
+                    if (!bendToItself || currentPPBE.toSendEntity != null) {
+                        if (currentPPBE.toSendEntity != null) {
+                            int max = currentPPBE.toSendEntity.getCapability(CFECapability.CFE).orElseGet(() -> DummyCFEHandler.instance).getFreeSpace();
+                            this.cfeContainer.setMaxCFE(max);
+                            currentPPBE.cfeContainer.setMaxCFE(max).setCfeTravelSpeed(5 / 20f);
+                            break;
+                        }
+                        blockEntityQueue.add(level.getBlockEntity(currentPPBE.nextNode));
                     }
-                    BlockState state = level.getBlockState(currentPPBE.nextNode);
-                    partQueue.add(Arrays.asList(PathPointerBlock.getParts(state)));
-                    blockEntityQueue.add(level.getBlockEntity(currentPPBE.nextNode));
                 }
-            }
-            if (currentBE instanceof PathPointerBlockEntity currentPPBE && currentPart.contains(PathPointerBlock.PPPart.EMITTER)){
-                if (level == null) break;
-                currentPPBE.connectRange = 7;
-                int max = currentPPBE.getMaxToEmit();
-                this.cfeContainer.setMaxCFE(max);
-                currentPPBE.cfeContainer.setMaxCFE(max).setCfeTravelSpeed(5/20f);
-                currentPPBE.scheduleMemberUpdate();
-                break;
+                if (currentPart.contains(PPPart.EMITTER)){
+                    currentPPBE.connectRange = 5;
+                    int max = currentPPBE.getMaxToEmit();
+                    this.cfeContainer.setMaxCFE(max);
+                    currentPPBE.cfeContainer.setMaxCFE(max).setCfeTravelSpeed(5/20f);
+                    currentPPBE.scheduleMemberUpdate();
+                    break;
+                }
             }
         }
     }
@@ -503,6 +498,8 @@ public class PathPointerBlockEntity extends TCCFEBlockEntity implements Nameable
         if (collectorPos != null) {
             pTag.putLong("collector", collectorPos.asLong());
         }
+        pTag.putInt("part0",parts.get(0).ordinal());
+        pTag.putInt("part1",parts.get(1).ordinal());
         super.saveAdditional(pTag);
     }
 
@@ -518,6 +515,9 @@ public class PathPointerBlockEntity extends TCCFEBlockEntity implements Nameable
             lastNode = BlockPos.of(pTag.getLong("last"));
         if (pTag.contains("collector"))
             collectorPos = BlockPos.of(pTag.getLong("collector"));
+        parts = NonNullList.of(PPPart.NONE,
+                PPPart.fromOrdinal(pTag.getInt("part0")),
+                PPPart.fromOrdinal(pTag.getInt("part1")));
     }
 
     public void highlightNodes() {
@@ -662,9 +662,9 @@ public class PathPointerBlockEntity extends TCCFEBlockEntity implements Nameable
     @Override
     public void handleUpdateTag(CompoundTag tag) {
         super.handleUpdateTag(tag);
-        rotationYaw = tag.getFloat("rotationX");
-        rotationPitch = tag.getFloat("rotationY");
-        rotationRoll = tag.getFloat("rotationZ");
+        rotationYaw = tag.getFloat("rot_y");
+        rotationPitch = tag.getFloat("rot_x");
+        rotationRoll = tag.getFloat("rot_z");
     }
 
     @Override
@@ -675,5 +675,41 @@ public class PathPointerBlockEntity extends TCCFEBlockEntity implements Nameable
     @Override
     public @Nullable Component getCustomName() {
         return Component.translatable("block.terracompositio.path_pointer");
+    }
+
+    public enum PPPart implements StringRepresentable {
+        COLLECTOR(true, "collector"),
+        RECEIVER(true, "receiver"),
+        SENDER(false, "sender"),
+        EMITTER(false, "emitter"),
+        NONE(false, "none");
+
+        @Getter
+        private final boolean input;
+        private final String name;
+
+        PPPart(boolean isInput, String name) {
+            this.input = isInput;
+            this.name = name;
+        }
+
+        @Override
+        public String toString() {
+            return "PPPart{" +
+                    "name='" + name + '\'' +
+                    '}';
+        }
+
+        @Override
+        public @NotNull String getSerializedName() {
+            return name;
+        }
+
+        public static PPPart fromOrdinal(int ordinal) {
+            for (PPPart part : PPPart.values()) {
+                if (part.ordinal() == ordinal) return part;
+            }
+            return PPPart.NONE;
+        }
     }
 }

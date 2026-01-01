@@ -14,7 +14,6 @@ import java.util.Objects;
 public class TCTags {
     public static class  Blocks{
         public static final TagKey<Block> FLOW_CEDAR_LOGS = tag("flow_cedar_logs_blocks");
-        public static final TagKey<Block> ENERGY_CONTAINING_AIR = tag("energy_containing_air");
         public static final TagKey<Block> CREATE_WRENCH_PICKUP = BlockTags.create(Objects.requireNonNull(
                 ResourceLocation.tryBuild("create", "wrench_pickup")));
 

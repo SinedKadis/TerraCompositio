@@ -1,4 +1,4 @@
-package net.sinedkadis.terracompositio.cfe;
+package net.sinedkadis.terracompositio.cfe.burst;
 
 import lombok.extern.slf4j.Slf4j;
 import net.minecraft.MethodsReturnNonnullByDefault;
@@ -20,7 +20,7 @@ import net.sinedkadis.terracompositio.api.networks.cfe.CFENetworkMember;
 import net.sinedkadis.terracompositio.api.networks.cfe.CFENetworkMemberBE;
 import net.sinedkadis.terracompositio.api.networks.cfe.CFENetworkMemberEntity;
 import net.sinedkadis.terracompositio.api.networks.cfe.ICFEHandler;
-import net.sinedkadis.terracompositio.block.entity.CFESaturatedAirBlockEntity;
+import net.sinedkadis.terracompositio.entity.custom.CFECloudEntity;
 import net.sinedkadis.terracompositio.registries.TCEntities;
 import net.sinedkadis.terracompositio.registries.TCItems;
 
@@ -101,10 +101,6 @@ public class CFEBurstProjectileEntity extends ThrowableProjectile {
         BlockPos blockPos = BlockPos.containing(this.position());
         if (!blockPos.equals(lastBP) && tickCount > 1) {
             BlockEntity blockEntity = level().getBlockEntity(blockPos);
-            if (blockEntity instanceof CFESaturatedAirBlockEntity)  {
-                lastBP.set(blockPos);
-                return;
-            }
             int cfe = this.getCFE();
             if (blockEntity instanceof CFENetworkMemberBE memberBE) {
                 int added = memberBE.getMainHandler().addCFE(cfe, true);
@@ -112,6 +108,7 @@ public class CFEBurstProjectileEntity extends ThrowableProjectile {
                 if (consumed == cfe) discard();
             } else {
                 level().getEntities(null, AABB.of(BoundingBox.fromCorners(blockPos,blockPos))).stream()
+                        .filter(entity -> !(entity instanceof CFECloudEntity))
                         .map(entity -> entity instanceof CFENetworkMemberEntity memberEntity ? memberEntity : null)
                         .filter(Objects::nonNull)
                         .forEach(memberEntity -> {

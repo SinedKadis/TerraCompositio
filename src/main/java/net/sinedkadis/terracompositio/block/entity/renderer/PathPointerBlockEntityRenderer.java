@@ -10,9 +10,7 @@ import net.minecraft.client.renderer.blockentity.BlockEntityRenderer;
 import net.minecraft.client.renderer.blockentity.BlockEntityRendererProvider;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.world.level.block.state.BlockState;
-import net.sinedkadis.terracompositio.block.custom.PathPointerBlock;
 import net.sinedkadis.terracompositio.block.entity.PathPointerBlockEntity;
-import net.sinedkadis.terracompositio.registries.TCBlockStateProperties;
 import net.sinedkadis.terracompositio.registries.TCBlocks;
 import net.sinedkadis.terracompositio.util.VecHelper;
 import org.jetbrains.annotations.NotNull;
@@ -22,15 +20,15 @@ import java.util.Map;
 
 @ParametersAreNonnullByDefault
 public class PathPointerBlockEntityRenderer implements BlockEntityRenderer<PathPointerBlockEntity> {
-    private final Map<PathPointerBlock.PPPart, BakedModel> modelMap;
+    private final Map<PathPointerBlockEntity.PPPart, BakedModel> modelMap;
 
     public PathPointerBlockEntityRenderer(BlockEntityRendererProvider.Context context) {
         BlockRenderDispatcher blockRenderer = context.getBlockRenderDispatcher();
         this.modelMap = Map.of(
-                PathPointerBlock.PPPart.RECEIVER, blockRenderer.getBlockModel(TCBlocks.PP_RECEIVER.get().defaultBlockState()),
-                PathPointerBlock.PPPart.COLLECTOR, blockRenderer.getBlockModel(TCBlocks.PP_COLLECTOR.get().defaultBlockState()),
-                PathPointerBlock.PPPart.SENDER, blockRenderer.getBlockModel(TCBlocks.PP_SENDER.get().defaultBlockState()),
-                PathPointerBlock.PPPart.EMITTER, blockRenderer.getBlockModel(TCBlocks.PP_EMITTER.get().defaultBlockState())
+                PathPointerBlockEntity.PPPart.RECEIVER, blockRenderer.getBlockModel(TCBlocks.PP_RECEIVER.get().defaultBlockState()),
+                PathPointerBlockEntity.PPPart.COLLECTOR, blockRenderer.getBlockModel(TCBlocks.PP_COLLECTOR.get().defaultBlockState()),
+                PathPointerBlockEntity.PPPart.SENDER, blockRenderer.getBlockModel(TCBlocks.PP_SENDER.get().defaultBlockState()),
+                PathPointerBlockEntity.PPPart.EMITTER, blockRenderer.getBlockModel(TCBlocks.PP_EMITTER.get().defaultBlockState())
         );
     }
 
@@ -40,14 +38,14 @@ public class PathPointerBlockEntityRenderer implements BlockEntityRenderer<PathP
         BlockState state = blockEntity.getBlockState();
 
 
-        PathPointerBlock.PPPart basePart = state.getValue(TCBlockStateProperties.BASE_PART);
-        PathPointerBlock.PPPart additionalPart = state.getValue(TCBlockStateProperties.ADDITIONAL_PART);
+        PathPointerBlockEntity.PPPart basePart = blockEntity.parts.get(0);
+        PathPointerBlockEntity.PPPart additionalPart = blockEntity.parts.get(1);
 
         renderModel(poseStack, bufferSource, state, modelMap.get(basePart), packedLight, packedOverlay,
                 blockEntity.rotationYaw, blockEntity.rotationPitch, blockEntity.rotationRoll, partialTicks);
 
 
-        if (!additionalPart.equals(PathPointerBlock.PPPart.NONE)) {
+        if (!additionalPart.equals(PathPointerBlockEntity.PPPart.NONE)) {
             renderModel(poseStack, bufferSource, state, modelMap.get(additionalPart), packedLight, packedOverlay,
                     blockEntity.rotationYaw, blockEntity.rotationPitch, blockEntity.rotationRoll, partialTicks);
         }

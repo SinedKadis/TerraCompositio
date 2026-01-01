@@ -668,7 +668,7 @@ public class WrenchAxeItem extends AxeItem {
         Block block = pStateClicked.getBlock();
         if (rightClicked) {
             if (block instanceof PathPointerBlock)
-                return ppWrenchInteraction(pPlayer, pStateClicked, level, pos, wrenchStack);
+                return ppWrenchInteraction(pPlayer, level, pos, wrenchStack);
             CompoundTag tag = wrenchStack.getOrCreateTag();
             if (tag.contains("BindPos")) {
                 sendBindMessage(pPlayer, "item.terracompositio.flow_rotating_axe.bind_fail_cleared");
@@ -733,13 +733,17 @@ public class WrenchAxeItem extends AxeItem {
         }
     }
 
-    private boolean ppWrenchInteraction(@Nullable Player pPlayer, BlockState pStateClicked, LevelAccessor level, BlockPos pos, ItemStack wrenchStack) {
+    private boolean ppWrenchInteraction(@Nullable Player pPlayer, LevelAccessor level, BlockPos pos, ItemStack wrenchStack) {
         CompoundTag tag = wrenchStack.getOrCreateTag();
-        List<PathPointerBlock.PPPart> partsList = Arrays.asList(PathPointerBlock.getParts(pStateClicked));
+
+        BlockEntity blockEntity = level.getBlockEntity(pos);
+        if (blockEntity == null) return false;
+
+        List<PathPointerBlockEntity.PPPart> partsList = ((PathPointerBlockEntity) blockEntity).parts;
 
         if (!tag.contains("BindPos")) {
-            boolean isSender = partsList.contains(PathPointerBlock.PPPart.SENDER);
-            boolean isReceiver = partsList.contains(PathPointerBlock.PPPart.RECEIVER);
+            boolean isSender = partsList.contains(PathPointerBlockEntity.PPPart.SENDER);
+            boolean isReceiver = partsList.contains(PathPointerBlockEntity.PPPart.RECEIVER);
 
             tag.putLong("BindPos", pos.asLong());
 
@@ -757,8 +761,8 @@ public class WrenchAxeItem extends AxeItem {
         boolean hasBindMode = tag.contains("BindMode");
         boolean bindMode = hasBindMode && tag.getBoolean("BindMode");
 
-        boolean isSender = partsList.contains(PathPointerBlock.PPPart.SENDER);
-        boolean isReceiver = partsList.contains(PathPointerBlock.PPPart.RECEIVER);
+        boolean isSender = partsList.contains(PathPointerBlockEntity.PPPart.SENDER);
+        boolean isReceiver = partsList.contains(PathPointerBlockEntity.PPPart.RECEIVER);
 
         boolean allowBind = !hasBindMode ||
                 (bindMode ? isSender : isReceiver);
@@ -819,14 +823,16 @@ public class WrenchAxeItem extends AxeItem {
             return false;
         }
 
-        List<PathPointerBlock.PPPart> inputParts = Arrays.asList(PathPointerBlock.getParts(level.getBlockState(inputPos)));
-        if (inputParts.contains(PathPointerBlock.PPPart.COLLECTOR)) {
-            PathPointerBlockEntity be = ((PathPointerBlockEntity) level.getBlockEntity(inputPos));
-            if (be != null) {
-                be.updateMax();
+        PathPointerBlockEntity blockEntity1 = (PathPointerBlockEntity) level.getBlockEntity(inputPos);
+        if (blockEntity1 != null) {
+            List<PathPointerBlockEntity.PPPart> inputParts = blockEntity1.parts;
+            if (inputParts.contains(PathPointerBlockEntity.PPPart.COLLECTOR)) {
+                PathPointerBlockEntity be = ((PathPointerBlockEntity) level.getBlockEntity(inputPos));
+                if (be != null) {
+                    be.updateMax();
+                }
             }
         }
-
         return applyBind(level, inputPos, outputPos, wrenchStack, pPlayer);
     }
 

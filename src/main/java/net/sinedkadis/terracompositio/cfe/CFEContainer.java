@@ -18,6 +18,7 @@ import net.minecraftforge.network.PacketDistributor;
 import net.sinedkadis.terracompositio.api.TerraCompositioAPI;
 import net.sinedkadis.terracompositio.api.networks.NetworkAction;
 import net.sinedkadis.terracompositio.api.networks.cfe.*;
+import net.sinedkadis.terracompositio.cfe.burst.CFEBurstProjectileEntity;
 import net.sinedkadis.terracompositio.network.TCPackets;
 import net.sinedkadis.terracompositio.network.packets.S2CPlayerCfeContainerSync;
 
@@ -90,7 +91,7 @@ public class CFEContainer implements ICFEHandler, INBTSerializable<CompoundTag> 
             return 0;
 
         if (!simulate) {
-            CFEBurstProjectileEntity entity = CFEBurstProjectileEntity.sendBurst(this, target, added, getCfeTravelSpeed());
+            CFEBurstProjectileEntity entity = CFEBurstProjectileEntity.sendBurst(this, target, added, target.getCfeTravelSpeed());
             if (entity != null)
                 target.addToQueue(added);
         }

@@ -30,7 +30,9 @@ import net.sinedkadis.terracompositio.api.networks.cfe.*;
 import net.sinedkadis.terracompositio.block.custom.FlowCedarLikeBlock;
 
 
+
 import net.sinedkadis.terracompositio.block.entity.TCCFEBlockEntity;
+import net.sinedkadis.terracompositio.entity.custom.CFECloudEntity;
 import net.sinedkadis.terracompositio.particle.CFEParticleData;
 import net.sinedkadis.terracompositio.particle.FluidParticleData;
 import net.sinedkadis.terracompositio.registries.TCBlockStateProperties;
@@ -524,5 +526,12 @@ public class TCUtil {
                 .uv2(pPackedLight)
                 .normal(normal, 0, 0, 1)
                 .endVertex();
+    }
+
+    public static int placeCFECloud(Level pLevel, BlockPos targetPos, int cfe) {
+        CFECloudEntity entity = new CFECloudEntity(pLevel,cfe);
+        entity.setPos(targetPos.getCenter());
+        pLevel.addFreshEntity(entity);
+        return cfe;
     }
 }

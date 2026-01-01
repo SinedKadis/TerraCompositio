@@ -12,7 +12,8 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.sinedkadis.terracompositio.TerraCompositio;
-import net.sinedkadis.terracompositio.cfe.CFEBurstProjectileEntity;
+
+import net.sinedkadis.terracompositio.entity.custom.CFECloudEntity;
 import net.sinedkadis.terracompositio.util.TCUtil;
 import org.joml.Vector3f;
 
@@ -21,47 +22,51 @@ import javax.annotation.ParametersAreNonnullByDefault;
 @OnlyIn(Dist.CLIENT)
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
-public class CFEBurstRenderer extends EntityRenderer<CFEBurstProjectileEntity> {
-    private static final float MIN_CAMERA_DISTANCE_SQUARED = 12.25F;
+public class CFECloudRenderer extends EntityRenderer<CFECloudEntity> {
+    //private static final float MIN_CAMERA_DISTANCE_SQUARED = 3.25F;
     private static final int REDUCTION = 10;
     private final String x = "x";
     private final String y = "y";
     private final String z = "z";
 
-    public CFEBurstRenderer(EntityRendererProvider.Context pContext) {
-        super(pContext);
+    public CFECloudRenderer(EntityRendererProvider.Context context) {
+        super(context);
     }
 
-    public void render(CFEBurstProjectileEntity pEntity, float pEntityYaw, float pPartialTicks, PoseStack pPoseStack, MultiBufferSource pBuffer, int pPackedLight) {
+    @Override
+    public void render(CFECloudEntity pEntity, float pEntityYaw, float pPartialTick, PoseStack pPoseStack, MultiBufferSource pBuffer, int pPackedLight) {
+        super.render(pEntity, pEntityYaw, pPartialTick, pPoseStack, pBuffer, pPackedLight);
         CompoundTag persistentData = pEntity.getPersistentData();
         if (!persistentData.contains("offsets")) genOffsets(pEntity);
-        if (pEntity.tickCount >= 1 || !(this.entityRenderDispatcher.camera.getEntity().distanceToSqr(pEntity) < MIN_CAMERA_DISTANCE_SQUARED)) {
-            CompoundTag offsets = (CompoundTag) persistentData.get("offsets");
-            assert offsets != null;
-            var renderType = RenderType.entityTranslucentEmissive(getTextureLocation(pEntity));
-            var buffer = pBuffer.getBuffer(renderType);
-            int cfe = pEntity.getCFE();
-            for (int i = 0; i < cfe/REDUCTION; i++) {
-                CompoundTag offset = (CompoundTag) offsets.get(String.valueOf(i));
-                assert offset != null;
 
-                pPoseStack.pushPose();
-
-                pPoseStack.translate(offset.getFloat(x),offset.getFloat(y),offset.getFloat(z));
-                pPoseStack.mulPose(this.entityRenderDispatcher.cameraOrientation());
-                pPoseStack.mulPose(Axis.YP.rotationDegrees(180.0F));
-
-                TCUtil.drawCfeParticle(pPoseStack, pPackedLight, buffer);
-
-                pPoseStack.popPose();
-            }
-            super.render(pEntity, pEntityYaw, pPartialTicks, pPoseStack, pBuffer, pPackedLight);
+        CompoundTag offsets = (CompoundTag) persistentData.get("offsets");
+        assert offsets != null;
+        var renderType = RenderType.entityTranslucentEmissive(getTextureLocation(pEntity));
+        var buffer = pBuffer.getBuffer(renderType);
+        int cfe = pEntity.getSyncedCFE();
+        float k = (float) Math.log10(cfe);
+        for (int i = 0; i < cfe / REDUCTION; i++) {
+            CompoundTag offset = (CompoundTag) offsets.get(String.valueOf(i));
+            assert offset != null;
+            float oX = offset.getFloat(x);
+            float oY = offset.getFloat(y);
+            float oZ = offset.getFloat(z);
+            pPoseStack.pushPose();
+            pPoseStack.translate(oX*k, oY*k, oZ*k);
+            pPoseStack.mulPose(entityRenderDispatcher.camera.rotation());
+            pPoseStack.mulPose(Axis.YP.rotationDegrees(180.0F));
+            TCUtil.drawCfeParticle(pPoseStack, pPackedLight, buffer);
+            pPoseStack.popPose();
         }
+
     }
 
-    private void genOffsets(CFEBurstProjectileEntity entity) {
+
+
+
+    private void genOffsets(CFECloudEntity entity) {
         CompoundTag offsets = new CompoundTag();
-        int cfe = entity.getCFE();
+        int cfe = entity.getSyncedCFE();
         for (int i = 0; i < cfe/REDUCTION; i++) {
             CompoundTag offset = new CompoundTag();
             Vector3f offsetGen = TCUtil.getSpreadParticleOffset(entity.level().random, cfe / REDUCTION).toVector3f();
@@ -77,7 +82,8 @@ public class CFEBurstRenderer extends EntityRenderer<CFEBurstProjectileEntity> {
     /**
      * Returns the location of an entity's texture.
      */
-    public ResourceLocation getTextureLocation(CFEBurstProjectileEntity pEntity) {
+    @Override
+    public ResourceLocation getTextureLocation(CFECloudEntity pEntity) {
         return TerraCompositio.modLoc("textures/particle/cfe_particle.png");
     }
 }

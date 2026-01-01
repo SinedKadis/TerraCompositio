@@ -3,8 +3,6 @@ package net.sinedkadis.terracompositio.mixin;
 import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.sounds.SoundEvents;
-import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.level.Level;
@@ -18,7 +16,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.Optional;
 
-import static net.sinedkadis.terracompositio.block.custom.CFESaturatedAirBlock.placeCFECloud;
+import static net.sinedkadis.terracompositio.util.TCUtil.placeCFECloud;
 
 @Mixin(AbstractFurnaceBlockEntity.class)
 public class AbstractFurnaceBlockEntityMixin {
@@ -47,10 +45,7 @@ public class AbstractFurnaceBlockEntityMixin {
                             new SimpleContainer(pBlockEntity.getItem(0)),pLevel);
                     if (firingRecipe.isPresent()) {
                         int cfe = firingRecipe.get().getCfe();
-                        int placed = placeCFECloud(pLevel, airPos, cfe);
-                        if (placed < cfe) {
-                            pLevel.playSound(null,pPos, SoundEvents.FIRECHARGE_USE, SoundSource.BLOCKS);
-                        }
+                        placeCFECloud(pLevel, airPos, cfe);
                     }
                     break;
                 }

@@ -2,14 +2,11 @@ package net.sinedkadis.terracompositio.cfe;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.MinecraftForge;
 import net.sinedkadis.terracompositio.api.networks.cfe.*;
 import net.sinedkadis.terracompositio.api.networks.NetworkAction;
-import net.sinedkadis.terracompositio.block.entity.CFESaturatedAirBlockEntity;
 import net.sinedkadis.terracompositio.block.entity.PathPointerBlockEntity;
 import net.sinedkadis.terracompositio.events.CFENetworkEvent;
-import net.sinedkadis.terracompositio.registries.TCBlocks;
 import net.sinedkadis.terracompositio.util.TCUtil;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -34,12 +31,8 @@ public class CFENetworkHandler implements CFENetwork {
 
     public void networkMemberUpdated(CFENetworkMember updated) {
         if (cfeSources.containsKey(updated.getLevel())) {
-            //if (updated instanceof CFESaturatedAirBlockEntity) return;
-//            if (updated instanceof Player) {
-//                updated.getLimit()
-//            }
             cfeSources.get(updated.getLevel()).stream()
-                    .filter(member -> updated.getPos().closerThan(member.getPos(),updated.getLimit()))
+                    .filter(member -> updated.getPos().closerThan(member.getPos(),Math.max(updated.getLimit(),member.getLimit())))
                     .filter(member -> !updated.getPos().equals(member.getPos()))
                     .peek(member -> {
                         if (member instanceof PathPointerBlockEntity && !(updated.getPriority() < member.getPriority())) {
@@ -64,23 +57,24 @@ public class CFENetworkHandler implements CFENetwork {
             long minDist = Long.MAX_VALUE;
             long limitSquared = (long) limit * limit;
             CFENetworkMember closest = null;
-            BlockState blockState = level.getBlockState(pos);
-            boolean skipAir = blockState.is(TCBlocks.AIR_SATURATOR.get());
 
             for (CFENetworkMember source : sources) {
+                Optional<ICFEHandler> cfeHandlerOptional = Optional.empty();
                 if (source instanceof CFENetworkMemberBE memberBE) {
-                    if (memberBE instanceof CFESaturatedAirBlockEntity && skipAir) continue;
-                    long distance = distSqr(source.getPos(), pos);
-                    Optional<ICFEHandler> cfeHandlerOptional = memberBE.getEntity().getCapability(CFECapability.CFE).resolve();
-                    if (distance <= limitSquared
-                            && distance < minDist
-                            && distance < (long) source.getLimit() * source.getLimit()
-                            && cfeHandlerOptional.isPresent()
-                            && cfeHandlerOptional.get().getCFE() > 0
-                            && (priority == null || source.getPriority() < priority)) {
-                        minDist = distance;
-                        closest = memberBE;
-                    }
+                    cfeHandlerOptional = memberBE.getEntity().getCapability(CFECapability.CFE).resolve();
+                }
+                if (source instanceof CFENetworkMemberEntity memberE) {
+                    cfeHandlerOptional = memberE.getEntity().getCapability(CFECapability.CFE).resolve();
+                }
+                long distance = distSqr(source.getPos(), pos);
+                if (distance <= limitSquared
+                        && distance < minDist
+                        && distance < (long) source.getLimit() * source.getLimit()
+                        && cfeHandlerOptional.isPresent()
+                        && cfeHandlerOptional.get().getCFE() > 0
+                        && (priority == null || source.getPriority() < priority)) {
+                    minDist = distance;
+                    closest = source;
                 }
             }
 

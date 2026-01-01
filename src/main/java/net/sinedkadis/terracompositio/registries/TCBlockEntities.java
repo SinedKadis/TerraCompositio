@@ -70,10 +70,6 @@ public class TCBlockEntities {
             BLOCK_ENTITIES.register("flow_cedar_tank_be", () ->
                     BlockEntityType.Builder.of(FlowCedarTankBlockEntity::new,
                             TCBlocks.FLOW_CEDAR_TANK.get()).build(null));
-    public static final RegistryObject<BlockEntityType<CFESaturatedAirBlockEntity>> CFE_SATURATED_AIR_BE =
-            BLOCK_ENTITIES.register("cfe_saturated_air_be", () ->
-                    BlockEntityType.Builder.of(CFESaturatedAirBlockEntity::new,
-                            TCBlocks.CFE_SATURATED_AIR.get()).build(null));
 
     public static final RegistryObject<BlockEntityType<PathPointerBlockEntity>> PATH_POINTER_BE =
             BLOCK_ENTITIES.register("path_pointer_be", () ->

@@ -2,7 +2,6 @@ package net.sinedkadis.terracompositio.registries;
 
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
-import net.sinedkadis.terracompositio.block.custom.PathPointerBlock;
 import net.sinedkadis.terracompositio.util.FunctionSide;
 
 public class TCBlockStateProperties {
@@ -10,8 +9,6 @@ public class TCBlockStateProperties {
     public static final BooleanProperty INPUT_BUS = BooleanProperty.create("input_bus");
     public static final BooleanProperty OUTPUT_BUS = BooleanProperty.create("output_bus");
     public static final EnumProperty<FunctionSide> FUNCTION_SIDE = EnumProperty.create("function_side",FunctionSide.class);
-    public static final EnumProperty<PathPointerBlock.PPPart> BASE_PART = EnumProperty.create("base_part", PathPointerBlock.PPPart.class);
-    public static final EnumProperty<PathPointerBlock.PPPart> ADDITIONAL_PART = EnumProperty.create("additional_part", PathPointerBlock.PPPart.class);
     public static final BooleanProperty INPUT_BUS_CONNECTION = BooleanProperty.create("input_bus_connection");
     public static final BooleanProperty OUTPUT_BUS_CONNECTION = BooleanProperty.create("output_bus_connection");
     public static final BooleanProperty UP_CONNECTION = BooleanProperty.create("up_connection");

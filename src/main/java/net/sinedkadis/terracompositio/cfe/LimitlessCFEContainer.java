@@ -3,6 +3,7 @@ package net.sinedkadis.terracompositio.cfe;
 import net.minecraft.util.Mth;
 import net.sinedkadis.terracompositio.api.networks.cfe.CFENetworkMember;
 import net.sinedkadis.terracompositio.api.networks.cfe.ICFEHandler;
+import net.sinedkadis.terracompositio.cfe.burst.CFEBurstProjectileEntity;
 import org.jetbrains.annotations.NotNull;
 
 public class LimitlessCFEContainer extends CFEContainer{
@@ -17,7 +18,7 @@ public class LimitlessCFEContainer extends CFEContainer{
         if (added < 1)
             return 0;
         if (!simulate) {
-            CFEBurstProjectileEntity entity = CFEBurstProjectileEntity.sendBurst(this, target, added, getCfeTravelSpeed());
+            CFEBurstProjectileEntity entity = CFEBurstProjectileEntity.sendBurst(this, target, added, target.getCfeTravelSpeed());
             if (entity != null)
                 target.addToQueue(added);
         }

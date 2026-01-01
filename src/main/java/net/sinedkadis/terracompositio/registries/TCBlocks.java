@@ -18,6 +18,7 @@ import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
 import net.sinedkadis.terracompositio.TerraCompositio;
 import net.sinedkadis.terracompositio.block.custom.*;
+import net.sinedkadis.terracompositio.block.entity.PathPointerBlockEntity;
 import net.sinedkadis.terracompositio.item.custom.UnstableTechnetiumBlockItem;
 import net.sinedkadis.terracompositio.worldgen.tree.FlowCedarTreeGrower;
 
@@ -151,17 +152,14 @@ public class TCBlocks {
     public static final RegistryObject<Block> FLOW_CEDAR_TANK = registerBlock("flow_cedar_tank",
             () -> new FlowCedarTankBlock(BlockBehaviour.Properties.copy(Blocks.OAK_PLANKS).noOcclusion()));
 
-    public static final RegistryObject<Block> CFE_SATURATED_AIR = registerBlock("cfe_saturated_air",
-            () -> new CFESaturatedAirBlock(BlockBehaviour.Properties.copy(Blocks.AIR).noLootTable()));
-
     public static final RegistryObject<Block> PP_RECEIVER = registerBlock("pp_receiver",
-            () -> new PathPointerBlock(BlockBehaviour.Properties.copy(Blocks.OAK_PLANKS).noOcclusion(), PathPointerBlock.PPPart.RECEIVER));
+            () -> new PathPointerBlock(BlockBehaviour.Properties.copy(Blocks.OAK_PLANKS).noOcclusion(), PathPointerBlockEntity.PPPart.RECEIVER));
     public static final RegistryObject<Block> PP_COLLECTOR = registerBlock("pp_collector",
-            () -> new PathPointerBlock(BlockBehaviour.Properties.copy(Blocks.OAK_PLANKS).noOcclusion(), PathPointerBlock.PPPart.COLLECTOR));
+            () -> new PathPointerBlock(BlockBehaviour.Properties.copy(Blocks.OAK_PLANKS).noOcclusion(), PathPointerBlockEntity.PPPart.COLLECTOR));
     public static final RegistryObject<Block> PP_SENDER = registerBlock("pp_sender",
-            () -> new PathPointerBlock(BlockBehaviour.Properties.copy(Blocks.OAK_PLANKS).noOcclusion(), PathPointerBlock.PPPart.SENDER));
+            () -> new PathPointerBlock(BlockBehaviour.Properties.copy(Blocks.OAK_PLANKS).noOcclusion(), PathPointerBlockEntity.PPPart.SENDER));
     public static final RegistryObject<Block> PP_EMITTER = registerBlock("pp_emitter",
-            () -> new PathPointerBlock(BlockBehaviour.Properties.copy(Blocks.OAK_PLANKS).noOcclusion(), PathPointerBlock.PPPart.EMITTER));
+            () -> new PathPointerBlock(BlockBehaviour.Properties.copy(Blocks.OAK_PLANKS).noOcclusion(), PathPointerBlockEntity.PPPart.EMITTER));
 
     public static final RegistryObject<Block> TECHNETIUM_BLOCK = registerBlock("technetium_block",
             () -> new Block(BlockBehaviour.Properties.copy(Blocks.NETHERITE_BLOCK)));

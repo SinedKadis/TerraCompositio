@@ -3,12 +3,9 @@ package net.sinedkadis.terracompositio.compat.jade.providers;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
-import net.minecraft.world.level.block.state.BlockState;
 import net.sinedkadis.terracompositio.TerraCompositio;
-import net.sinedkadis.terracompositio.block.custom.PathPointerBlock;
 import net.sinedkadis.terracompositio.block.entity.PathPointerBlockEntity;
 import net.sinedkadis.terracompositio.compat.jade.JadeTerraCompositioPlugin;
-import net.sinedkadis.terracompositio.registries.TCBlockStateProperties;
 import snownee.jade.api.BlockAccessor;
 import snownee.jade.api.IBlockComponentProvider;
 import snownee.jade.api.IServerDataProvider;
@@ -24,13 +21,13 @@ public enum PPComponentProvider implements IBlockComponentProvider, IServerDataP
 
         if (blockAccessor.getServerData().contains("base") && iPluginConfig.get(partsConfigRL())) {
             iTooltip.add(Component.translatable("block.terracompositio.pp."+
-                    PathPointerBlock.PPPart.values()[blockAccessor.getServerData().getInt("base")]
+                    PathPointerBlockEntity.PPPart.values()[blockAccessor.getServerData().getInt("base")]
                             .getSerializedName()));
         }
         if (blockAccessor.getServerData().contains("add") && iPluginConfig.get(partsConfigRL())) {
             iTooltip.append(Component.literal(", "));
             iTooltip.append(Component.translatable("block.terracompositio.pp."+
-                    PathPointerBlock.PPPart.values()[blockAccessor.getServerData().getInt("add")]
+                    PathPointerBlockEntity.PPPart.values()[blockAccessor.getServerData().getInt("add")]
                             .getSerializedName()));
         }
 
@@ -53,9 +50,8 @@ public enum PPComponentProvider implements IBlockComponentProvider, IServerDataP
     @Override
     public void appendServerData(CompoundTag compoundTag, BlockAccessor blockAccessor) {
         PathPointerBlockEntity blockEntity = (PathPointerBlockEntity) blockAccessor.getBlockEntity();
-        BlockState blockState = blockAccessor.getBlockState();
-        compoundTag.putInt("base", blockState.getValue(TCBlockStateProperties.BASE_PART).ordinal());
-        compoundTag.putInt("add", blockState.getValue(TCBlockStateProperties.ADDITIONAL_PART).ordinal());
+        compoundTag.putInt("base", blockEntity.parts.get(0).ordinal());
+        compoundTag.putInt("add", blockEntity.parts.get(1).ordinal());
         compoundTag.putFloat("yaw", blockEntity.rotationYaw);
         compoundTag.putFloat("pitch", blockEntity.rotationPitch);
         compoundTag.putFloat("roll", blockEntity.rotationRoll);
