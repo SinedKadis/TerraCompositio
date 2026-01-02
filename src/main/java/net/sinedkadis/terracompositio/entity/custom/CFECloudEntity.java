@@ -7,9 +7,11 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.util.Mth;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
+import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
 import net.sinedkadis.terracompositio.api.TerraCompositioAPI;
@@ -20,7 +22,10 @@ import net.sinedkadis.terracompositio.api.networks.cfe.CFENetwork;
 import net.sinedkadis.terracompositio.api.networks.cfe.CFENetworkMemberEntity;
 import net.sinedkadis.terracompositio.api.networks.cfe.ICFEHandler;
 import net.sinedkadis.terracompositio.cfe.LimitlessCFEContainer;
+import net.sinedkadis.terracompositio.cfe.burst.CFEBurstProjectileEntity;
 import net.sinedkadis.terracompositio.registries.TCEntities;
+import net.sinedkadis.terracompositio.util.TCUtil;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -43,7 +48,42 @@ public class CFECloudEntity extends Entity implements CFENetworkMemberEntity {
         public void setCFE(int CFE) {
             setSyncedCFE(CFE);
         }
+
+        @Override
+        public int sendCFE(int cfe, @NotNull ICFEHandler target, boolean simulate) {
+            int freeSpace = target.getFreeSpace();
+            int added = Mth.clamp(cfe, 0, freeSpace);
+            if (added < 1)
+                return 0;
+            if (!simulate) {
+                Vec3 burstOffset = getBurstOffset(target);
+                BlockPos offset = BlockPos.containing(this.getPos().getCenter().add(burstOffset));
+                if (offset.closerThan(target.getPos(),2)) {
+                    target.addCFE(added,false);
+                    return added;
+                }
+                CFEBurstProjectileEntity entity = CFEBurstProjectileEntity.sendBurst(this, burstOffset,target,added,getCfeTravelSpeed());
+                if (entity != null)
+                    target.addToQueue(added);
+            }
+            return added;
+        }
     });
+
+    private Vec3 getBurstOffset(@NotNull ICFEHandler target) {
+        double r = getRadius();
+        BlockPos sourcePos = this.getPos();
+        BlockPos targetPos = target.getPos();
+        if (sourcePos.closerThan(targetPos,r)) return targetPos.subtract(sourcePos).getCenter();
+        return sourcePos.getCenter().vectorTo(targetPos.getCenter()).normalize().scale(r);
+    }
+
+    private double getRadius() {
+        int cfe = (int) (getSyncedCFE() * TCUtil.CFE_PARTICLE_MULTIPLIER);
+        float k = (float) Math.log10(cfe);
+        double baseRadius = 0.2 + 0.3 * Math.log1p(cfe * 0.1);
+        return baseRadius * k;
+    }
 
     public CFECloudEntity(EntityType<? extends Entity> pEntityType, Level pLevel) {
         super(pEntityType, pLevel);
@@ -51,10 +91,8 @@ public class CFECloudEntity extends Entity implements CFENetworkMemberEntity {
         setInvulnerable(true);
     }
 
-    public CFECloudEntity(Level pLevel,int cfe) {
+    public CFECloudEntity(Level pLevel) {
         this(TCEntities.CFE_CLOUD.get(),pLevel);
-        setSyncedCFE(cfe);
-
     }
 
     @Override
@@ -74,14 +112,14 @@ public class CFECloudEntity extends Entity implements CFENetworkMemberEntity {
         }
         updateIfScheduled();
         if (getSyncedCFE() <= 0) discard();
-        int cfe = getSyncedCFE();
-        //todo find more accurate formula
-        double size = Math.log10(cfe*cfe/4f);
-        setBoundingBox(AABB.ofSize(position(),size,size,size));
+
+
     }
 
-
-
+    public AABB getBoundingBox() {
+        double radius = getRadius()*2;
+        return AABB.ofSize(position(), radius,radius,radius);
+    }
 
     @Override
     protected void defineSynchedData() {
@@ -122,7 +160,7 @@ public class CFECloudEntity extends Entity implements CFENetworkMemberEntity {
 
     @Override
     public int getLimit() {
-        return 5;
+        return (int) (getRadius() + 5);
     }
 
     @Override

@@ -26,17 +26,19 @@ public class FlowInfuserBlockEntity extends TCItemIOCFEBlockEntity {
 
     public void tick(Level pLevel, BlockPos pPos, BlockState pState) {
         super.tick(pLevel, pPos, pState);
-        if(hasRecipe() && enoughCFE()){
-            increaseCraftingProgress();
-            consumeCFE();
-            setChanged(pLevel, pPos, pState);
-            spawnParticles(pLevel, pPos);
-            if(hasProgressFinished()){
-                craftItem();
+        if (!pLevel.isClientSide) {
+            if (hasRecipe() && enoughCFE()) {
+                increaseCraftingProgress();
+                consumeCFE();
+                setChanged(pLevel, pPos, pState);
+                spawnParticles(pLevel, pPos);
+                if (hasProgressFinished()) {
+                    craftItem();
+                    resetProgress();
+                }
+            } else if (!hasRecipe()) {
                 resetProgress();
             }
-        }else if(!hasRecipe()) {
-            resetProgress();
         }
     }
 

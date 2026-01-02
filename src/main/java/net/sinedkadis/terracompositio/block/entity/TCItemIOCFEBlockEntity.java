@@ -58,6 +58,7 @@ public abstract class TCItemIOCFEBlockEntity extends TCCFEBlockEntity implements
 
     @Override
     public boolean canPlaceItemThroughFace(int i, ItemStack itemStack, @Nullable Direction direction) {
+        if (getFirstSlot().getCount()+getLastSlot().getCount()>1) return false;
         if (direction != null) {
             return i == SLOT_INPUT && direction.equals(Direction.UP);
         }
@@ -200,6 +201,7 @@ public abstract class TCItemIOCFEBlockEntity extends TCCFEBlockEntity implements
     }
 
     public ItemStack insertItemStack(int slot, ItemStack stack){
+        //if (getFirstSlot().getCount()+getLastSlot().getCount()>1) return false;
         ItemStack itemStack;
         if (stack.getCount() == 1)
             itemStack = stack.copyWithCount(2);

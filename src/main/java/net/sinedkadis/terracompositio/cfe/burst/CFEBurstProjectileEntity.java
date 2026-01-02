@@ -50,8 +50,17 @@ public class CFEBurstProjectileEntity extends ThrowableProjectile {
 
     private CFEBurstProjectileEntity(ICFEHandler pSource, ICFEHandler target, int cfe, float cfeTravelSpeed) {
         this(pSource.x(), pSource.y(), pSource.z(), pSource.getLevel());
+        init(pSource,Vec3.ZERO, target, cfe, cfeTravelSpeed);
+    }
 
 
+
+    private CFEBurstProjectileEntity(ICFEHandler pSource,Vec3 offset, ICFEHandler target, int cfe, float cfeTravelSpeed) {
+        this(pSource.x()+offset.x,pSource.y()+offset.y,pSource.z()+offset.z,pSource.getLevel());
+        init(pSource,offset,target,cfe,cfeTravelSpeed);
+    }
+
+    private void init(ICFEHandler pSource,Vec3 offset, ICFEHandler target, int cfe, float cfeTravelSpeed) {
         CFENetworkMember attachedMember = target.getAttachedMember();
         if (attachedMember instanceof LivingEntity livingEntity) {
             this.setOwner(livingEntity);
@@ -62,7 +71,7 @@ public class CFEBurstProjectileEntity extends ThrowableProjectile {
         this.setNoGravity(true);
         float size = 0f;
         this.setBoundingBox(new AABB(size, size, size, size, size, size));
-        BlockPos shootVec = target.getPos().subtract(pSource.getPos());
+        BlockPos shootVec = target.getPos().subtract(BlockPos.containing(pSource.getPos().getCenter().add(offset)));
         this.cfeTravelSpeed = cfeTravelSpeed;
         this.shoot(shootVec.getX(), shootVec.getY(), shootVec.getZ(), cfeTravelSpeed, 0);
         lastBP.set(pSource.getPos());
@@ -79,6 +88,12 @@ public class CFEBurstProjectileEntity extends ThrowableProjectile {
             return null;
         }
         return new CFEBurstProjectileEntity(pSource, target, cfe, cfeTravelSpeed);
+    }
+    public static @Nullable CFEBurstProjectileEntity sendBurst(ICFEHandler pSource, Vec3 offset, ICFEHandler target, int cfe, float cfeTravelSpeed) {
+        if (cfe < 1) {
+            return null;
+        }
+        return new CFEBurstProjectileEntity(pSource,offset, target, cfe, cfeTravelSpeed);
     }
 
     public CFEBurstProjectileEntity createPartWithCFE(int cfe) {

@@ -24,6 +24,7 @@ import net.minecraft.world.level.block.RotatedPillarBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.Property;
+import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.fluids.FluidStack;
 import net.sinedkadis.terracompositio.api.networks.cfe.*;
@@ -48,6 +49,9 @@ import static net.sinedkadis.terracompositio.registries.TCBlockStateProperties.I
 
 public class TCUtil {
 
+
+    //private static final float MIN_CAMERA_DISTANCE_SQUARED = 3.25F;
+    public static final float CFE_PARTICLE_MULTIPLIER = 0.1f;
 
     public static void tryCFETransfer(CFENetworkMember target, CFENetworkMember source, int maxTransfer){
         int taken = source.getMainHandler().takeCFE(maxTransfer,true);
@@ -529,9 +533,16 @@ public class TCUtil {
     }
 
     public static int placeCFECloud(Level pLevel, BlockPos targetPos, int cfe) {
-        CFECloudEntity entity = new CFECloudEntity(pLevel,cfe);
+        Optional<CFECloudEntity> first = pLevel.getEntities(null, AABB.ofSize(targetPos.getCenter(), 1, 1, 1))
+                .stream()
+                .map(entity -> entity instanceof CFECloudEntity cfeCloudEntity ? cfeCloudEntity : null)
+                .filter(Objects::nonNull)
+                .findFirst();
+        CFECloudEntity entity = first.orElseGet(() -> new CFECloudEntity(pLevel));
+        int cfe1 = entity.getSyncedCFE();
+        if (cfe1 == 0) pLevel.addFreshEntity(entity);
+        entity.setSyncedCFE(cfe1 +cfe);
         entity.setPos(targetPos.getCenter());
-        pLevel.addFreshEntity(entity);
         return cfe;
     }
 }

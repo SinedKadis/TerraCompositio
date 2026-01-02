@@ -2,7 +2,6 @@ package net.sinedkadis.terracompositio.mixin;
 
 import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.level.Level;
@@ -37,18 +36,11 @@ public class AbstractFurnaceBlockEntityMixin {
             @Local Recipe<?> recipe
     ) {
         if (recipe != null) {
-            for (Direction direction : Direction.values()){
-                BlockPos airPos = pPos.relative(direction);
-                BlockState airState = pLevel.getBlockState(airPos);
-                if (airState.isAir()){
-                    Optional<TechnetiumFiringRecipe> firingRecipe = pLevel.getRecipeManager().getRecipeFor(TechnetiumFiringRecipe.Type.INSTANCE,
-                            new SimpleContainer(pBlockEntity.getItem(0)),pLevel);
-                    if (firingRecipe.isPresent()) {
-                        int cfe = firingRecipe.get().getCfe();
-                        placeCFECloud(pLevel, airPos, cfe);
-                    }
-                    break;
-                }
+            Optional<TechnetiumFiringRecipe> firingRecipe = pLevel.getRecipeManager().getRecipeFor(TechnetiumFiringRecipe.Type.INSTANCE,
+                    new SimpleContainer(pBlockEntity.getItem(0)),pLevel);
+            if (firingRecipe.isPresent()) {
+                int cfe = firingRecipe.get().getCfe();
+                placeCFECloud(pLevel, pPos, cfe);
             }
         }
     }

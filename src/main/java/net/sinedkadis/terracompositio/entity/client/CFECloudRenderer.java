@@ -23,8 +23,6 @@ import javax.annotation.ParametersAreNonnullByDefault;
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
 public class CFECloudRenderer extends EntityRenderer<CFECloudEntity> {
-    //private static final float MIN_CAMERA_DISTANCE_SQUARED = 3.25F;
-    private static final int REDUCTION = 10;
     private final String x = "x";
     private final String y = "y";
     private final String z = "z";
@@ -45,9 +43,16 @@ public class CFECloudRenderer extends EntityRenderer<CFECloudEntity> {
         var buffer = pBuffer.getBuffer(renderType);
         int cfe = pEntity.getSyncedCFE();
         float k = (float) Math.log10(cfe);
-        for (int i = 0; i < cfe / REDUCTION; i++) {
+        for (int i = 0; i < cfe * TCUtil.CFE_PARTICLE_MULTIPLIER; i++) {
             CompoundTag offset = (CompoundTag) offsets.get(String.valueOf(i));
-            assert offset != null;
+            if (offset == null) {
+                genOffsets(pEntity);
+                persistentData = pEntity.getPersistentData();
+                offsets = (CompoundTag) persistentData.get("offsets");
+                assert offsets != null;
+                offset = (CompoundTag) offsets.get(String.valueOf(i));
+                assert offset != null;
+            }
             float oX = offset.getFloat(x);
             float oY = offset.getFloat(y);
             float oZ = offset.getFloat(z);
@@ -65,17 +70,27 @@ public class CFECloudRenderer extends EntityRenderer<CFECloudEntity> {
 
 
     private void genOffsets(CFECloudEntity entity) {
-        CompoundTag offsets = new CompoundTag();
+        CompoundTag persistentData = entity.getPersistentData();
+        CompoundTag offsets;
+        if (persistentData.contains("offsets"))
+            offsets = persistentData.getCompound("offsets");
+        else
+            offsets = new CompoundTag();
+
         int cfe = entity.getSyncedCFE();
-        for (int i = 0; i < cfe/REDUCTION; i++) {
-            CompoundTag offset = new CompoundTag();
-            Vector3f offsetGen = TCUtil.getSpreadParticleOffset(entity.level().random, cfe / REDUCTION).toVector3f();
+        for (int i = 0; i < cfe * TCUtil.CFE_PARTICLE_MULTIPLIER; i++) {
+            CompoundTag offset;
+            if (offsets.contains(String.valueOf(i)))
+                continue;
+            else
+                offset = new CompoundTag();
+            Vector3f offsetGen = TCUtil.getSpreadParticleOffset(entity.level().random, (int) (cfe * TCUtil.CFE_PARTICLE_MULTIPLIER)).toVector3f();
             offset.putFloat(x,offsetGen.x);
             offset.putFloat(y,offsetGen.y);
             offset.putFloat(z,offsetGen.z);
             offsets.put(String.valueOf(i),offset);
         }
-        entity.getPersistentData().put("offsets",offsets);
+        persistentData.put("offsets",offsets);
     }
 
 

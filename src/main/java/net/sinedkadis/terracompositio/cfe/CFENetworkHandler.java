@@ -6,7 +6,9 @@ import net.minecraftforge.common.MinecraftForge;
 import net.sinedkadis.terracompositio.api.networks.cfe.*;
 import net.sinedkadis.terracompositio.api.networks.NetworkAction;
 import net.sinedkadis.terracompositio.block.entity.PathPointerBlockEntity;
+import net.sinedkadis.terracompositio.entity.custom.CFECloudEntity;
 import net.sinedkadis.terracompositio.events.CFENetworkEvent;
+import net.sinedkadis.terracompositio.registries.TCBlocks;
 import net.sinedkadis.terracompositio.util.TCUtil;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -65,11 +67,12 @@ public class CFENetworkHandler implements CFENetwork {
                 }
                 if (source instanceof CFENetworkMemberEntity memberE) {
                     cfeHandlerOptional = memberE.getEntity().getCapability(CFECapability.CFE).resolve();
+                    if (source instanceof CFECloudEntity && level.getBlockState(pos).is(TCBlocks.AIR_SATURATOR.get()))
+                        continue;
                 }
                 long distance = distSqr(source.getPos(), pos);
-                if (distance <= limitSquared
+                if ((distance <= limitSquared || distance < (long) source.getLimit() * source.getLimit())
                         && distance < minDist
-                        && distance < (long) source.getLimit() * source.getLimit()
                         && cfeHandlerOptional.isPresent()
                         && cfeHandlerOptional.get().getCFE() > 0
                         && (priority == null || source.getPriority() < priority)) {
