@@ -67,7 +67,7 @@ public enum MatterInfuserIOComponentProvider implements IBlockComponentProvider,
         });
 
         ItemStack inputSlot = blockEntity.getInputSlot();
-        ItemStack outputSlot = blockEntity.getOutputSlot();
+        ItemStack outputSlot = blockEntity.getSlotOutput();
 
         compoundTag.putInt("input_c",inputSlot.getCount());
         compoundTag.putInt("input",Item.getId(inputSlot.getItem()));

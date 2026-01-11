@@ -1,47 +1,79 @@
 package net.sinedkadis.terracompositio.block.entity;
 
+import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.sinedkadis.terracompositio.api.networks.cfe.ICFEHandler;
+import net.sinedkadis.terracompositio.block.behaviours.CFEHandlerBehaviour;
+import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBEBehaviour;
 import net.sinedkadis.terracompositio.registries.TCBlockEntities;
 import net.sinedkadis.terracompositio.registries.TCBlockStateProperties;
 import net.sinedkadis.terracompositio.util.TCUtil;
+import org.jetbrains.annotations.NotNull;
 
-public class AirSaturatorBlockEntity extends TCCFEBlockEntity{
+import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.List;
+
+@ParametersAreNonnullByDefault
+@MethodsReturnNonnullByDefault
+public class AirSaturatorBlockEntity extends TCBlockEntity{
     public AirSaturatorBlockEntity(BlockPos pos, BlockState state) {
-        super(TCBlockEntities.AIR_SATURATOR_BE.get(), pos, state, 100, 5, BlockMode.CONSUMER);
+        super(TCBlockEntities.AIR_SATURATOR_BE.get(), pos, state);
     }
 
     private boolean wasActivated = false;
     private int timer = 0;
+
     @Override
-    public void tick(Level pLevel, BlockPos pPos, BlockState pState) {
+    void addBehaviours(List<IBEBehaviour> list) {
+        list.add(new CFEHandlerBehaviour(this){
+            @Override
+            public void init() {
+                setMaxCFE(100);
+                setPriority(100);
+                setLimit(5);
+            }
+        });
+
+    }
+
+    @Override
+    public void tick(@NotNull Level pLevel, BlockPos pPos, BlockState pState) {
         super.tick(pLevel, pPos, pState);
         boolean isActivated = pLevel.hasNeighborSignal(pPos);
         if (isActivated && !wasActivated) {
             scheduleMemberUpdate();
         }
-        int cfe = cfeContainer.getCFE();
+        int cfe = cfeContainer().getCFE();
         if (isActivated && cfe > 0) {
             BlockPos toPlace = pPos.relative(pState.getValue(BlockStateProperties.FACING));
             if (!pLevel.getBlockState(toPlace).isAir()) return;
             if (pState.getValue(TCBlockStateProperties.INFUSED)) {
                 TCUtil.placeCFECloud(pLevel, toPlace, cfe);
-                cfeContainer.takeCFE(cfe,false);
+                cfeContainer().takeCFE(cfe,false);
                 scheduleMemberUpdate();
                 pLevel.playSound(null,toPlace, SoundEvents.WOOL_PLACE, SoundSource.BLOCKS,0.5f,1f);
             } else if (timer <= 0){
-                int toSaturate = cfeContainer.takeCFE(10,true);
+                int toSaturate = cfeContainer().takeCFE(10,true);
                 TCUtil.placeCFECloud(pLevel, toPlace, toSaturate);
-                cfeContainer.takeCFE(toSaturate,false);
+                cfeContainer().takeCFE(toSaturate,false);
                 scheduleMemberUpdate();
                 timer = 20;
                 pLevel.playSound(null,toPlace, SoundEvents.WOOL_PLACE, SoundSource.BLOCKS,0.5f,1f);
             } else timer--;
         }
         wasActivated = isActivated;
+    }
+
+    private ICFEHandler cfeContainer() {
+        return ((CFEHandlerBehaviour) behaviours.get(0)).getMainHandler();
+    }
+
+    private void scheduleMemberUpdate() {
+        ((CFEHandlerBehaviour) behaviours.get(0)).scheduleMemberUpdate();
     }
 }

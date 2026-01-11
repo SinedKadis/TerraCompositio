@@ -9,13 +9,13 @@ import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.EntityBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.DirectionProperty;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBEItemBehaviour;
 import net.sinedkadis.terracompositio.block.entity.FlowCedarCasingBlockEntity;
 import net.sinedkadis.terracompositio.registries.TCBlocks;
 import net.sinedkadis.terracompositio.util.FunctionSide;
@@ -27,14 +27,15 @@ import java.util.Objects;
 import static net.minecraft.world.level.block.state.properties.BlockStateProperties.AXIS;
 import static net.sinedkadis.terracompositio.block.custom.FlowCedarCasingBlock.FUNCTION_SIDE;
 
-public abstract class MatterInfuserBaseBaseEntityBlock extends TCIOBaseEntityBlock implements EntityBlock {
+@SuppressWarnings("deprecation")
+public abstract class MatterInfuserBaseEntityBlock extends TCBaseEntityBlock {
     protected final static DirectionProperty FACING;
     protected static final VoxelShape NORTH_AABB;
     protected static final VoxelShape SOUTH_AABB;
     protected static final VoxelShape WEST_AABB;
     protected static final VoxelShape EAST_AABB;
 
-    public MatterInfuserBaseBaseEntityBlock(Properties pProperties) {
+    public MatterInfuserBaseEntityBlock(Properties pProperties) {
         super(pProperties);
         this.registerDefaultState(this.defaultBlockState().setValue(FACING, Direction.EAST));
     }
@@ -60,7 +61,7 @@ public abstract class MatterInfuserBaseBaseEntityBlock extends TCIOBaseEntityBlo
     }
 
     @Override
-    public void onRemove(BlockState pState, @NotNull Level pLevel, @NotNull BlockPos pPos, BlockState pNewState, boolean pIsMoving) {
+    public void onRemove(@NotNull BlockState pState, @NotNull Level pLevel, @NotNull BlockPos pPos, @NotNull BlockState pNewState, boolean pIsMoving) {
         super.onRemove(pState, pLevel, pPos, pNewState, pIsMoving);
         if (pState.getBlock() != pNewState.getBlock()) {
             Direction direction = pState.getValue(FACING);
@@ -68,8 +69,10 @@ public abstract class MatterInfuserBaseBaseEntityBlock extends TCIOBaseEntityBlo
             BlockState blockstate = pLevel.getBlockState(blockpos);
             if (blockstate.is(TCBlocks.FLOW_CEDAR_CASING.get())) {
                 FlowCedarCasingBlockEntity blockEntity = (FlowCedarCasingBlockEntity) Objects.requireNonNull(pLevel.getBlockEntity(blockpos));
-                blockEntity.drops();
-                blockEntity.setSlotCount(slotCount());
+                //noinspection OptionalGetWithoutIsPresent
+                IBEItemBehaviour iItemBehaviour = blockEntity.getItemBehaviour().get();
+                iItemBehaviour.drops();
+                iItemBehaviour.getItemHandler().setSize(slotCount());
             }
         }
     }
@@ -115,8 +118,10 @@ public abstract class MatterInfuserBaseBaseEntityBlock extends TCIOBaseEntityBlo
             pLevel.setBlock(casingPos, casingState.setValue(FUNCTION_SIDE, functionSideByDirection), 3);
             FlowCedarCasingBlockEntity blockEntity = (FlowCedarCasingBlockEntity) pLevel.getBlockEntity(casingPos);
             if (blockEntity != null) {
-                blockEntity.drops();
-                blockEntity.setSlotCount(slotCount());
+                //noinspection OptionalGetWithoutIsPresent
+                IBEItemBehaviour iItemBehaviour = blockEntity.getItemBehaviour().get();
+                iItemBehaviour.drops();
+                iItemBehaviour.getItemHandler().setSize(slotCount());
             }
         }
     }

@@ -16,6 +16,7 @@ import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.storage.loot.LootParams;
 import net.minecraft.world.phys.BlockHitResult;
+import net.sinedkadis.terracompositio.block.entity.TCBlockEntity;
 import net.sinedkadis.terracompositio.registries.TCBlockStateProperties;
 import net.sinedkadis.terracompositio.registries.TCBlocks;
 import net.sinedkadis.terracompositio.registries.TCBlockEntities;
@@ -30,7 +31,7 @@ import static net.sinedkadis.terracompositio.block.custom.FlowCedarCasingBlock.*
 import static net.sinedkadis.terracompositio.registries.TCBlockStateProperties.LEFT_CONNECTION;
 
 
-public class MatterInfuserPortBlock extends MatterInfuserBaseBaseEntityBlock {
+public class MatterInfuserPortBlock extends MatterInfuserBaseEntityBlock {
     private final static BooleanProperty UP_CONNECTION;
     private final static BooleanProperty RIGHT_CONNECTION;
 
@@ -62,6 +63,7 @@ public class MatterInfuserPortBlock extends MatterInfuserBaseBaseEntityBlock {
         }
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     public @NotNull List<ItemStack> getDrops(@NotNull BlockState pState, LootParams.@NotNull Builder pParams) {
         List<ItemStack> drops =  super.getDrops(pState, pParams);
@@ -80,7 +82,7 @@ public class MatterInfuserPortBlock extends MatterInfuserBaseBaseEntityBlock {
     }
 
     @Override
-    public @NotNull InteractionResult use(@NotNull BlockState pState, Level pLevel, @NotNull BlockPos pPos, @NotNull Player pPlayer, @NotNull InteractionHand pHand, @NotNull BlockHitResult pHit) {
+    public @NotNull InteractionResult use(@NotNull BlockState pState, @NotNull Level pLevel, @NotNull BlockPos pPos, @NotNull Player pPlayer, @NotNull InteractionHand pHand, @NotNull BlockHitResult pHit) {
         ItemStack item = pPlayer.getItemInHand(pHand);
         Direction facing = pState.getValue(FACING);
         BlockPos casingPos = pPos.relative(facing.getOpposite());
@@ -100,10 +102,9 @@ public class MatterInfuserPortBlock extends MatterInfuserBaseBaseEntityBlock {
         return ((FlowCedarCasingBlock) casingState.getBlock()).use(casingState,pLevel,casingPos,pPlayer,pHand,pHit);
     }
 
-    @Nullable
     @Override
-    public BlockEntity newBlockEntity(@NotNull BlockPos blockPos, @NotNull BlockState blockState) {
-        return TCBlockEntities.MATTER_INFUSER_PORT_BE.get().create(blockPos, blockState);
+    protected @NotNull BlockEntityType<? extends TCBlockEntity> getBlockEntityType() {
+        return TCBlockEntities.MATTER_INFUSER_PORT_BE.get();
     }
 
     @Nullable

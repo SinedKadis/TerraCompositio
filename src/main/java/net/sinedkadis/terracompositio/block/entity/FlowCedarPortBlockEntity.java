@@ -14,6 +14,10 @@ import net.minecraft.world.inventory.ContainerData;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraftforge.items.ItemStackHandler;
+import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBEBehaviour;
+import net.sinedkadis.terracompositio.block.behaviours.OneSlotItemHandlerBehaviour;
+import net.sinedkadis.terracompositio.block.behaviours.TwoSlotItemHandlerBehaviour;
 import net.sinedkadis.terracompositio.recipe.FlowSaturationRecipe;
 import net.sinedkadis.terracompositio.registries.TCBlockEntities;
 import net.sinedkadis.terracompositio.screen.FlowBlockPortMenu;
@@ -21,6 +25,7 @@ import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.List;
 import java.util.Optional;
 
 import static net.sinedkadis.terracompositio.registries.TCBlockStateProperties.INFUSED;
@@ -28,18 +33,15 @@ import static net.sinedkadis.terracompositio.registries.TCBlockStateProperties.I
 @SuppressWarnings("DataFlowIssue")
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
-public class FlowCedarPortBlockEntity extends TCItemIOCFEBlockEntity implements MenuProvider {
+public class FlowCedarPortBlockEntity extends TCCraftingBlockEntity implements MenuProvider {
 
     protected final ContainerData data;
     private int tickForSound = 0;
 
-    @Override
-    public int getSlotLimit(int slot) {
-        return 1;
-    }
+
 
     public FlowCedarPortBlockEntity(BlockPos pPos, BlockState pBlockState) {
-        super(TCBlockEntities.FLOW_PORT_BE.get(),pPos,pBlockState,BlockMode.CONSUMER);
+        super(TCBlockEntities.FLOW_PORT_BE.get(),pPos,pBlockState);
         this.data =new ContainerData() {
             @Override
             public int get(int pIndex) {
@@ -65,6 +67,8 @@ public class FlowCedarPortBlockEntity extends TCItemIOCFEBlockEntity implements 
         };
     }
 
+
+
     @Override
     protected void saveAdditional(@NotNull CompoundTag pTag) {
         pTag.putInt("flow_port_progress", progress);
@@ -75,6 +79,16 @@ public class FlowCedarPortBlockEntity extends TCItemIOCFEBlockEntity implements 
     public void load(@NotNull CompoundTag pTag) {
         super.load(pTag);
         progress = pTag.getInt("flow_port_progress");
+    }
+
+    @Override
+    void addBehaviours(List<IBEBehaviour> list) {
+        list.add(new OneSlotItemHandlerBehaviour(this){
+            @Override
+            public int getLimitInSlot(int slot) {
+                return 1;
+            }
+        });
     }
 
     public void tick(Level pLevel, BlockPos pPos, BlockState pState) {
@@ -101,9 +115,13 @@ public class FlowCedarPortBlockEntity extends TCItemIOCFEBlockEntity implements 
                 resetProgress();
             }
         }
-        if (pLevel.getRandom().nextFloat() < 0.005f && itemHandler.getStackInSlot(SLOT_INPUT).isEmpty()) {
+        if (pLevel.getRandom().nextFloat() < 0.005f && itemHandler().getStackInSlot(0).isEmpty()) {
             pLevel.playSound(null, pPos, SoundEvents.ITEM_FRAME_ADD_ITEM, SoundSource.BLOCKS,2,1);
         }
+    }
+
+    protected ItemStackHandler itemHandler() {
+        return ((TwoSlotItemHandlerBehaviour) behaviours.get(0)).getItemHandler();
     }
 
     protected boolean hasRecipe() {
@@ -123,17 +141,17 @@ public class FlowCedarPortBlockEntity extends TCItemIOCFEBlockEntity implements 
         Optional<FlowSaturationRecipe> recipe = getCurrentRecipe();
         if (recipe.isPresent()) {
             ItemStack result = recipe.get().getResultItem(null);
-            this.itemHandler.forceExtractItem(SLOT_INPUT, 1, false);
-            this.itemHandler.forceInsertItem(SLOT_OUTPUT, result,false);
+            this.itemHandler().extractItem(0, 1, false);
+            this.itemHandler().insertItem(1, result,false);
             return result;
         }
         return ItemStack.EMPTY;
     }
 
     protected Optional<FlowSaturationRecipe> getCurrentRecipe() {
-        SimpleContainer inventory = new SimpleContainer(this.itemHandler.getSlots());
-        for(int i = 0; i < itemHandler.getSlots(); i++) {
-            inventory.setItem(i, this.itemHandler.getStackInSlot(i));
+        SimpleContainer inventory = new SimpleContainer(this.itemHandler().getSlots());
+        for(int i = 0; i < itemHandler().getSlots(); i++) {
+            inventory.setItem(i, this.itemHandler().getStackInSlot(i));
         }
 
         assert this.level != null;
@@ -150,6 +168,5 @@ public class FlowCedarPortBlockEntity extends TCItemIOCFEBlockEntity implements 
     public AbstractContainerMenu createMenu(int pContainerId, @NotNull Inventory pPlayerInventory, @NotNull Player pPlayer) {
         return new FlowBlockPortMenu(pContainerId,pPlayerInventory,this,this.data);
     }
-
 
 }

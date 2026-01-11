@@ -24,6 +24,8 @@ import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.level.storage.loot.LootParams;
 import net.minecraft.world.phys.BlockHitResult;
+import net.minecraftforge.items.ItemStackHandler;
+import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBEItemBehaviour;
 import net.sinedkadis.terracompositio.block.entity.FlowCedarCasingBlockEntity;
 import net.sinedkadis.terracompositio.item.custom.WrenchAxeItem;
 import net.sinedkadis.terracompositio.registries.TCBlockEntities;
@@ -36,8 +38,9 @@ import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.List;
+import java.util.Optional;
 
-import static net.sinedkadis.terracompositio.block.custom.TCIOBaseEntityBlock.createTickerHelper;
+import static net.sinedkadis.terracompositio.block.custom.TCBaseEntityBlock.createTickerHelper;
 import static net.sinedkadis.terracompositio.util.TCUtil.handleInWorldBlockCraft;
 
 @MethodsReturnNonnullByDefault
@@ -60,15 +63,11 @@ public class FlowCedarCasingBlock extends FlowCedarLikeBlock implements EntityBl
     }
 
     @Override
-    public BlockState getStateForPlacement(BlockPlaceContext pContext) {
-        return this.defaultBlockState().setValue(AXIS, pContext.getClickedFace().getAxis());
-    }
-
-    @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> pBuilder) {
         pBuilder.add(AXIS, INPUT_BUS, OUTPUT_BUS, FUNCTION_SIDE, INPUT_BUS_CONNECTION, OUTPUT_BUS_CONNECTION, INFUSED,WAXED);
     }
 
+    @SuppressWarnings("OptionalGetWithoutIsPresent")
     @Override
     public @NotNull InteractionResult use(@NotNull BlockState pState, @NotNull Level pLevel, @NotNull BlockPos pPos, @NotNull Player pPlayer, @NotNull InteractionHand pHand, @NotNull BlockHitResult pHit) {
         ItemStack item = pPlayer.getItemInHand(InteractionHand.MAIN_HAND);
@@ -103,10 +102,11 @@ public class FlowCedarCasingBlock extends FlowCedarLikeBlock implements EntityBl
         if (isPortAttached(pLevel,pState,pPos) && pPos != pHit.getBlockPos() && pHand != InteractionHand.OFF_HAND){
             FlowCedarCasingBlockEntity blockEntity = (FlowCedarCasingBlockEntity) pLevel.getBlockEntity(pPos);
             assert blockEntity != null;
-            ItemStack inputSlot = blockEntity.getFirstSlot();
+            ItemStackHandler itemHandler = blockEntity.getItemBehaviour().get().getItemHandler();
+            ItemStack inputSlot = itemHandler.getStackInSlot(0);
             if (inputSlot.isEmpty()) {
                 if (!item.isEmpty()) {
-                    blockEntity.insertItemStack(0, item);
+                    itemHandler.insertItem(0, item,false);
                     item.shrink(1);
                     pLevel.playSound(pPlayer, pPos, SoundEvents.ITEM_FRAME_ADD_ITEM, SoundSource.BLOCKS);
                     return InteractionResult.SUCCESS;
@@ -115,7 +115,7 @@ public class FlowCedarCasingBlock extends FlowCedarLikeBlock implements EntityBl
                 if (!pPlayer.addItem(inputSlot)) {
                     pPlayer.drop(inputSlot, false);
                 }
-                blockEntity.setSlotEmpty(0);
+                itemHandler.setStackInSlot(0,ItemStack.EMPTY);
                 pLevel.playSound(pPlayer, pPos, SoundEvents.ITEM_FRAME_REMOVE_ITEM, SoundSource.BLOCKS);
                 return InteractionResult.SUCCESS;
             }
@@ -139,15 +139,18 @@ public class FlowCedarCasingBlock extends FlowCedarLikeBlock implements EntityBl
             }
             FlowCedarCasingBlockEntity blockEntity = (FlowCedarCasingBlockEntity) pLevel.getBlockEntity(pPos);
             if (blockEntity != null) {
-                blockEntity.drops();
+                Optional<IBEItemBehaviour> itemBehaviour = blockEntity.getItemBehaviour();
+                itemBehaviour.ifPresent(IBEItemBehaviour::drops);
             }
         } else if (pNewState.getBlock() == Blocks.STRUCTURE_VOID){
             FlowCedarCasingBlockEntity blockEntity = (FlowCedarCasingBlockEntity) pLevel.getBlockEntity(pPos);
             if (blockEntity != null) {
-                blockEntity.drops();
+                Optional<IBEItemBehaviour> itemBehaviour = blockEntity.getItemBehaviour();
+                itemBehaviour.ifPresent(IBEItemBehaviour::drops);
             }
         }
     }
+    @SuppressWarnings("deprecation")
     @Override
     public @NotNull List<ItemStack> getDrops(@NotNull BlockState pState, LootParams.@NotNull Builder pParams) {
         List<ItemStack> drops = super.getDrops(pState,pParams);

@@ -99,7 +99,8 @@ public class CFEContainer implements ICFEHandler, INBTSerializable<CompoundTag> 
     }
 
     public int addCFE(int cfe,boolean simulate) {
-        int added = Mth.clamp(cfe, 0, getMaxCFE()-getCFE());
+        int pMax = getMaxCFE() - getCFE();
+        int added = Mth.clamp(cfe, 0, pMax);
         if (!simulate) {
             setCFE(getCFE()+added);
             //subFromQueue(added);

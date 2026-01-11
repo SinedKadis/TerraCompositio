@@ -5,9 +5,6 @@ import lombok.Getter;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.protocol.Packet;
-import net.minecraft.network.protocol.game.ClientGamePacketListener;
-import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -19,15 +16,18 @@ import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidUtil;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.fluids.capability.templates.FluidTank;
-import net.sinedkadis.terracompositio.api.networks.cfe.CFENetworkMemberBE;
+import net.sinedkadis.terracompositio.api.networks.cfe.ICFEHandler;
+import net.sinedkadis.terracompositio.block.behaviours.CFEHandlerBehaviour;
+import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBEBehaviour;
 import net.sinedkadis.terracompositio.registries.TCBlockStateProperties;
 import net.sinedkadis.terracompositio.registries.TCFluids;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.List;
 import java.util.Optional;
 @Getter
-public abstract class AbstractDesorberBlockEntity extends TCCFEBlockEntity implements CFENetworkMemberBE {
+public abstract class AbstractDesorberBlockEntity extends TCBlockEntity {
 
     protected final FluidTank fluidHandler = new FluidTank(getTankCapacity()){
         private final FluidStack flow = new FluidStack(TCFluids.FLOW_FLUID.source.get(), 1000);
@@ -40,9 +40,17 @@ public abstract class AbstractDesorberBlockEntity extends TCCFEBlockEntity imple
     };
 
     @Override
-    public int getLimit() {
-        return 5;
+    void addBehaviours(@NotNull List<IBEBehaviour> list) {
+        list.add(new CFEHandlerBehaviour(this){
+            @Override
+            public void init() {
+                setLimit(5);
+                setPriority(-100);
+            }
+        });
     }
+
+
 
 
     protected int getTankCapacity() {
@@ -51,10 +59,10 @@ public abstract class AbstractDesorberBlockEntity extends TCCFEBlockEntity imple
     protected LazyOptional<IFluidHandler> lazyFluidHandler = LazyOptional.empty();
 
     public AbstractDesorberBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
-        super(type, pos, state,BlockMode.SOURCE);
+        super(type, pos, state);
     }
 
-    public void tick(Level pLevel, BlockPos pPos, BlockState pState) {
+    public void tick(@NotNull Level pLevel, @NotNull BlockPos pPos, @NotNull BlockState pState) {
         super.tick(pLevel,pPos,pState);
         if (!fluidHandler.isEmpty() && !pState.getValue(TCBlockStateProperties.INFUSED)) {
             pLevel.setBlockAndUpdate(pPos, pState.setValue(TCBlockStateProperties.INFUSED, true));
@@ -103,14 +111,8 @@ public abstract class AbstractDesorberBlockEntity extends TCCFEBlockEntity imple
         lazyFluidHandler.invalidate();
     }
 
-    @Nullable
-    @Override
-    public Packet<ClientGamePacketListener> getUpdatePacket() {
-        return ClientboundBlockEntityDataPacket.create(this);
+    protected ICFEHandler cfeContainer() {
+        return ((CFEHandlerBehaviour) behaviours.get(0)).getMainHandler();
     }
 
-    @Override
-    public @NotNull CompoundTag getUpdateTag() {
-        return saveWithoutMetadata();
-    }
 }

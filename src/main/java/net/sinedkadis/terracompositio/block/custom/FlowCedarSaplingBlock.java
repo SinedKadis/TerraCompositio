@@ -22,6 +22,7 @@ import net.sinedkadis.terracompositio.worldgen.tree.FlowCedarTreeGrower;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 
+@SuppressWarnings("deprecation")
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class FlowCedarSaplingBlock extends SaplingBlock {

@@ -33,7 +33,7 @@ import net.sinedkadis.terracompositio.registries.TCFluids;
 import net.sinedkadis.terracompositio.registries.TCItems;
 import org.jetbrains.annotations.NotNull;
 
-public abstract class AbstractDesorberBlock extends TCCFEBaseEntityBlock implements SimpleWaterloggedBlock {
+public abstract class AbstractDesorberBlock extends TCBaseEntityBlock implements SimpleWaterloggedBlock {
     protected static final BooleanProperty INFUSED;
     protected static final BooleanProperty WATERLOGGED;
 
@@ -44,6 +44,7 @@ public abstract class AbstractDesorberBlock extends TCCFEBaseEntityBlock impleme
 
 
 
+    @SuppressWarnings("deprecation")
     public @NotNull FluidState getFluidState(BlockState pState) {
         return pState.getValue(WATERLOGGED) ? Fluids.WATER.getSource(false) : super.getFluidState(pState);
     }

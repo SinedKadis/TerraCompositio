@@ -99,7 +99,7 @@ public class FlowCedarEntStatueModel extends Model implements HeadedModel {
 
 
 		boolean flag = false;
-		ItemStack stack = entity.getItem(0);
+		@SuppressWarnings("OptionalGetWithoutIsPresent") ItemStack stack = entity.getItemBehaviour().get().getItemHandler().getStackInSlot(0);
 		if (stack.is(TCItems.TECHNETIUM_CROWN.get())){
 			flag = true;
 		}

@@ -11,18 +11,18 @@ import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.storage.loot.LootParams;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
-import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.event.level.BlockEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.fluids.capability.templates.FluidTank;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.items.ItemStackHandler;
 import net.sinedkadis.terracompositio.TerraCompositio;
 import net.sinedkadis.terracompositio.api.TerraCompositioAPI;
 import net.sinedkadis.terracompositio.api.networks.cfe.CFENetwork;
 import net.sinedkadis.terracompositio.api.networks.cfe.CFENetworkMember;
 import net.sinedkadis.terracompositio.registries.TCBlockEntities;
-import net.sinedkadis.terracompositio.util.TCItemStackHandler;
+
 import net.sinedkadis.terracompositio.util.TCUtil;
 import org.jetbrains.annotations.NotNull;
 
@@ -34,7 +34,7 @@ import java.util.stream.Collectors;
 @Mod.EventBusSubscriber(modid = TerraCompositio.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class CultivationDesorberBlockEntity extends AbstractDesorberBlockEntity {
 
-    private final TCItemStackHandler renderStack = new TCItemStackHandler(this);
+    private final ItemStackHandler renderStack = new ItemStackHandler();
 
     public CultivationDesorberBlockEntity(BlockPos pos, BlockState state) {
         super(TCBlockEntities.CULTIVATION_DESORBER_BE.get(), pos, state);
@@ -90,14 +90,14 @@ public class CultivationDesorberBlockEntity extends AbstractDesorberBlockEntity 
             FluidTank fluidHandler1 = blockEntity.fluidHandler;
             if (!fluidHandler1.isEmpty() && fluidHandler1.getFluidAmount() >= CFEToAdd) {
                 fluidHandler1.drain(CFEToAdd, IFluidHandler.FluidAction.EXECUTE);
-                int added = blockEntity.cfeContainer.addCFE(CFEToAdd, false);
+                int added = blockEntity.cfeContainer().addCFE(CFEToAdd, false);
                 CFEToAdd -= added;
                 if (!level.isClientSide())
                     level.playSound(null,pos, SoundEvents.AZALEA_LEAVES_STEP, SoundSource.BLOCKS);
-                TCUtil.sendCFEParticles((ServerLevel) level, Vec3.atLowerCornerWithOffset(blockEntity.getBlockPos(),
-                        blockEntity.particleTargetOffset().x,
-                        blockEntity.particleTargetOffset().y,
-                        blockEntity.particleTargetOffset().z),pos.getCenter(),added);
+                TCUtil.sendCFEParticles((ServerLevel) level,
+                        blockEntity.cfeContainer().getOffset().apply(blockEntity.getBlockPos().getCenter()),
+                        pos.getCenter(),
+                        added);
                 //noinspection deprecation
                 blockEntity.setRenderStack(new ItemStack(state.getBlock()
                         .getDrops(state,new LootParams.Builder((ServerLevel) level)

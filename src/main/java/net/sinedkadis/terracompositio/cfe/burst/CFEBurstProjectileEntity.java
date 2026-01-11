@@ -16,10 +16,11 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
+import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBECFEBehaviour;
 import net.sinedkadis.terracompositio.api.networks.cfe.CFENetworkMember;
-import net.sinedkadis.terracompositio.api.networks.cfe.CFENetworkMemberBE;
 import net.sinedkadis.terracompositio.api.networks.cfe.CFENetworkMemberEntity;
 import net.sinedkadis.terracompositio.api.networks.cfe.ICFEHandler;
+import net.sinedkadis.terracompositio.block.entity.TCBlockEntity;
 import net.sinedkadis.terracompositio.entity.custom.CFECloudEntity;
 import net.sinedkadis.terracompositio.registries.TCEntities;
 import net.sinedkadis.terracompositio.registries.TCItems;
@@ -27,6 +28,7 @@ import net.sinedkadis.terracompositio.registries.TCItems;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.Objects;
+import java.util.Optional;
 
 @Slf4j
 @MethodsReturnNonnullByDefault
@@ -117,10 +119,14 @@ public class CFEBurstProjectileEntity extends ThrowableProjectile {
         if (!blockPos.equals(lastBP) && tickCount > 1) {
             BlockEntity blockEntity = level().getBlockEntity(blockPos);
             int cfe = this.getCFE();
-            if (blockEntity instanceof CFENetworkMemberBE memberBE) {
-                int added = memberBE.getMainHandler().addCFE(cfe, true);
-                int consumed = memberBE.consumeCFEBurst(this.createPartWithCFE(added));
-                if (consumed == cfe) discard();
+            if (blockEntity instanceof TCBlockEntity memberBE) {
+                Optional<IBECFEBehaviour> cfeBehaviour = memberBE.getCfeBehaviour();
+                if (cfeBehaviour.isPresent()) {
+                    IBECFEBehaviour behaviour = cfeBehaviour.get();
+                    int added = behaviour.getCfeHandler().addCFE(cfe, true);
+                    int consumed = behaviour.consumeCFEBurst(this.createPartWithCFE(added));
+                    if (consumed == cfe) discard();
+                }
             } else {
                 level().getEntities(null, AABB.of(BoundingBox.fromCorners(blockPos,blockPos))).stream()
                         .filter(entity -> !(entity instanceof CFECloudEntity))
@@ -141,8 +147,9 @@ public class CFEBurstProjectileEntity extends ThrowableProjectile {
     @Override
     public void remove(RemovalReason pReason) {
         BlockEntity blockEntity = level().getBlockEntity(getTarget());
-        if (blockEntity instanceof  CFENetworkMemberBE memberBE) {
-            memberBE.getMainHandler().subFromQueue(getO_CFE());
+        if (blockEntity instanceof TCBlockEntity memberBE) {
+            memberBE.getCfeBehaviour().ifPresent(ibecfeBehaviour ->
+                    ibecfeBehaviour.getCfeHandler().subFromQueue(getO_CFE()));
         }
         super.remove(pReason);
     }

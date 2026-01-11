@@ -17,8 +17,6 @@ import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.*;
-import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
@@ -27,7 +25,7 @@ import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.block.state.properties.DirectionProperty;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraftforge.common.ToolAction;
-import net.sinedkadis.terracompositio.block.entity.FlowCedarPortBlockEntity;
+import net.sinedkadis.terracompositio.block.entity.TCBlockEntity;
 import net.sinedkadis.terracompositio.item.custom.WrenchAxeItem;
 import net.sinedkadis.terracompositio.registries.*;
 import org.jetbrains.annotations.NotNull;
@@ -39,7 +37,7 @@ import static net.sinedkadis.terracompositio.util.TCUtil.flowLeak;
 import static net.sinedkadis.terracompositio.util.TCUtil.*;
 
 
-public class FlowCedarPortBlock extends TCIOBaseEntityBlock {
+public class FlowCedarPortBlock extends TCBaseEntityBlock {
     public static final DirectionProperty FACING;
     public static final BooleanProperty INFUSED;
     private final Supplier<Block> stripPair;
@@ -76,7 +74,7 @@ public class FlowCedarPortBlock extends TCIOBaseEntityBlock {
     }
 
     @Override
-    public @NotNull InteractionResult use(@NotNull BlockState pState, Level pLevel, @NotNull BlockPos pPos, @NotNull Player pPlayer, @NotNull InteractionHand pHand, @NotNull BlockHitResult pHit) {
+    public @NotNull InteractionResult use(@NotNull BlockState pState, @NotNull Level pLevel, @NotNull BlockPos pPos, @NotNull Player pPlayer, @NotNull InteractionHand pHand, @NotNull BlockHitResult pHit) {
         ItemStack item = pPlayer.getItemInHand(InteractionHand.MAIN_HAND);
         ItemStack item2 = pPlayer.getItemInHand(InteractionHand.OFF_HAND);
         if (item.is(TCItems.GOLD_ROD.get())
@@ -113,20 +111,9 @@ public class FlowCedarPortBlock extends TCIOBaseEntityBlock {
         return super.getToolModifiedState(state, context,toolAction,simulate);
     }
 
-    @Nullable
     @Override
-    public BlockEntity newBlockEntity(@NotNull BlockPos pPos, @NotNull BlockState pState) {
-        return new FlowCedarPortBlockEntity(pPos,pState);
-    }
-
-    @Nullable
-    @Override
-    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(Level pLevel, @NotNull BlockState pState, @NotNull BlockEntityType<T> pBlockEntityType) {
-        if (pLevel.isClientSide()) {
-            return null;
-        }
-        return createTickerHelper(pBlockEntityType, TCBlockEntities.FLOW_PORT_BE.get(),
-                (pLevel1, pPos, pState1, pBlockEntity) -> pBlockEntity.tick(pLevel1,pPos,pState1));
+    protected @NotNull BlockEntityType<? extends TCBlockEntity> getBlockEntityType() {
+        return TCBlockEntities.FLOW_PORT_BE.get();
     }
 
     @SuppressWarnings("deprecation")

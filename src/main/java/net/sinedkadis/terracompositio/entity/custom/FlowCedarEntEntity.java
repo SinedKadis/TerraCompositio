@@ -147,7 +147,8 @@ public class FlowCedarEntEntity extends AbstractGolem implements CFENetworkMembe
                 TCBlocks.FLOW_CEDAR_ENT_STATUE.get().defaultBlockState(),3);
         BlockEntity blockEntity = this.level().getBlockEntity(this.blockPosition());
         if (blockEntity instanceof EntStatueBlockEntity entStatueBlockEntity) {
-            entStatueBlockEntity.setItem(0,crown);
+            //noinspection OptionalGetWithoutIsPresent
+            entStatueBlockEntity.getItemBehaviour().get().getItemHandler().setStackInSlot(0,crown);
         }
         this.remove(RemovalReason.CHANGED_DIMENSION);
     }

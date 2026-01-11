@@ -17,6 +17,7 @@ import net.sinedkadis.terracompositio.api.networks.fluid.FluidNetwork;
 import net.sinedkadis.terracompositio.api.networks.fluid.FluidNetworkMemberBE;
 import net.sinedkadis.terracompositio.api.TerraCompositioAPI;
 import net.sinedkadis.terracompositio.api.networks.NetworkAction;
+import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBEBehaviour;
 import net.sinedkadis.terracompositio.fluid.TCFluidTank;
 import net.sinedkadis.terracompositio.registries.TCBlockEntities;
 import net.sinedkadis.terracompositio.registries.TCBlocks;
@@ -45,6 +46,11 @@ public class FlowCedarTankBlockEntity extends TCBlockEntity implements FluidNetw
     }
 
     @Override
+    void addBehaviours(@NotNull List<IBEBehaviour> list) {
+
+    }
+
+    @Override
     public @NotNull <T> LazyOptional<T> getCapability(@NotNull Capability<T> cap, @Nullable Direction side) {
         if (cap == ForgeCapabilities.FLUID_HANDLER) {
             return lazyFluidHandler.cast();
@@ -70,7 +76,7 @@ public class FlowCedarTankBlockEntity extends TCBlockEntity implements FluidNetw
         fluidHandler.readFromNBT(pTag);
     }
 
-    public void tick(Level level, BlockPos pos, BlockState state) {
+    public void tick(@NotNull Level level, @NotNull BlockPos pos, @NotNull BlockState state) {
         FluidNetwork fluidNetworkInstance = TerraCompositioAPI.INSTANCE.getFluidNetworkInstance();
         if (!level.isClientSide) {
             boolean inNetwork = fluidNetworkInstance.isIn(level, this.fluidHandler);

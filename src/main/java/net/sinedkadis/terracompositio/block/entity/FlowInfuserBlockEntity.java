@@ -1,37 +1,79 @@
 package net.sinedkadis.terracompositio.block.entity;
 
+import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraftforge.items.ItemStackHandler;
+import net.sinedkadis.terracompositio.api.networks.cfe.ICFEHandler;
+import net.sinedkadis.terracompositio.block.behaviours.CFEHandlerBehaviour;
+import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBEBehaviour;
+import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBECFEBehaviour;
+import net.sinedkadis.terracompositio.block.behaviours.TwoSlotItemHandlerBehaviour;
+import net.sinedkadis.terracompositio.compat.jade.JadeTerraCompositioPlugin;
 import net.sinedkadis.terracompositio.particle.CFEParticleData;
 import net.sinedkadis.terracompositio.registries.TCBlockEntities;
 import net.sinedkadis.terracompositio.recipe.FlowInfusionRecipe;
+import org.jetbrains.annotations.NotNull;
+import snownee.jade.api.ITooltip;
+import snownee.jade.api.config.IPluginConfig;
 
+import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.List;
 import java.util.Optional;
 
-public class FlowInfuserBlockEntity extends TCItemIOCFEBlockEntity {
+@MethodsReturnNonnullByDefault
+@ParametersAreNonnullByDefault
+public class FlowInfuserBlockEntity extends TCCraftingBlockEntity {
 
     public FlowInfuserBlockEntity(BlockPos pPos, BlockState pBlockState) {
-        super(TCBlockEntities.FLOW_INFUSER_BE.get(),pPos, pBlockState,100,5,BlockMode.CONSUMER);
+        super(TCBlockEntities.FLOW_INFUSER_BE.get(),pPos, pBlockState);
     }
 
     @Override
-    public int getSlotLimit(int slot) {
-        return 1;
+    void addBehaviours(List<IBEBehaviour> list) {
+        list.add(new CFEHandlerBehaviour(this){
+            @Override
+            public void init() {
+                setPriority(100);
+            }
+
+            @Override
+            public void onAppendServerData(CompoundTag compoundTag) {
+                super.onAppendServerData(compoundTag);
+                compoundTag.putFloat("cfe_tick",tickCFECost);
+            }
+
+            @Override
+            public void onAppendTooltip(ITooltip iTooltip, CompoundTag serverData, IPluginConfig iPluginConfig) {
+                super.onAppendTooltip(iTooltip, serverData, iPluginConfig);
+                if (serverData.contains("cfe_tick")  && iPluginConfig.get(JadeTerraCompositioPlugin.debugConfigRL())) {
+                    iTooltip.add(Component.translatable("block.terracompositio." + "cfe_tick", serverData.getFloat("cfe_tick")));
+                }
+            }
+        });
+        list.add(new TwoSlotItemHandlerBehaviour(this){
+            @Override
+            public int getLimitInSlot(int slot) {
+                return 1;
+            }
+        });
+
     }
 
-
-    public void tick(Level pLevel, BlockPos pPos, BlockState pState) {
+    public void tick(@NotNull Level pLevel, BlockPos pPos, BlockState pState) {
         super.tick(pLevel, pPos, pState);
         if (!pLevel.isClientSide) {
             if (hasRecipe() && enoughCFE()) {
                 increaseCraftingProgress();
                 consumeCFE();
                 setChanged(pLevel, pPos, pState);
-                spawnParticles(pLevel, pPos);
+                spawnParticles();
                 if (hasProgressFinished()) {
                     craftItem();
                     resetProgress();
@@ -40,6 +82,11 @@ public class FlowInfuserBlockEntity extends TCItemIOCFEBlockEntity {
                 resetProgress();
             }
         }
+    }
+
+    private boolean enoughCFE() {
+        int cfe = cfeContainer().getCFE();
+        return cfe > tickCFECost;
     }
 
     protected boolean hasRecipe() {
@@ -57,38 +104,55 @@ public class FlowInfuserBlockEntity extends TCItemIOCFEBlockEntity {
     }
 
     protected Optional<FlowInfusionRecipe> getCurrentRecipe() {
-        SimpleContainer inventory = new SimpleContainer(this.itemHandler.getSlots());
-        for(int i = 0; i < itemHandler.getSlots(); i++) {
-            inventory.setItem(i, this.itemHandler.getStackInSlot(i));
+        SimpleContainer inventory = new SimpleContainer(this.itemHandler().getSlots());
+        for(int i = 0; i < itemHandler().getSlots(); i++) {
+            inventory.setItem(i, this.itemHandler().getStackInSlot(i));
         }
 
         assert this.level != null;
         return this.level.getRecipeManager().getRecipeFor(FlowInfusionRecipe.Type.INSTANCE, inventory, level);
     }
 
-    private static void spawnParticles(Level pLevel, BlockPos targetPos) {
-        if (!pLevel.isClientSide){
-            TCCFEBlockEntity be = (TCCFEBlockEntity) pLevel.getBlockEntity(targetPos);
-            float speed = 1/20f;
-            if (be != null) {
-                speed = be.getCfeContainer().getCfeTravelSpeed();
-            }
-            ((ServerLevel) pLevel).sendParticles(new CFEParticleData(speed),
-                    targetPos.getX()+0.5D,
-                    targetPos.getY()+0.5D,
-                    targetPos.getZ()+0.5D,3,0,-0.1D,0,0.1D);
+    @Override
+    protected ItemStackHandler itemHandler() {
+        return ((TwoSlotItemHandlerBehaviour) behaviours.get(1)).getItemHandler();
+    }
+
+    protected ICFEHandler cfeContainer() {
+        return ((CFEHandlerBehaviour) behaviours.get(0)).getMainHandler();
+    }
+
+    int ticker = 0;
+    private void spawnParticles() {
+        if (level instanceof ServerLevel serverLevel && ticker >= 20) {
+            ticker = 0;
+            float speed = 1 / 20f;
+            Optional<IBECFEBehaviour> cfeBehaviour = getCfeBehaviour();
+            if (cfeBehaviour.isPresent())
+                speed = cfeBehaviour.get().getCfeHandler().getCfeTravelSpeed();
+
+            BlockPos blockPos = getBlockPos();
+            serverLevel.sendParticles(new CFEParticleData(speed),
+                    blockPos.getX() + 0.5D,
+                    blockPos.getY() + 0.5D,
+                    blockPos.getZ() + 0.5D, 0, 0, -0.1D, 0, 0.1D);
         }
     }
 
 
-    protected void craftItem() {
+    protected ItemStack craftItem() {
         Optional<FlowInfusionRecipe> recipe = getCurrentRecipe();
         if (recipe.isPresent()) {
             ItemStack result = recipe.get().getResultItem(null);
-            this.itemHandler.forceExtractItem(SLOT_INPUT, 1, false);
-            this.itemHandler.forceInsertItem(SLOT_OUTPUT, new ItemStack(result.getItem(),
-                    this.itemHandler.getStackInSlot(SLOT_OUTPUT).getCount() + result.getCount()),false);
+            if (this.getItemBehaviour().isEmpty()) return ItemStack.EMPTY;
+            TwoSlotItemHandlerBehaviour itemBehaviour = (TwoSlotItemHandlerBehaviour) this.getItemBehaviour().get();
+            ItemStack left = itemBehaviour.forceInsertItem(1, result.copy(), false);
+            itemHandler().setStackInSlot(0,left);
+            return result;
         }
+        return ItemStack.EMPTY;
     }
+
+
 
 }

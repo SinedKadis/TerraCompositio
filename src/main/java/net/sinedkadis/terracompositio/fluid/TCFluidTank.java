@@ -11,10 +11,10 @@ import net.sinedkadis.terracompositio.api.TerraCompositioAPI;
 public class TCFluidTank extends FluidTank {
     private final BlockEntity blockEntity;
 
-    public TCFluidTank(int size, BlockEntity blockEntity) {
+    public TCFluidTank(int size, FluidNetworkMemberBE blockEntity) {
         super(size);
 
-        this.blockEntity = blockEntity;
+        this.blockEntity = blockEntity.getBE();
     }
 
     @Override

@@ -9,18 +9,17 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.event.level.BlockEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.fluids.capability.templates.FluidTank;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.items.ItemStackHandler;
 import net.sinedkadis.terracompositio.TerraCompositio;
 import net.sinedkadis.terracompositio.api.TerraCompositioAPI;
 import net.sinedkadis.terracompositio.api.networks.cfe.CFENetwork;
 import net.sinedkadis.terracompositio.api.networks.cfe.CFENetworkMember;
 import net.sinedkadis.terracompositio.registries.TCBlockEntities;
-import net.sinedkadis.terracompositio.util.TCItemStackHandler;
 import net.sinedkadis.terracompositio.util.TCUtil;
 import org.jetbrains.annotations.NotNull;
 
@@ -32,7 +31,7 @@ import java.util.stream.Collectors;
 @Mod.EventBusSubscriber(modid = TerraCompositio.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class ConstructionDesorberBlockEntity extends AbstractDesorberBlockEntity {
 
-    private final TCItemStackHandler renderStack = new TCItemStackHandler(this);
+    private final ItemStackHandler renderStack = new ItemStackHandler();
 
     public ConstructionDesorberBlockEntity(BlockPos pos, BlockState state) {
         super(TCBlockEntities.CONSTRUCTION_DESORBER_BE.get(), pos, state);
@@ -86,7 +85,7 @@ public class ConstructionDesorberBlockEntity extends AbstractDesorberBlockEntity
             FluidTank fluidHandler1 = blockEntity.fluidHandler;
             if (!fluidHandler1.isEmpty() && fluidHandler1.getFluidAmount() >= CFEToAdd) {
                 fluidHandler1.drain(CFEToAdd, IFluidHandler.FluidAction.EXECUTE);
-                int added = blockEntity.cfeContainer.addCFE(CFEToAdd,false);
+                int added = blockEntity.cfeContainer().addCFE(CFEToAdd,false);
                 CFEToAdd -= added;
                 blockEntity.setRenderStack(new ItemStack(event.getPlacedBlock().getBlock()));
                 if (CFEToAdd == 0) {
@@ -94,10 +93,7 @@ public class ConstructionDesorberBlockEntity extends AbstractDesorberBlockEntity
                         BlockPos blockEntityBlockPos = blockEntity.getBlockPos();
                         level.playSound(null, blockEntityBlockPos, SoundEvents.BEACON_ACTIVATE, SoundSource.BLOCKS, 0.1f, 1f);
                         TCUtil.sendCFEParticles((ServerLevel) level,
-                                Vec3.atLowerCornerWithOffset(blockEntityBlockPos,
-                                        blockEntity.particleTargetOffset().x,
-                                        blockEntity.particleTargetOffset().y,
-                                        blockEntity.particleTargetOffset().z),
+                                blockEntity.cfeContainer().getOffset().apply(blockEntityBlockPos.getCenter()),
                                 pos.getCenter(),
                                 added);
                     }

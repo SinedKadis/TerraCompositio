@@ -9,8 +9,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
@@ -19,19 +17,19 @@ import net.minecraft.world.level.storage.loot.LootParams;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import net.sinedkadis.terracompositio.block.entity.TCBlockEntity;
 import net.sinedkadis.terracompositio.registries.TCBlockEntities;
 import net.sinedkadis.terracompositio.registries.TCBlockStateProperties;
 import net.sinedkadis.terracompositio.registries.TCBlocks;
 import net.sinedkadis.terracompositio.registries.TCItems;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 
 import static net.minecraft.world.level.block.state.properties.BlockStateProperties.HORIZONTAL_FACING;
 import static net.sinedkadis.terracompositio.block.custom.FlowCedarCasingBlock.*;
 
-public class MatterInfuserIOBlock extends MatterInfuserBaseBaseEntityBlock{
+public class MatterInfuserIOBlock extends MatterInfuserBaseEntityBlock {
     private final static BooleanProperty UP_CONNECTION;
     private final static BooleanProperty RIGHT_CONNECTION;
     private final static BooleanProperty DOWN_CONNECTION;
@@ -78,6 +76,7 @@ public class MatterInfuserIOBlock extends MatterInfuserBaseBaseEntityBlock{
         }
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     public @NotNull List<ItemStack> getDrops(@NotNull BlockState pState, LootParams.@NotNull Builder pParams) {
         List<ItemStack> drops = super.getDrops(pState, pParams);
@@ -97,7 +96,7 @@ public class MatterInfuserIOBlock extends MatterInfuserBaseBaseEntityBlock{
     }
 
     @Override
-    public @NotNull InteractionResult use(@NotNull BlockState pState, Level pLevel, @NotNull BlockPos pPos, @NotNull Player pPlayer, @NotNull InteractionHand pHand, @NotNull BlockHitResult pHit) {
+    public @NotNull InteractionResult use(@NotNull BlockState pState, @NotNull Level pLevel, @NotNull BlockPos pPos, @NotNull Player pPlayer, @NotNull InteractionHand pHand, @NotNull BlockHitResult pHit) {
         ItemStack item = pPlayer.getItemInHand(pHand);
         Direction facing = pState.getValue(FACING);
         BlockPos casingPos = pPos.relative(facing.getOpposite());
@@ -143,20 +142,9 @@ public class MatterInfuserIOBlock extends MatterInfuserBaseBaseEntityBlock{
         return InteractionResult.PASS;
     }
 
-    @Nullable
     @Override
-    public BlockEntity newBlockEntity(@NotNull BlockPos blockPos, @NotNull BlockState blockState) {
-        return TCBlockEntities.MATTER_INFUSER_IO_BE.get().create(blockPos, blockState);
-    }
-
-    @Nullable
-    @Override
-    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(@NotNull Level pLevel, @NotNull BlockState pState, @NotNull BlockEntityType<T> pBlockEntityType) {
-        if (pLevel.isClientSide()) {
-            return null;
-        }
-        return createTickerHelper(pBlockEntityType, TCBlockEntities.MATTER_INFUSER_IO_BE.get(),
-                (pLevel1, pPos, pState1, pBlockEntity) -> pBlockEntity.tick(pLevel1,pPos,pState1));
+    protected @NotNull BlockEntityType<? extends TCBlockEntity> getBlockEntityType() {
+        return TCBlockEntities.MATTER_INFUSER_IO_BE.get();
     }
 
     @Override

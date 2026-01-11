@@ -124,7 +124,7 @@ public class TCBlocks {
     public static final RegistryObject<Block> CFE_TRASH_CAN = registerBlock("cfe_trash_can",
             () -> new CFETrashCanBlock(BlockBehaviour.Properties.copy(Blocks.IRON_BLOCK)));
     public static final RegistryObject<Block> FLOW_INFUSER = registerBlock("flow_infuser",
-            () -> new FlowInfuserBlock(BlockBehaviour.Properties.copy(Blocks.IRON_BLOCK).noOcclusion(), TCBlocks.STRIPPED_FLOW_CEDAR_LOG));
+            () -> new FlowInfuserBlock(BlockBehaviour.Properties.copy(Blocks.IRON_BLOCK).noOcclusion()));
     public static final RegistryObject<Block> TECHNETIUM_ORE = registerUnstableTechnetiumBlock("technetium_ore",
             () -> new Block(BlockBehaviour.Properties.copy(Blocks.IRON_ORE)),2);
     public static final RegistryObject<Block> TECHNETIUM_DEEPSLATE_ORE = registerUnstableTechnetiumBlock("technetium_deepslate_ore",

@@ -16,6 +16,7 @@ import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
@@ -28,11 +29,11 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.fluids.FluidStack;
 import net.sinedkadis.terracompositio.api.networks.cfe.*;
+import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBECFEBehaviour;
 import net.sinedkadis.terracompositio.block.custom.FlowCedarLikeBlock;
 
 
-
-import net.sinedkadis.terracompositio.block.entity.TCCFEBlockEntity;
+import net.sinedkadis.terracompositio.block.entity.TCBlockEntity;
 import net.sinedkadis.terracompositio.entity.custom.CFECloudEntity;
 import net.sinedkadis.terracompositio.particle.CFEParticleData;
 import net.sinedkadis.terracompositio.particle.FluidParticleData;
@@ -123,10 +124,12 @@ public class TCUtil {
         return InteractionResult.sidedSuccess(pLevel.isClientSide);
     }
     public static @NotNull InteractionResult handleInWorldBlockCraft(BlockState oldState, BlockState newState, Level pLevel, BlockPos pPos, ItemStack item, int count) {
-        TCCFEBlockEntity be = (TCCFEBlockEntity) pLevel.getBlockEntity(pPos);
+        TCBlockEntity be = (TCBlockEntity) pLevel.getBlockEntity(pPos);
         float speed = 1/20f;
         if (be != null) {
-            speed = be.getCfeContainer().getCfeTravelSpeed();
+            Optional<IBECFEBehaviour> cfeBehaviour = be.getCfeBehaviour();
+            if (cfeBehaviour.isPresent())
+                speed = cfeBehaviour.get().getCfeHandler().getCfeTravelSpeed();
         }
         return handleInWorldBlockCraft(oldState,newState,pLevel,pPos,item,count, new CFEParticleData(speed),SoundEvents.COPPER_PLACE);
     }
@@ -134,10 +137,12 @@ public class TCUtil {
 
     public static void spawnParticlesIn(Level pLevel, BlockPos targetPos){
         if (pLevel instanceof ServerLevel level) {
-            TCCFEBlockEntity be = (TCCFEBlockEntity) pLevel.getBlockEntity(targetPos);
+            TCBlockEntity be = (TCBlockEntity) pLevel.getBlockEntity(targetPos);
             float speed = 1/20f;
             if (be != null) {
-                speed = be.getCfeContainer().getCfeTravelSpeed();
+                Optional<IBECFEBehaviour> cfeBehaviour = be.getCfeBehaviour();
+                if (cfeBehaviour.isPresent())
+                    speed = cfeBehaviour.get().getCfeHandler().getCfeTravelSpeed();
             }
             level.sendParticles(new CFEParticleData(speed),
                 targetPos.getX()+pLevel.getRandom().nextFloat(),
@@ -153,10 +158,12 @@ public class TCUtil {
     public static void spawnParticlesIn(Level pLevel, BlockPos targetPos, int count){
         for (int i = 0; i < count; i++) {
             if (pLevel instanceof ServerLevel level) {
-                TCCFEBlockEntity be = (TCCFEBlockEntity) pLevel.getBlockEntity(targetPos);
+                TCBlockEntity be = (TCBlockEntity) pLevel.getBlockEntity(targetPos);
                 float speed = 1/20f;
                 if (be != null) {
-                    speed = be.getCfeContainer().getCfeTravelSpeed();
+                    Optional<IBECFEBehaviour> cfeBehaviour = be.getCfeBehaviour();
+                    if (cfeBehaviour.isPresent())
+                        speed = cfeBehaviour.get().getCfeHandler().getCfeTravelSpeed();
                 }
                 level.sendParticles(new CFEParticleData(speed),
                         targetPos.getX() + pLevel.getRandom().nextFloat(),
@@ -323,8 +330,10 @@ public class TCUtil {
         if (target == null) return;
 
         BlockEntity be = level.getBlockEntity(BlockPos.containing(target));
-        if (be instanceof TCCFEBlockEntity tccfeBlockEntity) {
-            speed = tccfeBlockEntity.getCfeContainer().getCfeTravelSpeed();
+        if (be instanceof TCBlockEntity tcCfeBlockEntity) {
+            Optional<IBECFEBehaviour> cfeBehaviour = tcCfeBlockEntity.getCfeBehaviour();
+            if (cfeBehaviour.isPresent())
+                speed = cfeBehaviour.get().getCfeHandler().getCfeTravelSpeed();
         }
 
         if (offsets == null) {
@@ -544,5 +553,11 @@ public class TCUtil {
         entity.setSyncedCFE(cfe1 +cfe);
         entity.setPos(targetPos.getCenter());
         return cfe;
+    }
+
+    public static void addOrDropToPlayer(@NotNull Player pPlayer, ItemStack toAdd) {
+        if (!pPlayer.addItem(toAdd)) {
+            pPlayer.drop(toAdd, false);
+        }
     }
 }

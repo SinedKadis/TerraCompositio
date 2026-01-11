@@ -29,7 +29,7 @@ public class TimePassageDesorberBlockEntity extends AbstractDesorberBlockEntity 
     }
 
     @Override
-    public void tick(Level pLevel, BlockPos pPos, BlockState pState) {
+    public void tick(@NotNull Level pLevel, @NotNull BlockPos pPos, @NotNull BlockState pState) {
         super.tick(pLevel, pPos, pState);
         timeReSetter--;
         if (timeReSetter <= 1) {
@@ -59,9 +59,9 @@ public class TimePassageDesorberBlockEntity extends AbstractDesorberBlockEntity 
     private void addingCFEProcess() {
         timeCounter = 0;
         if (timeBuffer > 20) {
-            timeBuffer -= cfeContainer.addCFE(20, false);
+            timeBuffer -= cfeContainer().addCFE(20, false);
         } else if (timeBuffer > 0){
-            timeBuffer -= cfeContainer.addCFE(timeBuffer,false);
+            timeBuffer -= cfeContainer().addCFE(timeBuffer,false);
         }
     }
 

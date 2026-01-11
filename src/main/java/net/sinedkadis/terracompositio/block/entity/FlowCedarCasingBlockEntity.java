@@ -2,10 +2,6 @@ package net.sinedkadis.terracompositio.block.entity;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.protocol.Packet;
-import net.minecraft.network.protocol.game.ClientGamePacketListener;
-import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
 import net.minecraft.world.Container;
 import net.minecraft.world.WorldlyContainer;
 import net.minecraft.world.item.ItemStack;
@@ -17,6 +13,9 @@ import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemHandlerHelper;
+import net.minecraftforge.items.ItemStackHandler;
+import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBEBehaviour;
+import net.sinedkadis.terracompositio.block.behaviours.TwoSlotItemHandlerBehaviour;
 import net.sinedkadis.terracompositio.registries.TCBlockEntities;
 import net.sinedkadis.terracompositio.registries.TCBlockStateProperties;
 import org.apache.commons.lang3.tuple.ImmutablePair;
@@ -24,6 +23,7 @@ import org.apache.commons.lang3.tuple.Pair;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.List;
 import java.util.Optional;
 import java.util.stream.IntStream;
 
@@ -31,37 +31,31 @@ import static net.minecraft.world.level.block.entity.HopperBlockEntity.getContai
 import static net.sinedkadis.terracompositio.block.custom.FlowCedarCasingBlock.*;
 import static net.sinedkadis.terracompositio.registries.TCBlockStateProperties.INPUT_BUS;
 
-public class FlowCedarCasingBlockEntity extends TCItemIOCFEBlockEntity {
+public class FlowCedarCasingBlockEntity extends TCCraftingBlockEntity{
 
     private int cooldownTime;
 
     public FlowCedarCasingBlockEntity(BlockPos pos, BlockState state) {
-        super(TCBlockEntities.FLOW_CEDAR_CASING_BE.get(), pos, state,BlockMode.CONSUMER);
-    }
-
-    protected <T> @Nullable LazyOptional<T> getCap(@NotNull Capability<T> cap, @Nullable Direction side) {
-        if ((side == null && cap == ForgeCapabilities.ITEM_HANDLER)
-                || cap == ForgeCapabilities.ITEM_HANDLER
-                && ((side.equals(Direction.UP) && this.getBlockState().getValue(INPUT_BUS))
-                    || (side.equals(Direction.DOWN) && this.getBlockState().getValue(TCBlockStateProperties.OUTPUT_BUS)))) {
-            return lazyItemHandler.cast();
-        }
-        return null;
-    }
-
-    @Nullable
-    @Override
-    public Packet<ClientGamePacketListener> getUpdatePacket() {
-        return ClientboundBlockEntityDataPacket.create(this);
+        super(TCBlockEntities.FLOW_CEDAR_CASING_BE.get(), pos, state);
     }
 
     @Override
-    public @NotNull CompoundTag getUpdateTag() {
-        return saveWithoutMetadata();
+    void addBehaviours(@NotNull List<IBEBehaviour> list) {
+        list.add(new TwoSlotItemHandlerBehaviour(this){
+            @Override
+            public @Nullable LazyOptional<?> getCapability(@NotNull Capability<?> cap, @Nullable Direction side) {
+                if ((side == null && cap == ForgeCapabilities.ITEM_HANDLER)
+                        || cap == ForgeCapabilities.ITEM_HANDLER
+                        && ((side.equals(Direction.UP) && getBlockEntity().getBlockState().getValue(INPUT_BUS))
+                        || (side.equals(Direction.DOWN) && getBlockEntity().getBlockState().getValue(TCBlockStateProperties.OUTPUT_BUS)))) {
+                    return lazyItemHandler.cast();
+                }
+                return null;
+            }
+        });
     }
 
-
-    public void tick(Level pLevel, BlockPos pPos, BlockState pState) {
+    public void tick(@NotNull Level pLevel, @NotNull BlockPos pPos, @NotNull BlockState pState) {
         super.tick(pLevel,pPos,pState);
         --this.cooldownTime;
         if (this.notOnCooldown() && hasOutputBusConnection(pState)) {
@@ -70,23 +64,21 @@ public class FlowCedarCasingBlockEntity extends TCItemIOCFEBlockEntity {
         }
     }
 
-    private boolean tryMoveItems(Level pLevel, BlockPos pPos, BlockState pState) {
+    private void tryMoveItems(Level pLevel, BlockPos pPos, BlockState pState) {
         if (!pLevel.isClientSide) {
             if (this.notOnCooldown()) {
                 boolean flag = false;
-                if (!this.itemHandler.getStackInSlot(SLOT_OUTPUT).isEmpty()) {
+                if (!this.itemHandler().getStackInSlot(1).isEmpty()) {
                     flag = ejectItems(pLevel, pPos);
                 }
 
                 if (flag) {
                     this.setCooldown(8);
                     setChanged(pLevel, pPos, pState);
-                    return true;
                 }
             }
 
         }
-        return false;
     }
 
     private  boolean ejectItems(Level level, BlockPos blockPos) {
@@ -97,14 +89,14 @@ public class FlowCedarCasingBlockEntity extends TCItemIOCFEBlockEntity {
             if (container != null) {
                 Direction direction = Direction.DOWN.getOpposite();
                 if (!isFullContainer(container, direction)) {
-                    if (!this.itemHandler.getStackInSlot(1).isEmpty()) {
-                        ItemStack itemstack = this.itemHandler.getStackInSlot(1).copy();
-                        ItemStack itemstack1 = addItem(container, this.itemHandler.extractItem(1, 1, false), direction);
+                    if (!this.itemHandler().getStackInSlot(1).isEmpty()) {
+                        ItemStack itemstack = this.itemHandler().getStackInSlot(1).copy();
+                        ItemStack itemstack1 = addItem(container, this.itemHandler().extractItem(1, 1, false), direction);
                         if (itemstack1.isEmpty()) {
                             container.setChanged();
                             return true;
                         }
-                        this.itemHandler.setStackInSlot(1, itemstack);
+                        this.itemHandler().setStackInSlot(1, itemstack);
                     }
                 }
             }
@@ -194,14 +186,14 @@ public class FlowCedarCasingBlockEntity extends TCItemIOCFEBlockEntity {
         return getItemHandler().map((destinationResult) -> {
             IItemHandler itemHandler = destinationResult.getKey();
             if (!isFull(itemHandler)) {
-                if (!this.itemHandler.getStackInSlot(1).isEmpty()) {
-                    ItemStack originalSlotContents = this.itemHandler.getStackInSlot(1).copy();
-                    ItemStack insertStack = this.itemHandler.extractItem(1,1,false);
+                if (!this.itemHandler().getStackInSlot(1).isEmpty()) {
+                    ItemStack originalSlotContents = this.itemHandler().getStackInSlot(1).copy();
+                    ItemStack insertStack = this.itemHandler().extractItem(1,1,false);
                     ItemStack remainder = putStackInInventoryAllSlots(itemHandler, insertStack);
                     if (remainder.isEmpty()) {
                         return true;
                     }
-                    this.itemHandler.setStackInSlot(1, originalSlotContents);
+                    this.itemHandler().setStackInSlot(1, originalSlotContents);
                 }
             }
             return false;
@@ -260,5 +252,9 @@ public class FlowCedarCasingBlockEntity extends TCItemIOCFEBlockEntity {
 
     public void setCooldown(int pCooldownTime) {
         this.cooldownTime = pCooldownTime;
+    }
+
+    public ItemStackHandler itemHandler() {
+        return ((TwoSlotItemHandlerBehaviour) behaviours.get(0)).getItemHandler();
     }
 }

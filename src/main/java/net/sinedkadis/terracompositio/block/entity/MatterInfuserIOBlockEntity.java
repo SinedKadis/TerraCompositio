@@ -8,26 +8,52 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.phys.Vec3;
+import net.minecraftforge.items.ItemStackHandler;
+import net.sinedkadis.terracompositio.api.networks.cfe.ICFEHandler;
+import net.sinedkadis.terracompositio.block.behaviours.CFEHandlerBehaviour;
+import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBEBehaviour;
+import net.sinedkadis.terracompositio.block.behaviours.TwoSlotItemHandlerBehaviour;
 import net.sinedkadis.terracompositio.recipe.MatterInfusionRecipe;
 import net.sinedkadis.terracompositio.registries.TCBlockEntities;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import java.util.List;
 import java.util.Optional;
 
 import static net.sinedkadis.terracompositio.registries.TCBlockStateProperties.INFUSED;
 
 public class MatterInfuserIOBlockEntity extends MatterInfuserBaseBlockEntity{
 
-    private int progress;
-    private int maxProgress;
-    protected float tickCFECost;
+
     protected float catalystDecayRate;
 
     public MatterInfuserIOBlockEntity(BlockPos pos, BlockState state) {
-        super(TCBlockEntities.MATTER_INFUSER_IO_BE.get(), pos, state, 100, 10);
+        super(TCBlockEntities.MATTER_INFUSER_IO_BE.get(), pos, state);
     }
 
-    public void tick(Level pLevel, BlockPos pPos, BlockState pState) {
+    @Override
+    void addBehaviours(@NotNull List<IBEBehaviour> list) {
+        list.add(new CFEHandlerBehaviour(this){
+            @Override
+            public void init() {
+                setLimit(10);
+            }
+            @Override
+            public Vec3 particleTargetOffset() {
+                return switch (getBlockState().getValue(BlockStateProperties.HORIZONTAL_FACING)){
+                    case SOUTH -> new Vec3(8.0 / 16, 8.0 / 16, 0.5 / 16);
+                    case NORTH -> new Vec3(8.0 / 16, 8.0 / 16, 15.5 / 16);
+                    case EAST -> new Vec3(0.5 / 16, 8.0 / 16, 8.0 / 16);
+                    case WEST -> new Vec3(15.5 / 16, 8.0 / 16, 8.0 / 16);
+                    default -> super.particleTargetOffset();
+                };
+            }
+        });
+
+    }
+
+    public void tick(@NotNull Level pLevel, @NotNull BlockPos pPos, @NotNull BlockState pState) {
         super.tick(pLevel, pPos, pState);
         if(hasRecipe() && enoughCFE()){
             increaseCraftingProgress();
@@ -45,75 +71,34 @@ public class MatterInfuserIOBlockEntity extends MatterInfuserBaseBlockEntity{
         }
     }
 
-    @Override
-    public Vec3 particleTargetOffset() {
-        return switch (getBlockState().getValue(BlockStateProperties.HORIZONTAL_FACING)){
-            case SOUTH -> new Vec3(8.0 / 16, 8.0 / 16, 0.5 / 16);
-            case NORTH -> new Vec3(8.0 / 16, 8.0 / 16, 15.5 / 16);
-            case EAST -> new Vec3(0.5 / 16, 8.0 / 16, 8.0 / 16);
-            case WEST -> new Vec3(15.5 / 16, 8.0 / 16, 8.0 / 16);
-            default -> super.particleTargetOffset();
-        };
-    }
-
-    private float partialCFE = 0;
-    private void consumeCFE() {
-        int tickCFECost1 = (int) tickCFECost;
-        partialCFE += tickCFECost - tickCFECost1;
-        this.cfeContainer.takeCFE(tickCFECost1,false);
-        if (partialCFE >= 1){
-            int taken = this.cfeContainer.takeCFE((int) partialCFE, false);
-            partialCFE -= taken;
-        }
-    }
-
-    private void resetProgress() {
-        progress = 0;
-    }
-
-    private void craftItem() {
+    protected ItemStack craftItem() {
         Optional<MatterInfusionRecipe> recipe = getCurrentRecipe();
         MatterInfuserPortBlockEntity portBE = this.getPortBE();
         if (recipe.isPresent() && this.level != null && portBE != null) {
             ItemStack result = recipe.get().getResultItem(null);
             int takeCount = recipe.get().getIngredients().get(1).getItems()[0].getCount();
-            this.extractItemStack(0, takeCount);
-            this.forceInsertItemStack(1, result);
+            if (this.getItemBehaviour().isEmpty()) return ItemStack.EMPTY;
+            TwoSlotItemHandlerBehaviour itemBehaviour = (TwoSlotItemHandlerBehaviour) this.getItemBehaviour().get();
+            itemBehaviour.forceExtractItem(0, takeCount,false);
+            itemBehaviour.forceInsertItem(1, result,false);
+
             if (this.level.getRandom().nextInt(100) < catalystDecayRate){
                 portBE.extractItemStack(0,1);
             }
-
-//            if (this.level instanceof ServerLevel level1) {
-//                level1.sendParticles(ModParticles.FLOW_STILL_PARTICLE.get(),
-//                        this.getBlockPos().getX(),
-//                        this.getBlockPos().getY(),
-//                        this.getBlockPos().getZ(),
-//                        10,
-//                        this.level.getRandom().nextFloat(),
-//                        this.level.getRandom().nextFloat(),
-//                        this.level.getRandom().nextFloat(),
-//                        0.5D);
-//            }
+            return result;
         }
-    }
-
-    private boolean hasProgressFinished() {
-        return progress>=maxProgress;
+        return ItemStack.EMPTY;
     }
 
     public int ticksLeft(){
         return maxProgress-progress;
     }
 
-    private void increaseCraftingProgress() {
-        progress++;
-    }
-
     protected boolean enoughCFE() {
-        return this.cfeContainer.getCFE() >= Math.ceil(tickCFECost);
+        return this.cfeContainer().getCFE() >= Math.ceil(tickCFECost);
     }
 
-    private boolean hasRecipe() {
+    protected boolean hasRecipe() {
         Optional<MatterInfusionRecipe> recipe = getCurrentRecipe();
         if (recipe.isEmpty()){
             return false;
@@ -132,6 +117,18 @@ public class MatterInfuserIOBlockEntity extends MatterInfuserBaseBlockEntity{
             catalystDecayRate = matterInfusionRecipe.getCatalystDecayRate();
         }
         return outputTest && infusedTest;
+    }
+
+    @Override
+    protected ItemStackHandler itemHandler() {
+        FlowCedarCasingBlockEntity casingBE = getCasingBE();
+        if (casingBE != null)
+            return ((TwoSlotItemHandlerBehaviour) casingBE.getBehaviours().get(1)).getItemHandler();
+        return null;
+    }
+
+    protected ICFEHandler cfeContainer() {
+        return ((CFEHandlerBehaviour) behaviours.get(0)).getMainHandler();
     }
 
     public Optional<MatterInfusionRecipe> getCurrentRecipe() {
@@ -166,13 +163,13 @@ public class MatterInfuserIOBlockEntity extends MatterInfuserBaseBlockEntity{
         return null;
     }
 
-    private boolean sameItemInOutput(Item item) {
-        ItemStack outputSlot = this.getOutputSlot();
+    protected boolean sameItemInOutput(Item item) {
+        ItemStack outputSlot = this.getItemInSlot(1);
         return outputSlot.isEmpty() || outputSlot.is(item);
     }
 
-    private boolean enoughSpaceInOutput(int count) {
-        ItemStack outputSlot = this.getOutputSlot();
+    protected boolean enoughSpaceInOutput(int count) {
+        ItemStack outputSlot = this.getItemInSlot(1);
         return outputSlot.getCount() + count <= outputSlot.getMaxStackSize();
     }
 }

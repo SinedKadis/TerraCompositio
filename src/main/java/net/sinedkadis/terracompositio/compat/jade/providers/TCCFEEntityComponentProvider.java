@@ -6,6 +6,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.entity.Entity;
 import net.sinedkadis.terracompositio.TerraCompositio;
 import net.sinedkadis.terracompositio.api.networks.cfe.*;
+import net.sinedkadis.terracompositio.cfe.burst.CFEBurstProjectileEntity;
 import net.sinedkadis.terracompositio.entity.custom.FlowCedarEntEntity;
 import snownee.jade.api.*;
 import snownee.jade.api.config.IPluginConfig;
@@ -28,18 +29,20 @@ public enum TCCFEEntityComponentProvider implements IEntityComponentProvider, IS
 
     @Override
     public ResourceLocation getUid() {
-        return TerraCompositio.modLoc("mod_cfe_be_tooltip");
+        return TerraCompositio.modLoc("tc_be_tooltip");
     }
 
     @Override
     public void appendServerData(CompoundTag compoundTag, EntityAccessor blockAccessor) {
-        Entity blockEntity = blockAccessor.getEntity();
-        if (blockEntity instanceof CFENetworkMemberEntity memberBE){
+        Entity entity = blockAccessor.getEntity();
+        if (entity instanceof CFENetworkMemberEntity memberBE){
             Optional<ICFEHandler> cfeHandler = CFENetwork.getCFEHandler(memberBE);
             cfeHandler.ifPresent(icfeHandler -> compoundTag.putInt("cfe", icfeHandler.getCFE()));
             if (memberBE instanceof FlowCedarEntEntity flowCedarEntEntity){
                 flowCedarEntEntity.getInnerCFEOptional().ifPresent(icfeHandler -> compoundTag.putInt("inner_cfe", icfeHandler.getCFE()));
             }
+        } else if (entity instanceof CFEBurstProjectileEntity cfeBurstProjectileEntity) {
+            compoundTag.putInt("cfe", cfeBurstProjectileEntity.getCFE());
         }
 
     }
