@@ -14,7 +14,7 @@ public class TCFluidTank extends FluidTank {
     public TCFluidTank(int size, FluidNetworkMemberBE blockEntity) {
         super(size);
 
-        this.blockEntity = blockEntity.getBE();
+        this.blockEntity = blockEntity.getEntity();
     }
 
     @Override

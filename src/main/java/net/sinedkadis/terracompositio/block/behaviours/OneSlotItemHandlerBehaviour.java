@@ -20,7 +20,6 @@ import net.minecraftforge.items.ItemStackHandler;
 import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBEItemBehaviour;
 import net.sinedkadis.terracompositio.block.entity.TCBlockEntity;
 import net.sinedkadis.terracompositio.util.TCUtil;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -28,7 +27,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 @Data
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
-public class OneSlotItemHandlerBehaviour implements IBEItemBehaviour, WorldlyContainer {
+public abstract class OneSlotItemHandlerBehaviour implements IBEItemBehaviour, WorldlyContainer {
     protected static final int SLOT = 0;
 
 
@@ -39,10 +38,18 @@ public class OneSlotItemHandlerBehaviour implements IBEItemBehaviour, WorldlyCon
         public int getSlotLimit(int slot) {
             return getLimitInSlot(slot);
         }
+
+        @Override
+        public boolean isItemValid(int slot, ItemStack stack) {
+            return isItemAllowed(slot,stack);
+        }
     };
 
     public int getLimitInSlot(int slot) {
         return 64;
+    }
+    public boolean isItemAllowed(int pSlot, ItemStack pStack){
+        return true;
     }
 
     protected LazyOptional<IItemHandler> lazyItemHandler = LazyOptional.empty();
@@ -62,7 +69,7 @@ public class OneSlotItemHandlerBehaviour implements IBEItemBehaviour, WorldlyCon
     }
 
     @Override
-    public @Nullable LazyOptional<?> getCapability(@NotNull Capability<?> cap, @Nullable Direction side) {
+    public @Nullable LazyOptional<?> getCapability(Capability<?> cap, @Nullable Direction side) {
         if (cap == ForgeCapabilities.ITEM_HANDLER) {
             return lazyItemHandler.cast();
         }
@@ -91,7 +98,7 @@ public class OneSlotItemHandlerBehaviour implements IBEItemBehaviour, WorldlyCon
 
 
     @Override
-    public InteractionResult onUse(@NotNull Player pPlayer, @NotNull InteractionHand pHand, @NotNull BlockHitResult pHit) {
+    public InteractionResult onUse(Player pPlayer, InteractionHand pHand, BlockHitResult pHit) {
         Level level = blockEntity.getLevel();
         if (level == null) return InteractionResult.PASS;
 
@@ -206,4 +213,6 @@ public class OneSlotItemHandlerBehaviour implements IBEItemBehaviour, WorldlyCon
     public ItemStack getInputSlot() {
         return this.itemHandler.getStackInSlot(SLOT);
     }
+
+
 }

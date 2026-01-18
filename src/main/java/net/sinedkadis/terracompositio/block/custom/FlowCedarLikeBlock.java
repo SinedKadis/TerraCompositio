@@ -180,9 +180,9 @@ public class FlowCedarLikeBlock extends RotatedPillarBlock implements IFluidAppl
         FluidStack resource = new FluidStack(TCFluids.FLOW_FLUID.source.get(), 1000);
         FluidStack result = handlerItem.drain(resource, IFluidHandler.FluidAction.SIMULATE);
         BlockState blockState = level.getBlockState(blockPos);
-        if (result.getAmount() == 1000 && !blockState.getValue(INFUSED)) {
+        if (result.getAmount() >= 1000 && !blockState.getValue(INFUSED)) {
             level.setBlockAndUpdate(blockPos, blockState.setValue(INFUSED,true));
-            handlerItem.drain(resource, IFluidHandler.FluidAction.EXECUTE);
+            handlerItem.drain(1000, IFluidHandler.FluidAction.EXECUTE);
             return FluidApplyResult.SUCCESS;
         }
         return FluidApplyResult.SKIP;

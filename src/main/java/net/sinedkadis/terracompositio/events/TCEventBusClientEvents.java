@@ -12,16 +12,18 @@ import net.minecraft.client.renderer.blockentity.SignRenderer;
 import net.minecraft.client.renderer.entity.EntityRenderers;
 import net.minecraft.client.renderer.entity.ThrownItemRenderer;
 import net.minecraft.client.renderer.item.ItemProperties;
-import net.minecraft.core.BlockPos;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.material.Fluids;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.*;
+import net.minecraftforge.client.extensions.common.IClientFluidTypeExtensions;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidUtil;
 import net.minecraftforge.fluids.capability.IFluidHandlerItem;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
+import net.minecraftforge.registries.ForgeRegistries;
 import net.sinedkadis.terracompositio.TerraCompositio;
 import net.sinedkadis.terracompositio.block.entity.renderer.*;
 import net.sinedkadis.terracompositio.cfe.burst.CFEBurstRenderer;
@@ -44,6 +46,7 @@ import net.sinedkadis.terracompositio.registries.*;
 import net.sinedkadis.terracompositio.screen.FlowBlockPortScreen;
 import net.sinedkadis.terracompositio.screen.TCMenuTypes;
 
+import java.util.Map;
 import java.util.Optional;
 
 @Mod.EventBusSubscriber(modid = TerraCompositio.MOD_ID, bus = Mod.EventBusSubscriber.Bus.MOD,value = Dist.CLIENT)
@@ -107,7 +110,12 @@ public class TCEventBusClientEvents {
 //                        FluidApplierItem.getRenderAmount(stack)
 //        );
     }
-
+    static final Map<String, Integer> HARDCODED_COLORS = Map.of(
+            "create:chocolate", 0x5A3A22,
+            "create:honey", 0xEAAE2F,
+            "terracompositio:flow_source", 0x0B23BA,
+            "terracompositio:birch_juice_source", 0x97872F
+    );
     @SubscribeEvent
     public static void registerColorHandlers(RegisterColorHandlersEvent.Item event) {
         event.register((pStack, pTintIndex) -> {
@@ -116,17 +124,23 @@ public class TCEventBusClientEvents {
                 if (fluidHandler.isPresent()) {
                     FluidStack fluid = fluidHandler.get().getFluidInTank(0);
                     if (!fluid.isEmpty()) {
-                         // 0 = base, 1 = overlay
-                            if (Minecraft.getInstance().level != null) {
-                                return event.getBlockColors().getColor(
-                                                fluid.getFluid().defaultFluidState().createLegacyBlock(),
-                                                Minecraft.getInstance().level,
-                                                BlockPos.ZERO.above(100));
+                        if (fluid.getFluid().isSame(Fluids.LAVA)) {
+                            return 0xFF7A00; //0xFF7A00
+                        }
+                        ResourceLocation id = ForgeRegistries.FLUIDS.getKey(fluid.getFluid());
+                        if (id != null) {
+                            String string = id.toString();
+                            if (HARDCODED_COLORS.containsKey(string)) {
+                                return HARDCODED_COLORS.get(string);
                             }
                         }
+                        IClientFluidTypeExtensions extensions = IClientFluidTypeExtensions.of(fluid.getFluid());
+
+                        return extensions.getTintColor();
                     }
-                    return 0x000000;
                 }
+                return 0x555555;
+            }
 
             return 0xFFFFFF;
         },TCItems.FLUID_APPLIER.get());

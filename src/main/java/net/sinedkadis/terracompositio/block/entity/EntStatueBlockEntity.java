@@ -5,7 +5,6 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.fluids.FluidStack;
@@ -18,7 +17,6 @@ import net.sinedkadis.terracompositio.api.networks.fluid.FluidNetwork;
 import net.sinedkadis.terracompositio.api.networks.fluid.FluidNetworkMemberBE;
 import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBEBehaviour;
 import net.sinedkadis.terracompositio.block.behaviours.OneSlotItemHandlerBehaviour;
-import net.sinedkadis.terracompositio.block.behaviours.TwoSlotItemHandlerBehaviour;
 import net.sinedkadis.terracompositio.entity.custom.FlowCedarEntEntity;
 import net.sinedkadis.terracompositio.registries.TCBlockEntities;
 import net.sinedkadis.terracompositio.registries.TCEntities;
@@ -41,7 +39,12 @@ public class EntStatueBlockEntity extends TCBlockEntity implements FluidNetworkM
 
     @Override
     void addBehaviours(@NotNull List<IBEBehaviour> list) {
-        list.add(new OneSlotItemHandlerBehaviour(this));
+        list.add(new OneSlotItemHandlerBehaviour(this){
+            @Override
+            public boolean isItemAllowed(int pSlot, @NotNull ItemStack pStack) {
+                return pStack.is(TCItems.TECHNETIUM_CROWN.get());
+            }
+        });
     }
 
     @Override
@@ -57,6 +60,7 @@ public class EntStatueBlockEntity extends TCBlockEntity implements FluidNetworkM
             cd = 20;
         }
         cd--;
+        updateIfScheduled();
     }
 
     public void jojoReference() {
@@ -71,13 +75,16 @@ public class EntStatueBlockEntity extends TCBlockEntity implements FluidNetworkM
                 }
                 BlockPos blockPos = getBlockPos();
                 pEntity.setPos(blockPos.getCenter());
-                level.setBlockAndUpdate(blockPos, Blocks.AIR.defaultBlockState());
+                level.destroyBlock(blockPos,false);
+                TerraCompositioAPI.instance().getFluidNetworkInstance()
+                        .fireFluidNetworkEvent(this,NetworkAction.REMOVE);
+                //this.setRemoved();
             }
         }
     }
 
     private IItemHandler itemHandler() {
-        return ((TwoSlotItemHandlerBehaviour) behaviours.get(0)).getItemHandler();
+        return ((OneSlotItemHandlerBehaviour) (behaviours.get(0))).getItemHandler();
     }
 
     @Override
@@ -99,11 +106,12 @@ public class EntStatueBlockEntity extends TCBlockEntity implements FluidNetworkM
                     .getClosestFluidHandlerWithMatchingContent(pos, level, TCFluids.FLOW_FLUID.source.get(), 10, getPriority());
 
             if (source != null) {
-                Optional<IFluidHandler> fluidHandlerOptional = source.getBE().getCapability(ForgeCapabilities.FLUID_HANDLER).resolve();
+                Optional<IFluidHandler> fluidHandlerOptional = source.getEntity().getCapability(ForgeCapabilities.FLUID_HANDLER).resolve();
                 if (fluidHandlerOptional.isPresent() && fluidHandlerOptional.get() instanceof FluidTank sourceTank) {
 
                     FluidStack amount = sourceTank.drain(500, IFluidHandler.FluidAction.SIMULATE);
                     if (amount.getAmount() == 500){
+                        sourceTank.drain(500, IFluidHandler.FluidAction.EXECUTE);
                         TCUtil.sendFluidParticles((ServerLevel) level,pos,source.getBlockPos(), amount.getAmount() /10,amount);
                         jojoReference();
                     }

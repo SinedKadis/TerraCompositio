@@ -63,7 +63,7 @@ public class FluidNetworkHandler implements FluidNetwork {
         if (fluidSources.containsKey(updated.getLevel())) {
             for (FluidNetworkMemberBE source : fluidSources.get(updated.getLevel())) {
                 if (TCUtil.distSqr(source.getBlockPos(), updated.getBlockPos()) <= 10) {
-                    source.onFluidNetworkMemberUpdate();
+                    source.scheduleMemberUpdate();
                 }
             }
         }

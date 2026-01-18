@@ -18,6 +18,6 @@ public interface FluidNetwork {
     boolean isIn(Level pLevel, IFluidHandler fluidHandler);
     boolean isIn(Level pLevel, FluidNetworkMemberBE cfeHandler);
     static Optional<IFluidHandler> getFluidHandler(FluidNetworkMemberBE source){
-        return source.getBE().getCapability(ForgeCapabilities.FLUID_HANDLER).resolve();
+        return source.getEntity().getCapability(ForgeCapabilities.FLUID_HANDLER).resolve();
     }
 }

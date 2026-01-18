@@ -90,10 +90,14 @@ public class FluidApplierItem extends Item implements DispensibleContainerItem {
                 Direction direction = blockhitresult.getDirection();
                 BlockPos blockpos1 = blockpos.relative(direction);
                 BlockState blockState = pLevel.getBlockState(blockpos);
-                if (blockState.getBlock() instanceof IFluidApplicable fluidApplicable) {
+                if (blockState.getBlock() instanceof IFluidApplicable fluidApplicable
+                    && !pPlayer.isShiftKeyDown()) {
                     IFluidApplicable.FluidApplyResult result = fluidApplicable.tryApply(pLevel,blockpos,itemstack,fluidHandlerItem);
                     if (result.cancel()) return InteractionResultHolder.pass(itemstack);
-                    if (result.success()) return InteractionResultHolder.sidedSuccess(itemstack, pLevel.isClientSide);
+                    if (result.success()) {
+                        pLevel.playSound(null,blockpos,SoundEvents.NOTE_BLOCK_PLING.value(),SoundSource.BLOCKS);
+                        return InteractionResultHolder.sidedSuccess(itemstack, pLevel.isClientSide);
+                    }
                 }
                 if (pLevel.mayInteract(pPlayer, blockpos) && pPlayer.mayUseItemAt(blockpos1, direction, itemstack)) {
                     if (fluidStack.getAmount() < fluidHandlerItem.getTankCapacity(0)) {
@@ -142,12 +146,12 @@ public class FluidApplierItem extends Item implements DispensibleContainerItem {
 
     @Override
     public int getDamage(ItemStack stack) {
-        return getRenderAmount(stack);
+        return 8-getRenderAmount(stack);
     }
 
     @Override
     public boolean isDamageable(ItemStack stack) {
-        return false;
+        return true;
     }
 
 

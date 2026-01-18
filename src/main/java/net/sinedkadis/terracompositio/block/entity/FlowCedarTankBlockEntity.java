@@ -109,6 +109,7 @@ public class FlowCedarTankBlockEntity extends TCBlockEntity implements FluidNetw
                 }
             }
         }
+        updateIfScheduled();
     }
 
     @Override
@@ -154,7 +155,7 @@ public class FlowCedarTankBlockEntity extends TCBlockEntity implements FluidNetw
                         .getClosestFluidHandlerWithMatchingContent(pos, level, fluidHandler.getFluid().getFluid(), 10, getPriority());
             }
             if (source != null) {
-                Optional<IFluidHandler> fluidHandlerOptional = source.getBE().getCapability(ForgeCapabilities.FLUID_HANDLER).resolve();
+                Optional<IFluidHandler> fluidHandlerOptional = source.getEntity().getCapability(ForgeCapabilities.FLUID_HANDLER).resolve();
                 if (fluidHandlerOptional.isPresent() && fluidHandlerOptional.get() instanceof FluidTank sourceTank) {
                     FluidStack transferred = FluidUtil.tryFluidTransfer(fluidHandler, sourceTank, 1000, true);
                     int amount = transferred.getAmount();
