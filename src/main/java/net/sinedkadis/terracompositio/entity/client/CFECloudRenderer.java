@@ -3,12 +3,13 @@ package net.sinedkadis.terracompositio.entity.client;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.client.renderer.entity.EntityRenderer;
 import net.minecraft.client.renderer.entity.EntityRendererProvider;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.phys.AABB;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.sinedkadis.terracompositio.TerraCompositio;
@@ -23,9 +24,8 @@ import javax.annotation.ParametersAreNonnullByDefault;
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
 public class CFECloudRenderer extends EntityRenderer<CFECloudEntity> {
-    private final String x = "x";
-    private final String y = "y";
-    private final String z = "z";
+    private Vector3f[] offsets;
+
 
     public CFECloudRenderer(EntityRendererProvider.Context context) {
         super(context);
@@ -34,28 +34,33 @@ public class CFECloudRenderer extends EntityRenderer<CFECloudEntity> {
     @Override
     public void render(CFECloudEntity pEntity, float pEntityYaw, float pPartialTick, PoseStack pPoseStack, MultiBufferSource pBuffer, int pPackedLight) {
         super.render(pEntity, pEntityYaw, pPartialTick, pPoseStack, pBuffer, pPackedLight);
-        CompoundTag persistentData = pEntity.getPersistentData();
-        if (!persistentData.contains("offsets")) genOffsets(pEntity);
-
-        CompoundTag offsets = (CompoundTag) persistentData.get("offsets");
-        assert offsets != null;
-        var renderType = RenderType.entityTranslucentEmissive(getTextureLocation(pEntity));
+        var renderType = RenderType.entityCutout(getTextureLocation(pEntity));
         var buffer = pBuffer.getBuffer(renderType);
         int cfe = pEntity.getSyncedCFE();
         float k = (float) Math.log10(cfe);
-        for (int i = 0; i < cfe * TCUtil.CFE_PARTICLE_MULTIPLIER; i++) {
-            CompoundTag offset = (CompoundTag) offsets.get(String.valueOf(i));
-            if (offset == null) {
-                genOffsets(pEntity);
-                persistentData = pEntity.getPersistentData();
-                offsets = (CompoundTag) persistentData.get("offsets");
-                assert offsets != null;
-                offset = (CompoundTag) offsets.get(String.valueOf(i));
-                assert offset != null;
-            }
-            float oX = offset.getFloat(x);
-            float oY = offset.getFloat(y);
-            float oZ = offset.getFloat(z);
+        float count = cfe * TCUtil.CFE_PARTICLE_MULTIPLIER;
+        if (offsets == null || offsets.length < count) genOffsets(pEntity);
+        pPoseStack.pushPose();
+        var frustum = Minecraft.getInstance().levelRenderer.getFrustum();
+        float size = 0.1f;
+        for (int i = 0; i < count; i++) {
+            var offset = offsets[i];
+            float oX = offset.x();
+            float oY = offset.y();
+            float oZ = offset.z();
+
+            AABB aabb = new AABB(
+                    pEntity.getX() + oX*k - size,
+                    pEntity.getY() + oY*k - size,
+                    pEntity.getZ() + oZ*k - size,
+                    pEntity.getX() + oX*k + size,
+                    pEntity.getY() + oY*k + size,
+                    pEntity.getZ() + oZ*k + size
+            );
+
+            if (!frustum.isVisible(aabb)) continue;
+
+
             pPoseStack.pushPose();
             pPoseStack.translate(oX*k, oY*k, oZ*k);
             pPoseStack.mulPose(entityRenderDispatcher.camera.rotation());
@@ -63,6 +68,7 @@ public class CFECloudRenderer extends EntityRenderer<CFECloudEntity> {
             TCUtil.drawCfeParticle(pPoseStack, pPackedLight, buffer);
             pPoseStack.popPose();
         }
+        pPoseStack.popPose();
 
     }
 
@@ -70,27 +76,14 @@ public class CFECloudRenderer extends EntityRenderer<CFECloudEntity> {
 
 
     private void genOffsets(CFECloudEntity entity) {
-        CompoundTag persistentData = entity.getPersistentData();
-        CompoundTag offsets;
-        if (persistentData.contains("offsets"))
-            offsets = persistentData.getCompound("offsets");
-        else
-            offsets = new CompoundTag();
-
         int cfe = entity.getSyncedCFE();
-        for (int i = 0; i < cfe * TCUtil.CFE_PARTICLE_MULTIPLIER; i++) {
-            CompoundTag offset;
-            if (offsets.contains(String.valueOf(i)))
-                continue;
-            else
-                offset = new CompoundTag();
-            Vector3f offsetGen = TCUtil.getSpreadParticleOffset(entity.level().random, (int) (cfe * TCUtil.CFE_PARTICLE_MULTIPLIER)).toVector3f();
-            offset.putFloat(x,offsetGen.x);
-            offset.putFloat(y,offsetGen.y);
-            offset.putFloat(z,offsetGen.z);
-            offsets.put(String.valueOf(i),offset);
+        float count = cfe * TCUtil.CFE_PARTICLE_MULTIPLIER;
+        if (offsets == null || offsets.length < count) {
+            offsets = new Vector3f[(int) Math.ceil(count)];
+            for (int i = 0; i < count; i++) {
+                offsets[i] = TCUtil.getSpreadParticleOffset(entity.level().random, (int) (count)).toVector3f();
+            }
         }
-        persistentData.put("offsets",offsets);
     }
 
 

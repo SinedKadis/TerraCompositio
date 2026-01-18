@@ -13,13 +13,11 @@ import net.minecraftforge.items.ItemStackHandler;
 import net.sinedkadis.terracompositio.api.networks.cfe.ICFEHandler;
 import net.sinedkadis.terracompositio.block.behaviours.CFEHandlerBehaviour;
 import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBEBehaviour;
-import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBECFEBehaviour;
 import net.sinedkadis.terracompositio.block.behaviours.TwoSlotItemHandlerBehaviour;
 import net.sinedkadis.terracompositio.compat.jade.JadeTerraCompositioPlugin;
 import net.sinedkadis.terracompositio.particle.CFEParticleData;
 import net.sinedkadis.terracompositio.registries.TCBlockEntities;
 import net.sinedkadis.terracompositio.recipe.FlowInfusionRecipe;
-import org.jetbrains.annotations.NotNull;
 import snownee.jade.api.ITooltip;
 import snownee.jade.api.config.IPluginConfig;
 
@@ -66,7 +64,7 @@ public class FlowInfuserBlockEntity extends TCCraftingBlockEntity {
 
     }
 
-    public void tick(@NotNull Level pLevel, BlockPos pPos, BlockState pState) {
+    public void tick(Level pLevel, BlockPos pPos, BlockState pState) {
         super.tick(pLevel, pPos, pState);
         if (!pLevel.isClientSide) {
             if (hasRecipe() && enoughCFE()) {
@@ -84,12 +82,12 @@ public class FlowInfuserBlockEntity extends TCCraftingBlockEntity {
         }
     }
 
-    private boolean enoughCFE() {
+    public boolean enoughCFE() {
         int cfe = cfeContainer().getCFE();
         return cfe > tickCFECost;
     }
 
-    protected boolean hasRecipe() {
+    public boolean hasRecipe() {
         Optional<FlowInfusionRecipe> recipe = getCurrentRecipe();
         if (recipe.isEmpty()){
             return false;
@@ -122,20 +120,15 @@ public class FlowInfuserBlockEntity extends TCCraftingBlockEntity {
         return ((CFEHandlerBehaviour) behaviours.get(0)).getMainHandler();
     }
 
-    int ticker = 0;
-    private void spawnParticles() {
-        if (level instanceof ServerLevel serverLevel && ticker >= 20) {
-            ticker = 0;
-            float speed = 1 / 20f;
-            Optional<IBECFEBehaviour> cfeBehaviour = getCfeBehaviour();
-            if (cfeBehaviour.isPresent())
-                speed = cfeBehaviour.get().getCfeHandler().getCfeTravelSpeed();
 
+    private void spawnParticles() {
+        if (level instanceof ServerLevel serverLevel) {
+            float speed = cfeContainer().getCfeTravelSpeed();
             BlockPos blockPos = getBlockPos();
             serverLevel.sendParticles(new CFEParticleData(speed),
                     blockPos.getX() + 0.5D,
                     blockPos.getY() + 0.5D,
-                    blockPos.getZ() + 0.5D, 0, 0, -0.1D, 0, 0.1D);
+                    blockPos.getZ() + 0.5D, 1, 0, -0.1D, 0, 0.1D);
         }
     }
 

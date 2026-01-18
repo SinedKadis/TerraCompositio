@@ -20,22 +20,17 @@ public class CFEParticle extends TextureSheetParticle{
                 CFEParticleData data) {
         super(level, x, y, z, xd, yd, zd);
         float speed = data.speed();
-        Vec3 targetPos = new Vec3(x + xd, y + yd, z + zd); // Рассчитываем целевую позицию
+        double distance = Math.sqrt(xd*xd + yd*yd + zd*zd);
         this.hasPhysics = false;
         this.gravity = 0.0F;
         if (!(xd == 0 && yd == 0 && zd == 0) ) {
-            this.lifetime = (int) ((targetPos.distanceTo(new Vec3(x,y,z))/ speed));
+            this.lifetime = (int) (distance / speed);
         } else {
-            this.lifetime = 20;
+            this.lifetime = 5;
         }
         this.scale(0.5F);
-        Vec3 direction = new Vec3(
-                targetPos.x - this.x,
-                targetPos.y - this.y,
-                targetPos.z - this.z
-        ).normalize().scale(speed);  // нормализуем и умножаем на скорость
+        Vec3 direction = new Vec3(xd, yd, zd).normalize().scale(speed);
 
-        // Обновляем скорость
         this.xd = direction.x;
         this.yd = direction.y;
         this.zd = direction.z;

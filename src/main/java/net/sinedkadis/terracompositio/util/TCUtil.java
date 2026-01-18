@@ -503,7 +503,7 @@ public class TCUtil {
         var matrix = pose.pose();
         var normal = pose.normal();
 
-        pPackedLight = 0xF000F0;
+        //pPackedLight = 0xF000F0;
 
         float size = 0.1f;
 
@@ -549,9 +549,11 @@ public class TCUtil {
                 .findFirst();
         CFECloudEntity entity = first.orElseGet(() -> new CFECloudEntity(pLevel));
         int cfe1 = entity.getSyncedCFE();
-        if (cfe1 == 0) pLevel.addFreshEntity(entity);
+        if (cfe1 == 0) {
+            pLevel.addFreshEntity(entity);
+            entity.setPos(targetPos.getCenter());
+        }
         entity.setSyncedCFE(cfe1 +cfe);
-        entity.setPos(targetPos.getCenter());
         return cfe;
     }
 

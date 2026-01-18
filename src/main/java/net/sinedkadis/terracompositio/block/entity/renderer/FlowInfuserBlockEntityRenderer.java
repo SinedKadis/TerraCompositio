@@ -18,7 +18,7 @@ import net.sinedkadis.terracompositio.block.entity.FlowInfuserBlockEntity;
 import org.jetbrains.annotations.NotNull;
 
 public class FlowInfuserBlockEntityRenderer implements BlockEntityRenderer<FlowInfuserBlockEntity> {
-    public FlowInfuserBlockEntityRenderer(BlockEntityRendererProvider.Context context) {
+    public FlowInfuserBlockEntityRenderer(BlockEntityRendererProvider.Context ignoredContext) {
 
     }
 
@@ -34,10 +34,10 @@ public class FlowInfuserBlockEntityRenderer implements BlockEntityRenderer<FlowI
         pPoseStack.scale(0.7f, 0.7f, 0.7f);
         pPoseStack.mulPose(Axis.XN.rotationDegrees(90));
 
-        itemRenderer.renderStatic(itemStack, ItemDisplayContext.FIXED, getLightLevel(pBlockEntity.getLevel(), pBlockEntity.getBlockPos()),
-                OverlayTexture.NO_OVERLAY, pPoseStack, pBuffer, pBlockEntity.getLevel(), 1);
+        Level level = pBlockEntity.getLevel();
+        itemRenderer.renderStatic(itemStack, ItemDisplayContext.FIXED, getLightLevel(level, pBlockEntity.getBlockPos()),
+                OverlayTexture.NO_OVERLAY, pPoseStack, pBuffer, level, 1);
         pPoseStack.popPose();
-
     }
 
     private int getLightLevel(Level level, BlockPos pos) {
