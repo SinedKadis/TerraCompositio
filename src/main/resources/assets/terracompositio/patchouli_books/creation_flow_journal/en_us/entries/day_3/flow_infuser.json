@@ -7,14 +7,15 @@
     "book.terracompositio.creation_flow_journal.entry.flow_infuser.page1",
     {
       "type": "patchouli:crafting",
-      "recipe": "terracompositio:construction_desorber",
+      "recipe": "terracompositio:flow_infuser_kit",
       "text": "book.terracompositio.creation_flow_journal.entry.flow_infuser.page2"
     },
     {
-      "type": "patchouli:image",
-      "images": [
-        "terracompositio:textures/illustrations/flow_infuser_image.png"
-      ],
+      "type": "patchouli:spotlight",
+      "item": {
+        "item": "terracompositio:infused_iron_ingot"
+      },
+      "link_recipe": true,
       "text": "book.terracompositio.creation_flow_journal.entry.flow_infuser.page3"
     }
   ]

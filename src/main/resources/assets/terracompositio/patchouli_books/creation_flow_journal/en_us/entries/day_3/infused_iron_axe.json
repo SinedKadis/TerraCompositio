@@ -1,0 +1,21 @@
+{
+  "name": "book.terracompositio.creation_flow_journal.entry.infused_iron_axe.name",
+  "category": "terracompositio:day_3",
+  "icon": "terracompositio:flow_rotating_axe",
+  "flag": "terracompositio:day_3",
+  "pages": [
+    "book.terracompositio.creation_flow_journal.entry.infused_iron_axe.page1",
+    {
+      "type": "patchouli:crafting",
+      "recipe": "terracompositio:flow_rotating_axe",
+      "text": "book.terracompositio.creation_flow_journal.entry.infused_iron_axe.page2"
+    },
+    {
+      "type": "patchouli:image",
+      "images": [
+        "terracompositio:textures/illustrations/infused_iron_axe_image.png"
+      ],
+      "text": "book.terracompositio.creation_flow_journal.entry.infused_iron_axe.page3"
+    }
+  ]
+}

@@ -64,7 +64,7 @@
   "item.terracompositio.flow_rotating_axe.axe": "Axe Mode",
   "item.terracompositio.flow_rotating_axe.wrench_axe": "Wrench-Axe Mode",
   "item.terracompositio.flow_rotating_axe.wrench": "Wrench Mode",
-  "item.terracompositio.flow_rotating_axe.crowbar": "Andiron Mode",
+  "item.terracompositio.flow_rotating_axe.crowbar": "Crowbar Mode",
   "message.terracompositio.wrench_mode": "Switched to %s",
   "item.terracompositio.flow_rotating_axe": "Infused Iron Axe",
   "item.terracompositio.flow_rotating_axe.mode": "Mode: %s",
@@ -90,8 +90,6 @@
   "block.terracompositio.matter_infuser.catalyst": "Catalyst: ",
   "block.terracompositio.matter_infuser.cfe_t": "CFE/tick: %s",
   "config.jade.plugin_terracompositio.matter_infuser_tooltip": "Matter Infuser",
-  "config.jade.plugin_terracompositio.mod_cfe_be_tooltip": "CFE",
-  "config.jade.plugin_terracompositio.mod_item_io_tooltip": "Item IO",
   "block.terracompositio.construction_desorber": "Construction Desorber",
   "config.jade.plugin_terracompositio.cfe_tick_config": "   CFE/tick",
   "config.jade.plugin_terracompositio.catalyst_config": "   Catalyst",
@@ -143,8 +141,6 @@
   "block.terracompositio.pp.roll": "Roll: %s",
   "block.terracompositio.technetium_block": "Technetium Block",
   "item.terracompositio.technetium_crown": "Technetium Crown",
-  "item.terracompositio.technetium_cloak": "Technetium Cloak",
-  "item.terracompositio.technetium_accumulators": "Technetium Accumulators",
   "item.terracompositio.technetium_boots": "Technetium Boots",
   "item.terracompositio.technetium_boots.height": "Set Boot Height",
   "item.terracompositio.technetium_boots.raise": "Raise Boot Height",
@@ -155,54 +151,61 @@
   "key.terracompositio.categories.main": "Terra Compositio",
 
   "book.terracompositio.creation_flow_journal.name": "Creation Flow Journal",
-  "book.terracompositio.creation_flow_journal.landing_text": "Записи о наблюдении за потоком созидания",
+  "book.terracompositio.creation_flow_journal.landing_text": "Записи о наблюдении за потоком созидания, автор John Pork",
 
   "book.terracompositio.creation_flow_journal.category.day_1.name": "День первый",
-  "book.terracompositio.creation_flow_journal.category.day_1.description": "Необычный кедр сам делает наблюдения? Удобно",
+  "book.terracompositio.creation_flow_journal.category.day_1.description": "Если вы это читаете, значит вы нашли способ раздобыть копию моего журнала, через один из портов, что я оставил. Я не буду сразу раскрывать все добытые мою знания, так что положите эту книгу в порт на следующий день, и я дам вам больше интересной информации",
 
-  "book.terracompositio.creation_flow_journal.entry.cedar_book_port.name": "Кедровый порт для книги",
-  "book.terracompositio.creation_flow_journal.entry.cedar_book_port.page1": " Кто оставил тут такое резьбление по дереву? Кто знает. Раз я это читаю, значит догадался, как правильно им воспользоватся. <br>$(o)Хех, забавно.$(k) Кто же написал книгу, неужели создатель!?$() <br>  Надо будет положить эту же книгу сюда завтра, может еще что-то появится. <br> Еще каким-то образом этот \"порт\" может делать сажанцы кедра из сажанцев дуба.",
+  "book.terracompositio.creation_flow_journal.entry.cedar_book_port.name": "Кедровый порт",
+  "book.terracompositio.creation_flow_journal.entry.cedar_book_port.page1": " Я нашел подобное резьбление на одном старом дереве. Там был изображен сажанец дуба. Я решил, ради интереса, приложить к отверствию сажанец, и о чудо!<br> Возможно, я смогу использовать это в будующем",
   "book.terracompositio.creation_flow_journal.entry.cedar_book_port.page2": " Поразительно !!!",
 
   "book.terracompositio.creation_flow_journal.entry.flow_infusion.name": "Наполненность потоком",
-  "book.terracompositio.creation_flow_journal.entry.flow_infusion.page1": " Наблюдая за кедровыми деревьями, можно заметить, как в них течет нечто синее и жидкое. Когда касаешься его, можно почувствовать прилив энергии, желание создавать.<br>  Назовем это $(l)потоком созидания$(). Так и хочется вкусить, зарядится энергией этого потока. <br>        $(o)Но ломать нельзя!$() <br>  Разрушение и созедание - противоположности. Если их соединить неправильно, то от них ничего не останется.",
-  "book.terracompositio.creation_flow_journal.entry.flow_infusion.page2": " А еще, дерево не правильно вот так вот повреждать, из его раны вытечет еще больше жидкости, и оно станет просто красивым пиломатериалом.",
+  "book.terracompositio.creation_flow_journal.entry.flow_infusion.page1": " Наблюдая за кедровыми деревьями, я заметил, как в них течет нечто синее и жидкое. Когда касаешься его, можно почувствовать прилив энергии, желание создавать.<br>  Назову это потоком созидания<br> Я попробовал забрать себе в лабораторию кусочек, до не тут то было. При ломании поток исщезает",
+  "book.terracompositio.creation_flow_journal.entry.flow_infusion.page2": " Однако, даже без самого потока, из него получается хороший строй-материал",
 
   "book.terracompositio.creation_flow_journal.entry.cedar_armor.name": "Броня из потокового кедра",
-  "book.terracompositio.creation_flow_journal.entry.cedar_armor.page1": "Кедровая броня должна обладать какими-то свойствами. Должна же?",
+  "book.terracompositio.creation_flow_journal.entry.cedar_armor.page1": "Кедр, на удивление, неплохой материал для брони. Свойства хоть и не лучшие, но сидит не плохо.",
 
   "book.terracompositio.creation_flow_journal.category.day_2.name": "День второй",
-  "book.terracompositio.creation_flow_journal.category.day_2.description": "Что же мы узнаем сегодня?",
+  "book.terracompositio.creation_flow_journal.category.day_2.description": "Подробнее про добычу и использование потока",
 
   "book.terracompositio.creation_flow_journal.entry.wedge.name": "Клин",
-  "book.terracompositio.creation_flow_journal.entry.wedge.page1": " Все-таки, жажду потока не преодолеть, но надо другой способ, нежели разрушение. Если создать что-то типа клина, и аккуратно, с уважением, вставить его в дерево, то можно добыть немного, особо не навредив ему.",
-  "book.terracompositio.creation_flow_journal.entry.wedge.page2": " Процесс не быстрый, так что надо подставить какую-то тару, и потом можно перелить в бутылочку, ну или в ведро",
-  "book.terracompositio.creation_flow_journal.entry.wedge.page3": " Однако, даже так, дерево все-равно чуть страдает. Иногда придется давать ему восстановится",
+  "book.terracompositio.creation_flow_journal.entry.wedge.page1": " Первое, что пришло мне в голову, это использовать клин, прям как при добыче березового сока. Вбиваешь клин в дерево, ставишь под него котел, и наслаждаешься результатом",
+  "book.terracompositio.creation_flow_journal.entry.wedge.page2": " Ресурс дерева хоть и истощается, но востанавливается со временем",
+  "book.terracompositio.creation_flow_journal.entry.wedge.page3": " Для добычи березового сока клин тоже хорошо подходит",
 
   "book.terracompositio.creation_flow_journal.entry.flow_fluid.name": "Жидкий поток",
-  "book.terracompositio.creation_flow_journal.entry.flow_fluid.page1": "  Какая прекрасная жидкость, так БОДРИТ!!! <br> Купаться в ней тоже одно удовольствие, правда если она не в стоячем состоянии, то в ней практически невозможно находится, не держась за что-то",
+  "book.terracompositio.creation_flow_journal.entry.flow_fluid.page1": "  Необычная жидкость, крайне текучая. Имеет сильную отталкивающую силу, а при употреблении внутрь неплого заряжает энергией, хоть и не на долго",
   "book.terracompositio.creation_flow_journal.entry.flow_fluid.page2.title": "Жидкий поток",
-  "book.terracompositio.creation_flow_journal.entry.flow_fluid.page2": "  Она еще так быстро течет, моргнуть не успеешь, как она уже везде. Бедный мой редстоун. Интересно, какие у нее еще есть применения, помимо пить и купаться",
+  "book.terracompositio.creation_flow_journal.entry.flow_fluid.page2": "  Хранит огромное количество энергии созидания",
 
-  "book.terracompositio.creation_flow_journal.entry.activated_cedar_armor.name": "Активированная броня ",
-  "book.terracompositio.creation_flow_journal.entry.activated_cedar_armor.page1": " Да, таки обладает! <br> Если одеть полный набор, а потом облить потоком из бутылочки, то произойдет чудо: броня впитает в себя его энергию, и вернет себе свойства, что у нее были когда-то. ",
-  "book.terracompositio.creation_flow_journal.entry.activated_cedar_armor.page2.title": "Активированная броня",
-  "book.terracompositio.creation_flow_journal.entry.activated_cedar_armor.page2": " Жаль только, что этот эффект очень хрупок, если снять какой-то элемент брони, или достаточно повредить его, то поток истратит свою силу. Ну ничего, можно же облить еще раз!",
+  "book.terracompositio.creation_flow_journal.entry.activated_cedar_armor.name": "Напитанная броня ",
+  "book.terracompositio.creation_flow_journal.entry.activated_cedar_armor.page1": " При напитывании потоком, броня проявляет свои скрытые свойства и становится чуть ли не лучшей из тех, что я видел. Это удобно делать бутылочной с потоком. По характеристикам она становится близка к незеритовой",
+  "book.terracompositio.creation_flow_journal.entry.activated_cedar_armor.page2.title": "Напитанная броня ",
+  "book.terracompositio.creation_flow_journal.entry.activated_cedar_armor.page2": " Это работает только при полном наборе брони, а при достаточном повреждении процедуру придется повторять",
 
   "book.terracompositio.creation_flow_journal.entry.desorbers.name": "Десорберы потока",
-  "book.terracompositio.creation_flow_journal.entry.desorbers.page1": "При достижении особых условий, можно из жидкого потока получить Чистую Энергию Потока. Подобные процессы и называют десорбцией. <br> Есть несколько способов добиться этого, но в любом случае необходимо переполнить предел блага, что жидкость может в себе удержать.",
+  "book.terracompositio.creation_flow_journal.entry.desorbers.page1": " Есть споб более прямого использования потока созидания. Для этого, из него нужно извлечь Энергию Потока Созидания (коротко ЭПС). Посколько жидкий поток, добываемый из деревьев, ее содержит, можно брать ее оттуда",
   "book.terracompositio.creation_flow_journal.entry.desorbers.page2.title": "Десорбер строительства",
-  "book.terracompositio.creation_flow_journal.entry.desorbers.page2": "Можно поставить на стройке, налить жидкого потока и получать бесплатную ЧЭП",
+  "book.terracompositio.creation_flow_journal.entry.desorbers.page2": " Извлекает ЭПС из жидкого потока, используя как катализатор созедание, получаемое при строительстве рядом. Рекомендую ничего не разрушать",
   "book.terracompositio.creation_flow_journal.entry.desorbers.page3.title": "Десорбер Культивации",
-  "book.terracompositio.creation_flow_journal.entry.desorbers.page3": "Будет издавать приятные звуки рядом с растущими культурами",
+  "book.terracompositio.creation_flow_journal.entry.desorbers.page3": " Извлекает ЭПС из жидкого потока, используя как катализатор созедание, получаемое при росте растений рядом",
   "book.terracompositio.creation_flow_journal.entry.desorbers.page4.title": "Десорбер течения времени",
-  "book.terracompositio.creation_flow_journal.entry.desorbers.page4": "Время обладает невероятной способностью творить, однако она переменчива",
+  "book.terracompositio.creation_flow_journal.entry.desorbers.page4": " Извлекает ЭПС из жидкого потока, используя как катализатор созедание собраного времени. Прирост переменчивый, что б преобразовать собраное время в ЭПС, нужно подать редстоун сигнал",
 
   "book.terracompositio.creation_flow_journal.category.day_3.name": "День третий",
-  "book.terracompositio.creation_flow_journal.category.day_3.description": "Классная штука эта ваша ЧЭП",
+  "book.terracompositio.creation_flow_journal.category.day_3.description": "Подробрее об использовании ЭПС",
 
   "book.terracompositio.creation_flow_journal.entry.flow_infuser.name": "Наполнитель потоком",
-  "book.terracompositio.creation_flow_journal.entry.flow_infuser.page1": "А вот и применение Чистой Энергии Потока созидания, которой у нас теперь в достатке. Если особым образом повредить дерево, не прям критично, но не приятно, то оно будет пытаться излечиться, что нам может пригодится. <br> К данному процессу можно добавить немножко ЧЭП, и разметить предмет, что можно наполнить, в наше повреждение. Главное следить, что б в жилах дерева текла жидкая энергия потока",
-  "book.terracompositio.creation_flow_journal.entry.flow_infuser.page2": "Для данного устройства на понадобится немного палок и меди",
-  "book.terracompositio.creation_flow_journal.entry.flow_infuser.page3": "И теперь ловким движением рук и топора монтируем конструкцию"
+  "book.terracompositio.creation_flow_journal.entry.flow_infuser.page1": " С помощью данного устройства можно создать материал, обладающий огромный потенциал, и не только. Для этого нам понадобятся палки, медь, топор и прямые руки.",
+  "book.terracompositio.creation_flow_journal.entry.flow_infuser.page2": " Для его работы устройство должно находится в наполненом потоком кедре",
+  "book.terracompositio.creation_flow_journal.entry.flow_infuser.page3": " Для работы нужно положить в созданое отверствие подходящий предмет (например, обычное железо), а также расположить радом источник ЭПС",
+
+  "book.terracompositio.creation_flow_journal.entry.infused_iron_axe.name": "Мульти-инструмент",
+  "book.terracompositio.creation_flow_journal.entry.infused_iron_axe.page1": " Благодаря невероятным свойствам материала, назвать данный инструмент топором было б неправильно. Он может иметь форму обычного топора, ключа, монтировки а так же ключа-топора",
+  "book.terracompositio.creation_flow_journal.entry.infused_iron_axe.page2": " В режиме топора с ним можно делать все, как и с любым другим.<br> В режиме ключа он способен менять форму разных блоков.<br> В режиме монтировки он может извлекать застрявшие в устройствах предметы ",
+  "book.terracompositio.creation_flow_journal.entry.infused_iron_axe.page3": " А вот режим ключа-топора способен вращать целые деревья. Правда, без листвы"
+
+
 }

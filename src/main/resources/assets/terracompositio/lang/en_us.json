@@ -215,6 +215,11 @@
   "book.terracompositio.creation_flow_journal.entry.flow_infuser.name": "Flow infuser",
   "book.terracompositio.creation_flow_journal.entry.flow_infuser.page1": "test",
   "book.terracompositio.creation_flow_journal.entry.flow_infuser.page2": "test",
-  "book.terracompositio.creation_flow_journal.entry.flow_infuser.page3": "test"
+  "book.terracompositio.creation_flow_journal.entry.flow_infuser.page3": "test",
+
+  "book.terracompositio.creation_flow_journal.entry.infused_iron_axe.name": "test",
+  "book.terracompositio.creation_flow_journal.entry.infused_iron_axe.page1": "test",
+  "book.terracompositio.creation_flow_journal.entry.infused_iron_axe.page2": "test",
+  "book.terracompositio.creation_flow_journal.entry.infused_iron_axe.page3": "test"
 
 }

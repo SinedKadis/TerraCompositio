@@ -14,7 +14,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.sinedkadis.terracompositio.registries.TCItems;
-import org.jetbrains.annotations.NotNull;
 import vazkii.patchouli.api.PatchouliAPI;
 
 import javax.annotation.Nullable;
@@ -25,7 +24,7 @@ import java.util.Objects;
 @ParametersAreNonnullByDefault
 public class CreationFlowJournalItem extends Item {
 
-    public static int MAX_DAYS = 2;
+    public static int MAX_DAYS = 3;
     public static String DAY_FLAG = "terracompositio:day_";
 
     public CreationFlowJournalItem(Properties properties) {
@@ -60,7 +59,6 @@ public class CreationFlowJournalItem extends Item {
         return Objects.equals(ForgeRegistries.ITEMS.getKey(TCItems.CREATION_FLOW_JOURNAL.get()), PatchouliAPI.get().getOpenBookGui());
     }
 
-    @NotNull
     @Override
     public InteractionResultHolder<ItemStack> use(Level worldIn, Player playerIn, InteractionHand handIn) {
         ItemStack stack = playerIn.getItemInHand(handIn);
