@@ -50,7 +50,7 @@ public abstract class AbstractDesorberBlockEntity extends TCBlockEntity {
         });
     }
 
-
+    //todo comparator compatibility
 
 
     protected int getTankCapacity() {

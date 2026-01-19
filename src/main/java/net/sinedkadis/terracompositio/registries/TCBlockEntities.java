@@ -89,6 +89,11 @@ public class TCBlockEntities {
                     BlockEntityType.Builder.of(AirSaturatorBlockEntity::new,
                             TCBlocks.AIR_SATURATOR.get()).build(null));
 
+    public static final RegistryObject<BlockEntityType<CedarGearboxBlockEntity>> CEDAR_GEARBOX_BE =
+            BLOCK_ENTITIES.register("cedar_gearbox_be", () ->
+                    BlockEntityType.Builder.of(CedarGearboxBlockEntity::new,
+                            TCBlocks.CEDAR_GEARBOX.get()).build(null));
+
 
 
     public static void register(IEventBus eventBus){

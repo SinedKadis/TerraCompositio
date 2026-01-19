@@ -171,4 +171,6 @@ public class TCBlocks {
     public static final RegistryObject<Block> AIR_SATURATOR = registerBlock("air_saturator",
             () -> new AirSaturatorBlock(BlockBehaviour.Properties.copy(Blocks.OAK_PLANKS).strength(3f)));
 
+    public static final RegistryObject<Block> CEDAR_GEARBOX = registerBlock("cedar_gearbox",
+            () -> new CedarGearboxBlock(BlockBehaviour.Properties.copy(TCBlocks.FLOW_CEDAR_LOG.get())));
 }
