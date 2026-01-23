@@ -21,7 +21,6 @@ import net.sinedkadis.terracompositio.block.behaviours.TwoSlotItemHandlerBehavio
 import net.sinedkadis.terracompositio.recipe.FlowSaturationRecipe;
 import net.sinedkadis.terracompositio.registries.TCBlockEntities;
 import net.sinedkadis.terracompositio.screen.FlowBlockPortMenu;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -70,19 +69,19 @@ public class FlowCedarPortBlockEntity extends TCCraftingBlockEntity implements M
 
 
     @Override
-    protected void saveAdditional(@NotNull CompoundTag pTag) {
+    protected void saveAdditional(CompoundTag pTag) {
         pTag.putInt("flow_port_progress", progress);
         super.saveAdditional(pTag);
     }
 
     @Override
-    public void load(@NotNull CompoundTag pTag) {
+    public void load(CompoundTag pTag) {
         super.load(pTag);
         progress = pTag.getInt("flow_port_progress");
     }
 
     @Override
-    void addBehaviours(List<IBEBehaviour> list) {
+    public void addBEBehaviours(List<IBEBehaviour> list) {
         list.add(new OneSlotItemHandlerBehaviour(this){
             @Override
             public int getLimitInSlot(int slot) {
@@ -159,13 +158,13 @@ public class FlowCedarPortBlockEntity extends TCCraftingBlockEntity implements M
     }
 
     @Override
-    public @NotNull Component getDisplayName() {
+    public Component getDisplayName() {
         return Component.translatable("block.terracompositio.flow_cedar_port");
     }
 
     @Nullable
     @Override
-    public AbstractContainerMenu createMenu(int pContainerId, @NotNull Inventory pPlayerInventory, @NotNull Player pPlayer) {
+    public AbstractContainerMenu createMenu(int pContainerId, Inventory pPlayerInventory, Player pPlayer) {
         return new FlowBlockPortMenu(pContainerId,pPlayerInventory,this,this.data);
     }
 

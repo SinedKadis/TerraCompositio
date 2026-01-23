@@ -38,7 +38,7 @@ public class EntStatueBlockEntity extends TCBlockEntity implements FluidNetworkM
     int cd = 20;
 
     @Override
-    void addBehaviours(@NotNull List<IBEBehaviour> list) {
+    public void addBEBehaviours(@NotNull List<IBEBehaviour> list) {
         list.add(new OneSlotItemHandlerBehaviour(this){
             @Override
             public boolean isItemAllowed(int pSlot, @NotNull ItemStack pStack) {

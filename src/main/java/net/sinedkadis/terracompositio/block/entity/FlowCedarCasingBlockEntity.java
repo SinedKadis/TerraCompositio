@@ -40,7 +40,7 @@ public class FlowCedarCasingBlockEntity extends TCCraftingBlockEntity{
     }
 
     @Override
-    void addBehaviours(@NotNull List<IBEBehaviour> list) {
+    public void addBEBehaviours(@NotNull List<IBEBehaviour> list) {
         list.add(new TwoSlotItemHandlerBehaviour(this){
             @Override
             public @Nullable LazyOptional<?> getCapability(@NotNull Capability<?> cap, @Nullable Direction side) {

@@ -13,7 +13,6 @@ import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBEBehaviour;
 import net.sinedkadis.terracompositio.registries.TCBlockEntities;
 import net.sinedkadis.terracompositio.registries.TCBlockStateProperties;
 import net.sinedkadis.terracompositio.util.TCUtil;
-import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.List;
@@ -29,7 +28,7 @@ public class AirSaturatorBlockEntity extends TCBlockEntity{
     private int timer = 0;
 
     @Override
-    void addBehaviours(List<IBEBehaviour> list) {
+    public void addBEBehaviours(List<IBEBehaviour> list) {
         list.add(new CFEHandlerBehaviour(this){
             @Override
             public void init() {
@@ -42,7 +41,7 @@ public class AirSaturatorBlockEntity extends TCBlockEntity{
     }
 
     @Override
-    public void tick(@NotNull Level pLevel, BlockPos pPos, BlockState pState) {
+    public void tick(Level pLevel, BlockPos pPos, BlockState pState) {
         super.tick(pLevel, pPos, pState);
         boolean isActivated = pLevel.hasNeighborSignal(pPos);
         if (isActivated && !wasActivated) {

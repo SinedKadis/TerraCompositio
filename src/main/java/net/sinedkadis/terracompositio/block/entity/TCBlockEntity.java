@@ -20,7 +20,6 @@ import net.minecraftforge.common.util.LazyOptional;
 import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBEBehaviour;
 import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBECFEBehaviour;
 import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBEItemBehaviour;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.ArrayList;
@@ -30,16 +29,16 @@ import java.util.Optional;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public abstract class TCBlockEntity extends BlockEntity {
+public abstract class TCBlockEntity extends BlockEntity{
     @Getter
     List<IBEBehaviour> behaviours = new ArrayList<>();
     public TCBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
-        addBehaviours(behaviours);
+        addBEBehaviours(behaviours);
         behaviours.forEach(IBEBehaviour::init);
     }
 
-    abstract void addBehaviours(List<IBEBehaviour> list);
+    public abstract void addBEBehaviours(List<IBEBehaviour> behaviourList);
 
     public Optional<IBECFEBehaviour> getCfeBehaviour() {
         return behaviours.stream().map(iBehaviour -> iBehaviour instanceof IBECFEBehaviour IBECFEBehaviour ? IBECFEBehaviour : null)
@@ -54,7 +53,7 @@ public abstract class TCBlockEntity extends BlockEntity {
 
 
     @Override
-    public @NotNull <T> LazyOptional<T> getCapability(@NotNull Capability<T> cap, @Nullable Direction side) {
+    public <T> LazyOptional<T> getCapability(Capability<T> cap, @Nullable Direction side) {
         Optional<? extends LazyOptional<?>> behaviourCap = behaviours.stream()
                 .map(iBehaviour -> iBehaviour.getCapability(cap, side))
                 .filter(Objects::nonNull)
@@ -104,7 +103,7 @@ public abstract class TCBlockEntity extends BlockEntity {
     }
 
     @Override
-    public @NotNull CompoundTag getUpdateTag() {
+    public CompoundTag getUpdateTag() {
         return saveWithoutMetadata();
     }
 }

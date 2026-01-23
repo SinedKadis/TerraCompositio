@@ -1,67 +1,84 @@
-package net.sinedkadis.terracompositio.block.behaviours;
+package net.sinedkadis.terracompositio.compat.create.block.entity;
 
-import lombok.Data;
-import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.core.Direction;
+import com.simibubi.create.content.kinetics.base.GeneratingKineticBlockEntity;
+import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
 import net.sinedkadis.terracompositio.api.TerraCompositioAPI;
-import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBECFEBehaviour;
 import net.sinedkadis.terracompositio.api.networks.NetworkAction;
 import net.sinedkadis.terracompositio.api.networks.cfe.*;
-import net.sinedkadis.terracompositio.block.entity.TCBlockEntity;
 import net.sinedkadis.terracompositio.cfe.CFEContainer;
 import net.sinedkadis.terracompositio.compat.jade.JadeTerraCompositioPlugin;
+import net.sinedkadis.terracompositio.registries.TCBlockEntities;
+import net.sinedkadis.terracompositio.registries.TCBlockStateProperties;
 import net.sinedkadis.terracompositio.util.TCUtil;
-import org.jetbrains.annotations.Nullable;
+import org.jetbrains.annotations.NotNull;
 import snownee.jade.api.ITooltip;
 import snownee.jade.api.config.IPluginConfig;
 
-import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.Objects;
 
-@Data
-@MethodsReturnNonnullByDefault
-@ParametersAreNonnullByDefault
-public class CFEHandlerBehaviour implements IBECFEBehaviour {
-    private final TCBlockEntity blockEntity;
+public class CedarGearboxBlockEntity extends GeneratingKineticBlockEntity implements CFENetworkMemberBE {
 
     protected int limit;
     protected int priority;
-    protected ICFEHandler cfeHandler = new CFEContainer(this);
+    protected ICFEHandler cfeHandler = new CFEContainer(this){
+        @Override
+        protected void sendCFEUpdate() {
+            super.sendCFEUpdate();
+            updateGeneratedRotation();
+        }
+    };
     protected LazyOptional<ICFEHandler> lazyCFEOptional = LazyOptional.empty();
 
-    public CFEHandlerBehaviour(TCBlockEntity blockEntity) {
-        this.blockEntity = blockEntity;
+    public CedarGearboxBlockEntity(BlockPos pPos, BlockState pBlockState) {
+        super(Objects.requireNonNull(TCBlockEntities.CEDAR_GEARBOX_BE).get(),pPos, pBlockState);
+        setLazyTickRate(60);
         this.limit = 5;
+        this.priority = 100;
+        this.capacity = 256f;
     }
 
     @Override
-    public BlockEntity getEntity() {
-        return blockEntity;
+    public float getGeneratedSpeed() {
+        if (isOverStressed()) return 0;
+        if (cfeHandler.getCFE() <= 0) return 0;
+        return getBlockState().getValue(TCBlockStateProperties.INFUSED) ? 16 : 8;
     }
 
+
+
     @Override
-    public void tick() {
+    public void lazyTick() {
+        super.lazyTick();
         CFENetwork cfeNetworkInstance = TerraCompositioAPI.INSTANCE.getCFENetworkInstance();
-        Level pLevel = blockEntity.getLevel();
+        Level pLevel = this.level;
         if (pLevel == null) return;
         if (!pLevel.isClientSide && limit != 0) {
             boolean inNetwork = cfeNetworkInstance.isIn(pLevel, this);
-            if (!inNetwork && !blockEntity.isRemoved()) {
+            if (!inNetwork && !isRemoved()) {
                 cfeNetworkInstance.fireCFENetworkEvent(this, NetworkAction.ADD);
             }
+        }
+        if (!isOverStressed() && cfeHandler.takeCFE(1, false) > 0) {
+            updateGeneratedRotation();
+        } else {
+            if (getSpeed() != 0)
+                updateGeneratedRotation();
         }
         updateIfScheduled();
     }
 
     @Override
-    public void onChunkLoad() {
+    public void onLoad() {
+        super.onLoad();
         lazyCFEOptional = LazyOptional.of(() -> cfeHandler);
         scheduleMemberUpdate();
+        updateGeneratedRotation();
     }
 
     @Override
@@ -76,34 +93,37 @@ public class CFEHandlerBehaviour implements IBECFEBehaviour {
     }
 
     @Override
-    public @Nullable LazyOptional<?> getCapability(Capability<?> cap, @Nullable Direction side) {
+    public @NotNull <T> LazyOptional<T> getCapability(@NotNull Capability<T> cap) {
         if (cap == CFECapability.CFE){
             return lazyCFEOptional.cast();
         }
-        return null;
+        return super.getCapability(cap);
     }
 
     @Override
-    public void onRemoved() {
+    public void remove() {
+        super.remove();
         TerraCompositioAPI.INSTANCE.getCFENetworkInstance().fireCFENetworkEvent(this, NetworkAction.REMOVE);
     }
 
     @Override
-    public void onInvalidateCaps() {
+    public void invalidate() {
+        super.invalidate();
         lazyCFEOptional.invalidate();
     }
 
     @Override
-    public void onSave(CompoundTag tag) {
-        cfeHandler.writeToNBT(tag);
+    protected void write(CompoundTag compound, boolean clientPacket) {
+        super.write(compound, clientPacket);
+        cfeHandler.writeToNBT(compound);
     }
 
     @Override
-    public void onLoad(CompoundTag tag) {
-        cfeHandler.readFromNBT(tag);
+    protected void read(CompoundTag compound, boolean clientPacket) {
+        super.read(compound, clientPacket);
+        cfeHandler.readFromNBT(compound);
     }
 
-    @Override
     public void onAppendServerData(CompoundTag compoundTag) {
         compoundTag.putInt("cfe",getMainHandler().getCFE());
         compoundTag.putInt("priority",getPriority());
@@ -114,7 +134,6 @@ public class CFEHandlerBehaviour implements IBECFEBehaviour {
         compoundTag.putFloat("speed",getMainHandler().getCfeTravelSpeed());
     }
 
-    @Override
     public void onAppendTooltip(ITooltip iTooltip, CompoundTag serverData, IPluginConfig iPluginConfig) {
         if (serverData.contains("cfe")) {
             iTooltip.add(Component.translatable("block.terracompositio." + "cfe", serverData.getInt("cfe")));
@@ -137,12 +156,20 @@ public class CFEHandlerBehaviour implements IBECFEBehaviour {
     }
 
 
+
+
+    @Override
+    public int getLimit() {
+        return limit;
+    }
+
+    @Override
+    public int getPriority() {
+        return priority;
+    }
+
     @Override
     public ICFEHandler getMainHandler() {
         return cfeHandler;
-    }
-
-    public void setMaxCFE(int cfe) {
-        getMainHandler().setMaxCFE(cfe);
     }
 }

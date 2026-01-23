@@ -1,10 +1,29 @@
 {
   "variants": {
-    "infused=true": {
-      "model": "terracompositio:block/flow_infuser_infused"
+    "axis=x,infused=false": {
+      "model": "terracompositio:block/cedar_gearbox",
+
+      "y": 90
     },
-    "infused=false": {
-      "model": "terracompositio:block/flow_infuser"
+    "axis=x,infused=true": {
+      "model": "terracompositio:block/cedar_gearbox_infused",
+      "y": 90
+    },
+    "axis=y,infused=false": {
+      "x": 90,
+      "model": "terracompositio:block/cedar_gearbox"
+    },
+    "axis=y,infused=true": {
+      "x": 90,
+      "model": "terracompositio:block/cedar_gearbox_infused"
+    },
+    "axis=z,infused=false": {
+      "model": "terracompositio:block/cedar_gearbox"
+
+    },
+    "axis=z,infused=true": {
+      "model": "terracompositio:block/cedar_gearbox_infused"
+
     }
   }
 }

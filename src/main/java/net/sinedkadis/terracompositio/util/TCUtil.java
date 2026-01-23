@@ -51,9 +51,6 @@ import static net.sinedkadis.terracompositio.registries.TCBlockStateProperties.I
 public class TCUtil {
 
 
-    //private static final float MIN_CAMERA_DISTANCE_SQUARED = 3.25F;
-    public static final float CFE_PARTICLE_MULTIPLIER = 0.1f;
-
     public static void tryCFETransfer(CFENetworkMember target, CFENetworkMember source, int maxTransfer){
         int taken = source.getMainHandler().takeCFE(maxTransfer,true);
         int added = source.getMainHandler().sendCFE(taken, target.getMainHandler(), true);

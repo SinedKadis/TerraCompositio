@@ -24,8 +24,7 @@ import net.sinedkadis.terracompositio.api.networks.cfe.ICFEHandler;
 import net.sinedkadis.terracompositio.cfe.LimitlessCFEContainer;
 import net.sinedkadis.terracompositio.cfe.burst.CFEBurstProjectileEntity;
 import net.sinedkadis.terracompositio.registries.TCEntities;
-import net.sinedkadis.terracompositio.util.TCUtil;
-import org.jetbrains.annotations.NotNull;
+import net.sinedkadis.terracompositio.util.TCConfig;
 import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -50,7 +49,7 @@ public class CFECloudEntity extends Entity implements CFENetworkMemberEntity {
         }
 
         @Override
-        public int sendCFE(int cfe, @NotNull ICFEHandler target, boolean simulate) {
+        public int sendCFE(int cfe, ICFEHandler target, boolean simulate) {
             int freeSpace = target.getFreeSpace();
             int added = Mth.clamp(cfe, 0, freeSpace);
             if (added < 1)
@@ -70,7 +69,7 @@ public class CFECloudEntity extends Entity implements CFENetworkMemberEntity {
         }
     });
 
-    private Vec3 getBurstOffset(@NotNull ICFEHandler target) {
+    private Vec3 getBurstOffset(ICFEHandler target) {
         double r = getRadius();
         BlockPos sourcePos = this.getPos();
         BlockPos targetPos = target.getPos();
@@ -79,7 +78,7 @@ public class CFECloudEntity extends Entity implements CFENetworkMemberEntity {
     }
 
     private double getRadius() {
-        int cfe = (int) (getSyncedCFE() * TCUtil.CFE_PARTICLE_MULTIPLIER);
+        int cfe = TCConfig.RENDER_COUNT_FUNCTION.applyAsInt(getSyncedCFE());
         float k = (float) Math.log10(cfe);
         double baseRadius = 0.2 + 0.3 * Math.log1p(cfe * 0.1);
         return baseRadius * k;

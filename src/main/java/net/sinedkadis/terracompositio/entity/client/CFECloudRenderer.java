@@ -15,6 +15,7 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import net.sinedkadis.terracompositio.TerraCompositio;
 
 import net.sinedkadis.terracompositio.entity.custom.CFECloudEntity;
+import net.sinedkadis.terracompositio.util.TCConfig;
 import net.sinedkadis.terracompositio.util.TCUtil;
 import org.joml.Vector3f;
 
@@ -38,7 +39,7 @@ public class CFECloudRenderer extends EntityRenderer<CFECloudEntity> {
         var buffer = pBuffer.getBuffer(renderType);
         int cfe = pEntity.getSyncedCFE();
         float k = (float) Math.log10(cfe);
-        float count = cfe * TCUtil.CFE_PARTICLE_MULTIPLIER;
+        int count = TCConfig.RENDER_COUNT_FUNCTION.applyAsInt(cfe);
         if (offsets == null || offsets.length < count) genOffsets(pEntity);
         pPoseStack.pushPose();
         var frustum = Minecraft.getInstance().levelRenderer.getFrustum();
@@ -77,7 +78,7 @@ public class CFECloudRenderer extends EntityRenderer<CFECloudEntity> {
 
     private void genOffsets(CFECloudEntity entity) {
         int cfe = entity.getSyncedCFE();
-        float count = cfe * TCUtil.CFE_PARTICLE_MULTIPLIER;
+        float count = TCConfig.RENDER_COUNT_FUNCTION.applyAsInt(cfe);
         if (offsets == null || offsets.length < count) {
             offsets = new Vector3f[(int) Math.ceil(count)];
             for (int i = 0; i < count; i++) {

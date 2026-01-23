@@ -25,7 +25,7 @@ public class MatterInfuserPortBlockEntity extends MatterInfuserBaseBlockEntity {
     }
 
     @Override
-    void addBehaviours(@NotNull List<IBEBehaviour> list) {
+    public void addBEBehaviours(@NotNull List<IBEBehaviour> list) {
 
     }
 }

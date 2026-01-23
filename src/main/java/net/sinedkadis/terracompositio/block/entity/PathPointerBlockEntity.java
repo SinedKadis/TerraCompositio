@@ -67,7 +67,7 @@ public class PathPointerBlockEntity extends TCBlockEntity implements Nameable {
     int timer = 100;
 
     @Override
-    void addBehaviours(@NotNull List<IBEBehaviour> list) {
+    public void addBEBehaviours(@NotNull List<IBEBehaviour> list) {
         list.add(new CFEHandlerBehaviour(this){
             @Override
             public void init() {

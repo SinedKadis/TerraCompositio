@@ -18,6 +18,7 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBECFEBehaviour;
 import net.sinedkadis.terracompositio.api.networks.cfe.CFENetworkMember;
+import net.sinedkadis.terracompositio.api.networks.cfe.CFENetworkMemberBE;
 import net.sinedkadis.terracompositio.api.networks.cfe.CFENetworkMemberEntity;
 import net.sinedkadis.terracompositio.api.networks.cfe.ICFEHandler;
 import net.sinedkadis.terracompositio.block.entity.TCBlockEntity;
@@ -127,6 +128,10 @@ public class CFEBurstProjectileEntity extends ThrowableProjectile {
                     int consumed = behaviour.consumeCFEBurst(this.createPartWithCFE(added));
                     if (consumed == cfe) discard();
                 }
+            } else if (blockEntity instanceof CFENetworkMemberBE memberBE) {
+                int added = memberBE.getMainHandler().addCFE(cfe, true);
+                int consumed = memberBE.consumeCFEBurst(this.createPartWithCFE(added));
+                if (consumed == cfe) discard();
             } else {
                 level().getEntities(null, AABB.of(BoundingBox.fromCorners(blockPos,blockPos))).stream()
                         .filter(entity -> !(entity instanceof CFECloudEntity))
@@ -150,6 +155,8 @@ public class CFEBurstProjectileEntity extends ThrowableProjectile {
         if (blockEntity instanceof TCBlockEntity memberBE) {
             memberBE.getCfeBehaviour().ifPresent(ibecfeBehaviour ->
                     ibecfeBehaviour.getCfeHandler().subFromQueue(getO_CFE()));
+        } else if (blockEntity instanceof CFENetworkMemberBE memberBE) {
+            memberBE.getMainHandler().subFromQueue(getO_CFE());
         }
         super.remove(pReason);
     }

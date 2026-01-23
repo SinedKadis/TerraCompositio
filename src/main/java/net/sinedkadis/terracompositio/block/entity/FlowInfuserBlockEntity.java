@@ -34,7 +34,7 @@ public class FlowInfuserBlockEntity extends TCCraftingBlockEntity {
     }
 
     @Override
-    void addBehaviours(List<IBEBehaviour> list) {
+    public void addBEBehaviours(List<IBEBehaviour> list) {
         list.add(new CFEHandlerBehaviour(this){
             @Override
             public void init() {

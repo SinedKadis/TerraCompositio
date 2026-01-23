@@ -46,7 +46,7 @@ public class FlowCedarTankBlockEntity extends TCBlockEntity implements FluidNetw
     }
 
     @Override
-    void addBehaviours(@NotNull List<IBEBehaviour> list) {
+    public void addBEBehaviours(@NotNull List<IBEBehaviour> list) {
 
     }
 
