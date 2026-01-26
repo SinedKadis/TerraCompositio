@@ -167,6 +167,10 @@ public class TCBlocks {
             () -> new PathPointerBlock(BlockBehaviour.Properties.copy(Blocks.OAK_PLANKS).noOcclusion(), PathPointerBlockEntity.PPPart.SENDER));
     public static final RegistryObject<Block> PP_EMITTER = registerBlock("pp_emitter",
             () -> new PathPointerBlock(BlockBehaviour.Properties.copy(Blocks.OAK_PLANKS).noOcclusion(), PathPointerBlockEntity.PPPart.EMITTER));
+    public static final RegistryObject<Block> PP_EXTRACTOR = registerBlock("pp_extractor",
+            () -> new PathPointerBlock(BlockBehaviour.Properties.copy(Blocks.OAK_PLANKS).noOcclusion(), PathPointerBlockEntity.PPPart.EXTRACTOR));
+    public static final RegistryObject<Block> PP_INFUSER = registerBlock("pp_infuser",
+            () -> new PathPointerBlock(BlockBehaviour.Properties.copy(Blocks.OAK_PLANKS).noOcclusion(), PathPointerBlockEntity.PPPart.INFUSER));
 
     public static final RegistryObject<Block> TECHNETIUM_BLOCK = registerBlock("technetium_block",
             () -> new Block(BlockBehaviour.Properties.copy(Blocks.NETHERITE_BLOCK)));

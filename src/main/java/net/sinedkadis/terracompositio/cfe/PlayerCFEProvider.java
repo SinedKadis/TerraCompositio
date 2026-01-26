@@ -6,7 +6,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.common.util.LazyOptional;
-import net.sinedkadis.terracompositio.api.networks.cfe.CFECapability;
+import net.sinedkadis.terracompositio.api.TCCapabilities;
 import net.sinedkadis.terracompositio.api.networks.cfe.CFENetworkMemberEntity;
 import net.sinedkadis.terracompositio.api.networks.cfe.ICFEHandler;
 import org.jetbrains.annotations.NotNull;
@@ -25,7 +25,7 @@ public class PlayerCFEProvider implements net.minecraftforge.common.capabilities
 
     @Override
     public @NotNull <T> LazyOptional<T> getCapability(@NotNull Capability<T> cap, @Nullable Direction side) {
-        if(cap == CFECapability.CFE) {
+        if(cap == TCCapabilities.CFE) {
             return optional.cast();
         }
 

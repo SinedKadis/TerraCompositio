@@ -4,7 +4,7 @@
 	"texture_size": [32, 32],
 	"textures": {
 		"1": "terracompositio:block/path_pointer/sender",
-		"particle": "terracompositio:block/path_pointer/sender"
+		"particle": "terracompositio:block/flow_cedar_log"
 	},
 	"elements": [
 		{

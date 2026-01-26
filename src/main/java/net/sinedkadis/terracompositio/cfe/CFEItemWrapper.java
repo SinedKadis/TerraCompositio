@@ -14,7 +14,7 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.LazyOptional;
-import net.sinedkadis.terracompositio.api.networks.cfe.CFECapability;
+import net.sinedkadis.terracompositio.api.TCCapabilities;
 import net.sinedkadis.terracompositio.api.networks.cfe.CFENetworkMember;
 import net.sinedkadis.terracompositio.api.networks.cfe.ICFEHandler;
 import org.jetbrains.annotations.NotNull;
@@ -37,8 +37,8 @@ public class CFEItemWrapper implements ICFEHandler, ICapabilityProvider {
     }
 
     @Override
-    public @NotNull <T> LazyOptional<T> getCapability(@NotNull Capability<T> cap, @Nullable Direction side) {
-        return CFECapability.CFE.orEmpty(cap, holder);
+    public <T> LazyOptional<T> getCapability(@NotNull Capability<T> cap, @Nullable Direction side) {
+        return TCCapabilities.CFE.orEmpty(cap, holder);
     }
 
     @Override
@@ -82,6 +82,11 @@ public class CFEItemWrapper implements ICFEHandler, ICapabilityProvider {
 
     @Override
     public int sendCFE(int cfe, ICFEHandler target, boolean simulate) {
+        return 0;
+    }
+
+    @Override
+    public int sendCFE(int cfe, BlockPos target, boolean simulate) {
         return 0;
     }
 

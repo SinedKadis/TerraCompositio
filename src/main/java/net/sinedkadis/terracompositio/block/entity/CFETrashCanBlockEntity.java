@@ -6,7 +6,7 @@ import net.sinedkadis.terracompositio.api.TerraCompositioAPI;
 import net.sinedkadis.terracompositio.api.networks.cfe.CFENetworkMemberBE;
 import net.sinedkadis.terracompositio.api.networks.cfe.CFENetworkMemberEntity;
 import net.sinedkadis.terracompositio.api.networks.cfe.ICFEHandler;
-import net.sinedkadis.terracompositio.api.networks.cfe.CFECapability;
+import net.sinedkadis.terracompositio.api.TCCapabilities;
 import net.sinedkadis.terracompositio.block.behaviours.CFEHandlerBehaviour;
 import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBEBehaviour;
 import net.sinedkadis.terracompositio.registries.TCBlockEntities;
@@ -45,7 +45,7 @@ public class CFETrashCanBlockEntity extends TCBlockEntity {
                             if (cfeNetworkMemberBE instanceof CFENetworkMemberBE cfeNetworkMemberBE1)
                                 return cfeNetworkMemberBE1.getMainHandler().getCFE() > 0;
                             if (cfeNetworkMemberBE instanceof CFENetworkMemberEntity cfeNetworkMemberEntity) {
-                                Optional<ICFEHandler> icfeHandler = cfeNetworkMemberEntity.getEntity().getCapability(CFECapability.CFE).resolve();
+                                Optional<ICFEHandler> icfeHandler = cfeNetworkMemberEntity.getEntity().getCapability(TCCapabilities.CFE).resolve();
                                 return icfeHandler.isPresent() && icfeHandler.get().getCFE() > 0;
                             }
                             return true;

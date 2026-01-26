@@ -10,7 +10,7 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.event.ForgeEventFactory;
 import net.sinedkadis.terracompositio.api.TerraCompositioAPI;
 import net.sinedkadis.terracompositio.api.networks.cfe.*;
-import net.sinedkadis.terracompositio.api.networks.cfe.CFECapability;
+import net.sinedkadis.terracompositio.api.TCCapabilities;
 import net.sinedkadis.terracompositio.entity.custom.FlowCedarEntEntity;
 import net.sinedkadis.terracompositio.registries.TCBlockStateProperties;
 import net.sinedkadis.terracompositio.registries.TCTags;
@@ -62,7 +62,7 @@ public class CFEExtractGoal extends Goal {
     }
 
     private boolean isCFEQueueEmpty() {
-        Optional<ICFEHandler> held = this.mob.getCapability(CFECapability.CFE).resolve();
+        Optional<ICFEHandler> held = this.mob.getCapability(TCCapabilities.CFE).resolve();
         Optional<ICFEHandler> inner = this.mob.getInnerCFEOptional().resolve();
         if (held.isPresent() && inner.isPresent()){
             ICFEHandler helded = held.get();
@@ -85,7 +85,7 @@ public class CFEExtractGoal extends Goal {
         }
         if (valid){
             boolean targetIsEnt = memberAt instanceof FlowCedarEntEntity;
-            targetIsAcceptableEnt = targetIsEnt && ((FlowCedarEntEntity) memberAt).getCapability(CFECapability.CFE)
+            targetIsAcceptableEnt = targetIsEnt && ((FlowCedarEntEntity) memberAt).getCapability(TCCapabilities.CFE)
                     .filter(icfeHandler -> icfeHandler.getCFE() > 1000).isPresent();
         }
         return valid;
@@ -100,7 +100,7 @@ public class CFEExtractGoal extends Goal {
             BlockPos blockPos = mob.blockPosition();
             BlockPos targetPos = BlockPos.containing(targetPosition);
             if (!targetPos.equals(blockPos)) {
-                Optional<ICFEHandler> cfeHandler = this.mob.getCapability(CFECapability.CFE).resolve();
+                Optional<ICFEHandler> cfeHandler = this.mob.getCapability(TCCapabilities.CFE).resolve();
                 if (cfeHandler.isPresent()) {
                     ICFEHandler icfeHandler = cfeHandler.get();
                     CFENetworkMember targetMember = TerraCompositioAPI.instance().getCFENetworkInstance().getMemberAt(level,targetPos);

@@ -9,7 +9,6 @@ import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.TagKey;
@@ -50,6 +49,7 @@ import net.sinedkadis.terracompositio.registries.TCBlocks;
 import net.sinedkadis.terracompositio.registries.TCItems;
 import net.sinedkadis.terracompositio.registries.TCTags;
 import net.sinedkadis.terracompositio.util.FunctionSide;
+import net.sinedkadis.terracompositio.util.TCUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -58,7 +58,6 @@ import java.util.function.Predicate;
 
 import static net.minecraft.world.level.block.Block.dropResources;
 import static net.minecraft.world.level.block.state.properties.BlockStateProperties.*;
-import static net.sinedkadis.terracompositio.block.entity.PathPointerBlockEntity.simulateUpdateRotation;
 import static net.sinedkadis.terracompositio.registries.TCBlockStateProperties.*;
 import static net.sinedkadis.terracompositio.util.TCUtil.getNearBlocks;
 import static net.sinedkadis.terracompositio.util.TCUtil.getTouchingBlocks;
@@ -154,7 +153,7 @@ public class WrenchAxeItem extends AxeItem {
             return false;
         }
         if (getWrenchMode(pPlayer.getItemInHand(InteractionHand.MAIN_HAND)) == WrenchMode.CROWBAR) {
-            this.crowbarInteraction(pPlayer, pState, pLevel, pPos, pPlayer.getItemInHand(InteractionHand.MAIN_HAND));
+            this.crowbarLMBInteraction(pPlayer, pState, pLevel, pPos, pPlayer.getItemInHand(InteractionHand.MAIN_HAND));
             return false;
         }
 
@@ -223,10 +222,10 @@ public class WrenchAxeItem extends AxeItem {
             }
             case WRENCH -> {
                 if (!level.isClientSide && (player == null || (level.mayInteract(player, pos)))) {
-                    if (!this.wrenchInteraction(player, blockState, level, pos, true, stack)) {
-                        return InteractionResult.FAIL;
+                    if (this.wrenchInteraction(player, blockState, level, pos, true, stack)) {
+                        return InteractionResult.SUCCESS;
                     }
-                    return InteractionResult.SUCCESS;
+                    return InteractionResult.FAIL;
                 }
                 return InteractionResult.PASS;
             }
@@ -243,7 +242,7 @@ public class WrenchAxeItem extends AxeItem {
             }
             case CROWBAR -> {
                 if (player != null && !level.isClientSide ) {
-                    if (!this.andironInteraction(player, level,pos,blockState,context.getClickedFace())) {
+                    if (!this.crowbarRMBInteraction(player, level,pos,blockState,context.getClickedFace())) {
                         return InteractionResult.FAIL;
                     }
                     return InteractionResult.SUCCESS;
@@ -256,7 +255,7 @@ public class WrenchAxeItem extends AxeItem {
         }
     }
 
-    private void crowbarInteraction(Player pPlayer, @NotNull BlockState pState, @NotNull Level pLevel, @NotNull BlockPos pPos, ItemStack itemInHand) {
+    private void crowbarLMBInteraction(Player pPlayer, @NotNull BlockState pState, @NotNull Level pLevel, @NotNull BlockPos pPos, ItemStack itemInHand) {
         ItemStack wasInHand = itemInHand.copy();
         pPlayer.setItemInHand(InteractionHand.MAIN_HAND,TCItems.WRENCH_TAG_HOLDER.get().getDefaultInstance());
         BlockHitResult blockHitResult = new BlockHitResult(pPlayer.getEyePosition(), Direction.orderedByNearest(pPlayer)[0], pPos, false);
@@ -298,7 +297,7 @@ public class WrenchAxeItem extends AxeItem {
         }
     }
 
-    private boolean andironInteraction(Player player, Level level, BlockPos pos, BlockState blockState, Direction clickedFace) {
+    private boolean crowbarRMBInteraction(Player player, Level level, BlockPos pos, BlockState blockState, Direction clickedFace) {
         BlockEntity blockEntity = level.getBlockEntity(pos);
         if (blockEntity != null) {
             Optional<IItemHandler> optional = blockEntity.getCapability(ForgeCapabilities.ITEM_HANDLER).resolve();
@@ -668,11 +667,11 @@ public class WrenchAxeItem extends AxeItem {
         Block block = pStateClicked.getBlock();
         if (rightClicked) {
             if (block instanceof PathPointerBlock)
-                return ppWrenchInteraction(pPlayer, level, pos, wrenchStack);
+                return PathPointerBlockEntity.ppWrenchInteraction(pPlayer, level, pos, wrenchStack);
             CompoundTag tag = wrenchStack.getOrCreateTag();
             if (tag.contains("BindPos")) {
-                sendBindMessage(pPlayer, "item.terracompositio.flow_rotating_axe.bind_fail_cleared");
-                clearBindTags(tag);
+                PathPointerBlockEntity.sendBindMessage(pPlayer, "item.terracompositio.flow_rotating_axe.bind_fail_cleared");
+                PathPointerBlockEntity.clearBindTags(tag);
                 return false;
             }
             if (pPlayer != null && !pPlayer.isCrouching()) {
@@ -694,7 +693,7 @@ public class WrenchAxeItem extends AxeItem {
         String name = Objects.requireNonNull(ForgeRegistries.BLOCKS.getKey(block)).toString();
         if (properties.isEmpty()) {
             if (pPlayer != null)
-                message(pPlayer, Component.translatable("item.terracompositio.flow_rotating_axe.no_change").withStyle(ChatFormatting.BOLD));
+                TCUtil.message(pPlayer, Component.translatable("item.terracompositio.flow_rotating_axe.no_change").withStyle(ChatFormatting.BOLD));
             return false;
         } else {
             CompoundTag debugProperty = wrenchStack.getOrCreateTagElement("DebugProperty");
@@ -707,7 +706,10 @@ public class WrenchAxeItem extends AxeItem {
                 BlockState newState;
                 if (pPlayer != null) {
                     newState = cycleState(pStateClicked, blockStateDefinitionProperty, pPlayer.isSecondaryUseActive());
-                    wrenchStack.hurtAndBreak(1,pPlayer,player1 -> player1.broadcastBreakEvent(InteractionHand.MAIN_HAND));
+                    wrenchStack.hurtAndBreak(1,pPlayer,player1 -> {
+                        assert player1 != null;
+                        player1.broadcastBreakEvent(InteractionHand.MAIN_HAND);
+                    });
                 } else {
                     newState = cycleState(pStateClicked, blockStateDefinitionProperty, false);
                     if (wrenchStack.hurt(1,level.getRandom(),null)){
@@ -717,7 +719,7 @@ public class WrenchAxeItem extends AxeItem {
                 }
                 level.getChunkSource().getLightEngine().checkBlock(pos);
                 ((Level) level).getChunkAt(pos).setBlockState(pos, newState, false);
-                message(pPlayer, Component.translatable(Items.DEBUG_STICK.getDescriptionId() + ".update", blockStateDefinitionProperty.getName(), getNameHelper(newState, blockStateDefinitionProperty)).withStyle(ChatFormatting.BOLD));
+                TCUtil.message(pPlayer, Component.translatable(Items.DEBUG_STICK.getDescriptionId() + ".update", blockStateDefinitionProperty.getName(), getNameHelper(newState, blockStateDefinitionProperty)).withStyle(ChatFormatting.BOLD));
             } else {
                 if (pPlayer != null) {
                     blockStateDefinitionProperty = getRelative(properties, blockStateDefinitionProperty, pPlayer.isSecondaryUseActive());
@@ -727,170 +729,10 @@ public class WrenchAxeItem extends AxeItem {
                 String $$14 = blockStateDefinitionProperty.getName();
                 debugProperty.putString(name, $$14);
                 if (pPlayer != null)
-                    message(pPlayer, Component.translatable(Items.DEBUG_STICK.getDescriptionId() + ".select", $$14, getNameHelper(pStateClicked, blockStateDefinitionProperty)).withStyle(ChatFormatting.BOLD));
+                    TCUtil.message(pPlayer, Component.translatable(Items.DEBUG_STICK.getDescriptionId() + ".select", $$14, getNameHelper(pStateClicked, blockStateDefinitionProperty)).withStyle(ChatFormatting.BOLD));
             }
             return true;
         }
-    }
-
-    private boolean ppWrenchInteraction(@Nullable Player pPlayer, LevelAccessor level, BlockPos pos, ItemStack wrenchStack) {
-        CompoundTag tag = wrenchStack.getOrCreateTag();
-
-        BlockEntity blockEntity = level.getBlockEntity(pos);
-        if (blockEntity == null) return false;
-
-        List<PathPointerBlockEntity.PPPart> partsList = ((PathPointerBlockEntity) blockEntity).parts;
-
-        if (!tag.contains("BindPos")) {
-            boolean isSender = partsList.contains(PathPointerBlockEntity.PPPart.SENDER);
-            boolean isReceiver = partsList.contains(PathPointerBlockEntity.PPPart.RECEIVER);
-
-            tag.putLong("BindPos", pos.asLong());
-
-            if (!(isSender && isReceiver)) {
-                tag.putBoolean("BindMode", !isSender && isReceiver);
-            }
-
-            if (pPlayer != null) {
-                message(pPlayer, Component.translatable("item.terracompositio.flow_rotating_axe.bind_begin").withStyle(ChatFormatting.BOLD));
-            }
-            return true;
-        }
-
-        BlockPos bindPos = BlockPos.of(tag.getLong("BindPos"));
-        boolean hasBindMode = tag.contains("BindMode");
-        boolean bindMode = hasBindMode && tag.getBoolean("BindMode");
-
-        boolean isSender = partsList.contains(PathPointerBlockEntity.PPPart.SENDER);
-        boolean isReceiver = partsList.contains(PathPointerBlockEntity.PPPart.RECEIVER);
-
-        boolean allowBind = !hasBindMode ||
-                (bindMode ? isSender : isReceiver);
-
-        if (!allowBind) {
-            sendBindMessage(pPlayer, "item.terracompositio.flow_rotating_axe.bind_fail_incompatible");
-            clearBindTags(tag);
-            return false;
-        }
-
-        BlockPos inputPos;
-        BlockPos outputPos;
-
-        if (hasBindMode) {
-            inputPos = bindMode ? pos : bindPos;
-            outputPos = bindMode ? bindPos : pos;
-        } else {
-            if (isReceiver && isSender){
-                inputPos = bindPos;
-                outputPos = pos;
-            } else if (isReceiver) {
-                inputPos = bindPos;
-                outputPos = pos;
-            } else if (isSender) {
-                inputPos = pos;
-                outputPos = bindPos;
-            } else {
-                sendBindMessage(pPlayer, "item.terracompositio.flow_rotating_axe.bind_fail_incompatible");
-                clearBindTags(tag);
-                return false;
-            }
-        }
-
-        if (outputPos.equals(inputPos)) {
-            sendBindMessage(pPlayer, "item.terracompositio.flow_rotating_axe.bind_cleared");
-            clearBindTags(tag);
-            PathPointerBlockEntity be = ((PathPointerBlockEntity) level.getBlockEntity(inputPos));
-            if (be != null) {
-                be.rotationPitch = 90;
-                be.rotationYaw = 0;
-                be.rotationRoll = 0;
-                be.setChanged();
-                if (!level.isClientSide()) {
-                    be.nextNode = BlockPos.ZERO;
-                    be.lastNode = BlockPos.ZERO;
-                    ((ServerLevel) level).sendBlockUpdated(be.getBlockPos(), be.getBlockState(), be.getBlockState(), Block.UPDATE_CLIENTS);
-                    be.nextNode = null;
-                    be.lastNode = null;
-                    ((ServerLevel) level).sendBlockUpdated(be.getBlockPos(), be.getBlockState(), be.getBlockState(), 1);
-                }
-            }
-            return false;
-        }
-
-        if (!inputPos.closerThan(outputPos, 7)) {
-            sendBindMessage(pPlayer, "item.terracompositio.flow_rotating_axe.bind_fail_too_far");
-            clearBindTags(tag);
-            return false;
-        }
-
-        PathPointerBlockEntity blockEntity1 = (PathPointerBlockEntity) level.getBlockEntity(inputPos);
-        if (blockEntity1 != null) {
-            List<PathPointerBlockEntity.PPPart> inputParts = blockEntity1.parts;
-            if (inputParts.contains(PathPointerBlockEntity.PPPart.COLLECTOR)) {
-                PathPointerBlockEntity be = ((PathPointerBlockEntity) level.getBlockEntity(inputPos));
-                if (be != null) {
-                    be.updateMax();
-                }
-            }
-        }
-        return applyBind(level, inputPos, outputPos, wrenchStack, pPlayer);
-    }
-
-    private void sendBindMessage(@Nullable Player player, String messageKey) {
-        if (player != null) {
-            message(player, Component.translatable(messageKey).withStyle(ChatFormatting.BOLD));
-        }
-    }
-
-    private void clearBindTags(CompoundTag tag) {
-        tag.remove("BindPos");
-        tag.remove("BindMode");
-    }
-
-    private boolean applyBind(LevelAccessor level, BlockPos inputPos, BlockPos outputPos, ItemStack wrenchStack, Player player) {
-        PathPointerBlockEntity inputBE = ((PathPointerBlockEntity) level.getBlockEntity(inputPos));
-        PathPointerBlockEntity outputBE = ((PathPointerBlockEntity) level.getBlockEntity(outputPos));
-
-        CompoundTag tag = wrenchStack.getTag();
-
-        if (inputBE != null && outputBE != null && tag != null) {
-
-            boolean flag1 = simulateUpdateRotation(inputBE.lastNode,inputPos,outputPos,inputBE.toSendEntity != null);
-            boolean flag2 = simulateUpdateRotation(inputPos,outputPos,outputBE.nextNode,outputBE.toReceiveEntity != null);
-
-            if (!(flag1 && flag2)) {
-                if (player != null) {
-                    message(player, Component.translatable("item.terracompositio.flow_rotating_axe.bind_fail_angle").withStyle(ChatFormatting.BOLD));
-                }
-                tag.remove("BindPos");
-                tag.remove("BindMode");
-                return false;
-            }
-            inputBE.nextNode = outputPos;
-            outputBE.lastNode = inputPos;
-
-//            if (inputBE.bindedEntity instanceof LivingEntity livingEntity) {
-//                ItemStack stack = livingEntity.getItemBySlot(EquipmentSlot.HEAD);
-//                TechnetiumArmorItem.removeBendSender(stack,inputPos);
-//            }
-            inputBE.toSendEntity = null;
-            outputBE.toReceiveEntity = null;
-
-            inputBE.updateRotation(false);
-            outputBE.updateRotation(false);
-
-            inputBE.updateContainer();
-            outputBE.updateContainer();
-
-            tag.remove("BindPos");
-            tag.remove("BindMode");
-
-            if (player != null) {
-                message(player, Component.translatable("item.terracompositio.flow_rotating_axe.bind_success").withStyle(ChatFormatting.BOLD));
-                wrenchStack.hurtAndBreak(1, player, player1 -> player1.broadcastBreakEvent(InteractionHand.MAIN_HAND));
-            }
-        }
-        return true;
     }
 
     private static <T extends Comparable<T>> BlockState cycleState(BlockState pState, Property<T> pProperty, boolean pBackwards) {
@@ -900,10 +742,6 @@ public class WrenchAxeItem extends AxeItem {
         return pBackwards ? Util.findPreviousInIterable(pAllowedValues, pCurrentValue) : Util.findNextInIterable(pAllowedValues, pCurrentValue);
     }
 
-    private static void message(Player pPlayer, Component pMessageComponent) {
-        if (pPlayer instanceof ServerPlayer player)
-            player.sendSystemMessage(pMessageComponent, true);
-    }
     private static <T extends Comparable<T>> String getNameHelper(BlockState pState, Property<T> pProperty) {
         return pProperty.getName(pState.getValue(pProperty));
     }

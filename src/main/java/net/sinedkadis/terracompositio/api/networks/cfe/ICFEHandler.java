@@ -1,5 +1,6 @@
 package net.sinedkadis.terracompositio.api.networks.cfe;
 
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.BlockSource;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.phys.Vec3;
@@ -16,6 +17,7 @@ public interface ICFEHandler extends BlockSource {
     int takeCFE(int cfe, boolean simulate);
     int addCFE(int cfe,boolean simulate);
     int sendCFE(int cfe, ICFEHandler target, boolean simulate);
+    int sendCFE(int cfe, BlockPos target, boolean simulate);
     void setCFE(int cfe);
     int getMaxCFE();
 

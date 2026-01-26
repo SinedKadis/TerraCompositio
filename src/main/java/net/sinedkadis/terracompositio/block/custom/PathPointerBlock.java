@@ -89,7 +89,7 @@ public class PathPointerBlock extends TCBaseEntityBlock {
             case WEST -> {}
             case EAST -> pp.rotationYaw = 180F;
         }
-        pp.updateContainer();
+
 
     }
 
@@ -99,23 +99,26 @@ public class PathPointerBlock extends TCBaseEntityBlock {
         PathPointerBlockEntity pp = (PathPointerBlockEntity) pLevel.getBlockEntity(pPos);
         PathPointerBlockEntity.PPPart newPart = getPart(hand);
         if (!pPlayer.isCrouching()
-                && pp != null
-                && pp.parts.get(1).equals(PathPointerBlockEntity.PPPart.NONE)
-                && pp.parts.get(0).isInput() != newPart.isInput()) {
-            pp.parts.set(1, newPart);
-            if (!pPlayer.isCreative()) {
-                hand.shrink(1);
-            }
-            pp.updateContainer();
-            pLevel.playSound(null,pPos, SoundEvents.WOOD_PLACE, SoundSource.BLOCKS);
-            return InteractionResult.SUCCESS;
+                && pp != null) {
+            int replacePart = pp.parts.indexOf(PathPointerBlockEntity.PPPart.NONE);
+            if (replacePart >= 0) {
+                PathPointerBlockEntity.PPPart oPart = pp.parts.get(replacePart == 0 ? 1 : 0);
+                if (oPart.isInput() != newPart.isInput()) {
+                    pp.parts.set(replacePart, newPart);
+                    if (!pPlayer.isCreative()) {
+                        hand.shrink(1);
+                    }
+                    pLevel.playSound(null, pPos, SoundEvents.WOOD_PLACE, SoundSource.BLOCKS);
+                    return InteractionResult.SUCCESS;
 
+                }
+            }
         }
 
         return super.use(pState, pLevel, pPos, pPlayer, pHand, pHit);
     }
 
-    private static @NonNull PathPointerBlockEntity.PPPart getPart(ItemStack hand) {
+    private static PathPointerBlockEntity.PPPart getPart(ItemStack hand) {
         if (hand.getItem() instanceof BlockItem item && item.getBlock() instanceof PathPointerBlock block){
             return block.getBasePart();
         }
@@ -145,6 +148,8 @@ public class PathPointerBlock extends TCBaseEntityBlock {
                 case SENDER -> TCBlocks.PP_SENDER.get();
                 case EMITTER -> TCBlocks.PP_EMITTER.get();
                 case RECEIVER -> TCBlocks.PP_RECEIVER.get();
+                case EXTRACTOR -> TCBlocks.PP_EXTRACTOR.get();
+                case INFUSER -> TCBlocks.PP_INFUSER.get();
                 default -> Blocks.AIR;
             });
             drops.add(toDrop);

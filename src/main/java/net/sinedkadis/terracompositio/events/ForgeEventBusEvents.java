@@ -16,7 +16,7 @@ import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.sinedkadis.terracompositio.TerraCompositio;
-import net.sinedkadis.terracompositio.api.networks.cfe.CFECapability;
+import net.sinedkadis.terracompositio.api.TCCapabilities;
 import net.sinedkadis.terracompositio.cfe.PlayerCFEProvider;
 import net.sinedkadis.terracompositio.entity.custom.FlowCedarEntEntity;
 import net.sinedkadis.terracompositio.registries.TCEffects;
@@ -73,7 +73,7 @@ public class ForgeEventBusEvents {
     @SubscribeEvent
     public static void onAttachCapabilities(AttachCapabilitiesEvent<Entity> event) {
         if (event.getObject() instanceof Player player) {
-            if (!player.getCapability(CFECapability.CFE).isPresent()) {
+            if (!player.getCapability(TCCapabilities.CFE).isPresent()) {
                 event.addCapability(TerraCompositio.modLoc("cfe_stored"), new PlayerCFEProvider(player));
             }
         }
@@ -83,8 +83,8 @@ public class ForgeEventBusEvents {
     public static void onPlayerCloned(PlayerEvent.Clone event) {
         if(event.isWasDeath()) {
             event.getOriginal().reviveCaps();
-            event.getOriginal().getCapability(CFECapability.CFE).ifPresent(oldStore ->
-                    event.getEntity().getCapability(CFECapability.CFE).ifPresent(newStore -> {
+            event.getOriginal().getCapability(TCCapabilities.CFE).ifPresent(oldStore ->
+                    event.getEntity().getCapability(TCCapabilities.CFE).ifPresent(newStore -> {
                 CompoundTag tag = new CompoundTag();
                 oldStore.writeToNBT(tag);
                 newStore.readFromNBT(tag);

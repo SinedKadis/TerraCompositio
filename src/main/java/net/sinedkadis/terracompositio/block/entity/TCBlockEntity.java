@@ -1,7 +1,5 @@
 package net.sinedkadis.terracompositio.block.entity;
 
-import javax.annotation.ParametersAreNonnullByDefault;
-
 import lombok.Getter;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
@@ -18,33 +16,53 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
 import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBEBehaviour;
+import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBEBehaviourHolder;
 import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBECFEBehaviour;
 import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBEItemBehaviour;
 import org.jetbrains.annotations.Nullable;
 
+import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
+@Getter
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public abstract class TCBlockEntity extends BlockEntity{
-    @Getter
-    List<IBEBehaviour> behaviours = new ArrayList<>();
+public abstract class TCBlockEntity extends BlockEntity implements IBEBehaviourHolder {
+    protected List<IBEBehaviour> behaviours = new ArrayList<>();
+
     public TCBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
         addBEBehaviours(behaviours);
         behaviours.forEach(IBEBehaviour::init);
     }
 
-    public abstract void addBEBehaviours(List<IBEBehaviour> behaviourList);
+    public static List<IBEBehaviour> getBehaviours(BlockEntity blockEntity) {
+        if (blockEntity instanceof TCBlockEntity tcBlockEntity) {
+            return tcBlockEntity.getBehaviours();
+        }
+        return List.of();
+    }
+
+    public static List<IBEBehaviour> getBehaviours(BlockEntity caller, BlockPos blockPos) {
+        Level level = caller.getLevel();
+        if (level instanceof ServerLevel) {
+            BlockEntity blockEntity = level.getBlockEntity(blockPos);
+            if (blockEntity instanceof TCBlockEntity tcBlockEntity) {
+                return tcBlockEntity.getBehaviours();
+            }
+        }
+        return List.of();
+    }
 
     public Optional<IBECFEBehaviour> getCfeBehaviour() {
         return behaviours.stream().map(iBehaviour -> iBehaviour instanceof IBECFEBehaviour IBECFEBehaviour ? IBECFEBehaviour : null)
                 .filter(Objects::nonNull)
                 .findAny();
     }
+
     public Optional<IBEItemBehaviour> getItemBehaviour() {
         return behaviours.stream().map(iBehaviour -> iBehaviour instanceof IBEItemBehaviour iitemBehaviour ? iitemBehaviour : null)
                 .filter(Objects::nonNull)
@@ -106,4 +124,5 @@ public abstract class TCBlockEntity extends BlockEntity{
     public CompoundTag getUpdateTag() {
         return saveWithoutMetadata();
     }
+
 }

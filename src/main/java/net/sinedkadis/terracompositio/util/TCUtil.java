@@ -9,7 +9,9 @@ import net.minecraft.core.Vec3i;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -60,7 +62,16 @@ public class TCUtil {
             source.getMainHandler().takeCFE(added, false);
         }
 
+    }
+    public static int tryCFETransfer(BlockPos targetPos, CFENetworkMember source, int maxTransfer){
+        int taken = source.getMainHandler().takeCFE(maxTransfer,true);
+        int added = source.getMainHandler().sendCFE(taken, targetPos, true);
 
+        if (added <= taken){
+            added = source.getMainHandler().sendCFE(added, targetPos, false);
+            source.getMainHandler().takeCFE(added, false);
+        }
+        return added;
     }
     public static void tryCFETransfer(ICFEHandler target, ICFEHandler source, int maxTransfer){
         int taken = source.takeCFE(maxTransfer,true);
@@ -558,5 +569,10 @@ public class TCUtil {
         if (!pPlayer.addItem(toAdd)) {
             pPlayer.drop(toAdd, false);
         }
+    }
+
+    public static void message(Player pPlayer, Component pMessageComponent) {
+        if (pPlayer instanceof ServerPlayer player)
+            player.sendSystemMessage(pMessageComponent, true);
     }
 }

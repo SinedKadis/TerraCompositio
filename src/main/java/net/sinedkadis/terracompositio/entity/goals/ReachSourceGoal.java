@@ -8,7 +8,7 @@ import net.minecraft.world.phys.Vec3;
 import net.sinedkadis.terracompositio.api.TerraCompositioAPI;
 import net.sinedkadis.terracompositio.api.networks.cfe.CFENetworkMember;
 import net.sinedkadis.terracompositio.api.networks.cfe.ICFEHandler;
-import net.sinedkadis.terracompositio.api.networks.cfe.CFECapability;
+import net.sinedkadis.terracompositio.api.TCCapabilities;
 import net.sinedkadis.terracompositio.entity.custom.FlowCedarEntEntity;
 import net.sinedkadis.terracompositio.registries.TCTags;
 import net.sinedkadis.terracompositio.util.TCUtil;
@@ -43,7 +43,7 @@ public class ReachSourceGoal extends Goal {
             CFENetworkMember randomSourceInRange = TerraCompositioAPI.instance().getCFENetworkInstance().getRandomSourceInRange(mob.blockPosition(), mob.level(), searchLimit);
             if (randomSourceInRange != null){
                 boolean targetIsEnt = randomSourceInRange instanceof FlowCedarEntEntity;
-                boolean targetIsAcceptableEnt = targetIsEnt && ((FlowCedarEntEntity) randomSourceInRange).getCapability(CFECapability.CFE)
+                boolean targetIsAcceptableEnt = targetIsEnt && ((FlowCedarEntEntity) randomSourceInRange).getCapability(TCCapabilities.CFE)
                         .filter(icfeHandler -> icfeHandler.getCFE() > 1000).isPresent();
                 if (!targetIsEnt || targetIsAcceptableEnt) {
                     BlockPos blockPos = randomSourceInRange.getPos();

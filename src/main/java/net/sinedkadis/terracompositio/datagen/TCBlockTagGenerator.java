@@ -37,6 +37,8 @@ public class TCBlockTagGenerator extends BlockTagsProvider {
                         TCBlocks.PP_EMITTER.get(),
                         TCBlocks.PP_COLLECTOR.get(),
                         TCBlocks.PP_RECEIVER.get(),
+                        TCBlocks.PP_EXTRACTOR.get(),
+                        TCBlocks.PP_INFUSER.get(),
                         TCBlocks.TECHNETIUM_BLOCK.get());
         this.tag(BlockTags.MINEABLE_WITH_AXE)
                 .add(TCBlocks.FLOW_CEDAR_LOG.get(),
@@ -54,6 +56,8 @@ public class TCBlockTagGenerator extends BlockTagsProvider {
                         TCBlocks.PP_EMITTER.get(),
                         TCBlocks.PP_COLLECTOR.get(),
                         TCBlocks.PP_RECEIVER.get(),
+                        TCBlocks.PP_EXTRACTOR.get(),
+                        TCBlocks.PP_INFUSER.get(),
                         TCBlocks.FLOW_CEDAR_ENT_STATUE.get());
 
 
@@ -67,7 +71,9 @@ public class TCBlockTagGenerator extends BlockTagsProvider {
                 .add(TCBlocks.PP_SENDER.get(),
                         TCBlocks.PP_EMITTER.get(),
                         TCBlocks.PP_COLLECTOR.get(),
-                        TCBlocks.PP_RECEIVER.get());
+                        TCBlocks.PP_RECEIVER.get(),
+                        TCBlocks.PP_EXTRACTOR.get(),
+                        TCBlocks.PP_INFUSER.get());
         this.tag(BlockTags.LOGS_THAT_BURN)
                 .add(TCBlocks.FLOW_CEDAR_LOG.get(),
                         TCBlocks.FLOW_CEDAR_WOOD.get(),

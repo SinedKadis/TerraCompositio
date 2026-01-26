@@ -17,7 +17,7 @@ import net.minecraftforge.common.util.LazyOptional;
 import net.sinedkadis.terracompositio.api.TerraCompositioAPI;
 import net.sinedkadis.terracompositio.api.dummies.DummyCFEHandler;
 import net.sinedkadis.terracompositio.api.networks.NetworkAction;
-import net.sinedkadis.terracompositio.api.networks.cfe.CFECapability;
+import net.sinedkadis.terracompositio.api.TCCapabilities;
 import net.sinedkadis.terracompositio.api.networks.cfe.CFENetwork;
 import net.sinedkadis.terracompositio.api.networks.cfe.CFENetworkMemberEntity;
 import net.sinedkadis.terracompositio.api.networks.cfe.ICFEHandler;
@@ -96,7 +96,7 @@ public class CFECloudEntity extends Entity implements CFENetworkMemberEntity {
 
     @Override
     public <T> LazyOptional<T> getCapability(Capability<T> capability, @Nullable Direction facing) {
-        if (capability == CFECapability.CFE)
+        if (capability == TCCapabilities.CFE)
             return lazyCFEOptional.cast();
         return super.getCapability(capability, facing);
     }

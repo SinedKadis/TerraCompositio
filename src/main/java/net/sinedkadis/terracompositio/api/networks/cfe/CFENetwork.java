@@ -2,6 +2,7 @@ package net.sinedkadis.terracompositio.api.networks.cfe;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
+import net.sinedkadis.terracompositio.api.TCCapabilities;
 import net.sinedkadis.terracompositio.api.networks.NetworkAction;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -24,9 +25,9 @@ public interface CFENetwork {
     boolean isIn(Level pLevel, CFENetworkMember cfeHandler);
     static Optional<ICFEHandler> getCFEHandler(CFENetworkMember source){
         if (source instanceof CFENetworkMemberBE cfeNetworkMemberBE)
-            return cfeNetworkMemberBE.getEntity().getCapability(CFECapability.CFE).resolve();
+            return cfeNetworkMemberBE.getEntity().getCapability(TCCapabilities.CFE).resolve();
         if (source instanceof CFENetworkMemberEntity cfeNetworkMemberEntity)
-            return cfeNetworkMemberEntity.getEntity().getCapability(CFECapability.CFE).resolve();
+            return cfeNetworkMemberEntity.getEntity().getCapability(TCCapabilities.CFE).resolve();
         return Optional.empty();
     }
 

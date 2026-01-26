@@ -2,57 +2,47 @@ package net.sinedkadis.terracompositio.block.entity;
 
 import lombok.Getter;
 import lombok.extern.slf4j.Slf4j;
+import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
-import net.minecraft.core.NonNullList;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.util.StringRepresentable;
+import net.minecraft.world.InteractionHand;
 import net.minecraft.world.Nameable;
-import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EquipmentSlot;
-import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
-import net.sinedkadis.terracompositio.api.TerraCompositioAPI;
-import net.sinedkadis.terracompositio.api.dummies.DummyCFEHandler;
-import net.sinedkadis.terracompositio.api.networks.cfe.*;
-import net.sinedkadis.terracompositio.block.behaviours.CFEHandlerBehaviour;
 import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBEBehaviour;
+import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBECFEBehaviour;
+import net.sinedkadis.terracompositio.api.behaviors.blockentity.IPPBEBehaviour;
+import net.sinedkadis.terracompositio.api.networks.cfe.*;
+import net.sinedkadis.terracompositio.block.behaviours.pp_behaviours.*;
 import net.sinedkadis.terracompositio.block.custom.PathPointerBlock;
-import net.sinedkadis.terracompositio.cfe.CFEContainer;
-import net.sinedkadis.terracompositio.cfe.LimitlessCFEContainer;
 import net.sinedkadis.terracompositio.registries.TCBlockEntities;
-import net.sinedkadis.terracompositio.registries.TCItems;
 import net.sinedkadis.terracompositio.util.TCUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
-import java.util.stream.Collectors;
+import java.util.concurrent.atomic.AtomicReference;
 
 @Slf4j
 public class PathPointerBlockEntity extends TCBlockEntity implements Nameable {
 
-    // rotationYaw: вокруг Y (в горизонтальной плоскости — блок "смотрит")
-    // rotationPitch: вокруг X (наклон вверх/вниз)
-    // rotationRoll: вокруг Z (вокруг взгляда, для кручения)
+    private static final String bindPosTag = "BindPos";
+    private static final String bindModeTag = "BindMode";
+
     public float rotationYaw, rotationPitch, rotationRoll;
-    public @Nullable BlockPos nextNode;
-    public @Nullable BlockPos lastNode;
-    public @Nullable BlockPos collectorPos;
-    public @Nullable LivingEntity toSendEntity;
-    public @Nullable LivingEntity toReceiveEntity;
-    private List<LivingEntity> lastToSendScan = List.of();
-    public List<PPPart> parts = NonNullList.withSize(2,PPPart.NONE);
+
+    public List<PPPart> parts = new PPPartList();
 
     public PathPointerBlockEntity(BlockPos pos, BlockState state) {
         super(TCBlockEntities.PATH_POINTER_BE.get(), pos, state);
@@ -62,452 +52,278 @@ public class PathPointerBlockEntity extends TCBlockEntity implements Nameable {
         }
     }
 
-
-
-    int timer = 100;
-
     @Override
     public void addBEBehaviours(@NotNull List<IBEBehaviour> list) {
-        list.add(new CFEHandlerBehaviour(this){
-            @Override
-            public void init() {
-                this.setCfeHandler(new CFEContainer(this).setCfeTravelSpeed((float) 5 /20));
-            }
-
-            @Override
-            public int getPriority() {
-                if (level == null) return 100;
-                if (parts.contains(PPPart.EMITTER)) {
-                    return -100;
-                }
-                return 100;
-            }
-            @Override
-            public void onCFENetworkMemberUpdate() {
-                if (level == null) return;
-
-                verifyNodes();
-
-                computeSender();
-                computeReceiver();
-                computeEmitter();
-
-                computeMax();
-
-                computeCollector();
-
-                transferCFE();
-                timer = 100;
-            }
-        });
-    }
-
-    @Override
-    public void tick(@NotNull Level pLevel, @NotNull BlockPos pPos, @NotNull BlockState pState) {
-        super.tick(pLevel,pPos,pState);
-        timer--;
-        if (timer <= 0) {
-            scheduleMemberUpdate();
-        }
-        if (toSendEntity != null && !(toSendEntity.blockPosition().equals(nextNode)) && toSendEntity.blockPosition() != this.getBlockPos()) {
-            scheduleMemberUpdate();
-        }
-        if (toReceiveEntity != null && !(toReceiveEntity.blockPosition().equals(lastNode)) && toReceiveEntity.blockPosition() != this.getBlockPos()) {
-            scheduleMemberUpdate();
-        }
-        if (toSendEntity == null || toReceiveEntity == null) {
-            lastToSendScan = scanCompatibleEntities(pLevel);
-            if (!lastToSendScan.isEmpty()) {
-                scheduleMemberUpdate();
-            }
-        }
+        //recursive behavior adding and init
     }
 
 
+    public static boolean ppWrenchInteraction(@Nullable Player pPlayer, LevelAccessor level, BlockPos pos, ItemStack wrenchStack) {
 
-    private void computeMax() {
-        if (level == null) return;
-        PathPointerBlockEntity blockEntity = null;
-        if (toReceiveEntity == null){
-            if (collectorPos == null) {
-                collectorPos = getCollector();
-            }
-            if (collectorPos != null) {
-                blockEntity = ((PathPointerBlockEntity) level.getBlockEntity(collectorPos));
-            }
-            if (blockEntity != null) {
-                blockEntity.updateMax();
-            }
+        BlockEntity blockEntity = level.getBlockEntity(pos);
+        if (!(blockEntity instanceof PathPointerBlockEntity pathPointerBlockEntity))
+            return false;
+
+        if (pPlayer != null && pPlayer.isShiftKeyDown()) {
+            pathPointerBlockEntity.rotationRoll += 25.5F;
+            return true;
+        }
+
+        CompoundTag tag = wrenchStack.getOrCreateTag();
+        List<PPPart> partsList = pathPointerBlockEntity.parts;
+        
+        boolean isSender = partsList.contains(PPPart.SENDER);
+        boolean isReceiver = partsList.contains(PPPart.RECEIVER);
+        
+        if (firstPPClicked(pPlayer, pos, tag, isSender,isReceiver))
+            return true;
+
+        BlockPos.MutableBlockPos inputPos = new BlockPos.MutableBlockPos();
+        BlockPos.MutableBlockPos outputPos = new BlockPos.MutableBlockPos();
+
+        if (!determineInputOutput(tag,pPlayer,pos,inputPos,outputPos,isSender,isReceiver))
+            return false;
+
+        if (tryClearBinding(pPlayer, level, outputPos, inputPos, tag))
+            return true;
+
+        boolean distanceTest = inputPos.closerThan(outputPos, 7);
+        if (failTest(distanceTest, pPlayer, "item.terracompositio.flow_rotating_axe.bind_fail_too_far", tag))
+            return false;
+
+        return tryApplyBind(level, inputPos, outputPos, wrenchStack, pPlayer);
+    }
+
+    private static boolean failTest(boolean inputPos, @Nullable Player pPlayer, String messageKey, CompoundTag tag) {
+        if (!inputPos) {
+            sendBindMessage(pPlayer, messageKey);
+            clearBindTags(tag);
+            return true;
+        }
+        return false;
+    }
+
+    private static boolean determineInputOutput(CompoundTag tag,
+                                                Player pPlayer,
+                                                BlockPos clickedPos,
+                                                BlockPos.MutableBlockPos inputPos,
+                                                BlockPos.MutableBlockPos outputPos,
+                                                boolean isSender,
+                                                boolean isReceiver) {
+        BlockPos bindPos = BlockPos.of(tag.getLong(PathPointerBlockEntity.bindPosTag));
+        boolean hasBindMode = tag.contains(bindModeTag);
+        boolean bindMode = hasBindMode && tag.getBoolean(bindModeTag);
+
+
+
+        boolean allowBindTest = !hasBindMode ||
+                (bindMode ? isSender : isReceiver);
+
+        if (failTest(allowBindTest, pPlayer, "item.terracompositio.flow_rotating_axe.bind_fail_incompatible", tag))
+            return false;
+
+        if (hasBindMode) {
+            inputPos.set(bindMode ? clickedPos : bindPos);
+            outputPos.set(bindMode ? bindPos : clickedPos);
         } else {
-            this.updateMax();
-        }
-    }
-
-    private void computeEmitter() {
-        if (parts.contains(PPPart.EMITTER)) {
-            cfeBehaviour().setLimit(5);
-        }
-    }
-
-
-
-    private void computeCollector() {
-        if (level == null) return;
-        if (parts.contains(PPPart.COLLECTOR)) {
-            cfeBehaviour().setLimit(5);
-            int toAdd = this.cfeContainer().getMaxCFE() - this.getInSystem();
-            if (toAdd > 0) {
-                if (!level.isClientSide()){
-
-                    CFENetwork cfeNetwork = TerraCompositioAPI.instance().getCFENetworkInstance();
-                    CFENetworkMember source = cfeNetwork.getClosestSourceWithCFE(worldPosition,
-                            level,
-                            cfeBehaviour().getLimit() * 2,
-                            cfeBehaviour().getPriority());
-                    if (source != null) {
-                        TCUtil.tryCFETransfer(cfeBehaviour(), source, toAdd);
-
-                    }
-                }
-            }
-        }
-    }
-
-    private void computeReceiver() {
-        if (parts.contains(PPPart.RECEIVER)) {
-            if (toReceiveEntity == null && lastNode == null) {
-                searchAndBindToEntity(level,false);
-            }
-            if (toReceiveEntity != null && lastNode != null ) {
-                BlockPos currentEntityPos = toReceiveEntity.blockPosition();
-                if (!(lastNode.equals(currentEntityPos))) {
-                    if (toReceiveEntity.getItemBySlot(EquipmentSlot.HEAD).is(TCItems.TECHNETIUM_CROWN.get())
-                            && simulateUpdateRotation(nextNode,getBlockPos(), currentEntityPos,false)) {
-                        lastNode = currentEntityPos;
-                    } else {
-                        lastNode = null;
-                        toReceiveEntity = null;
-                    }
-                    updateRotation(false);
-                }
-                if (toReceiveEntity instanceof CFENetworkMemberEntity member) {
-                    ICFEHandler handler = toReceiveEntity.getCapability(CFECapability.CFE)
-                            .filter(icfeHandler -> icfeHandler.getCFE() > 0).orElse(DummyCFEHandler.instance);
-                    if (!(handler instanceof DummyCFEHandler)) {
-                        TCUtil.tryCFETransfer(cfeBehaviour(),member,100);
-                    }
-                }
-            }
-        }
-    }
-
-    private void computeSender() {
-        if (parts.contains(PPPart.SENDER)) {
-            if (toSendEntity == null && nextNode == null) {
-                searchAndBindToEntity(level,true);
-            }
-            if (nextNode != null && toSendEntity != null ) {
-                BlockPos currentEntityPos = toSendEntity.blockPosition();
-                if (!(nextNode.equals(currentEntityPos))) {
-                    if (toSendEntity.getItemBySlot(EquipmentSlot.HEAD).is(TCItems.TECHNETIUM_CROWN.get())
-                            && simulateUpdateRotation(lastNode,getBlockPos(), currentEntityPos,false)) {
-                        nextNode = currentEntityPos;
-                    } else {
-                        nextNode = null;
-                        toSendEntity = null;
-                    }
-                    updateRotation(false);
-                }
-                if (toSendEntity instanceof CFENetworkMemberEntity member) {
-                    ICFEHandler handler = toSendEntity.getCapability(CFECapability.CFE)
-                            .filter(icfeHandler -> icfeHandler.getFreeSpace() > 0).orElse(DummyCFEHandler.instance);
-                    if (!(handler instanceof DummyCFEHandler)) {
-                        TCUtil.tryCFETransfer(member,cfeBehaviour(),100);
-                    }
-                }
-            }
-        }
-    }
-
-    private void verifyNodes() {
-        if (level == null) return;
-        if (nextNode != null) {
-            boolean nextNodeIsPP = level.getBlockState(nextNode).getBlock() instanceof PathPointerBlock;
-            if (toSendEntity != null && (toSendEntity.isRemoved() || !toSendEntity.blockPosition().closerThan(worldPosition,cfeBehaviour().getLimit())))
-                toSendEntity = null;
-            if (!nextNodeIsPP && toSendEntity == null) {
-                nextNode = null;
-            }
-        }
-        if (lastNode != null) {
-            boolean lastNodeIsPP = level.getBlockState(lastNode).getBlock() instanceof PathPointerBlock;
-            if (toReceiveEntity != null && (toReceiveEntity.isRemoved() || !toReceiveEntity.blockPosition().closerThan(worldPosition,cfeBehaviour().getLimit())))
-                toReceiveEntity = null;
-            if (!lastNodeIsPP && toReceiveEntity == null) {
-                lastNode = null;
-            }
-        }
-    }
-
-    private void searchAndBindToEntity(Level level,boolean isToSend) {
-        List<LivingEntity> canBindTo = scanCompatibleEntities(level, isToSend);
-        if (!canBindTo.isEmpty()) {
-            Collections.shuffle(canBindTo);
-            LivingEntity chosen = canBindTo.get(0);
-            if (isToSend) {
-                toSendEntity = chosen;
-                nextNode = chosen.blockPosition();
+            if (isReceiver && isSender){
+                inputPos.set(bindPos);
+                outputPos.set(clickedPos);
+            } else if (isReceiver) {
+                inputPos.set(bindPos);
+                outputPos.set(clickedPos);
+            } else if (isSender) {
+                inputPos.set(clickedPos);
+                outputPos.set(bindPos);
             } else {
-                toReceiveEntity = chosen;
-                lastNode = chosen.blockPosition();
-            }
-            updateRotation(false);
-            this.updateContainer();
-        }
-    }
-
-
-    private @NotNull List<LivingEntity> scanCompatibleEntities(Level level) {
-        return scanCompatibleEntities(level, true, true);
-    }
-
-    private @NotNull List<LivingEntity> scanCompatibleEntities(Level level, boolean isToSend) {
-        return scanCompatibleEntities(level, isToSend, false);
-    }
-
-    private @NotNull List<LivingEntity> scanCompatibleEntities(Level level, boolean isToSend, boolean recalk) {
-        if (isToSend && !lastToSendScan.isEmpty() && !recalk) return lastToSendScan;
-
-        List<Entity> entities = level.getEntities(null,
-                new AABB(this.worldPosition
-                                .relative(Direction.WEST, 7)
-                                .relative(Direction.SOUTH, 7)
-                                .relative(Direction.DOWN, 7),
-                        this.worldPosition
-                                .relative(Direction.EAST,7)
-                                .relative(Direction.NORTH,7)
-                                .relative(Direction.UP,7)));
-        return entities.stream()
-                .map(entity -> entity instanceof LivingEntity livingEntity ? livingEntity : null)
-                .filter(Objects::nonNull)
-                .filter(livingEntity -> isToSend || !livingEntity.equals(toSendEntity))
-                .filter(livingEntity -> isToSend || !(livingEntity instanceof Player))
-                .filter(livingEntity -> livingEntity.hasItemInSlot(EquipmentSlot.HEAD))
-                .filter(livingEntity -> livingEntity.getItemBySlot(EquipmentSlot.HEAD)
-                        .is(TCItems.TECHNETIUM_CROWN.get()))
-                .filter(livingEntity ->
-                        simulateUpdateRotation(isToSend ? lastNode : nextNode,getBlockPos(), livingEntity.blockPosition(),false))
-                .collect(Collectors.toList());
-    }
-
-    private void transferCFE() {
-        if (lastNode != null) {
-            if (level == null || level.isClientSide) return;
-            PathPointerBlockEntity lastNodeBE = (PathPointerBlockEntity) level.getBlockEntity(lastNode);
-            if (lastNodeBE == null) return;
-            List<PPPart> lastParts = lastNodeBE.parts;
-            if (lastParts.contains(PPPart.SENDER) && parts.contains(PPPart.RECEIVER)) {
-                TCUtil.tryCFETransfer(cfeBehaviour(), lastNodeBE.cfeBehaviour(), Integer.MAX_VALUE);
+                sendBindMessage(pPlayer, "item.terracompositio.flow_rotating_axe.bind_fail_incompatible");
+                clearBindTags(tag);
+                return false;
             }
         }
+        return true;
     }
 
-
-    public void updateContainer() {
-        if (level != null){
-            if (parts.contains(PPPart.SENDER)
-                    && parts.contains(PPPart.RECEIVER)
-                    && toSendEntity == null
-                    && toReceiveEntity == null) {
-                cfeBehaviour().setCfeHandler(new LimitlessCFEContainer(cfeBehaviour()).setCfeTravelSpeed((float) 5 / 20));
-            } else {
-                cfeBehaviour().setCfeHandler(new CFEContainer(cfeBehaviour()).setCfeTravelSpeed((float) 5 / 20));
-            }
-        }
-    }
-
-    private int getMaxToEmit() {
-        List<CFENetworkMember> members = TerraCompositioAPI.instance().getCFENetworkInstance().getAllCFENetworkMembers(level).stream()
-                .filter(cfeNetworkMember -> cfeNetworkMember.getPos().closerThan(this.getBlockPos(),cfeBehaviour().getLimit()))
-                .filter(cfeNetworkMember -> cfeNetworkMember.getPriority() > cfeBehaviour().getPriority())
-                .filter(cfeNetworkMember -> {
-                    if (cfeNetworkMember instanceof PathPointerBlockEntity be){
-                        return be.parts.contains(PPPart.COLLECTOR);
-                    }
-                    return true;
-                })
-                .filter(cfeNetworkMember -> CFENetwork.getCFEHandler(cfeNetworkMember)
-                        .filter(icfeHandler -> icfeHandler.getFreeSpace() > 0).isPresent())
-                .filter(cfeNetworkMember -> cfeNetworkMember.getPos() != collectorPos)
-                .toList();
-        int max = 0;
-        for (CFENetworkMember member : members){
-            ICFEHandler handler = member.getMainHandler();
-            max += handler.getFreeSpace();
-        }
-        return max;
-    }
-
-    private @Nullable BlockPos getCollector() {
-        Queue<PathPointerBlockEntity> blockEntityQueue = new LinkedList<>();
-        blockEntityQueue.add(this);
-        while (!blockEntityQueue.isEmpty()){
-            PathPointerBlockEntity currentBE = blockEntityQueue.poll();
-
-            if (currentBE != null) {
-                List<PPPart> parts = currentBE.parts;
-                if (parts.contains(PPPart.COLLECTOR)){
-                    return currentBE.getBlockPos();
-                }
-                BlockPos lastNode = currentBE.lastNode;
-                if (lastNode != null && !currentBE.getBlockPos().equals(lastNode) ) {
-                    if (level == null) break;
-                    PathPointerBlockEntity nextBE = (PathPointerBlockEntity) level.getBlockEntity(lastNode);
-                    if (nextBE != null && nextBE.nextNode != null && !nextBE.nextNode.equals(currentBE.getBlockPos()))
-                        blockEntityQueue.add(nextBE);
+    private static boolean tryClearBinding(@Nullable Player pPlayer, LevelAccessor level, BlockPos outputPos, BlockPos inputPos, CompoundTag tag) {
+        if (outputPos.equals(inputPos)) {
+            sendBindMessage(pPlayer, "item.terracompositio.flow_rotating_axe.bind_cleared");
+            clearBindTags(tag);
+            PathPointerBlockEntity be = ((PathPointerBlockEntity) level.getBlockEntity(inputPos));
+            if (be != null) {
+                be.rotationPitch = 90;
+                be.rotationYaw = 0;
+                be.rotationRoll = 0;
+                be.setChanged();
+                if (level instanceof ServerLevel serverLevel) {
+                    serverLevel.sendBlockUpdated(be.getBlockPos(), be.getBlockState(), be.getBlockState(), 1);
                 }
             }
+            return true;
+        }
+        return false;
+    }
+
+    private static boolean firstPPClicked(@Nullable Player pPlayer, BlockPos pos, CompoundTag tag, boolean isSender,boolean isReceiver) {
+        if (!tag.contains(bindPosTag)) {
+
+            tag.putLong(bindPosTag, pos.asLong());
+            
+            //both = none
+            if (!(isSender && isReceiver)) {
+                //sender = false
+                //receiver = true
+                tag.putBoolean(bindModeTag, !isSender && isReceiver);
+            }
+
+            if (pPlayer != null) {
+                TCUtil.message(pPlayer, Component.translatable("item.terracompositio.flow_rotating_axe.bind_begin").withStyle(ChatFormatting.BOLD));
+            }
+            return true;
+        }
+        return false;
+    }
+
+    public static void sendBindMessage(@Nullable Player player, String messageKey) {
+        if (player != null) {
+            TCUtil.message(player, Component.translatable(messageKey).withStyle(ChatFormatting.BOLD));
+        }
+    }
+
+    public static void clearBindTags(CompoundTag tag) {
+        tag.remove(bindPosTag);
+        tag.remove(bindModeTag);
+    }
+
+    @SuppressWarnings("SuspiciousNameCombination")
+    private static boolean tryApplyBind(LevelAccessor level, BlockPos inputPos, BlockPos outputPos, ItemStack wrenchStack, Player player) {
+        PathPointerBlockEntity inputBE = ((PathPointerBlockEntity) level.getBlockEntity(inputPos));
+        PathPointerBlockEntity outputBE = ((PathPointerBlockEntity) level.getBlockEntity(outputPos));
+
+        CompoundTag tag = wrenchStack.getTag();
+
+        if (inputBE != null && outputBE != null && tag != null) {
+            Optional<SenderBehaviour> inputSenderOpt = inputBE.getBehaviours().stream()
+                    .map(ibeBehaviour -> ibeBehaviour instanceof SenderBehaviour senderBehaviour ? senderBehaviour : null)
+                    .filter(Objects::nonNull)
+                    .findAny();
+            Optional<ReceiverBehaviour> inputReceiverOpt = inputBE.getBehaviours().stream()
+                    .map(ibeBehaviour -> ibeBehaviour instanceof ReceiverBehaviour receiverBehaviour ? receiverBehaviour : null)
+                    .filter(Objects::nonNull)
+                    .findAny();
+
+            Optional<SenderBehaviour> outputSenderOpt = outputBE.getBehaviours().stream()
+                    .map(ibeBehaviour -> ibeBehaviour instanceof SenderBehaviour senderBehaviour ? senderBehaviour : null)
+                    .filter(Objects::nonNull)
+                    .findAny();
+            Optional<ReceiverBehaviour> outputReceiverOpt = outputBE.getBehaviours().stream()
+                    .map(ibeBehaviour -> ibeBehaviour instanceof ReceiverBehaviour receiverBehaviour ? receiverBehaviour : null)
+                    .filter(Objects::nonNull)
+                    .findAny();
+
+            if (inputSenderOpt.isEmpty() || outputReceiverOpt.isEmpty()) return false;
+
+            List<BlockPos> inputReceiverSenderPoses = new ArrayList<>();
+            inputReceiverOpt.ifPresent(receiverBehaviour -> inputReceiverSenderPoses.addAll(receiverBehaviour.getSenderPoses()));
+            AtomicReference<BlockPos> outputSenderBindPos = new AtomicReference<>(null);
+            outputSenderOpt.ifPresent(senderBehaviour -> outputSenderBindPos.set(senderBehaviour.getBindPos()));
+
+
+            //input
+            {
+                Vec3 rot = calculateRot(inputReceiverSenderPoses, outputPos, inputPos);
+                if (rot == null) return false;
+
+                double yaw = Mth.atan2(rot.x, rot.z);
+                double pitch = Mth.atan2(rot.y, rot.z * Math.cos(yaw));
+                inputBE.rotationYaw = (float) Math.toDegrees(yaw);
+                inputBE.rotationPitch = (float) Math.toDegrees(pitch);
+
+                inputSenderOpt.get().setBindPos(outputPos);
+
+                BlockState blockState = level.getBlockState(inputPos);
+                ((Level) level).sendBlockUpdated(inputPos,blockState,blockState,3);
+            }
+            //output
+            {
+                List<BlockPos> senderPoses = outputReceiverOpt.get().getSenderPoses();
+
+                List<BlockPos> senderPosesCopy = new ArrayList<>(senderPoses);
+                senderPosesCopy.add(inputPos);
+
+                Vec3 rot = calculateRot(senderPosesCopy, outputSenderBindPos.get(), outputPos);
+                if (rot == null) return false;
+                double yaw = Mth.atan2(rot.x, rot.z);
+                double pitch = Mth.atan2(rot.y, rot.z * Math.cos(yaw));
+
+                outputBE.rotationYaw = (float) Math.toDegrees(yaw);
+                outputBE.rotationPitch = (float) Math.toDegrees(pitch);
+
+                senderPoses.add(inputPos);
+
+                BlockState blockState = level.getBlockState(outputPos);
+                ((Level) level).sendBlockUpdated(outputPos,blockState,blockState,3);
+            }
+
+
+            tag.remove(bindPosTag);
+            tag.remove(bindModeTag);
+
+            if (player != null) {
+                TCUtil.message(player, Component.translatable("item.terracompositio.flow_rotating_axe.bind_success").withStyle(ChatFormatting.BOLD));
+                wrenchStack.hurtAndBreak(1, player, player1 -> player1.broadcastBreakEvent(InteractionHand.MAIN_HAND));
+            }
+            return true;
+        }
+        return false;
+    }
+
+    private static Vec3 calculateRot(List<BlockPos> receiverSenderPoses, BlockPos senderBindPos,BlockPos origin) {
+        if (receiverSenderPoses.isEmpty()) return senderBindPos.getCenter();
+        List<Vec3> oSenders = receiverSenderPoses.stream().map(blockPos -> blockPos.subtract(origin).getCenter()).toList();
+        boolean sendersInBindRange = true;
+        Vec3 addedSenders = Vec3.ZERO;
+        Vec3 roBind = null;
+        if (senderBindPos != null) {
+            BlockPos oBind = senderBindPos.subtract(origin);
+
+            roBind = oBind.getCenter().reverse();
+
+            for (Vec3 vec3 : oSenders) {
+                sendersInBindRange &= angle(vec3,roBind) < Math.PI/2;
+            }
+            addedSenders = addedSenders.add(roBind);
+        }
+        if (sendersInBindRange) {
+            Optional<Vec3> addedSendersOpt = oSenders.stream().reduce(Vec3::add);
+            if (addedSendersOpt.isPresent()) {
+                addedSenders = addedSenders.add(addedSendersOpt.get()).normalize();
+            }
+
+            boolean sendersInAddedRange = true;
+            for (Vec3 vec3 : oSenders) {
+                sendersInAddedRange &= angle(vec3,addedSenders) < Math.PI/2;
+            }
+
+            if (sendersInAddedRange)
+                return addedSenders.reverse();
+            if (roBind != null)
+                return roBind.reverse();
         }
         return null;
     }
 
-    // Call from first member of chain
-    public void updateMax() {
-
-        if (level == null) return;
-        Queue<BlockEntity> blockEntityQueue = new LinkedList<>();
-
-
-        blockEntityQueue.add(this);
-
-        while (!blockEntityQueue.isEmpty()){
-            BlockEntity currentBE = blockEntityQueue.poll();
-
-            if (currentBE instanceof PathPointerBlockEntity currentPPBE) {
-                List<PPPart> currentPart = currentPPBE.parts;
-                if (currentPart.contains(PPPart.SENDER) && currentPPBE.nextNode != null) {
-                    boolean bendToItself = currentPPBE.getBlockPos().equals(currentPPBE.nextNode);
-                    if (!bendToItself || currentPPBE.toSendEntity != null) {
-                        if (currentPPBE.toSendEntity != null) {
-                            int max = currentPPBE.toSendEntity.getCapability(CFECapability.CFE).orElseGet(() -> DummyCFEHandler.instance).getFreeSpace();
-                            cfeContainer().setMaxCFE(max);
-                            currentPPBE.cfeContainer().setMaxCFE(max).setCfeTravelSpeed(5 / 20f);
-                            break;
-                        }
-                        blockEntityQueue.add(level.getBlockEntity(currentPPBE.nextNode));
-                    }
-                }
-                if (currentPart.contains(PPPart.EMITTER)){
-                    currentPPBE.cfeBehaviour().setLimit(5);
-                    int max = currentPPBE.getMaxToEmit();
-                    this.cfeContainer().setMaxCFE(max);
-                    currentPPBE.cfeContainer().setMaxCFE(max).setCfeTravelSpeed(5/20f);
-                    currentPPBE.scheduleMemberUpdate();
-                    break;
-                }
-            }
-        }
+    private static double angle(Vec3 a, Vec3 b) {
+        return Math.acos(a.dot(b)/a.length()/b.length());
     }
 
-    private int getInSystem() {
-        int inSystem = 0;
 
-        if (level != null) {
-            Queue<BlockEntity> blockEntityQueue = new LinkedList<>();
-            if (toReceiveEntity == null){
-                if (collectorPos == null) collectorPos = getCollector();
-            } else {
-                blockEntityQueue.add(this);
-            }
-
-            if (collectorPos != null) {
-                PathPointerBlockEntity collector = (PathPointerBlockEntity) level.getBlockEntity(collectorPos);
-                if (collector != null) {
-                    blockEntityQueue.add(collector);
-                }
-            }
-
-            while (!blockEntityQueue.isEmpty()) {
-                BlockEntity currentBE = blockEntityQueue.poll();
-                if (currentBE instanceof CFENetworkMember member) {
-                    inSystem += CFENetwork.getCFEHandler(member).stream().mapToInt(ICFEHandler::getCFEWithQueue).sum();
-                    if (currentBE instanceof PathPointerBlockEntity pp
-                            && pp.nextNode != null
-                            && !pp.nextNode.equals(pp.getBlockPos())) {
-                        blockEntityQueue.add(level.getBlockEntity(pp.nextNode));
-                    }
-                }
-            }
-        }
-
-        return inSystem;
-    }
-
-    public List<PathPointerBlockEntity> getNodes() {
-        List<PathPointerBlockEntity> nodes = new ArrayList<>();
-
-
-        if (level != null) {
-            Queue<PathPointerBlockEntity> blockEntityQueue = new LinkedList<>();
-            if (toReceiveEntity == null){
-                if (collectorPos == null) collectorPos = getCollector();
-            } else {
-                blockEntityQueue.add(this);
-            }
-            if (collectorPos != null) {
-                PathPointerBlockEntity collector = (PathPointerBlockEntity) level.getBlockEntity(collectorPos);
-                if (collector != null) {
-                    blockEntityQueue.add(collector);
-                }
-            }
-            while (!blockEntityQueue.isEmpty()) {
-                PathPointerBlockEntity currentBE = blockEntityQueue.poll();
-                if (currentBE != null) {
-                    nodes.add(currentBE);
-                    if (currentBE.nextNode != null && !currentBE.nextNode.equals(currentBE.getBlockPos())) {
-                        blockEntityQueue.add((PathPointerBlockEntity) level.getBlockEntity(currentBE.nextNode));
-                    }
-                }
-            }
-        }
-        return nodes;
-    }
-
-    @Override
-    public void onLoad() {
-        super.onLoad();
-        PathPointerBlockEntity blockEntity = null;
-        if (level != null) {
-            if (toReceiveEntity == null){
-                if (collectorPos == null) collectorPos = getCollector();
-            } else {
-                blockEntity = this;
-            }
-            if (collectorPos != null) {
-                blockEntity = ((PathPointerBlockEntity) level.getBlockEntity(collectorPos));
-            }
-        }
-        if (blockEntity != null) {
-            blockEntity.updateMax();
-        }
-        updateRotation(false);
-        updateContainer();
-    }
 
     @Override
     protected void saveAdditional(@NotNull CompoundTag pTag) {
         pTag.putFloat("rot_y", rotationYaw);
         pTag.putFloat("rot_x", rotationPitch);
         pTag.putFloat("rot_z", rotationRoll);
-        if (nextNode != null) {
-            pTag.putLong("next", nextNode.asLong());
-        }
-        if (lastNode != null) {
-            pTag.putLong("last", lastNode.asLong());
-        }
-        if (collectorPos != null) {
-            pTag.putLong("collector", collectorPos.asLong());
-        }
+
         pTag.putInt("part0",parts.get(0).ordinal());
         pTag.putInt("part1",parts.get(1).ordinal());
         super.saveAdditional(pTag);
@@ -519,27 +335,23 @@ public class PathPointerBlockEntity extends TCBlockEntity implements Nameable {
         rotationYaw = pTag.getFloat("rot_y");
         rotationPitch = pTag.getFloat("rot_x");
         rotationRoll = pTag.getFloat("rot_z");
-        if (pTag.contains("next"))
-            nextNode = BlockPos.of(pTag.getLong("next"));
-        if (pTag.contains("last"))
-            lastNode = BlockPos.of(pTag.getLong("last"));
-        if (pTag.contains("collector"))
-            collectorPos = BlockPos.of(pTag.getLong("collector"));
-        parts = NonNullList.of(PPPart.NONE,
-                PPPart.fromOrdinal(pTag.getInt("part0")),
-                PPPart.fromOrdinal(pTag.getInt("part1")));
+
+        parts = new PPPartList();
+        parts.set(0,PPPart.fromOrdinal(pTag.getInt("part0")));
+        parts.set(1,PPPart.fromOrdinal(pTag.getInt("part1")));
     }
 
     public void highlightNodes() {
         if (level != null && level.isClientSide) {
-            // Подсветка lastNode оранжевыми частицами (обычный огонь)
-            if (lastNode != null) {
-                addFireParticles(level, lastNode); // Оранжевый цвет
-            }
-            // Подсветка nextNode синими частицами (огонь душ)
-            if (nextNode != null) {
-                addSoulFireParticles(level, nextNode); // Голубой цвет
-            }
+            getBehaviours().forEach(ibeBehaviour -> {
+                if (ibeBehaviour instanceof SenderBehaviour senderBehaviour) {
+                    addFireParticles(level, senderBehaviour.getBindPos());
+                }
+                if (ibeBehaviour instanceof ReceiverBehaviour receiverBehaviour) {
+                    receiverBehaviour.getSenderPoses().forEach(blockPos ->
+                            addSoulFireParticles(level, blockPos));
+                }
+            });
         }
     }
 
@@ -567,108 +379,6 @@ public class PathPointerBlockEntity extends TCBlockEntity implements Nameable {
         }
     }
 
-    @SuppressWarnings("SuspiciousNameCombination")
-    public void updateRotation(boolean simulate) {
-        if (nextNode == null && lastNode == null) return;
-
-        BlockPos blockPos = getBlockPos();
-        boolean ignorAngle = Objects.equals(nextNode, blockPos) || Objects.equals(lastNode, blockPos);
-        ignorAngle |= toSendEntity != null;
-        ignorAngle |= toReceiveEntity != null;
-        Vec3 pos = Vec3.atCenterOf(blockPos);
-        Vec3 dirForward;
-        if (nextNode == null) {
-            assert lastNode != null;
-            dirForward = pos.subtract(Vec3.atCenterOf(lastNode)).normalize();
-        } else {
-            dirForward = Vec3.atCenterOf(nextNode).subtract(pos).normalize();
-        }
-
-        Vec3 dirBackward = lastNode == null ?
-                dirForward :
-                pos.subtract(Vec3.atCenterOf(lastNode)).normalize();
-
-        float forward = ((float) Mth.atan2(dirForward.x, dirForward.z));
-        float backward = ((float) Mth.atan2(dirBackward.x, dirBackward.z));
-
-        float diff = ((float) Math.toDegrees(forward - backward));
-        float abs_diff = Math.abs(diff);
-
-        if ((abs_diff > 91 && abs_diff - 360 < -91) && !ignorAngle) return;
-
-        if (!simulate) {
-
-            Vec3 lookDir = dirForward.add(dirBackward).normalize();
-
-            //noinspection SuspiciousNameCombination
-            float yaw = (float) Math.toDegrees(Mth.atan2(lookDir.x,lookDir.z));
-
-
-            float pitch = (float) Math.toDegrees(Mth.atan2(lookDir.y,Mth.sqrt((float) (Mth.square(lookDir.x)+Mth.square(lookDir.z)))));
-
-            Vec3 up = dirForward.cross(dirBackward).normalize();
-            Vec3 right = lookDir.cross(up).normalize();
-
-            float roll = (float) Math.toDegrees(Mth.atan2(right.y,right.x)) + diff/2;
-
-            this.rotationYaw = yaw;   // YAW (вокруг Y) → "куда смотрит"
-            this.rotationPitch = pitch;      // PITCH (наклон)
-            this.rotationRoll = roll;       // ROLL (кручение вокруг направления взгляда)
-
-            this.setChanged();
-
-            if (level != null && !level.isClientSide) {
-                level.sendBlockUpdated(blockPos, getBlockState(), getBlockState(), Block.UPDATE_ALL);
-            }
-        }
-    }
-    @SuppressWarnings("SuspiciousNameCombination")
-    public static boolean simulateUpdateRotation(BlockPos lastNode,BlockPos currentPos, BlockPos nextNode,boolean ignorAngle) {
-        if (nextNode == null && lastNode == null) return false;
-
-        boolean ignorAngle1 = Objects.equals(nextNode, currentPos) || Objects.equals(lastNode, currentPos);
-        ignorAngle1 |= ignorAngle;
-        Vec3 pos = Vec3.atCenterOf(currentPos);
-        Vec3 dirForward;
-        if (nextNode == null) {
-            dirForward = pos.subtract(Vec3.atCenterOf(lastNode)).normalize();
-        } else {
-            dirForward = Vec3.atCenterOf(nextNode).subtract(pos).normalize();
-        }
-
-        Vec3 dirBackward = lastNode == null ?
-                dirForward :
-                pos.subtract(Vec3.atCenterOf(lastNode)).normalize();
-
-        float forward = ((float) Mth.atan2(dirForward.x, dirForward.z));
-        float backward = ((float) Mth.atan2(dirBackward.x, dirBackward.z));
-
-        float diff = ((float) Math.toDegrees(Math.abs(forward - backward)));
-
-        return (!(diff > 91) || !(diff - 360 < -91)) || ignorAngle1;
-    }
-
-    @Override
-    public void setRemoved() {
-        super.setRemoved();
-        if (level != null) {
-            if (this.lastNode != null) {
-                BlockEntity last = level.getBlockEntity(this.lastNode);
-                if (last instanceof PathPointerBlockEntity last1) {
-                    last1.nextNode = null;
-                    last1.updateRotation(false);
-                }
-            }
-            if (this.nextNode != null) {
-                BlockEntity next = level.getBlockEntity(this.nextNode);
-                if (next instanceof PathPointerBlockEntity next1) {
-                    next1.lastNode = null;
-                    next1.updateRotation(false);
-                }
-            }
-        }
-    }
-
     @Override
     public void handleUpdateTag(CompoundTag tag) {
         super.handleUpdateTag(tag);
@@ -687,32 +397,38 @@ public class PathPointerBlockEntity extends TCBlockEntity implements Nameable {
         return Component.translatable("block.terracompositio.path_pointer");
     }
 
-    private ICFEHandler cfeContainer() {
-        return cfeBehaviour().getMainHandler();
-    }
+
 
     public void scheduleMemberUpdate() {
         cfeBehaviour().scheduleMemberUpdate();
     }
 
-    private CFEHandlerBehaviour cfeBehaviour() {
-        return (CFEHandlerBehaviour) behaviours.get(0);
+    public IBECFEBehaviour cfeBehaviour() {
+        IBEBehaviour ibeBehaviour = behaviours.get(behaviours.size() - 1);
+        if (ibeBehaviour instanceof IBECFEBehaviour ibecfeBehaviour)
+            return ibecfeBehaviour;
+        return null;
     }
 
     public enum PPPart implements StringRepresentable {
-        COLLECTOR(true, "collector"),
-        RECEIVER(true, "receiver"),
-        SENDER(false, "sender"),
-        EMITTER(false, "emitter"),
-        NONE(false, "none");
+        COLLECTOR(true, "collector", CollectorBehaviour::new),
+        RECEIVER(true, "receiver", ReceiverBehaviour::new),
+        SENDER(false, "sender", SenderBehaviour::new),
+        EMITTER(false, "emitter", EmitterBehaviour::new),
+        INFUSER(false, "infuser", InfuserBehaviour::new),
+        EXTRACTOR(true, "extractor", ExtractorBehaviour::new),
+        NONE(false, "none", (be) -> null);
 
         @Getter
         private final boolean input;
         private final String name;
+        @Getter
+        private final BehaviourFactory behaviourFactory;
 
-        PPPart(boolean isInput, String name) {
+        PPPart(boolean isInput, String name, BehaviourFactory behaviourFactory) {
             this.input = isInput;
             this.name = name;
+            this.behaviourFactory = behaviourFactory;
         }
 
         @Override
@@ -732,6 +448,34 @@ public class PathPointerBlockEntity extends TCBlockEntity implements Nameable {
                 if (part.ordinal() == ordinal) return part;
             }
             return PPPart.NONE;
+        }
+
+
+
+        @FunctionalInterface
+        interface BehaviourFactory {
+            IPPBEBehaviour getBehaviour(PathPointerBlockEntity blockEntity);
+        }
+    }
+
+    private class PPPartList extends ArrayList<PPPart> {
+        public PPPartList() {
+            super(3);
+        }
+
+        @Override
+        public PPPart remove(int index) {
+            IBEBehaviour ibeBehaviour = behaviours.get(index);
+            ibeBehaviour.onRemoved();
+            behaviours.set(index, PPPart.NONE.behaviourFactory.getBehaviour(PathPointerBlockEntity.this));
+            return super.set(index, PPPart.NONE);
+        }
+
+        @Override
+        public PPPart set(int index, PPPart element) {
+            behaviours.set(index,element.behaviourFactory.getBehaviour(PathPointerBlockEntity.this));
+            behaviours.get(index).init();
+            return super.set(index, element);
         }
     }
 }

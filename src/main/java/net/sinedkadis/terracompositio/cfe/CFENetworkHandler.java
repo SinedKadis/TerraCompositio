@@ -3,9 +3,9 @@ package net.sinedkadis.terracompositio.cfe;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.common.MinecraftForge;
+import net.sinedkadis.terracompositio.api.TCCapabilities;
 import net.sinedkadis.terracompositio.api.networks.cfe.*;
 import net.sinedkadis.terracompositio.api.networks.NetworkAction;
-import net.sinedkadis.terracompositio.block.entity.PathPointerBlockEntity;
 import net.sinedkadis.terracompositio.entity.custom.CFECloudEntity;
 import net.sinedkadis.terracompositio.events.CFENetworkEvent;
 import net.sinedkadis.terracompositio.registries.TCBlocks;
@@ -36,18 +36,9 @@ public class CFENetworkHandler implements CFENetwork {
             cfeSources.get(updated.getLevel()).stream()
                     .filter(member -> updated.getPos().closerThan(member.getPos(),Math.max(updated.getLimit(),member.getLimit())))
                     .filter(member -> !updated.getPos().equals(member.getPos()))
-                    .peek(member -> {
-                        if (member instanceof PathPointerBlockEntity && !(updated.getPriority() < member.getPriority())) {
-                            member.scheduleMemberUpdate();
-                        }
-                    })
                     .filter(member -> updated.getPriority() < member.getPriority())
                     .forEach(CFENetworkMember::scheduleMemberUpdate);
-            if (updated instanceof PathPointerBlockEntity blockEntity) {
-                List<PathPointerBlockEntity> nodes = blockEntity.getNodes();
-                nodes.remove(blockEntity);
-                nodes.forEach(PathPointerBlockEntity::scheduleMemberUpdate);
-            }
+
         }
 
     }
@@ -63,10 +54,10 @@ public class CFENetworkHandler implements CFENetwork {
             for (CFENetworkMember source : sources) {
                 Optional<ICFEHandler> cfeHandlerOptional = Optional.empty();
                 if (source instanceof CFENetworkMemberBE memberBE) {
-                    cfeHandlerOptional = memberBE.getEntity().getCapability(CFECapability.CFE).resolve();
+                    cfeHandlerOptional = memberBE.getEntity().getCapability(TCCapabilities.CFE).resolve();
                 }
                 if (source instanceof CFENetworkMemberEntity memberE) {
-                    cfeHandlerOptional = memberE.getEntity().getCapability(CFECapability.CFE).resolve();
+                    cfeHandlerOptional = memberE.getEntity().getCapability(TCCapabilities.CFE).resolve();
                     if (source instanceof CFECloudEntity && level.getBlockState(pos).is(TCBlocks.AIR_SATURATOR.get()))
                         continue;
                 }

@@ -5,6 +5,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.LazyOptional;
+import net.sinedkadis.terracompositio.api.TCCapabilities;
 import net.sinedkadis.terracompositio.cfe.burst.CFEBurstProjectileEntity;
 
 import java.util.List;
@@ -21,7 +22,7 @@ public interface CFENetworkMember {
     }
 
     default List<LazyOptional<ICFEHandler>> getCfeHandlers() {
-        return List.of(((ICapabilityProvider) this).getCapability(CFECapability.CFE));
+        return List.of(((ICapabilityProvider) this).getCapability(TCCapabilities.CFE));
     }
     ICFEHandler getMainHandler();
 

@@ -9,6 +9,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
+import net.sinedkadis.terracompositio.api.TCCapabilities;
 import net.sinedkadis.terracompositio.api.TerraCompositioAPI;
 import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBECFEBehaviour;
 import net.sinedkadis.terracompositio.api.networks.NetworkAction;
@@ -77,7 +78,7 @@ public class CFEHandlerBehaviour implements IBECFEBehaviour {
 
     @Override
     public @Nullable LazyOptional<?> getCapability(Capability<?> cap, @Nullable Direction side) {
-        if (cap == CFECapability.CFE){
+        if (cap == TCCapabilities.CFE){
             return lazyCFEOptional.cast();
         }
         return null;

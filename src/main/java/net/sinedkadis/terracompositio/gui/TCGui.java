@@ -12,7 +12,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.client.gui.overlay.ForgeGui;
 import net.sinedkadis.terracompositio.TerraCompositio;
 import net.sinedkadis.terracompositio.api.dummies.DummyCFEHandler;
-import net.sinedkadis.terracompositio.api.networks.cfe.CFECapability;
+import net.sinedkadis.terracompositio.api.TCCapabilities;
 import net.sinedkadis.terracompositio.api.networks.cfe.ICFEHandler;
 import org.lwjgl.opengl.GL11;
 
@@ -27,11 +27,11 @@ public class TCGui {
         LocalPlayer player = Minecraft.getInstance().player;
         if (player == null) return;
         Inventory inventory = player.getInventory();
-        ICFEHandler playerHandler = player.getCapability(CFECapability.CFE).orElse(DummyCFEHandler.instance);
+        ICFEHandler playerHandler = player.getCapability(TCCapabilities.CFE).orElse(DummyCFEHandler.instance);
         int cfeTotal = playerHandler.getCFE();
         int cfeMaxTotal = playerHandler.getMaxCFE();
         for (ItemStack itemStack : inventory.armor) {
-            ICFEHandler handler = itemStack.getCapability(CFECapability.CFE).orElse(DummyCFEHandler.instance);
+            ICFEHandler handler = itemStack.getCapability(TCCapabilities.CFE).orElse(DummyCFEHandler.instance);
             if (!(handler instanceof DummyCFEHandler)) {
                 cfeTotal += handler.getCFE()-1;
                 cfeMaxTotal += handler.getMaxCFE()-1;

@@ -98,6 +98,21 @@ public class CFEContainer implements ICFEHandler, INBTSerializable<CompoundTag> 
         return added;
     }
 
+    @Override
+    public int sendCFE(int cfe, BlockPos target, boolean simulate) {
+
+        int available = this.getCFE();
+        int added = Mth.clamp(cfe, 0, available);
+        if (added < 1)
+            return 0;
+
+        if (!simulate) {
+            CFEBurstProjectileEntity.sendBurst(this, target, added, 5 / 20f);
+
+        }
+        return added;
+    }
+
     public int addCFE(int cfe,boolean simulate) {
         int pMax = getMaxCFE() - getCFE();
         int added = Mth.clamp(cfe, 0, pMax);

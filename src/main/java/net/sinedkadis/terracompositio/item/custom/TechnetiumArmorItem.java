@@ -24,7 +24,7 @@ import net.sinedkadis.terracompositio.TerraCompositio;
 import net.sinedkadis.terracompositio.api.TerraCompositioAPI;
 import net.sinedkadis.terracompositio.api.dummies.DummyCFEHandler;
 import net.sinedkadis.terracompositio.api.networks.NetworkAction;
-import net.sinedkadis.terracompositio.api.networks.cfe.CFECapability;
+import net.sinedkadis.terracompositio.api.TCCapabilities;
 import net.sinedkadis.terracompositio.api.networks.cfe.CFENetworkMemberEntity;
 import net.sinedkadis.terracompositio.api.networks.cfe.ICFEHandler;
 import net.sinedkadis.terracompositio.cfe.CFEItemWrapper;
@@ -87,7 +87,7 @@ public class TechnetiumArmorItem extends TCArmorItem {
     @Override
     public void inventoryTick(ItemStack pStack, Level pLevel, Entity entity, int pSlotId, boolean pIsSelected) {
         super.inventoryTick(pStack, pLevel, entity, pSlotId, pIsSelected);
-        ICFEHandler icfeHandler = pStack.getCapability(CFECapability.CFE).orElse(DummyCFEHandler.instance);
+        ICFEHandler icfeHandler = pStack.getCapability(TCCapabilities.CFE).orElse(DummyCFEHandler.instance);
 //        switch (type) {
 //            case BOOTS -> this.bootTick(pStack, pLevel, entity, icfeHandler);
 //            case CHESTPLATE -> this.cloakTick(pStack, pLevel, entity, icfeHandler);
@@ -112,7 +112,7 @@ public class TechnetiumArmorItem extends TCArmorItem {
 
         ItemStack stack = livingEntity.getItemBySlot(EquipmentSlot.FEET);
 
-        ICFEHandler handler = stack.getCapability(CFECapability.CFE).orElse(DummyCFEHandler.instance);
+        ICFEHandler handler = stack.getCapability(TCCapabilities.CFE).orElse(DummyCFEHandler.instance);
 
         BlockState blockStateOn = pLevel.getBlockState(onPos);
 
@@ -235,7 +235,7 @@ public class TechnetiumArmorItem extends TCArmorItem {
 
 
             BlockPos.MutableBlockPos mutableBlockPos = onPos.mutable();
-            ICFEHandler handler = stack.getCapability(CFECapability.CFE).orElse(DummyCFEHandler.instance);
+            ICFEHandler handler = stack.getCapability(TCCapabilities.CFE).orElse(DummyCFEHandler.instance);
             if (handler instanceof DummyCFEHandler || handler.getCFE() < 1) return;
             float speed = livingEntity.getSpeed();
             for (int i = 0; i <= speed*30; i++) {
@@ -271,29 +271,29 @@ public class TechnetiumArmorItem extends TCArmorItem {
         if (!(icfeHandler instanceof DummyCFEHandler)) {
             int cfe = icfeHandler.getCFE();
             Type type = ((ArmorItem) pStack.getItem()).getType();
-            ICFEHandler playerCap = entity.getCapability(CFECapability.CFE).orElse(DummyCFEHandler.instance);
+            ICFEHandler playerCap = entity.getCapability(TCCapabilities.CFE).orElse(DummyCFEHandler.instance);
             if (!type.equals(Type.LEGGINGS)) {
                 ICFEHandler leggings = DummyCFEHandler.instance;
                 for (ItemStack armor : entity.getArmorSlots()) {
                     if (armor.getItem() instanceof ArmorItem armorItem
                             && armorItem.getType().equals(Type.LEGGINGS)) {
-                        leggings = armor.getCapability(CFECapability.CFE).orElse(DummyCFEHandler.instance);
+                        leggings = armor.getCapability(TCCapabilities.CFE).orElse(DummyCFEHandler.instance);
                     }
                 }
                 if (cfe < 1) {
                     if (leggings.takeCFE(1,true)>0) {
                         int cfe1 = leggings.takeCFE(1, false);
-                        icfeHandler.sendCFE(
-                                cfe1,null,false);
+                        icfeHandler.addCFE(
+                                cfe1,false);
                     } else if (playerCap.takeCFE(1,true)>0) {
-                        icfeHandler.sendCFE(
-                                playerCap.takeCFE(1,false),null,false);
+                        icfeHandler.addCFE(
+                                playerCap.takeCFE(1,false), false);
                     }
                 }
             } else {
                 if (playerCap.takeCFE(icfeHandler.getFreeSpace(),true)>0) {
-                    icfeHandler.sendCFE(
-                            playerCap.takeCFE(icfeHandler.getFreeSpace(),false),null,false);
+                    icfeHandler.addCFE(
+                            playerCap.takeCFE(icfeHandler.getFreeSpace(),false),false);
                 }
             }
         }
