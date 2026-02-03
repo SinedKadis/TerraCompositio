@@ -22,7 +22,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBEBehaviour;
 import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBECFEBehaviour;
-import net.sinedkadis.terracompositio.api.behaviors.blockentity.IPPBEBehaviour;
+import net.sinedkadis.terracompositio.api.dummies.DummyBehaviour;
 import net.sinedkadis.terracompositio.api.networks.cfe.*;
 import net.sinedkadis.terracompositio.block.behaviours.pp_behaviours.*;
 import net.sinedkadis.terracompositio.block.custom.PathPointerBlock;
@@ -46,7 +46,6 @@ public class PathPointerBlockEntity extends TCBlockEntity implements Nameable {
 
     public PathPointerBlockEntity(BlockPos pos, BlockState state) {
         super(TCBlockEntities.PATH_POINTER_BE.get(), pos, state);
-
         if (state.getBlock() instanceof PathPointerBlock pathPointerBlock) {
             parts.set(0,pathPointerBlock.getBasePart());
         }
@@ -417,7 +416,7 @@ public class PathPointerBlockEntity extends TCBlockEntity implements Nameable {
         EMITTER(false, "emitter", EmitterBehaviour::new),
         INFUSER(false, "infuser", InfuserBehaviour::new),
         EXTRACTOR(true, "extractor", ExtractorBehaviour::new),
-        NONE(false, "none", (be) -> null);
+        NONE(false, "none", (be) -> DummyBehaviour.instance);
 
         @Getter
         private final boolean input;
@@ -454,13 +453,21 @@ public class PathPointerBlockEntity extends TCBlockEntity implements Nameable {
 
         @FunctionalInterface
         interface BehaviourFactory {
-            IPPBEBehaviour getBehaviour(PathPointerBlockEntity blockEntity);
+            IBEBehaviour getBehaviour(PathPointerBlockEntity blockEntity);
         }
     }
 
     private class PPPartList extends ArrayList<PPPart> {
         public PPPartList() {
-            super(3);
+            super(2);
+            this.add(PPPart.NONE);
+            this.add(PPPart.NONE);
+        }
+
+        @Override
+        public PPPart get(int index) {
+
+            return super.get(index);
         }
 
         @Override
@@ -473,6 +480,7 @@ public class PathPointerBlockEntity extends TCBlockEntity implements Nameable {
 
         @Override
         public PPPart set(int index, PPPart element) {
+            while (behaviours.size() <= index) behaviours.add(DummyBehaviour.instance);
             behaviours.set(index,element.behaviourFactory.getBehaviour(PathPointerBlockEntity.this));
             behaviours.get(index).init();
             return super.set(index, element);

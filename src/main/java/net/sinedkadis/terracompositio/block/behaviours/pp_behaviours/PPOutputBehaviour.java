@@ -4,6 +4,7 @@ import lombok.Getter;
 import net.minecraft.core.BlockPos;
 import net.sinedkadis.terracompositio.api.TerraCompositioAPI;
 import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBEBehaviour;
+import net.sinedkadis.terracompositio.api.dummies.DummyBehaviour;
 import net.sinedkadis.terracompositio.api.networks.cfe.CFENetworkMember;
 import net.sinedkadis.terracompositio.block.behaviours.CFEHandlerBehaviour;
 import net.sinedkadis.terracompositio.block.entity.PathPointerBlockEntity;
@@ -21,6 +22,7 @@ public abstract class PPOutputBehaviour extends AbstractPPBehaviour {
 
     protected void addOutputCFEBehaviour() {
         List<IBEBehaviour> list = blockEntity.getBehaviours();
+        while (list.size()<3) list.add(DummyBehaviour.instance);
         list.set(2,new CFEHandlerBehaviour(blockEntity) {
             @Override
             public void init() {

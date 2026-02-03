@@ -84,7 +84,9 @@ public class TCBlockEntities {
                     PP_COLLECTOR,
                     PP_EMITTER,
                     PP_RECEIVER,
-                    PP_SENDER);
+                    PP_SENDER,
+                    PP_EXTRACTOR,
+                    PP_INFUSER);
 
     public static final RegistryObject<BlockEntityType<EntStatueBlockEntity>> ENT_STATUE_BE =
             BLOCK_ENTITIES.register("ent_statue_be", () ->

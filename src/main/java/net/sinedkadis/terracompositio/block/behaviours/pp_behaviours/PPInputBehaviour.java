@@ -5,6 +5,7 @@ import net.minecraft.util.Mth;
 import net.sinedkadis.terracompositio.api.TerraCompositioAPI;
 import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBEBehaviour;
 import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBECFEBehaviour;
+import net.sinedkadis.terracompositio.api.dummies.DummyBehaviour;
 import net.sinedkadis.terracompositio.api.networks.cfe.CFENetwork;
 import net.sinedkadis.terracompositio.api.networks.cfe.CFENetworkMember;
 import net.sinedkadis.terracompositio.api.networks.cfe.ICFEHandler;
@@ -99,6 +100,7 @@ public abstract class PPInputBehaviour extends AbstractPPBehaviour{
 
     protected void addInputCFEBehaviour() {
         List<IBEBehaviour> list = blockEntity.getBehaviours();
+        while (list.size()<3) list.add(DummyBehaviour.instance);
         list.set(2,new CFEHandlerBehaviour(blockEntity) {
             @Override
             public void init() {

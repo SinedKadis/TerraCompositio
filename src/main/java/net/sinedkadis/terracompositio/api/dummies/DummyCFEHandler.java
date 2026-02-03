@@ -49,6 +49,11 @@ public class DummyCFEHandler implements ICFEHandler {
         return 0;
     }
 
+    @Override
+    public int sendCFE(int cfe, BlockPos target, boolean simulate) {
+        return 0;
+    }
+
 
     @Override
     public void setCFE(int cfe) {

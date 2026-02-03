@@ -13,7 +13,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.sinedkadis.terracompositio.block.entity.PathPointerBlockEntity;
 import net.sinedkadis.terracompositio.registries.TCBlocks;
 import net.sinedkadis.terracompositio.util.VecHelper;
-import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.Map;
@@ -28,13 +27,15 @@ public class PathPointerBlockEntityRenderer implements BlockEntityRenderer<PathP
                 PathPointerBlockEntity.PPPart.RECEIVER, blockRenderer.getBlockModel(TCBlocks.PP_RECEIVER.get().defaultBlockState()),
                 PathPointerBlockEntity.PPPart.COLLECTOR, blockRenderer.getBlockModel(TCBlocks.PP_COLLECTOR.get().defaultBlockState()),
                 PathPointerBlockEntity.PPPart.SENDER, blockRenderer.getBlockModel(TCBlocks.PP_SENDER.get().defaultBlockState()),
-                PathPointerBlockEntity.PPPart.EMITTER, blockRenderer.getBlockModel(TCBlocks.PP_EMITTER.get().defaultBlockState())
+                PathPointerBlockEntity.PPPart.EMITTER, blockRenderer.getBlockModel(TCBlocks.PP_EMITTER.get().defaultBlockState()),
+                PathPointerBlockEntity.PPPart.INFUSER, blockRenderer.getBlockModel(TCBlocks.PP_INFUSER.get().defaultBlockState()),
+                PathPointerBlockEntity.PPPart.EXTRACTOR, blockRenderer.getBlockModel(TCBlocks.PP_EXTRACTOR.get().defaultBlockState())
         );
     }
 
     @Override
-    public void render(@NotNull PathPointerBlockEntity blockEntity, float partialTicks, PoseStack poseStack,
-                       @NotNull MultiBufferSource bufferSource, int packedLight, int packedOverlay) {
+    public void render(PathPointerBlockEntity blockEntity, float partialTicks, PoseStack poseStack,
+                       MultiBufferSource bufferSource, int packedLight, int packedOverlay) {
         BlockState state = blockEntity.getBlockState();
 
 

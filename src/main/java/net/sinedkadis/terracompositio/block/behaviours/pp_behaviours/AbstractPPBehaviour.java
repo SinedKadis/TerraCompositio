@@ -10,6 +10,7 @@ import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
 import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBEBehaviour;
 import net.sinedkadis.terracompositio.api.behaviors.blockentity.IPPBEBehaviour;
+import net.sinedkadis.terracompositio.api.dummies.DummyBehaviour;
 import net.sinedkadis.terracompositio.block.behaviours.CFEHandlerBehaviour;
 import net.sinedkadis.terracompositio.block.entity.PathPointerBlockEntity;
 import net.sinedkadis.terracompositio.cfe.CFEContainer;
@@ -65,6 +66,7 @@ public abstract class AbstractPPBehaviour implements IPPBEBehaviour {
 
     protected void addInputOutputCFEBehaviour() {
         List<IBEBehaviour> list = blockEntity.getBehaviours();
+        while (list.size()<3) list.add(DummyBehaviour.instance);
         list.set(2,new CFEHandlerBehaviour(blockEntity) {
             @Override
             public void init() {

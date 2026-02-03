@@ -11,6 +11,8 @@ import snownee.jade.api.IServerDataProvider;
 import snownee.jade.api.ITooltip;
 import snownee.jade.api.config.IPluginConfig;
 
+import java.util.Objects;
+
 public enum TCBlockEntityComponentProvider implements IBlockComponentProvider, IServerDataProvider<BlockAccessor> {
     INSTANCE;
 
@@ -20,7 +22,9 @@ public enum TCBlockEntityComponentProvider implements IBlockComponentProvider, I
         BlockEntity blockEntity = blockAccessor.getBlockEntity();
         if (blockEntity instanceof TCBlockEntity tcBlockEntity) {
             CompoundTag serverData = blockAccessor.getServerData();
-            tcBlockEntity.getBehaviours().forEach(ibeBehaviour -> ibeBehaviour.onAppendTooltip(iTooltip,serverData,iPluginConfig));
+            tcBlockEntity.getBehaviours().stream()
+                    .filter(Objects::nonNull)
+                    .forEach(ibeBehaviour -> ibeBehaviour.onAppendTooltip(iTooltip,serverData,iPluginConfig));
         }
 
     }

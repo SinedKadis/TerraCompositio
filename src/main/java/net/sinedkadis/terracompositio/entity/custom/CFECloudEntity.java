@@ -36,6 +36,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 public class CFECloudEntity extends Entity implements CFENetworkMemberEntity {
     private static final EntityDataAccessor<Integer> CFE_DATA =
             SynchedEntityData.defineId(CFECloudEntity.class, EntityDataSerializers.INT);
+    private int queuedCFE;
 
     protected LazyOptional<ICFEHandler> lazyCFEOptional = LazyOptional.of(() -> new LimitlessCFEContainer(this){
         @Override
@@ -64,6 +65,19 @@ public class CFECloudEntity extends Entity implements CFENetworkMemberEntity {
                 CFEBurstProjectileEntity entity = CFEBurstProjectileEntity.sendBurst(this, burstOffset,target,added,getCfeTravelSpeed());
                 if (entity != null)
                     target.addToQueue(added);
+            }
+            return added;
+        }
+
+        @Override
+        public int addCFE(int cfe, boolean simulate) {
+            int pMax = getMaxCFE() - getCFE();
+            int added = Mth.clamp(cfe, 0, pMax);
+            if (!simulate) {
+                queuedCFE += added;
+                //subFromQueue(added);
+                sendCFEUpdate();
+                onContentsChanged();
             }
             return added;
         }
@@ -112,6 +126,13 @@ public class CFECloudEntity extends Entity implements CFENetworkMemberEntity {
         updateIfScheduled();
         if (getSyncedCFE() <= 0) discard();
 
+        if (queuedCFE > 0){
+            int toAdd = (int) Math.ceil(queuedCFE*0.1f);
+            if (toAdd < 1) toAdd = queuedCFE;
+            queuedCFE -= toAdd;
+
+            setSyncedCFE(getSyncedCFE()+toAdd);
+        }
 
     }
 
@@ -176,10 +197,12 @@ public class CFECloudEntity extends Entity implements CFENetworkMemberEntity {
     @Override
     public void addAdditionalSaveData(CompoundTag pCompound) {
         lazyCFEOptional.ifPresent(cap -> cap.writeToNBT(pCompound));
+        pCompound.putInt("queuedCFE", queuedCFE);
     }
 
     @Override
     public void readAdditionalSaveData(CompoundTag pCompound) {
         lazyCFEOptional.ifPresent(cap -> cap.readFromNBT(pCompound));
+        queuedCFE = pCompound.getInt("queuedCFE");
     }
 }
