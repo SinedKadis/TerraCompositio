@@ -134,7 +134,7 @@
   "block.terracompositio.pp.infuser": "Infuser",
   "block.terracompositio.pp.none": " - ",
   "config.jade.plugin_terracompositio.pp_tooltip": "Time Passage Desorber",
-  "config.jade.plugin_terracompositio.partInfusers_config": "   Parts",
+  "config.jade.plugin_terracompositio.parts_config": "   Parts",
   "config.jade.plugin_terracompositio.debug_config": "Debug",
   "item.terracompositio.flow_rotating_axe.bind_success": "Binding passed successful",
   "item.terracompositio.flow_rotating_axe.bind_fail_too_far": "I can't bind it. Too far",
