@@ -575,4 +575,24 @@ public class TCUtil {
         if (pPlayer instanceof ServerPlayer player)
             player.sendSystemMessage(pMessageComponent, true);
     }
+
+    public static CompoundTag saveBlockPos(BlockPos blockPos) {
+        CompoundTag tag = new CompoundTag();
+        if (blockPos == null) return tag;
+        
+        int x = blockPos.getX();
+        int y = blockPos.getY();
+        int z = blockPos.getZ();
+
+        tag.putInt("x",x);
+        tag.putInt("y",y);
+        tag.putInt("z",z);
+        return tag;
+    }
+    public static BlockPos loadBlockPos(CompoundTag compoundTag) {
+        int x = compoundTag.getInt("x");
+        int y = compoundTag.getInt("y");
+        int z = compoundTag.getInt("z");
+        return new BlockPos(x,y,z);
+    }
 }

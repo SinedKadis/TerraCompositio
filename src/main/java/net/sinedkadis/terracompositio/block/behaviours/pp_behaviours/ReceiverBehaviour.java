@@ -7,6 +7,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.phys.Vec3;
 import net.sinedkadis.terracompositio.block.entity.PathPointerBlockEntity;
+import net.sinedkadis.terracompositio.util.TCUtil;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -57,11 +58,7 @@ public class ReceiverBehaviour extends AbstractPPBehaviour{
         compoundTag.putInt("SenderCount",size);
         for (int i = 0; i < size; i++) {
             BlockPos blockPos = senderPoses.get(i);
-            CompoundTag blockPosTag = new CompoundTag();
-            blockPosTag.putInt("x",blockPos.getX());
-            blockPosTag.putInt("y",blockPos.getY());
-            blockPosTag.putInt("z",blockPos.getZ());
-            compoundTag.put("SenderPos_"+i,blockPosTag);
+            compoundTag.put("SenderPos_"+i, TCUtil.saveBlockPos(blockPos));
         }
     }
 
@@ -70,11 +67,17 @@ public class ReceiverBehaviour extends AbstractPPBehaviour{
         super.onLoad(compoundTag);
         int size = compoundTag.getInt("SenderCount");
         for (int i = 0; i < size; i++) {
-            CompoundTag blockPosTag = compoundTag.getCompound("SenderPos_"+i);
-            int x = blockPosTag.getInt("x");
-            int y = blockPosTag.getInt("y");
-            int z = blockPosTag.getInt("z");
-            senderPoses.add(new BlockPos(x,y,z));
+            senderPoses.add(TCUtil.loadBlockPos(compoundTag.getCompound("SenderPos_"+i)));
+        }
+    }
+
+    @Override
+    public void onTagUpdate(CompoundTag compoundTag) {
+        super.onTagUpdate(compoundTag);
+        super.onLoad(compoundTag);
+        int size = compoundTag.getInt("SenderCount");
+        for (int i = 0; i < size; i++) {
+            senderPoses.add(TCUtil.loadBlockPos(compoundTag.getCompound("SenderPos_"+i)));
         }
     }
 }

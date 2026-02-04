@@ -1,5 +1,7 @@
 package net.sinedkadis.terracompositio.api.behaviors.blockentity;
 
-public interface IPPBEBehaviour extends IBEBehaviour {
+import net.minecraft.nbt.CompoundTag;
 
+public interface IPPBEBehaviour extends IBEBehaviour {
+    default void onTagUpdate(CompoundTag compoundTag){}
 }
