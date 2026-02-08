@@ -113,59 +113,30 @@ public class PathPointerBlockEntity extends TCBlockEntity implements Nameable {
             return false;
         }
 
-        Optional<SenderBehaviour> clickedSenderOpt = clickedPPBE.getBehaviours().stream()
+        SenderBehaviour clickedSender = clickedPPBE.getBehaviours().stream()
                 .map(ibeBehaviour -> ibeBehaviour instanceof SenderBehaviour senderBehaviour ? senderBehaviour : null)
                 .filter(Objects::nonNull)
-                .findAny();
-        Optional<ReceiverBehaviour> clickedReceiverOpt = clickedPPBE.getBehaviours().stream()
+                .findAny().orElse(null);
+        ReceiverBehaviour clickedReceiver = clickedPPBE.getBehaviours().stream()
                 .map(ibeBehaviour -> ibeBehaviour instanceof ReceiverBehaviour receiverBehaviour ? receiverBehaviour : null)
                 .filter(Objects::nonNull)
-                .findAny();
+                .findAny().orElse(null);
 
-        Optional<SenderBehaviour> storedSenderOpt = storedPPBE.getBehaviours().stream()
+        SenderBehaviour storedSender = storedPPBE.getBehaviours().stream()
                 .map(ibeBehaviour -> ibeBehaviour instanceof SenderBehaviour senderBehaviour ? senderBehaviour : null)
                 .filter(Objects::nonNull)
-                .findAny();
-        Optional<ReceiverBehaviour> storedReceiverOpt = storedPPBE.getBehaviours().stream()
+                .findAny().orElse(null);
+        ReceiverBehaviour storedReceiver = storedPPBE.getBehaviours().stream()
                 .map(ibeBehaviour -> ibeBehaviour instanceof ReceiverBehaviour receiverBehaviour ? receiverBehaviour : null)
                 .filter(Objects::nonNull)
-                .findAny();
+                .findAny().orElse(null);
 
-
-        Optional<SenderBehaviour> inputSenderOpt;
-        if (inputSenderOpt.isEmpty() || outputReceiverOpt.isEmpty()) {
-            return false;
+        if (forwardBind) {
+            bind(level,storedSender,storedReceiver,clickedSender,clickedReceiver);
         }
-
-        List<BlockPos> inputReceiverSenderPoses = new ArrayList<>();
-        inputReceiverOpt.ifPresent(receiverBehaviour -> inputReceiverSenderPoses.addAll(receiverBehaviour.getSenderPoses()));
-        AtomicReference<BlockPos> outputSenderBindPos = new AtomicReference<>(null);
-        outputSenderOpt.ifPresent(senderBehaviour -> outputSenderBindPos.set(senderBehaviour.getBindPos()));
-
-
-        Vec3 rotInput = calculateRot(inputReceiverSenderPoses, outputPos, inputPos);
-        if (rotInput == null) return false;
-
-        setYawAndPitchFromRot(rotInput, inputBE);
-        inputSenderOpt.get().setBindPos(outputPos);
-        BlockState inpitBlockState = level.getBlockState(inputPos);
-        ((Level) level).sendBlockUpdated(inputPos,inpitBlockState,inpitBlockState,3);
-
-
-
-        List<BlockPos> senderPoses = outputReceiverOpt.get().getSenderPoses();
-        List<BlockPos> senderPosesCopy = new ArrayList<>(senderPoses);
-        senderPosesCopy.add(inputPos);
-
-        Vec3 rotOutput = calculateRot(senderPosesCopy, outputSenderBindPos.get(), outputPos);
-        if (rotOutput == null) return false;
-
-        setYawAndPitchFromRot(rotOutput, outputBE);
-        senderPoses.add(inputPos);
-        BlockState outputBlockState = level.getBlockState(outputPos);
-        ((Level) level).sendBlockUpdated(outputPos,outputBlockState,outputBlockState,3);
-
-
+        if (backwardBind) {
+            bind(level,clickedSender,clickedReceiver,storedSender,storedReceiver);
+        }
 
         if (pPlayer != null) {
             TCUtil.message(pPlayer, Component.translatable("item.terracompositio.flow_rotating_axe.bind_success").withStyle(ChatFormatting.BOLD));
@@ -175,6 +146,42 @@ public class PathPointerBlockEntity extends TCBlockEntity implements Nameable {
             });
         }
         return true;
+    }
+
+    private static void bind(LevelAccessor level,
+                             SenderBehaviour firstSender,
+                             @Nullable ReceiverBehaviour firstReceiver,
+                             @Nullable SenderBehaviour secondSender,
+                             ReceiverBehaviour secondReceiver) {
+        List<BlockPos> inputReceiverSenderPoses = new ArrayList<>();
+        if (firstReceiver != null)
+            inputReceiverSenderPoses.addAll(firstReceiver.getSenderPoses());
+        BlockPos outputSenderBindPos = null;
+        if (secondSender != null)
+            outputSenderBindPos = secondSender.getBindPos();
+
+        BlockPos firstPos = firstSender.getBlockEntity().getBlockPos();
+        BlockPos secondPos = secondReceiver.getBlockEntity().getBlockPos();
+
+        Vec3 rotInput = calculateRot(inputReceiverSenderPoses, secondPos, firstPos);
+        if (rotInput == null) return;
+        setYawAndPitchFromRot(rotInput, firstSender.getBlockEntity());
+        firstSender.setBindPos(secondPos);
+        BlockState firstBlockState = level.getBlockState(firstPos);
+        ((Level) level).sendBlockUpdated(firstPos,firstBlockState,firstBlockState,3);
+
+
+        List<BlockPos> senderPoses = secondReceiver.getSenderPoses();
+        List<BlockPos> senderPosesCopy = new ArrayList<>(senderPoses);
+        senderPosesCopy.add(firstPos);
+
+        Vec3 rotOutput = calculateRot(senderPosesCopy, outputSenderBindPos, secondPos);
+        if (rotOutput == null) return;
+
+        setYawAndPitchFromRot(rotOutput, secondReceiver.getBlockEntity());
+        senderPoses.add(firstPos);
+        BlockState outputBlockState = level.getBlockState(secondPos);
+        ((Level) level).sendBlockUpdated(secondPos,outputBlockState,outputBlockState,3);
     }
 
     private static void setYawAndPitchFromRot(Vec3 rotInput, PathPointerBlockEntity inputBE) {
