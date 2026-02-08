@@ -55,29 +55,28 @@ public class ReceiverBehaviour extends AbstractPPBehaviour{
         super.onSave(compoundTag);
 
         int size = senderPoses.size();
-        compoundTag.putInt("SenderCount",size);
+        getBlockEntity().getPersistentData().putInt("SenderCount",size);
         for (int i = 0; i < size; i++) {
             BlockPos blockPos = senderPoses.get(i);
-            compoundTag.put("SenderPos_"+i, TCUtil.saveBlockPos(blockPos));
+            getBlockEntity().getPersistentData().put("SenderPos_"+i, TCUtil.saveBlockPos(blockPos));
         }
     }
 
     @Override
     public void onLoad(CompoundTag compoundTag) {
         super.onLoad(compoundTag);
-        int size = compoundTag.getInt("SenderCount");
+        int size = getBlockEntity().getPersistentData().getInt("SenderCount");
         for (int i = 0; i < size; i++) {
-            senderPoses.add(TCUtil.loadBlockPos(compoundTag.getCompound("SenderPos_"+i)));
+            senderPoses.add(TCUtil.loadBlockPos(getBlockEntity().getPersistentData().getCompound("SenderPos_"+i)));
         }
     }
 
     @Override
     public void onTagUpdate(CompoundTag compoundTag) {
         super.onTagUpdate(compoundTag);
-        super.onLoad(compoundTag);
-        int size = compoundTag.getInt("SenderCount");
+        int size = getBlockEntity().getPersistentData().getInt("SenderCount");
         for (int i = 0; i < size; i++) {
-            senderPoses.add(TCUtil.loadBlockPos(compoundTag.getCompound("SenderPos_"+i)));
+            senderPoses.add(TCUtil.loadBlockPos(getBlockEntity().getPersistentData().getCompound("SenderPos_"+i)));
         }
     }
 }

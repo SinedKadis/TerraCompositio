@@ -153,17 +153,17 @@ public class PathPointerBlockEntity extends TCBlockEntity implements Nameable {
                              @Nullable ReceiverBehaviour firstReceiver,
                              @Nullable SenderBehaviour secondSender,
                              ReceiverBehaviour secondReceiver) {
-        List<BlockPos> inputReceiverSenderPoses = new ArrayList<>();
+        List<BlockPos> firstReceiverSenderPoses = new ArrayList<>();
         if (firstReceiver != null)
-            inputReceiverSenderPoses.addAll(firstReceiver.getSenderPoses());
-        BlockPos outputSenderBindPos = null;
+            firstReceiverSenderPoses.addAll(firstReceiver.getSenderPoses());
+        BlockPos secondSenderBindPos = null;
         if (secondSender != null)
-            outputSenderBindPos = secondSender.getBindPos();
+            secondSenderBindPos = secondSender.getBindPos();
 
         BlockPos firstPos = firstSender.getBlockEntity().getBlockPos();
         BlockPos secondPos = secondReceiver.getBlockEntity().getBlockPos();
 
-        Vec3 rotInput = calculateRot(inputReceiverSenderPoses, secondPos, firstPos);
+        Vec3 rotInput = calculateRot(firstReceiverSenderPoses, secondPos, firstPos);
         if (rotInput == null) return;
         setYawAndPitchFromRot(rotInput, firstSender.getBlockEntity());
         firstSender.setBindPos(secondPos);
@@ -173,9 +173,10 @@ public class PathPointerBlockEntity extends TCBlockEntity implements Nameable {
 
         List<BlockPos> senderPoses = secondReceiver.getSenderPoses();
         List<BlockPos> senderPosesCopy = new ArrayList<>(senderPoses);
+        if (senderPoses.contains(firstPos)) return;
         senderPosesCopy.add(firstPos);
 
-        Vec3 rotOutput = calculateRot(senderPosesCopy, outputSenderBindPos, secondPos);
+        Vec3 rotOutput = calculateRot(senderPosesCopy, secondSenderBindPos, secondPos);
         if (rotOutput == null) return;
 
         setYawAndPitchFromRot(rotOutput, secondReceiver.getBlockEntity());
@@ -198,7 +199,7 @@ public class PathPointerBlockEntity extends TCBlockEntity implements Nameable {
         if (be != null) {
             be.rotationPitch = 90;
             be.rotationYaw = 0;
-            be.rotationRoll = 0;
+            //be.rotationRoll = 0;
             be.setChanged();
             if (level instanceof ServerLevel serverLevel) {
                 serverLevel.sendBlockUpdated(be.getBlockPos(), be.getBlockState(), be.getBlockState(), 1);
@@ -304,15 +305,13 @@ public class PathPointerBlockEntity extends TCBlockEntity implements Nameable {
 
     public void highlightNodes() {
         if (level != null && level.isClientSide) {
-            getBehaviours().forEach(ibeBehaviour -> {
-                if (ibeBehaviour instanceof SenderBehaviour senderBehaviour) {
-                    addFireParticles(level, senderBehaviour.getBindPos());
-                }
-                if (ibeBehaviour instanceof ReceiverBehaviour receiverBehaviour) {
-                    receiverBehaviour.getSenderPoses().forEach(blockPos ->
-                            addSoulFireParticles(level, blockPos));
-                }
-            });
+            CompoundTag persistentData = getPersistentData();
+            addFireParticles(level, TCUtil.loadBlockPos(persistentData.getCompound("bindpos")));
+
+            int size = persistentData.getInt("SenderCount");
+            for (int i = 0; i < size; i++) {
+                addSoulFireParticles(level,TCUtil.loadBlockPos(persistentData.getCompound("SenderPos_"+i)));
+            }
         }
     }
 

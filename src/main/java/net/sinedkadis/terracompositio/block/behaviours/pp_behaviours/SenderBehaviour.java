@@ -38,18 +38,18 @@ public class SenderBehaviour extends AbstractPPBehaviour{
     @Override
     public void onSave(CompoundTag compoundTag) {
         super.onSave(compoundTag);
-        compoundTag.put("bindpos", TCUtil.saveBlockPos(bindPos));
+        getBlockEntity().getPersistentData().put("bindpos", TCUtil.saveBlockPos(bindPos));
     }
 
     @Override
     public void onLoad(CompoundTag compoundTag) {
         super.onLoad(compoundTag);
-        bindPos = TCUtil.loadBlockPos(compoundTag.getCompound("bindpos"));
+        bindPos = TCUtil.loadBlockPos(getBlockEntity().getPersistentData().getCompound("bindpos"));
     }
 
     @Override
     public void onTagUpdate(CompoundTag compoundTag) {
         super.onTagUpdate(compoundTag);
-        bindPos = TCUtil.loadBlockPos(compoundTag.getCompound("bindpos"));
+        bindPos = TCUtil.loadBlockPos(getBlockEntity().getPersistentData().getCompound("bindpos"));
     }
 }
