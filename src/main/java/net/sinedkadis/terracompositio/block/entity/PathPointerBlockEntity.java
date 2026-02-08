@@ -31,6 +31,7 @@ import net.sinedkadis.terracompositio.util.TCUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import javax.naming.Name;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 
@@ -38,7 +39,6 @@ import java.util.concurrent.atomic.AtomicReference;
 public class PathPointerBlockEntity extends TCBlockEntity implements Nameable {
 
     private static final String bindPosTag = "BindPos";
-    private static final String bindModeTag = "BindMode";
 
     public float rotationYaw, rotationPitch, rotationRoll;
 
@@ -57,103 +57,82 @@ public class PathPointerBlockEntity extends TCBlockEntity implements Nameable {
     }
 
 
-    public static boolean ppWrenchInteraction(@Nullable Player pPlayer, LevelAccessor level, BlockPos pos, ItemStack wrenchStack) {
+    public static boolean ppWrenchInteraction(@Nullable Player pPlayer, LevelAccessor level, BlockPos clickedPos, ItemStack wrenchStack) {
 
-        BlockEntity blockEntity = level.getBlockEntity(pos);
-        CompoundTag tag = wrenchStack.getOrCreateTag();
-
-        if (!(blockEntity instanceof PathPointerBlockEntity pathPointerBlockEntity)) {
-            clearBindTags(tag);
+        BlockEntity blockEntity = level.getBlockEntity(clickedPos);
+        if (!(blockEntity instanceof PathPointerBlockEntity clickedPPBE)) {
             return false;
         }
 
         if (pPlayer != null && pPlayer.isShiftKeyDown()) {
-            rotatePP(pathPointerBlockEntity);
+            rotatePP(clickedPPBE);
             return true;
         }
 
+        CompoundTag tag = wrenchStack.getOrCreateTag();
+        if (!tag.contains(bindPosTag)) {
+            storeToTag(pPlayer, clickedPos, tag);
+            return true;
+        }
 
-        List<PPPart> partsList = pathPointerBlockEntity.parts;
-        
-        boolean isSender = partsList.contains(PPPart.SENDER);
-        boolean isReceiver = partsList.contains(PPPart.RECEIVER);
+        BlockPos storedPos = TCUtil.loadBlockPos(tag.getCompound(bindPosTag));
+        clearBindTags(tag);
+        if (storedPos.equals(clickedPos)) {
+            clearAnyBindings(pPlayer,level, clickedPos);
+            return true;
+        }
 
-        if (!isSender && !isReceiver) {
+        BlockEntity storedBE = level.getBlockEntity(storedPos);
+        if (!(storedBE instanceof PathPointerBlockEntity storedPPBE)) {
+            return false;
+        }
+
+        List<PPPart> clickedPartsList = clickedPPBE.parts;
+        List<PPPart> storedPartsList = storedPPBE.parts;
+
+        boolean isClickedSender = clickedPartsList.contains(PPPart.SENDER);
+        boolean isClickedReceiver = clickedPartsList.contains(PPPart.RECEIVER);
+        boolean isStoredSender = storedPartsList.contains(PPPart.SENDER);
+        boolean isStoredReceiver = storedPartsList.contains(PPPart.RECEIVER);
+
+        boolean forwardBind = isClickedReceiver && isStoredSender;
+        boolean backwardBind = isClickedSender && isStoredReceiver;
+
+        if (!(forwardBind || backwardBind)) {
             sendBindMessage(pPlayer, "item.terracompositio.flow_rotating_axe.bind_fail_incompatible");
             clearBindTags(tag);
             return false;
         }
 
-        if (!tag.contains(bindPosTag)) {
-            storeToTag(pPlayer, pos, tag, isSender, isReceiver);
-            return true;
-        }
-
-        BlockPos.MutableBlockPos inputPos = new BlockPos.MutableBlockPos();
-        BlockPos.MutableBlockPos outputPos = new BlockPos.MutableBlockPos();
-
-        BlockPos bindPos = BlockPos.of(tag.getLong(bindPosTag));
-        boolean hasBindMode = tag.contains(bindModeTag);
-        boolean bindMode = hasBindMode && tag.getBoolean(bindModeTag);
-        clearBindTags(tag);
-
-        if (bindPos.equals(pos)) {
-            clearBinding(pPlayer,level, pos);
-            return true;
-        }
-
-        boolean allowBindTest = !hasBindMode ||
-                (bindMode ? isReceiver : isSender );
-
-        if (!allowBindTest) {
-            sendBindMessage(pPlayer, "item.terracompositio.flow_rotating_axe.bind_fail_incompatible");
-            return false;
-        }
-
-        if (!hasBindMode) {
-            bindMode = !isReceiver ;
-        }
-
-        if (bindMode) {
-            inputPos.set(pos);
-            outputPos.set(bindPos);
-        } else {
-            inputPos.set(bindPos);
-            outputPos.set(pos);
-
-        }
+        if (forwardBind) backwardBind = false;
 
 
-        boolean distanceTest = inputPos.closerThan(outputPos, 7);
+        boolean distanceTest = clickedPos.closerThan(storedPos, 7);
         if (!distanceTest) {
             sendBindMessage(pPlayer, "item.terracompositio.flow_rotating_axe.bind_fail_too_far");
             return false;
         }
 
-        PathPointerBlockEntity inputBE = ((PathPointerBlockEntity) level.getBlockEntity(inputPos));
-        PathPointerBlockEntity outputBE = ((PathPointerBlockEntity) level.getBlockEntity(outputPos));
-
-        if (inputBE == null || outputBE == null) {
-            return false;
-        }
-        Optional<SenderBehaviour> inputSenderOpt = inputBE.getBehaviours().stream()
+        Optional<SenderBehaviour> clickedSenderOpt = clickedPPBE.getBehaviours().stream()
                 .map(ibeBehaviour -> ibeBehaviour instanceof SenderBehaviour senderBehaviour ? senderBehaviour : null)
                 .filter(Objects::nonNull)
                 .findAny();
-        Optional<ReceiverBehaviour> inputReceiverOpt = inputBE.getBehaviours().stream()
+        Optional<ReceiverBehaviour> clickedReceiverOpt = clickedPPBE.getBehaviours().stream()
                 .map(ibeBehaviour -> ibeBehaviour instanceof ReceiverBehaviour receiverBehaviour ? receiverBehaviour : null)
                 .filter(Objects::nonNull)
                 .findAny();
 
-        Optional<SenderBehaviour> outputSenderOpt = outputBE.getBehaviours().stream()
+        Optional<SenderBehaviour> storedSenderOpt = storedPPBE.getBehaviours().stream()
                 .map(ibeBehaviour -> ibeBehaviour instanceof SenderBehaviour senderBehaviour ? senderBehaviour : null)
                 .filter(Objects::nonNull)
                 .findAny();
-        Optional<ReceiverBehaviour> outputReceiverOpt = outputBE.getBehaviours().stream()
+        Optional<ReceiverBehaviour> storedReceiverOpt = storedPPBE.getBehaviours().stream()
                 .map(ibeBehaviour -> ibeBehaviour instanceof ReceiverBehaviour receiverBehaviour ? receiverBehaviour : null)
                 .filter(Objects::nonNull)
                 .findAny();
 
+
+        Optional<SenderBehaviour> inputSenderOpt;
         if (inputSenderOpt.isEmpty() || outputReceiverOpt.isEmpty()) {
             return false;
         }
@@ -206,7 +185,7 @@ public class PathPointerBlockEntity extends TCBlockEntity implements Nameable {
         inputBE.rotationPitch = (float) Math.toDegrees(pitch);
     }
 
-    private static void clearBinding(@Nullable Player pPlayer, LevelAccessor level, BlockPos inputPos) {
+    private static void clearAnyBindings(@Nullable Player pPlayer, LevelAccessor level, BlockPos inputPos) {
         sendBindMessage(pPlayer, "item.terracompositio.flow_rotating_axe.bind_cleared");
         PathPointerBlockEntity be = ((PathPointerBlockEntity) level.getBlockEntity(inputPos));
         if (be != null) {
@@ -220,15 +199,8 @@ public class PathPointerBlockEntity extends TCBlockEntity implements Nameable {
         }
     }
 
-    private static void storeToTag(@Nullable Player pPlayer, BlockPos pos, CompoundTag tag, boolean isSender, boolean isReceiver) {
-        tag.putLong(bindPosTag, pos.asLong());
-
-        //both = none
-        if (!(isSender && isReceiver)) {
-            //sender = false
-            //receiver = true
-            tag.putBoolean(bindModeTag, !isReceiver && isSender);
-        }
+    private static void storeToTag(@Nullable Player pPlayer, BlockPos pos, CompoundTag tag) {
+        tag.put(bindPosTag,TCUtil.saveBlockPos(pos));
 
         if (pPlayer != null) {
             TCUtil.message(pPlayer, Component.translatable("item.terracompositio.flow_rotating_axe.bind_begin").withStyle(ChatFormatting.BOLD));
@@ -257,7 +229,6 @@ public class PathPointerBlockEntity extends TCBlockEntity implements Nameable {
 
     public static void clearBindTags(CompoundTag tag) {
         tag.remove(bindPosTag);
-        tag.remove(bindModeTag);
     }
 
     private static Vec3 calculateRot(List<BlockPos> receiverSenderPoses, BlockPos senderBindPos,BlockPos origin) {
