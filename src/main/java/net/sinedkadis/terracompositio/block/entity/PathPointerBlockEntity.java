@@ -200,6 +200,14 @@ public class PathPointerBlockEntity extends TCBlockEntity implements Nameable {
             be.rotationPitch = 90;
             be.rotationYaw = 0;
             //be.rotationRoll = 0;
+            be.behaviours.forEach(ibeBehaviour -> {
+                if (ibeBehaviour instanceof SenderBehaviour senderBehaviour) {
+                    senderBehaviour.setBindPos(null);
+                }
+                if (ibeBehaviour instanceof ReceiverBehaviour receiverBehaviour) {
+                    receiverBehaviour.getSenderPoses().clear();
+                }
+            });
             be.setChanged();
             if (level instanceof ServerLevel serverLevel) {
                 serverLevel.sendBlockUpdated(be.getBlockPos(), be.getBlockState(), be.getBlockState(), 1);

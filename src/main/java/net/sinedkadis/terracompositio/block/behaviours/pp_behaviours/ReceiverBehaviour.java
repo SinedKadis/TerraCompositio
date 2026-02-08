@@ -3,11 +3,15 @@ package net.sinedkadis.terracompositio.block.behaviours.pp_behaviours;
 import lombok.Getter;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.phys.Vec3;
 import net.sinedkadis.terracompositio.block.entity.PathPointerBlockEntity;
+import net.sinedkadis.terracompositio.compat.jade.JadeTerraCompositioPlugin;
 import net.sinedkadis.terracompositio.util.TCUtil;
+import snownee.jade.api.ITooltip;
+import snownee.jade.api.config.IPluginConfig;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -77,6 +81,27 @@ public class ReceiverBehaviour extends AbstractPPBehaviour{
         int size = getBlockEntity().getPersistentData().getInt("SenderCount");
         for (int i = 0; i < size; i++) {
             senderPoses.add(TCUtil.loadBlockPos(getBlockEntity().getPersistentData().getCompound("SenderPos_"+i)));
+        }
+    }
+
+    @Override
+    public void onAppendServerData(CompoundTag compoundTag) {
+        super.onAppendServerData(compoundTag);
+        for (int i = 0; i < senderPoses.size(); i++) {
+            BlockPos bindPos = senderPoses.get(i);
+            compoundTag.put("senderPos_"+i, TCUtil.saveBlockPos(bindPos));
+        }
+    }
+
+    @Override
+    public void onAppendTooltip(ITooltip iTooltip, CompoundTag serverData, IPluginConfig iPluginConfig) {
+        super.onAppendTooltip(iTooltip, serverData, iPluginConfig);
+        if (iPluginConfig.get(JadeTerraCompositioPlugin.debugConfigRL())){
+            for (int i = 0;;i++) {
+                if (!serverData.contains("senderPos_"+i)) break;
+                BlockPos pos = TCUtil.loadBlockPos(serverData.getCompound("senderPos_"+i));
+                iTooltip.add(Component.literal("SenderPos "+ i +": " + pos.getX() + " " + pos.getY() + " " + pos.getZ()));
+            }
         }
     }
 }
