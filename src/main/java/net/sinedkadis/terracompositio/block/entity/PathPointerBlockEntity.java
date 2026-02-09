@@ -1,6 +1,7 @@
 package net.sinedkadis.terracompositio.block.entity;
 
 import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
@@ -17,7 +18,6 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBEBehaviour;
@@ -31,11 +31,11 @@ import net.sinedkadis.terracompositio.util.TCUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
-import javax.naming.Name;
+import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicReference;
 
 @Slf4j
+@ParametersAreNonnullByDefault
 public class PathPointerBlockEntity extends TCBlockEntity implements Nameable {
 
     private static final String bindPosTag = "BindPos";
@@ -43,6 +43,9 @@ public class PathPointerBlockEntity extends TCBlockEntity implements Nameable {
     public float rotationYaw, rotationPitch, rotationRoll;
 
     public List<PPPart> parts = new PPPartList();
+
+    @Setter
+    private boolean updateScheduled = false;
 
     public PathPointerBlockEntity(BlockPos pos, BlockState state) {
         super(TCBlockEntities.PATH_POINTER_BE.get(), pos, state);
@@ -52,15 +55,23 @@ public class PathPointerBlockEntity extends TCBlockEntity implements Nameable {
     }
 
     @Override
-    public void addBEBehaviours(@NotNull List<IBEBehaviour> list) {
+    public void addBEBehaviours(List<IBEBehaviour> list) {
         //recursive behavior adding and init
     }
 
+    @Override
+    public void tick(Level pLevel, BlockPos pPos, BlockState pState) {
+        super.tick(pLevel, pPos, pState);
+        if (updateScheduled) {
+            updateScheduled = false;
+            setChanged();
+            pLevel.sendBlockUpdated(worldPosition,getBlockState(),getBlockState(),3);
+        }
+    }
 
     public static boolean ppWrenchInteraction(@Nullable Player pPlayer, LevelAccessor level, BlockPos clickedPos, ItemStack wrenchStack) {
 
-        BlockEntity blockEntity = level.getBlockEntity(clickedPos);
-        if (!(blockEntity instanceof PathPointerBlockEntity clickedPPBE)) {
+        if (!(level.getBlockEntity(clickedPos) instanceof PathPointerBlockEntity clickedPPBE)) {
             return false;
         }
 
@@ -82,8 +93,7 @@ public class PathPointerBlockEntity extends TCBlockEntity implements Nameable {
             return true;
         }
 
-        BlockEntity storedBE = level.getBlockEntity(storedPos);
-        if (!(storedBE instanceof PathPointerBlockEntity storedPPBE)) {
+        if (!(level.getBlockEntity(storedPos) instanceof PathPointerBlockEntity storedPPBE)) {
             return false;
         }
 
@@ -132,11 +142,24 @@ public class PathPointerBlockEntity extends TCBlockEntity implements Nameable {
                 .findAny().orElse(null);
 
         if (forwardBind) {
-            bind(level,storedSender,storedReceiver,clickedSender,clickedReceiver);
+            assert storedSender != null;
+            assert clickedReceiver != null;
+            bind(storedSender,storedReceiver,clickedSender,clickedReceiver);
         }
         if (backwardBind) {
-            bind(level,clickedSender,clickedReceiver,storedSender,storedReceiver);
+            assert clickedSender != null;
+            assert storedReceiver != null;
+            bind(clickedSender,clickedReceiver,storedSender,storedReceiver);
         }
+
+        storedPPBE.setChanged();
+        clickedPPBE.setChanged();
+
+        ((ServerLevel) level).sendBlockUpdated(storedPos,storedPPBE.getBlockState(),storedPPBE.getBlockState(),3);
+        ((ServerLevel) level).sendBlockUpdated(clickedPos,clickedPPBE.getBlockState(),clickedPPBE.getBlockState(),3);
+
+        storedPPBE.setUpdateScheduled(true);
+        clickedPPBE.setUpdateScheduled(true);
 
         if (pPlayer != null) {
             TCUtil.message(pPlayer, Component.translatable("item.terracompositio.flow_rotating_axe.bind_success").withStyle(ChatFormatting.BOLD));
@@ -148,8 +171,7 @@ public class PathPointerBlockEntity extends TCBlockEntity implements Nameable {
         return true;
     }
 
-    private static void bind(LevelAccessor level,
-                             SenderBehaviour firstSender,
+    private static void bind(SenderBehaviour firstSender,
                              @Nullable ReceiverBehaviour firstReceiver,
                              @Nullable SenderBehaviour secondSender,
                              ReceiverBehaviour secondReceiver) {
@@ -167,8 +189,6 @@ public class PathPointerBlockEntity extends TCBlockEntity implements Nameable {
         if (rotInput == null) return;
         setYawAndPitchFromRot(rotInput, firstSender.getBlockEntity());
         firstSender.setBindPos(secondPos);
-        BlockState firstBlockState = level.getBlockState(firstPos);
-        ((Level) level).sendBlockUpdated(firstPos,firstBlockState,firstBlockState,3);
 
 
         List<BlockPos> senderPoses = secondReceiver.getSenderPoses();
@@ -181,8 +201,6 @@ public class PathPointerBlockEntity extends TCBlockEntity implements Nameable {
 
         setYawAndPitchFromRot(rotOutput, secondReceiver.getBlockEntity());
         senderPoses.add(firstPos);
-        BlockState outputBlockState = level.getBlockState(secondPos);
-        ((Level) level).sendBlockUpdated(secondPos,outputBlockState,outputBlockState,3);
     }
 
     private static void setYawAndPitchFromRot(Vec3 rotInput, PathPointerBlockEntity inputBE) {
@@ -208,10 +226,7 @@ public class PathPointerBlockEntity extends TCBlockEntity implements Nameable {
                     receiverBehaviour.getSenderPoses().clear();
                 }
             });
-            be.setChanged();
-            if (level instanceof ServerLevel serverLevel) {
-                serverLevel.sendBlockUpdated(be.getBlockPos(), be.getBlockState(), be.getBlockState(), 1);
-            }
+            be.setUpdateScheduled(true);
         }
     }
 
@@ -247,40 +262,88 @@ public class PathPointerBlockEntity extends TCBlockEntity implements Nameable {
         tag.remove(bindPosTag);
     }
 
-    private static Vec3 calculateRot(List<BlockPos> receiverSenderPoses, BlockPos senderBindPos,BlockPos origin) {
-        //if (receiverSenderPoses.isEmpty()) return senderBindPos.getCenter().reverse();
-        List<Vec3> oSenders = receiverSenderPoses.stream().map(blockPos -> blockPos.subtract(origin).getCenter()).toList();
-        boolean sendersInBindRange = true;
-        Vec3 addedSenders = Vec3.ZERO;
-        Vec3 roBind = null;
+    private static Vec3 calculateRot(List<BlockPos> receiverSenderPoses,@Nullable BlockPos senderBindPos,BlockPos origin) {
+        // --- вектор К bind'у (вперёд)
+        Vec3 toBind = null;
         if (senderBindPos != null) {
-            BlockPos oBind = senderBindPos.subtract(origin);
-
-            roBind = oBind.getCenter().reverse();
-
-            for (Vec3 vec3 : oSenders) {
-                sendersInBindRange &= angle(vec3,roBind) < Math.PI/2;
-            }
-            addedSenders = addedSenders.add(roBind);
+            toBind = Vec3.atCenterOf(senderBindPos.subtract(origin)).normalize();
         }
-        if (sendersInBindRange) {
-            Optional<Vec3> addedSendersOpt = oSenders.stream().reduce(Vec3::add);
-            if (addedSendersOpt.isPresent()) {
-                addedSenders = addedSenders.add(addedSendersOpt.get()).normalize();
-            }
 
-            boolean sendersInAddedRange = true;
-            for (Vec3 vec3 : oSenders) {
-                sendersInAddedRange &= angle(vec3,addedSenders) < Math.PI/2;
-            }
+        // --- векторы К receivers
+        List<Vec3> toReceivers = receiverSenderPoses.stream()
+                .map(p -> Vec3.atCenterOf(p.subtract(origin)).normalize())
+                .toList();
 
-            if (sendersInAddedRange)
-                return addedSenders.reverse();
-            if (roBind != null)
-                return roBind.reverse();
+        // --- если receivers нет — смотрим строго на bind
+        if (toReceivers.isEmpty()) {
+            return toBind;
         }
-        return null;
+
+        // --- усредняем receivers и смотрим ОТ них
+        Vec3 receiversAvg = Vec3.ZERO;
+        for (Vec3 r : toReceivers) {
+            receiversAvg = receiversAvg.add(r);
+        }
+        receiversAvg = receiversAvg.normalize().scale(-1); // важно
+
+        // --- если есть bind — тянем направление вперёд
+        Vec3 lookDir = receiversAvg;
+        if (toBind != null) {
+            lookDir = lookDir.add(toBind).normalize();
+        }
+
+        // --- receivers должны быть сзади
+        for (Vec3 r : toReceivers) {
+            if (lookDir.dot(r) > 0) { // угол < 90° → спереди → херня
+                return toBind; // fallback
+            }
+        }
+
+        // --- bind должен быть спереди
+        if (toBind != null && lookDir.dot(toBind) <= 0) {
+            return toBind;
+        }
+
+        return lookDir;
+
+
+
+// if (receiverSenderPoses.isEmpty()) return senderBindPos.getCenter().reverse();
+//        List<Vec3> oSenders = receiverSenderPoses.stream().map(blockPos -> blockPos.subtract(origin).getCenter()).toList();
+//        boolean sendersInBindRange = true;
+//        boolean sendersInAddedRange = true;
+//        Vec3 added;
+//        Vec3 roBind = null;
+//
+//        if (senderBindPos != null) {
+//            BlockPos oBind = senderBindPos.subtract(origin);
+//
+//            roBind = oBind.getCenter().reverse();
+//
+//            for (Vec3 vec3 : oSenders) {
+//                sendersInBindRange &= angle(vec3,roBind) < Math.PI/2;
+//            }
+//        }
+//        if (sendersInBindRange) {
+//            Optional<Vec3> addedSendersOpt = oSenders.stream().reduce(Vec3::add);
+//            if (addedSendersOpt.isPresent()) {
+//                added = addedSendersOpt.get().normalize();
+//                if (roBind != null) {
+//                    added = added.add(roBind);
+//                }
+//
+//                for (Vec3 vec3 : oSenders) {
+//                    sendersInAddedRange &= angle(vec3,added) < Math.PI/2;
+//                }
+//                if (sendersInAddedRange)
+//                    return added.reverse();
+//            }
+//        }
+//        if (roBind != null)
+//            return roBind.reverse();
+//        return null;
     }
+    
 
     private static double angle(Vec3 a, Vec3 b) {
         return Math.acos(a.dot(b)/a.length()/b.length());
@@ -289,7 +352,7 @@ public class PathPointerBlockEntity extends TCBlockEntity implements Nameable {
 
 
     @Override
-    protected void saveAdditional(@NotNull CompoundTag pTag) {
+    protected void saveAdditional(CompoundTag pTag) {
         pTag.putFloat("rot_y", rotationYaw);
         pTag.putFloat("rot_x", rotationPitch);
         pTag.putFloat("rot_z", rotationRoll);
@@ -300,7 +363,7 @@ public class PathPointerBlockEntity extends TCBlockEntity implements Nameable {
     }
 
     @Override
-    public void load(@NotNull CompoundTag pTag) {
+    public void load(CompoundTag pTag) {
         super.load(pTag);
         rotationYaw = pTag.getFloat("rot_y");
         rotationPitch = pTag.getFloat("rot_x");
@@ -323,7 +386,7 @@ public class PathPointerBlockEntity extends TCBlockEntity implements Nameable {
         }
     }
 
-    private static void addFireParticles(Level level, BlockPos pos) {
+    private static void addFireParticles(Level level,@Nullable BlockPos pos) {
         if (pos == null) return;
         RandomSource rand = level.random;
         for (int i = 0; i < 3; i++) {
@@ -336,7 +399,7 @@ public class PathPointerBlockEntity extends TCBlockEntity implements Nameable {
         }
     }
 
-    private static void addSoulFireParticles(Level level, BlockPos pos) {
+    private static void addSoulFireParticles(Level level,@Nullable BlockPos pos) {
         if (pos == null) return;
         RandomSource rand = level.random;
         for (int i = 0; i < 3; i++) {
