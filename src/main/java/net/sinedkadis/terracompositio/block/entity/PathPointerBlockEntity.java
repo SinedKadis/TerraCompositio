@@ -144,12 +144,20 @@ public class PathPointerBlockEntity extends TCBlockEntity implements Nameable {
         if (forwardBind) {
             assert storedSender != null;
             assert clickedReceiver != null;
-            bind(storedSender,storedReceiver,clickedSender,clickedReceiver);
+            if(!bind(storedSender,storedReceiver,clickedSender,clickedReceiver)) {
+                TCUtil.message(pPlayer, Component.translatable("item.terracompositio.flow_rotating_axe.bind_fail_angle")
+                        .withStyle(ChatFormatting.BOLD));
+                return false;
+            }
         }
         if (backwardBind) {
             assert clickedSender != null;
             assert storedReceiver != null;
-            bind(clickedSender,clickedReceiver,storedSender,storedReceiver);
+            if(!bind(clickedSender,clickedReceiver,storedSender,storedReceiver)) {
+                TCUtil.message(pPlayer, Component.translatable("item.terracompositio.flow_rotating_axe.bind_fail_angle")
+                        .withStyle(ChatFormatting.BOLD));
+                return false;
+            }
         }
 
         storedPPBE.setChanged();
@@ -171,7 +179,7 @@ public class PathPointerBlockEntity extends TCBlockEntity implements Nameable {
         return true;
     }
 
-    private static void bind(SenderBehaviour firstSender,
+    private static boolean bind(SenderBehaviour firstSender,
                              @Nullable ReceiverBehaviour firstReceiver,
                              @Nullable SenderBehaviour secondSender,
                              ReceiverBehaviour secondReceiver) {
@@ -186,29 +194,39 @@ public class PathPointerBlockEntity extends TCBlockEntity implements Nameable {
         BlockPos secondPos = secondReceiver.getBlockEntity().getBlockPos();
 
         Vec3 rotInput = calculateRot(firstReceiverSenderPoses, secondPos, firstPos);
-        if (rotInput == null) return;
-        setYawAndPitchFromRot(rotInput, firstSender.getBlockEntity());
-        firstSender.setBindPos(secondPos);
+        if (rotInput == null) return false;
+
 
 
         List<BlockPos> senderPoses = secondReceiver.getSenderPoses();
         List<BlockPos> senderPosesCopy = new ArrayList<>(senderPoses);
-        if (senderPoses.contains(firstPos)) return;
+        if (senderPoses.contains(firstPos)) return false;
         senderPosesCopy.add(firstPos);
 
         Vec3 rotOutput = calculateRot(senderPosesCopy, secondSenderBindPos, secondPos);
-        if (rotOutput == null) return;
+        if (rotOutput == null) return false;
+
+
+        setYawAndPitchFromRot(rotInput, firstSender.getBlockEntity());
+        firstSender.setBindPos(secondPos);
 
         setYawAndPitchFromRot(rotOutput, secondReceiver.getBlockEntity());
         senderPoses.add(firstPos);
+        return true;
     }
 
-    private static void setYawAndPitchFromRot(Vec3 rotInput, PathPointerBlockEntity inputBE) {
-        @SuppressWarnings("SuspiciousNameCombination")
-        double yaw = Mth.atan2(rotInput.x, rotInput.z);
-        double pitch = Mth.atan2(rotInput.y, rotInput.z * Math.cos(yaw));
-        inputBE.rotationYaw = (float) Math.toDegrees(yaw);
-        inputBE.rotationPitch = (float) Math.toDegrees(pitch);
+    private static void setYawAndPitchFromRot(Vec3 dir, PathPointerBlockEntity be) {
+        // yaw: 0 = +Z (south)
+        double yaw = Math.atan2(dir.x, dir.z);
+
+        // горизонтальная длина
+        double h = Math.sqrt(dir.x * dir.x + dir.z * dir.z);
+
+        // pitch: вверх +
+        double pitch = Math.atan2(dir.y, h);
+
+        be.rotationYaw = (float) Math.toDegrees(yaw);
+        be.rotationPitch = (float) Math.toDegrees(pitch);
     }
 
     private static void clearAnyBindings(@Nullable Player pPlayer, LevelAccessor level, BlockPos inputPos) {
@@ -240,7 +258,7 @@ public class PathPointerBlockEntity extends TCBlockEntity implements Nameable {
 
     private static void rotatePP(PathPointerBlockEntity pathPointerBlockEntity) {
         if (pathPointerBlockEntity.getLevel() != null) {
-            pathPointerBlockEntity.rotationRoll += 25.5F;
+            pathPointerBlockEntity.rotationRoll += 22.5F;
             if (pathPointerBlockEntity.rotationRoll > 360)
                 pathPointerBlockEntity.rotationRoll -= 360;
             BlockState blockState = pathPointerBlockEntity.getBlockState();
@@ -262,88 +280,67 @@ public class PathPointerBlockEntity extends TCBlockEntity implements Nameable {
         tag.remove(bindPosTag);
     }
 
-    private static Vec3 calculateRot(List<BlockPos> receiverSenderPoses,@Nullable BlockPos senderBindPos,BlockPos origin) {
-        // --- вектор К bind'у (вперёд)
+    @Nullable
+    private static Vec3 calculateRot(
+            List<BlockPos> receiverSenderPoses,
+            @Nullable BlockPos senderBindPos,
+            BlockPos origin
+    ) {
+        // --- bind → вперёд
         Vec3 toBind = null;
         if (senderBindPos != null) {
             toBind = Vec3.atCenterOf(senderBindPos.subtract(origin)).normalize();
         }
 
-        // --- векторы К receivers
+        // --- receivers → наружу
         List<Vec3> toReceivers = receiverSenderPoses.stream()
                 .map(p -> Vec3.atCenterOf(p.subtract(origin)).normalize())
                 .toList();
 
-        // --- если receivers нет — смотрим строго на bind
+        // --- ВАЛИДАЦИЯ:
+        // если receiver и bind смотрят в одну полусферу → хуйня
+        if (toBind != null) {
+            for (Vec3 r : toReceivers) {
+                if (r.dot(toBind) > 0) { // угол < 90°
+                    return null;
+                }
+            }
+        }
+
+        // --- если receivers нет — строго на bind
         if (toReceivers.isEmpty()) {
             return toBind;
         }
 
-        // --- усредняем receivers и смотрим ОТ них
+        // --- среднее receivers → смотрим ОТ них
         Vec3 receiversAvg = Vec3.ZERO;
         for (Vec3 r : toReceivers) {
             receiversAvg = receiversAvg.add(r);
         }
-        receiversAvg = receiversAvg.normalize().scale(-1); // важно
+        receiversAvg = receiversAvg.normalize().scale(-1);
 
-        // --- если есть bind — тянем направление вперёд
+        // --- тянем к bind
         Vec3 lookDir = receiversAvg;
         if (toBind != null) {
             lookDir = lookDir.add(toBind).normalize();
         }
 
-        // --- receivers должны быть сзади
+        // --- финальная проверка: receivers точно сзади
         for (Vec3 r : toReceivers) {
-            if (lookDir.dot(r) > 0) { // угол < 90° → спереди → херня
-                return toBind; // fallback
+            if (lookDir.dot(r) > 0) {
+                return null;
             }
         }
 
-        // --- bind должен быть спереди
+        // --- bind точно спереди
         if (toBind != null && lookDir.dot(toBind) <= 0) {
-            return toBind;
+            return null;
         }
 
         return lookDir;
-
-
-
-// if (receiverSenderPoses.isEmpty()) return senderBindPos.getCenter().reverse();
-//        List<Vec3> oSenders = receiverSenderPoses.stream().map(blockPos -> blockPos.subtract(origin).getCenter()).toList();
-//        boolean sendersInBindRange = true;
-//        boolean sendersInAddedRange = true;
-//        Vec3 added;
-//        Vec3 roBind = null;
-//
-//        if (senderBindPos != null) {
-//            BlockPos oBind = senderBindPos.subtract(origin);
-//
-//            roBind = oBind.getCenter().reverse();
-//
-//            for (Vec3 vec3 : oSenders) {
-//                sendersInBindRange &= angle(vec3,roBind) < Math.PI/2;
-//            }
-//        }
-//        if (sendersInBindRange) {
-//            Optional<Vec3> addedSendersOpt = oSenders.stream().reduce(Vec3::add);
-//            if (addedSendersOpt.isPresent()) {
-//                added = addedSendersOpt.get().normalize();
-//                if (roBind != null) {
-//                    added = added.add(roBind);
-//                }
-//
-//                for (Vec3 vec3 : oSenders) {
-//                    sendersInAddedRange &= angle(vec3,added) < Math.PI/2;
-//                }
-//                if (sendersInAddedRange)
-//                    return added.reverse();
-//            }
-//        }
-//        if (roBind != null)
-//            return roBind.reverse();
-//        return null;
     }
-    
+
+
 
     private static double angle(Vec3 a, Vec3 b) {
         return Math.acos(a.dot(b)/a.length()/b.length());

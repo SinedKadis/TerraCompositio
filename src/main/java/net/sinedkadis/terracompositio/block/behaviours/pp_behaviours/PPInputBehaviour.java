@@ -120,6 +120,13 @@ public abstract class PPInputBehaviour extends AbstractPPBehaviour{
                         }
                         return added;
                     }
+
+                    @Override
+                    public int addCFE(int cfe, boolean simulate) {
+                        int i = super.addCFE(cfe, simulate);
+                        blockEntity.scheduleMemberUpdate();
+                        return i;
+                    }
                 }.setCfeTravelSpeed((float) 5 / 20));
             }
 

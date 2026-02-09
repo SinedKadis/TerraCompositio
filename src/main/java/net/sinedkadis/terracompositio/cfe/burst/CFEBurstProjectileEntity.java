@@ -136,8 +136,12 @@ public class CFEBurstProjectileEntity extends ThrowableProjectile {
             BlockEntity blockEntity = level().getBlockEntity(blockPos);
             int cfe = this.getCFE();
             if (blockEntity instanceof PathPointerBlockEntity pathPointerBlockEntity) {
-                tryRedirectByPPBE(pathPointerBlockEntity,blockPos);
-            } else if (blockEntity instanceof TCBlockEntity memberBE) {
+                if (tryRedirectByPPBE(pathPointerBlockEntity,blockPos)) {
+                    lastBP.set(blockPos);
+                    return;
+                }
+            }
+            if (blockEntity instanceof TCBlockEntity memberBE) {
                 tryConsumeTCBE(memberBE, cfe);
             } else if (blockEntity instanceof CFENetworkMemberBE memberBE) {
                 tryConsumeCFENetworkMemberBE(memberBE.getMainHandler(), cfe, memberBE);
@@ -166,7 +170,7 @@ public class CFEBurstProjectileEntity extends ThrowableProjectile {
         }
     }
 
-    private void tryRedirectByPPBE(PathPointerBlockEntity pathPointerBlockEntity,BlockPos currentPos) {
+    private boolean tryRedirectByPPBE(PathPointerBlockEntity pathPointerBlockEntity,BlockPos currentPos) {
         List<IBEBehaviour> behaviours = pathPointerBlockEntity.getBehaviours();
         Optional<SenderBehaviour> sender = behaviours.stream()
                 .map(ibeBehaviour -> ibeBehaviour instanceof SenderBehaviour senderBehaviour ? senderBehaviour : null)
@@ -178,13 +182,15 @@ public class CFEBurstProjectileEntity extends ThrowableProjectile {
                     .filter(Objects::nonNull)
                     .findAny();
             if (receiver.isPresent()) {
-                if (!receiver.get().validAngle(currentPos)) return;
+                if (!receiver.get().validAngle(currentPos)) return false;
                 timeToLive+=100;
                 setDeltaMovement(Vec3.ZERO);
                 Vec3 shootVec = sender.get().getBindPos().subtract(currentPos).getCenter();
                 this.shoot(shootVec.x(),shootVec.y(),shootVec.z(),cfeTravelSpeed,0);
+                return true;
             }
         }
+        return false;
     }
 
     private void tryConsumeCFENetworkMemberEntity(BlockPos blockPos, int cfe) {
