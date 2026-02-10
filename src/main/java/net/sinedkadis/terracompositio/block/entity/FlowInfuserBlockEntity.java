@@ -9,6 +9,7 @@ import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.items.ItemStackHandler;
 import net.sinedkadis.terracompositio.api.networks.cfe.ICFEHandler;
 import net.sinedkadis.terracompositio.block.behaviours.CFEHandlerBehaviour;
@@ -137,10 +138,12 @@ public class FlowInfuserBlockEntity extends TCCraftingBlockEntity {
         Optional<FlowInfusionRecipe> recipe = getCurrentRecipe();
         if (recipe.isPresent()) {
             ItemStack result = recipe.get().getResultItem(null);
-            if (this.getItemBehaviour().isEmpty()) return ItemStack.EMPTY;
-            TwoSlotItemHandlerBehaviour itemBehaviour = (TwoSlotItemHandlerBehaviour) this.getItemBehaviour().get();
-            ItemStack left = itemBehaviour.forceInsertItem(1, result.copy(), false);
-            itemHandler().setStackInSlot(0,left);
+            this.getCapability(ForgeCapabilities.ITEM_HANDLER).ifPresent(iItemHandler -> {
+                if (iItemHandler instanceof TwoSlotItemHandlerBehaviour.SlotSensitiveItemStackHandler slotSensitiveItemStackHandler) {
+                    ItemStack left = slotSensitiveItemStackHandler.forceInsertItem(0, result.copy(), false);
+                    itemHandler().setStackInSlot(0,left);
+                }
+            });
             return result;
         }
         return ItemStack.EMPTY;

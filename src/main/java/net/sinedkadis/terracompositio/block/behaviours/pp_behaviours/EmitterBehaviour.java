@@ -12,12 +12,4 @@ public class EmitterBehaviour extends PPOutputBehaviour{
     public void init() {
         validateCFEBehaviour();
     }
-
-    private void validateCFEBehaviour() {
-        if (blockEntity.cfeBehaviour() == null) {
-            addOutputCFEBehaviour();
-        } else {
-            addInputOutputCFEBehaviour();
-        }
-    }
 }

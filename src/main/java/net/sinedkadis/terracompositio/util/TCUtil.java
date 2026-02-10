@@ -17,7 +17,9 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.TagKey;
 import net.minecraft.util.RandomSource;
+import net.minecraft.world.Containers;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -29,9 +31,11 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.Property;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
+import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.fluids.FluidStack;
+import net.sinedkadis.terracompositio.api.TCCapabilities;
+import net.sinedkadis.terracompositio.api.dummies.DummyCFEHandler;
 import net.sinedkadis.terracompositio.api.networks.cfe.*;
-import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBECFEBehaviour;
 import net.sinedkadis.terracompositio.block.custom.FlowCedarLikeBlock;
 
 
@@ -135,9 +139,7 @@ public class TCUtil {
         TCBlockEntity be = (TCBlockEntity) pLevel.getBlockEntity(pPos);
         float speed = 1/20f;
         if (be != null) {
-            Optional<IBECFEBehaviour> cfeBehaviour = be.getCfeBehaviour();
-            if (cfeBehaviour.isPresent())
-                speed = cfeBehaviour.get().getCfeHandler().getCfeTravelSpeed();
+            speed = be.getCapability(TCCapabilities.CFE).orElse(DummyCFEHandler.instance).getCfeTravelSpeed();
         }
         return handleInWorldBlockCraft(oldState,newState,pLevel,pPos,item,count, new CFEParticleData(speed),SoundEvents.COPPER_PLACE);
     }
@@ -148,9 +150,7 @@ public class TCUtil {
             TCBlockEntity be = (TCBlockEntity) pLevel.getBlockEntity(targetPos);
             float speed = 1/20f;
             if (be != null) {
-                Optional<IBECFEBehaviour> cfeBehaviour = be.getCfeBehaviour();
-                if (cfeBehaviour.isPresent())
-                    speed = cfeBehaviour.get().getCfeHandler().getCfeTravelSpeed();
+                speed = be.getCapability(TCCapabilities.CFE).orElse(DummyCFEHandler.instance).getCfeTravelSpeed();
             }
             level.sendParticles(new CFEParticleData(speed),
                 targetPos.getX()+pLevel.getRandom().nextFloat(),
@@ -169,9 +169,7 @@ public class TCUtil {
                 TCBlockEntity be = (TCBlockEntity) pLevel.getBlockEntity(targetPos);
                 float speed = 1/20f;
                 if (be != null) {
-                    Optional<IBECFEBehaviour> cfeBehaviour = be.getCfeBehaviour();
-                    if (cfeBehaviour.isPresent())
-                        speed = cfeBehaviour.get().getCfeHandler().getCfeTravelSpeed();
+                    speed = be.getCapability(TCCapabilities.CFE).orElse(DummyCFEHandler.instance).getCfeTravelSpeed();
                 }
                 level.sendParticles(new CFEParticleData(speed),
                         targetPos.getX() + pLevel.getRandom().nextFloat(),
@@ -338,10 +336,8 @@ public class TCUtil {
         if (target == null) return;
 
         BlockEntity be = level.getBlockEntity(BlockPos.containing(target));
-        if (be instanceof TCBlockEntity tcCfeBlockEntity) {
-            Optional<IBECFEBehaviour> cfeBehaviour = tcCfeBlockEntity.getCfeBehaviour();
-            if (cfeBehaviour.isPresent())
-                speed = cfeBehaviour.get().getCfeHandler().getCfeTravelSpeed();
+        if (be != null) {
+            speed = be.getCapability(TCCapabilities.CFE).orElse(DummyCFEHandler.instance).getCfeTravelSpeed();
         }
 
         if (offsets == null) {
@@ -594,5 +590,19 @@ public class TCUtil {
         int y = compoundTag.getInt("y");
         int z = compoundTag.getInt("z");
         return new BlockPos(x,y,z);
+    }
+
+    public static void dropContents(BlockEntity blockEntity) {
+        blockEntity.getCapability(ForgeCapabilities.ITEM_HANDLER).ifPresent(itemHandler -> {
+            SimpleContainer inventory = new SimpleContainer(itemHandler.getSlots());
+            for (int i = 0; i < itemHandler.getSlots(); i++){
+                inventory.setItem(i, itemHandler.getStackInSlot(i));
+            }
+            Level level = blockEntity.getLevel();
+            BlockPos worldPosition = blockEntity.getBlockPos();
+            if (level != null) {
+                Containers.dropContents(level, worldPosition,inventory);
+            }
+        });
     }
 }

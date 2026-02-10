@@ -64,32 +64,10 @@ public abstract class AbstractPPBehaviour implements IPPBEBehaviour {
     }
 
 
-    protected void addInputOutputCFEBehaviour() {
+    protected void addCFEBehaviour() {
         List<IBEBehaviour> list = blockEntity.getBehaviours();
         while (list.size()<3) list.add(DummyBehaviour.instance);
-        list.set(2,new CFEHandlerBehaviour(blockEntity) {
-            @Override
-            public void init() {
-                this.setCfeHandler(new CFEContainer(this).setCfeTravelSpeed((float) 5 / 20));
-                setMaxCFE(100);
-            }
-
-            @Override
-            public int getPriority() {
-                return 0;
-            }
-
-            @Override
-            public int getLimit() {
-                return 5;
-            }
-
-            @Override
-            public void onCFENetworkMemberUpdate() {
-                if (blockEntity.getLevel() == null) return;
-                list.forEach(IBEBehaviour::onUpdate);
-            }
-        });
+        list.set(2, new InputOutputCfeBehaviour(list));
     }
 
     protected BlockPos getEndpoint() {
@@ -117,6 +95,37 @@ public abstract class AbstractPPBehaviour implements IPPBEBehaviour {
             if (queue.isEmpty()) {
                 return currentPos;
             }
+        }
+    }
+
+    private class InputOutputCfeBehaviour extends CFEHandlerBehaviour {
+        private final List<IBEBehaviour> list;
+
+        public InputOutputCfeBehaviour(List<IBEBehaviour> list) {
+            super(AbstractPPBehaviour.this.blockEntity);
+            this.list = list;
+        }
+
+        @Override
+        public void init() {
+            this.setCfeHandler(new CFEContainer(this).setCfeTravelSpeed((float) 5 / 20));
+            setMaxCFE(100);
+        }
+
+        @Override
+        public int getPriority() {
+            return 0;
+        }
+
+        @Override
+        public int getLimit() {
+            return 5;
+        }
+
+        @Override
+        public void onCFENetworkMemberUpdate() {
+            if (blockEntity.getLevel() == null) return;
+            list.forEach(IBEBehaviour::onUpdate);
         }
     }
 }

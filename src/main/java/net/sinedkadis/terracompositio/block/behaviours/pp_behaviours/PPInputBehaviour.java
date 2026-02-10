@@ -59,11 +59,16 @@ public abstract class PPInputBehaviour extends AbstractPPBehaviour{
     }
 
     protected void validateCFEBehaviour() {
-        if (blockEntity.cfeBehaviour() == null) {
-            addInputCFEBehaviour();
-        } else {
-            addInputOutputCFEBehaviour();
+        if (blockEntity.getBehaviours().stream().noneMatch(ibeBehaviour -> ibeBehaviour instanceof InputCFEBehaviour)) {
+            addCFEBehaviour();
         }
+    }
+
+    @Override
+    protected void addCFEBehaviour() {
+        List<IBEBehaviour> list = blockEntity.getBehaviours();
+        while (list.size()<3) list.add(DummyBehaviour.instance);
+        list.set(2, new InputCFEBehaviour(list));
     }
 
     protected boolean invalidBehaviours() {
@@ -84,7 +89,7 @@ public abstract class PPInputBehaviour extends AbstractPPBehaviour{
                 endPointCFEBehaviour = thisCFEBehaviour;
                 return false;
             }
-            Optional<IBECFEBehaviour> behaviour = TCBlockEntity.getBehaviours(blockEntity, endpoint).stream()
+            Optional<IBECFEBehaviour> behaviour = TCBlockEntity.getBehaviours(blockEntity.getLevel(), endpoint).stream()
                     .map(ibeBehaviour -> ibeBehaviour instanceof IBECFEBehaviour ibecfeBehaviour ? ibecfeBehaviour : null)
                     .filter(Objects::nonNull)
                     .findAny();
@@ -98,53 +103,56 @@ public abstract class PPInputBehaviour extends AbstractPPBehaviour{
         return false;
     }
 
-    protected void addInputCFEBehaviour() {
-        List<IBEBehaviour> list = blockEntity.getBehaviours();
-        while (list.size()<3) list.add(DummyBehaviour.instance);
-        list.set(2,new CFEHandlerBehaviour(blockEntity) {
-            @Override
-            public void init() {
-                this.setCfeHandler(new CFEContainer(this){
-                    @Override
-                    public int sendCFE(int cfe, @NotNull ICFEHandler target, boolean simulate) {
-                        int freeSpace = target.getFreeSpace();
-                        int available = this.getCFE();
-                        int added = Mth.clamp(cfe, 0, Math.min(available, freeSpace));
-                        if (added < 1)
-                            return 0;
+    private class InputCFEBehaviour extends CFEHandlerBehaviour {
+        private final List<IBEBehaviour> list;
 
-                        if (!simulate) {
-                            CFEBurstProjectileEntity entity = CFEBurstProjectileEntity.sendBurst(this, target, added, target.getCfeTravelSpeed());
-                            if (entity != null)
-                                target.addToQueue(added);
-                        }
-                        return added;
+        public InputCFEBehaviour(List<IBEBehaviour> list) {
+            super(PPInputBehaviour.this.blockEntity);
+            this.list = list;
+        }
+
+        @Override
+        public void init() {
+            this.setCfeHandler(new CFEContainer(this){
+                @Override
+                public int sendCFE(int cfe, @NotNull ICFEHandler target, boolean simulate) {
+                    int freeSpace = target.getFreeSpace();
+                    int available = this.getCFE();
+                    int added = Mth.clamp(cfe, 0, Math.min(available, freeSpace));
+                    if (added < 1)
+                        return 0;
+
+                    if (!simulate) {
+                        CFEBurstProjectileEntity entity = CFEBurstProjectileEntity.sendBurst(this, target, added, target.getCfeTravelSpeed());
+                        if (entity != null)
+                            target.addToQueue(added);
                     }
+                    return added;
+                }
 
-                    @Override
-                    public int addCFE(int cfe, boolean simulate) {
-                        int i = super.addCFE(cfe, simulate);
-                        blockEntity.scheduleMemberUpdate();
-                        return i;
-                    }
-                }.setCfeTravelSpeed((float) 5 / 20));
-            }
+                @Override
+                public int addCFE(int cfe, boolean simulate) {
+                    int i = super.addCFE(cfe, simulate);
+                    blockEntity.scheduleMemberUpdate();
+                    return i;
+                }
+            }.setCfeTravelSpeed((float) 5 / 20));
+        }
 
-            @Override
-            public int getPriority() {
-                return 100;
-            }
+        @Override
+        public int getPriority() {
+            return 100;
+        }
 
-            @Override
-            public int getLimit() {
-                return 5;
-            }
+        @Override
+        public int getLimit() {
+            return 5;
+        }
 
-            @Override
-            public void onCFENetworkMemberUpdate() {
-                if (blockEntity.getLevel() == null) return;
-                list.forEach(IBEBehaviour::onUpdate);
-            }
-        });
+        @Override
+        public void onCFENetworkMemberUpdate() {
+            if (blockEntity.getLevel() == null) return;
+            list.forEach(IBEBehaviour::onUpdate);
+        }
     }
 }

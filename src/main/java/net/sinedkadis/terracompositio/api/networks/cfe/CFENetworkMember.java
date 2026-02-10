@@ -6,7 +6,6 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.LazyOptional;
 import net.sinedkadis.terracompositio.api.TCCapabilities;
-import net.sinedkadis.terracompositio.cfe.burst.CFEBurstProjectileEntity;
 
 import java.util.List;
 
@@ -25,12 +24,6 @@ public interface CFENetworkMember {
         return List.of(((ICapabilityProvider) this).getCapability(TCCapabilities.CFE));
     }
     ICFEHandler getMainHandler();
-
-    default int consumeCFEBurst(CFEBurstProjectileEntity burst) {
-        int added = getMainHandler().addCFE(burst.getCFE(), false);
-        burst.discard();
-        return added;
-    }
 
     String UPDATE_TAG = "scheduledCfeUpdate";
 

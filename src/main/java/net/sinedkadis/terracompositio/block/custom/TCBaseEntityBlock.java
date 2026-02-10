@@ -14,12 +14,11 @@ import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
-import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBEItemBehaviour;
 import net.sinedkadis.terracompositio.block.entity.TCBlockEntity;
+import net.sinedkadis.terracompositio.util.TCUtil;
 import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.ParametersAreNonnullByDefault;
-import java.util.Optional;
 
 @SuppressWarnings("deprecation")
 @MethodsReturnNonnullByDefault
@@ -54,8 +53,7 @@ public abstract class TCBaseEntityBlock extends Block implements EntityBlock {
         if (pState.getBlock() != pNewState.getBlock()){
             TCBlockEntity blockEntity = (TCBlockEntity) pLevel.getBlockEntity(pPos);
             if (blockEntity != null){
-                Optional<IBEItemBehaviour> itemBehaviour = blockEntity.getItemBehaviour();
-                itemBehaviour.ifPresent(IBEItemBehaviour::drops);
+                TCUtil.dropContents(blockEntity);
             }
         }
         super.onRemove(pState, pLevel, pPos, pNewState, pIsMoving);

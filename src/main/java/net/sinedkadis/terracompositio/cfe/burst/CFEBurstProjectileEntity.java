@@ -16,8 +16,9 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
+import net.sinedkadis.terracompositio.api.TCCapabilities;
 import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBEBehaviour;
-import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBECFEBehaviour;
+import net.sinedkadis.terracompositio.api.dummies.DummyCFEHandler;
 import net.sinedkadis.terracompositio.api.networks.cfe.CFENetworkMember;
 import net.sinedkadis.terracompositio.api.networks.cfe.CFENetworkMemberBE;
 import net.sinedkadis.terracompositio.api.networks.cfe.CFENetworkMemberEntity;
@@ -144,7 +145,7 @@ public class CFEBurstProjectileEntity extends ThrowableProjectile {
             if (blockEntity instanceof TCBlockEntity memberBE) {
                 tryConsumeTCBE(memberBE, cfe);
             } else if (blockEntity instanceof CFENetworkMemberBE memberBE) {
-                tryConsumeCFENetworkMemberBE(memberBE.getMainHandler(), cfe, memberBE);
+                tryConsumeCFENetworkMemberBE(memberBE.getMainHandler(), cfe);
             } else {
                 tryConsumeCFENetworkMemberEntity(blockPos, cfe);
             }
@@ -200,28 +201,30 @@ public class CFEBurstProjectileEntity extends ThrowableProjectile {
                 .filter(Objects::nonNull)
                 .forEach(memberEntity -> {
                     int added = memberEntity.getMainHandler().addCFE(cfe, true);
-                    int consumed = memberEntity.consumeCFEBurst(this.createPartWithCFE(added));
+                    CFEBurstProjectileEntity burst = this.createPartWithCFE(added);
+                    int consumed = memberEntity.getMainHandler().addCFE(burst.getCFE(), false);
+                    burst.discard();
                     if (consumed == cfe) discard();
                 });
     }
 
-    private void tryConsumeCFENetworkMemberBE(ICFEHandler memberBE, int cfe, CFENetworkMemberBE memberBE1) {
-        int added = memberBE.addCFE(cfe, true);
-        int consumed = memberBE1.consumeCFEBurst(this.createPartWithCFE(added));
+    private void tryConsumeCFENetworkMemberBE(ICFEHandler icfeHandler, int cfe) {
+        int added = icfeHandler.addCFE(cfe, true);
+        CFEBurstProjectileEntity burst = this.createPartWithCFE(added);
+        int consumed = icfeHandler.addCFE(burst.getCFE(), false);
+        burst.discard();
         if (consumed == cfe) discard();
     }
 
     private void tryConsumeTCBE(TCBlockEntity memberBE, int cfe) {
-        Optional<IBECFEBehaviour> cfeBehaviour = memberBE.getCfeBehaviour();
-        cfeBehaviour.ifPresent(behaviour -> tryConsumeCFENetworkMemberBE(behaviour.getCfeHandler(), cfe, behaviour));
+        tryConsumeCFENetworkMemberBE(memberBE.getCapability(TCCapabilities.CFE).orElse(DummyCFEHandler.instance), cfe);
     }
 
     @Override
     public void remove(RemovalReason pReason) {
         BlockEntity blockEntity = level().getBlockEntity(getTarget());
         if (blockEntity instanceof TCBlockEntity memberBE) {
-            memberBE.getCfeBehaviour().ifPresent(ibecfeBehaviour ->
-                    ibecfeBehaviour.getCfeHandler().subFromQueue(getO_CFE()));
+            memberBE.getCapability(TCCapabilities.CFE).orElse(DummyCFEHandler.instance).subFromQueue(getO_CFE());
         } else if (blockEntity instanceof CFENetworkMemberBE memberBE) {
             memberBE.getMainHandler().subFromQueue(getO_CFE());
         }

@@ -31,14 +31,6 @@ public class InfuserBehaviour extends PPOutputBehaviour{
         validateCFEBehaviour();
     }
 
-    private void validateCFEBehaviour() {
-        if (blockEntity.cfeBehaviour() == null) {
-            addOutputCFEBehaviour();
-        } else {
-            addInputOutputCFEBehaviour();
-        }
-    }
-
     @Override
     public void onUpdate() {
         super.onUpdate();

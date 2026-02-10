@@ -24,7 +24,6 @@ import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBEItemBehaviour
 import net.sinedkadis.terracompositio.block.entity.MatterInfuserIOBlockEntity;
 import net.sinedkadis.terracompositio.block.entity.TCBlockEntity;
 import net.sinedkadis.terracompositio.util.TCUtil;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 import snownee.jade.api.ITooltip;
 import snownee.jade.api.config.IPluginConfig;
@@ -67,7 +66,7 @@ public class TwoSlotItemHandlerBehaviour implements IBEItemBehaviour, WorldlyCon
     }
 
     @Override
-    public @Nullable LazyOptional<?> getCapability(@NotNull Capability<?> cap, @Nullable Direction side) {
+    public @Nullable LazyOptional<?> getCapability(Capability<?> cap, @Nullable Direction side) {
         if (cap == ForgeCapabilities.ITEM_HANDLER){
             return lazyItemHandler.cast();
         }
@@ -151,7 +150,7 @@ public class TwoSlotItemHandlerBehaviour implements IBEItemBehaviour, WorldlyCon
     }
 
     @Override
-    public InteractionResult onUse(@NotNull Player pPlayer, @NotNull InteractionHand pHand, @NotNull BlockHitResult pHit) {
+    public InteractionResult onUse(Player pPlayer, InteractionHand pHand, BlockHitResult pHit) {
         Level level = blockEntity.getLevel();
         if (level == null) return InteractionResult.PASS;
 
@@ -261,25 +260,13 @@ public class TwoSlotItemHandlerBehaviour implements IBEItemBehaviour, WorldlyCon
         itemHandler.setStackInSlot(OUTPUT,ItemStack.EMPTY);
     }
 
-    public void drops(){
-        SimpleContainer inventory = new SimpleContainer(itemHandler.getSlots());
-        for (int i = 0; i < itemHandler.getSlots(); i++){
-            inventory.setItem(i, itemHandler.getStackInSlot(i));
-        }
-        Level level = this.blockEntity.getLevel();
-        BlockPos worldPosition = this.blockEntity.getBlockPos();
-        if (level != null) {
-            Containers.dropContents(level, worldPosition,inventory);
-        }
-    }
-
     public ItemStack getInputSlot(){
         return this.itemHandler.getStackInSlot(INPUT);
     }
     public ItemStack getOutputSlot(){
         return this.itemHandler.getStackInSlot(OUTPUT);
     }
-    public ItemStack forceInsertItem(int slot, @NotNull ItemStack stack, boolean simulate) {
+    public ItemStack forceInsertItem(int slot, ItemStack stack, boolean simulate) {
         return itemHandler.forceInsertItem(slot, stack, simulate);
     }
 
@@ -287,7 +274,7 @@ public class TwoSlotItemHandlerBehaviour implements IBEItemBehaviour, WorldlyCon
         itemHandler.forceExtractItem(slot, amount, simulate);
     }
 
-    protected class SlotSensitiveItemStackHandler extends ItemStackHandler {
+    public class SlotSensitiveItemStackHandler extends ItemStackHandler {
 
 
         public SlotSensitiveItemStackHandler(int size) {
@@ -300,7 +287,7 @@ public class TwoSlotItemHandlerBehaviour implements IBEItemBehaviour, WorldlyCon
         }
 
         @Override
-        public @NotNull ItemStack insertItem(int slot, @NotNull ItemStack stack, boolean simulate) {
+        public ItemStack insertItem(int slot, ItemStack stack, boolean simulate) {
             if (slot != INPUT) return stack;
             ItemStack itemStack = super.insertItem(slot, stack, simulate);
             setChanged();
@@ -308,12 +295,12 @@ public class TwoSlotItemHandlerBehaviour implements IBEItemBehaviour, WorldlyCon
         }
 
         @Override
-        public @NotNull ItemStack extractItem(int slot, int amount, boolean simulate) {
+        public ItemStack extractItem(int slot, int amount, boolean simulate) {
             if (slot != OUTPUT) return ItemStack.EMPTY;
             return super.extractItem(slot, amount, simulate);
         }
 
-        public ItemStack forceInsertItem(int slot, @NotNull ItemStack stack, boolean simulate) {
+        public ItemStack forceInsertItem(int slot, ItemStack stack, boolean simulate) {
             return super.insertItem(slot, stack, simulate);
         }
 

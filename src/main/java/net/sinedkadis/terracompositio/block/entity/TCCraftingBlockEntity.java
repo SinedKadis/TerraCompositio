@@ -6,6 +6,8 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.items.ItemStackHandler;
+import net.sinedkadis.terracompositio.api.TCCapabilities;
+import net.sinedkadis.terracompositio.api.dummies.DummyCFEHandler;
 
 import java.util.Optional;
 
@@ -32,7 +34,7 @@ public abstract class TCCraftingBlockEntity extends TCBlockEntity{
         partialCFE += tickCFECost- floorCFE;
         int floorPart = (int) Math.floor(partialCFE);
         partialCFE = partialCFE - floorPart;
-        this.getCfeBehaviour().ifPresent(icfeBehaviour -> icfeBehaviour.getCfeHandler().takeCFE(floorCFE+floorPart,false));
+        this.getCapability(TCCapabilities.CFE).orElse(DummyCFEHandler.instance).takeCFE(floorCFE+floorPart,false);
     }
 
     protected void increaseCraftingProgress() {

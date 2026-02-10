@@ -15,10 +15,12 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.DirectionProperty;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBEItemBehaviour;
+import net.minecraftforge.common.capabilities.ForgeCapabilities;
+import net.minecraftforge.items.ItemStackHandler;
 import net.sinedkadis.terracompositio.block.entity.FlowCedarCasingBlockEntity;
 import net.sinedkadis.terracompositio.registries.TCBlocks;
 import net.sinedkadis.terracompositio.util.FunctionSide;
+import net.sinedkadis.terracompositio.util.TCUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -69,10 +71,9 @@ public abstract class MatterInfuserBaseEntityBlock extends TCBaseEntityBlock {
             BlockState blockstate = pLevel.getBlockState(blockpos);
             if (blockstate.is(TCBlocks.FLOW_CEDAR_CASING.get())) {
                 FlowCedarCasingBlockEntity blockEntity = (FlowCedarCasingBlockEntity) Objects.requireNonNull(pLevel.getBlockEntity(blockpos));
-                //noinspection OptionalGetWithoutIsPresent
-                IBEItemBehaviour iItemBehaviour = blockEntity.getItemBehaviour().get();
-                iItemBehaviour.drops();
-                iItemBehaviour.getItemHandler().setSize(slotCount());
+                TCUtil.dropContents(blockEntity);
+                blockEntity.getCapability(ForgeCapabilities.ITEM_HANDLER)
+                        .ifPresent(iItemHandler -> ((ItemStackHandler) iItemHandler).setSize(slotCount()));
             }
         }
     }
@@ -118,10 +119,9 @@ public abstract class MatterInfuserBaseEntityBlock extends TCBaseEntityBlock {
             pLevel.setBlock(casingPos, casingState.setValue(FUNCTION_SIDE, functionSideByDirection), 3);
             FlowCedarCasingBlockEntity blockEntity = (FlowCedarCasingBlockEntity) pLevel.getBlockEntity(casingPos);
             if (blockEntity != null) {
-                //noinspection OptionalGetWithoutIsPresent
-                IBEItemBehaviour iItemBehaviour = blockEntity.getItemBehaviour().get();
-                iItemBehaviour.drops();
-                iItemBehaviour.getItemHandler().setSize(slotCount());
+                TCUtil.dropContents(blockEntity);
+                blockEntity.getCapability(ForgeCapabilities.ITEM_HANDLER)
+                        .ifPresent(iItemHandler -> ((ItemStackHandler) iItemHandler).setSize(slotCount()));
             }
         }
     }

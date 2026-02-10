@@ -17,15 +17,11 @@ import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
 import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBEBehaviour;
 import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBEBehaviourHolder;
-import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBECFEBehaviour;
 import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBEItemBehaviour;
 import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.ParametersAreNonnullByDefault;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 @Getter
 @ParametersAreNonnullByDefault
@@ -46,8 +42,7 @@ public abstract class TCBlockEntity extends BlockEntity implements IBEBehaviourH
         return List.of();
     }
 
-    public static List<IBEBehaviour> getBehaviours(BlockEntity caller, BlockPos blockPos) {
-        Level level = caller.getLevel();
+    public static List<IBEBehaviour> getBehaviours(@Nullable Level level, BlockPos blockPos) {
         if (level instanceof ServerLevel) {
             BlockEntity blockEntity = level.getBlockEntity(blockPos);
             if (blockEntity instanceof TCBlockEntity tcBlockEntity) {
@@ -55,12 +50,6 @@ public abstract class TCBlockEntity extends BlockEntity implements IBEBehaviourH
             }
         }
         return List.of();
-    }
-
-    public Optional<IBECFEBehaviour> getCfeBehaviour() {
-        return behaviours.stream().map(iBehaviour -> iBehaviour instanceof IBECFEBehaviour IBECFEBehaviour ? IBECFEBehaviour : null)
-                .filter(Objects::nonNull)
-                .findAny();
     }
 
     public Optional<IBEItemBehaviour> getItemBehaviour() {
@@ -124,5 +113,6 @@ public abstract class TCBlockEntity extends BlockEntity implements IBEBehaviourH
     public CompoundTag getUpdateTag() {
         return saveWithoutMetadata();
     }
+
 
 }

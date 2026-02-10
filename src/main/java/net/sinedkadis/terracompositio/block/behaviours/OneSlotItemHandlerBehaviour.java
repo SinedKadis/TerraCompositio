@@ -60,7 +60,7 @@ public abstract class OneSlotItemHandlerBehaviour implements IBEItemBehaviour, W
 
     @Override
     public void tick() {
-
+        parseBehaviourData();
     }
 
     @Override
@@ -196,18 +196,6 @@ public abstract class OneSlotItemHandlerBehaviour implements IBEItemBehaviour, W
     @Override
     public void clearContent() {
         itemHandler.setStackInSlot(SLOT, ItemStack.EMPTY);
-    }
-
-    public void drops() {
-        SimpleContainer inventory = new SimpleContainer(itemHandler.getSlots());
-        for (int i = 0; i < itemHandler.getSlots(); i++) {
-            inventory.setItem(i, itemHandler.getStackInSlot(i));
-        }
-        Level level = this.blockEntity.getLevel();
-        BlockPos worldPosition = this.blockEntity.getBlockPos();
-        if (level != null) {
-            Containers.dropContents(level, worldPosition, inventory);
-        }
     }
 
     public ItemStack getInputSlot() {

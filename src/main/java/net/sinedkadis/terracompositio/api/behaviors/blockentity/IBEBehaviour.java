@@ -33,6 +33,8 @@ public interface IBEBehaviour {
     }
     //misc
     default void onUpdate(){}
+    default void parseBehaviourData(){}
 
     <T extends BlockEntity> T getBlockEntity();
+
 }
