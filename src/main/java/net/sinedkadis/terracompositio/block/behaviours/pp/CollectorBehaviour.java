@@ -1,4 +1,4 @@
-package net.sinedkadis.terracompositio.block.behaviours.pp_behaviours;
+package net.sinedkadis.terracompositio.block.behaviours.pp;
 
 import net.sinedkadis.terracompositio.block.entity.PathPointerBlockEntity;
 

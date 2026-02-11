@@ -28,7 +28,9 @@ import net.minecraft.world.level.ServerLevelAccessor;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.util.LazyOptional;
+import net.minecraftforge.items.ItemStackHandler;
 import net.sinedkadis.terracompositio.api.TerraCompositioAPI;
 import net.sinedkadis.terracompositio.api.dummies.DummyCFEHandler;
 import net.sinedkadis.terracompositio.api.networks.NetworkAction;
@@ -147,8 +149,11 @@ public class FlowCedarEntEntity extends AbstractGolem implements CFENetworkMembe
                 TCBlocks.FLOW_CEDAR_ENT_STATUE.get().defaultBlockState(),3);
         BlockEntity blockEntity = this.level().getBlockEntity(this.blockPosition());
         if (blockEntity instanceof EntStatueBlockEntity entStatueBlockEntity) {
-            //noinspection OptionalGetWithoutIsPresent
-            entStatueBlockEntity.getItemBehaviour().get().getItemHandler().setStackInSlot(0,crown);
+            entStatueBlockEntity.getCapability(ForgeCapabilities.ITEM_HANDLER).ifPresent(iItemHandler -> {
+                if (iItemHandler instanceof ItemStackHandler itemStackHandler)
+                    itemStackHandler.setStackInSlot(0,crown);
+            });
+
         }
         this.remove(RemovalReason.CHANGED_DIMENSION);
     }

@@ -1,15 +1,21 @@
-package net.sinedkadis.terracompositio.block.behaviours.pp_behaviours;
+package net.sinedkadis.terracompositio.block.behaviours.pp;
 
 import lombok.Getter;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.phys.Vec3;
+import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.util.LazyOptional;
 import net.sinedkadis.terracompositio.block.entity.PathPointerBlockEntity;
 import net.sinedkadis.terracompositio.compat.jade.JadeTerraCompositioPlugin;
+import net.sinedkadis.terracompositio.util.BehaviourCapabilities;
 import net.sinedkadis.terracompositio.util.TCUtil;
+import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 import snownee.jade.api.ITooltip;
 import snownee.jade.api.config.IPluginConfig;
 
@@ -43,11 +49,8 @@ public class ReceiverBehaviour extends AbstractPPBehaviour{
             senderPoses.forEach(blockPos -> {
                 BlockEntity senderEntity = level.getBlockEntity(blockPos);
                 if (senderEntity instanceof PathPointerBlockEntity pathPointerBlockEntity) {
-                    pathPointerBlockEntity.getBehaviours().forEach(ibeBehaviour -> {
-                        if (ibeBehaviour instanceof SenderBehaviour senderBehaviour) {
-                            senderBehaviour.setBindPos(null);
-                        }
-                    });
+                    pathPointerBlockEntity.getCapability(BehaviourCapabilities.SENDER).ifPresent(senderBehaviour ->
+                            senderBehaviour.setBindPos(null));
                 }
             });
         }
@@ -67,6 +70,13 @@ public class ReceiverBehaviour extends AbstractPPBehaviour{
     }
 
     @Override
+    public @Nullable LazyOptional<?> getCapability(@NotNull Capability<?> cap, @Nullable Direction side) {
+        if (cap == BehaviourCapabilities.RECEIVER)
+            return LazyOptional.of(() -> this);
+        return super.getCapability(cap,side);
+    }
+
+    @Override
     public void onLoad(CompoundTag compoundTag) {
         super.onLoad(compoundTag);
         int size = getBlockEntity().getPersistentData().getInt("SenderCount");
@@ -74,16 +84,6 @@ public class ReceiverBehaviour extends AbstractPPBehaviour{
             senderPoses.add(TCUtil.loadBlockPos(getBlockEntity().getPersistentData().getCompound("SenderPos_"+i)));
         }
     }
-
-    @Override
-    public void onTagUpdate(CompoundTag compoundTag) {
-        super.onTagUpdate(compoundTag);
-        int size = getBlockEntity().getPersistentData().getInt("SenderCount");
-        for (int i = 0; i < size; i++) {
-            senderPoses.add(TCUtil.loadBlockPos(getBlockEntity().getPersistentData().getCompound("SenderPos_"+i)));
-        }
-    }
-
     @Override
     public void onAppendServerData(CompoundTag compoundTag) {
         super.onAppendServerData(compoundTag);

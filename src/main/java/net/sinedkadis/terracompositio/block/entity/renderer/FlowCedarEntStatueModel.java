@@ -13,6 +13,7 @@ import net.minecraft.client.model.geom.PartPose;
 import net.minecraft.client.model.geom.builders.*;
 import net.minecraft.client.renderer.RenderType;
 import net.minecraft.world.item.ItemStack;
+import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.sinedkadis.terracompositio.block.entity.EntStatueBlockEntity;
 import net.sinedkadis.terracompositio.registries.TCItems;
 
@@ -98,12 +99,15 @@ public class FlowCedarEntStatueModel extends Model implements HeadedModel {
 
 
 
-		boolean flag = false;
-		@SuppressWarnings("OptionalGetWithoutIsPresent") ItemStack stack = entity.getItemBehaviour().get().getItemHandler().getStackInSlot(0);
-		if (stack.is(TCItems.TECHNETIUM_CROWN.get())){
-			flag = true;
-		}
-		this.mini_crown.visible = flag;
+
+		entity.getCapability(ForgeCapabilities.ITEM_HANDLER).ifPresent(iItemHandler -> {
+			boolean flag = false;
+			ItemStack stack = iItemHandler.getStackInSlot(0);
+			if (stack.is(TCItems.TECHNETIUM_CROWN.get())){
+				flag = true;
+			}
+			this.mini_crown.visible = flag;
+		});
 
 //		this.animateWalk(FlowCedarEntAnimations.WALK, limbSwing, limbSwingAmount, 2f, 2f);
 //		this.animate(entity1.idleAnimationState, FlowCedarEntAnimations.IDLE, ageInTicks, 1f);

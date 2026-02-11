@@ -1,4 +1,4 @@
-package net.sinedkadis.terracompositio.block.behaviours.pp_behaviours;
+package net.sinedkadis.terracompositio.block.behaviours.pp;
 
 import net.minecraft.core.Direction;
 import net.minecraft.world.entity.Entity;

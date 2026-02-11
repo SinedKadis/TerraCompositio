@@ -1,44 +1,39 @@
-package net.sinedkadis.terracompositio.block.behaviours.pp_behaviours;
+package net.sinedkadis.terracompositio.block.behaviours.pp;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.util.Mth;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.sinedkadis.terracompositio.api.TCCapabilities;
 import net.sinedkadis.terracompositio.api.TerraCompositioAPI;
 import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBEBehaviour;
-import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBECFEBehaviour;
 import net.sinedkadis.terracompositio.api.dummies.DummyBehaviour;
 import net.sinedkadis.terracompositio.api.networks.cfe.CFENetwork;
 import net.sinedkadis.terracompositio.api.networks.cfe.CFENetworkMember;
 import net.sinedkadis.terracompositio.api.networks.cfe.ICFEHandler;
 import net.sinedkadis.terracompositio.block.behaviours.CFEHandlerBehaviour;
 import net.sinedkadis.terracompositio.block.entity.PathPointerBlockEntity;
-import net.sinedkadis.terracompositio.block.entity.TCBlockEntity;
 import net.sinedkadis.terracompositio.cfe.CFEContainer;
 import net.sinedkadis.terracompositio.cfe.burst.CFEBurstProjectileEntity;
 import net.sinedkadis.terracompositio.util.TCUtil;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
-import java.util.Objects;
 import java.util.Optional;
 
 public abstract class PPInputBehaviour extends AbstractPPBehaviour{
-    IBECFEBehaviour thisCFEBehaviour;
-    IBECFEBehaviour endPointCFEBehaviour;
+    ICFEHandler thisCFEBehaviour;
+    ICFEHandler endPointCFEBehaviour;
 
     public PPInputBehaviour(PathPointerBlockEntity blockEntity) {
         super(blockEntity);
     }
 
     protected void sendCFE() {
-        Optional<SenderBehaviour> senderOpt = blockEntity.getBehaviours().stream()
-                .map(ibeBehaviour -> ibeBehaviour instanceof SenderBehaviour senderBehaviour ? senderBehaviour : null)
-                .filter(Objects::nonNull)
-                .findAny();
-        if (senderOpt.isPresent()) {
-            int added = TCUtil.tryCFETransfer(endPointCFEBehaviour.getBlockEntity().getBlockPos(),
-                    thisCFEBehaviour,
-                    endPointCFEBehaviour.getCfeHandler().getFreeSpace());
-            endPointCFEBehaviour.getCfeHandler().addToQueue(added);
+        if (blockEntity.parts.contains(PathPointerBlockEntity.PPPart.SENDER)) {
+            int added = TCUtil.tryCFETransfer(endPointCFEBehaviour.getEntity().getBlockPos(),
+                    thisCFEBehaviour.getAttachedMember(),
+                    endPointCFEBehaviour.getFreeSpace());
+            endPointCFEBehaviour.addToQueue(added);
         }
     }
 
@@ -46,26 +41,26 @@ public abstract class PPInputBehaviour extends AbstractPPBehaviour{
         CFENetwork cfeNetwork = TerraCompositioAPI.instance().getCFENetworkInstance();
         CFENetworkMember source = cfeNetwork.getClosestSourceWithCFE(blockEntity.getBlockPos(),
                 blockEntity.getLevel(),
-                thisCFEBehaviour.getLimit() * 2,
-                thisCFEBehaviour.getPriority());
+                thisCFEBehaviour.getAttachedMember().getLimit() * 2,
+                thisCFEBehaviour.getAttachedMember().getPriority());
         if (source != null) {
-            TCUtil.tryCFETransfer(thisCFEBehaviour, source, thisCFEBehaviour.getCfeHandler().getFreeSpace());
+            TCUtil.tryCFETransfer(thisCFEBehaviour.getAttachedMember(), source, thisCFEBehaviour.getFreeSpace());
         }
     }
 
     protected void updateMaxCFE() {
         if (!thisCFEBehaviour.equals(endPointCFEBehaviour))
-            thisCFEBehaviour.getCfeHandler().setMaxCFE(endPointCFEBehaviour.getCfeHandler().getFreeSpace());
+            thisCFEBehaviour.setMaxCFE(endPointCFEBehaviour.getFreeSpace());
     }
 
     protected void validateCFEBehaviour() {
         if (blockEntity.getBehaviours().stream().noneMatch(ibeBehaviour -> ibeBehaviour instanceof InputCFEBehaviour)) {
-            addCFEBehaviour();
+            setCFEBehaviour();
         }
     }
 
     @Override
-    protected void addCFEBehaviour() {
+    protected void setCFEBehaviour() {
         List<IBEBehaviour> list = blockEntity.getBehaviours();
         while (list.size()<3) list.add(DummyBehaviour.instance);
         list.set(2, new InputCFEBehaviour(list));
@@ -73,10 +68,7 @@ public abstract class PPInputBehaviour extends AbstractPPBehaviour{
 
     protected boolean invalidBehaviours() {
         if (thisCFEBehaviour == null) {
-            Optional<IBECFEBehaviour> behaviour = TCBlockEntity.getBehaviours(blockEntity).stream()
-                    .map(ibeBehaviour -> ibeBehaviour instanceof IBECFEBehaviour ibecfeBehaviour ? ibecfeBehaviour : null)
-                    .filter(Objects::nonNull)
-                    .findAny();
+            Optional<ICFEHandler> behaviour = blockEntity.getCapability(TCCapabilities.CFE).resolve();
             if (behaviour.isPresent()) {
                 thisCFEBehaviour = behaviour.get();
             } else {
@@ -89,14 +81,17 @@ public abstract class PPInputBehaviour extends AbstractPPBehaviour{
                 endPointCFEBehaviour = thisCFEBehaviour;
                 return false;
             }
-            Optional<IBECFEBehaviour> behaviour = TCBlockEntity.getBehaviours(blockEntity.getLevel(), endpoint).stream()
-                    .map(ibeBehaviour -> ibeBehaviour instanceof IBECFEBehaviour ibecfeBehaviour ? ibecfeBehaviour : null)
-                    .filter(Objects::nonNull)
-                    .findAny();
-            if (behaviour.isPresent()) {
-                endPointCFEBehaviour = behaviour.get();
-            } else {
-                return true;
+
+            if (blockEntity.getLevel() != null) {
+                BlockEntity endPointBE = blockEntity.getLevel().getBlockEntity(endpoint);
+                if (endPointBE != null) {
+                    Optional<ICFEHandler> behaviour = endPointBE.getCapability(TCCapabilities.CFE).resolve();
+                    if (behaviour.isPresent()) {
+                        endPointCFEBehaviour = behaviour.get();
+                    } else {
+                        return true;
+                    }
+                }
             }
         }
 

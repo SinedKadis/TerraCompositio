@@ -1,4 +1,4 @@
-package net.sinedkadis.terracompositio.block.behaviours.pp_behaviours;
+package net.sinedkadis.terracompositio.block.behaviours.pp;
 
 import lombok.Getter;
 import net.minecraft.core.BlockPos;
@@ -21,7 +21,7 @@ public abstract class PPOutputBehaviour extends AbstractPPBehaviour {
     }
 
     @Override
-    protected void addCFEBehaviour() {
+    protected void setCFEBehaviour() {
         List<IBEBehaviour> list = blockEntity.getBehaviours();
         while (list.size()<3) list.add(DummyBehaviour.instance);
         list.set(2, new OutputCfeBehaviour(list));
@@ -29,7 +29,7 @@ public abstract class PPOutputBehaviour extends AbstractPPBehaviour {
 
     protected void validateCFEBehaviour() {
         if (blockEntity.getBehaviours().stream().noneMatch(ibeBehaviour -> ibeBehaviour instanceof OutputCfeBehaviour)) {
-            addCFEBehaviour();
+            setCFEBehaviour();
         }
     }
 

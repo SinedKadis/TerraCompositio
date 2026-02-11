@@ -17,23 +17,22 @@ import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.sinedkadis.terracompositio.api.TCCapabilities;
-import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBEBehaviour;
 import net.sinedkadis.terracompositio.api.dummies.DummyCFEHandler;
 import net.sinedkadis.terracompositio.api.networks.cfe.CFENetworkMember;
 import net.sinedkadis.terracompositio.api.networks.cfe.CFENetworkMemberBE;
 import net.sinedkadis.terracompositio.api.networks.cfe.CFENetworkMemberEntity;
 import net.sinedkadis.terracompositio.api.networks.cfe.ICFEHandler;
-import net.sinedkadis.terracompositio.block.behaviours.pp_behaviours.ReceiverBehaviour;
-import net.sinedkadis.terracompositio.block.behaviours.pp_behaviours.SenderBehaviour;
+import net.sinedkadis.terracompositio.block.behaviours.pp.ReceiverBehaviour;
+import net.sinedkadis.terracompositio.block.behaviours.pp.SenderBehaviour;
 import net.sinedkadis.terracompositio.block.entity.PathPointerBlockEntity;
 import net.sinedkadis.terracompositio.block.entity.TCBlockEntity;
 import net.sinedkadis.terracompositio.entity.custom.CFECloudEntity;
 import net.sinedkadis.terracompositio.registries.TCEntities;
 import net.sinedkadis.terracompositio.registries.TCItems;
+import net.sinedkadis.terracompositio.util.BehaviourCapabilities;
 
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
-import java.util.List;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -172,16 +171,9 @@ public class CFEBurstProjectileEntity extends ThrowableProjectile {
     }
 
     private boolean tryRedirectByPPBE(PathPointerBlockEntity pathPointerBlockEntity,BlockPos currentPos) {
-        List<IBEBehaviour> behaviours = pathPointerBlockEntity.getBehaviours();
-        Optional<SenderBehaviour> sender = behaviours.stream()
-                .map(ibeBehaviour -> ibeBehaviour instanceof SenderBehaviour senderBehaviour ? senderBehaviour : null)
-                .filter(Objects::nonNull)
-                .findAny();
+        Optional<SenderBehaviour> sender = pathPointerBlockEntity.getCapability(BehaviourCapabilities.SENDER).resolve();
         if (sender.isPresent()) {
-            Optional<ReceiverBehaviour> receiver = behaviours.stream()
-                    .map(ibeBehaviour -> ibeBehaviour instanceof ReceiverBehaviour senderBehaviour ? senderBehaviour : null)
-                    .filter(Objects::nonNull)
-                    .findAny();
+            Optional<ReceiverBehaviour> receiver = pathPointerBlockEntity.getCapability(BehaviourCapabilities.RECEIVER).resolve();
             if (receiver.isPresent()) {
                 if (!receiver.get().validAngle(currentPos)) return false;
                 timeToLive+=100;

@@ -16,17 +16,16 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
 import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBEBehaviour;
-import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBEBehaviourHolder;
-import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBEItemBehaviour;
 import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.*;
 
-@Getter
+
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public abstract class TCBlockEntity extends BlockEntity implements IBEBehaviourHolder {
+public abstract class TCBlockEntity extends BlockEntity{
+    @Getter
     protected List<IBEBehaviour> behaviours = new ArrayList<>();
 
     public TCBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
@@ -35,29 +34,7 @@ public abstract class TCBlockEntity extends BlockEntity implements IBEBehaviourH
         behaviours.forEach(IBEBehaviour::init);
     }
 
-    public static List<IBEBehaviour> getBehaviours(BlockEntity blockEntity) {
-        if (blockEntity instanceof TCBlockEntity tcBlockEntity) {
-            return tcBlockEntity.getBehaviours();
-        }
-        return List.of();
-    }
-
-    public static List<IBEBehaviour> getBehaviours(@Nullable Level level, BlockPos blockPos) {
-        if (level instanceof ServerLevel) {
-            BlockEntity blockEntity = level.getBlockEntity(blockPos);
-            if (blockEntity instanceof TCBlockEntity tcBlockEntity) {
-                return tcBlockEntity.getBehaviours();
-            }
-        }
-        return List.of();
-    }
-
-    public Optional<IBEItemBehaviour> getItemBehaviour() {
-        return behaviours.stream().map(iBehaviour -> iBehaviour instanceof IBEItemBehaviour iitemBehaviour ? iitemBehaviour : null)
-                .filter(Objects::nonNull)
-                .findAny();
-    }
-
+    abstract void addBEBehaviours(List<IBEBehaviour> behaviourList);
 
     @Override
     public <T> LazyOptional<T> getCapability(Capability<T> cap, @Nullable Direction side) {

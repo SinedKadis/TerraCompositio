@@ -1,4 +1,4 @@
-package net.sinedkadis.terracompositio.block.behaviours.pp_behaviours;
+package net.sinedkadis.terracompositio.block.behaviours.pp;
 
 import net.minecraft.core.Direction;
 import net.minecraft.world.entity.Entity;
@@ -40,11 +40,11 @@ public class ExtractorBehaviour extends PPInputBehaviour{
 
     @Override
     protected void collectCFE() {
-        int freeSpace = thisCFEBehaviour.getCfeHandler().getFreeSpace();
+        int freeSpace = thisCFEBehaviour.getFreeSpace();
         if (freeSpace < 1) return;
         scanCompatibleEntities().forEach(livingEntity ->
                 livingEntity.getCapability(TCCapabilities.CFE).ifPresent(icfeHandler ->
-                        TCUtil.tryCFETransfer(thisCFEBehaviour.getCfeHandler(), icfeHandler, freeSpace)));
+                        TCUtil.tryCFETransfer(thisCFEBehaviour, icfeHandler, freeSpace)));
     }
 
     public @NotNull List<LivingEntity> scanCompatibleEntities() {

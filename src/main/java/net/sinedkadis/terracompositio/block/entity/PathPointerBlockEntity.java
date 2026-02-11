@@ -9,7 +9,6 @@ import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.util.Mth;
 import net.minecraft.util.RandomSource;
 import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.InteractionHand;
@@ -22,11 +21,11 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBEBehaviour;
 import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBECFEBehaviour;
-import net.sinedkadis.terracompositio.api.behaviors.blockentity.IPPBEBehaviour;
 import net.sinedkadis.terracompositio.api.dummies.DummyBehaviour;
-import net.sinedkadis.terracompositio.block.behaviours.pp_behaviours.*;
+import net.sinedkadis.terracompositio.block.behaviours.pp.*;
 import net.sinedkadis.terracompositio.block.custom.PathPointerBlock;
 import net.sinedkadis.terracompositio.registries.TCBlockEntities;
+import net.sinedkadis.terracompositio.util.BehaviourCapabilities;
 import net.sinedkadis.terracompositio.util.TCUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -69,6 +68,7 @@ public class PathPointerBlockEntity extends TCBlockEntity implements Nameable {
         }
     }
 
+    @SuppressWarnings("DataFlowIssue")
     public static boolean ppWrenchInteraction(@Nullable Player pPlayer, LevelAccessor level, BlockPos clickedPos, ItemStack wrenchStack) {
 
         if (!(level.getBlockEntity(clickedPos) instanceof PathPointerBlockEntity clickedPPBE)) {
@@ -123,27 +123,13 @@ public class PathPointerBlockEntity extends TCBlockEntity implements Nameable {
             return false;
         }
 
-        SenderBehaviour clickedSender = clickedPPBE.getBehaviours().stream()
-                .map(ibeBehaviour -> ibeBehaviour instanceof SenderBehaviour senderBehaviour ? senderBehaviour : null)
-                .filter(Objects::nonNull)
-                .findAny().orElse(null);
-        ReceiverBehaviour clickedReceiver = clickedPPBE.getBehaviours().stream()
-                .map(ibeBehaviour -> ibeBehaviour instanceof ReceiverBehaviour receiverBehaviour ? receiverBehaviour : null)
-                .filter(Objects::nonNull)
-                .findAny().orElse(null);
+        SenderBehaviour clickedSender = clickedPPBE.getCapability(BehaviourCapabilities.SENDER).orElse(null);
+        ReceiverBehaviour clickedReceiver = clickedPPBE.getCapability(BehaviourCapabilities.RECEIVER).orElse(null);
 
-        SenderBehaviour storedSender = storedPPBE.getBehaviours().stream()
-                .map(ibeBehaviour -> ibeBehaviour instanceof SenderBehaviour senderBehaviour ? senderBehaviour : null)
-                .filter(Objects::nonNull)
-                .findAny().orElse(null);
-        ReceiverBehaviour storedReceiver = storedPPBE.getBehaviours().stream()
-                .map(ibeBehaviour -> ibeBehaviour instanceof ReceiverBehaviour receiverBehaviour ? receiverBehaviour : null)
-                .filter(Objects::nonNull)
-                .findAny().orElse(null);
+        SenderBehaviour storedSender = storedPPBE.getCapability(BehaviourCapabilities.SENDER).orElse(null);
+        ReceiverBehaviour storedReceiver = storedPPBE.getCapability(BehaviourCapabilities.RECEIVER).orElse(null);
 
         if (forwardBind) {
-            assert storedSender != null;
-            assert clickedReceiver != null;
             if(!bind(storedSender,storedReceiver,clickedSender,clickedReceiver)) {
                 TCUtil.message(pPlayer, Component.translatable("item.terracompositio.flow_rotating_axe.bind_fail_angle")
                         .withStyle(ChatFormatting.BOLD));
@@ -151,8 +137,6 @@ public class PathPointerBlockEntity extends TCBlockEntity implements Nameable {
             }
         }
         if (backwardBind) {
-            assert clickedSender != null;
-            assert storedReceiver != null;
             if(!bind(clickedSender,clickedReceiver,storedSender,storedReceiver)) {
                 TCUtil.message(pPlayer, Component.translatable("item.terracompositio.flow_rotating_axe.bind_fail_angle")
                         .withStyle(ChatFormatting.BOLD));
@@ -236,14 +220,8 @@ public class PathPointerBlockEntity extends TCBlockEntity implements Nameable {
             be.rotationPitch = 90;
             be.rotationYaw = 0;
             //be.rotationRoll = 0;
-            be.behaviours.forEach(ibeBehaviour -> {
-                if (ibeBehaviour instanceof SenderBehaviour senderBehaviour) {
-                    senderBehaviour.setBindPos(null);
-                }
-                if (ibeBehaviour instanceof ReceiverBehaviour receiverBehaviour) {
-                    receiverBehaviour.getSenderPoses().clear();
-                }
-            });
+            be.getCapability(BehaviourCapabilities.SENDER).ifPresent(senderBehaviour -> senderBehaviour.setBindPos(null));
+            be.getCapability(BehaviourCapabilities.RECEIVER).ifPresent(receiverBehaviour -> receiverBehaviour.getSenderPoses().clear());
             be.setUpdateScheduled(true);
         }
     }
@@ -340,14 +318,6 @@ public class PathPointerBlockEntity extends TCBlockEntity implements Nameable {
         return lookDir;
     }
 
-
-
-    private static double angle(Vec3 a, Vec3 b) {
-        return Math.acos(a.dot(b)/a.length()/b.length());
-    }
-
-
-
     @Override
     protected void saveAdditional(CompoundTag pTag) {
         pTag.putFloat("rot_y", rotationYaw);
@@ -415,11 +385,6 @@ public class PathPointerBlockEntity extends TCBlockEntity implements Nameable {
         rotationYaw = tag.getFloat("rot_y");
         rotationPitch = tag.getFloat("rot_x");
         rotationRoll = tag.getFloat("rot_z");
-        behaviours.forEach(ibeBehaviour -> {
-            if (ibeBehaviour instanceof IPPBEBehaviour ippbeBehaviour) {
-                ippbeBehaviour.onTagUpdate(tag);
-            }
-        });
     }
 
     @Override
@@ -515,11 +480,11 @@ public class PathPointerBlockEntity extends TCBlockEntity implements Nameable {
         }
 
         @Override
-        public PPPart set(int index, PPPart element) {
+        public PPPart set(int index, PPPart part) {
             while (behaviours.size() <= index) behaviours.add(DummyBehaviour.instance);
-            behaviours.set(index,element.behaviourFactory.getBehaviour(PathPointerBlockEntity.this));
+            behaviours.set(index,part.behaviourFactory.getBehaviour(PathPointerBlockEntity.this));
             behaviours.get(index).init();
-            return super.set(index, element);
+            return super.set(index, part);
         }
     }
 }

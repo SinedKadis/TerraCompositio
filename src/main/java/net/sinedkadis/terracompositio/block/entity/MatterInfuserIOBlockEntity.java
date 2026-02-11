@@ -8,6 +8,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.phys.Vec3;
+import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.items.ItemStackHandler;
 import net.sinedkadis.terracompositio.api.networks.cfe.ICFEHandler;
 import net.sinedkadis.terracompositio.block.behaviours.CFEHandlerBehaviour;
@@ -77,11 +78,12 @@ public class MatterInfuserIOBlockEntity extends MatterInfuserBaseBlockEntity{
         if (recipe.isPresent() && this.level != null && portBE != null) {
             ItemStack result = recipe.get().getResultItem(null);
             int takeCount = recipe.get().getIngredients().get(1).getItems()[0].getCount();
-            if (this.getItemBehaviour().isEmpty()) return ItemStack.EMPTY;
-            TwoSlotItemHandlerBehaviour itemBehaviour = (TwoSlotItemHandlerBehaviour) this.getItemBehaviour().get();
-            itemBehaviour.forceExtractItem(0, takeCount,false);
-            itemBehaviour.forceInsertItem(1, result,false);
-
+            this.getCapability(ForgeCapabilities.ITEM_HANDLER).ifPresent(iItemHandler -> {
+                if (iItemHandler instanceof TwoSlotItemHandlerBehaviour.SlotSensitiveItemStackHandler itemStackHandler) {
+                    itemStackHandler.forceExtractItem(0, takeCount,false);
+                    itemStackHandler.forceInsertItem(1, result,false);
+                }
+            });
             if (this.level.getRandom().nextInt(100) < catalystDecayRate){
                 portBE.extractItemStack(0,1);
             }
