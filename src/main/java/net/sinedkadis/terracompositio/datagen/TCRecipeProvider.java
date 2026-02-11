@@ -46,7 +46,6 @@ public class TCRecipeProvider extends RecipeProvider implements IConditionBuilde
         buildInfusedIronMaterials(pWriter);
         buildGoldMaterials(pWriter);
         buildDesorbers(pWriter);
-        buildWrenchAxe(pWriter);
         buildPathPointers(pWriter);
         buildFloatingRedstone(pWriter);
         buildCFJ(pWriter);
@@ -91,6 +90,18 @@ public class TCRecipeProvider extends RecipeProvider implements IConditionBuilde
                 .define('T', Items.REDSTONE_TORCH)
                 .define('Q', Items.QUARTZ)
                 .define('S', Items.STONE)
+                .define('I',TCItems.INFUSED_IRON_INGOT.get())
+                .unlockedBy(getHasName(TCItems.INFUSED_IRON_INGOT.get()), has(TCItems.INFUSED_IRON_INGOT.get()))
+                .save(pWriter);
+        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, TCBlocks.INFUSED_IRON_PRESSURE_PLATE.get())
+                .pattern("II")
+                .define('I',TCItems.INFUSED_IRON_INGOT.get())
+                .unlockedBy(getHasName(TCItems.INFUSED_IRON_INGOT.get()), has(TCItems.INFUSED_IRON_INGOT.get()))
+                .save(pWriter);
+        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, TCBlocks.INFUSED_IRON_DOOR.get())
+                .pattern("II")
+                .pattern("II")
+                .pattern("II")
                 .define('I',TCItems.INFUSED_IRON_INGOT.get())
                 .unlockedBy(getHasName(TCItems.INFUSED_IRON_INGOT.get()), has(TCItems.INFUSED_IRON_INGOT.get()))
                 .save(pWriter);
@@ -419,6 +430,8 @@ public class TCRecipeProvider extends RecipeProvider implements IConditionBuilde
     }
 
     private static void buildSpecial(@NotNull Consumer<FinishedRecipe> pWriter) {
+        buildWrenchAxe(pWriter);
+
         ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, TCBlocks.WEDGE.get())
                 .pattern("S S")
                 .pattern("SSS")
@@ -439,6 +452,26 @@ public class TCRecipeProvider extends RecipeProvider implements IConditionBuilde
                 .requires(TCItems.INFUSED_IRON_INGOT.get())
                 .unlockedBy(getHasName(TCItems.INFUSED_IRON_INGOT.get()), has(Items.BUNDLE))
                 .save(pWriter);
+        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, TCItems.FLUID_APPLIER.get())
+                .pattern("  N")
+                .pattern(" T ")
+                .pattern("S  ")
+                .define('T', TCItems.TECHNETIUM_INGOT.get())
+                .define('N', TCItems.INFUSED_IRON_NUGGET.get())
+                .define('S', Items.STICK)
+                .unlockedBy(getHasName(TCItems.TECHNETIUM_INGOT.get()), has(TCItems.TECHNETIUM_INGOT.get()))
+                .save(pWriter);
+        //todo recipe
+//        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, TCItems.CFE_BALL.get())
+//                .pattern(" T ")
+//                .pattern("TQT")
+//                .pattern("SIS")
+//                .define('T', Items.REDSTONE_TORCH)
+//                .define('Q', Items.QUARTZ)
+//                .define('S', Items.STONE)
+//                .define('I',TCItems.INFUSED_IRON_INGOT.get())
+//                .unlockedBy(getHasName(TCItems.INFUSED_IRON_INGOT.get()), has(TCItems.INFUSED_IRON_INGOT.get()))
+//                .save(pWriter);
     }
 
     private static void buildMatterInfuserBlocks(@NotNull Consumer<FinishedRecipe> pWriter) {
