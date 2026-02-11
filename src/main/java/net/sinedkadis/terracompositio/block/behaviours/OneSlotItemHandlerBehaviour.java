@@ -27,7 +27,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 @Data
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
-public abstract class OneSlotItemHandlerBehaviour implements IBEItemBehaviour, WorldlyContainer {
+public class OneSlotItemHandlerBehaviour implements IBEItemBehaviour, WorldlyContainer {
     protected static final int SLOT = 0;
 
 
@@ -65,7 +65,7 @@ public abstract class OneSlotItemHandlerBehaviour implements IBEItemBehaviour, W
 
     @Override
     public void onChunkLoad() {
-        lazyItemHandler = LazyOptional.of(() -> itemHandler);
+        lazyItemHandler = LazyOptional.of(this::getItemHandler);
     }
 
     @Override
@@ -88,12 +88,12 @@ public abstract class OneSlotItemHandlerBehaviour implements IBEItemBehaviour, W
 
     @Override
     public void onSave(CompoundTag tag) {
-        tag.put("itemHandler", itemHandler.serializeNBT());
+        tag.put("itemHandler", getItemHandler().serializeNBT());
     }
 
     @Override
     public void onLoad(CompoundTag tag) {
-        itemHandler.deserializeNBT(tag);
+        getItemHandler().deserializeNBT(tag);
     }
 
 
@@ -154,33 +154,33 @@ public abstract class OneSlotItemHandlerBehaviour implements IBEItemBehaviour, W
 
     @Override
     public boolean isEmpty() {
-        return itemHandler.getStackInSlot(SLOT).isEmpty();
+        return getItemHandler().getStackInSlot(SLOT).isEmpty();
     }
 
     @Override
     public ItemStack getItem(int pSlot) {
-        return itemHandler.getStackInSlot(pSlot);
+        return getItemHandler().getStackInSlot(pSlot);
     }
 
     @Override
     public ItemStack removeItem(int pSlot, int pAmount) {
-        return itemHandler.extractItem(pSlot, pAmount, false);
+        return getItemHandler().extractItem(pSlot, pAmount, false);
     }
 
     @Override
     public ItemStack removeItemNoUpdate(int pSlot) {
-        ItemStack stackInSlot = itemHandler.getStackInSlot(pSlot);
-        itemHandler.setStackInSlot(pSlot, ItemStack.EMPTY);
+        ItemStack stackInSlot = getItemHandler().getStackInSlot(pSlot);
+        getItemHandler().setStackInSlot(pSlot, ItemStack.EMPTY);
         return stackInSlot;
     }
 
     @Override
     public void setItem(int pSlot, ItemStack pStack) {
-        itemHandler.setStackInSlot(pSlot, pStack);
+        getItemHandler().setStackInSlot(pSlot, pStack);
     }
 
     public void insertItem(int pSlot, ItemStack pStack) {
-        itemHandler.insertItem(pSlot, pStack, false);
+        getItemHandler().insertItem(pSlot, pStack, false);
     }
 
     @Override
@@ -195,11 +195,11 @@ public abstract class OneSlotItemHandlerBehaviour implements IBEItemBehaviour, W
 
     @Override
     public void clearContent() {
-        itemHandler.setStackInSlot(SLOT, ItemStack.EMPTY);
+        getItemHandler().setStackInSlot(SLOT, ItemStack.EMPTY);
     }
 
     public ItemStack getInputSlot() {
-        return this.itemHandler.getStackInSlot(SLOT);
+        return this.getItemHandler().getStackInSlot(SLOT);
     }
 
 

@@ -48,6 +48,7 @@ public class TCRecipeProvider extends RecipeProvider implements IConditionBuilde
         buildDesorbers(pWriter);
         buildWrenchAxe(pWriter);
         buildPathPointers(pWriter);
+        buildFloatingRedstone(pWriter);
         buildCFJ(pWriter);
 
 
@@ -57,6 +58,42 @@ public class TCRecipeProvider extends RecipeProvider implements IConditionBuilde
 
 
 
+    }
+
+    private void buildFloatingRedstone(@NotNull Consumer<FinishedRecipe> pWriter) {
+        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, TCBlocks.FLOATING_REDSTONE.get())
+                .pattern("R")
+                .pattern("N")
+                .define('R', Items.REDSTONE)
+                .define('N', TCItems.INFUSED_IRON_NUGGET.get())
+                .unlockedBy(getHasName(TCItems.INFUSED_IRON_INGOT.get()), has(TCItems.INFUSED_IRON_INGOT.get()))
+                .save(pWriter);
+        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, TCBlocks.FLOATING_TORCH_HOLDER.get())
+                .pattern("P")
+                .pattern("I")
+                .define('P', Items.FLOWER_POT)
+                .define('I', TCItems.INFUSED_IRON_INGOT.get())
+                .unlockedBy(getHasName(TCItems.INFUSED_IRON_INGOT.get()), has(TCItems.INFUSED_IRON_INGOT.get()))
+                .save(pWriter);
+        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, TCBlocks.FLOATING_REPEATER.get())
+                .pattern("TRT")
+                .pattern("SIS")
+                .define('T', Items.REDSTONE_TORCH)
+                .define('R', Items.REDSTONE)
+                .define('S', Items.STONE)
+                .define('I',TCItems.INFUSED_IRON_INGOT.get())
+                .unlockedBy(getHasName(TCItems.INFUSED_IRON_INGOT.get()), has(TCItems.INFUSED_IRON_INGOT.get()))
+                .save(pWriter);
+        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, TCBlocks.FLOATING_REPEATER.get())
+                .pattern(" T ")
+                .pattern("TQT")
+                .pattern("SIS")
+                .define('T', Items.REDSTONE_TORCH)
+                .define('Q', Items.QUARTZ)
+                .define('S', Items.STONE)
+                .define('I',TCItems.INFUSED_IRON_INGOT.get())
+                .unlockedBy(getHasName(TCItems.INFUSED_IRON_INGOT.get()), has(TCItems.INFUSED_IRON_INGOT.get()))
+                .save(pWriter);
     }
 
     private static void buildTechnetiumOreProcessing(@NotNull Consumer<FinishedRecipe> pWriter) {
@@ -192,6 +229,24 @@ public class TCRecipeProvider extends RecipeProvider implements IConditionBuilde
                 .pattern("LT ")
                 .define('T', TCItems.TECHNETIUM_INGOT.get())
                 .define('L', Items.LAPIS_LAZULI)
+                .unlockedBy(getHasName(TCItems.TECHNETIUM_INGOT.get()), has(TCItems.TECHNETIUM_INGOT.get()))
+                .save(pWriter);
+        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, TCBlocks.PP_EXTRACTOR.get())
+                .pattern("LT ")
+                .pattern("NLT")
+                .pattern("LT ")
+                .define('T', TCItems.TECHNETIUM_INGOT.get())
+                .define('N', TCItems.INFUSED_IRON_NUGGET.get())
+                .define('L', TCTags.Items.FLOW_CEDAR_LOGS)
+                .unlockedBy(getHasName(TCItems.TECHNETIUM_INGOT.get()), has(TCItems.TECHNETIUM_INGOT.get()))
+                .save(pWriter);
+        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, TCBlocks.PP_INFUSER.get())
+                .pattern(" TR")
+                .pattern("TLR")
+                .pattern(" TR")
+                .define('T', TCItems.TECHNETIUM_INGOT.get())
+                .define('R', TCItems.INFUSED_IRON_ROD.get())
+                .define('L', TCTags.Items.FLOW_CEDAR_LOGS)
                 .unlockedBy(getHasName(TCItems.TECHNETIUM_INGOT.get()), has(TCItems.TECHNETIUM_INGOT.get()))
                 .save(pWriter);
     }

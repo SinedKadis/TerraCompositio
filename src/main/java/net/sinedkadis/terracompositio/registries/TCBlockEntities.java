@@ -95,6 +95,9 @@ public class TCBlockEntities {
     public static final RegistryObject<BlockEntityType<AirSaturatorBlockEntity>> AIR_SATURATOR_BE =
             registerBE("air_saturator_be",AirSaturatorBlockEntity::new, AIR_SATURATOR);
 
+    public static final RegistryObject<BlockEntityType<FloatingTorchHolderBlockEntity>> FLOATING_TORCH_HOLDER_BE =
+            registerBE("floating_torch_holder_be",FloatingTorchHolderBlockEntity::new, FLOATING_TORCH_HOLDER);
+
     public static final RegistryObject<BlockEntityType<CedarGearboxBlockEntity>> CEDAR_GEARBOX_BE =
             registerBE("cedar_gearbox_be",CedarGearboxBlockEntity::new, CompatUtils.CREATE_EXISTENCE, CEDAR_GEARBOX);
 

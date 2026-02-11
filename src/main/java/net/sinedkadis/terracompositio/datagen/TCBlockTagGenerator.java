@@ -4,6 +4,7 @@ import net.minecraft.core.HolderLookup;
 import net.minecraft.data.PackOutput;
 import net.minecraft.tags.BlockTags;
 
+import net.minecraft.world.level.block.Blocks;
 import net.minecraftforge.common.data.BlockTagsProvider;
 import net.minecraftforge.common.data.ExistingFileHelper;
 import net.sinedkadis.terracompositio.TerraCompositio;
@@ -91,13 +92,15 @@ public class TCBlockTagGenerator extends BlockTagsProvider {
         this.tag(BlockTags.STAIRS)
                 .add(TCBlocks.FLOW_CEDAR_STAIRS.get());
         this.tag(BlockTags.DOORS)
-                .add(TCBlocks.FLOW_CEDAR_DOOR.get());
+                .add(TCBlocks.FLOW_CEDAR_DOOR.get(),
+                        TCBlocks.INFUSED_IRON_DOOR.get());
         this.tag(BlockTags.TRAPDOORS)
                 .add(TCBlocks.FLOW_CEDAR_TRAPDOOR.get());
         this.tag(BlockTags.BUTTONS)
                 .add(TCBlocks.FLOW_CEDAR_BUTTON.get());
         this.tag(BlockTags.PRESSURE_PLATES)
-                .add(TCBlocks.FLOW_CEDAR_PRESSURE_PLATE.get());
+                .add(TCBlocks.FLOW_CEDAR_PRESSURE_PLATE.get(),
+                        TCBlocks.INFUSED_IRON_PRESSURE_PLATE.get());
         this.tag(BlockTags.FENCES)
                 .add(TCBlocks.FLOW_CEDAR_FENCE.get());
         this.tag(BlockTags.FENCE_GATES)
@@ -131,6 +134,7 @@ public class TCBlockTagGenerator extends BlockTagsProvider {
                 .add(TCBlocks.FLOW_CEDAR_SIGN.get());
         this.tag(BlockTags.SAPLINGS)
                 .add(TCBlocks.FLOW_CEDAR_SAPLING.get());
+
 //        this.tag(TCTags.Blocks.CREATE_WRENCH_PICKUP)
 //                .add(Blocks.PISTON);
 

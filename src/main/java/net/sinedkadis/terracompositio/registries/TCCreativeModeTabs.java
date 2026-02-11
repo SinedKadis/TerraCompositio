@@ -128,6 +128,16 @@ public class TCCreativeModeTabs {
                             pOutput.accept(TCBlocks.PP_EXTRACTOR.get());
                             pOutput.accept(TCBlocks.PP_INFUSER.get());
 
+                            //Floating redstone
+                            pOutput.accept(TCBlocks.FLOATING_REDSTONE.get());
+                            pOutput.accept(TCBlocks.FLOATING_REPEATER.get());
+                            pOutput.accept(TCBlocks.FLOATING_COMPARATOR.get());
+                            pOutput.accept(TCBlocks.FLOATING_TORCH_HOLDER.get());
+                            pOutput.accept(TCBlocks.INFUSED_IRON_PRESSURE_PLATE.get());
+                            pOutput.accept(TCBlocks.INFUSED_IRON_DOOR.get());
+
+
+
                             //misc
                             pOutput.accept(TCItems.FLOW_CEDAR_ENT_SPAWN_EGG.get());
                             pOutput.accept(TCBlocks.FLOW_CEDAR_ENT_STATUE.get());

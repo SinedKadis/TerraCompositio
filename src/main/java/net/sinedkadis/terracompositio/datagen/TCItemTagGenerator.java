@@ -5,7 +5,9 @@ import net.minecraft.data.PackOutput;
 import net.minecraft.data.tags.ItemTagsProvider;
 
 import net.minecraft.tags.ItemTags;
+import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraftforge.common.Tags;
 import net.minecraftforge.common.data.ExistingFileHelper;
 import net.sinedkadis.terracompositio.TerraCompositio;
@@ -90,5 +92,9 @@ public class TCItemTagGenerator extends ItemTagsProvider {
                         TCBlocks.TECHNETIUM_RAW_ORE_BLOCK.get().asItem());
         this.tag(TCTags.Items.WRENCHES)
                 .add(TCItems.WRENCH_TAG_HOLDER.get());
+        this.tag(TCTags.Items.TORCHES)
+                .add(Items.TORCH,
+                        Items.REDSTONE_TORCH,
+                        Items.SOUL_TORCH);
     }
 }

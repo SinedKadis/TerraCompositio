@@ -102,6 +102,14 @@ public class TCBlockLootTables extends BlockLootSubProvider {
         this.dropSelf(TCBlocks.FLOW_CEDAR_ENT_STATUE.get());
         this.dropSelf(TCBlocks.AIR_SATURATOR.get());
 
+        this.dropSelf(TCBlocks.FLOATING_REDSTONE.get());
+        this.dropSelf(TCBlocks.FLOATING_COMPARATOR.get());
+        this.dropSelf(TCBlocks.FLOATING_REPEATER.get());
+        this.dropSelf(TCBlocks.FLOATING_TORCH_HOLDER.get());
+        this.dropSelf(TCBlocks.INFUSED_IRON_PRESSURE_PLATE.get());
+        this.dropSelf(TCBlocks.INFUSED_IRON_DOOR.get());
+
+
     }
 
     protected LootTable.Builder createCopperLikeOreDrops(Block pBlock, Item item) {

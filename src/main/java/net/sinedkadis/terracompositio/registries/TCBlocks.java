@@ -8,10 +8,12 @@ import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockSetType;
+import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -24,10 +26,11 @@ import net.sinedkadis.terracompositio.compat.create.block.custom.CedarGearboxBlo
 import net.sinedkadis.terracompositio.item.custom.UnstableTechnetiumBlockItem;
 import net.sinedkadis.terracompositio.worldgen.tree.FlowCedarTreeGrower;
 
+import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.function.Supplier;
 
 
-
+@ParametersAreNonnullByDefault
 public class TCBlocks {
     public static final DeferredRegister<Block> BLOCKS =
             DeferredRegister.create(ForgeRegistries.BLOCKS, TerraCompositio.MOD_ID);
@@ -170,6 +173,53 @@ public class TCBlocks {
     public static final RegistryObject<Block> PP_INFUSER = registerBlock("pp_infuser",
             () -> new PathPointerBlock(BlockBehaviour.Properties.copy(Blocks.OAK_PLANKS).noOcclusion(), PathPointerBlockEntity.PPPart.INFUSER));
 
+
+    //Infused Iron Based redstone
+    public static final RegistryObject<Block> FLOATING_REDSTONE = registerBlock("floating_redstone",
+            () -> new RedStoneWireBlock(BlockBehaviour.Properties.copy(Blocks.REDSTONE_WIRE)){
+                @Override
+                public boolean canSurvive(BlockState pState, LevelReader pLevel, BlockPos pPos) {
+                    return true;
+                }
+            });
+    public static final RegistryObject<Block> FLOATING_REPEATER = registerBlock("floating_repeater",
+            () -> new RepeaterBlock(BlockBehaviour.Properties.copy(Blocks.REPEATER)){
+                @Override
+                public boolean canSurvive(BlockState pState, LevelReader pLevel, BlockPos pPos) {
+                    return true;
+                }
+            });
+    public static final RegistryObject<Block> FLOATING_COMPARATOR = registerBlock("floating_comparator",
+            () -> new ComparatorBlock(BlockBehaviour.Properties.copy(Blocks.COMPARATOR)){
+                @Override
+                public boolean canSurvive(BlockState pState, LevelReader pLevel, BlockPos pPos) {
+                    return true;
+                }
+            });
+    public static final RegistryObject<Block> FLOATING_TORCH_HOLDER = registerBlock("floating_torch_holder",
+            () -> new FloatingTorchHolderBlock(BlockBehaviour.Properties.copy(Blocks.TORCH)){
+                @SuppressWarnings("deprecation")
+                @Override
+                public boolean canSurvive(BlockState pState, LevelReader pLevel, BlockPos pPos) {
+                    return true;
+                }
+            });
+    public static final RegistryObject<Block> INFUSED_IRON_PRESSURE_PLATE = registerBlock("infused_iron_pressure_plate",
+            () -> new PressurePlateBlock(PressurePlateBlock.Sensitivity.EVERYTHING,BlockBehaviour.Properties.copy(Blocks.OAK_PRESSURE_PLATE),BlockSetType.IRON){
+                @Override
+                public boolean canSurvive(BlockState pState, LevelReader pLevel, BlockPos pPos) {
+                    return true;
+                }
+            });
+    public static final RegistryObject<Block> INFUSED_IRON_DOOR = registerBlock("infused_iron_door",
+            () -> new DoorBlock(BlockBehaviour.Properties.copy(Blocks.IRON_DOOR),BlockSetType.IRON){
+                @Override
+                public boolean canSurvive(BlockState pState, LevelReader pLevel, BlockPos pPos) {
+                    BlockPos blockpos = pPos.below();
+                    BlockState blockstate = pLevel.getBlockState(blockpos);
+                    return pState.getValue(HALF) == DoubleBlockHalf.LOWER || blockstate.is(this);
+                }
+            });
 
     //Misc
     public static final RegistryObject<Block> FLOW_CEDAR_ENT_STATUE = registerBlock("flow_cedar_ent_statue",
