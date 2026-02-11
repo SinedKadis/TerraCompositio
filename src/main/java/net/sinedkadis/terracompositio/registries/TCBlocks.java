@@ -32,44 +32,19 @@ public class TCBlocks {
     public static final DeferredRegister<Block> BLOCKS =
             DeferredRegister.create(ForgeRegistries.BLOCKS, TerraCompositio.MOD_ID);
 
-    private static <T extends Block>RegistryObject<T> registerBlock(String name, Supplier<T> block) {
-        return registerBlock(name, block, () -> true);
-    }
 
-    private static <T extends Block>RegistryObject<T> registerBlock(String name, Supplier<T> block, Supplier<Boolean> predicate) {
-        if (!predicate.get()) return null;
-        RegistryObject<T> toReturn = BLOCKS.register(name, block);
-        registerBlockItem(name, toReturn);
-        return toReturn;
-    }
-    private static <T extends Block> void registerBlockItem(String name, RegistryObject<T> block) {
-        TCItems.ITEMS.register(name, () -> new BlockItem(block.get(), new Item.Properties()));
-    }
-    private static <T extends Block>RegistryObject<T> registerUnstableTechnetiumBlock(String name, Supplier<T> block,int radiation) {
-        RegistryObject<T> toReturn = BLOCKS.register(name, block);
-        registerUnstableTechnetiumBlockItem(name, toReturn,radiation);
-        return toReturn;
-    }
-    private static <T extends Block> void registerUnstableTechnetiumBlockItem(String name, RegistryObject<T> block,int radiation) {
-        TCItems.ITEMS.register(name, () -> new UnstableTechnetiumBlockItem(block.get(), new Item.Properties(),radiation));
-    }
 
-    public static void register(IEventBus eventBus) {
-        BLOCKS.register(eventBus);
-    }
-
+    //Cedar blocks
     public static final RegistryObject<Block> FLOW_CEDAR_LOG = registerBlock("flow_cedar_log",
             () -> new FlowCedarLikeBlock(BlockBehaviour.Properties.copy(Blocks.OAK_LOG).strength(3f), TCBlocks.STRIPPED_FLOW_CEDAR_LOG));
     public static final RegistryObject<Block> FLOW_CEDAR_PORT = registerBlock("flow_cedar_port",
             () -> new FlowCedarPortBlock(BlockBehaviour.Properties.copy(Blocks.OAK_WOOD).strength(3f), TCBlocks.STRIPPED_FLOW_CEDAR_LOG));
-
     public static final RegistryObject<Block> FLOW_CEDAR_WOOD = registerBlock("flow_cedar_wood",
             () -> new FlowCedarLikeBlock(BlockBehaviour.Properties.copy(Blocks.OAK_WOOD).strength(3f), TCBlocks.STRIPPED_FLOW_CEDAR_WOOD));
     public static final RegistryObject<Block> STRIPPED_FLOW_CEDAR_LOG = registerBlock("stripped_flow_cedar_log",
             () -> new FlowCedarLikeBlock(BlockBehaviour.Properties.copy(Blocks.STRIPPED_OAK_LOG).strength(3f)));
     public static final RegistryObject<Block> STRIPPED_FLOW_CEDAR_WOOD = registerBlock("stripped_flow_cedar_wood",
             () -> new FlowCedarLikeBlock(BlockBehaviour.Properties.copy(Blocks.STRIPPED_OAK_WOOD).strength(3f)));
-
     public static final RegistryObject<Block> FLOW_CEDAR_PLANKS = registerBlock("flow_cedar_planks",
             () -> new Block(BlockBehaviour.Properties.copy(Blocks.OAK_PLANKS)){
                 @Override
@@ -108,15 +83,6 @@ public class TCBlocks {
             () -> new DoorBlock(BlockBehaviour.Properties.copy(Blocks.OAK_PLANKS).noOcclusion(), BlockSetType.OAK));
     public static final RegistryObject<Block> FLOW_CEDAR_TRAPDOOR = registerBlock("flow_cedar_trapdoor",
             () -> new TrapDoorBlock(BlockBehaviour.Properties.copy(Blocks.OAK_PLANKS).noOcclusion(),BlockSetType.OAK));
-
-    public static final RegistryObject<Block> FLOW_CAULDRON = registerBlock("flow_cauldron",
-            () -> new FlowCauldronBlock(BlockBehaviour.Properties.copy(Blocks.CAULDRON), null,CauldronInteraction.EMPTY));
-    public static final RegistryObject<Block> BIRCH_JUICE_CAULDRON = registerBlock("birch_juice_cauldron",
-            () -> new BirchJuiceCauldronBlock(BlockBehaviour.Properties.copy(Blocks.CAULDRON), null,CauldronInteraction.EMPTY));
-    public static final RegistryObject<Block> WEDGE = registerBlock("wedge",
-            () -> new WedgeBlock(BlockBehaviour.Properties.copy(Blocks.TRIPWIRE_HOOK)));
-
-
     public static final RegistryObject<Block> FLOW_CEDAR_SIGN = BLOCKS.register("flow_cedar_sign",
             () -> new ModStandingSignBlock(BlockBehaviour.Properties.copy(Blocks.OAK_SIGN), TCWoodTypes.FLOW_CEDAR));
     public static final RegistryObject<Block> FLOW_CEDAR_WALL_SIGN = BLOCKS.register("flow_cedar_wall_sign",
@@ -125,21 +91,47 @@ public class TCBlocks {
             () -> new TCHangingSignBlock(BlockBehaviour.Properties.copy(Blocks.OAK_HANGING_SIGN), TCWoodTypes.FLOW_CEDAR));
     public static final RegistryObject<Block> FLOW_CEDAR_WALL_HANGING_SIGN = BLOCKS.register("flow_cedar_wall_hanging_sign",
             () -> new TCWallHangingSignBlock(BlockBehaviour.Properties.copy(Blocks.OAK_WALL_HANGING_SIGN), TCWoodTypes.FLOW_CEDAR));
+    public static final RegistryObject<Block> FLOW_INFUSER = registerBlock("flow_infuser",
+            () -> new FlowInfuserBlock(BlockBehaviour.Properties.copy(Blocks.IRON_BLOCK).noOcclusion()));
+    public static final RegistryObject<Block> FLOW_CEDAR_SAPLING = registerBlock("flow_cedar_sapling",
+            () -> new FlowCedarSaplingBlock(new FlowCedarTreeGrower(), BlockBehaviour.Properties.copy(Blocks.OAK_SAPLING)));
 
+
+
+
+    //Cauldron related
+    public static final RegistryObject<Block> FLOW_CAULDRON = registerBlock("flow_cauldron",
+            () -> new FlowCauldronBlock(BlockBehaviour.Properties.copy(Blocks.CAULDRON), null,CauldronInteraction.EMPTY));
+    public static final RegistryObject<Block> BIRCH_JUICE_CAULDRON = registerBlock("birch_juice_cauldron",
+            () -> new BirchJuiceCauldronBlock(BlockBehaviour.Properties.copy(Blocks.CAULDRON), null,CauldronInteraction.EMPTY));
+    public static final RegistryObject<Block> WEDGE = registerBlock("wedge",
+            () -> new WedgeBlock(BlockBehaviour.Properties.copy(Blocks.TRIPWIRE_HOOK)));
+
+
+    //Creative
     public static final RegistryObject<Block> CREATIVE_CFE_SOURCE = registerBlock("creative_cfe_source",
             () -> new CreativeCFESourceBlock(BlockBehaviour.Properties.copy(Blocks.IRON_BLOCK)));
     public static final RegistryObject<Block> CFE_TRASH_CAN = registerBlock("cfe_trash_can",
             () -> new CFETrashCanBlock(BlockBehaviour.Properties.copy(Blocks.IRON_BLOCK)));
-    public static final RegistryObject<Block> FLOW_INFUSER = registerBlock("flow_infuser",
-            () -> new FlowInfuserBlock(BlockBehaviour.Properties.copy(Blocks.IRON_BLOCK).noOcclusion()));
+
+
+    //Technetium
     public static final RegistryObject<Block> TECHNETIUM_ORE = registerUnstableTechnetiumBlock("technetium_ore",
             () -> new Block(BlockBehaviour.Properties.copy(Blocks.IRON_ORE)),2);
     public static final RegistryObject<Block> TECHNETIUM_DEEPSLATE_ORE = registerUnstableTechnetiumBlock("technetium_deepslate_ore",
             () -> new Block(BlockBehaviour.Properties.copy(Blocks.DEEPSLATE_IRON_ORE)),2);
     public static final RegistryObject<Block> TECHNETIUM_RAW_ORE_BLOCK = registerUnstableTechnetiumBlock("technetium_raw_ore_block",
             () -> new Block(BlockBehaviour.Properties.copy(Blocks.RAW_IRON_BLOCK)),8);
-    public static final RegistryObject<Block> FLOW_CEDAR_SAPLING = registerBlock("flow_cedar_sapling",
-            () -> new FlowCedarSaplingBlock(new FlowCedarTreeGrower(), BlockBehaviour.Properties.copy(Blocks.OAK_SAPLING)));
+    public static final RegistryObject<Block> TECHNETIUM_BLOCK = registerBlock("technetium_block",
+            () -> new Block(BlockBehaviour.Properties.copy(Blocks.NETHERITE_BLOCK)));
+
+
+    //Infused Iron
+    public static final RegistryObject<Block> INFUSED_IRON_BLOCK = registerBlock("infused_iron_block",
+            () -> new Block(BlockBehaviour.Properties.copy(Blocks.IRON_BLOCK)));
+
+
+    //Matter infuser
     public static final RegistryObject<Block> FLOW_CEDAR_CASING = registerBlock("flow_cedar_casing",
             () -> new FlowCedarCasingBlock(BlockBehaviour.Properties.copy(Blocks.STRIPPED_OAK_LOG).strength(3f)));
     public static final RegistryObject<Block> MATTER_INFUSER_PORT = registerBlock("matter_infuser_port",
@@ -147,6 +139,8 @@ public class TCBlocks {
     public static final RegistryObject<Block> MATTER_INFUSER_IO = registerBlock("matter_infuser_io",
             () -> new MatterInfuserIOBlock(BlockBehaviour.Properties.copy(Blocks.TRIPWIRE_HOOK).sound(SoundType.COPPER).strength(3f)));
 
+
+    //Desorbers
     public static final RegistryObject<Block> CONSTRUCTION_DESORBER = registerBlock("construction_desorber",
             () -> new ConstructionDesorberBlock(BlockBehaviour.Properties.copy(Blocks.IRON_BLOCK).strength(3f).noOcclusion()));
     public static final RegistryObject<Block> CULTIVATION_DESORBER = registerBlock("cultivation_desorber",
@@ -154,11 +148,15 @@ public class TCBlocks {
     public static final RegistryObject<Block> TIME_PASSAGE_DESORBER = registerBlock("time_passage_desorber",
             () -> new TimePassageDesorberBlock(BlockBehaviour.Properties.copy(Blocks.IRON_BLOCK).strength(3f).noOcclusion()));
 
+
+    //Cedar tanks
     public static final RegistryObject<Block> FLOW_CEDAR_PEDESTAL = registerBlock("flow_cedar_pedestal",
             () -> new FlowCedarPedestalBlock(BlockBehaviour.Properties.copy(Blocks.AZALEA).noOcclusion()));
     public static final RegistryObject<Block> FLOW_CEDAR_TANK = registerBlock("flow_cedar_tank",
             () -> new FlowCedarTankBlock(BlockBehaviour.Properties.copy(Blocks.OAK_PLANKS).noOcclusion()));
 
+
+    //Path pointers
     public static final RegistryObject<Block> PP_RECEIVER = registerBlock("pp_receiver",
             () -> new PathPointerBlock(BlockBehaviour.Properties.copy(Blocks.OAK_PLANKS).noOcclusion(), PathPointerBlockEntity.PPPart.RECEIVER));
     public static final RegistryObject<Block> PP_COLLECTOR = registerBlock("pp_collector",
@@ -172,16 +170,48 @@ public class TCBlocks {
     public static final RegistryObject<Block> PP_INFUSER = registerBlock("pp_infuser",
             () -> new PathPointerBlock(BlockBehaviour.Properties.copy(Blocks.OAK_PLANKS).noOcclusion(), PathPointerBlockEntity.PPPart.INFUSER));
 
-    public static final RegistryObject<Block> TECHNETIUM_BLOCK = registerBlock("technetium_block",
-            () -> new Block(BlockBehaviour.Properties.copy(Blocks.NETHERITE_BLOCK)));
+
+    //Misc
     public static final RegistryObject<Block> FLOW_CEDAR_ENT_STATUE = registerBlock("flow_cedar_ent_statue",
             () -> new EntStatueBlock(BlockBehaviour.Properties.copy(Blocks.OAK_PLANKS)));
     public static final RegistryObject<Block> TECHNETIUM_BOARD = registerBlock("technetium_board",
             () -> new TechnetiumBoardBlock(BlockBehaviour.Properties.copy(Blocks.GLASS).noLootTable().noParticlesOnBreak().noOcclusion()));
-
     public static final RegistryObject<Block> AIR_SATURATOR = registerBlock("air_saturator",
             () -> new AirSaturatorBlock(BlockBehaviour.Properties.copy(Blocks.OAK_PLANKS).strength(3f)));
 
+
+    //Compat
     public static final RegistryObject<Block> CEDAR_GEARBOX = registerBlock("cedar_gearbox",
             () -> new CedarGearboxBlock(BlockBehaviour.Properties.copy(TCBlocks.FLOW_CEDAR_LOG.get())), CompatUtils.CREATE_EXISTENCE);
+
+
+
+
+
+    private static <T extends Block>RegistryObject<T> registerBlock(String name, Supplier<T> block) {
+        return registerBlock(name, block, () -> true);
+    }
+
+    private static <T extends Block>RegistryObject<T> registerBlock(String name, Supplier<T> block, Supplier<Boolean> predicate) {
+        if (!predicate.get()) return null;
+        RegistryObject<T> toReturn = BLOCKS.register(name, block);
+        registerBlockItem(name, toReturn);
+        return toReturn;
+    }
+    private static <T extends Block> void registerBlockItem(String name, RegistryObject<T> block) {
+        TCItems.ITEMS.register(name, () -> new BlockItem(block.get(), new Item.Properties()));
+    }
+    private static <T extends Block>RegistryObject<T> registerUnstableTechnetiumBlock(String name, Supplier<T> block,int radiation) {
+        RegistryObject<T> toReturn = BLOCKS.register(name, block);
+        registerUnstableTechnetiumBlockItem(name, toReturn,radiation);
+        return toReturn;
+    }
+    private static <T extends Block> void registerUnstableTechnetiumBlockItem(String name, RegistryObject<T> block,int radiation) {
+        TCItems.ITEMS.register(name, () -> new UnstableTechnetiumBlockItem(block.get(), new Item.Properties(),radiation));
+    }
+
+    public static void register(IEventBus eventBus) {
+        BLOCKS.register(eventBus);
+    }
+
 }

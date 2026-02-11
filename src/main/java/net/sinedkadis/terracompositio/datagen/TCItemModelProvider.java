@@ -73,6 +73,7 @@ public class TCItemModelProvider extends ItemModelProvider {
         simpleItem(TCItems.FLOW_CEDAR_CHEST_BOAT);
 
         simpleItem(TCItems.INFUSED_IRON_INGOT);
+        simpleItem(TCItems.INFUSED_IRON_NUGGET);
         simpleItem(TCItems.COPPER_NUGGET);
         simpleItem(TCItems.FLOW_INFUSER_KIT);
         simpleItem(TCItems.RAW_TECHNETIUM);
@@ -86,6 +87,8 @@ public class TCItemModelProvider extends ItemModelProvider {
         simpleItem(TCItems.COPPER_ROD);
 
         simpleItem(TCItems.TECHNETIUM_INGOT);
+        simpleItem(TCItems.TECHNETIUM_ROD);
+        simpleItem(TCItems.TECHNETIUM_NUGGET);
         simpleItem(TCItems.WRENCH_TAG_HOLDER);
 
         simpleItem(TCItems.CFE_BALL);

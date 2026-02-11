@@ -70,11 +70,14 @@ public class TCItemTagGenerator extends ItemTagsProvider {
         this.tag(Tags.Items.INGOTS)
                 .add(TCItems.INFUSED_IRON_INGOT.get());
         this.tag(Tags.Items.NUGGETS)
-                .add(TCItems.COPPER_NUGGET.get());
+                .add(TCItems.COPPER_NUGGET.get(),
+                        TCItems.INFUSED_IRON_NUGGET.get(),
+                        TCItems.TECHNETIUM_NUGGET.get());
         this.tag(Tags.Items.RODS)
                 .add(TCItems.INFUSED_IRON_ROD.get(),
                         TCItems.GOLD_ROD.get(),
-                        TCItems.COPPER_ROD.get());
+                        TCItems.COPPER_ROD.get(),
+                        TCItems.TECHNETIUM_ROD.get());
         this.tag(ItemTags.AXES)
                 .add(TCItems.WRENCH_AXE.get());
         this.tag(TCTags.Items.UNSTABLE_TECHNETIUM)
