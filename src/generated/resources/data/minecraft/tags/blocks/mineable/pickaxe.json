@@ -12,6 +12,9 @@
     "terracompositio:pp_emitter",
     "terracompositio:pp_collector",
     "terracompositio:pp_receiver",
-    "terracompositio:technetium_block"
+    "terracompositio:pp_extractor",
+    "terracompositio:pp_infuser",
+    "terracompositio:technetium_block",
+    "terracompositio:infused_iron_block"
   ]
 }

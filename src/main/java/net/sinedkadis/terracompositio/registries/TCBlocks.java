@@ -25,6 +25,7 @@ import net.sinedkadis.terracompositio.compat.CompatUtils;
 import net.sinedkadis.terracompositio.compat.create.block.custom.CedarGearboxBlock;
 import net.sinedkadis.terracompositio.item.custom.UnstableTechnetiumBlockItem;
 import net.sinedkadis.terracompositio.worldgen.tree.FlowCedarTreeGrower;
+import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.function.Supplier;
@@ -176,9 +177,15 @@ public class TCBlocks {
 
     //Infused Iron Based redstone
     public static final RegistryObject<Block> FLOATING_REDSTONE = registerBlock("floating_redstone",
-            () -> new RedStoneWireBlock(BlockBehaviour.Properties.copy(Blocks.REDSTONE_WIRE)){
+            () -> new RedStoneWireBlock(BlockBehaviour.Properties.copy(Blocks.REDSTONE_WIRE)
+                    .isRedstoneConductor((a,s,d) -> true)){
                 @Override
                 public boolean canSurvive(BlockState pState, LevelReader pLevel, BlockPos pPos) {
+                    return true;
+                }
+
+                @Override
+                public boolean canConnectRedstone(BlockState state, BlockGetter level, BlockPos pos, @Nullable Direction direction) {
                     return true;
                 }
             });
@@ -188,11 +195,19 @@ public class TCBlocks {
                 public boolean canSurvive(BlockState pState, LevelReader pLevel, BlockPos pPos) {
                     return true;
                 }
+                @Override
+                public boolean canConnectRedstone(BlockState state, BlockGetter level, BlockPos pos, @Nullable Direction direction) {
+                    return true;
+                }
             });
     public static final RegistryObject<Block> FLOATING_COMPARATOR = registerBlock("floating_comparator",
             () -> new ComparatorBlock(BlockBehaviour.Properties.copy(Blocks.COMPARATOR)){
                 @Override
                 public boolean canSurvive(BlockState pState, LevelReader pLevel, BlockPos pPos) {
+                    return true;
+                }
+                @Override
+                public boolean canConnectRedstone(BlockState state, BlockGetter level, BlockPos pos, @Nullable Direction direction) {
                     return true;
                 }
             });
@@ -203,11 +218,19 @@ public class TCBlocks {
                 public boolean canSurvive(BlockState pState, LevelReader pLevel, BlockPos pPos) {
                     return true;
                 }
+                @Override
+                public boolean canConnectRedstone(BlockState state, BlockGetter level, BlockPos pos, @Nullable Direction direction) {
+                    return true;
+                }
             });
     public static final RegistryObject<Block> INFUSED_IRON_PRESSURE_PLATE = registerBlock("infused_iron_pressure_plate",
             () -> new PressurePlateBlock(PressurePlateBlock.Sensitivity.EVERYTHING,BlockBehaviour.Properties.copy(Blocks.OAK_PRESSURE_PLATE),BlockSetType.IRON){
                 @Override
                 public boolean canSurvive(BlockState pState, LevelReader pLevel, BlockPos pPos) {
+                    return true;
+                }
+                @Override
+                public boolean canConnectRedstone(BlockState state, BlockGetter level, BlockPos pos, @Nullable Direction direction) {
                     return true;
                 }
             });
@@ -218,6 +241,10 @@ public class TCBlocks {
                     BlockPos blockpos = pPos.below();
                     BlockState blockstate = pLevel.getBlockState(blockpos);
                     return pState.getValue(HALF) == DoubleBlockHalf.LOWER || blockstate.is(this);
+                }
+                @Override
+                public boolean canConnectRedstone(BlockState state, BlockGetter level, BlockPos pos, @Nullable Direction direction) {
+                    return true;
                 }
             });
 

@@ -1,5 +1,7 @@
 {
   "values": [
-    "terracompositio:copper_nugget"
+    "terracompositio:copper_nugget",
+    "terracompositio:infused_iron_nugget",
+    "terracompositio:technetium_nugget"
   ]
 }

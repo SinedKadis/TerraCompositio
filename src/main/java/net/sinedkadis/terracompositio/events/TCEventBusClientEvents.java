@@ -14,6 +14,7 @@ import net.minecraft.client.renderer.entity.EntityRenderers;
 import net.minecraft.client.renderer.entity.ThrownItemRenderer;
 import net.minecraft.client.renderer.item.ItemProperties;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.level.block.RedStoneWireBlock;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.*;
@@ -114,8 +115,16 @@ public class TCEventBusClientEvents {
             "terracompositio:flow_source", 0x0B23BA,
             "terracompositio:birch_juice_source", 0x97872F
     );
+
     @SubscribeEvent
-    public static void registerColorHandlers(RegisterColorHandlersEvent.Item event) {
+    public static void onRegisterColorHandlers(RegisterColorHandlersEvent.Block event) {
+        event.register((p_92616_, p_92617_, p_92618_, p_92619_) ->
+                RedStoneWireBlock.getColorForPower(p_92616_.getValue(RedStoneWireBlock.POWER)),
+                TCBlocks.FLOATING_REDSTONE.get());
+    }
+
+    @SubscribeEvent
+    public static void registerItemColorHandlers(RegisterColorHandlersEvent.Item event) {
         event.register((pStack, pTintIndex) -> {
             if (pTintIndex == 1) {
                 Optional<IFluidHandlerItem> fluidHandler = FluidUtil.getFluidHandler(pStack).resolve();

@@ -1,0 +1,46 @@
+{
+	"format_version": "1.21.11",
+	"credit": "Made with Blockbench",
+	"render_type": "minecraft:cutout",
+	"ambientocclusion": false,
+	"textures": {
+		"3": "terracompositio:block/floating_redstone/infused_iron_base",
+		"particle": "terracompositio:block/floating_redstone/redstone_dust_dot",
+		"line": "terracompositio:block/floating_redstone/redstone_dust_dot",
+		"overlay": "terracompositio:block/floating_redstone/redstone_dust_overlay"
+	},
+	"elements": [
+		{
+			"from": [0, 1.25, 0],
+			"to": [16, 1.25, 16],
+			"shade": false,
+			"rotation": {"angle": 0, "axis": "y", "origin": [0, 1, 0]},
+			"faces": {
+				"up": {"uv": [0, 0, 16, 16], "texture": "#line", "tintindex": 0},
+				"down": {"uv": [0, 16, 16, 0], "texture": "#line", "tintindex": 0}
+			}
+		},
+		{
+			"from": [0, 0.25, 0],
+			"to": [16, 0.25, 16],
+			"shade": false,
+			"faces": {
+				"up": {"uv": [0, 0, 16, 16], "texture": "#overlay"},
+				"down": {"uv": [0, 16, 16, 0], "texture": "#overlay"}
+			}
+		},
+		{
+			"from": [4, 0, 4],
+			"to": [12, 1, 12],
+			"rotation": {"angle": 0, "axis": "y", "origin": [7, 0, 6]},
+			"faces": {
+				"north": {"uv": [8, 0, 16, 1], "texture": "#3"},
+				"east": {"uv": [8, 1, 16, 2], "texture": "#3"},
+				"south": {"uv": [8, 2, 16, 3], "texture": "#3"},
+				"west": {"uv": [8, 3, 16, 4], "texture": "#3"},
+				"up": {"uv": [8, 8, 0, 0], "texture": "#3"},
+				"down": {"uv": [8, 8, 0, 16], "texture": "#3"}
+			}
+		}
+	]
+}

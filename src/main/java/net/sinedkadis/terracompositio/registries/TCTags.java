@@ -16,6 +16,7 @@ public class TCTags {
         public static final TagKey<Block> FLOW_CEDAR_LOGS = tag("flow_cedar_logs_blocks");
         public static final TagKey<Block> CREATE_WRENCH_PICKUP = BlockTags.create(Objects.requireNonNull(
                 ResourceLocation.tryBuild("create", "wrench_pickup")));
+        public static final TagKey<Block> REDSTONE_WIRES = tag("redstone_wires");
 
 
 

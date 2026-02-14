@@ -83,7 +83,7 @@ public class TCRecipeProvider extends RecipeProvider implements IConditionBuilde
                 .define('I',TCItems.INFUSED_IRON_INGOT.get())
                 .unlockedBy(getHasName(TCItems.INFUSED_IRON_INGOT.get()), has(TCItems.INFUSED_IRON_INGOT.get()))
                 .save(pWriter);
-        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, TCBlocks.FLOATING_REPEATER.get())
+        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, TCBlocks.FLOATING_COMPARATOR.get())
                 .pattern(" T ")
                 .pattern("TQT")
                 .pattern("SIS")
@@ -334,18 +334,22 @@ public class TCRecipeProvider extends RecipeProvider implements IConditionBuilde
     }
 
     private static void buildInfusedIronMaterials(@NotNull Consumer<FinishedRecipe> pWriter) {
+        ResourceLocation key = ForgeRegistries.ITEMS.getKey(TCItems.INFUSED_IRON_INGOT.get());
         ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, TCItems.INFUSED_IRON_INGOT.get(), 1)
                 .requires(TCItems.INFUSED_IRON_NUGGET.get(),9)
                 .unlockedBy(getHasName(TCItems.INFUSED_IRON_INGOT.get()), has(TCItems.INFUSED_IRON_INGOT.get()))
-                .save(pWriter);
+                .save(pWriter,Objects.requireNonNull(ResourceLocation.tryBuild(Objects.requireNonNull(key).getNamespace(),
+                        Objects.requireNonNull(key).getPath() + "_from_nugget")));
         ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, TCBlocks.INFUSED_IRON_BLOCK.get(), 1)
                 .requires(TCItems.INFUSED_IRON_INGOT.get(),9)
                 .unlockedBy(getHasName(TCItems.INFUSED_IRON_INGOT.get()), has(TCItems.TECHNETIUM_INGOT.get()))
                 .save(pWriter);
+
         ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, TCItems.INFUSED_IRON_INGOT.get(), 9)
                 .requires(TCBlocks.INFUSED_IRON_BLOCK.get(),1)
                 .unlockedBy(getHasName(TCItems.INFUSED_IRON_INGOT.get()), has(TCItems.INFUSED_IRON_INGOT.get()))
-                .save(pWriter);
+                .save(pWriter,Objects.requireNonNull(ResourceLocation.tryBuild(Objects.requireNonNull(key).getNamespace(),
+                        Objects.requireNonNull(key).getPath() + "_from_block")));
         ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, TCItems.INFUSED_IRON_ROD.get())
                 .pattern("R")
                 .pattern("R")
@@ -396,10 +400,12 @@ public class TCRecipeProvider extends RecipeProvider implements IConditionBuilde
                 .requires(TCItems.RAW_TECHNETIUM.get(),9)
                 .unlockedBy(getHasName(TCItems.RAW_TECHNETIUM.get()), has(TCItems.RAW_TECHNETIUM.get()))
                 .save(pWriter);
+        ResourceLocation technetium = ForgeRegistries.ITEMS.getKey(TCItems.TECHNETIUM_INGOT.get());
         ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, TCItems.TECHNETIUM_INGOT.get(), 1)
                 .requires(TCItems.TECHNETIUM_NUGGET.get(),9)
                 .unlockedBy(getHasName(TCItems.TECHNETIUM_INGOT.get()), has(TCItems.TECHNETIUM_INGOT.get()))
-                .save(pWriter);
+                .save(pWriter,Objects.requireNonNull(ResourceLocation.tryBuild(Objects.requireNonNull(technetium).getNamespace(),
+                        Objects.requireNonNull(technetium).getPath() + "_from_nugget")));
         ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, TCBlocks.TECHNETIUM_BLOCK.get(), 1)
                 .requires(TCItems.TECHNETIUM_INGOT.get(),9)
                 .unlockedBy(getHasName(TCItems.TECHNETIUM_INGOT.get()), has(TCItems.TECHNETIUM_INGOT.get()))
@@ -407,7 +413,8 @@ public class TCRecipeProvider extends RecipeProvider implements IConditionBuilde
         ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, TCItems.TECHNETIUM_INGOT.get(), 9)
                 .requires(TCBlocks.TECHNETIUM_BLOCK.get(),1)
                 .unlockedBy(getHasName(TCItems.TECHNETIUM_INGOT.get()), has(TCItems.TECHNETIUM_INGOT.get()))
-                .save(pWriter);
+                .save(pWriter,Objects.requireNonNull(ResourceLocation.tryBuild(Objects.requireNonNull(technetium).getNamespace(),
+                        Objects.requireNonNull(technetium).getPath() + "_from_block")));
         ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, TCItems.TECHNETIUM_ROD.get())
                 .pattern("R")
                 .pattern("R")

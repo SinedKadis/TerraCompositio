@@ -109,6 +109,8 @@ public class TCBlockLootTables extends BlockLootSubProvider {
         this.dropSelf(TCBlocks.INFUSED_IRON_PRESSURE_PLATE.get());
         this.dropSelf(TCBlocks.INFUSED_IRON_DOOR.get());
 
+        assert TCBlocks.CEDAR_GEARBOX != null;
+        this.dropSelf(TCBlocks.CEDAR_GEARBOX.get());
 
     }
 

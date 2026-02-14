@@ -162,6 +162,22 @@
   "block.terracompositio.air_saturator": "Air Saturator",
   "block.terracompositio.cedar_gearbox": "Cedar Gearbox",
 
+  "block.terracompositio.infused_iron_block": "Infused Iron Block",
+  "item.terracompositio.infused_iron_nugget": "Infused Iron Nugget",
+  "item.terracompositio.technetium_nugget": "Technetium Nugget",
+  "item.terracompositio.technetium_rod": "Technetium Rod",
+  "block.terracompositio.floating_redstone": "Floating Redstone",
+  "block.terracompositio.floating_repeater": "Floating Repeater",
+  "block.terracompositio.floating_comparator": "Floating Comparator",
+  "block.terracompositio.floating_torch_holder": "Floating Torch Holder",
+  "block.terracompositio.infused_iron_pressure_plate": "Infused Iron Pressure Plate",
+  "block.terracompositio.infused_iron_door": "Infused Iron Door",
+
+
+
+
+
+
   "key.terracompositio.categories.main": "Terra Compositio",
 
 
