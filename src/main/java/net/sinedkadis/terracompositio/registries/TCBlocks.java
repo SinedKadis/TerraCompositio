@@ -192,7 +192,8 @@ public class TCBlocks {
                 }
                 @Override
                 public boolean canConnectRedstone(BlockState state, BlockGetter level, BlockPos pos, @Nullable Direction direction) {
-                    return true;
+                    Direction facing = state.getValue(RepeaterBlock.FACING);
+                    return facing == direction || facing.getOpposite() == direction;
                 }
             });
     public static final RegistryObject<Block> FLOATING_COMPARATOR = registerBlock("floating_comparator",
