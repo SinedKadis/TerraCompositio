@@ -177,17 +177,12 @@ public class TCBlocks {
 
     //Infused Iron Based redstone
     public static final RegistryObject<Block> FLOATING_REDSTONE = registerBlock("floating_redstone",
-            () -> new RedStoneWireBlock(BlockBehaviour.Properties.copy(Blocks.REDSTONE_WIRE)
-                    .isRedstoneConductor((a,s,d) -> true)){
+            () -> new RedStoneWireBlock(BlockBehaviour.Properties.copy(Blocks.REDSTONE_WIRE)){
                 @Override
                 public boolean canSurvive(BlockState pState, LevelReader pLevel, BlockPos pPos) {
                     return true;
                 }
 
-                @Override
-                public boolean canConnectRedstone(BlockState state, BlockGetter level, BlockPos pos, @Nullable Direction direction) {
-                    return true;
-                }
             });
     public static final RegistryObject<Block> FLOATING_REPEATER = registerBlock("floating_repeater",
             () -> new RepeaterBlock(BlockBehaviour.Properties.copy(Blocks.REPEATER)){
