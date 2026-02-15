@@ -5,7 +5,6 @@ import net.minecraft.core.Direction;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.RedStoneWireBlock;
-import net.minecraft.world.level.block.TrapDoorBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.RedstoneSide;
 import org.spongepowered.asm.mixin.Mixin;
@@ -21,9 +20,6 @@ public abstract class RedStoneWireBlockMixin {
 
     @Shadow
     protected abstract int getWireSignal(BlockState pState);
-
-    @Shadow
-    protected abstract boolean canSurviveOn(BlockGetter pLevel, BlockPos pPos, BlockState pState);
 
     @Unique
     private static boolean terraCompositio$sharedShouldSignal = true;
@@ -63,16 +59,12 @@ public abstract class RedStoneWireBlockMixin {
         BlockState blockstateRel = pLevel.getBlockState(blockposRel);
 
         if (pNonNormalCubeAbove ) {
-
             if (!(pLevel.getBlockState(pPos.above()).getBlock() instanceof RedStoneWireBlock)) {
-                boolean flag = blockstateRel.getBlock() instanceof TrapDoorBlock || this.canSurviveOn(pLevel, blockposRel, blockstateRel);
-                if (flag && pLevel.getBlockState(blockposRel.above()).canRedstoneConnectTo(pLevel, blockposRel.above(), null)) {
+                if (pLevel.getBlockState(blockposRel.above()).canRedstoneConnectTo(pLevel, blockposRel.above(), null)) {
                     if (blockstateRel.isFaceSturdy(pLevel, blockposRel, pDirection.getOpposite())) {
                         cir.setReturnValue(RedstoneSide.UP);
                         return;
                     }
-                    cir.setReturnValue(RedstoneSide.SIDE);
-                    return;
                 }
             }
 
@@ -85,7 +77,7 @@ public abstract class RedStoneWireBlockMixin {
             cir.setReturnValue(RedstoneSide.NONE);
             return;
         }
-        if (!(pLevel.getBlockState(pPos.below()).getBlock() instanceof RedStoneWireBlock)){
+        if (pLevel.getBlockState(pPos.below()).isFaceSturdy(pLevel,pPos.below(),pDirection)){
             BlockPos blockPosRelBelow = blockposRel.below();
             cir.setReturnValue(pLevel.getBlockState(blockPosRelBelow).canRedstoneConnectTo(pLevel, blockPosRelBelow, null)
                     ? RedstoneSide.SIDE : RedstoneSide.NONE);
@@ -123,12 +115,16 @@ public abstract class RedStoneWireBlockMixin {
                 boolean wireAbove = blockStateAbove.getBlock() instanceof RedStoneWireBlock;
                 boolean wireBelow = blockStateBelow.getBlock() instanceof RedStoneWireBlock;
                 boolean wireRel = blockstateRel.getBlock() instanceof RedStoneWireBlock;
+                boolean faceSturdy = blockStateBelow.isFaceSturdy(pLevel,blockposBelow,direction);
 
-                if (blockstateRel.isRedstoneConductor(pLevel, blockposRel)
+                if (blockstateRel.isFaceSturdy(pLevel,blockposRel,direction.getOpposite())
                         && !blockStateAbove.isRedstoneConductor(pLevel, blockposAbove)
                         && !wireAbove) {
                     j = Math.max(j, this.getWireSignal(pLevel.getBlockState(blockposRel.above())));
-                } else if (!blockstateRel.isRedstoneConductor(pLevel, blockposRel) && !wireBelow && !wireRel) {
+                } else if (!blockstateRel.isRedstoneConductor(pLevel, blockposRel)
+                        && !wireBelow
+                        && !wireRel
+                        && faceSturdy) {
                     j = Math.max(j, this.getWireSignal(pLevel.getBlockState(blockposRel.below())));
                 }
 

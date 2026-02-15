@@ -562,8 +562,10 @@ public class TCUtil {
     }
 
     public static void addOrDropToPlayer(@NotNull Player pPlayer, ItemStack toAdd) {
-        if (!pPlayer.addItem(toAdd)) {
-            pPlayer.drop(toAdd, false);
+        if (!pPlayer.isCreative()) {
+            if (!pPlayer.addItem(toAdd)) {
+                pPlayer.drop(toAdd, false);
+            }
         }
     }
 

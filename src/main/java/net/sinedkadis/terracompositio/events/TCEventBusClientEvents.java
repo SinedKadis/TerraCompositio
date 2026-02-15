@@ -79,6 +79,8 @@ public class TCEventBusClientEvents {
         ItemBlockRenderTypes.setRenderLayer(TCFluids.FLOW_FLUID.source.get(), RenderType.translucent());
         ItemBlockRenderTypes.setRenderLayer(TCFluids.FLOW_FLUID.flowing.get(), RenderType.translucent());
 
+        //noinspection removal
+        ItemBlockRenderTypes.setRenderLayer(TCBlocks.FLOATING_TORCH_HOLDER.get(),RenderType.cutout());
 
         ItemProperties.register(
                 TCItems.WRENCH_AXE.get(),

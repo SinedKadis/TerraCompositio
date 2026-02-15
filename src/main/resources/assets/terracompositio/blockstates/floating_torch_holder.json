@@ -1,0 +1,249 @@
+{
+  "multipart": [
+    {
+      "apply": {
+        "model": "terracompositio:block/floating_redstone/floating_torch_holder"
+      },
+      "when": {
+        "facing": "down"
+      }
+    },
+    {
+      "apply": {
+        "model": "block/redstone_torch"
+      },
+      "when": {
+        "facing": "down",
+        "hold_torch": "redstone",
+        "lit": true
+      }
+    },
+    {
+      "apply": {
+        "model": "block/redstone_torch_off"
+      },
+      "when": {
+        "facing": "down",
+        "hold_torch": "redstone",
+        "lit": false
+      }
+    },
+    {
+      "apply": {
+        "model": "block/soul_torch"
+      },
+      "when": {
+        "facing": "down",
+        "hold_torch": "soul"
+      }
+    },
+    {
+      "apply": {
+        "model": "block/torch"
+      },
+      "when": {
+        "facing": "down",
+        "hold_torch": "normal"
+      }
+    },
+    {
+      "apply": {
+        "model": "terracompositio:block/floating_redstone/floating_torch_holder_wall"
+      },
+      "when": {
+        "facing": "east"
+      }
+    },
+    {
+      "apply": {
+        "model": "block/redstone_wall_torch"
+      },
+      "when": {
+        "facing": "east",
+        "hold_torch": "redstone",
+        "lit": true
+      }
+    },
+    {
+      "apply": {
+        "model": "block/redstone_wall_torch_wall_off"
+      },
+      "when": {
+        "facing": "east",
+        "hold_torch": "redstone",
+        "lit": false
+      }
+    },
+    {
+      "apply": {
+        "model": "block/soul_wall_torch"
+      },
+      "when": {
+        "facing": "east",
+        "hold_torch": "soul"
+      }
+    },
+    {
+      "apply": {
+        "model": "block/wall_torch"
+      },
+      "when": {
+        "facing": "east",
+        "hold_torch": "normal"
+      }
+    },
+    {
+      "apply": {
+        "model": "terracompositio:block/floating_redstone/floating_torch_holder_wall",
+        "y": 270
+      },
+      "when": {
+        "facing": "north"
+      }
+    },
+    {
+      "apply": {
+        "model": "block/redstone_wall_torch",
+        "y": 270
+      },
+      "when": {
+        "facing": "north",
+        "hold_torch": "redstone",
+        "lit": true
+      }
+    },
+    {
+      "apply": {
+        "model": "block/redstone_wall_torch_off",
+        "y": 270
+      },
+      "when": {
+        "facing": "north",
+        "hold_torch": "redstone",
+        "lit": false
+      }
+    },
+    {
+      "apply": {
+        "model": "block/soul_wall_torch",
+        "y": 270
+      },
+      "when": {
+        "facing": "north",
+        "hold_torch": "soul"
+      }
+    },
+    {
+      "apply": {
+        "model": "block/wall_torch",
+        "y": 270
+      },
+      "when": {
+        "facing": "north",
+        "hold_torch": "normal"
+      }
+    },
+    {
+      "apply": {
+        "model": "terracompositio:block/floating_redstone/floating_torch_holder_wall",
+        "y": 90
+      },
+      "when": {
+        "facing": "south"
+      }
+    },
+    {
+      "apply": {
+        "model": "block/redstone_wall_torch",
+        "y": 90
+      },
+      "when": {
+        "facing": "south",
+        "hold_torch": "redstone",
+        "lit": true
+      }
+    },
+    {
+      "apply": {
+        "model": "block/redstone_wall_torch_off",
+        "y": 90
+      },
+      "when": {
+        "facing": "south",
+        "hold_torch": "redstone",
+        "lit": false
+      }
+    },
+    {
+      "apply": {
+        "model": "block/soul_wall_torch",
+        "y": 90
+      },
+      "when": {
+        "facing": "south",
+        "hold_torch": "soul"
+      }
+    },
+    {
+      "apply": {
+        "model": "block/wall_torch",
+        "y": 90
+      },
+      "when": {
+        "facing": "south",
+        "hold_torch": "normal"
+      }
+    },
+    {
+      "apply": {
+        "model": "terracompositio:block/floating_redstone/floating_torch_holder_wall",
+        "y": 180
+      },
+      "when": {
+        "facing": "west"
+      }
+    },
+    {
+      "apply": {
+        "model": "block/redstone_wall_torch",
+        "y": 180
+      },
+      "when": {
+        "facing": "west",
+        "hold_torch": "redstone",
+        "lit": true
+      }
+    },
+    {
+      "apply": {
+        "model": "block/redstone_wall_torch_off",
+        "y": 180
+      },
+      "when": {
+        "facing": "west",
+        "hold_torch": "redstone",
+        "lit": false
+      }
+    },
+    {
+      "apply": {
+        "model": "block/soul_wall_torch",
+        "y": 180
+      },
+      "when": {
+        "facing": "west",
+        "hold_torch": "soul"
+      }
+    },
+    {
+      "apply": {
+        "model": "block/wall_torch",
+        "y": 180
+      },
+      "when": {
+        "facing": "west",
+        "hold_torch": "normal"
+      }
+    }
+  ]
+}

@@ -208,17 +208,7 @@ public class TCBlocks {
                 }
             });
     public static final RegistryObject<Block> FLOATING_TORCH_HOLDER = registerBlock("floating_torch_holder",
-            () -> new FloatingTorchHolderBlock(BlockBehaviour.Properties.copy(Blocks.TORCH)){
-                @SuppressWarnings("deprecation")
-                @Override
-                public boolean canSurvive(BlockState pState, LevelReader pLevel, BlockPos pPos) {
-                    return true;
-                }
-                @Override
-                public boolean canConnectRedstone(BlockState state, BlockGetter level, BlockPos pos, @Nullable Direction direction) {
-                    return true;
-                }
-            });
+            () -> new FloatingTorchHolderBlock(BlockBehaviour.Properties.copy(Blocks.TORCH)));
     public static final RegistryObject<Block> INFUSED_IRON_PRESSURE_PLATE = registerBlock("infused_iron_pressure_plate",
             () -> new PressurePlateBlock(PressurePlateBlock.Sensitivity.EVERYTHING,BlockBehaviour.Properties.copy(Blocks.OAK_PRESSURE_PLATE),BlockSetType.IRON){
                 @Override
