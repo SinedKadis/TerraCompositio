@@ -1,0 +1,10 @@
+{
+  "variants": {
+    "powered=false": {
+      "model": "terracompositio:block/floating_redstone/infused_iron_pressure_plate_up"
+    },
+    "powered=true": {
+      "model": "terracompositio:block/floating_redstone/infused_iron_pressure_plate_down"
+    }
+  }
+}

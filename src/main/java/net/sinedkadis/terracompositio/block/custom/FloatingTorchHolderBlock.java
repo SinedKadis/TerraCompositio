@@ -5,6 +5,7 @@ import com.google.common.collect.Maps;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.core.particles.DustParticleOptions;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvents;
@@ -13,6 +14,7 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.context.BlockPlaceContext;
@@ -114,51 +116,33 @@ public class FloatingTorchHolderBlock extends RedstoneTorchBlock {
     @Override
     public InteractionResult use(BlockState pState, Level pLevel, BlockPos pPos, Player pPlayer, InteractionHand pHand, BlockHitResult pHit) {
         ItemStack itemInHand = pPlayer.getItemInHand(pHand);
-        switch (pState.getValue(HOLD_TORCH)) {
-            case NONE -> {
-                if (itemInHand.is(Items.REDSTONE_TORCH)) {
-                    pLevel.setBlockAndUpdate(pPos,pState.setValue(HOLD_TORCH,HoldTorch.REDSTONE));
+        HoldTorch torch = pState.getValue(HOLD_TORCH);
+        Map<HoldTorch,Item> map = Map.of(
+                HoldTorch.REDSTONE,Items.REDSTONE_TORCH,
+                HoldTorch.NORMAL,Items.TORCH,
+                HoldTorch.SOUL,Items.SOUL_TORCH
+        );
+        if (torch.isEmpty()){
+            for (Map.Entry<HoldTorch,Item> entry : map.entrySet()){
+                if (itemInHand.is(entry.getValue())) {
+                    pLevel.setBlockAndUpdate(pPos,pState.setValue(HOLD_TORCH,entry.getKey()));
                     if (!pPlayer.isCreative())
                         itemInHand.shrink(1);
                     pLevel.playSound(null,pPos, SoundEvents.WOOD_PLACE, SoundSource.BLOCKS);
                     return InteractionResult.SUCCESS;
                 }
-                if (itemInHand.is(Items.SOUL_TORCH)) {
-                    pLevel.setBlockAndUpdate(pPos,pState.setValue(HOLD_TORCH,HoldTorch.SOUL));
-                    if (!pPlayer.isCreative())
-                        itemInHand.shrink(1);
-                    pLevel.playSound(null,pPos, SoundEvents.WOOD_PLACE, SoundSource.BLOCKS);
-
-                    return InteractionResult.SUCCESS;
-                }
-                if (itemInHand.is(Items.TORCH)) {
-                    pLevel.setBlockAndUpdate(pPos,pState.setValue(HOLD_TORCH,HoldTorch.NORMAL));
-                    if (!pPlayer.isCreative())
-                        itemInHand.shrink(1);
-                    pLevel.playSound(null,pPos, SoundEvents.WOOD_PLACE, SoundSource.BLOCKS);
-                    return InteractionResult.SUCCESS;
-                }
-            }
-            case REDSTONE -> {
-                TCUtil.addOrDropToPlayer(pPlayer,Items.REDSTONE_TORCH.getDefaultInstance());
-                pLevel.setBlockAndUpdate(pPos,pState.setValue(HOLD_TORCH,HoldTorch.NONE));
-                pLevel.playSound(null,pPos, SoundEvents.WOOD_BREAK, SoundSource.BLOCKS);
-                return InteractionResult.SUCCESS;
-            }
-            case SOUL -> {
-                TCUtil.addOrDropToPlayer(pPlayer,Items.SOUL_TORCH.getDefaultInstance());
-                pLevel.setBlockAndUpdate(pPos,pState.setValue(HOLD_TORCH,HoldTorch.NONE));
-                pLevel.playSound(null,pPos, SoundEvents.WOOD_BREAK, SoundSource.BLOCKS);
-                return InteractionResult.SUCCESS;
-            }
-            case NORMAL -> {
-                TCUtil.addOrDropToPlayer(pPlayer,Items.TORCH.getDefaultInstance());
-                pLevel.setBlockAndUpdate(pPos,pState.setValue(HOLD_TORCH,HoldTorch.NONE));
-                pLevel.playSound(null,pPos, SoundEvents.WOOD_BREAK, SoundSource.BLOCKS);
-                return InteractionResult.SUCCESS;
             }
         }
-
+        for (Map.Entry<HoldTorch,Item> entry : map.entrySet()){
+            if (itemInHand.isEmpty() || itemInHand.is(entry.getValue())) {
+                if (torch.equals(entry.getKey())){
+                    TCUtil.addOrDropToPlayer(pPlayer, entry.getValue().getDefaultInstance());
+                    pLevel.setBlockAndUpdate(pPos, pState.setValue(HOLD_TORCH, HoldTorch.NONE));
+                    pLevel.playSound(null, pPos, SoundEvents.WOOD_BREAK, SoundSource.BLOCKS);
+                    return InteractionResult.SUCCESS;
+                }
+            }
+        }
 
         return super.use(pState, pLevel, pPos, pPlayer, pHand, pHit);
     }
@@ -220,24 +204,70 @@ public class FloatingTorchHolderBlock extends RedstoneTorchBlock {
 
     @Override
     public void animateTick(BlockState pState, Level pLevel, BlockPos pPos, RandomSource pRandom) {
+        Direction direction = pState.getValue(FACING);
         HoldTorch torch = pState.getValue(HOLD_TORCH);
-        switch (torch) {
-            case REDSTONE -> super.animateTick(pState, pLevel, pPos, pRandom);
-            case NORMAL -> {
-                double d0 = (double)pPos.getX() + 0.5D;
-                double d1 = (double)pPos.getY() + 0.7D;
-                double d2 = (double)pPos.getZ() + 0.5D;
-                pLevel.addParticle(ParticleTypes.SMOKE, d0, d1, d2, 0.0D, 0.0D, 0.0D);
-                pLevel.addParticle(ParticleTypes.FLAME, d0, d1, d2, 0.0D, 0.0D, 0.0D);
-            }
-            case SOUL -> {
-                double d0 = (double)pPos.getX() + 0.5D;
-                double d1 = (double)pPos.getY() + 0.7D;
-                double d2 = (double)pPos.getZ() + 0.5D;
-                pLevel.addParticle(ParticleTypes.SMOKE, d0, d1, d2, 0.0D, 0.0D, 0.0D);
-                pLevel.addParticle(ParticleTypes.SOUL_FIRE_FLAME, d0, d1, d2, 0.0D, 0.0D, 0.0D);
+
+        double d0 = (double)pPos.getX() + 0.5D;
+        double d1 = (double)pPos.getY() + 0.7D;
+        double d2 = (double)pPos.getZ() + 0.5D;
+
+        if (direction.equals(Direction.DOWN)) {
+            switch (torch) {
+                case REDSTONE -> super.animateTick(pState, pLevel, pPos, pRandom);
+                case NORMAL -> {
+                    pLevel.addParticle(ParticleTypes.SMOKE, d0, d1, d2, 0.0D, 0.0D, 0.0D);
+                    pLevel.addParticle(ParticleTypes.FLAME, d0, d1, d2, 0.0D, 0.0D, 0.0D);
+                }
+                case SOUL -> {
+                    pLevel.addParticle(ParticleTypes.SMOKE, d0, d1, d2, 0.0D, 0.0D, 0.0D);
+                    pLevel.addParticle(ParticleTypes.SOUL_FIRE_FLAME, d0, d1, d2, 0.0D, 0.0D, 0.0D);
+                }
             }
         }
+
+        double d3 = 0.22D;
+        double d4 = 0.27D;
+        Direction direction1 = direction.getOpposite();
+
+        switch (torch) {
+            case REDSTONE -> pLevel.addParticle(DustParticleOptions.REDSTONE, d0 + d4 * (double)direction1.getStepX(), d1 + d3, d2 + d4 * (double)direction1.getStepZ(), 0.0D, 0.0D, 0.0D);
+            case SOUL -> {
+                pLevel.addParticle(ParticleTypes.SMOKE,
+                        d0 + d4 * (double)direction1.getStepX(),
+                        d1 + d3,
+                        d2 + d4 * (double)direction1.getStepZ(),
+                        0.0D,
+                        0.0D,
+                        0.0D);
+                pLevel.addParticle(ParticleTypes.SOUL_FIRE_FLAME,
+                        d0 + d4 * (double)direction1.getStepX(),
+                        d1 + d3,
+                        d2 + d4 * (double)direction1.getStepZ(),
+                        0.0D,
+                        0.0D,
+                        0.0D);
+
+            }
+            case NORMAL -> {
+                pLevel.addParticle(ParticleTypes.SMOKE,
+                        d0 + d4 * (double)direction1.getStepX(),
+                        d1 + d3,
+                        d2 + d4 * (double)direction1.getStepZ(),
+                        0.0D,
+                        0.0D,
+                        0.0D);
+                pLevel.addParticle(ParticleTypes.FLAME,
+                        d0 + d4 * (double)direction1.getStepX(),
+                        d1 + d3,
+                        d2 + d4 * (double)direction1.getStepZ(),
+                        0.0D,
+                        0.0D,
+                        0.0D);
+
+            }
+
+        }
+
     }
 
     public BlockState rotate(BlockState pState, Rotation pRotation) {

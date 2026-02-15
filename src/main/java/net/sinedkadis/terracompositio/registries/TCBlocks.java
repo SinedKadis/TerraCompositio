@@ -5,15 +5,18 @@ import net.minecraft.core.Direction;
 
 import net.minecraft.core.cauldron.CauldronInteraction;
 import net.minecraft.sounds.SoundEvents;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.BlockGetter;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.*;
 import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockSetType;
 import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
+import net.minecraft.world.level.material.Fluids;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -228,9 +231,28 @@ public class TCBlocks {
                     BlockState blockstate = pLevel.getBlockState(blockpos);
                     return pState.getValue(HALF) == DoubleBlockHalf.LOWER || blockstate.is(this);
                 }
+
                 @Override
-                public boolean canConnectRedstone(BlockState state, BlockGetter level, BlockPos pos, @Nullable Direction direction) {
-                    return true;
+                public void playerWillDestroy(Level pLevel, BlockPos pPos, BlockState pState, Player pPlayer) {
+                    DoubleBlockHalf doubleblockhalf = pState.getValue(HALF);
+                    if (doubleblockhalf == DoubleBlockHalf.UPPER) {
+                        BlockPos blockpos = pPos.below();
+                        BlockState blockstate = pLevel.getBlockState(blockpos);
+                        if (blockstate.is(pState.getBlock()) && blockstate.getValue(HALF) == DoubleBlockHalf.LOWER) {
+                            BlockState blockstate1 = blockstate.getFluidState().is(Fluids.WATER) ? Blocks.WATER.defaultBlockState() : Blocks.AIR.defaultBlockState();
+                            pLevel.setBlock(blockpos, blockstate1, 35);
+                            pLevel.levelEvent(pPlayer, 2001, blockpos, Block.getId(blockstate));
+                        }
+                    } else {
+                        BlockPos blockpos = pPos.above();
+                        BlockState blockstate = pLevel.getBlockState(blockpos);
+                        if (blockstate.is(pState.getBlock()) && blockstate.getValue(HALF) == DoubleBlockHalf.UPPER) {
+                            BlockState blockstate1 = blockstate.getFluidState().is(Fluids.WATER) ? Blocks.WATER.defaultBlockState() : Blocks.AIR.defaultBlockState();
+                            pLevel.setBlock(blockpos, blockstate1, 35);
+                            pLevel.levelEvent(pPlayer, 2001, blockpos, Block.getId(blockstate));
+                        }
+                    }
+                    super.playerWillDestroy(pLevel, pPos, pState, pPlayer);
                 }
             });
 

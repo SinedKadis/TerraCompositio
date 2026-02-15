@@ -15,6 +15,8 @@
     "terracompositio:pp_extractor",
     "terracompositio:pp_infuser",
     "terracompositio:technetium_block",
-    "terracompositio:infused_iron_block"
+    "terracompositio:infused_iron_block",
+    "terracompositio:infused_iron_door",
+    "terracompositio:infused_iron_pressure_plate"
   ]
 }

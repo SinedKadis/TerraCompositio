@@ -1,0 +1,7 @@
+{
+  "parent": "minecraft:block/door_bottom_right",
+  "textures": {
+    "bottom": "terracompositio:block/floating_redstone/infused_iron_door_bottom",
+    "top": "terracompositio:block/floating_redstone/infused_iron_door_top"
+  }
+}

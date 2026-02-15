@@ -356,6 +356,11 @@ public class TCRecipeProvider extends RecipeProvider implements IConditionBuilde
                 .define('R', TCItems.INFUSED_IRON_INGOT.get())
                 .unlockedBy(getHasName(TCItems.INFUSED_IRON_INGOT.get()), has(TCItems.INFUSED_IRON_INGOT.get()))
                 .save(pWriter);
+
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, TCItems.INFUSED_IRON_NUGGET.get(), 9)
+                .requires(TCItems.INFUSED_IRON_INGOT.get())
+                .unlockedBy(getHasName(TCItems.INFUSED_IRON_INGOT.get()), has(TCItems.INFUSED_IRON_INGOT.get()))
+                .save(pWriter);
     }
 
     private static void buildCedarArmor(@NotNull Consumer<FinishedRecipe> pWriter) {
@@ -419,6 +424,10 @@ public class TCRecipeProvider extends RecipeProvider implements IConditionBuilde
                 .pattern("R")
                 .pattern("R")
                 .define('R', TCItems.TECHNETIUM_INGOT.get())
+                .unlockedBy(getHasName(TCItems.TECHNETIUM_INGOT.get()), has(TCItems.TECHNETIUM_INGOT.get()))
+                .save(pWriter);
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, TCItems.TECHNETIUM_NUGGET.get(), 9)
+                .requires(TCItems.TECHNETIUM_INGOT.get())
                 .unlockedBy(getHasName(TCItems.TECHNETIUM_INGOT.get()), has(TCItems.TECHNETIUM_INGOT.get()))
                 .save(pWriter);
     }

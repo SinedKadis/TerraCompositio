@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/door_top_right",
+  "render_type": "minecraft:cutout",
+  "textures": {
+    "bottom": "terracompositio:block/floating_redstone/infused_iron_door_bottom",
+    "top": "terracompositio:block/floating_redstone/infused_iron_door_top"
+  }
+}
