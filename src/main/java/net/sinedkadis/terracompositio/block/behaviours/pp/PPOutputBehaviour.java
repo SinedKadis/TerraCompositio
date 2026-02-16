@@ -43,7 +43,12 @@ public abstract class PPOutputBehaviour extends AbstractPPBehaviour {
 
         @Override
         public void init() {
-            this.setCfeHandler(new CFEContainer(this).setCfeTravelSpeed((float) 5 / 20));
+            this.setCfeHandler(new CFEContainer(this){
+                @Override
+                public float getCfeTravelSpeed() {
+                    return 5/20f;
+                }
+            });
             setMaxCFE(100);
         }
 

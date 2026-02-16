@@ -3,6 +3,7 @@ package net.sinedkadis.terracompositio.block.behaviours.pp;
 import net.minecraft.core.BlockPos;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraftforge.common.util.LazyOptional;
 import net.sinedkadis.terracompositio.api.TCCapabilities;
 import net.sinedkadis.terracompositio.api.TerraCompositioAPI;
 import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBEBehaviour;
@@ -26,15 +27,6 @@ public abstract class PPInputBehaviour extends AbstractPPBehaviour{
 
     public PPInputBehaviour(PathPointerBlockEntity blockEntity) {
         super(blockEntity);
-    }
-
-    protected void sendCFE() {
-        if (blockEntity.parts.contains(PathPointerBlockEntity.PPPart.SENDER)) {
-            int added = TCUtil.tryCFETransfer(endPointCFEBehaviour.getEntity().getBlockPos(),
-                    thisCFEBehaviour.getAttachedMember(),
-                    endPointCFEBehaviour.getFreeSpace());
-            endPointCFEBehaviour.addToQueue(added);
-        }
     }
 
     protected void collectCFE() {
@@ -85,9 +77,9 @@ public abstract class PPInputBehaviour extends AbstractPPBehaviour{
             if (blockEntity.getLevel() != null) {
                 BlockEntity endPointBE = blockEntity.getLevel().getBlockEntity(endpoint);
                 if (endPointBE != null) {
-                    Optional<ICFEHandler> behaviour = endPointBE.getCapability(TCCapabilities.CFE).resolve();
+                    LazyOptional<ICFEHandler> behaviour = endPointBE.getCapability(TCCapabilities.CFE);
                     if (behaviour.isPresent()) {
-                        endPointCFEBehaviour = behaviour.get();
+                        behaviour.ifPresent(icfeHandler -> endPointCFEBehaviour = icfeHandler);
                     } else {
                         return true;
                     }

@@ -35,7 +35,6 @@ public class ExtractorBehaviour extends PPInputBehaviour{
         if (invalidBehaviours()) return;
         updateMaxCFE();
         collectCFE();
-        sendCFE();
     }
 
     @Override

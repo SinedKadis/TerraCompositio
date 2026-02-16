@@ -86,11 +86,6 @@ public class CFEItemWrapper implements ICFEHandler, ICapabilityProvider {
     }
 
     @Override
-    public int sendCFE(int cfe, BlockPos target, boolean simulate) {
-        return 0;
-    }
-
-    @Override
     public void setCFE(int cfe) {
         CompoundTag tag = container.getOrCreateTag();
         tag.putInt("CFE",cfe);

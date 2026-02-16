@@ -1,76 +1,74 @@
-package net.sinedkadis.terracompositio.api.dummies;
+package net.sinedkadis.terracompositio.cfe;
 
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import net.sinedkadis.terracompositio.api.networks.cfe.CFENetworkMember;
 import net.sinedkadis.terracompositio.api.networks.cfe.ICFEHandler;
 
 import java.util.function.Function;
 
-@SuppressWarnings("DataFlowIssue")
 @MethodsReturnNonnullByDefault
-public class DummyCFEHandler implements ICFEHandler {
-    public static final DummyCFEHandler instance = new DummyCFEHandler();
+public class RedirectCFEHandler implements ICFEHandler {
+    ICFEHandler redirectedHandler;
+    CFENetworkMember member;
+
+    public RedirectCFEHandler(CFENetworkMember member,ICFEHandler redirectedHandler) {
+        this.redirectedHandler = redirectedHandler;
+        this.member = member;
+    }
 
     @Override
     public int getCFE() {
-        return 0;
+        return redirectedHandler.getCFE();
     }
-
 
     @Override
     public ICFEHandler setIndex(int index) {
-        return instance;
+        return redirectedHandler.setIndex(index);
     }
 
     @Override
     public ICFEHandler setOffset(Function<Vec3, Vec3> offset) {
-        return null;
+        return redirectedHandler.setOffset(offset);
     }
-
 
     @Override
     public int takeCFE(int cfe, boolean simulate) {
-        return 0;
+        return redirectedHandler.takeCFE(cfe,simulate);
     }
 
     @Override
     public int addCFE(int cfe, boolean simulate) {
-        return 0;
+        return redirectedHandler.addCFE(cfe,simulate);
     }
 
     @Override
     public int sendCFE(int cfe, ICFEHandler target, boolean simulate) {
-        return 0;
+        return redirectedHandler.sendCFE(cfe, target, simulate);
     }
-
 
     @Override
     public void setCFE(int cfe) {
-
+        redirectedHandler.setCFE(cfe);
     }
 
     @Override
     public int getMaxCFE() {
-        return 0;
+        return redirectedHandler.getMaxCFE();
     }
 
     @Override
     public ICFEHandler setCfeTravelSpeed(float cfeTravelSpeed) {
-        return instance;
+        redirectedHandler.setCfeTravelSpeed(cfeTravelSpeed);
+        return this;
     }
 
     @Override
     public ICFEHandler setMaxCFE(int max) {
-        return instance;
+        redirectedHandler.setMaxCFE(max);
+        return this;
     }
-
-
 
     @Override
     public void writeToNBT(CompoundTag pTag) {
@@ -84,88 +82,46 @@ public class DummyCFEHandler implements ICFEHandler {
 
     @Override
     public int getQueued() {
-        return 0;
+        return redirectedHandler.getQueued();
     }
 
     @Override
     public void setQueued(int queued) {
-
+        redirectedHandler.setQueued(queued);
     }
 
     @Override
     public int getCFEWithQueue() {
-        return 0;
+        return redirectedHandler.getCFEWithQueue();
     }
 
     @Override
     public boolean isEmpty() {
-        return false;
+        return redirectedHandler.isEmpty();
     }
-
 
     @Override
     public int getFreeSpace() {
-        return 0;
-    }
-
-
-    @Override
-    public double x() {
-        return 0;
-    }
-
-    @Override
-    public double y() {
-        return 0;
-    }
-
-    @Override
-    public double z() {
-        return 0;
-    }
-
-    @Override
-    public BlockPos getPos() {
-        return null;
-    }
-
-    @Override
-    public BlockState getBlockState() {
-        return null;
-    }
-
-    @Override
-    public <T extends BlockEntity> T getEntity() {
-        return null;
-    }
-
-    @Override
-    public ServerLevel getLevel() {
-        return null;
+        return redirectedHandler.getFreeSpace();
     }
 
     @Override
     public float getCfeTravelSpeed() {
-        return 0;
+        return redirectedHandler.getCfeTravelSpeed();
     }
 
     @Override
     public CFENetworkMember getAttachedMember() {
-        return null;
+        return member;
     }
 
     @Override
     public Function<Vec3, Vec3> getOffset() {
-        return null;
+        return redirectedHandler.getOffset();
     }
-
 
     @Override
     public int getIndex() {
-        return 0;
+        return redirectedHandler.getIndex();
     }
-
-
-
-
 }

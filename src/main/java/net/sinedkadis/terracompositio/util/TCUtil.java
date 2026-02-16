@@ -67,16 +67,11 @@ public class TCUtil {
         }
 
     }
-    public static int tryCFETransfer(BlockPos targetPos, CFENetworkMember source, int maxTransfer){
-        int taken = source.getMainHandler().takeCFE(maxTransfer,true);
-        int added = source.getMainHandler().sendCFE(taken, targetPos, true);
 
-        if (added <= taken){
-            added = source.getMainHandler().sendCFE(added, targetPos, false);
-            source.getMainHandler().takeCFE(added, false);
-        }
-        return added;
+    public static void tryCFETransfer(ICFEHandler target, ICFEHandler source) {
+        tryCFETransfer(target, source, target.getFreeSpace());
     }
+
     public static void tryCFETransfer(ICFEHandler target, ICFEHandler source, int maxTransfer){
         int taken = source.takeCFE(maxTransfer,true);
         int added = source.sendCFE(taken,target,true);

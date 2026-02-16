@@ -69,10 +69,6 @@ public class CFEBurstProjectileEntity extends ThrowableProjectile {
         this(pSource.x()+offset.x,pSource.y()+offset.y,pSource.z()+offset.z,pSource.getLevel());
         init(pSource,offset,target.getPos(),target.getAttachedMember(),cfe,cfeTravelSpeed);
     }
-    private CFEBurstProjectileEntity(ICFEHandler pSource,BlockPos targetPos,@Nullable CFENetworkMember attachedMember, int cfe, float cfeTravelSpeed) {
-        this(pSource.x(),pSource.y(),pSource.z(),pSource.getLevel());
-        init(pSource,Vec3.ZERO,targetPos,attachedMember,cfe,cfeTravelSpeed);
-    }
 
     private void init(ICFEHandler pSource,Vec3 offset,BlockPos targetPos,@Nullable CFENetworkMember attachedMember, int cfe, float cfeTravelSpeed) {
         if (attachedMember instanceof LivingEntity livingEntity) {
@@ -94,13 +90,6 @@ public class CFEBurstProjectileEntity extends ThrowableProjectile {
         this(owner.getX(), owner.getY(), owner.getZ(), owner.level());
         this.setOwner(owner);
         this.setCFE(cfe);
-    }
-
-    public static @Nullable CFEBurstProjectileEntity sendBurst(ICFEHandler pSource, BlockPos targetPos, int cfe, float cfeTravelSpeed) {
-        if (cfe < 1) {
-            return null;
-        }
-        return new CFEBurstProjectileEntity(pSource, targetPos,null, cfe, cfeTravelSpeed);
     }
 
     public static @Nullable CFEBurstProjectileEntity sendBurst(ICFEHandler pSource, ICFEHandler target, int cfe, float cfeTravelSpeed) {

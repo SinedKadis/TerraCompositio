@@ -18,7 +18,6 @@ public class CollectorBehaviour extends PPInputBehaviour{
         if (invalidBehaviours()) return;
         updateMaxCFE();
         collectCFE();
-        sendCFE();
     }
 
 

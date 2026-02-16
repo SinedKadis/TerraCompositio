@@ -4,9 +4,7 @@ package net.sinedkadis.terracompositio.cfe;
 import lombok.Getter;
 import lombok.Setter;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Mth;
 import net.minecraft.world.level.Level;
@@ -23,7 +21,6 @@ import net.sinedkadis.terracompositio.network.TCPackets;
 import net.sinedkadis.terracompositio.network.packets.S2CPlayerCfeContainerSync;
 
 import javax.annotation.ParametersAreNonnullByDefault;
-import java.util.Objects;
 import java.util.function.Function;
 
 @Getter
@@ -91,24 +88,10 @@ public class CFEContainer implements ICFEHandler, INBTSerializable<CompoundTag> 
             return 0;
 
         if (!simulate) {
-            CFEBurstProjectileEntity entity = CFEBurstProjectileEntity.sendBurst(this, target, added, target.getCfeTravelSpeed());
+            float targetCfeTravelSpeed = target.getCfeTravelSpeed();
+            CFEBurstProjectileEntity entity = CFEBurstProjectileEntity.sendBurst(this, target, added, targetCfeTravelSpeed);
             if (entity != null)
                 target.addToQueue(added);
-        }
-        return added;
-    }
-
-    @Override
-    public int sendCFE(int cfe, BlockPos target, boolean simulate) {
-
-        int available = this.getCFE();
-        int added = Mth.clamp(cfe, 0, available);
-        if (added < 1)
-            return 0;
-
-        if (!simulate) {
-            CFEBurstProjectileEntity.sendBurst(this, target, added, 5 / 20f);
-
         }
         return added;
     }
@@ -123,39 +106,6 @@ public class CFEContainer implements ICFEHandler, INBTSerializable<CompoundTag> 
             onContentsChanged();
         }
         return added;
-    }
-
-
-    public double x() {
-        return (double)this.getPos().getX() + 0.5D;
-    }
-
-    public double y() {
-        return (double)this.getPos().getY() + 0.5D;
-    }
-
-    public double z() {
-        return (double)this.getPos().getZ() + 0.5D;
-    }
-
-    @Override
-    public BlockPos getPos() {
-        return getAttachedMember().getPos();
-    }
-
-    public BlockState getBlockState() {
-        return this.getLevel().getBlockState(this.getPos());
-    }
-
-
-    public <T extends BlockEntity> T getEntity() {
-        //noinspection unchecked
-        return (T) Objects.requireNonNull(this.getLevel().getBlockEntity(this.getPos()));
-    }
-
-    @Override
-    public ServerLevel getLevel() {
-        return (ServerLevel) getAttachedMember().getLevel();
     }
 
 
