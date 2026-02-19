@@ -3,7 +3,6 @@ package net.sinedkadis.terracompositio.fluid;
 import com.mojang.blaze3d.shaders.FogShape;
 import com.mojang.blaze3d.systems.RenderSystem;
 import lombok.Getter;
-import mekanism.api.annotations.ParametersAreNotNullByDefault;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.client.Camera;
@@ -148,7 +147,7 @@ public class TCFluidRegistryContainer implements IForgeBucketPickup{
             }
 
             @Override
-            @ParametersAreNotNullByDefault
+            @ParametersAreNonnullByDefault
             public InteractionResultHolder<ItemStack> use(Level pLevel, Player pPlayer, InteractionHand pHand) {
                 BlockHitResult blockhitresult = getPlayerPOVHitResult(pLevel, pPlayer, super.getFluid() == Fluids.EMPTY ? net.minecraft.world.level.ClipContext.Fluid.SOURCE_ONLY : net.minecraft.world.level.ClipContext.Fluid.NONE);
                 if (blockhitresult.getType() == HitResult.Type.MISS) {
@@ -163,7 +162,7 @@ public class TCFluidRegistryContainer implements IForgeBucketPickup{
             }
 
             @Override
-            @ParametersAreNotNullByDefault
+            @ParametersAreNonnullByDefault
             public ItemStack finishUsingItem(ItemStack pStack, Level pLevel, LivingEntity pLivingEntity) {
                 super.finishUsingItem(pStack, pLevel, pLivingEntity);
                 if (pStack.is(TCFluids.BIRCH_JUICE_FLUID.bucket.get())) {

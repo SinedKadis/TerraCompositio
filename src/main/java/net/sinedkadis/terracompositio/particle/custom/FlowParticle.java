@@ -1,6 +1,5 @@
 package net.sinedkadis.terracompositio.particle.custom;
 
-import mekanism.api.annotations.ParametersAreNotNullByDefault;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.*;
 import net.minecraft.core.BlockPos;
@@ -18,6 +17,8 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import net.sinedkadis.terracompositio.registries.TCFluids;
 import net.sinedkadis.terracompositio.registries.TCParticles;
 import org.jetbrains.annotations.NotNull;
+
+import javax.annotation.ParametersAreNonnullByDefault;
 
 public class FlowParticle extends TextureSheetParticle {
     private final Fluid type = TCFluids.FLOW_FLUID.source.get();
@@ -79,7 +80,7 @@ public class FlowParticle extends TextureSheetParticle {
 
     @OnlyIn(Dist.CLIENT)
     public record Provider(SpriteSet sprites) implements ParticleProvider<SimpleParticleType> {
-        @ParametersAreNotNullByDefault
+        @ParametersAreNonnullByDefault
         public Particle createParticle(SimpleParticleType particleType, ClientLevel level,
                                    double x, double y, double z,
                                    double dx, double dy, double dz) {

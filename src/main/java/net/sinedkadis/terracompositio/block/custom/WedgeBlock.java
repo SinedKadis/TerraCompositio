@@ -1,6 +1,5 @@
 package net.sinedkadis.terracompositio.block.custom;
 
-import mekanism.api.annotations.ParametersAreNotNullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.core.particles.ParticleOptions;
@@ -35,6 +34,7 @@ import net.sinedkadis.terracompositio.registries.TCParticles;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.Nullable;
+import javax.annotation.ParametersAreNonnullByDefault;
 
 import java.util.Optional;
 import java.util.function.BiPredicate;
@@ -148,7 +148,7 @@ public class WedgeBlock extends Block {
     }
 
     @Override
-    @ParametersAreNotNullByDefault
+    @ParametersAreNonnullByDefault
     public void animateTick(BlockState pState, Level pLevel, BlockPos pPos, RandomSource pRandom) {
         super.animateTick(pState, pLevel, pPos, pRandom);
         if (pState.getValue(ATTACHED)) {

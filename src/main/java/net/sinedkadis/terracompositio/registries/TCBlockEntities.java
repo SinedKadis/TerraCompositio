@@ -10,8 +10,6 @@ import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
 import net.sinedkadis.terracompositio.TerraCompositio;
 import net.sinedkadis.terracompositio.block.entity.*;
-import net.sinedkadis.terracompositio.compat.CompatUtils;
-import net.sinedkadis.terracompositio.compat.create.block.entity.CedarGearboxBlockEntity;
 
 import java.util.function.Supplier;
 
@@ -95,15 +93,12 @@ public class TCBlockEntities {
     public static final RegistryObject<BlockEntityType<AirSaturatorBlockEntity>> AIR_SATURATOR_BE =
             registerBE("air_saturator_be",AirSaturatorBlockEntity::new, AIR_SATURATOR);
 
-    public static final RegistryObject<BlockEntityType<CedarGearboxBlockEntity>> CEDAR_GEARBOX_BE =
-            registerBE("cedar_gearbox_be",CedarGearboxBlockEntity::new, CompatUtils.CREATE_EXISTENCE, CEDAR_GEARBOX);
 
-
-    private static <T extends BlockEntity> RegistryObject<BlockEntityType<T>> registerBE(String name, BlockEntityType.BlockEntitySupplier<T> blockEntity, RegistryObject<Block>... blocks) {
+    public static <T extends BlockEntity> RegistryObject<BlockEntityType<T>> registerBE(String name, BlockEntityType.BlockEntitySupplier<T> blockEntity, RegistryObject<Block>... blocks) {
         return registerBE(name, blockEntity,  () -> true, blocks);
     }
 
-    private static <T extends BlockEntity> RegistryObject<BlockEntityType<T>> registerBE(String name, BlockEntityType.BlockEntitySupplier<T> blockEntity, Supplier<Boolean> predicate, RegistryObject<Block>... blocks) {
+    public static <T extends BlockEntity> RegistryObject<BlockEntityType<T>> registerBE(String name, BlockEntityType.BlockEntitySupplier<T> blockEntity, Supplier<Boolean> predicate, RegistryObject<Block>... blocks) {
         if (!predicate.get()) return null;
 
         return BLOCK_ENTITIES.register(name, () -> {

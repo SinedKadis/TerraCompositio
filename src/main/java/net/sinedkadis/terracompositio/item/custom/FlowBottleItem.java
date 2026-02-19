@@ -1,6 +1,5 @@
 package net.sinedkadis.terracompositio.item.custom;
 
-import mekanism.api.annotations.ParametersAreNotNullByDefault;
 import net.minecraft.advancements.CriteriaTriggers;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
@@ -24,6 +23,8 @@ import net.sinedkadis.terracompositio.registries.TCArmorMaterials;
 import net.sinedkadis.terracompositio.registries.TCItems;
 import org.jetbrains.annotations.NotNull;
 
+import javax.annotation.ParametersAreNonnullByDefault;
+
 import static net.minecraft.world.level.block.LayeredCauldronBlock.LEVEL;
 
 public class FlowBottleItem extends Item {
@@ -38,7 +39,7 @@ public class FlowBottleItem extends Item {
     }
 
     @Override
-    @ParametersAreNotNullByDefault
+    @ParametersAreNonnullByDefault
     public @NotNull ItemStack finishUsingItem(ItemStack pStack, Level pLevel, LivingEntity pEntityLiving) {
         Player player = pEntityLiving instanceof Player ? (Player)pEntityLiving : null;
         if (player instanceof ServerPlayer) {
@@ -148,7 +149,7 @@ public class FlowBottleItem extends Item {
     }
 
     @Override
-    @ParametersAreNotNullByDefault
+    @ParametersAreNonnullByDefault
     public @NotNull InteractionResultHolder<ItemStack> use(Level pLevel, Player pPlayer, InteractionHand pHand) {
         return ItemUtils.startUsingInstantly(pLevel, pPlayer, pHand);
     }

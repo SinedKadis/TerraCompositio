@@ -5,8 +5,6 @@ import net.sinedkadis.terracompositio.TerraCompositio;
 import net.sinedkadis.terracompositio.block.custom.*;
 import net.sinedkadis.terracompositio.block.entity.*;
 import net.sinedkadis.terracompositio.cfe.burst.CFEBurstProjectileEntity;
-import net.sinedkadis.terracompositio.compat.create.block.custom.CedarGearboxBlock;
-import net.sinedkadis.terracompositio.compat.create.block.entity.CedarGearboxBlockEntity;
 import net.sinedkadis.terracompositio.compat.jade.providers.*;
 import net.sinedkadis.terracompositio.entity.custom.CFECloudEntity;
 import net.sinedkadis.terracompositio.entity.custom.FlowCedarEntEntity;
@@ -19,7 +17,6 @@ public class JadeTerraCompositioPlugin implements IWailaPlugin {
     public void register(IWailaCommonRegistration registration) {
 
         registration.registerBlockDataProvider(TCBlockEntityComponentProvider.INSTANCE, TCBlockEntity.class);
-        registration.registerBlockDataProvider(CedarGearboxBlockEntityComponentProvider.INSTANCE, CedarGearboxBlockEntity.class);
 
         registration.registerBlockDataProvider(MatterInfuserIOComponentProvider.INSTANCE, MatterInfuserIOBlockEntity.class);
 
@@ -39,7 +36,6 @@ public class JadeTerraCompositioPlugin implements IWailaPlugin {
 
 
         registration.registerBlockComponent(TCBlockEntityComponentProvider.INSTANCE, TCBaseEntityBlock.class);
-        registration.registerBlockComponent(CedarGearboxBlockEntityComponentProvider.INSTANCE, CedarGearboxBlock.class);
 
         registration.registerBlockComponent(MatterInfuserIOComponentProvider.INSTANCE, MatterInfuserIOBlock.class);
         registration.addConfig(MatterInfuserIOComponentProvider.INSTANCE.catalystConfigRL(),true);

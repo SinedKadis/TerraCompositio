@@ -8,13 +8,14 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
+import net.sinedkadis.terracompositio.TerraCompositio;
 import net.sinedkadis.terracompositio.api.TCCapabilities;
 import net.sinedkadis.terracompositio.api.TerraCompositioAPI;
 import net.sinedkadis.terracompositio.api.networks.NetworkAction;
 import net.sinedkadis.terracompositio.api.networks.cfe.*;
 import net.sinedkadis.terracompositio.cfe.CFEContainer;
+import net.sinedkadis.terracompositio.compat.create.TCCreateCompat;
 import net.sinedkadis.terracompositio.compat.jade.JadeTerraCompositioPlugin;
-import net.sinedkadis.terracompositio.registries.TCBlockEntities;
 import net.sinedkadis.terracompositio.registries.TCBlockStateProperties;
 import net.sinedkadis.terracompositio.util.TCUtil;
 import org.jetbrains.annotations.NotNull;
@@ -37,7 +38,7 @@ public class CedarGearboxBlockEntity extends GeneratingKineticBlockEntity implem
     protected LazyOptional<ICFEHandler> lazyCFEOptional = LazyOptional.empty();
 
     public CedarGearboxBlockEntity(BlockPos pPos, BlockState pBlockState) {
-        super(Objects.requireNonNull(TCBlockEntities.CEDAR_GEARBOX_BE).get(),pPos, pBlockState);
+        super(Objects.requireNonNull(((TCCreateCompat) TerraCompositio.createCompat).blockEntities.CEDAR_GEARBOX_BE).get(),pPos, pBlockState);
         setLazyTickRate(60);
         this.limit = 5;
         this.priority = 100;

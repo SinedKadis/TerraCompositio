@@ -1,6 +1,5 @@
 package net.sinedkadis.terracompositio.events;
 
-import com.simibubi.create.content.kinetics.base.KineticBlockEntityRenderer;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.client.model.BoatModel;
@@ -30,7 +29,6 @@ import net.sinedkadis.terracompositio.TerraCompositio;
 import net.sinedkadis.terracompositio.block.entity.renderer.*;
 import net.sinedkadis.terracompositio.cfe.burst.CFEBurstRenderer;
 import net.sinedkadis.terracompositio.compat.CompatUtils;
-import net.sinedkadis.terracompositio.compat.create.TCCreateCompat;
 import net.sinedkadis.terracompositio.entity.client.CFECloudRenderer;
 import net.sinedkadis.terracompositio.entity.client.CFECubeModel;
 import net.sinedkadis.terracompositio.entity.client.FlowCedarEntModel;
@@ -109,7 +107,8 @@ public class TCEventBusClientEvents {
                 (stack, level, entity, seed) ->
                         CreationFlowJournalItem.isOpen() ? 1.0F : 0.0F
         );
-        TCCreateCompat.clientInit();
+        if (CompatUtils.CREATE_EXISTENCE.get())
+            TerraCompositio.createCompat.clientInit();
     }
     static final Map<String, Integer> HARDCODED_COLORS = Map.of(
             "create:chocolate", 0x5A3A22,
@@ -192,15 +191,11 @@ public class TCEventBusClientEvents {
         event.registerBlockEntityRenderer(TCBlockEntities.FLOW_CEDAR_TANK_BE.get(), FlowCedarTankBlockEntityRenderer::new);
         event.registerBlockEntityRenderer(TCBlockEntities.PATH_POINTER_BE.get(), PathPointerBlockEntityRenderer::new);
         event.registerBlockEntityRenderer(TCBlockEntities.ENT_STATUE_BE.get(), EntStatueBlockEntityRenderer::new);
+
+
         if (CompatUtils.CREATE_EXISTENCE.get()) {
-            assert TCBlockEntities.CEDAR_GEARBOX_BE != null;
-            event.registerBlockEntityRenderer(
-                    TCBlockEntities.CEDAR_GEARBOX_BE.get(),
-                    KineticBlockEntityRenderer::new
-            );
+            TerraCompositio.createCompat.registerCreateBER(event);
         }
-
-
     }
 
     @SuppressWarnings("deprecation")

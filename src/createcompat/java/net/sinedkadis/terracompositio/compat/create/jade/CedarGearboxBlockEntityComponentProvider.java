@@ -1,4 +1,4 @@
-package net.sinedkadis.terracompositio.compat.jade.providers;
+package net.sinedkadis.terracompositio.compat.create.jade;
 
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;

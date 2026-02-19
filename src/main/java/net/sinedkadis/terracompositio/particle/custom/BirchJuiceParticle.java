@@ -1,6 +1,5 @@
 package net.sinedkadis.terracompositio.particle.custom;
 
-import mekanism.api.annotations.ParametersAreNotNullByDefault;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.*;
 import net.minecraft.core.BlockPos;
@@ -18,6 +17,8 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import net.sinedkadis.terracompositio.registries.TCFluids;
 import net.sinedkadis.terracompositio.registries.TCParticles;
 import org.jetbrains.annotations.NotNull;
+
+import javax.annotation.ParametersAreNonnullByDefault;
 
 public class BirchJuiceParticle extends TextureSheetParticle {
     private final Fluid type = TCFluids.BIRCH_JUICE_FLUID.source.get();
@@ -86,7 +87,7 @@ public class BirchJuiceParticle extends TextureSheetParticle {
         public Provider(SpriteSet spriteSet) {
             this.sprites = spriteSet;
         }
-    @ParametersAreNotNullByDefault
+    @ParametersAreNonnullByDefault
     public Particle createParticle(SimpleParticleType particleType, ClientLevel level,
                                        double x, double y, double z,
                                        double dx, double dy, double dz) {

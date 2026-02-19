@@ -1,6 +1,5 @@
 package net.sinedkadis.terracompositio.block.custom;
 
-import mekanism.api.annotations.ParametersAreNotNullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.cauldron.CauldronInteraction;
 import net.minecraft.sounds.SoundEvents;
@@ -19,6 +18,7 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.sinedkadis.terracompositio.registries.TCFluids;
 import org.jetbrains.annotations.NotNull;
 
+import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.Map;
 import java.util.function.Predicate;
 
@@ -38,7 +38,7 @@ public class BirchJuiceCauldronBlock extends TCCauldronBlock {
     }
 
     @Override
-    @ParametersAreNotNullByDefault
+    @ParametersAreNonnullByDefault
     public @NotNull InteractionResult use(BlockState pState, Level pLevel, BlockPos pPos, Player pPlayer, InteractionHand pHand, BlockHitResult pHit) {
         ItemStack itemStack = pPlayer.getItemInHand(pHand);
         //GLOGGER.debug("Use called, {}, {}", pLevel,pLevel.getBlockEntity(pPos));

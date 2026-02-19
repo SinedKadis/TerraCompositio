@@ -1,6 +1,5 @@
 package net.sinedkadis.terracompositio.block.custom;
 
-import mekanism.api.annotations.ParametersAreNotNullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.cauldron.CauldronInteraction;
 import net.minecraft.sounds.SoundEvents;
@@ -20,6 +19,7 @@ import net.sinedkadis.terracompositio.registries.TCFluids;
 import net.sinedkadis.terracompositio.registries.TCItems;
 import org.jetbrains.annotations.NotNull;
 
+import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.Map;
 import java.util.function.Predicate;
 
@@ -37,13 +37,13 @@ public class FlowCauldronBlock extends TCCauldronBlock {
     }
 
     @Override
-    @ParametersAreNotNullByDefault
+    @ParametersAreNonnullByDefault
     protected void handleEntityOnFireInside(BlockState pState, Level pLevel, BlockPos pPos) {
 
     }
 
     @Override
-    @ParametersAreNotNullByDefault
+    @ParametersAreNonnullByDefault
     public @NotNull InteractionResult use(BlockState pState, Level pLevel, BlockPos pPos, Player pPlayer, InteractionHand pHand, BlockHitResult pHit) {
         ItemStack itemStack = pPlayer.getItemInHand(pHand);
         if (pState.getValue(LEVEL) == 3) {

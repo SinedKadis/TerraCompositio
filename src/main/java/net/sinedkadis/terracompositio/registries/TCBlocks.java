@@ -24,8 +24,6 @@ import net.minecraftforge.registries.RegistryObject;
 import net.sinedkadis.terracompositio.TerraCompositio;
 import net.sinedkadis.terracompositio.block.custom.*;
 import net.sinedkadis.terracompositio.block.entity.PathPointerBlockEntity;
-import net.sinedkadis.terracompositio.compat.CompatUtils;
-import net.sinedkadis.terracompositio.compat.create.block.custom.CedarGearboxBlock;
 import net.sinedkadis.terracompositio.item.custom.UnstableTechnetiumBlockItem;
 import net.sinedkadis.terracompositio.worldgen.tree.FlowCedarTreeGrower;
 import org.jetbrains.annotations.Nullable;
@@ -265,19 +263,11 @@ public class TCBlocks {
             () -> new AirSaturatorBlock(BlockBehaviour.Properties.copy(Blocks.OAK_PLANKS).strength(3f)));
 
 
-    //Compat
-    public static final RegistryObject<Block> CEDAR_GEARBOX = registerBlock("cedar_gearbox",
-            () -> new CedarGearboxBlock(BlockBehaviour.Properties.copy(TCBlocks.FLOW_CEDAR_LOG.get())), CompatUtils.CREATE_EXISTENCE);
-
-
-
-
-
-    private static <T extends Block>RegistryObject<T> registerBlock(String name, Supplier<T> block) {
+    public static <T extends Block>RegistryObject<T> registerBlock(String name, Supplier<T> block) {
         return registerBlock(name, block, () -> true);
     }
 
-    private static <T extends Block>RegistryObject<T> registerBlock(String name, Supplier<T> block, Supplier<Boolean> predicate) {
+    public static <T extends Block>RegistryObject<T> registerBlock(String name, Supplier<T> block, Supplier<Boolean> predicate) {
         if (!predicate.get()) return null;
         RegistryObject<T> toReturn = BLOCKS.register(name, block);
         registerBlockItem(name, toReturn);

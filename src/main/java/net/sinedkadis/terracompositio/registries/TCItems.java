@@ -1,6 +1,5 @@
 package net.sinedkadis.terracompositio.registries;
 
-import mekanism.api.annotations.ParametersAreNotNullByDefault;
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.*;
@@ -15,6 +14,7 @@ import net.sinedkadis.terracompositio.entity.custom.TCBoatEntity;
 import net.sinedkadis.terracompositio.item.custom.*;
 import org.jetbrains.annotations.Nullable;
 
+import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.List;
 
 public class TCItems {
@@ -130,7 +130,7 @@ public class TCItems {
     public static final RegistryObject<Item> FLOW_INFUSER_KIT = ITEMS.register("flow_infuser_kit",
             () -> new Item(new Item.Properties()){
                 @Override
-                @ParametersAreNotNullByDefault
+                @ParametersAreNonnullByDefault
                 public void appendHoverText(ItemStack pStack, @Nullable Level pLevel, List<Component> pTooltipComponents, TooltipFlag pIsAdvanced) {
                     super.appendHoverText(pStack, pLevel, pTooltipComponents, pIsAdvanced);
                     pTooltipComponents.add(Component.translatable("item.terracompositio.flow_infuser_kit.tooltip").withStyle(ChatFormatting.GRAY));

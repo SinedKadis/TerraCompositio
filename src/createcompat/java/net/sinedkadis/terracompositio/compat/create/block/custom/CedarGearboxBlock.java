@@ -14,8 +14,10 @@ import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
+import net.minecraftforge.registries.RegistryObject;
+import net.sinedkadis.terracompositio.TerraCompositio;
+import net.sinedkadis.terracompositio.compat.create.TCCreateCompat;
 import net.sinedkadis.terracompositio.compat.create.block.entity.CedarGearboxBlockEntity;
-import net.sinedkadis.terracompositio.registries.TCBlockEntities;
 import net.sinedkadis.terracompositio.registries.TCBlockStateProperties;
 
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -73,8 +75,10 @@ public class CedarGearboxBlock extends RotatedPillarKineticBlock implements IBE<
 
     @Override
     public BlockEntityType<? extends CedarGearboxBlockEntity> getBlockEntityType() {
-        assert TCBlockEntities.CEDAR_GEARBOX_BE != null;
-        return TCBlockEntities.CEDAR_GEARBOX_BE.get();
+        RegistryObject<BlockEntityType<CedarGearboxBlockEntity>> cedarGearboxBe =
+                ((TCCreateCompat) TerraCompositio.createCompat).blockEntities.CEDAR_GEARBOX_BE;
+        assert cedarGearboxBe != null;
+        return cedarGearboxBe.get();
     }
 
     @Override

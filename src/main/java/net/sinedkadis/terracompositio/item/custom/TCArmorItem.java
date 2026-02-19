@@ -1,7 +1,6 @@
 package net.sinedkadis.terracompositio.item.custom;
 
 import com.google.common.collect.ImmutableMap;
-import mekanism.api.annotations.ParametersAreNotNullByDefault;
 import net.minecraft.world.effect.MobEffectInstance;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
@@ -10,6 +9,7 @@ import net.minecraft.world.item.ArmorMaterial;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 
+import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.Map;
 
 public class TCArmorItem extends ArmorItem {
@@ -23,7 +23,7 @@ public class TCArmorItem extends ArmorItem {
     }
 
     @Override
-    @ParametersAreNotNullByDefault
+    @ParametersAreNonnullByDefault
     public void inventoryTick(ItemStack pStack,Level pLevel, Entity pEntity, int pSlotId, boolean pIsSelected) {
         if(!pLevel.isClientSide()
         && pEntity instanceof Player) {
