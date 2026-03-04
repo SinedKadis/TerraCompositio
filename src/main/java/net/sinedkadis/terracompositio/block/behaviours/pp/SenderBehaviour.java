@@ -10,14 +10,12 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
 import net.sinedkadis.terracompositio.api.TCCapabilities;
-import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBEBehaviour;
+import net.sinedkadis.terracompositio.api.dummies.DummyCFEHandler;
 import net.sinedkadis.terracompositio.api.networks.cfe.CFENetworkMemberBE;
 import net.sinedkadis.terracompositio.api.networks.cfe.ICFEHandler;
 import net.sinedkadis.terracompositio.block.entity.PathPointerBlockEntity;
-import net.sinedkadis.terracompositio.block.entity.TCBlockEntity;
 import net.sinedkadis.terracompositio.cfe.RedirectCFEHandler;
 import net.sinedkadis.terracompositio.compat.jade.JadeTerraCompositioPlugin;
-import net.sinedkadis.terracompositio.util.BehaviourCapabilities;
 import net.sinedkadis.terracompositio.util.TCUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -27,8 +25,7 @@ import snownee.jade.api.config.IPluginConfig;
 public class SenderBehaviour extends AbstractPPBehaviour implements CFENetworkMemberBE {
 
     @Getter
-    private RedirectCFEHandler redirectCFEHandler = null;
-    private LazyOptional<SenderBehaviour> senderBehaviourLazyOptional = LazyOptional.empty();
+    private final RedirectCFEHandler redirectCFEHandler = new RedirectCFEHandler(this, DummyCFEHandler.instance);
     private LazyOptional<ICFEHandler> redirectCFEHandlerLazyOptional = LazyOptional.empty();
 
     public SenderBehaviour(PathPointerBlockEntity blockEntity) {
@@ -37,67 +34,53 @@ public class SenderBehaviour extends AbstractPPBehaviour implements CFENetworkMe
 
     @Override
     public void onUpdate() {
-        super.onUpdate();
-        schedulePPNetworkUpdate();
+        scheduleBindPosPPNetworkUpdate();
         verifyHandler();
         sendCFE();
     }
 
-    private void schedulePPNetworkUpdate() {
-        BlockPos bindPos = getBindPos();
+    private void scheduleBindPosPPNetworkUpdate() {
+        BlockPos bindPos = getBindPos(blockEntity);
         if (bindPos == null) return;
         Level level = getBlockEntity().getLevel();
         if (level == null) return;
-        BlockEntity target = level.getBlockEntity(getBindPos());
-        if (target == null) return;
-        if (target instanceof TCBlockEntity tcBlockEntity) {
-            tcBlockEntity.getBehaviours().forEach(IBEBehaviour::onUpdate);
-        }
+        BlockEntity target = level.getBlockEntity(bindPos);
+        if (target instanceof PathPointerBlockEntity ppBE)
+            ppBE.setPpUpdateScheduled(true);
     }
 
     @Override
     public void onChunkLoad() {
         super.onChunkLoad();
-        senderBehaviourLazyOptional = LazyOptional.of(() -> this);
         redirectCFEHandlerLazyOptional = LazyOptional.of(() -> redirectCFEHandler);
     }
 
     @Override
     public void onInvalidateCaps() {
         super.onInvalidateCaps();
-        senderBehaviourLazyOptional.invalidate();
         redirectCFEHandlerLazyOptional.invalidate();
     }
 
     private void verifyHandler() {
-        if (redirectCFEHandler != null) return;
+        if (!(redirectCFEHandler.getRedirectedHandler() instanceof DummyCFEHandler)) return;
         Level level = getBlockEntity().getLevel();
         if (level == null) return;
-        BlockPos bindPos = getBindPos();
+        BlockPos bindPos = getBindPos(blockEntity);
         if (bindPos == null) return;
         BlockEntity target = level.getBlockEntity(bindPos);
         if (target == null) return;
         LazyOptional<ICFEHandler> resolve = target.getCapability(TCCapabilities.CFE);
-        resolve.ifPresent(icfeHandler ->
-                redirectCFEHandler = new RedirectCFEHandler(this, icfeHandler){
-                    @Override
-                    public int addCFE(int cfe, boolean simulate) {
-                        int i = super.addCFE(cfe, simulate);
-                        if (!simulate) getAttachedMember().scheduleMemberUpdate();
-                        return i;
-                    }
-                });
+        resolve.ifPresent(redirectCFEHandler::setRedirectedHandler);
     }
 
     @Override
     public void onRemoved() {
         Level level = blockEntity.getLevel();
-        BlockPos bindPos = getBindPos();
+        BlockPos bindPos = getBindPos(blockEntity);
         if (level != null && bindPos != null) {
             BlockEntity receiverEntity = level.getBlockEntity(bindPos);
             if (receiverEntity instanceof PathPointerBlockEntity pathPointerBlockEntity) {
-                pathPointerBlockEntity.getCapability(BehaviourCapabilities.RECEIVER).ifPresent(receiverBehaviour ->
-                        receiverBehaviour.getSenderPoses().remove(blockEntity.getBlockPos()));
+                ReceiverBehaviour.getSenderPoses(pathPointerBlockEntity).remove(blockEntity.getBlockPos());
             }
         }
         super.onRemoved();
@@ -107,8 +90,9 @@ public class SenderBehaviour extends AbstractPPBehaviour implements CFENetworkMe
         blockEntity.getCapability(TCCapabilities.CFE).ifPresent(icfeHandler -> {
             if (icfeHandler.getCFE() > 0) {
                 Level level = blockEntity.getLevel();
-                if (level != null) {
-                    BlockEntity target = level.getBlockEntity(getBindPos());
+                BlockPos bindPos = getBindPos(blockEntity);
+                if (level != null && bindPos != null) {
+                    BlockEntity target = level.getBlockEntity(bindPos);
                     if (target != null) {
                         target.getCapability(TCCapabilities.CFE).ifPresent(targetHandler ->
                                 TCUtil.tryCFETransfer(targetHandler,icfeHandler));
@@ -118,16 +102,10 @@ public class SenderBehaviour extends AbstractPPBehaviour implements CFENetworkMe
         });
     }
 
-
     @Override
     public @Nullable LazyOptional<?> getCapability(@NotNull Capability<?> cap, @Nullable Direction side) {
-        if (cap == BehaviourCapabilities.SENDER) {
-            return senderBehaviourLazyOptional.cast();
-        }
-        if (cap == TCCapabilities.CFE) {
-            if (blockEntity.getCapability(BehaviourCapabilities.RECEIVER).isPresent()) {
-                return redirectCFEHandlerLazyOptional;
-            }
+        if (cap == TCCapabilities.CFE && blockEntity.parts.contains(PathPointerBlockEntity.PPPart.RECEIVER)) {
+            return redirectCFEHandlerLazyOptional;
         }
         return super.getCapability(cap, side);
     }
@@ -135,7 +113,7 @@ public class SenderBehaviour extends AbstractPPBehaviour implements CFENetworkMe
     @Override
     public void onAppendServerData(CompoundTag compoundTag) {
         super.onAppendServerData(compoundTag);
-        compoundTag.put("bindPos", TCUtil.saveBlockPos(getBindPos()));
+        compoundTag.put("bindPos", TCUtil.saveBlockPos(getBindPos(blockEntity)));
     }
 
     @Override
@@ -147,13 +125,13 @@ public class SenderBehaviour extends AbstractPPBehaviour implements CFENetworkMe
         }
     }
 
-    public BlockPos getBindPos() {
+    public static BlockPos getBindPos(BlockEntity blockEntity) {
         CompoundTag persistentData = blockEntity.getPersistentData();
         if (!persistentData.contains("bindPos")) return null;
         return TCUtil.loadBlockPos(persistentData.getCompound("bindPos"));
     }
 
-    public void setBindPos(BlockPos bindPos) {
+    public static void setBindPos(BlockEntity blockEntity,BlockPos bindPos) {
         blockEntity.getPersistentData().put("bindPos",TCUtil.saveBlockPos(bindPos));
     }
 

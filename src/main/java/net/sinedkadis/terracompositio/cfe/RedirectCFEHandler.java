@@ -1,5 +1,7 @@
 package net.sinedkadis.terracompositio.cfe;
 
+import lombok.Getter;
+import lombok.Setter;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.phys.Vec3;
@@ -10,6 +12,8 @@ import java.util.function.Function;
 
 @MethodsReturnNonnullByDefault
 public class RedirectCFEHandler implements ICFEHandler {
+    @Getter
+    @Setter
     ICFEHandler redirectedHandler;
     CFENetworkMember member;
 

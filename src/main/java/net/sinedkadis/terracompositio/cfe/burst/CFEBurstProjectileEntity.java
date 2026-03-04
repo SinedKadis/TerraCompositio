@@ -29,12 +29,10 @@ import net.sinedkadis.terracompositio.block.entity.TCBlockEntity;
 import net.sinedkadis.terracompositio.entity.custom.CFECloudEntity;
 import net.sinedkadis.terracompositio.registries.TCEntities;
 import net.sinedkadis.terracompositio.registries.TCItems;
-import net.sinedkadis.terracompositio.util.BehaviourCapabilities;
 
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.Objects;
-import java.util.Optional;
 
 @Slf4j
 @MethodsReturnNonnullByDefault
@@ -160,19 +158,17 @@ public class CFEBurstProjectileEntity extends ThrowableProjectile {
     }
 
     private boolean tryRedirectByPPBE(PathPointerBlockEntity pathPointerBlockEntity,BlockPos currentPos) {
-        Optional<SenderBehaviour> sender = pathPointerBlockEntity.getCapability(BehaviourCapabilities.SENDER).resolve();
-        if (sender.isPresent()) {
-            Optional<ReceiverBehaviour> receiver = pathPointerBlockEntity.getCapability(BehaviourCapabilities.RECEIVER).resolve();
-            if (receiver.isPresent()) {
-                if (!receiver.get().validAngle(currentPos)) return false;
-                timeToLive+=100;
-                setDeltaMovement(Vec3.ZERO);
-                Vec3 shootVec = sender.get().getBindPos().subtract(currentPos).getCenter();
-                this.shoot(shootVec.x(),shootVec.y(),shootVec.z(),cfeTravelSpeed,0);
-                return true;
-            }
-        }
-        return false;
+        if (!ReceiverBehaviour.validAngle(pathPointerBlockEntity,currentPos)) return false;
+
+        timeToLive+=100;
+        setDeltaMovement(Vec3.ZERO);
+        BlockPos bindPos = SenderBehaviour.getBindPos(pathPointerBlockEntity);
+        if (bindPos == null) return false;
+
+        Vec3 shootVec = bindPos.subtract(currentPos).getCenter();
+        this.shoot(shootVec.x(),shootVec.y(),shootVec.z(),cfeTravelSpeed,0);
+
+        return true;
     }
 
     private void tryConsumeCFENetworkMemberEntity(BlockPos blockPos, int cfe) {

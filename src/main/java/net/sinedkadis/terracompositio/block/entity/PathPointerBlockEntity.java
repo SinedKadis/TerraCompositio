@@ -25,7 +25,6 @@ import net.sinedkadis.terracompositio.api.dummies.DummyBehaviour;
 import net.sinedkadis.terracompositio.block.behaviours.pp.*;
 import net.sinedkadis.terracompositio.block.custom.PathPointerBlock;
 import net.sinedkadis.terracompositio.registries.TCBlockEntities;
-import net.sinedkadis.terracompositio.util.BehaviourCapabilities;
 import net.sinedkadis.terracompositio.util.TCUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -45,6 +44,9 @@ public class PathPointerBlockEntity extends TCBlockEntity implements Nameable {
 
     @Setter
     private boolean updateScheduled = false;
+    @Setter
+    private boolean ppUpdateScheduled = false;
+
 
     public PathPointerBlockEntity(BlockPos pos, BlockState state) {
         super(TCBlockEntities.PATH_POINTER_BE.get(), pos, state);
@@ -66,9 +68,12 @@ public class PathPointerBlockEntity extends TCBlockEntity implements Nameable {
             setChanged();
             pLevel.sendBlockUpdated(worldPosition,getBlockState(),getBlockState(),3);
         }
+        if (ppUpdateScheduled) {
+            ppUpdateScheduled = false;
+            behaviours.forEach(IBEBehaviour::onUpdate);
+        }
     }
 
-    @SuppressWarnings("DataFlowIssue")
     public static boolean ppWrenchInteraction(@Nullable Player pPlayer, LevelAccessor level, BlockPos clickedPos, ItemStack wrenchStack) {
 
         if (!(level.getBlockEntity(clickedPos) instanceof PathPointerBlockEntity clickedPPBE)) {
@@ -123,21 +128,15 @@ public class PathPointerBlockEntity extends TCBlockEntity implements Nameable {
             return false;
         }
 
-        SenderBehaviour clickedSender = clickedPPBE.getCapability(BehaviourCapabilities.SENDER).orElse(null);
-        ReceiverBehaviour clickedReceiver = clickedPPBE.getCapability(BehaviourCapabilities.RECEIVER).orElse(null);
-
-        SenderBehaviour storedSender = storedPPBE.getCapability(BehaviourCapabilities.SENDER).orElse(null);
-        ReceiverBehaviour storedReceiver = storedPPBE.getCapability(BehaviourCapabilities.RECEIVER).orElse(null);
-
         if (forwardBind) {
-            if(!bind(storedSender,storedReceiver,clickedSender,clickedReceiver)) {
+            if(!bind(storedPPBE,clickedPPBE)) {
                 TCUtil.message(pPlayer, Component.translatable("item.terracompositio.flow_rotating_axe.bind_fail_angle")
                         .withStyle(ChatFormatting.BOLD));
                 return false;
             }
         }
         if (backwardBind) {
-            if(!bind(clickedSender,clickedReceiver,storedSender,storedReceiver)) {
+            if(!bind(clickedPPBE,storedPPBE)) {
                 TCUtil.message(pPlayer, Component.translatable("item.terracompositio.flow_rotating_axe.bind_fail_angle")
                         .withStyle(ChatFormatting.BOLD));
                 return false;
@@ -163,38 +162,30 @@ public class PathPointerBlockEntity extends TCBlockEntity implements Nameable {
         return true;
     }
 
-    private static boolean bind(SenderBehaviour firstSender,
-                             @Nullable ReceiverBehaviour firstReceiver,
-                             @Nullable SenderBehaviour secondSender,
-                             ReceiverBehaviour secondReceiver) {
-        List<BlockPos> firstReceiverSenderPoses = new ArrayList<>();
-        if (firstReceiver != null)
-            firstReceiverSenderPoses.addAll(firstReceiver.getSenderPoses());
-        BlockPos secondSenderBindPos = null;
-        if (secondSender != null)
-            secondSenderBindPos = secondSender.getBindPos();
+    @SuppressWarnings("BooleanMethodIsAlwaysInverted")
+    private static boolean bind(PathPointerBlockEntity firstPPBE, PathPointerBlockEntity secondPPBE) {
 
-        BlockPos firstPos = firstSender.getBlockEntity().getBlockPos();
-        BlockPos secondPos = secondReceiver.getBlockEntity().getBlockPos();
+        BlockPos firstPos = firstPPBE.getBlockPos();
+        BlockPos secondPos = secondPPBE.getBlockPos();
 
-        Vec3 rotInput = calculateRot(firstReceiverSenderPoses, secondPos, firstPos);
+        Vec3 rotInput = calculateRot(ReceiverBehaviour.getSenderPoses(firstPPBE), secondPos, firstPos);
         if (rotInput == null) return false;
 
 
 
-        List<BlockPos> senderPoses = secondReceiver.getSenderPoses();
+        List<BlockPos> senderPoses = ReceiverBehaviour.getSenderPoses(secondPPBE);
         List<BlockPos> senderPosesCopy = new ArrayList<>(senderPoses);
         if (senderPoses.contains(firstPos)) return false;
         senderPosesCopy.add(firstPos);
 
-        Vec3 rotOutput = calculateRot(senderPosesCopy, secondSenderBindPos, secondPos);
+        Vec3 rotOutput = calculateRot(senderPosesCopy, SenderBehaviour.getBindPos(secondPPBE), secondPos);
         if (rotOutput == null) return false;
 
 
-        setYawAndPitchFromRot(rotInput, firstSender.getBlockEntity());
-        firstSender.setBindPos(secondPos);
+        setYawAndPitchFromRot(rotInput, firstPPBE);
+        SenderBehaviour.setBindPos(firstPPBE,secondPos);
 
-        setYawAndPitchFromRot(rotOutput, secondReceiver.getBlockEntity());
+        setYawAndPitchFromRot(rotOutput, secondPPBE);
         senderPoses.add(firstPos);
         return true;
     }
@@ -220,8 +211,8 @@ public class PathPointerBlockEntity extends TCBlockEntity implements Nameable {
             be.rotationPitch = 90;
             be.rotationYaw = 0;
             //be.rotationRoll = 0;
-            be.getCapability(BehaviourCapabilities.SENDER).ifPresent(senderBehaviour -> senderBehaviour.setBindPos(null));
-            be.getCapability(BehaviourCapabilities.RECEIVER).ifPresent(receiverBehaviour -> receiverBehaviour.getSenderPoses().clear());
+            SenderBehaviour.setBindPos(be,null);
+            ReceiverBehaviour.getSenderPoses(be).clear();
             be.setUpdateScheduled(true);
         }
     }

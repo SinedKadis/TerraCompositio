@@ -39,10 +39,6 @@ public abstract class PPOutputBehaviour extends AbstractPPBehaviour {
         public OutputCfeBehaviour(List<IBEBehaviour> list) {
             super(PPOutputBehaviour.this.blockEntity);
             this.list = list;
-        }
-
-        @Override
-        public void init() {
             this.setCfeHandler(new CFEContainer(this){
                 @Override
                 public float getCfeTravelSpeed() {

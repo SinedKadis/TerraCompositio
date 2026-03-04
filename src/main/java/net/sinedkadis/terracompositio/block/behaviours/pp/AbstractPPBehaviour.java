@@ -13,13 +13,13 @@ import net.sinedkadis.terracompositio.api.dummies.DummyBehaviour;
 import net.sinedkadis.terracompositio.block.behaviours.CFEHandlerBehaviour;
 import net.sinedkadis.terracompositio.block.entity.PathPointerBlockEntity;
 import net.sinedkadis.terracompositio.cfe.CFEContainer;
-import net.sinedkadis.terracompositio.util.BehaviourCapabilities;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
 
 public abstract class AbstractPPBehaviour implements IBEBehaviour {
+
     @Getter
     protected PathPointerBlockEntity blockEntity;
 
@@ -84,12 +84,9 @@ public abstract class AbstractPPBehaviour implements IBEBehaviour {
             BlockPos currentPos = queue.poll();
             BlockEntity currentBE = level.getBlockEntity(currentPos);
             if (currentBE instanceof PathPointerBlockEntity currentPPBE) {
-                currentPPBE.getCapability(BehaviourCapabilities.SENDER).ifPresent(senderBehaviour -> {
-                    BlockPos bindPos = senderBehaviour.getBindPos();
-                    if (bindPos != null)
-                        queue.add(bindPos);
-
-                });
+                var bindPos = SenderBehaviour.getBindPos(currentPPBE);
+                if (bindPos != null)
+                    queue.add(bindPos);
             }
             if (queue.isEmpty()) {
                 return currentPos;

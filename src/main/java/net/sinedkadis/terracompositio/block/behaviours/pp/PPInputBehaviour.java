@@ -1,7 +1,6 @@
 package net.sinedkadis.terracompositio.block.behaviours.pp;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.util.Mth;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.common.util.LazyOptional;
 import net.sinedkadis.terracompositio.api.TCCapabilities;
@@ -14,9 +13,7 @@ import net.sinedkadis.terracompositio.api.networks.cfe.ICFEHandler;
 import net.sinedkadis.terracompositio.block.behaviours.CFEHandlerBehaviour;
 import net.sinedkadis.terracompositio.block.entity.PathPointerBlockEntity;
 import net.sinedkadis.terracompositio.cfe.CFEContainer;
-import net.sinedkadis.terracompositio.cfe.burst.CFEBurstProjectileEntity;
 import net.sinedkadis.terracompositio.util.TCUtil;
-import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
 import java.util.Optional;
@@ -102,25 +99,9 @@ public abstract class PPInputBehaviour extends AbstractPPBehaviour{
         public void init() {
             this.setCfeHandler(new CFEContainer(this){
                 @Override
-                public int sendCFE(int cfe, @NotNull ICFEHandler target, boolean simulate) {
-                    int freeSpace = target.getFreeSpace();
-                    int available = this.getCFE();
-                    int added = Mth.clamp(cfe, 0, Math.min(available, freeSpace));
-                    if (added < 1)
-                        return 0;
-
-                    if (!simulate) {
-                        CFEBurstProjectileEntity entity = CFEBurstProjectileEntity.sendBurst(this, target, added, target.getCfeTravelSpeed());
-                        if (entity != null)
-                            target.addToQueue(added);
-                    }
-                    return added;
-                }
-
-                @Override
                 public int addCFE(int cfe, boolean simulate) {
                     int i = super.addCFE(cfe, simulate);
-                    blockEntity.scheduleMemberUpdate();
+                    blockEntity.setPpUpdateScheduled(true);
                     return i;
                 }
             }.setCfeTravelSpeed((float) 5 / 20));
