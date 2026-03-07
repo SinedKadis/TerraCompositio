@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "N": {
+      "item": "terracompositio:infused_iron_nugget"
+    },
+    "S": {
+      "item": "minecraft:stick"
+    },
+    "T": {
+      "item": "terracompositio:technetium_ingot"
+    }
+  },
+  "pattern": [
+    "  N",
+    " T ",
+    "S  "
+  ],
+  "result": {
+    "item": "terracompositio:fluid_applier"
+  },
+  "show_notification": true
+}

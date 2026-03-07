@@ -1,0 +1,20 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "N": {
+      "item": "terracompositio:infused_iron_nugget"
+    },
+    "R": {
+      "item": "minecraft:redstone"
+    }
+  },
+  "pattern": [
+    "R",
+    "N"
+  ],
+  "result": {
+    "item": "terracompositio:floating_redstone"
+  },
+  "show_notification": true
+}

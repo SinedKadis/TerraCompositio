@@ -1,0 +1,36 @@
+{
+  "type": "minecraft:crafting_shapeless",
+  "category": "misc",
+  "ingredients": [
+    {
+      "item": "terracompositio:technetium_nugget"
+    },
+    {
+      "item": "terracompositio:technetium_nugget"
+    },
+    {
+      "item": "terracompositio:technetium_nugget"
+    },
+    {
+      "item": "terracompositio:technetium_nugget"
+    },
+    {
+      "item": "terracompositio:technetium_nugget"
+    },
+    {
+      "item": "terracompositio:technetium_nugget"
+    },
+    {
+      "item": "terracompositio:technetium_nugget"
+    },
+    {
+      "item": "terracompositio:technetium_nugget"
+    },
+    {
+      "item": "terracompositio:technetium_nugget"
+    }
+  ],
+  "result": {
+    "item": "terracompositio:technetium_ingot"
+  }
+}
