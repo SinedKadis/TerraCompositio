@@ -3,6 +3,7 @@ package net.sinedkadis.terracompositio.compat.create;
 import com.simibubi.create.content.kinetics.base.KineticBlockEntityRenderer;
 import com.simibubi.create.content.kinetics.base.SingleAxisRotatingVisual;
 import dev.engine_room.flywheel.lib.visualization.SimpleBlockEntityVisualizer;
+import net.minecraft.world.item.CreativeModeTab;
 import net.minecraftforge.client.event.EntityRenderersEvent;
 import net.sinedkadis.terracompositio.compat.CompatUtils;
 import net.sinedkadis.terracompositio.compat.ISoftCompat;
@@ -47,6 +48,12 @@ public class TCCreateCompat implements ISoftCompat {
         }
 
 
+    }
+
+    @Override
+    public void addCreativeTab(CreativeModeTab.Output output) {
+        assert blocks.CEDAR_GEARBOX != null;
+        output.accept(blocks.CEDAR_GEARBOX.get());
     }
 
 

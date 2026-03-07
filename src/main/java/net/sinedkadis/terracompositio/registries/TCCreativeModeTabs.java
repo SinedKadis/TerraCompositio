@@ -7,6 +7,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.registries.DeferredRegister;
 import net.sinedkadis.terracompositio.TerraCompositio;
+import net.sinedkadis.terracompositio.compat.CompatUtils;
 
 public class TCCreativeModeTabs {
     public static final DeferredRegister<CreativeModeTab> Creative_mode_tabs =
@@ -142,6 +143,9 @@ public class TCCreativeModeTabs {
                             pOutput.accept(TCBlocks.FLOW_CEDAR_ENT_STATUE.get());
 
 
+                            //create compat
+                            if (CompatUtils.CREATE_EXISTENCE.get())
+                                TerraCompositio.createCompat.addCreativeTab(pOutput);
 
                         })
                         .build());

@@ -59,8 +59,8 @@ public class CedarGearboxBlock extends RotatedPillarKineticBlock implements IBE<
         VoxelShape SHAPE_Y = Shapes.or(
                 Shapes.box(0.125, 0.0625, 0.125, 0.875, 0.9375, 0.875),
 
-                Shapes.box(0,     0, 0, 1, 0.125, 1),
-                Shapes.box(0, 0.875, 0, 1, 1,     1),
+                Shapes.box(0,     0, 0, 0.125, 1, 1),
+                Shapes.box(0.875, 0, 0, 1,     1, 1),
 
                 Shapes.box(0.125, 0,     0, 0.875, 1, 0.125),
                 Shapes.box(0.125, 0, 0.875, 0.875, 1, 1)
