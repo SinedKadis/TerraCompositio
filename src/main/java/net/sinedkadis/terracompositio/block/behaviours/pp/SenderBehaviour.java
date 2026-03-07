@@ -22,6 +22,9 @@ import org.jetbrains.annotations.Nullable;
 import snownee.jade.api.ITooltip;
 import snownee.jade.api.config.IPluginConfig;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public class SenderBehaviour extends AbstractPPBehaviour implements CFENetworkMemberBE {
 
     @Getter
@@ -36,7 +39,6 @@ public class SenderBehaviour extends AbstractPPBehaviour implements CFENetworkMe
     public void onUpdate() {
         scheduleBindPosPPNetworkUpdate();
         verifyHandler();
-        sendCFE();
     }
 
     private void scheduleBindPosPPNetworkUpdate() {
@@ -80,27 +82,20 @@ public class SenderBehaviour extends AbstractPPBehaviour implements CFENetworkMe
         if (level != null && bindPos != null) {
             BlockEntity receiverEntity = level.getBlockEntity(bindPos);
             if (receiverEntity instanceof PathPointerBlockEntity pathPointerBlockEntity) {
-                ReceiverBehaviour.getSenderPoses(pathPointerBlockEntity).remove(blockEntity.getBlockPos());
+                List<BlockPos> senderPoses = new ArrayList<>(ReceiverBehaviour.getSenderPoses(pathPointerBlockEntity));
+                senderPoses.remove(blockEntity.getBlockPos());
+                ReceiverBehaviour.setSenderPoses(pathPointerBlockEntity,
+                        senderPoses);
             }
         }
         super.onRemoved();
     }
 
-    protected void sendCFE() {
-        blockEntity.getCapability(TCCapabilities.CFE).ifPresent(icfeHandler -> {
-            if (icfeHandler.getCFE() > 0) {
-                Level level = blockEntity.getLevel();
-                BlockPos bindPos = getBindPos(blockEntity);
-                if (level != null && bindPos != null) {
-                    BlockEntity target = level.getBlockEntity(bindPos);
-                    if (target != null) {
-                        target.getCapability(TCCapabilities.CFE).ifPresent(targetHandler ->
-                                TCUtil.tryCFETransfer(targetHandler,icfeHandler));
-                    }
-                }
-            }
-        });
+    @Override
+    public boolean isActive() {
+        return blockEntity.parts.contains(PathPointerBlockEntity.PPPart.SENDER);
     }
+
 
     @Override
     public @Nullable LazyOptional<?> getCapability(@NotNull Capability<?> cap, @Nullable Direction side) {
@@ -142,7 +137,7 @@ public class SenderBehaviour extends AbstractPPBehaviour implements CFENetworkMe
 
     @Override
     public int getPriority() {
-        return 0;
+        return 200;
     }
 
     @Override

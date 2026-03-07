@@ -4,6 +4,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.sinedkadis.terracompositio.TerraCompositio;
+import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBEBehaviour;
 import net.sinedkadis.terracompositio.block.entity.TCBlockEntity;
 import snownee.jade.api.BlockAccessor;
 import snownee.jade.api.IBlockComponentProvider;
@@ -24,6 +25,7 @@ public enum TCBlockEntityComponentProvider implements IBlockComponentProvider, I
             CompoundTag serverData = blockAccessor.getServerData();
             tcBlockEntity.getBehaviours().stream()
                     .filter(Objects::nonNull)
+                    .filter(IBEBehaviour::isActive)
                     .forEach(ibeBehaviour -> ibeBehaviour.onAppendTooltip(iTooltip,serverData,iPluginConfig));
         }
 
@@ -38,7 +40,9 @@ public enum TCBlockEntityComponentProvider implements IBlockComponentProvider, I
     public void appendServerData(CompoundTag compoundTag, BlockAccessor blockAccessor) {
         BlockEntity blockEntity = blockAccessor.getBlockEntity();
         if (blockEntity instanceof TCBlockEntity tcBlockEntity) {
-            tcBlockEntity.getBehaviours().forEach(ibeBehaviour -> ibeBehaviour.onAppendServerData(compoundTag));
+            tcBlockEntity.getBehaviours().stream()
+                    .filter(IBEBehaviour::isActive)
+                    .forEach(ibeBehaviour -> ibeBehaviour.onAppendServerData(compoundTag));
         }
 
     }

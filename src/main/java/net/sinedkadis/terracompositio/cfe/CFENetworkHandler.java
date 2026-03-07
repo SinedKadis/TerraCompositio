@@ -6,6 +6,7 @@ import net.minecraftforge.common.MinecraftForge;
 import net.sinedkadis.terracompositio.api.TCCapabilities;
 import net.sinedkadis.terracompositio.api.networks.cfe.*;
 import net.sinedkadis.terracompositio.api.networks.NetworkAction;
+import net.sinedkadis.terracompositio.block.entity.PathPointerBlockEntity;
 import net.sinedkadis.terracompositio.entity.custom.CFECloudEntity;
 import net.sinedkadis.terracompositio.events.CFENetworkEvent;
 import net.sinedkadis.terracompositio.registries.TCBlocks;
@@ -36,7 +37,7 @@ public class CFENetworkHandler implements CFENetwork {
             cfeSources.get(updated.getLevel()).stream()
                     .filter(member -> updated.getPos().closerThan(member.getPos(),Math.max(updated.getLimit(),member.getLimit())))
                     .filter(member -> !updated.getPos().equals(member.getPos()))
-                    .filter(member -> updated.getPriority() < member.getPriority())
+                    .filter(member -> updated.getPriority() < member.getPriority() || member instanceof PathPointerBlockEntity)
                     .forEach(CFENetworkMember::scheduleMemberUpdate);
 
         }

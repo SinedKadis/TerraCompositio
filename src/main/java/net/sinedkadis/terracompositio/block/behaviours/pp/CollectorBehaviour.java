@@ -9,16 +9,14 @@ public class CollectorBehaviour extends PPInputBehaviour{
     }
 
     @Override
-    public void init() {
-        validateCFEBehaviour();
-    }
-
-    @Override
     public void onUpdate() {
         if (invalidBehaviours()) return;
         updateMaxCFE();
         collectCFE();
     }
 
-
+    @Override
+    public boolean isActive() {
+        return blockEntity.parts.contains(PathPointerBlockEntity.PPPart.COLLECTOR);
+    }
 }

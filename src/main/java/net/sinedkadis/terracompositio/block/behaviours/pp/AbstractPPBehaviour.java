@@ -9,10 +9,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
 import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBEBehaviour;
-import net.sinedkadis.terracompositio.api.dummies.DummyBehaviour;
-import net.sinedkadis.terracompositio.block.behaviours.CFEHandlerBehaviour;
 import net.sinedkadis.terracompositio.block.entity.PathPointerBlockEntity;
-import net.sinedkadis.terracompositio.cfe.CFEContainer;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -26,7 +23,6 @@ public abstract class AbstractPPBehaviour implements IBEBehaviour {
     public AbstractPPBehaviour(PathPointerBlockEntity blockEntity) {
         this.blockEntity = blockEntity;
     }
-
 
     @Override
     public void tick() {
@@ -63,13 +59,6 @@ public abstract class AbstractPPBehaviour implements IBEBehaviour {
 
     }
 
-
-    protected void setCFEBehaviour() {
-        List<IBEBehaviour> list = blockEntity.getBehaviours();
-        while (list.size()<3) list.add(DummyBehaviour.instance);
-        list.set(2, new InputOutputCfeBehaviour(list));
-    }
-
     protected BlockPos getEndpoint() {
         Level level = blockEntity.getLevel();
         BlockPos blockPos = blockEntity.getBlockPos();
@@ -94,34 +83,5 @@ public abstract class AbstractPPBehaviour implements IBEBehaviour {
         }
     }
 
-    private class InputOutputCfeBehaviour extends CFEHandlerBehaviour {
-        private final List<IBEBehaviour> list;
 
-        public InputOutputCfeBehaviour(List<IBEBehaviour> list) {
-            super(AbstractPPBehaviour.this.blockEntity);
-            this.list = list;
-        }
-
-        @Override
-        public void init() {
-            this.setCfeHandler(new CFEContainer(this).setCfeTravelSpeed((float) 5 / 20));
-            setMaxCFE(100);
-        }
-
-        @Override
-        public int getPriority() {
-            return 0;
-        }
-
-        @Override
-        public int getLimit() {
-            return 5;
-        }
-
-        @Override
-        public void onCFENetworkMemberUpdate() {
-            if (blockEntity.getLevel() == null) return;
-            list.forEach(IBEBehaviour::onUpdate);
-        }
-    }
 }

@@ -29,14 +29,10 @@ public class AirSaturatorBlockEntity extends TCBlockEntity{
 
     @Override
     public void addBEBehaviours(List<IBEBehaviour> list) {
-        list.add(new CFEHandlerBehaviour(this){
-            @Override
-            public void init() {
-                setMaxCFE(100);
-                setPriority(100);
-                setLimit(5);
-            }
-        });
+        list.add(new CFEHandlerBehaviour(this)
+                .maxCFE(100)
+                .priority(100)
+                .limit(5));
 
     }
 

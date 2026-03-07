@@ -5,6 +5,7 @@ import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.NonNullList;
 import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -21,9 +22,10 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBEBehaviour;
 import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBECFEBehaviour;
-import net.sinedkadis.terracompositio.api.dummies.DummyBehaviour;
+import net.sinedkadis.terracompositio.block.behaviours.CFEHandlerBehaviour;
 import net.sinedkadis.terracompositio.block.behaviours.pp.*;
 import net.sinedkadis.terracompositio.block.custom.PathPointerBlock;
+import net.sinedkadis.terracompositio.cfe.CFEContainer;
 import net.sinedkadis.terracompositio.registries.TCBlockEntities;
 import net.sinedkadis.terracompositio.util.TCUtil;
 import org.jetbrains.annotations.NotNull;
@@ -40,7 +42,7 @@ public class PathPointerBlockEntity extends TCBlockEntity implements Nameable {
 
     public float rotationYaw, rotationPitch, rotationRoll;
 
-    public List<PPPart> parts = new PPPartList();
+    public List<PPPart> parts = NonNullList.withSize(2,PPPart.NONE);
 
     @Setter
     private boolean updateScheduled = false;
@@ -57,7 +59,51 @@ public class PathPointerBlockEntity extends TCBlockEntity implements Nameable {
 
     @Override
     public void addBEBehaviours(List<IBEBehaviour> list) {
-        //recursive behavior adding and init
+        list.add(new CFEHandlerBehaviour(this){
+            @Override
+            public int getPriority() {
+                if (parts.contains(PPPart.EMITTER) && parts.contains(PPPart.COLLECTOR)) return 0;
+                if (parts.contains(PPPart.EMITTER)) return -100;
+                if (parts.contains(PPPart.COLLECTOR)) return 100;
+                return 0;
+            }
+
+            @Override
+            public boolean isActive() {
+                return !(parts.contains(PPPart.SENDER) && parts.contains(PPPart.RECEIVER));
+            }
+
+            @Override
+            public void scheduleMemberUpdate() {
+                super.scheduleMemberUpdate();
+                setPpUpdateScheduled(true);
+            }
+        }
+                .cfeHandler(cfeHandlerBehaviour -> new CFEContainer(cfeHandlerBehaviour){
+                    @Override
+                    public float getCfeTravelSpeed() {
+                        if (parts.contains(PPPart.RECEIVER)) return 5/20f;
+                        return 1/20f;
+                    }
+
+                    @Override
+                    public int addCFE(int cfe, boolean simulate) {
+                        int added = super.addCFE(cfe, simulate);
+                        if (parts.contains(PPPart.COLLECTOR)) {
+                            setPpUpdateScheduled(true);
+                        }
+                        return added;
+                    }
+                })
+                .maxCFE(100)
+                .limit(5)
+                );
+        list.add(new CollectorBehaviour(this));
+        list.add(new EmitterBehaviour(this));
+        list.add(new ExtractorBehaviour(this));
+        list.add(new InfuserBehaviour(this));
+        list.add(new SenderBehaviour(this));
+        list.add(new ReceiverBehaviour(this));
     }
 
     @Override
@@ -70,7 +116,9 @@ public class PathPointerBlockEntity extends TCBlockEntity implements Nameable {
         }
         if (ppUpdateScheduled) {
             ppUpdateScheduled = false;
-            behaviours.forEach(IBEBehaviour::onUpdate);
+            behaviours.stream()
+                    .filter(IBEBehaviour::isActive)
+                    .forEach(IBEBehaviour::onUpdate);
         }
     }
 
@@ -152,6 +200,9 @@ public class PathPointerBlockEntity extends TCBlockEntity implements Nameable {
         storedPPBE.setUpdateScheduled(true);
         clickedPPBE.setUpdateScheduled(true);
 
+        storedPPBE.setPpUpdateScheduled(true);
+        clickedPPBE.setPpUpdateScheduled(true);
+
         if (pPlayer != null) {
             TCUtil.message(pPlayer, Component.translatable("item.terracompositio.flow_rotating_axe.bind_success").withStyle(ChatFormatting.BOLD));
             wrenchStack.hurtAndBreak(1, pPlayer, player1 -> {
@@ -186,7 +237,7 @@ public class PathPointerBlockEntity extends TCBlockEntity implements Nameable {
         SenderBehaviour.setBindPos(firstPPBE,secondPos);
 
         setYawAndPitchFromRot(rotOutput, secondPPBE);
-        senderPoses.add(firstPos);
+        ReceiverBehaviour.setSenderPoses(secondPPBE,senderPosesCopy);
         return true;
     }
 
@@ -212,7 +263,7 @@ public class PathPointerBlockEntity extends TCBlockEntity implements Nameable {
             be.rotationYaw = 0;
             //be.rotationRoll = 0;
             SenderBehaviour.setBindPos(be,null);
-            ReceiverBehaviour.getSenderPoses(be).clear();
+            ReceiverBehaviour.setSenderPoses(be,List.of());
             be.setUpdateScheduled(true);
         }
     }
@@ -327,20 +378,17 @@ public class PathPointerBlockEntity extends TCBlockEntity implements Nameable {
         rotationPitch = pTag.getFloat("rot_x");
         rotationRoll = pTag.getFloat("rot_z");
 
-        parts = new PPPartList();
+        parts = NonNullList.withSize(2,PPPart.NONE);
         parts.set(0,PPPart.fromOrdinal(pTag.getInt("part0")));
         parts.set(1,PPPart.fromOrdinal(pTag.getInt("part1")));
     }
 
     public void highlightNodes() {
         if (level != null && level.isClientSide) {
-            CompoundTag persistentData = getPersistentData();
-            addFireParticles(level, TCUtil.loadBlockPos(persistentData.getCompound("bindpos")));
+            addFireParticles(level, SenderBehaviour.getBindPos(this));
 
-            int size = persistentData.getInt("SenderCount");
-            for (int i = 0; i < size; i++) {
-                addSoulFireParticles(level,TCUtil.loadBlockPos(persistentData.getCompound("SenderPos_"+i)));
-            }
+            ReceiverBehaviour.getSenderPoses(this).forEach(blockpos ->
+                            addSoulFireParticles(level, blockpos));
         }
     }
 
@@ -402,24 +450,22 @@ public class PathPointerBlockEntity extends TCBlockEntity implements Nameable {
     }
 
     public enum PPPart implements StringRepresentable {
-        COLLECTOR(true, "collector", CollectorBehaviour::new),
-        RECEIVER(true, "receiver", ReceiverBehaviour::new),
-        SENDER(false, "sender", SenderBehaviour::new),
-        EMITTER(false, "emitter", EmitterBehaviour::new),
-        INFUSER(false, "infuser", InfuserBehaviour::new),
-        EXTRACTOR(true, "extractor", ExtractorBehaviour::new),
-        NONE(false, "none", (be) -> DummyBehaviour.instance);
+        COLLECTOR(true, "collector"),
+        RECEIVER(true, "receiver"),
+        SENDER(false, "sender"),
+        EMITTER(false, "emitter"),
+        INFUSER(false, "infuser"),
+        EXTRACTOR(true, "extractor"),
+        NONE(false, "none");
 
         @Getter
         private final boolean input;
         private final String name;
-        @Getter
-        private final BehaviourFactory behaviourFactory;
 
-        PPPart(boolean isInput, String name, BehaviourFactory behaviourFactory) {
+
+        PPPart(boolean isInput, String name) {
             this.input = isInput;
             this.name = name;
-            this.behaviourFactory = behaviourFactory;
         }
 
         @Override
@@ -439,43 +485,6 @@ public class PathPointerBlockEntity extends TCBlockEntity implements Nameable {
                 if (part.ordinal() == ordinal) return part;
             }
             return PPPart.NONE;
-        }
-
-
-
-        @FunctionalInterface
-        interface BehaviourFactory {
-            IBEBehaviour getBehaviour(PathPointerBlockEntity blockEntity);
-        }
-    }
-
-    private class PPPartList extends ArrayList<PPPart> {
-        public PPPartList() {
-            super(2);
-            this.add(PPPart.NONE);
-            this.add(PPPart.NONE);
-        }
-
-        @Override
-        public PPPart get(int index) {
-
-            return super.get(index);
-        }
-
-        @Override
-        public PPPart remove(int index) {
-            IBEBehaviour ibeBehaviour = behaviours.get(index);
-            ibeBehaviour.onRemoved();
-            behaviours.set(index, PPPart.NONE.behaviourFactory.getBehaviour(PathPointerBlockEntity.this));
-            return super.set(index, PPPart.NONE);
-        }
-
-        @Override
-        public PPPart set(int index, PPPart part) {
-            while (behaviours.size() <= index) behaviours.add(DummyBehaviour.instance);
-            behaviours.set(index,part.behaviourFactory.getBehaviour(PathPointerBlockEntity.this));
-            behaviours.get(index).init();
-            return super.set(index, part);
         }
     }
 }

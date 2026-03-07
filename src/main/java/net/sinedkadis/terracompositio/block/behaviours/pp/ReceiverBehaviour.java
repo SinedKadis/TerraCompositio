@@ -8,14 +8,15 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.phys.Vec3;
+import net.sinedkadis.terracompositio.api.TCCapabilities;
 import net.sinedkadis.terracompositio.block.entity.PathPointerBlockEntity;
 import net.sinedkadis.terracompositio.compat.jade.JadeTerraCompositioPlugin;
 import net.sinedkadis.terracompositio.util.TCUtil;
 import snownee.jade.api.ITooltip;
 import snownee.jade.api.config.IPluginConfig;
 
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Objects;
 
 public class ReceiverBehaviour extends AbstractPPBehaviour {
 
@@ -25,17 +26,53 @@ public class ReceiverBehaviour extends AbstractPPBehaviour {
         super(blockEntity);
     }
 
-    public static boolean validAngle(PathPointerBlockEntity blockEntity,BlockPos senderPos) {
-        float rotationYaw = blockEntity.rotationYaw;
-        float rotationPitch = blockEntity.rotationPitch;
-        BlockPos currentPos = blockEntity.getBlockPos();
+    @Override
+    public void onUpdate() {
+        pullCFE();
+    }
 
-        Vec3 senderVec = currentPos.subtract(senderPos).getCenter().normalize();
-        Vec3 currentVec = new Vec3(0, 0, -1).normalize().yRot(rotationYaw).xRot(rotationPitch);
+    @Override
+    public boolean isActive() {
+        return blockEntity.parts.contains(PathPointerBlockEntity.PPPart.RECEIVER);
+    }
 
-        double angle = Math.acos(senderVec.dot(currentVec) / senderVec.length() / currentVec.length());
+    protected void pullCFE() {
+        Level level = blockEntity.getLevel();
+        if (level == null) return;
 
-        return angle < Math.PI / 2;
+        getSenderPoses(blockEntity).stream()
+                .map(level::getBlockEntity)
+                .filter(Objects::nonNull)
+                .forEach(blockEntity1 -> {
+                    if (blockEntity1 instanceof PathPointerBlockEntity pathPointerBlockEntity) {
+                        tryPullFrom(pathPointerBlockEntity);
+                    }
+                });
+
+    }
+
+    private void tryPullFrom(PathPointerBlockEntity senderBE) {
+        senderBE.getCapability(TCCapabilities.CFE).ifPresent(senderHandler -> {
+            if (senderHandler.getCFE() > 0) {
+                blockEntity.getCapability(TCCapabilities.CFE).ifPresent(thisHandler ->
+                                TCUtil.tryCFETransfer(thisHandler,senderHandler));
+            }
+        });
+    }
+
+    public static boolean validAngle(PathPointerBlockEntity be, Vec3 burstDir) {
+
+        float yaw = be.rotationYaw;
+        float pitch = be.rotationPitch;
+
+        // куда смотрит блок
+        Vec3 lookDir = new Vec3(0, 0, 1)
+                .yRot(yaw)
+                .xRot(pitch)
+                .normalize();
+
+        double dot = burstDir.dot(lookDir);
+        return dot > 0;
     }
 
     @Override
@@ -78,50 +115,16 @@ public class ReceiverBehaviour extends AbstractPPBehaviour {
 
     public static List<BlockPos> getSenderPoses(BlockEntity blockEntity) {
         CompoundTag persistentData = blockEntity.getPersistentData();
+        ListTag list = persistentData.getList(sendersTag, Tag.TAG_COMPOUND);
+        return list.stream()
+                .map(tag -> TCUtil.loadBlockPos(((CompoundTag) tag)))
+                .toList();
+    }
 
-        return new ArrayList<>(){
-
-            @Override
-            public BlockPos get(int index) {
-                ListTag list = persistentData.getList(sendersTag, Tag.TAG_COMPOUND);
-                return TCUtil.loadBlockPos((CompoundTag) list.get(index));
-            }
-
-            @Override
-            public void clear() {
-                persistentData.put(sendersTag, new CompoundTag());
-            }
-
-            @Override
-            public boolean add(BlockPos blockPos) {
-                ListTag list = persistentData.getList(sendersTag, Tag.TAG_COMPOUND);
-
-
-                CompoundTag posTag = TCUtil.saveBlockPos(blockPos);
-                if (list.contains(posTag)) return false;
-                list.add(posTag);
-
-                persistentData.put(sendersTag, list);
-                return true;
-            }
-
-
-
-            @Override
-            public BlockPos remove(int index) {
-                ListTag list = persistentData.getList(sendersTag, Tag.TAG_COMPOUND);
-                Tag remove = list.remove(index);
-                persistentData.put(sendersTag,list);
-                return TCUtil.loadBlockPos(((CompoundTag) remove));
-            }
-
-            @Override
-            public boolean remove(Object o) {
-                ListTag list = persistentData.getList(sendersTag, Tag.TAG_COMPOUND);
-                boolean remove = list.remove(TCUtil.saveBlockPos(((BlockPos) o)));
-                persistentData.put(sendersTag,list);
-                return remove;
-            }
-        };
+    public static void setSenderPoses(BlockEntity blockEntity, List<BlockPos> list) {
+        CompoundTag persistentData = blockEntity.getPersistentData();
+        ListTag listTag = new ListTag();
+        listTag.addAll(list.stream().map(TCUtil::saveBlockPos).toList());
+        persistentData.put(sendersTag, listTag);
     }
 }

@@ -9,7 +9,7 @@ public class EmitterBehaviour extends PPOutputBehaviour{
     }
 
     @Override
-    public void init() {
-        validateCFEBehaviour();
+    public boolean isActive() {
+        return blockEntity.parts.contains(PathPointerBlockEntity.PPPart.EMITTER);
     }
 }

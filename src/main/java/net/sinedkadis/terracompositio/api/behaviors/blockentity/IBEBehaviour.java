@@ -15,7 +15,6 @@ import snownee.jade.api.ITooltip;
 import snownee.jade.api.config.IPluginConfig;
 
 public interface IBEBehaviour {
-    default void init(){}
     void tick();
     void onChunkLoad();
     @Nullable LazyOptional<?> getCapability(@NotNull Capability<?> cap, @Nullable Direction side);
@@ -34,6 +33,7 @@ public interface IBEBehaviour {
     //misc
     default void onUpdate(){}
     default void parseBehaviourData(){}
+    default boolean isActive(){return true;}
 
     <T extends BlockEntity> T getBlockEntity();
 

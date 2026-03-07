@@ -23,6 +23,7 @@ import snownee.jade.api.ITooltip;
 import snownee.jade.api.config.IPluginConfig;
 
 import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.function.Function;
 
 @Data
 @MethodsReturnNonnullByDefault
@@ -39,6 +40,27 @@ public class CFEHandlerBehaviour implements IBECFEBehaviour {
         this.blockEntity = blockEntity;
         this.limit = 5;
     }
+    public CFEHandlerBehaviour maxCFE(int maxCFE) {
+        this.cfeHandler.setMaxCFE(maxCFE);
+        return this;
+    }
+    public CFEHandlerBehaviour limit(int limit) {
+        this.limit = limit;
+        return this;
+    }
+    public CFEHandlerBehaviour priority(int priority) {
+        this.priority = priority;
+        return this;
+    }
+    public CFEHandlerBehaviour cfeHandler(Function<CFEHandlerBehaviour,ICFEHandler> cfeHandler) {
+        this.cfeHandler = cfeHandler.apply(this);
+        return this;
+    }
+//    public CFEHandlerBehaviour cfeTravelSpeed(float speed) {
+//        this.cfeHandler.setCfeTravelSpeed(speed);
+//        return this;
+//    }
+
 
     @Override
     public BlockEntity getEntity() {
@@ -143,9 +165,5 @@ public class CFEHandlerBehaviour implements IBECFEBehaviour {
     @Override
     public ICFEHandler getMainHandler() {
         return cfeHandler;
-    }
-
-    public void setMaxCFE(int cfe) {
-        getMainHandler().setMaxCFE(cfe);
     }
 }

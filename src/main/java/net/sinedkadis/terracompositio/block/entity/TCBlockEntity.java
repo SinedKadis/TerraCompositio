@@ -31,7 +31,6 @@ public abstract class TCBlockEntity extends BlockEntity{
     public TCBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
         addBEBehaviours(behaviours);
-        behaviours.forEach(IBEBehaviour::init);
     }
 
     abstract void addBEBehaviours(List<IBEBehaviour> behaviourList);
@@ -39,6 +38,7 @@ public abstract class TCBlockEntity extends BlockEntity{
     @Override
     public <T> LazyOptional<T> getCapability(Capability<T> cap, @Nullable Direction side) {
         Optional<? extends LazyOptional<?>> behaviourCap = behaviours.stream()
+                .filter(IBEBehaviour::isActive)
                 .map(iBehaviour -> iBehaviour.getCapability(cap, side))
                 .filter(Objects::nonNull)
                 .findAny();
@@ -47,37 +47,49 @@ public abstract class TCBlockEntity extends BlockEntity{
 
     public void tick(Level pLevel, BlockPos pPos, BlockState pState) {
         if (level instanceof ServerLevel)
-            behaviours.forEach(IBEBehaviour::tick);
+            behaviours.stream()
+                    .filter(IBEBehaviour::isActive)
+                    .forEach(IBEBehaviour::tick);
     }
 
     @Override
     public void onLoad() {
         super.onLoad();
-        behaviours.forEach(IBEBehaviour::onChunkLoad);
+        behaviours.stream()
+                .filter(IBEBehaviour::isActive)
+                .forEach(IBEBehaviour::onChunkLoad);
     }
 
     @Override
     public void setRemoved() {
         super.setRemoved();
-        behaviours.forEach(IBEBehaviour::onRemoved);
+        behaviours.stream()
+                .filter(IBEBehaviour::isActive)
+                .forEach(IBEBehaviour::onRemoved);
     }
 
     @Override
     public void invalidateCaps() {
         super.invalidateCaps();
-        behaviours.forEach(IBEBehaviour::onInvalidateCaps);
+        behaviours.stream()
+                .filter(IBEBehaviour::isActive)
+                .forEach(IBEBehaviour::onInvalidateCaps);
     }
 
     @Override
     protected void saveAdditional(CompoundTag pTag) {
         super.saveAdditional(pTag);
-        behaviours.forEach(iBehaviour -> iBehaviour.onSave(pTag));
+        behaviours.stream()
+                .filter(IBEBehaviour::isActive)
+                .forEach(iBehaviour -> iBehaviour.onSave(pTag));
     }
 
     @Override
     public void load(CompoundTag pTag) {
         super.load(pTag);
-        behaviours.forEach(iBehaviour -> iBehaviour.onLoad(pTag));
+        behaviours.stream()
+                .filter(IBEBehaviour::isActive)
+                .forEach(iBehaviour -> iBehaviour.onLoad(pTag));
     }
 
     @Nullable

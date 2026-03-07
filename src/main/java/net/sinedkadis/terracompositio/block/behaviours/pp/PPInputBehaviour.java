@@ -5,17 +5,12 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.common.util.LazyOptional;
 import net.sinedkadis.terracompositio.api.TCCapabilities;
 import net.sinedkadis.terracompositio.api.TerraCompositioAPI;
-import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBEBehaviour;
-import net.sinedkadis.terracompositio.api.dummies.DummyBehaviour;
 import net.sinedkadis.terracompositio.api.networks.cfe.CFENetwork;
 import net.sinedkadis.terracompositio.api.networks.cfe.CFENetworkMember;
 import net.sinedkadis.terracompositio.api.networks.cfe.ICFEHandler;
-import net.sinedkadis.terracompositio.block.behaviours.CFEHandlerBehaviour;
 import net.sinedkadis.terracompositio.block.entity.PathPointerBlockEntity;
-import net.sinedkadis.terracompositio.cfe.CFEContainer;
 import net.sinedkadis.terracompositio.util.TCUtil;
 
-import java.util.List;
 import java.util.Optional;
 
 public abstract class PPInputBehaviour extends AbstractPPBehaviour{
@@ -42,19 +37,6 @@ public abstract class PPInputBehaviour extends AbstractPPBehaviour{
             thisCFEBehaviour.setMaxCFE(endPointCFEBehaviour.getFreeSpace());
     }
 
-    protected void validateCFEBehaviour() {
-        if (blockEntity.getBehaviours().stream().noneMatch(ibeBehaviour -> ibeBehaviour instanceof InputCFEBehaviour)) {
-            setCFEBehaviour();
-        }
-    }
-
-    @Override
-    protected void setCFEBehaviour() {
-        List<IBEBehaviour> list = blockEntity.getBehaviours();
-        while (list.size()<3) list.add(DummyBehaviour.instance);
-        list.set(2, new InputCFEBehaviour(list));
-    }
-
     protected boolean invalidBehaviours() {
         if (thisCFEBehaviour == null) {
             Optional<ICFEHandler> behaviour = blockEntity.getCapability(TCCapabilities.CFE).resolve();
@@ -77,50 +59,11 @@ public abstract class PPInputBehaviour extends AbstractPPBehaviour{
                     LazyOptional<ICFEHandler> behaviour = endPointBE.getCapability(TCCapabilities.CFE);
                     if (behaviour.isPresent()) {
                         behaviour.ifPresent(icfeHandler -> endPointCFEBehaviour = icfeHandler);
-                    } else {
-                        return true;
-                    }
-                }
-            }
+                    } else return true;
+                } else return true;
+            } else return true;
         }
 
         return false;
-    }
-
-    private class InputCFEBehaviour extends CFEHandlerBehaviour {
-        private final List<IBEBehaviour> list;
-
-        public InputCFEBehaviour(List<IBEBehaviour> list) {
-            super(PPInputBehaviour.this.blockEntity);
-            this.list = list;
-        }
-
-        @Override
-        public void init() {
-            this.setCfeHandler(new CFEContainer(this){
-                @Override
-                public int addCFE(int cfe, boolean simulate) {
-                    int i = super.addCFE(cfe, simulate);
-                    blockEntity.setPpUpdateScheduled(true);
-                    return i;
-                }
-            }.setCfeTravelSpeed((float) 5 / 20));
-        }
-
-        @Override
-        public int getPriority() {
-            return 100;
-        }
-
-        @Override
-        public int getLimit() {
-            return 5;
-        }
-
-        @Override
-        public void onCFENetworkMemberUpdate() {
-            if (blockEntity.getLevel() == null) return;
-            list.forEach(IBEBehaviour::onUpdate);
-        }
     }
 }

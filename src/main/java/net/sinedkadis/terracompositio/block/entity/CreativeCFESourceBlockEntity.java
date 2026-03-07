@@ -19,17 +19,13 @@ public class CreativeCFESourceBlockEntity extends TCBlockEntity{
 
     @Override
     public void addBEBehaviours(@NotNull List<IBEBehaviour> list) {
-        list.add(new CFEHandlerBehaviour(this){
-            @Override
-            public void init() {
-                setCfeHandler(new CFEContainer(this) {
-                    @Override
-                    public int getCFE() {
-                        return Integer.MAX_VALUE;
-                    }
-                });
-                setPriority(-100);
-            }
-        });
+        list.add(new CFEHandlerBehaviour(this)
+                .cfeHandler(cfeHandlerBehaviour -> new CFEContainer(cfeHandlerBehaviour) {
+                        @Override
+                        public int getCFE() {
+                            return Integer.MAX_VALUE;
+                        }
+                    })
+                .priority(-100));
     }
 }

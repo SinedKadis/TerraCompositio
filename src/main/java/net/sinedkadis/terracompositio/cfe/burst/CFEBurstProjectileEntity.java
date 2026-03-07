@@ -122,11 +122,13 @@ public class CFEBurstProjectileEntity extends ThrowableProjectile {
         if (!blockPos.equals(lastBP) && tickCount > 1) {
             BlockEntity blockEntity = level().getBlockEntity(blockPos);
             int cfe = this.getCFE();
-            if (blockEntity instanceof PathPointerBlockEntity pathPointerBlockEntity) {
-                if (tryRedirectByPPBE(pathPointerBlockEntity,blockPos)) {
-                    lastBP.set(blockPos);
-                    return;
-                }
+            if (blockEntity instanceof PathPointerBlockEntity pathPointerBlockEntity
+                    && pathPointerBlockEntity.parts.contains(PathPointerBlockEntity.PPPart.RECEIVER)
+                    && pathPointerBlockEntity.parts.contains(PathPointerBlockEntity.PPPart.SENDER)) {
+                tryRedirectByPPBE(pathPointerBlockEntity,this.getDeltaMovement());
+                lastBP.set(blockPos);
+                return;
+
             }
             if (blockEntity instanceof TCBlockEntity memberBE) {
                 tryConsumeTCBE(memberBE, cfe);
@@ -157,18 +159,17 @@ public class CFEBurstProjectileEntity extends ThrowableProjectile {
         }
     }
 
-    private boolean tryRedirectByPPBE(PathPointerBlockEntity pathPointerBlockEntity,BlockPos currentPos) {
-        if (!ReceiverBehaviour.validAngle(pathPointerBlockEntity,currentPos)) return false;
+    private void tryRedirectByPPBE(PathPointerBlockEntity pathPointerBlockEntity, Vec3 burstDir) {
+        if (!ReceiverBehaviour.validAngle(pathPointerBlockEntity,burstDir)) return;
 
         timeToLive+=100;
         setDeltaMovement(Vec3.ZERO);
         BlockPos bindPos = SenderBehaviour.getBindPos(pathPointerBlockEntity);
-        if (bindPos == null) return false;
+        if (bindPos == null) return;
 
-        Vec3 shootVec = bindPos.subtract(currentPos).getCenter();
+        Vec3 shootVec = bindPos.subtract(pathPointerBlockEntity.getBlockPos()).getCenter();
         this.shoot(shootVec.x(),shootVec.y(),shootVec.z(),cfeTravelSpeed,0);
 
-        return true;
     }
 
     private void tryConsumeCFENetworkMemberEntity(BlockPos blockPos, int cfe) {

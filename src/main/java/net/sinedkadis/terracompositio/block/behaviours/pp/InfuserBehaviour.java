@@ -27,13 +27,16 @@ public class InfuserBehaviour extends PPOutputBehaviour{
     }
 
     @Override
-    public void init() {
-        validateCFEBehaviour();
+    public boolean isActive() {
+        return blockEntity.parts.contains(PathPointerBlockEntity.PPPart.INFUSER);
     }
 
     @Override
     public void onUpdate() {
-        super.onUpdate();
+        trySendToEntity();
+    }
+
+    private void trySendToEntity() {
         ICFEHandler cfeHandler = ((CFEHandlerBehaviour) blockEntity.getBehaviours().get(2)).getCfeHandler();
         if (cfeHandler.getCFE() < 1) return;
 

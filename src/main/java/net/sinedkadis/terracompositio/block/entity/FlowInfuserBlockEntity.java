@@ -37,10 +37,6 @@ public class FlowInfuserBlockEntity extends TCCraftingBlockEntity {
     @Override
     public void addBEBehaviours(List<IBEBehaviour> list) {
         list.add(new CFEHandlerBehaviour(this){
-            @Override
-            public void init() {
-                setPriority(100);
-            }
 
             @Override
             public void onAppendServerData(CompoundTag compoundTag) {
@@ -55,7 +51,7 @@ public class FlowInfuserBlockEntity extends TCCraftingBlockEntity {
                     iTooltip.add(Component.translatable("block.terracompositio." + "cfe_tick", serverData.getFloat("cfe_tick")));
                 }
             }
-        });
+        }.priority(100));
         list.add(new TwoSlotItemHandlerBehaviour(this){
             @Override
             public int getLimitInSlot(int slot) {

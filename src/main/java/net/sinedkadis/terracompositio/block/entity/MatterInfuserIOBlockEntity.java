@@ -37,10 +37,6 @@ public class MatterInfuserIOBlockEntity extends MatterInfuserBaseBlockEntity{
     public void addBEBehaviours(@NotNull List<IBEBehaviour> list) {
         list.add(new CFEHandlerBehaviour(this){
             @Override
-            public void init() {
-                setLimit(10);
-            }
-            @Override
             public Vec3 particleTargetOffset() {
                 return switch (getBlockState().getValue(BlockStateProperties.HORIZONTAL_FACING)){
                     case SOUTH -> new Vec3(8.0 / 16, 8.0 / 16, 0.5 / 16);
@@ -50,7 +46,7 @@ public class MatterInfuserIOBlockEntity extends MatterInfuserBaseBlockEntity{
                     default -> super.particleTargetOffset();
                 };
             }
-        });
+        }.limit(10));
 
     }
 

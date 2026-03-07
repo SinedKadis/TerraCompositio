@@ -24,36 +24,32 @@ public class CFETrashCanBlockEntity extends TCBlockEntity {
 
     @Override
     public void addBEBehaviours(@NotNull List<IBEBehaviour> list) {
-        list.add(new CFEHandlerBehaviour(this){
-            @Override
-            public void init() {
-                setPriority(Integer.MAX_VALUE);
-                setMaxCFE(Integer.MAX_VALUE);
-                setLimit(10);
-            }
-
-            @Override
-            public void onCFENetworkMemberUpdate() {
-                TerraCompositioAPI.instance().getCFENetworkInstance().getAllCFENetworkMembers(level).stream()
-                        .filter(cfeNetworkMemberBE -> TCUtil.distSqr(cfeNetworkMemberBE.getPos(),worldPosition) <= 100)
-                        .filter(cfeNetworkMemberBE -> {
-                            if (cfeNetworkMemberBE instanceof CFENetworkMemberBE cfeNetworkMemberBE1)
-                                return !(cfeNetworkMemberBE1.getEntity() instanceof CreativeCFESourceBlockEntity);
-                            return true;
-                        })
-                        .filter(cfeNetworkMemberBE -> {
-                            if (cfeNetworkMemberBE instanceof CFENetworkMemberBE cfeNetworkMemberBE1)
-                                return cfeNetworkMemberBE1.getMainHandler().getCFE() > 0;
-                            if (cfeNetworkMemberBE instanceof CFENetworkMemberEntity cfeNetworkMemberEntity) {
-                                Optional<ICFEHandler> icfeHandler = cfeNetworkMemberEntity.getEntity().getCapability(TCCapabilities.CFE).resolve();
-                                return icfeHandler.isPresent() && icfeHandler.get().getCFE() > 0;
-                            }
-                            return true;
-                        })
-                        .filter(cfeNetworkMemberBE -> cfeNetworkMemberBE != this)
-                        .forEach(cfeNetworkMemberBE -> TCUtil.tryCFETransfer(this, cfeNetworkMemberBE, Integer.MAX_VALUE));
-            }
-        });
+        list.add(new CFEHandlerBehaviour(this) {
+                @Override
+                public void onCFENetworkMemberUpdate() {
+                    TerraCompositioAPI.instance().getCFENetworkInstance().getAllCFENetworkMembers(level).stream()
+                            .filter(cfeNetworkMemberBE -> TCUtil.distSqr(cfeNetworkMemberBE.getPos(),worldPosition) <= 100)
+                            .filter(cfeNetworkMemberBE -> {
+                                if (cfeNetworkMemberBE instanceof CFENetworkMemberBE cfeNetworkMemberBE1)
+                                    return !(cfeNetworkMemberBE1.getEntity() instanceof CreativeCFESourceBlockEntity);
+                                return true;
+                            })
+                            .filter(cfeNetworkMemberBE -> {
+                                if (cfeNetworkMemberBE instanceof CFENetworkMemberBE cfeNetworkMemberBE1)
+                                    return cfeNetworkMemberBE1.getMainHandler().getCFE() > 0;
+                                if (cfeNetworkMemberBE instanceof CFENetworkMemberEntity cfeNetworkMemberEntity) {
+                                    Optional<ICFEHandler> icfeHandler = cfeNetworkMemberEntity.getEntity().getCapability(TCCapabilities.CFE).resolve();
+                                    return icfeHandler.isPresent() && icfeHandler.get().getCFE() > 0;
+                                }
+                                return true;
+                            })
+                            .filter(cfeNetworkMemberBE -> cfeNetworkMemberBE != this)
+                            .forEach(cfeNetworkMemberBE -> TCUtil.tryCFETransfer(this, cfeNetworkMemberBE, Integer.MAX_VALUE));
+                }
+            }.priority(Integer.MAX_VALUE)
+                .maxCFE(Integer.MAX_VALUE)
+                .limit(10)
+        );
     }
 
 

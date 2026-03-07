@@ -41,13 +41,9 @@ public abstract class AbstractDesorberBlockEntity extends TCBlockEntity {
 
     @Override
     public void addBEBehaviours(@NotNull List<IBEBehaviour> list) {
-        list.add(new CFEHandlerBehaviour(this){
-            @Override
-            public void init() {
-                setLimit(5);
-                setPriority(-100);
-            }
-        });
+        list.add(new CFEHandlerBehaviour(this)
+                .limit(5)
+                .priority(-100));
     }
 
     //todo comparator compatibility
