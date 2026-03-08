@@ -13,19 +13,15 @@ import java.util.List;
 public class DummyCFENetwork implements CFENetwork {
     public static final DummyCFENetwork instance = new DummyCFENetwork();
 
-    @Override
-    public @Nullable CFENetworkMember getClosestSourceWithCFE(BlockPos pos, Level level, int limit, @Nullable Integer priority) {
-        return null;
-    }
-
-    @Override
-    public @Nullable CFENetworkMember getRandomSourceInRange(BlockPos pos, Level level, int limit, @Nullable Integer priority) {
-        return null;
-    }
 
     @Override
     public @Nullable CFENetworkMember getMemberAt(Level level, BlockPos blockPos) {
         return null;
+    }
+
+    @Override
+    public List<CFENetworkMember> getAvailableNetworkTargets(CFENetworkMember sender) {
+        return List.of();
     }
 
     @Override
@@ -48,8 +44,4 @@ public class DummyCFENetwork implements CFENetwork {
         return true;
     }
 
-    @Override
-    public ICFEHandler createCFEHandler(CFENetworkMember entity) {
-        return null;
-    }
 }

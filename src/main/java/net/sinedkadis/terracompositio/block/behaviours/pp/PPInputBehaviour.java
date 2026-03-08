@@ -4,12 +4,8 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.common.util.LazyOptional;
 import net.sinedkadis.terracompositio.api.TCCapabilities;
-import net.sinedkadis.terracompositio.api.TerraCompositioAPI;
-import net.sinedkadis.terracompositio.api.networks.cfe.CFENetwork;
-import net.sinedkadis.terracompositio.api.networks.cfe.CFENetworkMember;
 import net.sinedkadis.terracompositio.api.networks.cfe.ICFEHandler;
 import net.sinedkadis.terracompositio.block.entity.PathPointerBlockEntity;
-import net.sinedkadis.terracompositio.util.TCUtil;
 
 import java.util.Optional;
 
@@ -19,17 +15,6 @@ public abstract class PPInputBehaviour extends AbstractPPBehaviour{
 
     public PPInputBehaviour(PathPointerBlockEntity blockEntity) {
         super(blockEntity);
-    }
-
-    protected void collectCFE() {
-        CFENetwork cfeNetwork = TerraCompositioAPI.instance().getCFENetworkInstance();
-        CFENetworkMember source = cfeNetwork.getClosestSourceWithCFE(blockEntity.getBlockPos(),
-                blockEntity.getLevel(),
-                thisCFEBehaviour.getAttachedMember().getLimit() * 2,
-                thisCFEBehaviour.getAttachedMember().getPriority());
-        if (source != null) {
-            TCUtil.tryCFETransfer(thisCFEBehaviour.getAttachedMember(), source, thisCFEBehaviour.getFreeSpace());
-        }
     }
 
     protected void updateMaxCFE() {

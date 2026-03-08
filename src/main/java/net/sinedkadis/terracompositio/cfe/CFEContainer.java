@@ -71,9 +71,8 @@ public class CFEContainer implements ICFEHandler, INBTSerializable<CompoundTag> 
         if (!simulate) {
             setCFE(getCFE()-taken);
 
+            sendCFEUpdate();
             onContentsChanged();
-            //sendCFEUpdate();
-            getAttachedMember().scheduleMemberUpdate();
         }
         return taken;
     }
@@ -101,8 +100,8 @@ public class CFEContainer implements ICFEHandler, INBTSerializable<CompoundTag> 
         int added = Mth.clamp(cfe, 0, pMax);
         if (!simulate) {
             setCFE(getCFE()+added);
-            //subFromQueue(added);
-            sendCFEUpdate();
+            
+            getAttachedMember().scheduleMemberUpdate();
             onContentsChanged();
         }
         return added;

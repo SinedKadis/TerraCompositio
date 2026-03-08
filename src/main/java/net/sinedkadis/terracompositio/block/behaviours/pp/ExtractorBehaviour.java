@@ -6,10 +6,8 @@ import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.AABB;
-import net.sinedkadis.terracompositio.api.TCCapabilities;
 import net.sinedkadis.terracompositio.block.entity.PathPointerBlockEntity;
 import net.sinedkadis.terracompositio.registries.TCItems;
-import net.sinedkadis.terracompositio.util.TCUtil;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -33,16 +31,6 @@ public class ExtractorBehaviour extends PPInputBehaviour{
     public void onUpdate() {
         if (invalidBehaviours()) return;
         updateMaxCFE();
-        collectCFE();
-    }
-
-    @Override
-    protected void collectCFE() {
-        int freeSpace = thisCFEBehaviour.getFreeSpace();
-        if (freeSpace < 1) return;
-        scanCompatibleEntities().forEach(livingEntity ->
-                livingEntity.getCapability(TCCapabilities.CFE).ifPresent(icfeHandler ->
-                        TCUtil.tryCFETransfer(thisCFEBehaviour, icfeHandler, freeSpace)));
     }
 
     public @NotNull List<LivingEntity> scanCompatibleEntities() {

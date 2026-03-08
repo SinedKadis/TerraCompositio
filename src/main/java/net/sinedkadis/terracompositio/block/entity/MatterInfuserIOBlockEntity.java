@@ -46,7 +46,7 @@ public class MatterInfuserIOBlockEntity extends MatterInfuserBaseBlockEntity{
                     default -> super.particleTargetOffset();
                 };
             }
-        }.limit(10));
+        }.range(10));
 
     }
 

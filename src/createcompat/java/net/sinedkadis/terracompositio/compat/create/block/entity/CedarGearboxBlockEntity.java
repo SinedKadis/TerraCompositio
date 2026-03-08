@@ -17,7 +17,6 @@ import net.sinedkadis.terracompositio.cfe.CFEContainer;
 import net.sinedkadis.terracompositio.compat.create.TCCreateCompat;
 import net.sinedkadis.terracompositio.compat.jade.JadeTerraCompositioPlugin;
 import net.sinedkadis.terracompositio.registries.TCBlockStateProperties;
-import net.sinedkadis.terracompositio.util.TCUtil;
 import org.jetbrains.annotations.NotNull;
 import snownee.jade.api.ITooltip;
 import snownee.jade.api.config.IPluginConfig;
@@ -26,8 +25,9 @@ import java.util.Objects;
 
 public class CedarGearboxBlockEntity extends GeneratingKineticBlockEntity implements CFENetworkMemberBE {
 
-    protected int limit;
+    protected int range;
     protected int priority;
+    protected boolean scheduledUpdate = false;
     protected ICFEHandler cfeHandler = new CFEContainer(this){
         @Override
         protected void sendCFEUpdate() {
@@ -40,7 +40,7 @@ public class CedarGearboxBlockEntity extends GeneratingKineticBlockEntity implem
     public CedarGearboxBlockEntity(BlockPos pPos, BlockState pBlockState) {
         super(Objects.requireNonNull(((TCCreateCompat) TerraCompositio.createCompat).blockEntities.CEDAR_GEARBOX_BE).get(),pPos, pBlockState);
         setLazyTickRate(60);
-        this.limit = 5;
+        this.range = 5;
         this.priority = 100;
         this.capacity = 256f;
     }
@@ -60,7 +60,7 @@ public class CedarGearboxBlockEntity extends GeneratingKineticBlockEntity implem
         CFENetwork cfeNetworkInstance = TerraCompositioAPI.INSTANCE.getCFENetworkInstance();
         Level pLevel = this.level;
         if (pLevel == null) return;
-        if (!pLevel.isClientSide && limit != 0) {
+        if (!pLevel.isClientSide && range != 0) {
             boolean inNetwork = cfeNetworkInstance.isIn(pLevel, this);
             if (!inNetwork && !isRemoved()) {
                 cfeNetworkInstance.fireCFENetworkEvent(this, NetworkAction.ADD);
@@ -81,17 +81,6 @@ public class CedarGearboxBlockEntity extends GeneratingKineticBlockEntity implem
         lazyCFEOptional = LazyOptional.of(() -> cfeHandler);
         scheduleMemberUpdate();
         updateGeneratedRotation();
-    }
-
-    @Override
-    public void onCFENetworkMemberUpdate() {
-        if (getPriority() >= 0){
-            CFENetwork cfeNetwork = TerraCompositioAPI.instance().getCFENetworkInstance();
-            CFENetworkMember source = cfeNetwork.getClosestSourceWithCFE(getPos(), getLevel(), getLimit(), getPriority());
-            if (source != null) {
-                TCUtil.tryCFETransfer(this, source, Integer.MAX_VALUE);
-            }
-        }
     }
 
     @Override
@@ -129,7 +118,7 @@ public class CedarGearboxBlockEntity extends GeneratingKineticBlockEntity implem
     public void onAppendServerData(CompoundTag compoundTag) {
         compoundTag.putInt("cfe",getMainHandler().getCFE());
         compoundTag.putInt("priority",getPriority());
-        compoundTag.putInt("limit",getLimit());
+        compoundTag.putInt("limit", getRange());
 
         compoundTag.putInt("max_cfe",getMainHandler().getMaxCFE());
         compoundTag.putInt("queued",getMainHandler().getQueued());
@@ -161,8 +150,8 @@ public class CedarGearboxBlockEntity extends GeneratingKineticBlockEntity implem
 
 
     @Override
-    public int getLimit() {
-        return limit;
+    public int getRange() {
+        return range;
     }
 
     @Override
@@ -173,5 +162,18 @@ public class CedarGearboxBlockEntity extends GeneratingKineticBlockEntity implem
     @Override
     public ICFEHandler getMainHandler() {
         return cfeHandler;
+    }
+
+    @Override
+    public void updateIfScheduled() {
+        if (scheduledUpdate) {
+            this.scheduledUpdate = false;
+            this.onCFENetworkMemberUpdate();
+        }
+    }
+
+    @Override
+    public void scheduleMemberUpdate() {
+        this.scheduledUpdate = true;
     }
 }

@@ -2,34 +2,22 @@ package net.sinedkadis.terracompositio.api.networks.cfe;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
-import net.sinedkadis.terracompositio.api.TCCapabilities;
 import net.sinedkadis.terracompositio.api.networks.NetworkAction;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.util.List;
-import java.util.Optional;
 
 public interface CFENetwork {
-    @Nullable CFENetworkMember getClosestSourceWithCFE(BlockPos pos, Level level, int limit, @Nullable Integer priority);
-    default @Nullable CFENetworkMember getClosestSourceWithCFE(BlockPos pos, Level level, int limit){
-        return getClosestSourceWithCFE(pos,level,limit,null);
-    }
-    @Nullable CFENetworkMember getRandomSourceInRange(BlockPos pos, Level level, int limit, @Nullable Integer priority);
-    default @Nullable CFENetworkMember getRandomSourceInRange(BlockPos pos, Level level, int limit){
-        return getRandomSourceInRange(pos,level,limit,null);
-    }
-    @Nullable CFENetworkMember getMemberAt(Level level,BlockPos blockPos);
-    List<CFENetworkMember> getAllCFENetworkMembers(Level level);
+    //Event
     void fireCFENetworkEvent(CFENetworkMember source, NetworkAction action);
+
+    //Existence checks
     boolean isIn(Level pLevel, ICFEHandler cfeHandler);
     boolean isIn(Level pLevel, CFENetworkMember cfeHandler);
-    static Optional<ICFEHandler> getCFEHandler(CFENetworkMember source){
-        if (source instanceof CFENetworkMemberBE cfeNetworkMemberBE)
-            return cfeNetworkMemberBE.getEntity().getCapability(TCCapabilities.CFE).resolve();
-        if (source instanceof CFENetworkMemberEntity cfeNetworkMemberEntity)
-            return cfeNetworkMemberEntity.getEntity().getCapability(TCCapabilities.CFE).resolve();
-        return Optional.empty();
-    }
 
-    ICFEHandler createCFEHandler(CFENetworkMember entity);
+    //Member getters
+    @Nullable CFENetworkMember getMemberAt(Level level,BlockPos blockPos);
+    List<CFENetworkMember> getAvailableNetworkTargets(CFENetworkMember sender);
+    List<CFENetworkMember> getAllCFENetworkMembers(Level level);
+
 }

@@ -131,7 +131,7 @@ public class SenderBehaviour extends AbstractPPBehaviour implements CFENetworkMe
     }
 
     @Override
-    public int getLimit() {
+    public int getRange() {
         return 5;
     }
 
@@ -148,5 +148,15 @@ public class SenderBehaviour extends AbstractPPBehaviour implements CFENetworkMe
     @Override
     public ICFEHandler getMainHandler() {
         return redirectCFEHandler;
+    }
+
+    @Override
+    public void updateIfScheduled() {
+
+    }
+
+    @Override
+    public void scheduleMemberUpdate() {
+        blockEntity.setPpUpdateScheduled(true);
     }
 }

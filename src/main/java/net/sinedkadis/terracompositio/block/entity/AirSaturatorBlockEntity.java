@@ -32,7 +32,7 @@ public class AirSaturatorBlockEntity extends TCBlockEntity{
         list.add(new CFEHandlerBehaviour(this)
                 .maxCFE(100)
                 .priority(100)
-                .limit(5));
+                .range(5));
 
     }
 

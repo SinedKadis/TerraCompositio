@@ -81,6 +81,8 @@ public class FlowCedarEntEntity extends AbstractGolem implements CFENetworkMembe
     public final AnimationState extractionCompleteAnimationState = new AnimationState();
     public final AnimationState cfeHoldState = new AnimationState();
 
+    boolean scheduleUpdate = false;
+
     @Setter @Getter @Nullable
     private BlockPos sourcePos;
 
@@ -290,13 +292,26 @@ public class FlowCedarEntEntity extends AbstractGolem implements CFENetworkMembe
     }
 
     @Override
-    public int getLimit() {
+    public void updateIfScheduled() {
+        if (scheduleUpdate) {
+            scheduleUpdate = false;
+            onCFENetworkMemberUpdate();
+        }
+    }
+
+    @Override
+    public void scheduleMemberUpdate() {
+        scheduleUpdate = true;
+    }
+
+    @Override
+    public int getRange() {
         return 5;
     }
 
     @Override
     public int getPriority() {
-        return 512;
+        return 0;
     }
 
     @Override

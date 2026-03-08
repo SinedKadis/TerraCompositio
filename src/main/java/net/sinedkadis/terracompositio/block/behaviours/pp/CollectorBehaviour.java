@@ -12,7 +12,6 @@ public class CollectorBehaviour extends PPInputBehaviour{
     public void onUpdate() {
         if (invalidBehaviours()) return;
         updateMaxCFE();
-        collectCFE();
     }
 
     @Override

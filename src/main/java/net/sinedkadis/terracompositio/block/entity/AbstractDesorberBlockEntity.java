@@ -42,7 +42,7 @@ public abstract class AbstractDesorberBlockEntity extends TCBlockEntity {
     @Override
     public void addBEBehaviours(@NotNull List<IBEBehaviour> list) {
         list.add(new CFEHandlerBehaviour(this)
-                .limit(5)
+                .range(5)
                 .priority(-100));
     }
 

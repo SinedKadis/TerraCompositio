@@ -3,6 +3,7 @@ package net.sinedkadis.terracompositio.entity.goals;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.entity.ai.navigation.PathNavigation;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.pathfinder.Path;
 import net.minecraft.world.phys.Vec3;
 import net.sinedkadis.terracompositio.api.TerraCompositioAPI;
@@ -21,6 +22,7 @@ import static net.sinedkadis.terracompositio.registries.TCBlockStateProperties.I
 public class ReachSourceGoal extends Goal {
     private final FlowCedarEntEntity mob;
     private final double speedModifier;
+    private final Level level;
     private Vec3 targetPosition;
     private final int stopDistance;
     private final int searchLimit;
@@ -30,6 +32,7 @@ public class ReachSourceGoal extends Goal {
         this.speedModifier = speed;
         this.searchLimit = searchLimit;
         this.stopDistance = stopDistance;
+        this.level = mob.level();
     }
 
     @Override
@@ -37,16 +40,23 @@ public class ReachSourceGoal extends Goal {
         Optional<ICFEHandler> cfeHandler = mob.getInnerCFEOptional().resolve();
         if (cfeHandler.isPresent() && cfeHandler.get().getCFE() <= 60){
             BlockPos sourcePos = mob.getSourcePos();
-            if (sourcePos != null && sourcePos.closerThan(mob.blockPosition(),mob.getLimit()-1)) {
+            if (sourcePos != null && sourcePos.closerThan(mob.blockPosition(),mob.getRange()-1)) {
                 return false;
             }
-            CFENetworkMember randomSourceInRange = TerraCompositioAPI.instance().getCFENetworkInstance().getRandomSourceInRange(mob.blockPosition(), mob.level(), searchLimit);
-            if (randomSourceInRange != null){
-                boolean targetIsEnt = randomSourceInRange instanceof FlowCedarEntEntity;
-                boolean targetIsAcceptableEnt = targetIsEnt && ((FlowCedarEntEntity) randomSourceInRange).getCapability(TCCapabilities.CFE)
+            Optional<CFENetworkMember> randomSourceInRange = TerraCompositioAPI.instance().getCFENetworkInstance()
+                    .getAllCFENetworkMembers(level).stream()
+                    //Distance check: needs to be in search limit
+                    .filter(member -> member.getPos().closerThan(mob.getPos(),searchLimit))
+                    //Entity check: don`t take from itself
+                    .filter(member -> !member.getEntity().equals(mob))
+                    .findAny();
+            if (randomSourceInRange.isPresent()){
+                CFENetworkMember cfeNetworkMember = randomSourceInRange.get();
+                boolean targetIsEnt = cfeNetworkMember instanceof FlowCedarEntEntity;
+                boolean targetIsAcceptableEnt = targetIsEnt && ((FlowCedarEntEntity) cfeNetworkMember).getCapability(TCCapabilities.CFE)
                         .filter(icfeHandler -> icfeHandler.getCFE() > 1000).isPresent();
                 if (!targetIsEnt || targetIsAcceptableEnt) {
-                    BlockPos blockPos = randomSourceInRange.getPos();
+                    BlockPos blockPos = cfeNetworkMember.getPos();
                     mob.setSourcePos(blockPos);
                     if (TCUtil.distSqr(blockPos, mob.blockPosition()) > (long) stopDistance * stopDistance) {
                         targetPosition = blockPos.getCenter();
@@ -55,11 +65,11 @@ public class ReachSourceGoal extends Goal {
                 }
             }
             List<BlockPos> list = TCUtil.getNearBlocks(mob.getPos(), 10).stream()
-                    .filter(pos1 -> mob.level().getBlockState(pos1).is(TCTags.Blocks.FLOW_CEDAR_LOGS))
-                    .filter(pos2 -> mob.level().getBlockState(pos2).getValue(INFUSED))
+                    .filter(pos1 -> level.getBlockState(pos1).is(TCTags.Blocks.FLOW_CEDAR_LOGS))
+                    .filter(pos2 -> level.getBlockState(pos2).getValue(INFUSED))
                     .toList();
             if (!list.isEmpty()) {
-                int index = mob.level().getRandom().nextInt(list.size());
+                int index = level.getRandom().nextInt(list.size());
                 BlockPos pos = list.get(index);
                 mob.setSourcePos(pos);
                 if (!pos.closerThan(mob.blockPosition(),stopDistance)) {

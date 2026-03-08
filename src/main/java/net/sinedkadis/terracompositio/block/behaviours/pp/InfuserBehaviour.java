@@ -37,7 +37,7 @@ public class InfuserBehaviour extends PPOutputBehaviour{
     }
 
     private void trySendToEntity() {
-        ICFEHandler cfeHandler = ((CFEHandlerBehaviour) blockEntity.getBehaviours().get(2)).getCfeHandler();
+        ICFEHandler cfeHandler = ((CFEHandlerBehaviour) blockEntity.getBehaviours().get(2)).getMainHandler();
         if (cfeHandler.getCFE() < 1) return;
 
         scanCompatibleEntities().forEach(livingEntity ->

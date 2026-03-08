@@ -48,7 +48,7 @@ public class CFETrashCanBlockEntity extends TCBlockEntity {
                 }
             }.priority(Integer.MAX_VALUE)
                 .maxCFE(Integer.MAX_VALUE)
-                .limit(10)
+                .range(10)
         );
     }
 

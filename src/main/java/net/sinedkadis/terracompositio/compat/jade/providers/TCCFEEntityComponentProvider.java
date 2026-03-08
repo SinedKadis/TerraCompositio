@@ -11,8 +11,6 @@ import net.sinedkadis.terracompositio.entity.custom.FlowCedarEntEntity;
 import snownee.jade.api.*;
 import snownee.jade.api.config.IPluginConfig;
 
-import java.util.Optional;
-
 public enum TCCFEEntityComponentProvider implements IEntityComponentProvider, IServerDataProvider<EntityAccessor> {
     INSTANCE;
 
@@ -36,8 +34,8 @@ public enum TCCFEEntityComponentProvider implements IEntityComponentProvider, IS
     public void appendServerData(CompoundTag compoundTag, EntityAccessor blockAccessor) {
         Entity entity = blockAccessor.getEntity();
         if (entity instanceof CFENetworkMemberEntity memberBE){
-            Optional<ICFEHandler> cfeHandler = CFENetwork.getCFEHandler(memberBE);
-            cfeHandler.ifPresent(icfeHandler -> compoundTag.putInt("cfe", icfeHandler.getCFE()));
+            ICFEHandler cfeHandler = memberBE.getMainHandler();
+            compoundTag.putInt("cfe", cfeHandler.getCFE());
             if (memberBE instanceof FlowCedarEntEntity flowCedarEntEntity){
                 flowCedarEntEntity.getInnerCFEOptional().ifPresent(icfeHandler -> compoundTag.putInt("inner_cfe", icfeHandler.getCFE()));
             }

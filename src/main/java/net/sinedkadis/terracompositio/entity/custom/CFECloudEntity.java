@@ -37,6 +37,7 @@ public class CFECloudEntity extends Entity implements CFENetworkMemberEntity {
     private static final EntityDataAccessor<Integer> CFE_DATA =
             SynchedEntityData.defineId(CFECloudEntity.class, EntityDataSerializers.INT);
     private int queuedCFE;
+    boolean scheduleUpdate = false;
 
     protected LazyOptional<ICFEHandler> lazyCFEOptional = LazyOptional.of(() -> new LimitlessCFEContainer(this){
         @Override
@@ -179,7 +180,20 @@ public class CFECloudEntity extends Entity implements CFENetworkMemberEntity {
     }
 
     @Override
-    public int getLimit() {
+    public void updateIfScheduled() {
+        if (scheduleUpdate) {
+            scheduleUpdate = false;
+            onCFENetworkMemberUpdate();
+        }
+    }
+
+    @Override
+    public void scheduleMemberUpdate() {
+        scheduleUpdate = true;
+    }
+
+    @Override
+    public int getRange() {
         return (int) (getRadius() + 5);
     }
 

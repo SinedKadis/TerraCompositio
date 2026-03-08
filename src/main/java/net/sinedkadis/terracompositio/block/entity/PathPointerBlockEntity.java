@@ -96,7 +96,7 @@ public class PathPointerBlockEntity extends TCBlockEntity implements Nameable {
                     }
                 })
                 .maxCFE(100)
-                .limit(5)
+                .range(5)
                 );
         list.add(new CollectorBehaviour(this));
         list.add(new EmitterBehaviour(this));

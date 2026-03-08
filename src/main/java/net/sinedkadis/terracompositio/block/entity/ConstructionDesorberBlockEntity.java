@@ -65,7 +65,7 @@ public class ConstructionDesorberBlockEntity extends AbstractDesorberBlockEntity
         CFENetwork network = TerraCompositioAPI.instance().getCFENetworkInstance();
         List<CFENetworkMember> members = network.getAllCFENetworkMembers((Level) level);
         List<ConstructionDesorberBlockEntity> constructors = members.stream()
-                .filter(cfeSource -> Math.sqrt(cfeSource.getPos().distSqr(pos)) < cfeSource.getLimit())
+                .filter(cfeSource -> Math.sqrt(cfeSource.getPos().distSqr(pos)) < cfeSource.getRange())
                 .map(CFENetworkMember::getPos)
                 .map(cfeSourceBlockPos -> {
                     if (level.getBlockEntity(cfeSourceBlockPos) instanceof ConstructionDesorberBlockEntity blockEntity)

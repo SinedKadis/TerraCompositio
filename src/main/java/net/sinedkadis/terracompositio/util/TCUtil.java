@@ -57,6 +57,10 @@ import static net.sinedkadis.terracompositio.registries.TCBlockStateProperties.I
 public class TCUtil {
 
 
+    public static void tryCFETransfer(CFENetworkMember target, CFENetworkMember source) {
+        tryCFETransfer(target, source, TCConfig.CFE_BY_TICK_TRANSFER_LIMIT);
+    }
+
     public static void tryCFETransfer(CFENetworkMember target, CFENetworkMember source, int maxTransfer){
         int taken = source.getMainHandler().takeCFE(maxTransfer,true);
         int added = source.getMainHandler().sendCFE(taken, target.getMainHandler(), true);
@@ -69,7 +73,7 @@ public class TCUtil {
     }
 
     public static void tryCFETransfer(ICFEHandler target, ICFEHandler source) {
-        tryCFETransfer(target, source, target.getFreeSpace());
+        tryCFETransfer(target, source, TCConfig.CFE_BY_TICK_TRANSFER_LIMIT);
     }
 
     public static void tryCFETransfer(ICFEHandler target, ICFEHandler source, int maxTransfer){

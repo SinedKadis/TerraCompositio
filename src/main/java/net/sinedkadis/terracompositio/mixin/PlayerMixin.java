@@ -8,9 +8,14 @@ import net.sinedkadis.terracompositio.api.TCCapabilities;
 import net.sinedkadis.terracompositio.api.networks.cfe.CFENetworkMemberEntity;
 import net.sinedkadis.terracompositio.api.networks.cfe.ICFEHandler;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Unique;
 
+@SuppressWarnings("AddedMixinMembersNamePattern")
 @Mixin(Player.class)
 public class PlayerMixin implements CFENetworkMemberEntity {
+    @Unique
+    boolean scheduleUpdate = false;
+
     @Override
     public Level getLevel() {
         return ((Player)(Object)this).level();
@@ -22,7 +27,20 @@ public class PlayerMixin implements CFENetworkMemberEntity {
     }
 
     @Override
-    public int getLimit() {
+    public void updateIfScheduled() {
+        if (scheduleUpdate){
+            scheduleUpdate = false;
+            onCFENetworkMemberUpdate();
+        }
+    }
+
+    @Override
+    public void scheduleMemberUpdate() {
+        scheduleUpdate = true;
+    }
+
+    @Override
+    public int getRange() {
         return 10;
     }
 

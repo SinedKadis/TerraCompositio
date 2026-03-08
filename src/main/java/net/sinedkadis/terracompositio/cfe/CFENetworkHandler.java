@@ -3,19 +3,12 @@ package net.sinedkadis.terracompositio.cfe;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.common.MinecraftForge;
-import net.sinedkadis.terracompositio.api.TCCapabilities;
 import net.sinedkadis.terracompositio.api.networks.cfe.*;
 import net.sinedkadis.terracompositio.api.networks.NetworkAction;
-import net.sinedkadis.terracompositio.block.entity.PathPointerBlockEntity;
-import net.sinedkadis.terracompositio.entity.custom.CFECloudEntity;
 import net.sinedkadis.terracompositio.events.CFENetworkEvent;
-import net.sinedkadis.terracompositio.registries.TCBlocks;
-import net.sinedkadis.terracompositio.util.TCUtil;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.util.*;
-
-import static net.sinedkadis.terracompositio.util.TCUtil.distSqr;
 
 public class CFENetworkHandler implements CFENetwork {
     public static final CFENetworkHandler instance = new CFENetworkHandler();
@@ -23,82 +16,28 @@ public class CFENetworkHandler implements CFENetwork {
     private final Map<Level, Set<CFENetworkMember>> cfeSources = new WeakHashMap<>();
 
     public void onNetworkEvent(CFENetworkMember source, NetworkAction action) {
-        if (action == NetworkAction.ADD){
+        if (action.equals(NetworkAction.ADD)){
             add(cfeSources,source.getLevel(), source);
-        } else if (action == NetworkAction.REMOVE){
+        } else if (action.equals(NetworkAction.REMOVE)){
             remove(cfeSources,source.getLevel(), source);
-        } else {
+        } else if (action.equals(NetworkAction.UPDATE)){
             networkMemberUpdated(source);
-        }
+        } else throw new RuntimeException("Unknown Network action: "+ action);
     }
 
     public void networkMemberUpdated(CFENetworkMember updated) {
         if (cfeSources.containsKey(updated.getLevel())) {
             cfeSources.get(updated.getLevel()).stream()
-                    .filter(member -> updated.getPos().closerThan(member.getPos(),Math.max(updated.getLimit(),member.getLimit())))
-                    .filter(member -> !updated.getPos().equals(member.getPos()))
-                    .filter(member -> updated.getPriority() < member.getPriority() || member instanceof PathPointerBlockEntity)
-                    .forEach(CFENetworkMember::scheduleMemberUpdate);
+                    //Range check: taken max range between two
+                    .filter(member -> updated.getPos().closerThan(member.getPos(),Math.max(updated.getRange(),member.getRange())))
+                    //Entity check: no self update
+                    .filter(member -> !updated.getEntity().equals(member.getEntity()))
+                    //Priority check: High priority updates low priority
+                    .filter(member -> updated.getPriority() > member.getPriority())
+                    .forEach(cfeNetworkMember -> cfeNetworkMember.scheduleMemberUpdate(updated));
 
         }
 
-    }
-
-    @Override
-    public CFENetworkMember getClosestSourceWithCFE(BlockPos pos, Level level, int limit, @Nullable Integer priority) {
-        if (cfeSources.containsKey(level)) {
-            Set<CFENetworkMember> sources = cfeSources.get(level);
-            long minDist = Long.MAX_VALUE;
-            long limitSquared = (long) limit * limit;
-            CFENetworkMember closest = null;
-
-            for (CFENetworkMember source : sources) {
-                Optional<ICFEHandler> cfeHandlerOptional = Optional.empty();
-                if (source instanceof CFENetworkMemberBE memberBE) {
-                    cfeHandlerOptional = memberBE.getEntity().getCapability(TCCapabilities.CFE).resolve();
-                }
-                if (source instanceof CFENetworkMemberEntity memberE) {
-                    cfeHandlerOptional = memberE.getEntity().getCapability(TCCapabilities.CFE).resolve();
-                    if (source instanceof CFECloudEntity && level.getBlockState(pos).is(TCBlocks.AIR_SATURATOR.get()))
-                        continue;
-                }
-                long distance = distSqr(source.getPos(), pos);
-                if ((distance <= limitSquared || distance < (long) source.getLimit() * source.getLimit())
-                        && distance < minDist
-                        && cfeHandlerOptional.isPresent()
-                        && cfeHandlerOptional.get().getCFE() > 0
-                        && (priority == null || source.getPriority() < priority)) {
-                    minDist = distance;
-                    closest = source;
-                }
-            }
-
-            return closest;
-        }
-        return null;
-    }
-
-    @Override
-    public CFENetworkMember getRandomSourceInRange(BlockPos pos, Level level, int limit, @Nullable Integer priority) {
-        if (cfeSources.containsKey(level)) {
-            long limitSquared = (long) limit * limit;
-            List<CFENetworkMember> sources = new ArrayList<>(cfeSources.get(level));
-            Collections.shuffle(sources);
-            for (CFENetworkMember source : sources) {
-                long distance = TCUtil.distSqr(source.getPos(), pos);
-                Optional<ICFEHandler> fluidHandler = CFENetwork.getCFEHandler(source);
-                int cfe = 0;
-                if (fluidHandler.isPresent()) {
-                    cfe = fluidHandler.get().getCFE();
-                }
-                if (distance <= limitSquared
-                        && cfe > 0
-                        && (priority == null || source.getPriority() < priority)) {
-                    return source;
-                }
-            }
-        }
-        return null;
     }
 
     @Override
@@ -122,26 +61,39 @@ public class CFENetworkHandler implements CFENetwork {
     }
 
     @Override
+    public @Nullable List<CFENetworkMember> getAvailableNetworkTargets(CFENetworkMember source) {
+        Level level = source.getLevel();
+        if (cfeSources.containsKey(level)) {
+            Set<CFENetworkMember> cfeNetworkMembers = cfeSources.get(level);
+            return cfeNetworkMembers.stream()
+                    //Distance check: needs to be in source range
+                    .filter(member -> member.getPos().closerThan(source.getPos(), source.getRange()))
+                    //Priority check: needs to be higher and not zero(inert state)
+                    .filter(member -> member.getPriority() != 0 && member.getPriority() > source.getPriority())
+                    //Space check: needs to have empty space
+                    .filter(member -> member.getMainHandler().getFreeSpace() > 0)
+                    //Entity check: don`t send to itself
+                    .filter(member -> !member.getEntity().equals(source.getEntity()))
+                    .toList();
+        }
+        return List.of();
+    }
+
+    @Override
     public void fireCFENetworkEvent(CFENetworkMember source, NetworkAction action) {
         MinecraftForge.EVENT_BUS.post(new CFENetworkEvent(source,action));
     }
 
     @Override
     public boolean isIn(Level pLevel, ICFEHandler cfeHandler) {
-        return cfeSources.getOrDefault(pLevel, Collections.emptySet()).stream().anyMatch(fluidSource -> {
-            Optional<ICFEHandler> fluidHandler2 = CFENetwork.getCFEHandler(fluidSource);
-            return fluidHandler2.map(iFluidHandler -> iFluidHandler.equals(cfeHandler)).orElse(false);
-        });
+        return cfeSources.getOrDefault(pLevel, Collections.emptySet()).stream()
+                .anyMatch(member -> member.getMainHandler().equals(cfeHandler));
     }
 
     @Override
-    public boolean isIn(Level pLevel, CFENetworkMember cfeHandler) {
-        return cfeSources.getOrDefault(pLevel, Collections.emptySet()).stream().anyMatch(fluidSource -> fluidSource.equals(cfeHandler));
-    }
-
-    @Override
-    public ICFEHandler createCFEHandler(CFENetworkMember entity) {
-        return new CFEContainer(entity);
+    public boolean isIn(Level pLevel, CFENetworkMember networkMember) {
+        return cfeSources.getOrDefault(pLevel, Collections.emptySet()).stream()
+                .anyMatch(member -> member.equals(networkMember));
     }
 
 

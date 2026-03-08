@@ -17,12 +17,14 @@ import net.sinedkadis.terracompositio.api.networks.cfe.*;
 import net.sinedkadis.terracompositio.block.entity.TCBlockEntity;
 import net.sinedkadis.terracompositio.cfe.CFEContainer;
 import net.sinedkadis.terracompositio.compat.jade.JadeTerraCompositioPlugin;
+import net.sinedkadis.terracompositio.util.TCConfig;
 import net.sinedkadis.terracompositio.util.TCUtil;
 import org.jetbrains.annotations.Nullable;
 import snownee.jade.api.ITooltip;
 import snownee.jade.api.config.IPluginConfig;
 
 import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.*;
 import java.util.function.Function;
 
 @Data
@@ -31,21 +33,24 @@ import java.util.function.Function;
 public class CFEHandlerBehaviour implements IBECFEBehaviour {
     private final TCBlockEntity blockEntity;
 
-    protected int limit;
+    protected int range;
     protected int priority;
     protected ICFEHandler cfeHandler = new CFEContainer(this);
     protected LazyOptional<ICFEHandler> lazyCFEOptional = LazyOptional.empty();
 
+    protected boolean scheduledUpdate = false;
+    protected Set<CFENetworkMember> scheduledMembers = new HashSet<>();
+
     public CFEHandlerBehaviour(TCBlockEntity blockEntity) {
         this.blockEntity = blockEntity;
-        this.limit = 5;
+        this.range = 5;
     }
     public CFEHandlerBehaviour maxCFE(int maxCFE) {
         this.cfeHandler.setMaxCFE(maxCFE);
         return this;
     }
-    public CFEHandlerBehaviour limit(int limit) {
-        this.limit = limit;
+    public CFEHandlerBehaviour range(int range) {
+        this.range = range;
         return this;
     }
     public CFEHandlerBehaviour priority(int priority) {
@@ -72,7 +77,7 @@ public class CFEHandlerBehaviour implements IBECFEBehaviour {
         CFENetwork cfeNetworkInstance = TerraCompositioAPI.INSTANCE.getCFENetworkInstance();
         Level pLevel = blockEntity.getLevel();
         if (pLevel == null) return;
-        if (!pLevel.isClientSide && limit != 0) {
+        if (!pLevel.isClientSide && range != 0) {
             boolean inNetwork = cfeNetworkInstance.isIn(pLevel, this);
             if (!inNetwork && !blockEntity.isRemoved()) {
                 cfeNetworkInstance.fireCFENetworkEvent(this, NetworkAction.ADD);
@@ -89,13 +94,28 @@ public class CFEHandlerBehaviour implements IBECFEBehaviour {
 
     @Override
     public void onCFENetworkMemberUpdate() {
-        if (getPriority() >= 0){
-            CFENetwork cfeNetwork = TerraCompositioAPI.instance().getCFENetworkInstance();
-            CFENetworkMember source = cfeNetwork.getClosestSourceWithCFE(getPos(), getLevel(), getLimit(), getPriority());
-            if (source != null) {
-                TCUtil.tryCFETransfer(this, source, Integer.MAX_VALUE);
-            }
+        if (getPriority() < 0 && getMainHandler().getCFE() > 0){
+            sendCFEToAvailableTargets();
         }
+    }
+
+    @Override
+    public void onCFENetworkMemberUpdate(CFENetworkMember updated) {
+        if (getPriority() < 0 && getMainHandler().getCFE() > 0){
+            if (updated.getMainHandler().getFreeSpace() > TCConfig.CFE_BY_TICK_TRANSFER_LIMIT)
+                scheduleMemberUpdate(updated);
+            TCUtil.tryCFETransfer(updated,this);
+        }
+    }
+
+    private void sendCFEToAvailableTargets() {
+        CFENetwork cfeNetwork = TerraCompositioAPI.instance().getCFENetworkInstance();
+        List<CFENetworkMember> targets = cfeNetwork.getAvailableNetworkTargets(this);
+        targets.forEach(target -> {
+            if (target.getMainHandler().getFreeSpace() > TCConfig.CFE_BY_TICK_TRANSFER_LIMIT)
+                scheduleMemberUpdate(target);
+            TCUtil.tryCFETransfer(target, this);
+        });
     }
 
     @Override
@@ -130,7 +150,7 @@ public class CFEHandlerBehaviour implements IBECFEBehaviour {
     public void onAppendServerData(CompoundTag compoundTag) {
         compoundTag.putInt("cfe",getMainHandler().getCFE());
         compoundTag.putInt("priority",getPriority());
-        compoundTag.putInt("limit",getLimit());
+        compoundTag.putInt("limit", getRange());
 
         compoundTag.putInt("max_cfe",getMainHandler().getMaxCFE());
         compoundTag.putInt("queued",getMainHandler().getQueued());
@@ -165,5 +185,25 @@ public class CFEHandlerBehaviour implements IBECFEBehaviour {
     @Override
     public ICFEHandler getMainHandler() {
         return cfeHandler;
+    }
+
+    @Override
+    public void updateIfScheduled() {
+        if (scheduledUpdate) {
+            this.scheduledUpdate = false;
+            this.onCFENetworkMemberUpdate();
+        }
+        Set<CFENetworkMember> scheduledMembers1 = Set.copyOf(this.scheduledMembers);
+        scheduledMembers1.forEach(this::onCFENetworkMemberUpdate);
+    }
+
+    @Override
+    public void scheduleMemberUpdate() {
+        this.scheduledUpdate = true;
+    }
+
+    @Override
+    public void scheduleMemberUpdate(CFENetworkMember updated) {
+        this.scheduledMembers.add(updated);
     }
 }

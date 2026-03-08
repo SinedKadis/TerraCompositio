@@ -76,12 +76,12 @@ public class CFEExtractGoal extends Goal {
         BlockPos blockPos = mob.getSourcePos();
         CFENetworkMember memberAt = TerraCompositioAPI.instance().getCFENetworkInstance().getMemberAt(level, blockPos);
         boolean valid = blockPos != null
-                && blockPos.closerThan(mob.blockPosition(), mob.getLimit())
+                && blockPos.closerThan(mob.blockPosition(), mob.getRange())
                 && memberAt != null
-                && CFENetwork.getCFEHandler(memberAt).filter(icfeHandler -> icfeHandler.getCFE() > 0).isPresent();
+                && Optional.of(memberAt.getMainHandler()).filter(icfeHandler -> icfeHandler.getCFE() > 0).isPresent();
         if (blockPos != null) {
             valid |= level.getBlockState(blockPos).is(TCTags.Blocks.FLOW_CEDAR_LOGS)
-                    && blockPos.closerThan(mob.blockPosition(), mob.getLimit());
+                    && blockPos.closerThan(mob.blockPosition(), mob.getRange());
         }
         if (valid){
             boolean targetIsEnt = memberAt instanceof FlowCedarEntEntity;
