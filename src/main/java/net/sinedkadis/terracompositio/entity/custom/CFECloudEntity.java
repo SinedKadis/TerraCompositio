@@ -19,15 +19,21 @@ import net.sinedkadis.terracompositio.api.dummies.DummyCFEHandler;
 import net.sinedkadis.terracompositio.api.networks.NetworkAction;
 import net.sinedkadis.terracompositio.api.TCCapabilities;
 import net.sinedkadis.terracompositio.api.networks.cfe.CFENetwork;
+import net.sinedkadis.terracompositio.api.networks.cfe.CFENetworkMember;
 import net.sinedkadis.terracompositio.api.networks.cfe.CFENetworkMemberEntity;
 import net.sinedkadis.terracompositio.api.networks.cfe.ICFEHandler;
 import net.sinedkadis.terracompositio.cfe.LimitlessCFEContainer;
 import net.sinedkadis.terracompositio.cfe.burst.CFEBurstProjectileEntity;
+import net.sinedkadis.terracompositio.config.TCCommonConfigs;
 import net.sinedkadis.terracompositio.registries.TCEntities;
-import net.sinedkadis.terracompositio.util.TCConfig;
+import net.sinedkadis.terracompositio.util.TCUtil;
 import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.function.ToIntFunction;
 
 // /kill @e[type=terracompositio:cfe_cloud_entity]
 
@@ -38,6 +44,9 @@ public class CFECloudEntity extends Entity implements CFENetworkMemberEntity {
             SynchedEntityData.defineId(CFECloudEntity.class, EntityDataSerializers.INT);
     private int queuedCFE;
     boolean scheduleUpdate = false;
+    protected Set<CFENetworkMember> scheduledMembers = new HashSet<>();
+    protected int scheduledMembersUpdate = -1;
+
 
     protected LazyOptional<ICFEHandler> lazyCFEOptional = LazyOptional.of(() -> new LimitlessCFEContainer(this){
         @Override
@@ -84,6 +93,28 @@ public class CFECloudEntity extends Entity implements CFENetworkMemberEntity {
         }
     });
 
+    @Override
+    public void onCFENetworkMemberUpdate() {
+        if (getPriority() < 0 && getMainHandler().getCFE() > 0){
+            CFENetwork cfeNetwork = TerraCompositioAPI.instance().getCFENetworkInstance();
+            List<CFENetworkMember> targets = cfeNetwork.getAvailableNetworkTargets(this);
+            targets.forEach(target -> {
+                if (target.getMainHandler().getFreeSpace() > TCCommonConfigs.CFE_PER_TICK_TRANSFER_LIMIT.get())
+                    scheduleMemberUpdate(target);
+                TCUtil.tryCFETransfer(target, this);
+            });
+        }
+    }
+
+    @Override
+    public void onCFENetworkMemberUpdate(CFENetworkMember updated) {
+        if (getPriority() < 0 && getMainHandler().getCFE() > 0 && TCUtil.validMember(updated)){
+            if (updated.getMainHandler().getFreeSpace() > TCCommonConfigs.CFE_PER_TICK_TRANSFER_LIMIT.get())
+                scheduleMemberUpdate(updated);
+            TCUtil.tryCFETransfer(updated,this);
+        }
+    }
+
     private Vec3 getBurstOffset(ICFEHandler target) {
         double r = getRadius();
         BlockPos sourcePos = this.getPos();
@@ -92,8 +123,10 @@ public class CFECloudEntity extends Entity implements CFENetworkMemberEntity {
         return sourcePos.getCenter().vectorTo(targetPos.getCenter()).normalize().scale(r);
     }
 
+    public static final ToIntFunction<Integer> RENDER_COUNT_FUNCTION = cfe ->
+            (int) Math.ceil(cfe * 0.1f);
     private double getRadius() {
-        int cfe = TCConfig.RENDER_COUNT_FUNCTION.applyAsInt(getSyncedCFE());
+        int cfe = RENDER_COUNT_FUNCTION.applyAsInt(getSyncedCFE());
         float k = (float) Math.log10(cfe);
         double baseRadius = 0.2 + 0.3 * Math.log1p(cfe * 0.1);
         return baseRadius * k;
@@ -182,14 +215,27 @@ public class CFECloudEntity extends Entity implements CFENetworkMemberEntity {
     @Override
     public void updateIfScheduled() {
         if (scheduleUpdate) {
-            scheduleUpdate = false;
-            onCFENetworkMemberUpdate();
+            this.scheduleUpdate = false;
+            this.onCFENetworkMemberUpdate();
         }
+        if (scheduledMembersUpdate == 0) {
+            scheduledMembersUpdate = -1;
+            Set<CFENetworkMember> scheduledMembers1 = Set.copyOf(this.scheduledMembers);
+            this.scheduledMembers.clear();
+            scheduledMembers1.forEach(this::onCFENetworkMemberUpdate);
+        } else if (scheduledMembersUpdate > 0)
+            scheduledMembersUpdate--;
+
     }
 
     @Override
     public void scheduleMemberUpdate() {
         scheduleUpdate = true;
+    }
+    @Override
+    public void scheduleMemberUpdate(CFENetworkMember updated) {
+        this.scheduledMembers.add(updated);
+        if (scheduledMembersUpdate < 0) scheduledMembersUpdate = 5;
     }
 
     @Override

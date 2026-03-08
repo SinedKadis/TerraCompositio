@@ -12,10 +12,11 @@ import net.minecraft.util.Mth;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.sinedkadis.terracompositio.TerraCompositio;
-import net.sinedkadis.terracompositio.util.TCConfig;
+import net.sinedkadis.terracompositio.config.TCInnerConfig;
 import net.sinedkadis.terracompositio.util.TCUtil;
 import org.joml.Vector3f;
 
+import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 
 @OnlyIn(Dist.CLIENT)
@@ -23,7 +24,6 @@ import javax.annotation.ParametersAreNonnullByDefault;
 @ParametersAreNonnullByDefault
 public class CFEBurstRenderer extends EntityRenderer<CFEBurstProjectileEntity> {
     private static final float MIN_CAMERA_DISTANCE_SQUARED = 12.25F;
-    private Vector3f[] offsets;
 
     public CFEBurstRenderer(EntityRendererProvider.Context pContext) {
         super(pContext);
@@ -33,29 +33,31 @@ public class CFEBurstRenderer extends EntityRenderer<CFEBurstProjectileEntity> {
         int tickCount = pEntity.tickCount;
         if (tickCount >= 1 || !(this.entityRenderDispatcher.camera.getEntity().distanceToSqr(pEntity) < MIN_CAMERA_DISTANCE_SQUARED)) {
             int cfe = pEntity.getCFE();
-            int count = TCConfig.RENDER_COUNT_FUNCTION.applyAsInt(cfe);
-            if (offsets == null || offsets.length < count) genOffsets(pEntity);
-            assert offsets != null;
+            int count = TCInnerConfig.RENDER_COUNT_FUNCTION.applyAsInt(cfe);
+            Vector3f[] offsets1 = getOffsets(pEntity);
+            if (offsets1 == null || offsets1.length < count) genOffsets(pEntity);
+            offsets1 = getOffsets(pEntity);
+            assert offsets1 != null;
             var renderType = RenderType.entityTranslucentEmissive(getTextureLocation(pEntity));
             var buffer = pBuffer.getBuffer(renderType);
 
             boolean isEnd = tickCount >= 60;
-            float pDelta = (float) (tickCount-60)/40f;
+            float pDelta = (float) (tickCount - 60) / 40f;
 
             for (int i = 0; i < count; i++) {
 
                 pPoseStack.pushPose();
 
-                var offset = offsets[i];
+                var offset = offsets1[i];
                 float oX = offset.x();
                 float oY = offset.y();
                 float oZ = offset.z();
 
                 if (isEnd) {
                     pPoseStack.translate(
-                            Mth.lerp(pDelta,oX,-oX*0.1f),
-                            Mth.lerp(pDelta,oY,-oY*0.1f),
-                            Mth.lerp(pDelta,oZ,-oZ*0.1f)
+                            Mth.lerp(pDelta, oX, -oX * 0.1f),
+                            Mth.lerp(pDelta, oY, -oY * 0.1f),
+                            Mth.lerp(pDelta, oZ, -oZ * 0.1f)
                     );
                 } else {
                     pPoseStack.translate(oX, oY, oZ);
@@ -73,12 +75,14 @@ public class CFEBurstRenderer extends EntityRenderer<CFEBurstProjectileEntity> {
 
     private void genOffsets(CFEBurstProjectileEntity entity) {
         int cfe = entity.getCFE();
-        float count = TCConfig.RENDER_COUNT_FUNCTION.applyAsInt(cfe);
-        if (offsets == null || offsets.length < count) {
-            offsets = new Vector3f[(int) Math.ceil(count)];
+        float count = TCInnerConfig.RENDER_COUNT_FUNCTION.applyAsInt(cfe);
+        Vector3f[] offsets1 = getOffsets(entity);
+        if (offsets1 == null || offsets1.length < count) {
+            offsets1 = new Vector3f[(int) Math.ceil(count)];
             for (int i = 0; i < count; i++) {
-                offsets[i] = TCUtil.getSpreadParticleOffset(entity.level().random, (int) (count)).toVector3f();
+                offsets1[i] = TCUtil.getSpreadParticleOffset(entity.level().random, (int) (count)).toVector3f();
             }
+            setOffsets(entity,offsets1);
         }
     }
 
@@ -88,5 +92,14 @@ public class CFEBurstRenderer extends EntityRenderer<CFEBurstProjectileEntity> {
      */
     public ResourceLocation getTextureLocation(CFEBurstProjectileEntity pEntity) {
         return TerraCompositio.modLoc("textures/particle/cfe_particle.png");
+    }
+
+    @Nullable
+    public Vector3f[] getOffsets(CFEBurstProjectileEntity pEntity) {
+        return pEntity.getOffsets();
+    }
+
+    public void setOffsets(CFEBurstProjectileEntity pEntity,Vector3f[] offsets) {
+        pEntity.setOffsets(offsets);
     }
 }

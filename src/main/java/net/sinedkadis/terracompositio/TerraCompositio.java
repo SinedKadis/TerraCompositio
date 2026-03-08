@@ -8,10 +8,13 @@ import net.minecraftforge.event.BuildCreativeModeTabContentsEvent;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.sinedkadis.terracompositio.compat.CompatUtils;
 import net.sinedkadis.terracompositio.compat.ISoftCompat;
+import net.sinedkadis.terracompositio.config.TCClientConfigs;
+import net.sinedkadis.terracompositio.config.TCCommonConfigs;
 import net.sinedkadis.terracompositio.events.FluidNetworkEvent;
 import net.sinedkadis.terracompositio.network.TCPackets;
 import net.sinedkadis.terracompositio.registries.*;
@@ -39,10 +42,9 @@ public class TerraCompositio
     public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
     public static ISoftCompat createCompat;
 
-    public TerraCompositio() {
+    public TerraCompositio(FMLJavaModLoadingContext context) {
 
-        @SuppressWarnings("removal")
-        IEventBus modEventBus = FMLJavaModLoadingContext.get().getModEventBus();
+        IEventBus modEventBus = context.getModEventBus();
         modEventBus.addListener(this::commonSetup);
         modEventBus.addListener(this::addCreative);
 
@@ -77,6 +79,9 @@ public class TerraCompositio
                 throw new RuntimeException("Failed to load Create compat", e);
             }
         }
+
+        context.registerConfig(ModConfig.Type.CLIENT, TCClientConfigs.SPEC, "terracompositio-client.toml");
+        context.registerConfig(ModConfig.Type.COMMON, TCCommonConfigs.SPEC, "terracompositio-common.toml");
 
 
     }

@@ -40,6 +40,7 @@ import net.sinedkadis.terracompositio.block.custom.FlowCedarLikeBlock;
 
 
 import net.sinedkadis.terracompositio.block.entity.TCBlockEntity;
+import net.sinedkadis.terracompositio.config.TCCommonConfigs;
 import net.sinedkadis.terracompositio.entity.custom.CFECloudEntity;
 import net.sinedkadis.terracompositio.particle.CFEParticleData;
 import net.sinedkadis.terracompositio.particle.FluidParticleData;
@@ -58,10 +59,12 @@ public class TCUtil {
 
 
     public static void tryCFETransfer(CFENetworkMember target, CFENetworkMember source) {
-        tryCFETransfer(target, source, TCConfig.CFE_BY_TICK_TRANSFER_LIMIT);
+        tryCFETransfer(target, source, TCCommonConfigs.CFE_PER_TICK_TRANSFER_LIMIT.get());
     }
 
     public static void tryCFETransfer(CFENetworkMember target, CFENetworkMember source, int maxTransfer){
+        if (!validMember(target)) return;
+        if (!validMember(source)) return;
         int taken = source.getMainHandler().takeCFE(maxTransfer,true);
         int added = source.getMainHandler().sendCFE(taken, target.getMainHandler(), true);
 
@@ -72,8 +75,18 @@ public class TCUtil {
 
     }
 
+    public static boolean validMember(CFENetworkMember target) {
+        if (target instanceof CFENetworkMemberBE memberBE) {
+            return !memberBE.getEntity().isRemoved();
+        }
+        if (target instanceof CFENetworkMemberEntity memberEntity) {
+            return !memberEntity.getEntity().isRemoved();
+        }
+        return false;
+    }
+
     public static void tryCFETransfer(ICFEHandler target, ICFEHandler source) {
-        tryCFETransfer(target, source, TCConfig.CFE_BY_TICK_TRANSFER_LIMIT);
+        tryCFETransfer(target, source, TCCommonConfigs.CFE_PER_TICK_TRANSFER_LIMIT.get());
     }
 
     public static void tryCFETransfer(ICFEHandler target, ICFEHandler source, int maxTransfer){

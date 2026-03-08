@@ -30,8 +30,11 @@ public class CFETrashCanBlockEntity extends TCBlockEntity {
                     TerraCompositioAPI.instance().getCFENetworkInstance().getAllCFENetworkMembers(level).stream()
                             .filter(cfeNetworkMemberBE -> TCUtil.distSqr(cfeNetworkMemberBE.getPos(),worldPosition) <= 100)
                             .filter(cfeNetworkMemberBE -> {
-                                if (cfeNetworkMemberBE instanceof CFENetworkMemberBE cfeNetworkMemberBE1)
-                                    return !(cfeNetworkMemberBE1.getEntity() instanceof CreativeCFESourceBlockEntity);
+                                if (cfeNetworkMemberBE instanceof CFENetworkMemberBE cfeNetworkMemberBE1) {
+                                    boolean notCreativeSource = !(cfeNetworkMemberBE1.getEntity() instanceof CreativeCFESourceBlockEntity);
+                                    boolean notCreativeBin = !(cfeNetworkMemberBE1.getEntity() instanceof CFETrashCanBlockEntity);
+                                    return notCreativeSource && notCreativeBin;
+                                }
                                 return true;
                             })
                             .filter(cfeNetworkMemberBE -> {

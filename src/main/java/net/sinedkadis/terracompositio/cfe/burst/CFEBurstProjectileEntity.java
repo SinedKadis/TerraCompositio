@@ -1,5 +1,7 @@
 package net.sinedkadis.terracompositio.cfe.burst;
 
+import lombok.Getter;
+import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
@@ -29,6 +31,7 @@ import net.sinedkadis.terracompositio.block.entity.TCBlockEntity;
 import net.sinedkadis.terracompositio.entity.custom.CFECloudEntity;
 import net.sinedkadis.terracompositio.registries.TCEntities;
 import net.sinedkadis.terracompositio.registries.TCItems;
+import org.joml.Vector3f;
 
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -46,6 +49,10 @@ public class CFEBurstProjectileEntity extends ThrowableProjectile {
     private float cfeTravelSpeed;
     private final BlockPos.MutableBlockPos lastBP = new BlockPos.MutableBlockPos();
     private int timeToLive = 100;
+
+    @Getter
+    @Setter
+    Vector3f[] offsets = null;
 
     public CFEBurstProjectileEntity(EntityType<? extends ThrowableProjectile> pEntityType, Level pLevel) {
         super(pEntityType, pLevel);

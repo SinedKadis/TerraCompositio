@@ -17,7 +17,7 @@ import net.sinedkadis.terracompositio.api.networks.cfe.*;
 import net.sinedkadis.terracompositio.block.entity.TCBlockEntity;
 import net.sinedkadis.terracompositio.cfe.CFEContainer;
 import net.sinedkadis.terracompositio.compat.jade.JadeTerraCompositioPlugin;
-import net.sinedkadis.terracompositio.util.TCConfig;
+import net.sinedkadis.terracompositio.config.TCCommonConfigs;
 import net.sinedkadis.terracompositio.util.TCUtil;
 import org.jetbrains.annotations.Nullable;
 import snownee.jade.api.ITooltip;
@@ -39,6 +39,7 @@ public class CFEHandlerBehaviour implements IBECFEBehaviour {
     protected LazyOptional<ICFEHandler> lazyCFEOptional = LazyOptional.empty();
 
     protected boolean scheduledUpdate = false;
+    protected int scheduledMembersUpdate = -1;
     protected Set<CFENetworkMember> scheduledMembers = new HashSet<>();
 
     public CFEHandlerBehaviour(TCBlockEntity blockEntity) {
@@ -95,27 +96,23 @@ public class CFEHandlerBehaviour implements IBECFEBehaviour {
     @Override
     public void onCFENetworkMemberUpdate() {
         if (getPriority() < 0 && getMainHandler().getCFE() > 0){
-            sendCFEToAvailableTargets();
+            CFENetwork cfeNetwork = TerraCompositioAPI.instance().getCFENetworkInstance();
+            List<CFENetworkMember> targets = cfeNetwork.getAvailableNetworkTargets(this);
+            targets.forEach(target -> {
+                if (target.getMainHandler().getFreeSpace() > TCCommonConfigs.CFE_PER_TICK_TRANSFER_LIMIT.get())
+                    scheduleMemberUpdate(target);
+                TCUtil.tryCFETransfer(target, this);
+            });
         }
     }
 
     @Override
     public void onCFENetworkMemberUpdate(CFENetworkMember updated) {
-        if (getPriority() < 0 && getMainHandler().getCFE() > 0){
-            if (updated.getMainHandler().getFreeSpace() > TCConfig.CFE_BY_TICK_TRANSFER_LIMIT)
+        if (getPriority() < 0 && getMainHandler().getCFE() > 0 && TCUtil.validMember(updated)){
+            if (updated.getMainHandler().getFreeSpace() > TCCommonConfigs.CFE_PER_TICK_TRANSFER_LIMIT.get())
                 scheduleMemberUpdate(updated);
             TCUtil.tryCFETransfer(updated,this);
         }
-    }
-
-    private void sendCFEToAvailableTargets() {
-        CFENetwork cfeNetwork = TerraCompositioAPI.instance().getCFENetworkInstance();
-        List<CFENetworkMember> targets = cfeNetwork.getAvailableNetworkTargets(this);
-        targets.forEach(target -> {
-            if (target.getMainHandler().getFreeSpace() > TCConfig.CFE_BY_TICK_TRANSFER_LIMIT)
-                scheduleMemberUpdate(target);
-            TCUtil.tryCFETransfer(target, this);
-        });
     }
 
     @Override
@@ -193,8 +190,14 @@ public class CFEHandlerBehaviour implements IBECFEBehaviour {
             this.scheduledUpdate = false;
             this.onCFENetworkMemberUpdate();
         }
-        Set<CFENetworkMember> scheduledMembers1 = Set.copyOf(this.scheduledMembers);
-        scheduledMembers1.forEach(this::onCFENetworkMemberUpdate);
+        if (scheduledMembersUpdate == 0) {
+            scheduledMembersUpdate = -1;
+            Set<CFENetworkMember> scheduledMembers1 = Set.copyOf(this.scheduledMembers);
+            this.scheduledMembers.clear();
+            scheduledMembers1.forEach(this::onCFENetworkMemberUpdate);
+        } else if (scheduledMembersUpdate > 0)
+            scheduledMembersUpdate--;
+
     }
 
     @Override
@@ -205,5 +208,6 @@ public class CFEHandlerBehaviour implements IBECFEBehaviour {
     @Override
     public void scheduleMemberUpdate(CFENetworkMember updated) {
         this.scheduledMembers.add(updated);
+        if (scheduledMembersUpdate < 0) scheduledMembersUpdate = 5;
     }
 }
