@@ -26,6 +26,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Mod.EventBusSubscriber(modid = TerraCompositio.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
@@ -63,7 +64,7 @@ public class ConstructionDesorberBlockEntity extends AbstractDesorberBlockEntity
         LevelAccessor level = event.getLevel();
 
         CFENetwork network = TerraCompositioAPI.instance().getCFENetworkInstance();
-        List<CFENetworkMember> members = network.getAllCFENetworkMembers((Level) level);
+        Set<CFENetworkMember> members = network.getAllCFENetworkMembers((Level) level);
         List<ConstructionDesorberBlockEntity> constructors = members.stream()
                 .filter(cfeSource -> Math.sqrt(cfeSource.getPos().distSqr(pos)) < cfeSource.getRange())
                 .map(CFENetworkMember::getPos)
@@ -107,7 +108,7 @@ public class ConstructionDesorberBlockEntity extends AbstractDesorberBlockEntity
         BlockPos pos = event.getPos();
         LevelAccessor level = event.getLevel();
         CFENetwork network = TerraCompositioAPI.instance().getCFENetworkInstance();
-        List<CFENetworkMember> sources = network.getAllCFENetworkMembers((Level) level);
+        Set<CFENetworkMember> sources = network.getAllCFENetworkMembers((Level) level);
         List<ConstructionDesorberBlockEntity> constructors = sources.stream()
                 .map(CFENetworkMember::getPos)
                 .filter(cfeSourceBlockPos -> Math.sqrt(cfeSourceBlockPos.distSqr(pos)) < 7)

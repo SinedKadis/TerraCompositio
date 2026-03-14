@@ -9,9 +9,10 @@ import net.sinedkadis.terracompositio.events.CFENetworkEvent;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public class CFENetworkHandler implements CFENetwork {
-    public static final CFENetworkHandler instance = new CFENetworkHandler();
+    public static final CFENetworkHandler INSTANCE = new CFENetworkHandler();
 
     private final Map<Level, Set<CFENetworkMember>> cfeSources = new WeakHashMap<>();
 
@@ -22,7 +23,7 @@ public class CFENetworkHandler implements CFENetwork {
             remove(cfeSources,source.getLevel(), source);
         } else if (action.equals(NetworkAction.UPDATE)){
             networkMemberUpdated(source);
-        } else throw new RuntimeException("Unknown Network action: "+ action);
+        } else throw new RuntimeException("Unsupported Network action: "+ action);
     }
 
     public void networkMemberUpdated(CFENetworkMember updated) {
@@ -53,30 +54,36 @@ public class CFENetworkHandler implements CFENetwork {
     }
 
     @Override
-    public List<CFENetworkMember> getAllCFENetworkMembers(Level level) {
+    public Set<CFENetworkMember> getAllCFENetworkMembers(Level level) {
         if (cfeSources.containsKey(level)) {
-            return cfeSources.get(level).stream().toList();
+            return cfeSources.get(level);
         }
-        return List.of();
+        return Set.of();
     }
 
     @Override
-    public @Nullable List<CFENetworkMember> getAvailableNetworkTargets(CFENetworkMember source) {
-        Level level = source.getLevel();
-        if (cfeSources.containsKey(level)) {
-            Set<CFENetworkMember> cfeNetworkMembers = cfeSources.get(level);
+    public Set<CFENetworkMember> getAvailableNetworkTargets(CFENetworkMember source) {
+        return getAvailableNetworkTargets(source.getLevel(),source.getPos(),source.getRange(),source.getPriority(),source.getEntity());
+    }
+    public Set<CFENetworkMember> getAvailableNetworkTargets(Level sourceLevel,
+                                                                       BlockPos sourcePos,
+                                                                       int sourceRange,
+                                                                       int sourcePriority,
+                                                                       Object sourceEntity) {
+        if (cfeSources.containsKey(sourceLevel)) {
+            Set<CFENetworkMember> cfeNetworkMembers = cfeSources.get(sourceLevel);
             return cfeNetworkMembers.stream()
                     //Distance check: needs to be in source range
-                    .filter(member -> member.getPos().closerThan(source.getPos(), source.getRange()))
-                    //Priority check: needs to be higher and not zero(inert state)
-                    .filter(member -> member.getPriority() != 0 && member.getPriority() > source.getPriority())
+                    .filter(member -> member.getPos().closerThan(sourcePos, sourceRange))
+                    //Priority check: needs to be higher
+                    .filter(member -> member.getPriority() > sourcePriority)
                     //Space check: needs to have empty space
-                    .filter(member -> member.getMainHandler().getFreeSpace() > 0)
+                    //.filter(member -> member.getMainHandler().getFreeSpace() > 0)
                     //Entity check: don`t send to itself
-                    .filter(member -> !member.getEntity().equals(source.getEntity()))
-                    .toList();
+                    .filter(member -> !member.getEntity().equals(sourceEntity))
+                    .collect(Collectors.toSet());
         }
-        return List.of();
+        return Set.of();
     }
 
     @Override

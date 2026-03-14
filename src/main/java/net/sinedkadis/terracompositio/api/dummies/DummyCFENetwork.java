@@ -8,7 +8,7 @@ import net.sinedkadis.terracompositio.api.networks.cfe.CFENetworkMember;
 import net.sinedkadis.terracompositio.api.networks.cfe.ICFEHandler;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-import java.util.List;
+import java.util.Set;
 
 public class DummyCFENetwork implements CFENetwork {
     public static final DummyCFENetwork instance = new DummyCFENetwork();
@@ -20,13 +20,13 @@ public class DummyCFENetwork implements CFENetwork {
     }
 
     @Override
-    public List<CFENetworkMember> getAvailableNetworkTargets(CFENetworkMember sender) {
-        return List.of();
+    public Set<CFENetworkMember> getAvailableNetworkTargets(CFENetworkMember sender) {
+        return Set.of();
     }
 
     @Override
-    public List<CFENetworkMember> getAllCFENetworkMembers(Level level) {
-        return List.of();
+    public Set<CFENetworkMember> getAllCFENetworkMembers(Level level) {
+        return Set.of();
     }
 
     @Override

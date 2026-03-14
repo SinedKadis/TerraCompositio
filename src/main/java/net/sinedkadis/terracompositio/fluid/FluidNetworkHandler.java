@@ -16,7 +16,7 @@ import net.sinedkadis.terracompositio.util.TCUtil;
 import java.util.*;
 
 public class FluidNetworkHandler implements FluidNetwork {
-    public static final FluidNetworkHandler instance = new FluidNetworkHandler();
+    public static final FluidNetworkHandler INSTANCE = new FluidNetworkHandler();
 
     private final Map<Level, Set<FluidNetworkMemberBE>> fluidSources = new WeakHashMap<>();
 

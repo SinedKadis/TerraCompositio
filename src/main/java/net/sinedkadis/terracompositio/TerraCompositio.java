@@ -11,11 +11,13 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.sinedkadis.terracompositio.cfe.pp_network.PathPointerNetwork;
 import net.sinedkadis.terracompositio.compat.CompatUtils;
 import net.sinedkadis.terracompositio.compat.ISoftCompat;
 import net.sinedkadis.terracompositio.config.TCClientConfigs;
 import net.sinedkadis.terracompositio.config.TCCommonConfigs;
 import net.sinedkadis.terracompositio.events.FluidNetworkEvent;
+import net.sinedkadis.terracompositio.events.PPNetworkEvent;
 import net.sinedkadis.terracompositio.network.TCPackets;
 import net.sinedkadis.terracompositio.registries.*;
 import net.sinedkadis.terracompositio.cfe.CFENetworkHandler;
@@ -89,8 +91,9 @@ public class TerraCompositio
 
     private void commonSetup(final FMLCommonSetupEvent event) {
         IEventBus bus = MinecraftForge.EVENT_BUS;
-        bus.addListener((CFENetworkEvent e) -> CFENetworkHandler.instance.onNetworkEvent(e.getSource(),e.getAction()));
-        bus.addListener((FluidNetworkEvent e) -> FluidNetworkHandler.instance.onNetworkEvent(e.getSource(),e.getAction()));
+        bus.addListener((CFENetworkEvent e) -> CFENetworkHandler.INSTANCE.onNetworkEvent(e.getSource(),e.getAction()));
+        bus.addListener((FluidNetworkEvent e) -> FluidNetworkHandler.INSTANCE.onNetworkEvent(e.getSource(),e.getAction()));
+        bus.addListener((PPNetworkEvent e) -> PathPointerNetwork.INSTANCE.onNetworkEvent(e.getEmitterAndCollector(),e.getAction()));
         TCPackets.register();
         if (CompatUtils.CREATE_EXISTENCE.get())
             createCompat.commonInit();

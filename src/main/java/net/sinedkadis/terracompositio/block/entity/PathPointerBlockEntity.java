@@ -1,5 +1,6 @@
 package net.sinedkadis.terracompositio.block.entity;
 
+import com.mojang.datafixers.util.Pair;
 import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
@@ -18,14 +19,18 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
+import net.sinedkadis.terracompositio.api.TerraCompositioAPI;
 import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBEBehaviour;
-import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBECFEBehaviour;
-import net.sinedkadis.terracompositio.block.behaviours.CFEHandlerBehaviour;
+import net.sinedkadis.terracompositio.api.networks.NetworkAction;
+import net.sinedkadis.terracompositio.api.networks.cfe.CFENetwork;
+import net.sinedkadis.terracompositio.api.networks.cfe.CFENetworkMember;
+import net.sinedkadis.terracompositio.api.networks.cfe.ICFEHandler;
 import net.sinedkadis.terracompositio.block.behaviours.pp.*;
 import net.sinedkadis.terracompositio.block.custom.PathPointerBlock;
-import net.sinedkadis.terracompositio.cfe.CFEContainer;
+import net.sinedkadis.terracompositio.cfe.pp_network.PathPointerNetwork;
 import net.sinedkadis.terracompositio.registries.TCBlockEntities;
 import net.sinedkadis.terracompositio.util.TCUtil;
 import org.jetbrains.annotations.NotNull;
@@ -33,10 +38,11 @@ import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.*;
+import java.util.stream.Collectors;
 
 @Slf4j
 @ParametersAreNonnullByDefault
-public class PathPointerBlockEntity extends TCBlockEntity implements Nameable {
+public class PathPointerBlockEntity extends TCBlockEntity implements Nameable, CFENetworkMember {
 
     private static final String bindPosTag = "BindPos";
 
@@ -59,45 +65,6 @@ public class PathPointerBlockEntity extends TCBlockEntity implements Nameable {
 
     @Override
     public void addBEBehaviours(List<IBEBehaviour> list) {
-        list.add(new CFEHandlerBehaviour(this){
-            @Override
-            public int getPriority() {
-                if (parts.contains(PPPart.EMITTER) && parts.contains(PPPart.COLLECTOR)) return 0;
-                if (parts.contains(PPPart.EMITTER)) return -100;
-                if (parts.contains(PPPart.COLLECTOR)) return 100;
-                return 0;
-            }
-
-            @Override
-            public boolean isActive() {
-                return !(parts.contains(PPPart.SENDER) && parts.contains(PPPart.RECEIVER));
-            }
-
-            @Override
-            public void scheduleMemberUpdate() {
-                super.scheduleMemberUpdate();
-                setPpUpdateScheduled(true);
-            }
-        }
-                .cfeHandler(cfeHandlerBehaviour -> new CFEContainer(cfeHandlerBehaviour){
-                    @Override
-                    public float getCfeTravelSpeed() {
-                        if (parts.contains(PPPart.RECEIVER)) return 5/20f;
-                        return 1/20f;
-                    }
-
-                    @Override
-                    public int addCFE(int cfe, boolean simulate) {
-                        int added = super.addCFE(cfe, simulate);
-                        if (parts.contains(PPPart.COLLECTOR)) {
-                            setPpUpdateScheduled(true);
-                        }
-                        return added;
-                    }
-                })
-                .maxCFE(100)
-                .range(5)
-                );
         list.add(new CollectorBehaviour(this));
         list.add(new EmitterBehaviour(this));
         list.add(new ExtractorBehaviour(this));
@@ -109,8 +76,19 @@ public class PathPointerBlockEntity extends TCBlockEntity implements Nameable {
     @Override
     public void tick(Level pLevel, BlockPos pPos, BlockState pState) {
         super.tick(pLevel, pPos, pState);
+        CFENetwork cfeNetworkInstance = TerraCompositioAPI.INSTANCE.getCFENetworkInstance();
+        if (!pLevel.isClientSide) {
+            boolean inCFENetwork = cfeNetworkInstance.isIn(pLevel, this);
+            if (!inCFENetwork && !this.isRemoved()) {
+                cfeNetworkInstance.fireCFENetworkEvent(this, NetworkAction.ADD);
+            }
+        }
         if (updateScheduled) {
             updateScheduled = false;
+            if (parts.contains(PPPart.COLLECTOR)) {
+                BlockPos emitterPos = CollectorBehaviour.getEmitter(this);
+                if (emitterPos == null) updatePPNetwork(this);
+            }
             setChanged();
             pLevel.sendBlockUpdated(worldPosition,getBlockState(),getBlockState(),3);
         }
@@ -120,6 +98,12 @@ public class PathPointerBlockEntity extends TCBlockEntity implements Nameable {
                     .filter(IBEBehaviour::isActive)
                     .forEach(IBEBehaviour::onUpdate);
         }
+    }
+
+    @Override
+    public void setRemoved() {
+        TerraCompositioAPI.INSTANCE.getCFENetworkInstance().fireCFENetworkEvent(this, NetworkAction.REMOVE);
+        super.setRemoved();
     }
 
     public static boolean ppWrenchInteraction(@Nullable Player pPlayer, LevelAccessor level, BlockPos clickedPos, ItemStack wrenchStack) {
@@ -191,6 +175,8 @@ public class PathPointerBlockEntity extends TCBlockEntity implements Nameable {
             }
         }
 
+
+
         storedPPBE.setChanged();
         clickedPPBE.setChanged();
 
@@ -238,7 +224,59 @@ public class PathPointerBlockEntity extends TCBlockEntity implements Nameable {
 
         setYawAndPitchFromRot(rotOutput, secondPPBE);
         ReceiverBehaviour.setSenderPoses(secondPPBE,senderPosesCopy);
+
+        updatePPNetwork(firstPPBE);
         return true;
+    }
+
+    public static void updatePPNetwork(PathPointerBlockEntity pathPointerBlockEntity) {
+        Level level = pathPointerBlockEntity.getLevel();
+        if (level != null) {
+            Queue<PathPointerBlockEntity> queue = new LinkedList<>();
+            queue.add(pathPointerBlockEntity);
+            while (!queue.isEmpty()) {
+                PathPointerBlockEntity current = queue.poll();
+                if (current.parts.contains(PPPart.EMITTER)) {
+                    Set<PathPointerBlockEntity> collectors = findAvailableCollectors(level, pathPointerBlockEntity);
+                    for (PathPointerBlockEntity collector : collectors)
+                        PathPointerNetwork.INSTANCE.firePPNetworkEvent(Pair.of(current, collector), NetworkAction.ADD);
+                    break;
+                }
+                if (current.parts.contains(PPPart.SENDER)) {
+                    BlockPos bindPos = SenderBehaviour.getBindPos(current);
+                    if (bindPos == null)
+                        break;
+                    BlockEntity blockEntity = level.getBlockEntity(bindPos);
+                    if (blockEntity instanceof PathPointerBlockEntity ppBE) {
+                        queue.add(ppBE);
+                    }
+                }
+            }
+        }
+    }
+
+    private static Set<PathPointerBlockEntity> findAvailableCollectors(Level level, PathPointerBlockEntity pathPointerBlockEntity) {
+        Queue<PathPointerBlockEntity> queue = new LinkedList<>();
+        queue.add(pathPointerBlockEntity);
+        Set<PathPointerBlockEntity> toReturn = new HashSet<>();
+        while (!queue.isEmpty()) {
+            PathPointerBlockEntity current = queue.poll();
+            if (current.parts.contains(PPPart.COLLECTOR)) {
+                toReturn.add(pathPointerBlockEntity);
+                continue;
+            }
+            if (current.parts.contains(PPPart.RECEIVER)) {
+                queue.addAll(ReceiverBehaviour.getSenderPoses(current).stream()
+                        .map(level::getBlockEntity)
+                        .map(blockEntity -> blockEntity instanceof PathPointerBlockEntity ppBE ? ppBE : null)
+                        .filter(Objects::nonNull)
+                        .toList());
+
+            }
+        }
+        return toReturn.stream()
+                .filter(ppBE-> CollectorBehaviour.getEmitter(ppBE) == null)
+                .collect(Collectors.toSet());
     }
 
     private static void setYawAndPitchFromRot(Vec3 dir, PathPointerBlockEntity be) {
@@ -437,17 +475,42 @@ public class PathPointerBlockEntity extends TCBlockEntity implements Nameable {
     }
 
 
+    @Override
+    public int getRange() {
+        return 0;
+    }
+
+    @Override
+    public int getPriority() {
+        return 0;
+    }
+
+    @Override
+    public ICFEHandler getMainHandler() {
+        throw new RuntimeException("Unexpected getMainHandler call:"+this);
+    }
+
+    @Override
+    public <T> T getEntity() {
+        //noinspection unchecked
+        return ((T) this);
+    }
+
+    @Override
+    public BlockPos getPos() {
+        return this.getBlockPos();
+    }
+
+    @Override
+    public void updateIfScheduled() {
+
+    }
 
     public void scheduleMemberUpdate() {
-        cfeBehaviour().scheduleMemberUpdate();
+
     }
 
-    public IBECFEBehaviour cfeBehaviour() {
-        IBEBehaviour ibeBehaviour = behaviours.get(behaviours.size() - 1);
-        if (ibeBehaviour instanceof IBECFEBehaviour ibecfeBehaviour)
-            return ibecfeBehaviour;
-        return null;
-    }
+
 
     public enum PPPart implements StringRepresentable {
         COLLECTOR(true, "collector"),

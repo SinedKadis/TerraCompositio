@@ -31,7 +31,6 @@ import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.HashSet;
-import java.util.List;
 import java.util.Set;
 import java.util.function.ToIntFunction;
 
@@ -97,7 +96,7 @@ public class CFECloudEntity extends Entity implements CFENetworkMemberEntity {
     public void onCFENetworkMemberUpdate() {
         if (getPriority() < 0 && getMainHandler().getCFE() > 0){
             CFENetwork cfeNetwork = TerraCompositioAPI.instance().getCFENetworkInstance();
-            List<CFENetworkMember> targets = cfeNetwork.getAvailableNetworkTargets(this);
+            Set<CFENetworkMember> targets = cfeNetwork.getAvailableNetworkTargets(this);
             targets.forEach(target -> {
                 if (target.getMainHandler().getFreeSpace() > TCCommonConfigs.CFE_PER_TICK_TRANSFER_LIMIT.get())
                     scheduleMemberUpdate(target);

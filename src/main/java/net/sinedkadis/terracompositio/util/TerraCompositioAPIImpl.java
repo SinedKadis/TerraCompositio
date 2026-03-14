@@ -9,12 +9,12 @@ import net.sinedkadis.terracompositio.fluid.FluidNetworkHandler;
 public class TerraCompositioAPIImpl implements TerraCompositioAPI {
     @Override
     public CFENetwork getCFENetworkInstance() {
-        return CFENetworkHandler.instance;
+        return CFENetworkHandler.INSTANCE;
     }
 
     @Override
     public FluidNetwork getFluidNetworkInstance() {
-        return FluidNetworkHandler.instance;
+        return FluidNetworkHandler.INSTANCE;
     }
 
 }

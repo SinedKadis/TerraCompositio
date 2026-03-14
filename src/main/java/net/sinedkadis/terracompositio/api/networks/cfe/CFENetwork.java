@@ -5,7 +5,7 @@ import net.minecraft.world.level.Level;
 import net.sinedkadis.terracompositio.api.networks.NetworkAction;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
-import java.util.List;
+import java.util.Set;
 
 public interface CFENetwork {
     //Event
@@ -17,7 +17,7 @@ public interface CFENetwork {
 
     //Member getters
     @Nullable CFENetworkMember getMemberAt(Level level,BlockPos blockPos);
-    List<CFENetworkMember> getAvailableNetworkTargets(CFENetworkMember sender);
-    List<CFENetworkMember> getAllCFENetworkMembers(Level level);
+    Set<CFENetworkMember> getAvailableNetworkTargets(CFENetworkMember sender);
+    Set<CFENetworkMember> getAllCFENetworkMembers(Level level);
 
 }

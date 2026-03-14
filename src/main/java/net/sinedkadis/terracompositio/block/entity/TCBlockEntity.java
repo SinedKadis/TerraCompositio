@@ -62,10 +62,10 @@ public abstract class TCBlockEntity extends BlockEntity{
 
     @Override
     public void setRemoved() {
-        super.setRemoved();
         behaviours.stream()
                 .filter(IBEBehaviour::isActive)
                 .forEach(IBEBehaviour::onRemoved);
+        super.setRemoved();
     }
 
     @Override

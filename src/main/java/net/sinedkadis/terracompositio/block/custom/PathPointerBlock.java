@@ -81,6 +81,7 @@ public class PathPointerBlock extends TCBaseEntityBlock {
         Direction orientation = placer == null ? Direction.WEST : Direction.orderedByNearest(placer)[0].getOpposite();
         PathPointerBlockEntity pp = (PathPointerBlockEntity) world.getBlockEntity(pos);
         if (pp == null) return;
+
         switch (orientation) {
             case DOWN -> pp.rotationPitch = -90F;
             case UP -> pp.rotationPitch = 90F;
@@ -105,6 +106,7 @@ public class PathPointerBlock extends TCBaseEntityBlock {
                 PathPointerBlockEntity.PPPart oPart = pp.parts.get(replacePart == 0 ? 1 : 0);
                 if (oPart.isInput() != newPart.isInput()) {
                     pp.parts.set(replacePart, newPart);
+                    pp.setUpdateScheduled(true);
                     if (!pPlayer.isCreative()) {
                         hand.shrink(1);
                     }

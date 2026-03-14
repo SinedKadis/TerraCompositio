@@ -29,6 +29,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.Collections;
 import java.util.List;
 import java.util.Objects;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Mod.EventBusSubscriber(modid = TerraCompositio.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
@@ -68,7 +69,7 @@ public class CultivationDesorberBlockEntity extends AbstractDesorberBlockEntity 
         LevelAccessor level = event.getLevel();
         BlockState state = event.getState();
         CFENetwork network = TerraCompositioAPI.instance().getCFENetworkInstance();
-        List<CFENetworkMember> sources = network.getAllCFENetworkMembers((Level) level);
+        Set<CFENetworkMember> sources = network.getAllCFENetworkMembers((Level) level);
         List<CultivationDesorberBlockEntity> cultivators = sources.stream()
                 .map(CFENetworkMember::getPos)
                 .filter(cfeSourceBlockPos -> Math.sqrt(cfeSourceBlockPos.distSqr(pos)) < 7)
