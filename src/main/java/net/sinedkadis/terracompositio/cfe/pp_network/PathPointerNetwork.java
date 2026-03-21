@@ -9,11 +9,12 @@ import net.sinedkadis.terracompositio.api.TerraCompositioAPI;
 import net.sinedkadis.terracompositio.api.networks.NetworkAction;
 import net.sinedkadis.terracompositio.api.networks.cfe.CFENetworkMember;
 import net.sinedkadis.terracompositio.api.networks.cfe.ICFEHandler;
-import net.sinedkadis.terracompositio.block.behaviours.pp.CollectorBehaviour;
 import net.sinedkadis.terracompositio.block.entity.PathPointerBlockEntity;
 import net.sinedkadis.terracompositio.events.PPNetworkEvent;
+import net.sinedkadis.terracompositio.util.TCUtil;
 
 import java.util.*;
+import java.util.stream.Collectors;
 
 public enum PathPointerNetwork {
     INSTANCE;
@@ -36,13 +37,20 @@ public enum PathPointerNetwork {
     //Adds collector from pair to emitter from pair, and emitter, if it is not added yet
     private void addCollector(Pair<PathPointerBlockEntity,PathPointerBlockEntity> emitterAndCollector) {
         PathPointerBlockEntity emitter = emitterAndCollector.getFirst();
-        members.computeIfAbsent(emitter,(emitter1) ->{
+        members.compute(emitter,(emitter1,set) ->{
             Set<PathPointerBlockEntity> collectors = new HashSet<>();
             PathPointerBlockEntity collector = emitterAndCollector.getSecond();
             collectors.add(collector);
-            CollectorBehaviour.setEmitter(collector,emitter.getBlockPos());
+            collector.setEmitterPos(emitter.getBlockPos());
             return collectors;
         });
+        clearRemovedMembers(emitter);
+    }
+
+
+    private void clearRemovedMembers(PathPointerBlockEntity emitter) {
+        members.computeIfPresent(emitter,(emitter1, collectors) ->
+                collectors.stream().filter(TCUtil::validMember).collect(Collectors.toSet()));
     }
 
     //Removes collector from pair from emitter from pair, and emitter, if it has no collectors
@@ -54,7 +62,7 @@ public enum PathPointerNetwork {
         Set<PathPointerBlockEntity> set = members.get(emitter);
         PathPointerBlockEntity collector = emitterAndCollector.getSecond();
         set.remove(collector);
-        CollectorBehaviour.setEmitter(collector,null);
+        collector.setEmitterPos(null);
         if (set.isEmpty()) {
             members.remove(emitter);
         } else {
@@ -63,15 +71,15 @@ public enum PathPointerNetwork {
     }
 
     public void updateMembersAroundCollectors(PathPointerBlockEntity emitter,CFENetworkMember target) {
-        members.get(emitter).forEach( collector ->
+        members.getOrDefault(emitter,Set.of()).forEach( collector ->
                 TerraCompositioAPI.instance().getCFENetworkInstance()
                         .fireCFENetworkEvent(new CFEMemberProxy(target,collector), NetworkAction.UPDATE));
     }
 
 
 
-    public Set<CFENetworkMember> getAvailableTargetsToSend(PathPointerBlockEntity collector, CFENetworkMember cfeNetworkMember) {
-        BlockPos emitterPos = CollectorBehaviour.getEmitter(collector);
+    public Set<CFENetworkMember> getAvailableTargetsToSend(PathPointerBlockEntity collector, CFENetworkMember requesterMember) {
+        BlockPos emitterPos = collector.getEmitterPos();
         if (emitterPos == null) return Set.of();
 
         Level level = collector.getLevel();
@@ -81,7 +89,11 @@ public enum PathPointerNetwork {
         if (!(emitterBE instanceof PathPointerBlockEntity emitter)) return Set.of();
 
         return TerraCompositioAPI.instance().getCFENetworkInstance()
-                .getAvailableNetworkTargets(new CFEMemberProxy(cfeNetworkMember, emitter));
+                //get targets for requested member but with overwrote position of emitter
+                .getAvailableNetworkTargets(new CFEMemberProxy(requesterMember, emitter)).stream()
+                //return targets with overwrote position of collector
+                .map(member -> new CFEMemberProxy(member,collector))
+                .collect(Collectors.toSet());
     }
 
     static class CFEMemberProxy implements CFENetworkMember {
@@ -95,13 +107,25 @@ public enum PathPointerNetwork {
         }
 
         @Override
+        public boolean equals(Object o) {
+            if (o == null || getClass() != o.getClass()) return false;
+            CFEMemberProxy that = (CFEMemberProxy) o;
+            return Objects.equals(target, that.target) && Objects.equals(collector, that.collector);
+        }
+
+        @Override
+        public int hashCode() {
+            return Objects.hash(target, collector);
+        }
+
+        @Override
         public int getRange() {
             return target.getRange();
         }
 
         @Override
         public int getPriority() {
-            return target.getRange();
+            return target.getPriority();
         }
 
         @Override

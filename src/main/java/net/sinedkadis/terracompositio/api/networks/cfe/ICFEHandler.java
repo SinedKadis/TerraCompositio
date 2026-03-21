@@ -16,26 +16,29 @@ import java.util.function.Function;
 @MethodsReturnNonnullByDefault
 public interface ICFEHandler extends BlockSource {
     int getCFE();
-
-    ICFEHandler setIndex(int index);
-
-    ICFEHandler setOffset(Function<Vec3, Vec3> offset);
-
-    int takeCFE(int cfe, boolean simulate);
-    int addCFE(int cfe,boolean simulate);
-    int sendCFE(int cfe, ICFEHandler target, boolean simulate);
     void setCFE(int cfe);
+
     int getMaxCFE();
-
-    ICFEHandler setCfeTravelSpeed(float cfeTravelSpeed);
-
     ICFEHandler setMaxCFE(int max);
+
+    int addCFE(int cfe, boolean simulate);
+    int takeCFE(int cfe, boolean simulate);
+
+    int sendCFE(int cfe, CFENetworkMember target, boolean simulate);
+    int sendCFE(int cfe, ICFEHandler target, boolean simulate);
+
+
+    float getCfeTravelSpeed();
+    void setCfeTravelSpeed(float cfeTravelSpeed);
+
+
 
     void writeToNBT(CompoundTag pTag);
     void readFromNBT(CompoundTag pTag);
 
     int getQueued();
     void setQueued(int queued);
+
     default void addToQueue(int toAdd){
         setQueued(getQueued()+toAdd);
     }
@@ -48,13 +51,15 @@ public interface ICFEHandler extends BlockSource {
     boolean isEmpty();
     int getFreeSpace();
 
-    float getCfeTravelSpeed();
+
 
     CFENetworkMember getAttachedMember();
 
     Function<Vec3, Vec3> getOffset();
+    ICFEHandler setOffset(Function<Vec3, Vec3> offset);
 
     int getIndex();
+    ICFEHandler setIndex(int index);
 
     @Override
     default double x() {

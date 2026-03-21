@@ -17,7 +17,7 @@ public interface CFENetwork {
 
     //Member getters
     @Nullable CFENetworkMember getMemberAt(Level level,BlockPos blockPos);
-    Set<CFENetworkMember> getAvailableNetworkTargets(CFENetworkMember sender);
+    Set<CFENetworkMember> getAvailableNetworkTargets(CFENetworkMember requesterMember);
     Set<CFENetworkMember> getAllCFENetworkMembers(Level level);
 
 }

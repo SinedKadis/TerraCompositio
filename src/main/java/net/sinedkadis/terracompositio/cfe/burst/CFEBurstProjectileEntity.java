@@ -25,7 +25,6 @@ import net.sinedkadis.terracompositio.api.networks.cfe.CFENetworkMemberBE;
 import net.sinedkadis.terracompositio.api.networks.cfe.CFENetworkMemberEntity;
 import net.sinedkadis.terracompositio.api.networks.cfe.ICFEHandler;
 import net.sinedkadis.terracompositio.block.behaviours.pp.ReceiverBehaviour;
-import net.sinedkadis.terracompositio.block.behaviours.pp.SenderBehaviour;
 import net.sinedkadis.terracompositio.block.entity.PathPointerBlockEntity;
 import net.sinedkadis.terracompositio.block.entity.TCBlockEntity;
 import net.sinedkadis.terracompositio.entity.custom.CFECloudEntity;
@@ -67,6 +66,10 @@ public class CFEBurstProjectileEntity extends ThrowableProjectile {
         this(pSource.x(), pSource.y(), pSource.z(), pSource.getLevel());
         init(pSource,Vec3.ZERO, target.getPos(),target.getAttachedMember(), cfe, cfeTravelSpeed);
     }
+    private CFEBurstProjectileEntity(ICFEHandler pSource, CFENetworkMember target, int cfe, float cfeTravelSpeed) {
+        this(pSource.x(), pSource.y(), pSource.z(), pSource.getLevel());
+        init(pSource,Vec3.ZERO, target.getPos(),target, cfe, cfeTravelSpeed);
+    }
 
 
 
@@ -75,17 +78,18 @@ public class CFEBurstProjectileEntity extends ThrowableProjectile {
         init(pSource,offset,target.getPos(),target.getAttachedMember(),cfe,cfeTravelSpeed);
     }
 
-    private void init(ICFEHandler pSource,Vec3 offset,BlockPos targetPos,@Nullable CFENetworkMember attachedMember, int cfe, float cfeTravelSpeed) {
+    private void init(ICFEHandler pSource,Vec3 offset,BlockPos targetPos, CFENetworkMember attachedMember, int cfe, float cfeTravelSpeed) {
         if (attachedMember instanceof LivingEntity livingEntity) {
             this.setOwner(livingEntity);
         }
         this.setO_CFE(cfe);
-        this.setTarget(targetPos);
         this.setCFE(cfe);
         this.setNoGravity(true);
         float size = 0f;
         this.setBoundingBox(new AABB(size, size, size, size, size, size));
         BlockPos shootVec = targetPos.subtract(BlockPos.containing(pSource.getPos().getCenter().add(offset)));
+        //pp proxy backdoor
+        this.setTarget(attachedMember.getMainHandler().getAttachedMember().getPos());
         this.cfeTravelSpeed = cfeTravelSpeed;
         this.shoot(shootVec.getX(), shootVec.getY(), shootVec.getZ(), cfeTravelSpeed, 0);
         lastBP.set(pSource.getPos());
@@ -98,6 +102,12 @@ public class CFEBurstProjectileEntity extends ThrowableProjectile {
     }
 
     public static @Nullable CFEBurstProjectileEntity sendBurst(ICFEHandler pSource, ICFEHandler target, int cfe, float cfeTravelSpeed) {
+        if (cfe < 1) {
+            return null;
+        }
+        return new CFEBurstProjectileEntity(pSource, target, cfe, cfeTravelSpeed);
+    }
+    public static @Nullable CFEBurstProjectileEntity sendBurst(ICFEHandler pSource, CFENetworkMember target, int cfe, float cfeTravelSpeed) {
         if (cfe < 1) {
             return null;
         }
@@ -129,9 +139,7 @@ public class CFEBurstProjectileEntity extends ThrowableProjectile {
         if (!blockPos.equals(lastBP) && tickCount > 1) {
             BlockEntity blockEntity = level().getBlockEntity(blockPos);
             int cfe = this.getCFE();
-            if (blockEntity instanceof PathPointerBlockEntity pathPointerBlockEntity
-                    && pathPointerBlockEntity.parts.contains(PathPointerBlockEntity.PPPart.RECEIVER)
-                    && pathPointerBlockEntity.parts.contains(PathPointerBlockEntity.PPPart.SENDER)) {
+            if (blockEntity instanceof PathPointerBlockEntity pathPointerBlockEntity) {
                 tryRedirectByPPBE(pathPointerBlockEntity,this.getDeltaMovement());
                 lastBP.set(blockPos);
                 return;
@@ -169,13 +177,16 @@ public class CFEBurstProjectileEntity extends ThrowableProjectile {
     private void tryRedirectByPPBE(PathPointerBlockEntity pathPointerBlockEntity, Vec3 burstDir) {
         if (!ReceiverBehaviour.validAngle(pathPointerBlockEntity,burstDir)) return;
 
-        timeToLive+=100;
+        timeToLive += 100;
         setDeltaMovement(Vec3.ZERO);
-        BlockPos bindPos = SenderBehaviour.getBindPos(pathPointerBlockEntity);
-        if (bindPos == null) return;
+        setPos(pathPointerBlockEntity.getPos().getCenter());
+        BlockPos bindPos = pathPointerBlockEntity.getReceiverPos();
+        if (bindPos == null || bindPos.equals(BlockPos.ZERO)) {
+            bindPos = getTarget();
+        }
 
-        Vec3 shootVec = bindPos.subtract(pathPointerBlockEntity.getBlockPos()).getCenter();
-        this.shoot(shootVec.x(),shootVec.y(),shootVec.z(),cfeTravelSpeed,0);
+        Vec3 shootVec = pathPointerBlockEntity.getBlockPos().getCenter().vectorTo(bindPos.getCenter());
+        this.shoot(shootVec.x(),shootVec.y(),shootVec.z(),pathPointerBlockEntity.getMainHandler().getCfeTravelSpeed(),0);
 
     }
 

@@ -27,11 +27,6 @@ public class ExtractorBehaviour extends PPInputBehaviour{
         return blockEntity.parts.contains(PathPointerBlockEntity.PPPart.EXTRACTOR);
     }
 
-    @Override
-    public void onUpdate() {
-        if (invalidBehaviours()) return;
-        updateMaxCFE();
-    }
 
     public @NotNull List<LivingEntity> scanCompatibleEntities() {
         if (isEntityListValid()) return entityList;

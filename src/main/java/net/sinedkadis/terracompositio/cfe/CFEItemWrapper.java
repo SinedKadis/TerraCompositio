@@ -70,6 +70,11 @@ public class CFEItemWrapper implements ICFEHandler, ICapabilityProvider {
     }
 
     @Override
+    public int sendCFE(int cfe, CFENetworkMember target, boolean simulate) {
+        return 0;
+    }
+
+    @Override
     public int addCFE(int cfe, boolean simulate) {
         int toAdd = Math.min(this.getFreeSpace(),cfe);
         if (!simulate) {
@@ -98,8 +103,7 @@ public class CFEItemWrapper implements ICFEHandler, ICapabilityProvider {
     }
 
     @Override
-    public ICFEHandler setCfeTravelSpeed(float cfeTravelSpeed) {
-        return this;
+    public void setCfeTravelSpeed(float cfeTravelSpeed) {
     }
 
     @Override

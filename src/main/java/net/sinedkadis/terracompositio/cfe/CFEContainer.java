@@ -43,9 +43,8 @@ public class CFEContainer implements ICFEHandler, INBTSerializable<CompoundTag> 
     }
 
     @Override
-    public CFEContainer setCfeTravelSpeed(float cfeTravelSpeed) {
+    public void setCfeTravelSpeed(float cfeTravelSpeed) {
         this.cfeTravelSpeed = cfeTravelSpeed;
-        return this;
     }
 
     public CFEContainer setMaxCFE(int max) {
@@ -91,6 +90,23 @@ public class CFEContainer implements ICFEHandler, INBTSerializable<CompoundTag> 
             CFEBurstProjectileEntity entity = CFEBurstProjectileEntity.sendBurst(this, target, added, targetCfeTravelSpeed);
             if (entity != null)
                 target.addToQueue(added);
+        }
+        return added;
+    }
+
+    @Override
+    public int sendCFE(int cfe, CFENetworkMember target, boolean simulate) {
+        int freeSpace = target.getMainHandler().getFreeSpace();
+        int available = this.getCFE();
+        int added = Mth.clamp(cfe, 0, Math.min(available, freeSpace));
+        if (added < 1)
+            return 0;
+
+        if (!simulate) {
+            float targetCfeTravelSpeed = target.getMainHandler().getCfeTravelSpeed();
+            CFEBurstProjectileEntity entity = CFEBurstProjectileEntity.sendBurst(this, target, added, targetCfeTravelSpeed);
+            if (entity != null)
+                target.getMainHandler().addToQueue(added);
         }
         return added;
     }

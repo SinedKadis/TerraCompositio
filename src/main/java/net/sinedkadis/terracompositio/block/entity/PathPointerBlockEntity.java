@@ -8,10 +8,11 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.NonNullList;
 import net.minecraft.core.particles.ParticleTypes;
+import net.minecraft.core.particles.SimpleParticleType;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.util.RandomSource;
 import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.Nameable;
@@ -24,6 +25,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import net.sinedkadis.terracompositio.api.TerraCompositioAPI;
 import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBEBehaviour;
+import net.sinedkadis.terracompositio.api.dummies.DummyCFEHandler;
 import net.sinedkadis.terracompositio.api.networks.NetworkAction;
 import net.sinedkadis.terracompositio.api.networks.cfe.CFENetwork;
 import net.sinedkadis.terracompositio.api.networks.cfe.CFENetworkMember;
@@ -44,22 +46,40 @@ import java.util.stream.Collectors;
 @ParametersAreNonnullByDefault
 public class PathPointerBlockEntity extends TCBlockEntity implements Nameable, CFENetworkMember {
 
-    private static final String bindPosTag = "BindPos";
+    public static final String RECEIVER_POS_TAG = "receiver_pos";
+    public static final String EMITTER_POS_TAG = "emitter_pos";
+    public static final String SENDER_POSES_TAG = "sender_poses";
 
     public float rotationYaw, rotationPitch, rotationRoll;
 
-    public List<PPPart> parts = NonNullList.withSize(2,PPPart.NONE);
+    public List<PPPart> parts = NonNullList.withSize(2, PPPart.NONE);
 
     @Setter
     private boolean updateScheduled = false;
     @Setter
     private boolean ppUpdateScheduled = false;
 
+    @Getter
+    private BlockPos receiverPos = null;
+    public void setReceiverPos(@Nullable BlockPos receiverPos) {
+        this.receiverPos = receiverPos;
+    }
+
+    @Getter
+    private final Set<BlockPos> senderPoses = new HashSet<>();
+
+    @Getter
+    private BlockPos emitterPos = null;
+    public void setEmitterPos(@Nullable BlockPos emitterPos) {
+        this.emitterPos = emitterPos;
+    }
+
+
 
     public PathPointerBlockEntity(BlockPos pos, BlockState state) {
         super(TCBlockEntities.PATH_POINTER_BE.get(), pos, state);
         if (state.getBlock() instanceof PathPointerBlock pathPointerBlock) {
-            parts.set(0,pathPointerBlock.getBasePart());
+            parts.set(0, pathPointerBlock.getBasePart());
         }
     }
 
@@ -86,11 +106,11 @@ public class PathPointerBlockEntity extends TCBlockEntity implements Nameable, C
         if (updateScheduled) {
             updateScheduled = false;
             if (parts.contains(PPPart.COLLECTOR)) {
-                BlockPos emitterPos = CollectorBehaviour.getEmitter(this);
+                BlockPos emitterPos = this.getEmitterPos();
                 if (emitterPos == null) updatePPNetwork(this);
             }
             setChanged();
-            pLevel.sendBlockUpdated(worldPosition,getBlockState(),getBlockState(),3);
+            pLevel.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), 3);
         }
         if (ppUpdateScheduled) {
             ppUpdateScheduled = false;
@@ -98,6 +118,11 @@ public class PathPointerBlockEntity extends TCBlockEntity implements Nameable, C
                     .filter(IBEBehaviour::isActive)
                     .forEach(IBEBehaviour::onUpdate);
         }
+    }
+
+    @Override
+    public void scheduleMemberUpdate(CFENetworkMember updated) {
+        PathPointerNetwork.INSTANCE.updateMembersAroundCollectors(this, updated);
     }
 
     @Override
@@ -118,19 +143,19 @@ public class PathPointerBlockEntity extends TCBlockEntity implements Nameable, C
         }
 
         CompoundTag tag = wrenchStack.getOrCreateTag();
-        if (!tag.contains(bindPosTag)) {
+        if (!tag.contains(RECEIVER_POS_TAG)) {
             storeToTag(pPlayer, clickedPos, tag);
             return true;
         }
 
-        BlockPos storedPos = TCUtil.loadBlockPos(tag.getCompound(bindPosTag));
+        BlockPos storedPos = TCUtil.loadBlockPos(tag.getCompound(RECEIVER_POS_TAG));
         clearBindTags(tag);
-        if (storedPos.equals(clickedPos)) {
-            clearAnyBindings(pPlayer,level, clickedPos);
+        if (storedPos != null && storedPos.equals(clickedPos)) {
+            clearAnyBindings(pPlayer, level, clickedPos);
             return true;
         }
 
-        if (!(level.getBlockEntity(storedPos) instanceof PathPointerBlockEntity storedPPBE)) {
+        if (storedPos == null || !(level.getBlockEntity(storedPos) instanceof PathPointerBlockEntity storedPPBE)) {
             return false;
         }
 
@@ -161,14 +186,14 @@ public class PathPointerBlockEntity extends TCBlockEntity implements Nameable, C
         }
 
         if (forwardBind) {
-            if(!bind(storedPPBE,clickedPPBE)) {
+            if (!bind(storedPPBE, clickedPPBE)) {
                 TCUtil.message(pPlayer, Component.translatable("item.terracompositio.flow_rotating_axe.bind_fail_angle")
                         .withStyle(ChatFormatting.BOLD));
                 return false;
             }
         }
         if (backwardBind) {
-            if(!bind(clickedPPBE,storedPPBE)) {
+            if (!bind(clickedPPBE, storedPPBE)) {
                 TCUtil.message(pPlayer, Component.translatable("item.terracompositio.flow_rotating_axe.bind_fail_angle")
                         .withStyle(ChatFormatting.BOLD));
                 return false;
@@ -176,12 +201,11 @@ public class PathPointerBlockEntity extends TCBlockEntity implements Nameable, C
         }
 
 
-
         storedPPBE.setChanged();
         clickedPPBE.setChanged();
 
-        ((ServerLevel) level).sendBlockUpdated(storedPos,storedPPBE.getBlockState(),storedPPBE.getBlockState(),3);
-        ((ServerLevel) level).sendBlockUpdated(clickedPos,clickedPPBE.getBlockState(),clickedPPBE.getBlockState(),3);
+        ((ServerLevel) level).sendBlockUpdated(storedPos, storedPPBE.getBlockState(), storedPPBE.getBlockState(), 3);
+        ((ServerLevel) level).sendBlockUpdated(clickedPos, clickedPPBE.getBlockState(), clickedPPBE.getBlockState(), 3);
 
         storedPPBE.setUpdateScheduled(true);
         clickedPPBE.setUpdateScheduled(true);
@@ -205,25 +229,24 @@ public class PathPointerBlockEntity extends TCBlockEntity implements Nameable, C
         BlockPos firstPos = firstPPBE.getBlockPos();
         BlockPos secondPos = secondPPBE.getBlockPos();
 
-        Vec3 rotInput = calculateRot(ReceiverBehaviour.getSenderPoses(firstPPBE), secondPos, firstPos);
+        Vec3 rotInput = calculateRot(firstPPBE.getSenderPoses(), secondPos, firstPos);
         if (rotInput == null) return false;
 
 
-
-        List<BlockPos> senderPoses = ReceiverBehaviour.getSenderPoses(secondPPBE);
-        List<BlockPos> senderPosesCopy = new ArrayList<>(senderPoses);
+        Set<BlockPos> senderPoses = secondPPBE.getSenderPoses();
+        Set<BlockPos> senderPosesCopy = new HashSet<>(senderPoses);
         if (senderPoses.contains(firstPos)) return false;
         senderPosesCopy.add(firstPos);
 
-        Vec3 rotOutput = calculateRot(senderPosesCopy, SenderBehaviour.getBindPos(secondPPBE), secondPos);
+        Vec3 rotOutput = calculateRot(senderPosesCopy, secondPPBE.getReceiverPos(), secondPos);
         if (rotOutput == null) return false;
 
 
         setYawAndPitchFromRot(rotInput, firstPPBE);
-        SenderBehaviour.setBindPos(firstPPBE,secondPos);
+        firstPPBE.setReceiverPos(secondPos);
 
         setYawAndPitchFromRot(rotOutput, secondPPBE);
-        ReceiverBehaviour.setSenderPoses(secondPPBE,senderPosesCopy);
+        secondPPBE.getSenderPoses().add(firstPos);
 
         updatePPNetwork(firstPPBE);
         return true;
@@ -238,12 +261,13 @@ public class PathPointerBlockEntity extends TCBlockEntity implements Nameable, C
                 PathPointerBlockEntity current = queue.poll();
                 if (current.parts.contains(PPPart.EMITTER)) {
                     Set<PathPointerBlockEntity> collectors = findAvailableCollectors(level, pathPointerBlockEntity);
-                    for (PathPointerBlockEntity collector : collectors)
+                    for (PathPointerBlockEntity collector : collectors) {
                         PathPointerNetwork.INSTANCE.firePPNetworkEvent(Pair.of(current, collector), NetworkAction.ADD);
+                    }
                     break;
                 }
                 if (current.parts.contains(PPPart.SENDER)) {
-                    BlockPos bindPos = SenderBehaviour.getBindPos(current);
+                    BlockPos bindPos = current.getReceiverPos();
                     if (bindPos == null)
                         break;
                     BlockEntity blockEntity = level.getBlockEntity(bindPos);
@@ -255,18 +279,18 @@ public class PathPointerBlockEntity extends TCBlockEntity implements Nameable, C
         }
     }
 
-    private static Set<PathPointerBlockEntity> findAvailableCollectors(Level level, PathPointerBlockEntity pathPointerBlockEntity) {
+    private static Set<PathPointerBlockEntity> findAvailableCollectors(Level level, PathPointerBlockEntity emitterBE) {
         Queue<PathPointerBlockEntity> queue = new LinkedList<>();
-        queue.add(pathPointerBlockEntity);
+        queue.add(emitterBE);
         Set<PathPointerBlockEntity> toReturn = new HashSet<>();
         while (!queue.isEmpty()) {
             PathPointerBlockEntity current = queue.poll();
             if (current.parts.contains(PPPart.COLLECTOR)) {
-                toReturn.add(pathPointerBlockEntity);
+                toReturn.add(emitterBE);
                 continue;
             }
             if (current.parts.contains(PPPart.RECEIVER)) {
-                queue.addAll(ReceiverBehaviour.getSenderPoses(current).stream()
+                queue.addAll(current.getSenderPoses().stream()
                         .map(level::getBlockEntity)
                         .map(blockEntity -> blockEntity instanceof PathPointerBlockEntity ppBE ? ppBE : null)
                         .filter(Objects::nonNull)
@@ -275,7 +299,7 @@ public class PathPointerBlockEntity extends TCBlockEntity implements Nameable, C
             }
         }
         return toReturn.stream()
-                .filter(ppBE-> CollectorBehaviour.getEmitter(ppBE) == null)
+                .filter(ppBE -> ppBE.getEmitterPos() == null)
                 .collect(Collectors.toSet());
     }
 
@@ -300,14 +324,37 @@ public class PathPointerBlockEntity extends TCBlockEntity implements Nameable, C
             be.rotationPitch = 90;
             be.rotationYaw = 0;
             //be.rotationRoll = 0;
-            SenderBehaviour.setBindPos(be,null);
-            ReceiverBehaviour.setSenderPoses(be,List.of());
+
+            BlockPos emitterPos = be.getEmitterPos();
+            if (emitterPos != null) {
+                PathPointerBlockEntity emitter = (PathPointerBlockEntity) level.getBlockEntity(emitterPos);
+                if (emitter != null)
+                    PathPointerNetwork.INSTANCE.firePPNetworkEvent(Pair.of(emitter, be), NetworkAction.REMOVE);
+
+                be.setEmitterPos(null);
+            }
+            BlockPos receiverPos = be.getReceiverPos();
+            if (receiverPos != null) {
+                PathPointerBlockEntity receiver = (PathPointerBlockEntity) level.getBlockEntity(receiverPos);
+                if (receiver != null)
+                    receiver.getSenderPoses().remove(be.getPos());
+
+                be.setReceiverPos(null);
+            }
+
+            be.getSenderPoses().forEach(senderPos -> {
+                PathPointerBlockEntity sender = (PathPointerBlockEntity) level.getBlockEntity(senderPos);
+                if (sender != null)
+                    sender.setReceiverPos(null);
+            });
+            be.getSenderPoses().clear();
+
             be.setUpdateScheduled(true);
         }
     }
 
     private static void storeToTag(@Nullable Player pPlayer, BlockPos pos, CompoundTag tag) {
-        tag.put(bindPosTag,TCUtil.saveBlockPos(pos));
+        tag.put(RECEIVER_POS_TAG, TCUtil.saveBlockPos(pos));
 
         if (pPlayer != null) {
             TCUtil.message(pPlayer, Component.translatable("item.terracompositio.flow_rotating_axe.bind_begin").withStyle(ChatFormatting.BOLD));
@@ -335,12 +382,12 @@ public class PathPointerBlockEntity extends TCBlockEntity implements Nameable, C
     }
 
     public static void clearBindTags(CompoundTag tag) {
-        tag.remove(bindPosTag);
+        tag.remove(RECEIVER_POS_TAG);
     }
 
     @Nullable
     private static Vec3 calculateRot(
-            List<BlockPos> receiverSenderPoses,
+            Set<BlockPos> receiverSenderPoses,
             @Nullable BlockPos senderBindPos,
             BlockPos origin
     ) {
@@ -359,7 +406,8 @@ public class PathPointerBlockEntity extends TCBlockEntity implements Nameable, C
         // если receiver и bind смотрят в одну полусферу → хуйня
         if (toBind != null) {
             for (Vec3 r : toReceivers) {
-                if (r.dot(toBind) > 0) { // угол < 90°
+                double dot = r.dot(toBind);
+                if (dot > 0) { // угол < 90°
                     return null;
                 }
             }
@@ -404,8 +452,14 @@ public class PathPointerBlockEntity extends TCBlockEntity implements Nameable, C
         pTag.putFloat("rot_x", rotationPitch);
         pTag.putFloat("rot_z", rotationRoll);
 
-        pTag.putInt("part0",parts.get(0).ordinal());
-        pTag.putInt("part1",parts.get(1).ordinal());
+        pTag.putInt("part0", parts.get(0).ordinal());
+        pTag.putInt("part1", parts.get(1).ordinal());
+
+        if (receiverPos != null)
+            pTag.put(RECEIVER_POS_TAG, TCUtil.saveBlockPos(receiverPos));
+        if (emitterPos != null)
+            pTag.put(EMITTER_POS_TAG, TCUtil.saveBlockPos(emitterPos));
+        saveFromSetToTag(pTag,SENDER_POSES_TAG, senderPoses);
         super.saveAdditional(pTag);
     }
 
@@ -416,43 +470,56 @@ public class PathPointerBlockEntity extends TCBlockEntity implements Nameable, C
         rotationPitch = pTag.getFloat("rot_x");
         rotationRoll = pTag.getFloat("rot_z");
 
-        parts = NonNullList.withSize(2,PPPart.NONE);
-        parts.set(0,PPPart.fromOrdinal(pTag.getInt("part0")));
-        parts.set(1,PPPart.fromOrdinal(pTag.getInt("part1")));
+        parts = NonNullList.withSize(2, PPPart.NONE);
+        parts.set(0, PPPart.fromOrdinal(pTag.getInt("part0")));
+        parts.set(1, PPPart.fromOrdinal(pTag.getInt("part1")));
+
+        receiverPos = TCUtil.loadBlockPos(pTag.getCompound(RECEIVER_POS_TAG));
+
+        emitterPos = TCUtil.loadBlockPos(pTag.getCompound(EMITTER_POS_TAG));
+
+        loadFromTagToSet(pTag,SENDER_POSES_TAG, senderPoses);
+
+        setUpdateScheduled(true);
+    }
+
+    public static void saveFromSetToTag(CompoundTag pTag,String tag, Set<BlockPos> senderPoses) {
+        ListTag listTag = new ListTag();
+        listTag.addAll(senderPoses.stream().map(TCUtil::saveBlockPos).toList());
+        pTag.put(tag, listTag);
+    }
+
+    public static void loadFromTagToSet(CompoundTag pTag, String tag, Set<BlockPos> senderPoses) {
+        ListTag tagList = pTag.getList(tag, CompoundTag.TAG_COMPOUND);
+        senderPoses.addAll(tagList.stream().map(TCUtil::loadBlockPos).toList());
     }
 
     public void highlightNodes() {
         if (level != null && level.isClientSide) {
-            addFireParticles(level, SenderBehaviour.getBindPos(this));
+            if (receiverPos != null) {
+                addParticle(level,receiverPos, ParticleTypes.FLAME);
+            }
+            if (emitterPos != null) {
+                addParticle(level,emitterPos, ParticleTypes.WAX_OFF);
+            }
 
-            ReceiverBehaviour.getSenderPoses(this).forEach(blockpos ->
-                            addSoulFireParticles(level, blockpos));
+            senderPoses.forEach(blockpos ->
+            {
+                if (blockpos == null) return;
+                addParticle(level,blockpos, ParticleTypes.SOUL_FIRE_FLAME);
+            });
         }
     }
 
-    private static void addFireParticles(Level level,@Nullable BlockPos pos) {
-        if (pos == null) return;
-        RandomSource rand = level.random;
+    private static void addParticle(Level level,BlockPos blockPos, SimpleParticleType particleType) {
         for (int i = 0; i < 3; i++) {
-            double x = pos.getX() + 0.5 + (rand.nextDouble() - 0.5) * 0.5;
-            double y = pos.getY() + 0.5 + (rand.nextDouble() - 0.5) * 0.5;
-            double z = pos.getZ() + 0.5 + (rand.nextDouble() - 0.5) * 0.5;
+            double x = blockPos.getX() + 0.5 + (level.random.nextDouble() - 0.5) * 0.5;
+            double y = blockPos.getY() + 0.5 + (level.random.nextDouble() - 0.5) * 0.5;
+            double z = blockPos.getZ() + 0.5 + (level.random.nextDouble() - 0.5) * 0.5;
 
-            level.addParticle(ParticleTypes.FLAME, x, y, z,
-                    0,0,0);
-        }
-    }
 
-    private static void addSoulFireParticles(Level level,@Nullable BlockPos pos) {
-        if (pos == null) return;
-        RandomSource rand = level.random;
-        for (int i = 0; i < 3; i++) {
-            double x = pos.getX() + 0.5 + (rand.nextDouble() - 0.5) * 0.5;
-            double y = pos.getY() + 0.5 + (rand.nextDouble() - 0.5) * 0.5;
-            double z = pos.getZ() + 0.5 + (rand.nextDouble() - 0.5) * 0.5;
-
-            level.addParticle(ParticleTypes.SOUL_FIRE_FLAME, x, y, z,
-                    0,0,0);
+            level.addParticle(particleType, x, y, z,
+                    0, 0, 0);
         }
     }
 
@@ -487,7 +554,7 @@ public class PathPointerBlockEntity extends TCBlockEntity implements Nameable, C
 
     @Override
     public ICFEHandler getMainHandler() {
-        throw new RuntimeException("Unexpected getMainHandler call:"+this);
+        return DummyCFEHandler.instanceWithSpeed5;
     }
 
     @Override
@@ -512,35 +579,34 @@ public class PathPointerBlockEntity extends TCBlockEntity implements Nameable, C
 
 
 
+
     public enum PPPart implements StringRepresentable {
-        COLLECTOR(true, "collector"),
-        RECEIVER(true, "receiver"),
-        SENDER(false, "sender"),
-        EMITTER(false, "emitter"),
-        INFUSER(false, "infuser"),
-        EXTRACTOR(true, "extractor"),
-        NONE(false, "none");
+        COLLECTOR(true),
+        RECEIVER(true),
+        SENDER(false),
+        EMITTER(false),
+        INFUSER(false),
+        EXTRACTOR(true),
+        NONE(false);
 
         @Getter
         private final boolean input;
-        private final String name;
 
 
-        PPPart(boolean isInput, String name) {
+        PPPart(boolean isInput) {
             this.input = isInput;
-            this.name = name;
         }
 
         @Override
         public String toString() {
             return "PPPart{" +
-                    "name='" + name + '\'' +
+                    "name='" + getSerializedName() + '\'' +
                     '}';
         }
 
         @Override
         public @NotNull String getSerializedName() {
-            return name;
+            return this.name().toLowerCase();
         }
 
         public static PPPart fromOrdinal(int ordinal) {

@@ -5,7 +5,10 @@ import net.minecraft.world.level.Level;
 import net.minecraftforge.common.MinecraftForge;
 import net.sinedkadis.terracompositio.api.networks.cfe.*;
 import net.sinedkadis.terracompositio.api.networks.NetworkAction;
+import net.sinedkadis.terracompositio.block.entity.PathPointerBlockEntity;
+import net.sinedkadis.terracompositio.cfe.pp_network.PathPointerNetwork;
 import net.sinedkadis.terracompositio.events.CFENetworkEvent;
+import net.sinedkadis.terracompositio.util.TCUtil;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.util.*;
@@ -62,25 +65,28 @@ public class CFENetworkHandler implements CFENetwork {
     }
 
     @Override
-    public Set<CFENetworkMember> getAvailableNetworkTargets(CFENetworkMember source) {
-        return getAvailableNetworkTargets(source.getLevel(),source.getPos(),source.getRange(),source.getPriority(),source.getEntity());
-    }
-    public Set<CFENetworkMember> getAvailableNetworkTargets(Level sourceLevel,
-                                                                       BlockPos sourcePos,
-                                                                       int sourceRange,
-                                                                       int sourcePriority,
-                                                                       Object sourceEntity) {
-        if (cfeSources.containsKey(sourceLevel)) {
-            Set<CFENetworkMember> cfeNetworkMembers = cfeSources.get(sourceLevel);
-            return cfeNetworkMembers.stream()
+    public Set<CFENetworkMember> getAvailableNetworkTargets(CFENetworkMember requesterMember) {
+        if (cfeSources.containsKey(requesterMember.getLevel())) {
+            Set<CFENetworkMember> cfeNetworkMembers = cfeSources.get(requesterMember.getLevel());
+            Set<CFENetworkMember> normalFiltered = cfeNetworkMembers.stream()
                     //Distance check: needs to be in source range
-                    .filter(member -> member.getPos().closerThan(sourcePos, sourceRange))
+                    .filter(member -> member.getPos().closerThan(requesterMember.getPos(), requesterMember.getRange()))
                     //Priority check: needs to be higher
-                    .filter(member -> member.getPriority() > sourcePriority)
+                    .filter(member -> member.getPriority() > requesterMember.getPriority())
                     //Space check: needs to have empty space
                     //.filter(member -> member.getMainHandler().getFreeSpace() > 0)
-                    //Entity check: don`t send to itself
-                    .filter(member -> !member.getEntity().equals(sourceEntity))
+                    //Entity check: don't send to itself
+                    .filter(member -> !member.getEntity().equals(requesterMember.getEntity()))
+                    .collect(Collectors.toSet());
+            Set<CFENetworkMember> toReturn = new HashSet<>(normalFiltered);
+            normalFiltered.forEach(member -> {
+                if (member.getEntity() instanceof PathPointerBlockEntity ppBE
+                        && ppBE.parts.contains(PathPointerBlockEntity.PPPart.COLLECTOR)) {
+                    toReturn.addAll(PathPointerNetwork.INSTANCE.getAvailableTargetsToSend(ppBE, requesterMember));
+                }
+            });
+            return toReturn.stream()
+                    .filter(TCUtil::validMember)
                     .collect(Collectors.toSet());
         }
         return Set.of();

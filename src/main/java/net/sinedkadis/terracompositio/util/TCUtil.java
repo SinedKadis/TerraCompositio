@@ -9,6 +9,7 @@ import net.minecraft.core.Vec3i;
 import net.minecraft.core.particles.ParticleOptions;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -20,6 +21,7 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.Containers;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.SimpleContainer;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -66,21 +68,21 @@ public class TCUtil {
         if (!validMember(target)) return;
         if (!validMember(source)) return;
         int taken = source.getMainHandler().takeCFE(maxTransfer,true);
-        int added = source.getMainHandler().sendCFE(taken, target.getMainHandler(), true);
+        int added = target.getMainHandler().addCFE(taken, true);
 
         if (added <= taken){
-            added = source.getMainHandler().sendCFE(added, target.getMainHandler(), false);
+            added = source.getMainHandler().sendCFE(added, target, false);
             source.getMainHandler().takeCFE(added, false);
         }
 
     }
 
     public static boolean validMember(CFENetworkMember target) {
-        if (target instanceof CFENetworkMemberBE memberBE) {
-            return !memberBE.getEntity().isRemoved();
+        if (target.getEntity() instanceof BlockEntity memberBE) {
+            return !memberBE.isRemoved();
         }
-        if (target instanceof CFENetworkMemberEntity memberEntity) {
-            return !memberEntity.getEntity().isRemoved();
+        if (target.getEntity() instanceof Entity memberEntity) {
+            return !memberEntity.isRemoved();
         }
         return false;
     }
@@ -599,7 +601,12 @@ public class TCUtil {
         tag.putInt("z",z);
         return tag;
     }
-    public static BlockPos loadBlockPos(CompoundTag compoundTag) {
+    public static BlockPos loadBlockPos(Tag tag) {
+        CompoundTag compoundTag;
+        if (tag instanceof CompoundTag) {
+            compoundTag = ((CompoundTag) tag);
+        } else return null;
+        if (compoundTag.isEmpty()) return null;
         int x = compoundTag.getInt("x");
         int y = compoundTag.getInt("y");
         int z = compoundTag.getInt("z");

@@ -16,6 +16,12 @@ import java.util.function.Function;
 @MethodsReturnNonnullByDefault
 public class DummyCFEHandler implements ICFEHandler {
     public static final DummyCFEHandler instance = new DummyCFEHandler();
+    public static final DummyCFEHandler instanceWithSpeed5 = new DummyCFEHandler(){
+        @Override
+        public float getCfeTravelSpeed() {
+            return 5/20f;
+        }
+    };
 
     @Override
     public int getCFE() {
@@ -36,6 +42,11 @@ public class DummyCFEHandler implements ICFEHandler {
 
     @Override
     public int takeCFE(int cfe, boolean simulate) {
+        return 0;
+    }
+
+    @Override
+    public int sendCFE(int cfe, CFENetworkMember target, boolean simulate) {
         return 0;
     }
 
@@ -61,8 +72,7 @@ public class DummyCFEHandler implements ICFEHandler {
     }
 
     @Override
-    public ICFEHandler setCfeTravelSpeed(float cfeTravelSpeed) {
-        return instance;
+    public void setCfeTravelSpeed(float cfeTravelSpeed) {
     }
 
     @Override

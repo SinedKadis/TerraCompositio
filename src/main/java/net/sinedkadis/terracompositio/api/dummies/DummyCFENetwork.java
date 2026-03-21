@@ -20,7 +20,7 @@ public class DummyCFENetwork implements CFENetwork {
     }
 
     @Override
-    public Set<CFENetworkMember> getAvailableNetworkTargets(CFENetworkMember sender) {
+    public Set<CFENetworkMember> getAvailableNetworkTargets(CFENetworkMember requesterMember) {
         return Set.of();
     }
 
