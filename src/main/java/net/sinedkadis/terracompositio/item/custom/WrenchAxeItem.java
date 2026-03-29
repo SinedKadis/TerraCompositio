@@ -87,7 +87,7 @@ public class WrenchAxeItem extends AxeItem {
             if (stack.getTag() != null) {
                 stack.getTag().putInt("WrenchMode", getWrenchMode(stack).ordinal());
             }
-            pPlayer.displayClientMessage(Component.translatable("message.terracompositio.wrench_mode", getWrenchMode(stack).getDisplayName()), true);
+            pPlayer.displayClientMessage(Component.translatable("message.terracompositio.changed_tool_mode", getWrenchMode(stack).getDisplayName()), true);
         }
         return super.use(pLevel, pPlayer, pUsedHand);
     }
@@ -115,20 +115,12 @@ public class WrenchAxeItem extends AxeItem {
         }
     }
 
-    private WrenchMode loadWrenchMode(ItemStack stack) {
+
+
+    public static WrenchMode getWrenchMode(ItemStack stack) {
         CompoundTag tag = stack.getOrCreateTag();
         if (tag.contains("WrenchMode")) {
             return WrenchMode.fromOrdinal(tag.getInt("WrenchMode"));
-        }
-        return WrenchMode.AXE;
-    }
-
-    public static WrenchMode getWrenchMode(ItemStack stack) {
-        if (stack.getItem() instanceof WrenchAxeItem) {
-            CompoundTag tag = stack.getOrCreateTag();
-            if (tag.contains("WrenchMode")) {
-                return WrenchMode.fromOrdinal(tag.getInt("WrenchMode"));
-            }
         }
         return WrenchMode.AXE;
     }
@@ -142,7 +134,7 @@ public class WrenchAxeItem extends AxeItem {
     public void inventoryTick(@NotNull ItemStack pStack, @NotNull Level pLevel, @NotNull Entity pEntity, int pSlotId, boolean pIsSelected) {
         super.inventoryTick(pStack, pLevel, pEntity, pSlotId, pIsSelected);
         if (!pLevel.isClientSide && pEntity instanceof Player) {
-            setWrenchMode(pStack,loadWrenchMode(pStack));
+            setWrenchMode(pStack,getWrenchMode(pStack));
         }
     }
 
@@ -653,15 +645,9 @@ public class WrenchAxeItem extends AxeItem {
     public void appendHoverText(@NotNull ItemStack pStack, @Nullable Level pLevel, @NotNull List<Component> pTooltipComponents, @NotNull TooltipFlag pIsAdvanced) {
         super.appendHoverText(pStack, pLevel, pTooltipComponents, pIsAdvanced);
         WrenchMode mode = WrenchMode.fromOrdinal(pStack.getOrCreateTag().getInt("WrenchMode"));
-        pTooltipComponents.add(Component.translatable("item.terracompositio.flow_rotating_axe.mode", mode.getDisplayName()).withStyle(ChatFormatting.GRAY));
+        pTooltipComponents.add(Component.translatable("item.terracompositio.tool_mode", mode.getDisplayName()).withStyle(ChatFormatting.GRAY));
     }
 
-    public static WrenchMode getMode(ItemStack stack) {
-        if (stack.getTag() != null && stack.hasTag() && stack.getTag().contains("WrenchMode")) {
-            return WrenchMode.values()[stack.getTag().getInt("WrenchMode")];
-        }
-        return WrenchMode.AXE; // Default mode
-    }
 
     private boolean wrenchInteraction(@Nullable Player pPlayer, BlockState pStateClicked, LevelAccessor level, BlockPos pos, boolean rightClicked, ItemStack wrenchStack) {
         Block block = pStateClicked.getBlock();
@@ -747,24 +733,17 @@ public class WrenchAxeItem extends AxeItem {
     }
 
     public enum WrenchMode {
-        AXE("axe"),
-        WRENCH_AXE("wrench_axe"),
-        WRENCH("wrench"),
-        CROWBAR("crowbar");
-
-        private final String name;
-
-        WrenchMode(String name) {
-            this.name = name;
-        }
+        AXE,
+        WRENCH_AXE,
+        WRENCH,
+        CROWBAR;
 
         public WrenchMode next() {
-            // Переход к следующему режиму по кругу
             return values()[(this.ordinal() + 1) % values().length];
         }
 
         public Component getDisplayName() {
-            return Component.translatable("item.terracompositio.flow_rotating_axe." + name);
+            return Component.translatable("item.terracompositio.flow_rotating_axe." + name().toLowerCase());
         }
 
         public static WrenchMode fromOrdinal(int ordinal) {

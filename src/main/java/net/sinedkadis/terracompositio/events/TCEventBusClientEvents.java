@@ -83,7 +83,7 @@ public class TCEventBusClientEvents {
         ItemProperties.register(
                 TCItems.WRENCH_AXE.get(),
                 ResourceLocation.parse("wrench_mode"),
-                (stack, level, entity, seed) -> WrenchAxeItem.getMode(stack).ordinal()
+                (stack, level, entity, seed) -> WrenchAxeItem.getWrenchMode(stack).ordinal()
         );
         ItemProperties.register(
                 TCItems.SHIELDED_BUNDLE.get(),

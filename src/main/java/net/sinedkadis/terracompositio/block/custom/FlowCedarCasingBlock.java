@@ -74,7 +74,7 @@ public class FlowCedarCasingBlock extends FlowCedarLikeBlock implements EntityBl
         ItemStack item2 = pPlayer.getItemInHand(InteractionHand.OFF_HAND);
         if (pState.getValue(AXIS).isVertical() && item2.getItem() instanceof WrenchAxeItem){
             if (item.is(TCItems.INFUSED_IRON_ROD.get()) && item.getCount() >= 8){
-                if (WrenchAxeItem.getMode(item2).equals(WrenchAxeItem.WrenchMode.WRENCH)) {
+                if (WrenchAxeItem.getWrenchMode(item2).equals(WrenchAxeItem.WrenchMode.WRENCH)) {
                     return handleInWorldBlockCraft(pState,
                             TCBlocks.FLOW_CEDAR_TANK.get().defaultBlockState()
                                     .setValue(FlowCedarTankBlock.STAGE, pState.getValue(INFUSED) ? 0 : 1),

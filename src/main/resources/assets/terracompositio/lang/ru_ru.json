@@ -65,9 +65,9 @@
   "item.terracompositio.flow_rotating_axe.wrench_axe": "Wrench-Axe Mode",
   "item.terracompositio.flow_rotating_axe.wrench": "Wrench Mode",
   "item.terracompositio.flow_rotating_axe.crowbar": "Crowbar Mode",
-  "message.terracompositio.wrench_mode": "Switched to %s",
+  "message.terracompositio.changed_tool_mode": "Switched to %s",
   "item.terracompositio.flow_rotating_axe": "Infused Iron Axe",
-  "item.terracompositio.flow_rotating_axe.mode": "Mode: %s",
+  "item.terracompositio.tool_mode": "Mode: %s",
   "item.terracompositio.flow_rotating_axe.too_massive_tree": "I can't. Maybe it's too big",
   "item.terracompositio.flow_rotating_axe.no_change": "I can't change anything here",
 
