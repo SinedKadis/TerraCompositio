@@ -24,7 +24,6 @@ import net.sinedkadis.terracompositio.api.networks.cfe.CFENetworkMember;
 import net.sinedkadis.terracompositio.api.networks.cfe.CFENetworkMemberBE;
 import net.sinedkadis.terracompositio.api.networks.cfe.CFENetworkMemberEntity;
 import net.sinedkadis.terracompositio.api.networks.cfe.ICFEHandler;
-import net.sinedkadis.terracompositio.block.behaviours.pp.ReceiverBehaviour;
 import net.sinedkadis.terracompositio.block.entity.PathPointerBlockEntity;
 import net.sinedkadis.terracompositio.block.entity.TCBlockEntity;
 import net.sinedkadis.terracompositio.entity.custom.CFECloudEntity;
@@ -175,7 +174,7 @@ public class CFEBurstProjectileEntity extends ThrowableProjectile {
     }
 
     private void tryRedirectByPPBE(PathPointerBlockEntity pathPointerBlockEntity, Vec3 burstDir) {
-        if (!ReceiverBehaviour.validAngle(pathPointerBlockEntity,burstDir)) return;
+        if (!PathPointerBlockEntity.validAngle(pathPointerBlockEntity,burstDir)) return;
 
         timeToLive += 100;
         setDeltaMovement(Vec3.ZERO);

@@ -17,6 +17,9 @@ import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
 import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBEBehaviour;
 import org.jetbrains.annotations.Nullable;
+import snownee.jade.api.BlockAccessor;
+import snownee.jade.api.ITooltip;
+import snownee.jade.api.config.IPluginConfig;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.*;
@@ -38,7 +41,6 @@ public abstract class TCBlockEntity extends BlockEntity{
     @Override
     public <T> LazyOptional<T> getCapability(Capability<T> cap, @Nullable Direction side) {
         Optional<? extends LazyOptional<?>> behaviourCap = behaviours.stream()
-                .filter(IBEBehaviour::isActive)
                 .map(iBehaviour -> iBehaviour.getCapability(cap, side))
                 .filter(Objects::nonNull)
                 .findAny();
@@ -47,49 +49,46 @@ public abstract class TCBlockEntity extends BlockEntity{
 
     public void tick(Level pLevel, BlockPos pPos, BlockState pState) {
         if (level instanceof ServerLevel)
-            behaviours.stream()
-                    .filter(IBEBehaviour::isActive)
-                    .forEach(IBEBehaviour::tick);
+            behaviours.forEach(IBEBehaviour::tick);
     }
 
     @Override
     public void onLoad() {
         super.onLoad();
-        behaviours.stream()
-                .filter(IBEBehaviour::isActive)
-                .forEach(IBEBehaviour::onChunkLoad);
+        behaviours.forEach(IBEBehaviour::onChunkLoad);
     }
 
     @Override
     public void setRemoved() {
-        behaviours.stream()
-                .filter(IBEBehaviour::isActive)
-                .forEach(IBEBehaviour::onRemoved);
+        behaviours.forEach(IBEBehaviour::onRemoved);
         super.setRemoved();
     }
 
     @Override
     public void invalidateCaps() {
         super.invalidateCaps();
-        behaviours.stream()
-                .filter(IBEBehaviour::isActive)
-                .forEach(IBEBehaviour::onInvalidateCaps);
+        behaviours.forEach(IBEBehaviour::onInvalidateCaps);
     }
 
     @Override
     protected void saveAdditional(CompoundTag pTag) {
         super.saveAdditional(pTag);
-        behaviours.stream()
-                .filter(IBEBehaviour::isActive)
-                .forEach(iBehaviour -> iBehaviour.onSave(pTag));
+        behaviours.forEach(iBehaviour -> iBehaviour.onSave(pTag));
     }
 
     @Override
     public void load(CompoundTag pTag) {
         super.load(pTag);
-        behaviours.stream()
-                .filter(IBEBehaviour::isActive)
-                .forEach(iBehaviour -> iBehaviour.onLoad(pTag));
+        behaviours.forEach(iBehaviour -> iBehaviour.onLoad(pTag));
+    }
+
+    public void onAppendTooltip(ITooltip iTooltip, BlockAccessor blockAccessor, IPluginConfig iPluginConfig){
+        CompoundTag serverData = blockAccessor.getServerData();
+        getBehaviours().forEach(ibeBehaviour -> ibeBehaviour.onAppendTooltip(iTooltip,serverData,iPluginConfig));
+    }
+
+    public void onAppendServerData(CompoundTag compoundTag){
+        getBehaviours().forEach(ibeBehaviour -> ibeBehaviour.onAppendServerData(compoundTag));
     }
 
     @Nullable

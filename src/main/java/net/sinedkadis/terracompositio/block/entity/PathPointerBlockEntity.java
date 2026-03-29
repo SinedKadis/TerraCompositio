@@ -30,13 +30,16 @@ import net.sinedkadis.terracompositio.api.networks.NetworkAction;
 import net.sinedkadis.terracompositio.api.networks.cfe.CFENetwork;
 import net.sinedkadis.terracompositio.api.networks.cfe.CFENetworkMember;
 import net.sinedkadis.terracompositio.api.networks.cfe.ICFEHandler;
-import net.sinedkadis.terracompositio.block.behaviours.pp.*;
 import net.sinedkadis.terracompositio.block.custom.PathPointerBlock;
 import net.sinedkadis.terracompositio.cfe.pp_network.PathPointerNetwork;
+import net.sinedkadis.terracompositio.compat.jade.JadeTerraCompositioPlugin;
 import net.sinedkadis.terracompositio.registries.TCBlockEntities;
 import net.sinedkadis.terracompositio.util.TCUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
+import snownee.jade.api.BlockAccessor;
+import snownee.jade.api.ITooltip;
+import snownee.jade.api.config.IPluginConfig;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.*;
@@ -56,11 +59,26 @@ public class PathPointerBlockEntity extends TCBlockEntity implements Nameable, C
 
     @Setter
     private boolean updateScheduled = false;
-    @Setter
-    private boolean ppUpdateScheduled = false;
 
     @Getter
     private BlockPos receiverPos = null;
+
+    public static boolean validAngle(PathPointerBlockEntity be, Vec3 burstDir) {
+
+        float yaw = be.rotationYaw;
+        float pitch = be.rotationPitch;
+
+        // куда смотрит блок
+        Vec3 lookDir = new Vec3(0, 0, 1)
+                .yRot(yaw)
+                .xRot(pitch)
+                .normalize();
+        //Todo: fix
+        double dot = burstDir.dot(lookDir);
+        //return dot > 0;
+        return true;
+    }
+
     public void setReceiverPos(@Nullable BlockPos receiverPos) {
         this.receiverPos = receiverPos;
     }
@@ -85,12 +103,7 @@ public class PathPointerBlockEntity extends TCBlockEntity implements Nameable, C
 
     @Override
     public void addBEBehaviours(List<IBEBehaviour> list) {
-        list.add(new CollectorBehaviour(this));
-        list.add(new EmitterBehaviour(this));
-        list.add(new ExtractorBehaviour(this));
-        list.add(new InfuserBehaviour(this));
-        list.add(new SenderBehaviour(this));
-        list.add(new ReceiverBehaviour(this));
+
     }
 
     @Override
@@ -111,12 +124,6 @@ public class PathPointerBlockEntity extends TCBlockEntity implements Nameable, C
             }
             setChanged();
             pLevel.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), 3);
-        }
-        if (ppUpdateScheduled) {
-            ppUpdateScheduled = false;
-            behaviours.stream()
-                    .filter(IBEBehaviour::isActive)
-                    .forEach(IBEBehaviour::onUpdate);
         }
     }
 
@@ -209,9 +216,6 @@ public class PathPointerBlockEntity extends TCBlockEntity implements Nameable, C
 
         storedPPBE.setUpdateScheduled(true);
         clickedPPBE.setUpdateScheduled(true);
-
-        storedPPBE.setPpUpdateScheduled(true);
-        clickedPPBE.setPpUpdateScheduled(true);
 
         if (pPlayer != null) {
             TCUtil.message(pPlayer, Component.translatable("item.terracompositio.flow_rotating_axe.bind_success").withStyle(ChatFormatting.BOLD));
@@ -492,6 +496,38 @@ public class PathPointerBlockEntity extends TCBlockEntity implements Nameable, C
     public static void loadFromTagToSet(CompoundTag pTag, String tag, Set<BlockPos> senderPoses) {
         ListTag tagList = pTag.getList(tag, CompoundTag.TAG_COMPOUND);
         senderPoses.addAll(tagList.stream().map(TCUtil::loadBlockPos).toList());
+    }
+
+    @Override
+    public void onAppendServerData(CompoundTag compoundTag) {
+        super.onAppendServerData(compoundTag);
+        //sender
+        BlockPos receiverPos = getReceiverPos();
+        if (receiverPos != null)
+            compoundTag.put("bindPos", TCUtil.saveBlockPos(receiverPos));
+        //receiver
+        PathPointerBlockEntity.saveFromSetToTag(compoundTag,PathPointerBlockEntity.SENDER_POSES_TAG,getSenderPoses());
+    }
+
+    @Override
+    public void onAppendTooltip(ITooltip iTooltip, BlockAccessor blockAccessor, IPluginConfig iPluginConfig) {
+        super.onAppendTooltip(iTooltip, blockAccessor, iPluginConfig);
+        CompoundTag serverData = blockAccessor.getServerData();
+        //sender
+        if (serverData.contains("bindPos") && iPluginConfig.get(JadeTerraCompositioPlugin.debugConfigRL())) {
+            BlockPos pos = TCUtil.loadBlockPos(serverData.getCompound("bindPos"));
+            iTooltip.add(Component.literal("ReceiverPos: " + pos.getX() + " " + pos.getY() + " " + pos.getZ()));
+        }
+        //receiver
+        if (iPluginConfig.get(JadeTerraCompositioPlugin.debugConfigRL())) {
+            Set<BlockPos> senderPoses = new HashSet<>();
+            PathPointerBlockEntity.loadFromTagToSet(serverData,PathPointerBlockEntity.SENDER_POSES_TAG, senderPoses);
+            int i = 1;
+            for (BlockPos pos : senderPoses) {
+                iTooltip.add(Component.literal("SenderPos " + i + ": " + pos.getX() + " " + pos.getY() + " " + pos.getZ()));
+                i = i + 1;
+            }
+        }
     }
 
     public void highlightNodes() {

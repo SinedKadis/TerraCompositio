@@ -31,9 +31,7 @@ public interface IBEBehaviour {
         return InteractionResult.PASS;
     }
     //misc
-    default void onUpdate(){}
-    default void parseBehaviourData(){}
-    default boolean isActive(){return true;}
+
 
     <T extends BlockEntity> T getBlockEntity();
 

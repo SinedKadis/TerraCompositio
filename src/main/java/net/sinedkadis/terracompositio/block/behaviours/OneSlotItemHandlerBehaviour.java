@@ -60,7 +60,7 @@ public class OneSlotItemHandlerBehaviour implements IBEItemBehaviour, WorldlyCon
 
     @Override
     public void tick() {
-        parseBehaviourData();
+
     }
 
     @Override

@@ -4,15 +4,12 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.sinedkadis.terracompositio.TerraCompositio;
-import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBEBehaviour;
 import net.sinedkadis.terracompositio.block.entity.TCBlockEntity;
 import snownee.jade.api.BlockAccessor;
 import snownee.jade.api.IBlockComponentProvider;
 import snownee.jade.api.IServerDataProvider;
 import snownee.jade.api.ITooltip;
 import snownee.jade.api.config.IPluginConfig;
-
-import java.util.Objects;
 
 public enum TCBlockEntityComponentProvider implements IBlockComponentProvider, IServerDataProvider<BlockAccessor> {
     INSTANCE;
@@ -22,11 +19,7 @@ public enum TCBlockEntityComponentProvider implements IBlockComponentProvider, I
     public void appendTooltip(ITooltip iTooltip, BlockAccessor blockAccessor, IPluginConfig iPluginConfig) {
         BlockEntity blockEntity = blockAccessor.getBlockEntity();
         if (blockEntity instanceof TCBlockEntity tcBlockEntity) {
-            CompoundTag serverData = blockAccessor.getServerData();
-            tcBlockEntity.getBehaviours().stream()
-                    .filter(Objects::nonNull)
-                    .filter(IBEBehaviour::isActive)
-                    .forEach(ibeBehaviour -> ibeBehaviour.onAppendTooltip(iTooltip,serverData,iPluginConfig));
+            tcBlockEntity.onAppendTooltip(iTooltip,blockAccessor,iPluginConfig);
         }
 
     }
@@ -40,11 +33,8 @@ public enum TCBlockEntityComponentProvider implements IBlockComponentProvider, I
     public void appendServerData(CompoundTag compoundTag, BlockAccessor blockAccessor) {
         BlockEntity blockEntity = blockAccessor.getBlockEntity();
         if (blockEntity instanceof TCBlockEntity tcBlockEntity) {
-            tcBlockEntity.getBehaviours().stream()
-                    .filter(IBEBehaviour::isActive)
-                    .forEach(ibeBehaviour -> ibeBehaviour.onAppendServerData(compoundTag));
+            tcBlockEntity.onAppendServerData(compoundTag);
         }
-
     }
 
 
