@@ -87,9 +87,9 @@ public class PathPointerBlockEntity extends TCBlockEntity implements Nameable, C
     private final Set<BlockPos> senderPoses = new HashSet<>();
 
     @Getter
-    private BlockPos emitterPos = null;
-    public void setEmitterPos(@Nullable BlockPos emitterPos) {
-        this.emitterPos = emitterPos;
+    private BlockPos outputPos = null;
+    public void setOutputPos(@Nullable BlockPos emitterPos) {
+        this.outputPos = emitterPos;
     }
 
 
@@ -119,7 +119,7 @@ public class PathPointerBlockEntity extends TCBlockEntity implements Nameable, C
         if (updateScheduled) {
             updateScheduled = false;
             if (parts.contains(PPPart.COLLECTOR)) {
-                BlockPos emitterPos = this.getEmitterPos();
+                BlockPos emitterPos = this.getOutputPos();
                 if (emitterPos == null) updatePPNetwork(this);
             }
             setChanged();
@@ -303,7 +303,7 @@ public class PathPointerBlockEntity extends TCBlockEntity implements Nameable, C
             }
         }
         return toReturn.stream()
-                .filter(ppBE -> ppBE.getEmitterPos() == null)
+                .filter(ppBE -> ppBE.getOutputPos() == null)
                 .collect(Collectors.toSet());
     }
 
@@ -329,13 +329,13 @@ public class PathPointerBlockEntity extends TCBlockEntity implements Nameable, C
             be.rotationYaw = 0;
             //be.rotationRoll = 0;
 
-            BlockPos emitterPos = be.getEmitterPos();
+            BlockPos emitterPos = be.getOutputPos();
             if (emitterPos != null) {
                 PathPointerBlockEntity emitter = (PathPointerBlockEntity) level.getBlockEntity(emitterPos);
                 if (emitter != null)
                     PathPointerNetwork.INSTANCE.firePPNetworkEvent(Pair.of(emitter, be), NetworkAction.REMOVE);
 
-                be.setEmitterPos(null);
+                be.setOutputPos(null);
             }
             BlockPos receiverPos = be.getReceiverPos();
             if (receiverPos != null) {
@@ -461,8 +461,8 @@ public class PathPointerBlockEntity extends TCBlockEntity implements Nameable, C
 
         if (receiverPos != null)
             pTag.put(RECEIVER_POS_TAG, TCUtil.saveBlockPos(receiverPos));
-        if (emitterPos != null)
-            pTag.put(EMITTER_POS_TAG, TCUtil.saveBlockPos(emitterPos));
+        if (outputPos != null)
+            pTag.put(EMITTER_POS_TAG, TCUtil.saveBlockPos(outputPos));
         saveFromSetToTag(pTag,SENDER_POSES_TAG, senderPoses);
         super.saveAdditional(pTag);
     }
@@ -480,7 +480,7 @@ public class PathPointerBlockEntity extends TCBlockEntity implements Nameable, C
 
         receiverPos = TCUtil.loadBlockPos(pTag.getCompound(RECEIVER_POS_TAG));
 
-        emitterPos = TCUtil.loadBlockPos(pTag.getCompound(EMITTER_POS_TAG));
+        outputPos = TCUtil.loadBlockPos(pTag.getCompound(EMITTER_POS_TAG));
 
         loadFromTagToSet(pTag,SENDER_POSES_TAG, senderPoses);
 
@@ -535,8 +535,8 @@ public class PathPointerBlockEntity extends TCBlockEntity implements Nameable, C
             if (receiverPos != null) {
                 addParticle(level,receiverPos, ParticleTypes.FLAME);
             }
-            if (emitterPos != null) {
-                addParticle(level,emitterPos, ParticleTypes.WAX_OFF);
+            if (outputPos != null) {
+                addParticle(level, outputPos, ParticleTypes.WAX_OFF);
             }
 
             senderPoses.forEach(blockpos ->

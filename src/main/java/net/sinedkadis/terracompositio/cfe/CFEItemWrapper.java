@@ -29,6 +29,7 @@ public class CFEItemWrapper implements ICFEHandler, ICapabilityProvider {
     @Setter
     protected int queued = 0;
     private final LazyOptional<ICFEHandler> holder = LazyOptional.of(() -> this);
+    private Runnable onCFEAppear = () -> {};
     @NotNull
     protected ItemStack container;
 
@@ -58,6 +59,10 @@ public class CFEItemWrapper implements ICFEHandler, ICapabilityProvider {
     public ICFEHandler setOffset(Function<Vec3, Vec3> offset) {
         return this;
     }
+    public ICFEHandler setOnCFEAppear(Runnable onCFEAppear) {
+        this.onCFEAppear = onCFEAppear;
+        return this;
+    }
 
     @Override
     public int takeCFE(int cfe, boolean simulate) {
@@ -80,6 +85,8 @@ public class CFEItemWrapper implements ICFEHandler, ICapabilityProvider {
         if (!simulate) {
             int cfe1 = this.getCFE();
             this.setCFE(cfe1 +toAdd);
+            if (cfe1 == 0)
+                onCFEAppear.run();
         }
         return toAdd;
     }
