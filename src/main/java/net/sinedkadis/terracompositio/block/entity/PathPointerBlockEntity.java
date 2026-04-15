@@ -13,6 +13,7 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.nbt.ListTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.StringRepresentable;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.Nameable;
@@ -23,6 +24,7 @@ import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
+import net.minecraftforge.network.PacketDistributor;
 import net.sinedkadis.terracompositio.api.TerraCompositioAPI;
 import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBEBehaviour;
 import net.sinedkadis.terracompositio.api.dummies.DummyCFEHandler;
@@ -33,6 +35,9 @@ import net.sinedkadis.terracompositio.api.networks.cfe.ICFEHandler;
 import net.sinedkadis.terracompositio.block.custom.PathPointerBlock;
 import net.sinedkadis.terracompositio.cfe.pp_network.PathPointerNetwork;
 import net.sinedkadis.terracompositio.compat.jade.JadeTerraCompositioPlugin;
+import net.sinedkadis.terracompositio.network.TCPackets;
+import net.sinedkadis.terracompositio.network.packets.S2CHighLightNodesSync;
+import net.sinedkadis.terracompositio.network.packets.S2CPlayerCfeContainerSync;
 import net.sinedkadis.terracompositio.registries.TCBlockEntities;
 import net.sinedkadis.terracompositio.util.TCUtil;
 import org.jetbrains.annotations.NotNull;
@@ -84,7 +89,7 @@ public class PathPointerBlockEntity extends TCBlockEntity implements Nameable, C
     }
 
     @Getter
-    private final Set<BlockPos> senderPoses = new HashSet<>();
+    private final Set<BlockPos> senderPoses = new HashSet<>(){};
 
     @Getter
     private BlockPos outputPos = null;
@@ -207,7 +212,6 @@ public class PathPointerBlockEntity extends TCBlockEntity implements Nameable, C
             }
         }
 
-
         storedPPBE.setChanged();
         clickedPPBE.setChanged();
 
@@ -223,6 +227,10 @@ public class PathPointerBlockEntity extends TCBlockEntity implements Nameable, C
                 assert player1 != null;
                 player1.broadcastBreakEvent(InteractionHand.MAIN_HAND);
             });
+            if (pPlayer instanceof ServerPlayer serverPlayer) {
+                TCPackets.CHANNEL.send(PacketDistributor.PLAYER.with(() -> serverPlayer), new S2CHighLightNodesSync(clickedPPBE));
+                TCPackets.CHANNEL.send(PacketDistributor.PLAYER.with(() -> serverPlayer), new S2CHighLightNodesSync(storedPPBE));
+            }
         }
         return true;
     }
@@ -354,7 +362,11 @@ public class PathPointerBlockEntity extends TCBlockEntity implements Nameable, C
             be.getSenderPoses().clear();
 
             be.setUpdateScheduled(true);
+            if (pPlayer instanceof ServerPlayer serverPlayer) {
+                TCPackets.CHANNEL.send(PacketDistributor.PLAYER.with(() -> serverPlayer), new S2CHighLightNodesSync(be));
+            }
         }
+
     }
 
     private static void storeToTag(@Nullable Player pPlayer, BlockPos pos, CompoundTag tag) {

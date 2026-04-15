@@ -39,9 +39,11 @@ public enum PathPointerNetwork {
     //Adds collector from pair to emitter from pair, and emitter, if it is not added yet
     private void add(Pair<PathPointerBlockEntity,PathPointerBlockEntity> emitterAndCollector) {
         PathPointerBlockEntity emitter = emitterAndCollector.getFirst();
+        if (!emitter.parts.contains(PathPointerBlockEntity.PPPart.EMITTER)) throw new RuntimeException("Emitter is not emitter: " + emitter);
         members.compute(emitter,(emitter1,set) ->{
             Set<PathPointerBlockEntity> collectors = new HashSet<>();
             PathPointerBlockEntity collector = emitterAndCollector.getSecond();
+            if (!emitter.parts.contains(PathPointerBlockEntity.PPPart.COLLECTOR)) throw new RuntimeException("Collector is not collector: " + collector);
             collectors.add(collector);
             collector.setOutputPos(emitter.getBlockPos());
             return collectors;
