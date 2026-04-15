@@ -601,7 +601,7 @@ public class TCUtil {
         tag.putInt("z",z);
         return tag;
     }
-    public static BlockPos loadBlockPos(Tag tag) {
+    public static @Nullable BlockPos loadBlockPos(Tag tag) {
         CompoundTag compoundTag;
         if (tag instanceof CompoundTag) {
             compoundTag = ((CompoundTag) tag);

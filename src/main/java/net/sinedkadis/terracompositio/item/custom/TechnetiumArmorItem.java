@@ -38,7 +38,7 @@ import net.sinedkadis.terracompositio.api.networks.cfe.CFENetworkMemberEntity;
 import net.sinedkadis.terracompositio.api.networks.cfe.ICFEHandler;
 import net.sinedkadis.terracompositio.block.entity.PathPointerBlockEntity;
 import net.sinedkadis.terracompositio.cfe.CFEItemWrapper;
-import net.sinedkadis.terracompositio.cfe.pp_network.PathPointerNetwork;
+import net.sinedkadis.terracompositio.cfe.CFEMemberProxy;
 import net.sinedkadis.terracompositio.item.models.TechnetiumBootsModel;
 import net.sinedkadis.terracompositio.item.models.TechnetiumCloakModel;
 import net.sinedkadis.terracompositio.item.models.TechnetiumCrownModel;
@@ -52,7 +52,6 @@ import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.*;
-import java.util.concurrent.atomic.AtomicReference;
 import java.util.function.Consumer;
 import java.util.stream.Collectors;
 
@@ -66,8 +65,7 @@ public class TechnetiumArmorItem extends TCArmorItem {
 
     public static final String crownModeTag = "crown_mode";
     private static final String cachedExtractorsTag = "cached_extractors";
-    private static final String scheduleRefreshTag = "schedule_refresh";
-    private static final int refreshRate = 20;
+
 
     @Override
     public Type getType() {
@@ -127,15 +125,6 @@ public class TechnetiumArmorItem extends TCArmorItem {
             case SEND,ALL -> {
                 if (!(pEntity instanceof CFENetworkMember pMember)) return;
 
-                CompoundTag tag = pStack.getOrCreateTag();
-
-                if (tag.getBoolean(scheduleRefreshTag)) {
-                    tag.putBoolean(scheduleRefreshTag,false);
-                    refreshCachedExtractors(pStack, pEntity);
-                } else if (icfeHandlerCFE.getCFE() > 0 && pEntity.tickCount % refreshRate == 0) {
-                    refreshCachedExtractors(pStack, pEntity);
-                }
-
                 if (icfeHandlerCFE.getCFE() > 0) {
                     getCachedExtractors(pStack).stream()
                             //Convert BlockPoses to PPBlockEntities
@@ -148,34 +137,16 @@ public class TechnetiumArmorItem extends TCArmorItem {
                                 BlockEntity outputEntity = pLevel.getBlockEntity(inputEntity.getOutputPos());
                                 //Search targets from output positions with entity member data
                                 TerraCompositioAPI.instance().getCFENetworkInstance().getAvailableNetworkTargets(
-                                        new PathPointerNetwork.CFEMemberProxy(pMember, (PathPointerBlockEntity) outputEntity))
+                                        new CFEMemberProxy(pMember, (PathPointerBlockEntity) outputEntity))
                                         .forEach(cfeNetworkMember ->
                                                 //Try to transfer to input position to the target
                                                 TCUtil.tryCFETransfer(
-                                                        new PathPointerNetwork.CFEMemberProxy(cfeNetworkMember,inputEntity),
+                                                        new CFEMemberProxy(cfeNetworkMember,inputEntity),
                                                         pMember));
                             });
                 }
             }
         }
-    }
-
-    public void refreshCachedExtractors(ItemStack pStack, Entity entity) {
-        AtomicReference<Set<BlockPos>> atomicExtractors = new AtomicReference<>();
-        PathPointerNetwork.INSTANCE.getMembers().values().stream()
-                .reduce((a,b) -> {
-                    a.addAll(b);
-                    return a;
-                }).ifPresent(set ->
-                        atomicExtractors.set(
-                        set.stream()
-                                .filter(be -> be.parts.contains(PathPointerBlockEntity.PPPart.EXTRACTOR))
-                                .map(PathPointerBlockEntity::getPos)
-                                .filter(pos -> pos.closerThan(entity.blockPosition(),5))
-                                .collect(Collectors.toSet())
-                ));
-        Set<BlockPos> pathPointerBlockEntities = atomicExtractors.get();
-        setCachedExtractors(pStack,pathPointerBlockEntities);
     }
 
     public static Set<BlockPos> getCachedExtractors(ItemStack itemStack) {
@@ -184,13 +155,6 @@ public class TechnetiumArmorItem extends TCArmorItem {
         return list.stream()
                 .map(TCUtil::loadBlockPos)
                 .collect(Collectors.toSet());
-    }
-
-    public static void setCachedExtractors(ItemStack itemStack, Set<BlockPos> list) {
-        CompoundTag persistentData = itemStack.getOrCreateTag();
-        ListTag listTag = new ListTag();
-        listTag.addAll(list.stream().map(TCUtil::saveBlockPos).toList());
-        persistentData.put(cachedExtractorsTag, listTag);
     }
 
     private void chestplateInventoryTick(ItemStack ignoredPStack, Level ignoredPLevel, Entity ignoredEntity, ICFEHandler ignoredIcfeHandler) {
@@ -431,8 +395,6 @@ public class TechnetiumArmorItem extends TCArmorItem {
     public @Nullable ICapabilityProvider initCapabilities(ItemStack stack, @Nullable CompoundTag nbt) {
         Type type = ((ArmorItem) stack.getItem()).getType();
         return (ICapabilityProvider) new CFEItemWrapper(stack)
-                .setOnCFEAppear(() ->
-                        stack.getOrCreateTag().putBoolean(scheduleRefreshTag,true))
                 .setMaxCFE(switch (type) {
             case LEGGINGS -> 100;
             case HELMET -> 10;

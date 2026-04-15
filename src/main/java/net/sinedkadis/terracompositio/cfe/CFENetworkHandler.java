@@ -2,11 +2,11 @@ package net.sinedkadis.terracompositio.cfe;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.common.MinecraftForge;
 import net.sinedkadis.terracompositio.api.networks.cfe.*;
 import net.sinedkadis.terracompositio.api.networks.NetworkAction;
 import net.sinedkadis.terracompositio.block.entity.PathPointerBlockEntity;
-import net.sinedkadis.terracompositio.cfe.pp_network.PathPointerNetwork;
 import net.sinedkadis.terracompositio.events.CFENetworkEvent;
 import net.sinedkadis.terracompositio.util.TCUtil;
 import org.checkerframework.checker.nullness.qual.Nullable;
@@ -30,16 +30,33 @@ public class CFENetworkHandler implements CFENetwork {
     }
 
     public void networkMemberUpdated(CFENetworkMember updated) {
-        if (cfeSources.containsKey(updated.getLevel())) {
-            cfeSources.get(updated.getLevel()).stream()
-                    //Range check: taken max range between two
-                    .filter(member -> updated.getPos().closerThan(member.getPos(),Math.max(updated.getRange(),member.getRange())))
-                    //Entity check: no self update
-                    .filter(member -> !updated.getEntity().equals(member.getEntity()))
-                    //Priority check: High priority updates low priority
-                    .filter(member -> updated.getPriority() > member.getPriority())
-                    .forEach(cfeNetworkMember -> cfeNetworkMember.scheduleMemberUpdate(updated));
-
+        Level level = updated.getLevel();
+        if (cfeSources.containsKey(level)) {
+            Queue<CFENetworkMember> queue = new LinkedList<>();
+            queue.add(updated);
+            while (!queue.isEmpty()) {
+                CFENetworkMember current = queue.poll();
+                cfeSources.get(level).stream()
+                        //Range check: taken max range between two
+                        .filter(member -> current.getPos().closerThan(member.getPos(), Math.max(current.getRange(), member.getRange())))
+                        //Entity check: no self update
+                        .filter(member -> !current.getEntity().equals(member.getEntity()))
+                        //Priority check: High priority updates low priority
+                        .filter(member -> current.getPriority() > member.getPriority())
+                        .peek(member -> {
+                            if (member.getEntity() instanceof PathPointerBlockEntity ppBE
+                                    && ppBE.parts.contains(PathPointerBlockEntity.PPPart.EMITTER)) {
+                                Set<BlockPos> inputPoses = ppBE.getInputPoses();
+                                inputPoses.forEach(blockPos -> {
+                                    BlockEntity blockEntity = level.getBlockEntity(blockPos);
+                                    if (blockEntity instanceof PathPointerBlockEntity inputEntity) {
+                                        queue.add(new CFEMemberProxy(updated,inputEntity));
+                                    }
+                                });
+                            }
+                        })
+                        .forEach(cfeNetworkMember -> cfeNetworkMember.scheduleMemberUpdate(current));
+            }
         }
 
     }
@@ -66,25 +83,38 @@ public class CFENetworkHandler implements CFENetwork {
 
     @Override
     public Set<CFENetworkMember> getAvailableNetworkTargets(CFENetworkMember requesterMember) {
-        if (cfeSources.containsKey(requesterMember.getLevel())) {
-            Set<CFENetworkMember> cfeNetworkMembers = cfeSources.get(requesterMember.getLevel());
-            Set<CFENetworkMember> normalFiltered = cfeNetworkMembers.stream()
-                    //Distance check: needs to be in source range
-                    .filter(member -> member.getPos().closerThan(requesterMember.getPos(), requesterMember.getRange()))
-                    //Priority check: needs to be higher
-                    .filter(member -> member.getPriority() > requesterMember.getPriority())
-                    //Space check: needs to have empty space
-                    //.filter(member -> member.getMainHandler().getFreeSpace() > 0)
-                    //Entity check: don't send to itself
-                    .filter(member -> !member.getEntity().equals(requesterMember.getEntity()))
-                    .collect(Collectors.toSet());
-            Set<CFENetworkMember> toReturn = new HashSet<>(normalFiltered);
-            normalFiltered.forEach(member -> {
-                if (member.getEntity() instanceof PathPointerBlockEntity ppBE
-                        && ppBE.parts.contains(PathPointerBlockEntity.PPPart.COLLECTOR)) {
-                    toReturn.addAll(PathPointerNetwork.INSTANCE.getAvailableTargetsToSend(ppBE, requesterMember));
-                }
-            });
+        Level level = requesterMember.getLevel();
+        if (cfeSources.containsKey(level)) {
+            Set<CFENetworkMember> toReturn = new HashSet<>();
+            Set<CFENetworkMember> cfeNetworkMembers = cfeSources.get(level);
+            Queue<CFENetworkMember> queue = new LinkedList<>();
+            queue.add(requesterMember);
+            while (!queue.isEmpty()) {
+                CFENetworkMember current = queue.poll();
+                Set<CFENetworkMember> filtered = cfeNetworkMembers.stream()
+                        //Distance check: needs to be in source range
+                        .filter(member -> member.getPos().closerThan(current.getPos(), current.getRange()))
+                        //Priority check: needs to be higher
+                        .filter(member -> member.getPriority() > current.getPriority())
+                        //Space check: needs to have empty space
+                        //.filter(member -> member.getMainHandler().getFreeSpace() > 0)
+                        //Entity check: don't send to itself
+                        .filter(member -> !member.getEntity().equals(current.getEntity()))
+                        .collect(Collectors.toSet());
+
+                toReturn.addAll(filtered);
+
+                filtered.forEach(member -> {
+                            if (member.getEntity() instanceof PathPointerBlockEntity ppBE
+                                    && ppBE.parts.contains(PathPointerBlockEntity.PPPart.COLLECTOR)) {
+                                BlockEntity blockEntity = level.getBlockEntity(ppBE.getOutputPos());
+                                if (blockEntity instanceof PathPointerBlockEntity outputEntity) {
+                                    queue.add(new CFEMemberProxy(requesterMember,outputEntity));
+                                }
+                            }
+                        });
+
+            }
             return toReturn.stream()
                     .filter(TCUtil::validMember)
                     .collect(Collectors.toSet());

@@ -33,9 +33,14 @@ public class ClientPacketHandlers {
             if (blockEntity instanceof PathPointerBlockEntity pathPointerBlockEntity) {
                 pathPointerBlockEntity.setOutputPos(msg.outputPos());
                 pathPointerBlockEntity.setReceiverPos(msg.receiverPos());
+
                 Set<BlockPos> senderPoses = pathPointerBlockEntity.getSenderPoses();
                 senderPoses.clear();
                 senderPoses.addAll(msg.senderPoses());
+
+                Set<BlockPos> inputPoses = pathPointerBlockEntity.getInputPoses();
+                inputPoses.clear();
+                inputPoses.addAll(msg.inputPoses());
             }
         }
     }
