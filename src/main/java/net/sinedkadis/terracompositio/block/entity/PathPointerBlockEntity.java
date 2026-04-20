@@ -131,6 +131,10 @@ public class PathPointerBlockEntity extends TCBlockEntity implements Nameable, C
     @Override
     public void setRemoved() {
         TerraCompositioAPI.INSTANCE.getCFENetworkInstance().fireCFENetworkEvent(this, NetworkAction.REMOVE);
+        assert this.level != null;
+        if (!this.level.getBlockState(this.getBlockPos()).equals(this.getBlockState())) {
+            clearAnyBindings(null,this);
+        }
         super.setRemoved();
     }
 
@@ -288,10 +292,19 @@ public class PathPointerBlockEntity extends TCBlockEntity implements Nameable, C
         secondPPBE.getSenderPoses().add(firstPos);
     }
 
-    private static @Nullable PathPointerBlockEntity getOutputOf(PathPointerBlockEntity secondPPBE) {
-        Level level = secondPPBE.level;
+    private static @Nullable PathPointerBlockEntity getOutputOf(PathPointerBlockEntity origin) {
+        Level level = origin.level;
         if (level == null) return null;
-        BlockPos.MutableBlockPos mutableBlockPos = secondPPBE.getBlockPos().mutable();
+        BlockPos.MutableBlockPos mutableBlockPos = origin.getBlockPos().mutable();
+        if (level.getBlockEntity(mutableBlockPos) == null) {
+            if (origin.parts.contains(PPPart.EMITTER) || origin.parts.contains(PPPart.INFUSER)) {
+                return origin;
+            } else {
+                BlockPos originOutputPos = origin.getReceiverPos();
+                if (originOutputPos != null)
+                    mutableBlockPos.set(originOutputPos);
+            }
+        }
         while (true) {
             BlockEntity blockEntity = level.getBlockEntity(mutableBlockPos);
             if (blockEntity instanceof PathPointerBlockEntity pathPointerBlockEntity) {
@@ -313,7 +326,9 @@ public class PathPointerBlockEntity extends TCBlockEntity implements Nameable, C
     private static Set<PathPointerBlockEntity> getInputOf(PathPointerBlockEntity firstPPBE) {
         Level level = firstPPBE.level;
         if (level == null) return Set.of();
-        Queue<BlockPos> queue = new LinkedList<>(firstPPBE.senderPoses);
+        Queue<BlockPos> queue = new LinkedList<>();
+        queue.add(firstPPBE.getBlockPos());
+        queue.addAll(firstPPBE.senderPoses);
         Set<PathPointerBlockEntity> toReturn = new HashSet<>();
         while (!queue.isEmpty()) {
             BlockPos current = queue.poll();
@@ -345,9 +360,13 @@ public class PathPointerBlockEntity extends TCBlockEntity implements Nameable, C
         be.rotationPitch = (float) Math.toDegrees(pitch);
     }
 
-    private static void clearAnyBindings(@Nullable Player pPlayer, LevelAccessor level, BlockPos blockPos) {
-        PathPointerBlockEntity be = ((PathPointerBlockEntity) level.getBlockEntity(blockPos));
+    public static void clearAnyBindings(@Nullable Player pPlayer, LevelAccessor level, BlockPos blockPos) {
+        clearAnyBindings(pPlayer, (PathPointerBlockEntity) level.getBlockEntity(blockPos));
+    }
+    public static void clearAnyBindings(@Nullable Player pPlayer, @Nullable PathPointerBlockEntity be) {
         if (be != null) {
+            Level level = be.level;
+            if (level == null) return;
             be.rotationPitch = 90;
             be.rotationYaw = 0;
             //be.rotationRoll = 0;
@@ -363,9 +382,11 @@ public class PathPointerBlockEntity extends TCBlockEntity implements Nameable, C
 
             PathPointerBlockEntity output = getOutputOf(be);
             if (output != null) {
+                inputs.add(be);
                 output.getInputPoses().removeAll(inputs.stream().map(BlockEntity::getBlockPos).collect(Collectors.toSet()));
                 inputs.forEach(input -> updateClientHighLight(pPlayer, input));
                 be.setOutputPos(null);
+                updateClientHighLight(pPlayer, output);
             }
             be.getInputPoses().clear();
 
