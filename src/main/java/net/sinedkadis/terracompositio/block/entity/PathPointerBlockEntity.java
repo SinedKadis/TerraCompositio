@@ -74,13 +74,12 @@ public class PathPointerBlockEntity extends TCBlockEntity implements Nameable, C
 
         // куда смотрит блок
         Vec3 lookDir = new Vec3(0, 0, 1)
-                .yRot(yaw)
-                .xRot(pitch)
+                .yRot((float) -Math.toRadians(yaw))  // минус!
+                .xRot((float) Math.toRadians(pitch))
                 .normalize();
-        //Todo: fix
+
         double dot = burstDir.dot(lookDir);
-        //return dot > 0;
-        return true;
+        return dot > 0;
     }
 
     public void setReceiverPos(@Nullable BlockPos receiverPos) {
@@ -292,6 +291,8 @@ public class PathPointerBlockEntity extends TCBlockEntity implements Nameable, C
         secondPPBE.getSenderPoses().add(firstPos);
     }
 
+
+
     private static @Nullable PathPointerBlockEntity getOutputOf(PathPointerBlockEntity origin) {
         Level level = origin.level;
         if (level == null) return null;
@@ -462,59 +463,124 @@ public class PathPointerBlockEntity extends TCBlockEntity implements Nameable, C
             @Nullable BlockPos senderBindPos,
             BlockPos origin
     ) {
-        // --- bind → вперёд
         Vec3 toBind = null;
-        if (senderBindPos != null) {
-            toBind = Vec3.atCenterOf(senderBindPos.subtract(origin)).normalize();
+
+        if (senderBindPos != null && !senderBindPos.equals(origin)) {
+            toBind = Vec3.atCenterOf(senderBindPos)
+                    .subtract(Vec3.atCenterOf(origin))
+                    .normalize();
         }
 
-        // --- receivers → наружу
-        List<Vec3> toReceivers = receiverSenderPoses.stream()
-                .map(p -> Vec3.atCenterOf(p.subtract(origin)).normalize())
+        List<Vec3> receivers = receiverSenderPoses.stream()
+                .filter(p -> !p.equals(origin))
+                .map(p -> Vec3.atCenterOf(p).subtract(Vec3.atCenterOf(origin)).normalize())
                 .toList();
 
-        // --- ВАЛИДАЦИЯ:
-        // если receiver и bind смотрят в одну полусферу → хуйня
-        if (toBind != null) {
-            for (Vec3 r : toReceivers) {
-                double dot = r.dot(toBind);
-                if (dot > 0) { // угол < 90°
-                    return null;
-                }
-            }
-        }
+        Vec3 lookDir = computeLookDir(receivers, toBind);
+        if (lookDir == null) return null;
 
-        // --- если receivers нет — строго на bind
-        if (toReceivers.isEmpty()) {
-            return toBind;
-        }
-
-        // --- среднее receivers → смотрим ОТ них
-        Vec3 receiversAvg = Vec3.ZERO;
-        for (Vec3 r : toReceivers) {
-            receiversAvg = receiversAvg.add(r);
-        }
-        receiversAvg = receiversAvg.normalize().scale(-1);
-
-        // --- тянем к bind
-        Vec3 lookDir = receiversAvg;
-        if (toBind != null) {
-            lookDir = lookDir.add(toBind).normalize();
-        }
-
-        // --- финальная проверка: receivers точно сзади
-        for (Vec3 r : toReceivers) {
-            if (lookDir.dot(r) > 0) {
-                return null;
-            }
-        }
-
-        // --- bind точно спереди
-        if (toBind != null && lookDir.dot(toBind) <= 0) {
+        if (!validateLookDir(lookDir, receivers, toBind)) {
             return null;
         }
 
         return lookDir;
+    }
+
+    @Nullable
+    private static Vec3 computeLookDir(
+            List<Vec3> receivers,
+            @Nullable Vec3 toBind
+    ) {
+        // --- CASE 1: только bind
+        if (receivers.isEmpty() && toBind != null) {
+            return toBind.normalize();
+        }
+
+        // --- CASE 2: только receivers
+        if (!receivers.isEmpty() && toBind == null) {
+            Vec3 avg = Vec3.ZERO;
+
+            for (Vec3 r : receivers) {
+                avg = avg.add(r);
+            }
+
+            if (avg.lengthSqr() < 1e-6) return null;
+
+            return avg.normalize().scale(-1);
+        }
+
+        // --- CASE 3: вообще ничего
+        if (receivers.isEmpty()) {
+            return null;
+        }
+
+        // --- CASE 4: оба есть
+        Vec3 avg = Vec3.ZERO;
+
+        for (Vec3 r : receivers) {
+            avg = avg.add(r);
+        }
+
+        if (avg.lengthSqr() < 1e-6) return null;
+        avg = avg.normalize();
+
+        Vec3 forward = Vec3.ZERO;
+
+        // bind важнее
+        forward = forward.add(toBind.scale(2.0));
+        forward = forward.add(avg.scale(-1));
+
+        if (forward.lengthSqr() < 1e-6) return null;
+
+        return forward.normalize();
+    }
+
+    private static boolean validateLookDir(
+            Vec3 lookDir,
+            List<Vec3> receivers,
+            @Nullable Vec3 toBind
+    ) {
+        // --- receivers должны быть сзади (в среднем)
+        if (!receivers.isEmpty()) {
+            Vec3 avg = Vec3.ZERO;
+
+            for (Vec3 r : receivers) {
+                avg = avg.add(r);
+            }
+
+            if (avg.lengthSqr() < 1e-6) return false;
+
+            avg = avg.normalize();
+
+            // avg должен смотреть примерно противоположно взгляду
+            if (lookDir.dot(avg) > -0.2) {
+                return false;
+            }
+        }
+
+        // --- bind должен быть спереди
+        if (toBind != null) {
+            if (lookDir.dot(toBind) < 0.2) {
+                return false;
+            }
+        }
+
+        // --- угол между bind и receivers ≥ 90° (по среднему)
+        if (toBind != null && !receivers.isEmpty()) {
+            Vec3 avg = Vec3.ZERO;
+
+            for (Vec3 r : receivers) {
+                avg = avg.add(r);
+            }
+
+            if (avg.lengthSqr() < 1e-6) return false;
+
+            avg = avg.normalize();
+
+            return !(avg.dot(toBind) > 0.0);
+        }
+
+        return true;
     }
 
     @Override
