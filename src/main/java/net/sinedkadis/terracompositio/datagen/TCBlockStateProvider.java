@@ -9,11 +9,12 @@ import net.minecraftforge.client.model.generators.BlockStateProvider;
 import net.minecraftforge.client.model.generators.ModelFile;
 import net.minecraftforge.client.model.generators.VariantBlockStateBuilder;
 import net.minecraftforge.common.data.ExistingFileHelper;
+import net.minecraftforge.fml.ModList;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
 import net.sinedkadis.terracompositio.TerraCompositio;
-import net.sinedkadis.terracompositio.registries.TCBlocks;
 import net.sinedkadis.terracompositio.block.custom.FlowCedarLikeBlock;
+import net.sinedkadis.terracompositio.registries.TCBlocks;
 
 import java.util.Objects;
 
@@ -58,6 +59,10 @@ public class TCBlockStateProvider extends BlockStateProvider {
 
 
         saplingBlock(TCBlocks.FLOW_CEDAR_SAPLING);
+
+        if (ModList.get().isLoaded("create")) {
+            TerraCompositio.createCompat.getDataGen().registerBlockStatesAndModels();
+        }
     }
 
     private void blockSideTopBottom(RegistryObject<Block> blockRegistryObject) {

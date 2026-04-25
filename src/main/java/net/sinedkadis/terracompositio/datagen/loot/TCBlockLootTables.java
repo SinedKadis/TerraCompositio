@@ -15,12 +15,15 @@ import net.minecraft.world.level.storage.loot.entries.LootItem;
 import net.minecraft.world.level.storage.loot.functions.ApplyBonusCount;
 import net.minecraft.world.level.storage.loot.functions.SetItemCountFunction;
 import net.minecraft.world.level.storage.loot.providers.number.UniformGenerator;
+import net.minecraftforge.fml.ModList;
 import net.minecraftforge.registries.RegistryObject;
+import net.sinedkadis.terracompositio.TerraCompositio;
 import net.sinedkadis.terracompositio.registries.TCBlocks;
 import net.sinedkadis.terracompositio.registries.TCItems;
 import org.jetbrains.annotations.NotNull;
 
 
+import java.util.HashSet;
 import java.util.Set;
 
 public class TCBlockLootTables extends BlockLootSubProvider {
@@ -108,6 +111,12 @@ public class TCBlockLootTables extends BlockLootSubProvider {
         this.dropSelf(TCBlocks.FLOATING_TORCH_HOLDER.get());
         this.dropSelf(TCBlocks.INFUSED_IRON_PRESSURE_PLATE.get());
         this.dropSelf(TCBlocks.INFUSED_IRON_DOOR.get());
+
+        if (ModList.get().isLoaded("create")) {
+            Set<Block> blocks = new HashSet<>();
+            TerraCompositio.createCompat.getDataGen().dropSelf(blocks);
+            blocks.forEach(this::dropSelf);
+        }
     }
 
     protected LootTable.Builder createCopperLikeOreDrops(Block pBlock, Item item) {

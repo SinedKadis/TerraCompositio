@@ -10,10 +10,10 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.armortrim.TrimMaterial;
 import net.minecraft.world.item.armortrim.TrimMaterials;
 import net.minecraft.world.level.block.Block;
-import net.minecraftforge.client.model.generators.ItemModelBuilder;
 import net.minecraftforge.client.model.generators.ItemModelProvider;
 import net.minecraftforge.client.model.generators.ModelFile;
 import net.minecraftforge.common.data.ExistingFileHelper;
+import net.minecraftforge.fml.ModList;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
 import net.sinedkadis.terracompositio.TerraCompositio;
@@ -100,6 +100,10 @@ public class TCItemModelProvider extends ItemModelProvider {
         saplingItem(TCBlocks.FLOW_CEDAR_SAPLING);
 
         withExistingParent(Objects.requireNonNull(TCItems.FLOW_CEDAR_ENT_SPAWN_EGG.getId()).getPath(), mcLoc("item/template_spawn_egg"));
+
+        if (ModList.get().isLoaded("create")) {
+            TerraCompositio.createCompat.getDataGen().registerItemModels();
+        }
     }
 
     // Shoutout to El_Redstoniano for making this
@@ -151,16 +155,16 @@ public class TCItemModelProvider extends ItemModelProvider {
     }
 
 
-    private ItemModelBuilder simpleItem(RegistryObject<Item> item) {
-        return withExistingParent(Objects.requireNonNull(item.getId()).getPath(),
+    private void simpleItem(RegistryObject<Item> item) {
+        withExistingParent(Objects.requireNonNull(item.getId()).getPath(),
                 ResourceLocation.tryParse("item/generated")).texture("layer0",
-                ResourceLocation.tryBuild(TerraCompositio.MOD_ID,"item/" + item.getId().getPath()));
+                ResourceLocation.tryBuild(TerraCompositio.MOD_ID, "item/" + item.getId().getPath()));
     }
 
-    private ItemModelBuilder saplingItem(RegistryObject<Block> item) {
-        return withExistingParent(Objects.requireNonNull(item.getId()).getPath(),
+    private void saplingItem(RegistryObject<Block> item) {
+        withExistingParent(Objects.requireNonNull(item.getId()).getPath(),
                 ResourceLocation.tryParse("item/generated")).texture("layer0",
-                ResourceLocation.tryBuild(TerraCompositio.MOD_ID,"block/" + item.getId().getPath()));
+                ResourceLocation.tryBuild(TerraCompositio.MOD_ID, "block/" + item.getId().getPath()));
     }
 
     public void evenSimplerBlockItem(RegistryObject<Block> block) {
@@ -209,10 +213,10 @@ public class TCItemModelProvider extends ItemModelProvider {
         }
     }
 
-    private ItemModelBuilder simpleBlockItem(RegistryObject<Block> item) {
-        return withExistingParent(Objects.requireNonNull(item.getId()).getPath(),
+    private void simpleBlockItem(RegistryObject<Block> item) {
+        withExistingParent(Objects.requireNonNull(item.getId()).getPath(),
                 ResourceLocation.tryParse("item/generated")).texture("layer0",
-                ResourceLocation.tryBuild(TerraCompositio.MOD_ID,"item/" + item.getId().getPath()));
+                ResourceLocation.tryBuild(TerraCompositio.MOD_ID, "item/" + item.getId().getPath()));
     }
 
 }

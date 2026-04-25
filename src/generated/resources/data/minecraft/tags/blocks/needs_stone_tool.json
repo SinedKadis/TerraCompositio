@@ -5,6 +5,7 @@
     "terracompositio:pp_collector",
     "terracompositio:pp_receiver",
     "terracompositio:pp_extractor",
-    "terracompositio:pp_infuser"
+    "terracompositio:pp_infuser",
+    "terracompositio:cedar_gearbox"
   ]
 }

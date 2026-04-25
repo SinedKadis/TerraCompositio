@@ -3,13 +3,12 @@ package net.sinedkadis.terracompositio.datagen;
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.tags.ItemTagsProvider;
-
 import net.minecraft.tags.ItemTags;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraftforge.common.Tags;
 import net.minecraftforge.common.data.ExistingFileHelper;
+import net.minecraftforge.fml.ModList;
 import net.sinedkadis.terracompositio.TerraCompositio;
 import net.sinedkadis.terracompositio.registries.TCBlocks;
 import net.sinedkadis.terracompositio.registries.TCItems;
@@ -96,5 +95,8 @@ public class TCItemTagGenerator extends ItemTagsProvider {
                 .add(Items.TORCH,
                         Items.REDSTONE_TORCH,
                         Items.SOUL_TORCH);
+        if (ModList.get().isLoaded("create")) {
+            TerraCompositio.createCompat.getDataGen().addItemTags(this, pProvider);
+        }
     }
 }

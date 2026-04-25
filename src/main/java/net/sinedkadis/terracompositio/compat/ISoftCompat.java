@@ -13,4 +13,6 @@ public interface ISoftCompat {
     void registerCreateBER(EntityRenderersEvent.RegisterRenderers event);
 
     void addCreativeTab(CreativeModeTab.Output output);
+
+    ISoftDataGen getDataGen();
 }

@@ -13,6 +13,7 @@ import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraftforge.common.crafting.conditions.IConditionBuilder;
+import net.minecraftforge.fml.ModList;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.sinedkadis.terracompositio.TerraCompositio;
 import net.sinedkadis.terracompositio.datagen.builders.FlowSaturationRecipeBuilder;
@@ -54,9 +55,15 @@ public class TCRecipeProvider extends RecipeProvider implements IConditionBuilde
         buildTechnetiumOreProcessing(pWriter);
         buildMisc(pWriter);
         buildSpecial(pWriter);
+        buildCompat(pWriter);
 
 
+    }
 
+    private void buildCompat(@NotNull Consumer<FinishedRecipe> pWriter) {
+        if (ModList.get().isLoaded("create")) {
+            TerraCompositio.createCompat.getDataGen().buildRecipes(this, pWriter);
+        }
     }
 
     private void buildFloatingRedstone(@NotNull Consumer<FinishedRecipe> pWriter) {

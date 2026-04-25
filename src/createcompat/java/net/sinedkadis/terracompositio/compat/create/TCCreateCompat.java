@@ -7,6 +7,8 @@ import net.minecraft.world.item.CreativeModeTab;
 import net.minecraftforge.client.event.EntityRenderersEvent;
 import net.sinedkadis.terracompositio.compat.CompatUtils;
 import net.sinedkadis.terracompositio.compat.ISoftCompat;
+import net.sinedkadis.terracompositio.compat.ISoftDataGen;
+import net.sinedkadis.terracompositio.compat.create.datagen.DataGenerators;
 import net.sinedkadis.terracompositio.compat.create.registries.CreateBlockEntities;
 import net.sinedkadis.terracompositio.compat.create.registries.CreateBlocks;
 
@@ -15,11 +17,13 @@ import static com.simibubi.create.api.stress.BlockStressValues.CAPACITIES;
 public class TCCreateCompat implements ISoftCompat {
     public CreateBlocks blocks;
     public CreateBlockEntities blockEntities;
+    public DataGenerators dataGen;
 
     @Override
     public void init() {
         blocks = new CreateBlocks();
         blockEntities = new CreateBlockEntities();
+        dataGen = new DataGenerators();
     }
 
     @Override
@@ -54,6 +58,11 @@ public class TCCreateCompat implements ISoftCompat {
     public void addCreativeTab(CreativeModeTab.Output output) {
         assert blocks.CEDAR_GEARBOX != null;
         output.accept(blocks.CEDAR_GEARBOX.get());
+    }
+
+    @Override
+    public ISoftDataGen getDataGen() {
+        return dataGen;
     }
 
 

@@ -17,6 +17,7 @@
     "terracompositio:pp_receiver",
     "terracompositio:pp_extractor",
     "terracompositio:pp_infuser",
-    "terracompositio:flow_cedar_ent_statue"
+    "terracompositio:flow_cedar_ent_statue",
+    "terracompositio:cedar_gearbox"
   ]
 }
