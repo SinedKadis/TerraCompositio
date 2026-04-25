@@ -1,0 +1,19 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "misc",
+  "key": {
+    "L": {
+      "item": "terracompositio:flow_cedar_log"
+    },
+    "S": {
+      "item": "create:shaft"
+    }
+  },
+  "pattern": [
+    "SLS"
+  ],
+  "result": {
+    "item": "terracompositio:cedar_gearbox"
+  },
+  "show_notification": true
+}
