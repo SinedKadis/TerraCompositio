@@ -8,7 +8,7 @@
     {
       "type": "patchouli:image",
       "images": [
-        "terracompositio:textures/illustrations/sapling_craft_image.png"
+        "terracompositio:textures/illustrations/flow_port_image.png"
       ],
       "text": "book.terracompositio.creation_flow_journal.entry.cedar_book_port.page2"
     }

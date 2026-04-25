@@ -17,8 +17,8 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.sinedkadis.terracompositio.TerraCompositio;
-import net.sinedkadis.terracompositio.registries.TCBlocks;
 import net.sinedkadis.terracompositio.recipe.FlowInfusionRecipe;
+import net.sinedkadis.terracompositio.registries.TCBlocks;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -82,7 +82,7 @@ public class FlowInfusionCategory implements IRecipeCategory<FlowInfusionRecipe>
         animatedArrow.draw(guiGraphics,47,35);
         String cfe = "CFE: "+ recipe.getCfe();
         String cfe_t = "CFE/t: "+ recipe.getCFETick();
-        String duration = "Duration: "+ recipe.getTicks()+" t.";
+        String duration = "Duration: " + recipe.getTicks() / 20f + " s.";
         guiGraphics.drawString(Minecraft.getInstance().font,cfe,5,50, Color.WHITE.getRGB());
         guiGraphics.drawString(Minecraft.getInstance().font,cfe_t,5,60, Color.WHITE.getRGB());
         guiGraphics.drawString(Minecraft.getInstance().font,duration,5,70, Color.WHITE.getRGB());
