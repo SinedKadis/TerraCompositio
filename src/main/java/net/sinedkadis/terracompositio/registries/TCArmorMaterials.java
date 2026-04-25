@@ -13,7 +13,7 @@ import java.util.function.Supplier;
 public enum TCArmorMaterials implements ArmorMaterial {
     FLOW_CEDAR("flow_cedar",10,new int[]{ 1, 3, 2, 1 },25,
             SoundEvents.ARMOR_EQUIP_LEATHER,1f,0f,() -> Ingredient.of(TCBlocks.FLOW_CEDAR_WOOD.get().asItem())),
-    FLOWING_FLOW_CEDAR("flowing_flow_cedar",1,new int[]{ 3, 5, 3, 2 },25,
+    FLOWING_FLOW_CEDAR("flowing_flow_cedar", 1, new int[]{3, 8, 3, 2}, 25,
             SoundEvents.BEACON_ACTIVATE,3f,2f,() -> Ingredient.of(TCBlocks.FLOW_CEDAR_WOOD.get().asItem())),
     TECHNETIUM("technetium",30,new int[]{ 5, 6, 6, 5 },50,
             SoundEvents.ARMOR_EQUIP_NETHERITE,5f,4f,() -> Ingredient.of(TCBlocks.TECHNETIUM_BLOCK.get().asItem()));
