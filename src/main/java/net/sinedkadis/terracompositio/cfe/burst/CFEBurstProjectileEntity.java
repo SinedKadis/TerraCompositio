@@ -174,7 +174,7 @@ public class CFEBurstProjectileEntity extends ThrowableProjectile {
     }
 
     private void tryRedirectByPPBE(PathPointerBlockEntity pathPointerBlockEntity, Vec3 burstDir) {
-        if (!PathPointerBlockEntity.validAngle(pathPointerBlockEntity,burstDir)) return;
+        if (!PathPointerBlockEntity.validAngle(pathPointerBlockEntity,burstDir.normalize())) return;
 
         timeToLive += 100;
         setDeltaMovement(Vec3.ZERO);
