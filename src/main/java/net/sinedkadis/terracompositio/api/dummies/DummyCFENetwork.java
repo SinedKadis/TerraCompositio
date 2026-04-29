@@ -44,4 +44,9 @@ public class DummyCFENetwork implements CFENetwork {
         return true;
     }
 
+    @Override
+    public void updateInRange(Level level, BlockPos origin, int range) {
+
+    }
+
 }

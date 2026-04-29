@@ -180,11 +180,23 @@ public class CFEBurstProjectileEntity extends ThrowableProjectile {
         setDeltaMovement(Vec3.ZERO);
         setPos(pathPointerBlockEntity.getPos().getCenter());
         BlockPos bindPos = pathPointerBlockEntity.getReceiverPos();
-        if (bindPos == null || bindPos.equals(BlockPos.ZERO)) {
-            bindPos = getTarget();
-        }
 
-        Vec3 shootVec = pathPointerBlockEntity.getBlockPos().getCenter().vectorTo(bindPos.getCenter());
+        Vec3 shootVec;
+
+        boolean bindposNotValid = bindPos == null || bindPos.equals(BlockPos.ZERO);
+        boolean isEmitter = pathPointerBlockEntity.parts.contains(PathPointerBlockEntity.PPPart.EMITTER);
+
+        if (bindposNotValid && isEmitter) {
+            bindPos = getTarget();
+            shootVec = pathPointerBlockEntity.getBlockPos().getCenter().vectorTo(bindPos.getCenter());
+        } else if (bindposNotValid) {
+                shootVec = new Vec3(0, 0, 1)
+                        .yRot((float) Math.toRadians(pathPointerBlockEntity.getRotationYaw()))
+                        .xRot((float) Math.toRadians(pathPointerBlockEntity.getRotationPitch()))
+                        .normalize();
+        } else shootVec = pathPointerBlockEntity.getBlockPos().getCenter().vectorTo(bindPos.getCenter());
+
+
         this.shoot(shootVec.x(),shootVec.y(),shootVec.z(),pathPointerBlockEntity.getMainHandler().getCfeTravelSpeed(),0);
 
     }

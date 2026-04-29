@@ -15,6 +15,8 @@ public interface CFENetwork {
     boolean isIn(Level pLevel, ICFEHandler cfeHandler);
     boolean isIn(Level pLevel, CFENetworkMember cfeHandler);
 
+    void updateInRange(Level level, BlockPos origin, int range);
+
     //Member getters
     @Nullable CFENetworkMember getMemberAt(Level level,BlockPos blockPos);
     Set<CFENetworkMember> getAvailableNetworkTargets(CFENetworkMember requesterMember);

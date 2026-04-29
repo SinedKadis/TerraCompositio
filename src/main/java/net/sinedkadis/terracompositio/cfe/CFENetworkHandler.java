@@ -62,6 +62,15 @@ public class CFENetworkHandler implements CFENetwork {
     }
 
     @Override
+    public void updateInRange(Level level, BlockPos origin, int range) {
+        if (cfeSources.containsKey(level)) {
+            cfeSources.get(level).stream()
+                    .filter(member -> member.getPos().closerThan(origin,range))
+                    .forEach(CFENetworkMember::scheduleMemberUpdate);
+        }
+    }
+
+    @Override
     public @Nullable CFENetworkMember getMemberAt(Level level, BlockPos blockPos) {
         if (cfeSources.containsKey(level)) {
             for (CFENetworkMember member : cfeSources.get(level)){
@@ -123,9 +132,12 @@ public class CFENetworkHandler implements CFENetwork {
                 filtered.forEach(member -> {
                             if (member.getEntity() instanceof PathPointerBlockEntity ppBE
                                     && ppBE.parts.contains(PathPointerBlockEntity.PPPart.COLLECTOR)) {
-                                BlockEntity blockEntity = level.getBlockEntity(ppBE.getOutputPos());
-                                if (blockEntity instanceof PathPointerBlockEntity outputEntity) {
-                                    queue.add(new CFEMemberProxy(requesterMember,outputEntity));
+                                BlockPos outputPos = ppBE.getOutputPos();
+                                if (outputPos != null) {
+                                    BlockEntity blockEntity = level.getBlockEntity(outputPos);
+                                    if (blockEntity instanceof PathPointerBlockEntity outputEntity) {
+                                        queue.add(new CFEMemberProxy(requesterMember, outputEntity));
+                                    }
                                 }
                             }
                         });

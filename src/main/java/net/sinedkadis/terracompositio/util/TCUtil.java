@@ -41,7 +41,9 @@ import net.sinedkadis.terracompositio.api.networks.cfe.*;
 import net.sinedkadis.terracompositio.block.custom.FlowCedarLikeBlock;
 
 
+import net.sinedkadis.terracompositio.block.entity.PathPointerBlockEntity;
 import net.sinedkadis.terracompositio.block.entity.TCBlockEntity;
+import net.sinedkadis.terracompositio.cfe.CFEMemberProxy;
 import net.sinedkadis.terracompositio.config.TCCommonConfigs;
 import net.sinedkadis.terracompositio.entity.custom.CFECloudEntity;
 import net.sinedkadis.terracompositio.particle.CFEParticleData;
@@ -78,6 +80,11 @@ public class TCUtil {
     }
 
     public static boolean validMember(CFENetworkMember target) {
+        if (target instanceof CFEMemberProxy proxy) {
+            if (proxy.proxy().parts.contains(PathPointerBlockEntity.PPPart.COLLECTOR)) {
+                if (proxy.proxy().getOutputPos() == null) return false;
+            }
+        }
         if (target.getEntity() instanceof BlockEntity memberBE) {
             return !memberBE.isRemoved();
         }
