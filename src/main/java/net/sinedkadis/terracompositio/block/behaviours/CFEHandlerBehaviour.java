@@ -112,7 +112,7 @@ public class CFEHandlerBehaviour implements IBECFEBehaviour {
             if (updated.getMainHandler().getFreeSpace() > TCCommonConfigs.CFE_PER_TICK_TRANSFER_LIMIT.get())
                 scheduleMemberUpdate(updated);
             TCUtil.tryCFETransfer(updated,this);
-        }
+        } else onCFENetworkMemberUpdate();
     }
 
     @Override

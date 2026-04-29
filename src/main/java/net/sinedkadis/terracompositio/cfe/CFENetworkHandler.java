@@ -100,10 +100,26 @@ public class CFENetworkHandler implements CFENetwork {
                         //.filter(member -> member.getMainHandler().getFreeSpace() > 0)
                         //Entity check: don't send to itself
                         .filter(member -> !member.getEntity().equals(current.getEntity()))
+                        //Redirect position of target to closest collector
+                        .map(member -> {
+                            if (current instanceof CFEMemberProxy proxy) {
+                                PathPointerBlockEntity ppBE = proxy.proxy();
+                                if (ppBE.parts.contains(PathPointerBlockEntity.PPPart.EMITTER)) {
+                                    BlockPos requesterMemberPos = requesterMember.getPos();
+                                    Optional<BlockPos> reduced = ppBE.getInputPoses().stream()
+                                            .reduce((input1, input2) ->
+                                                    requesterMemberPos.distSqr(input1) < requesterMemberPos.distSqr(input2)
+                                                            ? input1 : input2);
+                                    if (reduced.isPresent()) {
+                                        return new CFEMemberProxy(member,((PathPointerBlockEntity) level.getBlockEntity(reduced.get())));
+                                    }
+                                }
+                            }
+                            return member;
+                        })
                         .collect(Collectors.toSet());
 
                 toReturn.addAll(filtered);
-
                 filtered.forEach(member -> {
                             if (member.getEntity() instanceof PathPointerBlockEntity ppBE
                                     && ppBE.parts.contains(PathPointerBlockEntity.PPPart.COLLECTOR)) {

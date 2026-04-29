@@ -30,8 +30,10 @@ import net.sinedkadis.terracompositio.api.dummies.DummyCFEHandler;
 import net.sinedkadis.terracompositio.api.networks.NetworkAction;
 import net.sinedkadis.terracompositio.api.networks.cfe.CFENetwork;
 import net.sinedkadis.terracompositio.api.networks.cfe.CFENetworkMember;
+import net.sinedkadis.terracompositio.api.networks.cfe.CFENetworkMemberBE;
 import net.sinedkadis.terracompositio.api.networks.cfe.ICFEHandler;
 import net.sinedkadis.terracompositio.block.custom.PathPointerBlock;
+import net.sinedkadis.terracompositio.cfe.CFEMemberProxy;
 import net.sinedkadis.terracompositio.compat.jade.JadeTerraCompositioPlugin;
 import net.sinedkadis.terracompositio.network.TCPackets;
 import net.sinedkadis.terracompositio.network.packets.S2CHighLightNodesSync;
@@ -69,12 +71,14 @@ public class PathPointerBlockEntity extends TCBlockEntity implements Nameable, C
 
     public static boolean validAngle(PathPointerBlockEntity be, Vec3 burstDir) {
 
+        if (be.parts.contains(PPPart.COLLECTOR)) return true;
+
         float yaw = be.rotationYaw;
         float pitch = be.rotationPitch;
 
         // куда смотрит блок
         Vec3 lookDir = new Vec3(0, 0, 1)
-                .yRot((float) -Math.toRadians(yaw))  // минус!
+                .yRot((float) Math.toRadians(yaw))  // БЕЗ минуса
                 .xRot((float) Math.toRadians(pitch))
                 .normalize();
 
@@ -225,6 +229,40 @@ public class PathPointerBlockEntity extends TCBlockEntity implements Nameable, C
 
         inputs.forEach(inputPPBE -> fullUpdateBE(pPlayer, (ServerLevel) level, inputPPBE));
         fullUpdateBE(pPlayer, (ServerLevel) level, outputPPBE);
+
+        inputs.forEach(inputPPBE -> {
+            TerraCompositioAPI.instance().getCFENetworkInstance().fireCFENetworkEvent(new CFENetworkMemberBE() {
+                @Override
+                public int getRange() {
+                    return 5;
+                }
+
+                @Override
+                public int getPriority() {
+                    return 1000;
+                }
+
+                @Override
+                public ICFEHandler getMainHandler() {
+                    return DummyCFEHandler.instance;
+                }
+
+                @Override
+                public BlockEntity getEntity() {
+                    return inputPPBE;
+                }
+
+                @Override
+                public void updateIfScheduled() {
+
+                }
+
+                @Override
+                public void scheduleMemberUpdate() {
+
+                }
+            }, NetworkAction.UPDATE);
+        });
     }
 
     private static void tryBindInputsAndOutput(Set<PathPointerBlockEntity> inputs,@Nullable PathPointerBlockEntity outputPPBE) {

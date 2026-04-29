@@ -6,29 +6,7 @@ import net.sinedkadis.terracompositio.api.networks.cfe.CFENetworkMember;
 import net.sinedkadis.terracompositio.api.networks.cfe.ICFEHandler;
 import net.sinedkadis.terracompositio.block.entity.PathPointerBlockEntity;
 
-import java.util.Objects;
-
-public class CFEMemberProxy implements CFENetworkMember {
-
-    private final CFENetworkMember target;
-    private final PathPointerBlockEntity proxy;
-
-    public CFEMemberProxy(CFENetworkMember target, PathPointerBlockEntity proxy) {
-        this.target = target;
-        this.proxy = proxy;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (o == null || getClass() != o.getClass()) return false;
-        CFEMemberProxy that = (CFEMemberProxy) o;
-        return Objects.equals(target, that.target) && Objects.equals(proxy, that.proxy);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(target, proxy);
-    }
+public record CFEMemberProxy(CFENetworkMember target, PathPointerBlockEntity proxy) implements CFENetworkMember {
 
     @Override
     public int getRange() {
