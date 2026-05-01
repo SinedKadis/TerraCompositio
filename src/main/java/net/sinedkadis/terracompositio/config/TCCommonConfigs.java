@@ -7,6 +7,7 @@ public class TCCommonConfigs {
     public static final ForgeConfigSpec SPEC;
 
     public static final ForgeConfigSpec.ConfigValue<Integer> CFE_PER_TICK_TRANSFER_LIMIT;
+    public static final ForgeConfigSpec.ConfigValue<Integer> PLATFORM_ALIVE_PER_PLAYER;
 //    public static final ForgeConfigSpec.ConfigValue<Integer> CITRINE_ORE_VEIN_SIZE;
 
     static {
@@ -14,6 +15,8 @@ public class TCCommonConfigs {
 
         CFE_PER_TICK_TRANSFER_LIMIT = BUILDER.comment("How many cfe can be transferred between two entities per tick")
                 .define("CFE/tick transfer limit", 20);
+        PLATFORM_ALIVE_PER_PLAYER = BUILDER.comment("How many cfe boards from cfe charges can be")
+                .define("Max boards per player", 3);
 //        CITRINE_ORE_VEIN_SIZE = BUILDER.comment("How many Citrine Ore Blocks spawn in one Vein!")
 //                .defineInRange("Vein Size", 9, 4, 20);
 
