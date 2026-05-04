@@ -16,6 +16,7 @@ import net.sinedkadis.terracompositio.block.behaviours.CFEHandlerBehaviour;
 import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBEBehaviour;
 import net.sinedkadis.terracompositio.block.behaviours.TwoSlotItemHandlerBehaviour;
 import net.sinedkadis.terracompositio.compat.jade.JadeTerraCompositioPlugin;
+import net.sinedkadis.terracompositio.config.TCInnerConfig;
 import net.sinedkadis.terracompositio.particle.CFEParticleData;
 import net.sinedkadis.terracompositio.registries.TCBlockEntities;
 import net.sinedkadis.terracompositio.recipe.FlowInfusionRecipe;
@@ -51,7 +52,7 @@ public class FlowInfuserBlockEntity extends TCCraftingBlockEntity {
                     iTooltip.add(Component.translatable("block.terracompositio." + "cfe_tick", serverData.getFloat("cfe_tick")));
                 }
             }
-        }.priority(100));
+        }.priority(TCInnerConfig.DEFAULT_CONSUMER_PRIORITY));
         list.add(new TwoSlotItemHandlerBehaviour(this){
             @Override
             public int getLimitInSlot(int slot) {

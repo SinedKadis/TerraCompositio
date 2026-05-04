@@ -7,6 +7,7 @@ import net.sinedkadis.terracompositio.api.dummies.DummyCFEHandler;
 import net.sinedkadis.terracompositio.api.TCCapabilities;
 import net.sinedkadis.terracompositio.api.networks.cfe.CFENetworkMemberEntity;
 import net.sinedkadis.terracompositio.api.networks.cfe.ICFEHandler;
+import net.sinedkadis.terracompositio.config.TCInnerConfig;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 
@@ -46,7 +47,7 @@ public class PlayerMixin implements CFENetworkMemberEntity {
 
     @Override
     public int getPriority() {
-        return 100;
+        return TCInnerConfig.DEFAULT_CONSUMER_PRIORITY;
     }
 
     @Override

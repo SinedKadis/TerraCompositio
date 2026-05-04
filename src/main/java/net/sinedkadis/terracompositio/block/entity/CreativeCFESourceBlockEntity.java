@@ -5,6 +5,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.sinedkadis.terracompositio.block.behaviours.CFEHandlerBehaviour;
 import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBEBehaviour;
 import net.sinedkadis.terracompositio.cfe.CFEContainer;
+import net.sinedkadis.terracompositio.config.TCInnerConfig;
 import net.sinedkadis.terracompositio.registries.TCBlockEntities;
 import org.jetbrains.annotations.NotNull;
 
@@ -26,6 +27,6 @@ public class CreativeCFESourceBlockEntity extends TCBlockEntity{
                             return Integer.MAX_VALUE;
                         }
                     })
-                .priority(-100));
+                .priority(TCInnerConfig.DEFAULT_SOURCE_PRIORITY));
     }
 }

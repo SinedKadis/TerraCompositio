@@ -40,6 +40,7 @@ import net.sinedkadis.terracompositio.api.networks.cfe.ICFEHandler;
 import net.sinedkadis.terracompositio.api.TCCapabilities;
 import net.sinedkadis.terracompositio.block.entity.EntStatueBlockEntity;
 import net.sinedkadis.terracompositio.cfe.CFEContainer;
+import net.sinedkadis.terracompositio.config.TCInnerConfig;
 import net.sinedkadis.terracompositio.entity.goals.CFEHoldGoal;
 import net.sinedkadis.terracompositio.entity.goals.ReachSourceGoal;
 import net.sinedkadis.terracompositio.entity.goals.CFEExtractGoal;
@@ -311,7 +312,7 @@ public class FlowCedarEntEntity extends AbstractGolem implements CFENetworkMembe
 
     @Override
     public int getPriority() {
-        return 0;
+        return TCInnerConfig.DEFAULT_SOURCE_PRIORITY;
     }
 
     @Override

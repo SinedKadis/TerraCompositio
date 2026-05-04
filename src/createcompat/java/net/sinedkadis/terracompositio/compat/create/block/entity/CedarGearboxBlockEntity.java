@@ -16,6 +16,7 @@ import net.sinedkadis.terracompositio.api.networks.cfe.*;
 import net.sinedkadis.terracompositio.cfe.CFEContainer;
 import net.sinedkadis.terracompositio.compat.create.TCCreateCompat;
 import net.sinedkadis.terracompositio.compat.jade.JadeTerraCompositioPlugin;
+import net.sinedkadis.terracompositio.config.TCInnerConfig;
 import net.sinedkadis.terracompositio.registries.TCBlockStateProperties;
 import org.jetbrains.annotations.NotNull;
 import snownee.jade.api.ITooltip;
@@ -41,7 +42,7 @@ public class CedarGearboxBlockEntity extends GeneratingKineticBlockEntity implem
         super(Objects.requireNonNull(((TCCreateCompat) TerraCompositio.createCompat).blockEntities.CEDAR_GEARBOX_BE).get(),pPos, pBlockState);
         setLazyTickRate(60);
         this.range = 5;
-        this.priority = 100;
+        this.priority = TCInnerConfig.DEFAULT_CONSUMER_PRIORITY;
         this.capacity = 256f;
     }
 

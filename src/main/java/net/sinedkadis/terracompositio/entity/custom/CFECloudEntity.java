@@ -25,6 +25,7 @@ import net.sinedkadis.terracompositio.api.networks.cfe.ICFEHandler;
 import net.sinedkadis.terracompositio.cfe.LimitlessCFEContainer;
 import net.sinedkadis.terracompositio.cfe.burst.CFEBurstProjectileEntity;
 import net.sinedkadis.terracompositio.config.TCCommonConfigs;
+import net.sinedkadis.terracompositio.config.TCInnerConfig;
 import net.sinedkadis.terracompositio.registries.TCEntities;
 import net.sinedkadis.terracompositio.util.TCUtil;
 import org.jetbrains.annotations.Nullable;
@@ -244,7 +245,7 @@ public class CFECloudEntity extends Entity implements CFENetworkMemberEntity {
 
     @Override
     public int getPriority() {
-        return -100;
+        return TCInnerConfig.DEFAULT_SOURCE_PRIORITY;
     }
 
 

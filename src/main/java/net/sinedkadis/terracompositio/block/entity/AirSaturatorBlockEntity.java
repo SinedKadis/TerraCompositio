@@ -10,6 +10,7 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.sinedkadis.terracompositio.api.networks.cfe.ICFEHandler;
 import net.sinedkadis.terracompositio.block.behaviours.CFEHandlerBehaviour;
 import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBEBehaviour;
+import net.sinedkadis.terracompositio.config.TCInnerConfig;
 import net.sinedkadis.terracompositio.registries.TCBlockEntities;
 import net.sinedkadis.terracompositio.registries.TCBlockStateProperties;
 import net.sinedkadis.terracompositio.util.TCUtil;
@@ -31,7 +32,7 @@ public class AirSaturatorBlockEntity extends TCBlockEntity{
     public void addBEBehaviours(List<IBEBehaviour> list) {
         list.add(new CFEHandlerBehaviour(this)
                 .maxCFE(100)
-                .priority(100)
+                .priority(TCInnerConfig.DEFAULT_CONSUMER_PRIORITY)
                 .range(5));
 
     }

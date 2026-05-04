@@ -19,6 +19,7 @@ import net.minecraftforge.fluids.capability.templates.FluidTank;
 import net.sinedkadis.terracompositio.api.networks.cfe.ICFEHandler;
 import net.sinedkadis.terracompositio.block.behaviours.CFEHandlerBehaviour;
 import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBEBehaviour;
+import net.sinedkadis.terracompositio.config.TCInnerConfig;
 import net.sinedkadis.terracompositio.registries.TCBlockStateProperties;
 import net.sinedkadis.terracompositio.registries.TCFluids;
 import org.jetbrains.annotations.NotNull;
@@ -43,7 +44,7 @@ public abstract class AbstractDesorberBlockEntity extends TCBlockEntity {
     public void addBEBehaviours(@NotNull List<IBEBehaviour> list) {
         list.add(new CFEHandlerBehaviour(this)
                 .range(5)
-                .priority(-100));
+                .priority(TCInnerConfig.DEFAULT_SOURCE_PRIORITY));
     }
 
     //todo comparator compatibility
