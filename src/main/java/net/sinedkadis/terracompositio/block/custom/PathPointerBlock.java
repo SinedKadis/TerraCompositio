@@ -106,7 +106,7 @@ public class PathPointerBlock extends TCBaseEntityBlock {
                 PathPointerBlockEntity.PPPart oPart = pp.parts.get(replacePart == 0 ? 1 : 0);
                 if (oPart.isInput() != newPart.isInput()) {
                     pp.parts.set(replacePart, newPart);
-                    pp.setUpdateScheduled(true);
+                    PathPointerBlockEntity.update(pp);
                     if (!pPlayer.isCreative()) {
                         hand.shrink(1);
                     }

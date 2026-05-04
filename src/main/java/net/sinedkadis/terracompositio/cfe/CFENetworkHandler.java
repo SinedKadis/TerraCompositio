@@ -1,13 +1,17 @@
 package net.sinedkadis.terracompositio.cfe;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.phys.AABB;
 import net.minecraftforge.common.MinecraftForge;
 import net.sinedkadis.terracompositio.api.networks.cfe.*;
 import net.sinedkadis.terracompositio.api.networks.NetworkAction;
 import net.sinedkadis.terracompositio.block.entity.PathPointerBlockEntity;
 import net.sinedkadis.terracompositio.events.CFENetworkEvent;
+import net.sinedkadis.terracompositio.registries.TCItems;
 import net.sinedkadis.terracompositio.util.TCUtil;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
@@ -34,8 +38,10 @@ public class CFENetworkHandler implements CFENetwork {
         if (cfeSources.containsKey(level)) {
             Queue<CFENetworkMember> queue = new LinkedList<>();
             queue.add(updated);
+            Set<PathPointerBlockEntity> updatedEmitters = new HashSet<>();
             while (!queue.isEmpty()) {
                 CFENetworkMember current = queue.poll();
+
                 cfeSources.get(level).stream()
                         //Range check: taken max range between two
                         .filter(member -> current.getPos().closerThan(member.getPos(), Math.max(current.getRange(), member.getRange())))
@@ -45,7 +51,9 @@ public class CFENetworkHandler implements CFENetwork {
                         .filter(member -> current.getPriority() > member.getPriority())
                         .peek(member -> {
                             if (member.getEntity() instanceof PathPointerBlockEntity ppBE
-                                    && ppBE.parts.contains(PathPointerBlockEntity.PPPart.EMITTER)) {
+                                    && ppBE.parts.contains(PathPointerBlockEntity.PPPart.EMITTER)
+                                    && !updatedEmitters.contains(ppBE)) {
+                                updatedEmitters.add(ppBE);
                                 Set<BlockPos> inputPoses = ppBE.getInputPoses();
                                 inputPoses.forEach(blockPos -> {
                                     BlockEntity blockEntity = level.getBlockEntity(blockPos);
@@ -100,29 +108,57 @@ public class CFENetworkHandler implements CFENetwork {
             queue.add(requesterMember);
             while (!queue.isEmpty()) {
                 CFENetworkMember current = queue.poll();
+
+                List<PathPointerBlockEntity.PPPart> parts;
+                PathPointerBlockEntity collector;
+
+                //Check if proxy and add ents if infuser
+                if (current instanceof CFEMemberProxy proxy) {
+                    PathPointerBlockEntity proxyBE = proxy.proxy();
+                    parts = proxyBE.parts;
+
+                    BlockPos requesterMemberPos = requesterMember.getPos();
+                    Optional<BlockPos> collectorOpt = proxyBE.getInputPoses().stream()
+                            .reduce((input1, input2) ->
+                                    requesterMemberPos.distSqr(input1) < requesterMemberPos.distSqr(input2)
+                                            ? input1 : input2);
+                    if (collectorOpt.isPresent()) {
+                        collector = (PathPointerBlockEntity) level.getBlockEntity(collectorOpt.get());
+                        if (parts.contains(PathPointerBlockEntity.PPPart.INFUSER)) {
+                            List<CFEMemberProxy> ents = level.getEntitiesOfClass(
+                                            LivingEntity.class,
+                                            new AABB(proxyBE.getPos()).inflate(3),
+                                            flowCedarEntEntity -> flowCedarEntEntity.getItemBySlot(EquipmentSlot.HEAD)
+                                                    .is(TCItems.TECHNETIUM_CROWN.get())).stream()
+                                    .map(livingEntity -> livingEntity instanceof CFENetworkMemberEntity member1 ? member1 : null)
+                                    .filter(Objects::nonNull)
+                                    .map(cfeNetworkMemberEntity ->
+                                            new CFEMemberProxy(cfeNetworkMemberEntity, collector))
+                                    .toList();
+                            toReturn.addAll(ents);
+                        }
+                    } else {
+                        collector = null;
+                    }
+                } else {
+                    parts = null;
+                    collector = null;
+                }
+
+                //filter members and redirect if via path pointers
                 Set<CFENetworkMember> filtered = cfeNetworkMembers.stream()
                         //Distance check: needs to be in source range
                         .filter(member -> member.getPos().closerThan(current.getPos(), current.getRange()))
                         //Priority check: needs to be higher
                         .filter(member -> member.getPriority() > current.getPriority())
-                        //Space check: needs to have empty space
+                        //Space check: needs to have empty space (ignored because of path pointers)
                         //.filter(member -> member.getMainHandler().getFreeSpace() > 0)
                         //Entity check: don't send to itself
                         .filter(member -> !member.getEntity().equals(current.getEntity()))
                         //Redirect position of target to closest collector
                         .map(member -> {
-                            if (current instanceof CFEMemberProxy proxy) {
-                                PathPointerBlockEntity ppBE = proxy.proxy();
-                                if (ppBE.parts.contains(PathPointerBlockEntity.PPPart.EMITTER)) {
-                                    BlockPos requesterMemberPos = requesterMember.getPos();
-                                    Optional<BlockPos> reduced = ppBE.getInputPoses().stream()
-                                            .reduce((input1, input2) ->
-                                                    requesterMemberPos.distSqr(input1) < requesterMemberPos.distSqr(input2)
-                                                            ? input1 : input2);
-                                    if (reduced.isPresent()) {
-                                        return new CFEMemberProxy(member,((PathPointerBlockEntity) level.getBlockEntity(reduced.get())));
-                                    }
-                                }
+                            if (parts != null && collector != null && parts.contains(PathPointerBlockEntity.PPPart.EMITTER)) {
+                                return new CFEMemberProxy(member, collector);
                             }
                             return member;
                         })

@@ -112,6 +112,7 @@ public class PathPointerBlockEntity extends TCBlockEntity implements Nameable, C
 
     }
 
+    int infuserTick = 100;
     @Override
     public void tick(Level pLevel, BlockPos pPos, BlockState pState) {
         super.tick(pLevel, pPos, pState);
@@ -124,8 +125,23 @@ public class PathPointerBlockEntity extends TCBlockEntity implements Nameable, C
         }
         if (updateScheduled) {
             updateScheduled = false;
-            setChanged();
-            pLevel.sendBlockUpdated(worldPosition, getBlockState(), getBlockState(), 3);
+            updateIfScheduled();
+            update(this);
+        }
+        if (parts.contains(PPPart.INFUSER)) {
+            infuserTick--;
+            if (infuserTick <= 0) {
+                infuserTick = 100;
+                scheduleMemberUpdate();
+            }
+        }
+    }
+
+    public static void update(PathPointerBlockEntity pathPointerBlockEntity) {
+        pathPointerBlockEntity.setChanged();
+        BlockState blockState = pathPointerBlockEntity.getBlockState();
+        if (pathPointerBlockEntity.level != null) {
+            pathPointerBlockEntity.level.sendBlockUpdated(pathPointerBlockEntity.worldPosition, blockState, blockState, 3);
         }
     }
 
@@ -241,12 +257,12 @@ public class PathPointerBlockEntity extends TCBlockEntity implements Nameable, C
         }
     }
 
-    private static void fullUpdateBE(@Nullable Player pPlayer, ServerLevel level, @Nullable PathPointerBlockEntity inputPPBE) {
-        if (inputPPBE == null) return;
-        inputPPBE.setChanged();
-        level.sendBlockUpdated(inputPPBE.getBlockPos(), inputPPBE.getBlockState(), inputPPBE.getBlockState(), 3);
-        inputPPBE.setUpdateScheduled(true);
-        updateClientHighLight(pPlayer, inputPPBE);
+    private static void fullUpdateBE(@Nullable Player pPlayer, ServerLevel level, @Nullable PathPointerBlockEntity ppBE) {
+        if (ppBE == null) return;
+        ppBE.setChanged();
+        level.sendBlockUpdated(ppBE.getBlockPos(), ppBE.getBlockState(), ppBE.getBlockState(), 3);
+        PathPointerBlockEntity.update(ppBE);
+        updateClientHighLight(pPlayer, ppBE);
     }
 
     private static void tryClearBindings(@Nullable Player pPlayer, LevelAccessor level, BlockPos clickedPos, BlockPos storedPos) throws BindException {
@@ -418,7 +434,8 @@ public class PathPointerBlockEntity extends TCBlockEntity implements Nameable, C
 
 
 
-            be.setUpdateScheduled(true);
+            update(be);
+
             updateClientHighLight(pPlayer, be);
         }
 
@@ -625,7 +642,7 @@ public class PathPointerBlockEntity extends TCBlockEntity implements Nameable, C
         loadFromTagToSet(pTag, INPUT_POSES_TAG, inputPoses);
 
 
-        setUpdateScheduled(true);
+        update(this);
     }
 
     public static void saveFromSetToTag(CompoundTag pTag, String tag, Set<BlockPos> senderPoses) {
@@ -774,11 +791,11 @@ public class PathPointerBlockEntity extends TCBlockEntity implements Nameable, C
 
     @Override
     public void updateIfScheduled() {
-
+        inputPoses.forEach(pos -> TerraCompositioAPI.instance().getCFENetworkInstance().updateInRange(level,pos,5));
     }
 
     public void scheduleMemberUpdate() {
-
+        updateScheduled = true;
     }
 
     public enum PPPart implements StringRepresentable {

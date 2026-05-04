@@ -95,7 +95,7 @@ public class CFEHandlerBehaviour implements IBECFEBehaviour {
 
     @Override
     public void onCFENetworkMemberUpdate() {
-        if (getPriority() < 0 && getMainHandler().getCFE() > 0){
+        if (getMainHandler().getCFE() > 0){
             CFENetwork cfeNetwork = TerraCompositioAPI.instance().getCFENetworkInstance();
             Set<CFENetworkMember> targets = cfeNetwork.getAvailableNetworkTargets(this);
             targets.forEach(target -> {
@@ -108,7 +108,7 @@ public class CFEHandlerBehaviour implements IBECFEBehaviour {
 
     @Override
     public void onCFENetworkMemberUpdate(CFENetworkMember updated) {
-        if (getPriority() < 0 && getMainHandler().getCFE() > 0 && TCUtil.validMember(updated)){
+        if (getMainHandler().getCFE() > 0 && TCUtil.validMember(updated)){
             if (updated.getMainHandler().getFreeSpace() > TCCommonConfigs.CFE_PER_TICK_TRANSFER_LIMIT.get())
                 scheduleMemberUpdate(updated);
             TCUtil.tryCFETransfer(updated,this);
