@@ -6,7 +6,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.event.ForgeEventFactory;
 import net.sinedkadis.terracompositio.api.TerraCompositioAPI;
 import net.sinedkadis.terracompositio.api.networks.cfe.*;
@@ -18,9 +17,6 @@ import net.sinedkadis.terracompositio.util.TCUtil;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.EnumSet;
-import java.util.Optional;
-import java.util.Set;
-import java.util.stream.Collectors;
 
 import static net.sinedkadis.terracompositio.registries.TCBlockStateProperties.INFUSED;
 
@@ -35,6 +31,11 @@ public class CFEExtractGoal extends Goal {
     private BlockPos targetPosition;
     private CFENetworkMember targetMember;
 
+    private int searchCooldown = 0;
+    private static final int SEARCH_INTERVAL = 20;
+
+    private @Nullable ICFEHandler cachedHeld;
+    private @Nullable ICFEHandler cachedInner;
 
     public CFEExtractGoal(FlowCedarEntEntity pMob, int extractRange) {
         this.mob = pMob;
@@ -45,112 +46,137 @@ public class CFEExtractGoal extends Goal {
 
     @Override
     public boolean canUse() {
-        Optional<ICFEHandler> capability = mob.getInnerCFEOptional().resolve();
+        if (searchCooldown-- > 0) return false;
+        searchCooldown = SEARCH_INTERVAL;
 
-        boolean cfeQueueEmpty = isCFEQueueEmpty();
-        boolean mobGriefingEvent = ForgeEventFactory.getMobGriefingEvent(this.level, this.mob);
-        boolean cfePresent = capability.filter(icfeHandler -> icfeHandler.getCFE() < 60).isPresent();
-        boolean extractionAllow = cfePresent
-                && mobGriefingEvent
-                && cfeQueueEmpty;
-        if (extractionAllow) {
-            targetMember = searchMember();
-            if (targetMember != null) return true;
-            targetPosition = searchLog();
-            return targetPosition != null;
-        }
-        return false;
+        if (!ForgeEventFactory.getMobGriefingEvent(this.level, this.mob)) return false;
+
+        cachedHeld = mob.getCapability(TCCapabilities.CFE).resolve().orElse(null);
+        cachedInner = mob.getInnerCFEOptional().resolve().orElse(null);
+
+        if (cachedInner == null || cachedInner.getCFE() >= 60) return false;
+        if (!isCFEQueueEmpty()) return false;
+
+        targetMember = searchMember();
+        if (targetMember != null) return true;
+
+        targetPosition = searchLog();
+        return targetPosition != null;
     }
 
     private @Nullable BlockPos searchLog() {
-        Optional<BlockPos> log = TCUtil.getNearBlocks(mob.getPos(), extractRange).stream()
-                .filter(pos -> {
-                    BlockState blockState = level.getBlockState(pos);
-                    return blockState.is(TCTags.Blocks.FLOW_CEDAR_LOGS) && blockState.getValue(INFUSED);
-                })
-                .findAny();
+        BlockPos mobPos = mob.blockPosition();
 
-        return log.orElse(null);
+        for (BlockPos pos : BlockPos.betweenClosed(
+                mobPos.offset(-extractRange, -extractRange, -extractRange),
+                mobPos.offset(extractRange, extractRange, extractRange)
+        )) {
+            if (!pos.closerThan(mobPos, extractRange)) continue;
+            BlockState blockState = level.getBlockState(pos);
+            if (blockState.is(TCTags.Blocks.FLOW_CEDAR_LOGS) && blockState.getValue(INFUSED)) {
+                return pos.immutable();
+            }
+        }
+        return null;
     }
 
     private @Nullable CFENetworkMember searchMember() {
-        Optional<CFENetworkMember> source = TerraCompositioAPI.instance().getCFENetworkInstance()
-                .getAllCFENetworkMembers(level).stream()
-                //Validate: entity is not removed
-                .filter(TCUtil::validMember)
-                //Distance check: needs to be in search limit
-                .filter(member -> member.getPos().closerThan(mob.getPos(),extractRange))
-                //Entity check: don`t take from itself
-                .filter(member -> !member.getEntity().equals(mob))
-                //CFE check: needs to be not empty
-                .filter(member -> member.getMainHandler().getCFE() > 0)
-                //Ent check: not ent or ent with 1000> cfe
-                .filter(member -> {
-                    boolean targetIsEnt = member instanceof FlowCedarEntEntity;
-                    boolean targetIsAcceptableEnt = targetIsEnt && ((FlowCedarEntEntity) member).getCapability(TCCapabilities.CFE)
-                            .filter(icfeHandler -> icfeHandler.getCFE() > 1000).isPresent();
-                    return !targetIsEnt || targetIsAcceptableEnt;
-                })
-                .findAny();
-        return source.orElse(null);
+        BlockPos mobPos = mob.blockPosition();
+
+        for (CFENetworkMember member : TerraCompositioAPI.instance()
+                .getCFENetworkInstance()
+                .getAllCFENetworkMembers(level)) {
+
+            if (!TCUtil.validMember(member)) continue;
+            if (!member.getPos().closerThan(mobPos, extractRange)) continue;
+            if (member.getEntity().equals(mob)) continue;
+            if (member.getMainHandler().getCFE() <= 0) continue;
+
+            if (member instanceof FlowCedarEntEntity ent) {
+                boolean hasEnough = ent.getCapability(TCCapabilities.CFE)
+                        .filter(h -> h.getCFE() > 1000)
+                        .isPresent();
+                if (!hasEnough) continue;
+            }
+
+            return member;
+        }
+        return null;
     }
 
+    @Override
     public void start() {
         this.mob.getNavigation().stop();
-        this.extractAnimationTick = 6*20;
+        this.extractAnimationTick = 6 * 20;
         mob.setExtracting(true);
     }
 
+    @Override
     public void stop() {
         this.extractAnimationTick = 0;
-        //this.mob.abortCFEConsume();
         this.mob.setExtracting(false);
+
+        this.targetPosition = null;
+        this.targetMember = null;
+        this.cachedHeld = null;
+        this.cachedInner = null;
     }
 
+    @Override
     public boolean canContinueToUse() {
         return this.extractAnimationTick > 0 || !isCFEQueueEmpty();
     }
 
     private boolean isCFEQueueEmpty() {
-        Optional<ICFEHandler> held = this.mob.getCapability(TCCapabilities.CFE).resolve();
-        Optional<ICFEHandler> inner = this.mob.getInnerCFEOptional().resolve();
-        if (held.isPresent() && inner.isPresent()){
-            ICFEHandler helded = held.get();
-            ICFEHandler innered = inner.get();
-            return helded.getCFE() + helded.getQueued() + innered.getQueued() <= 0;
-        }
-        return true;
+        ICFEHandler held = cachedHeld != null
+                ? cachedHeld
+                : mob.getCapability(TCCapabilities.CFE).resolve().orElse(null);
+        ICFEHandler inner = cachedInner != null
+                ? cachedInner
+                : mob.getInnerCFEOptional().resolve().orElse(null);
+
+        if (held == null || inner == null) return true;
+        return held.getCFE() + held.getQueued() + inner.getQueued() <= 0;
     }
 
+    @Override
     public void tick() {
         this.extractAnimationTick = Math.max(0, this.extractAnimationTick - 1);
         this.mob.getNavigation().stop();
-        if (targetPosition == null && targetMember != null) {
-            targetPosition = targetMember.getPos();
-        } else if (targetMember == null) return;
-        this.mob.lookAt(EntityAnchorArgument.Anchor.EYES,targetPosition.getCenter());
-        if (this.extractAnimationTick < 4*20) {
-            BlockPos blockPos = mob.blockPosition();
-            if (!targetPosition.equals(blockPos)) {
-                if (targetMember != null) {
-                    TCUtil.tryCFETransfer(mob, targetMember,1000);
-                    return;
-                }
 
-                Optional<ICFEHandler> cfeHandler = this.mob.getCapability(TCCapabilities.CFE).resolve();
-                if (cfeHandler.isPresent()) {
-                    ICFEHandler icfeHandler = cfeHandler.get();
-                    BlockState blockState = level.getBlockState(targetPosition);
-                    if (blockState.hasProperty(TCBlockStateProperties.INFUSED) && blockState.getValue(TCBlockStateProperties.INFUSED)) {
-                        //this.level.levelEvent(2001, blockpos1, Block.getId(Blocks.GRASS_BLOCK.defaultBlockState()));
-                        level.setBlockAndUpdate(targetPosition, blockState.setValue(TCBlockStateProperties.INFUSED, false));
-                        icfeHandler.addCFE(100, false);
-                    }
+        if (targetPosition == null) {
+            if (targetMember != null) {
+                targetPosition = targetMember.getPos();
+            } else {
+                return;
+            }
+        }
+
+        this.mob.lookAt(EntityAnchorArgument.Anchor.EYES, targetPosition.getCenter());
+
+        if (this.extractAnimationTick < 4 * 20) {
+            if (!targetPosition.equals(mob.blockPosition())) {
+                if (targetMember != null) {
+                    TCUtil.tryCFETransfer(mob, targetMember, 1000);
+                } else {
+                    extractFromLog();
                 }
             }
         }
-        if (this.extractAnimationTick < 20 && isCFEQueueEmpty()){
+
+        if (this.extractAnimationTick < 20 && isCFEQueueEmpty()) {
             this.mob.setExtracting(false);
+        }
+    }
+
+    private void extractFromLog() {
+        if (cachedHeld == null) return;
+        BlockState blockState = level.getBlockState(targetPosition);
+        if (blockState.hasProperty(TCBlockStateProperties.INFUSED)
+                && blockState.getValue(TCBlockStateProperties.INFUSED)) {
+            level.setBlockAndUpdate(targetPosition,
+                    blockState.setValue(TCBlockStateProperties.INFUSED, false));
+            cachedHeld.addCFE(100, false);
         }
     }
 }
