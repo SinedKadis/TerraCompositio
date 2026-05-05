@@ -84,9 +84,6 @@ public class FlowCedarEntEntity extends AbstractGolem implements CFENetworkMembe
 
     boolean scheduleUpdate = false;
 
-    @Setter @Getter @Nullable
-    private BlockPos sourcePos;
-
     public FlowCedarEntEntity(EntityType<? extends AbstractGolem> pEntityType, Level pLevel) {
         super(pEntityType, pLevel);
     }
@@ -248,7 +245,7 @@ public class FlowCedarEntEntity extends AbstractGolem implements CFENetworkMembe
 //        this.goalSelector.addGoal(2, new TemptGoal(this, 1.2D, Ingredient.of(Items.COOKED_BEEF), false));
 
         this.goalSelector.addGoal(3, new ReachSourceGoal(this,1.2D,32,3));
-        this.goalSelector.addGoal(3, new CFEExtractGoal(this));
+        this.goalSelector.addGoal(3, new CFEExtractGoal(this,3));
         this.goalSelector.addGoal(4, new WaterAvoidingRandomStrollGoal(this, 1.0D));
         this.goalSelector.addGoal(5, new LookAtPlayerGoal(this, Player.class, 3f));
         this.goalSelector.addGoal(6, new RandomLookAroundGoal(this));
@@ -335,8 +332,6 @@ public class FlowCedarEntEntity extends AbstractGolem implements CFENetworkMembe
         super.addAdditionalSaveData(pCompound);
         lazyCFEOptional.ifPresent(cap -> cap.writeToNBT(pCompound));
         innerCFEOptional.ifPresent(cap -> cap.writeToNBT(pCompound));
-        if (sourcePos != null)
-            pCompound.putIntArray("sourcePos", new int[]{sourcePos.getX(), sourcePos.getY(), sourcePos.getZ()});
     }
 
     @Override
@@ -344,9 +339,6 @@ public class FlowCedarEntEntity extends AbstractGolem implements CFENetworkMembe
         super.readAdditionalSaveData(pCompound);
         lazyCFEOptional.ifPresent(cap -> cap.readFromNBT(pCompound));
         innerCFEOptional.ifPresent(cap -> cap.readFromNBT(pCompound));
-        int[] pos = pCompound.getIntArray("sourcePos");
-        if (pos.length > 0)
-            sourcePos = new BlockPos(pos[0],pos[1],pos[2]);
     }
 
 

@@ -4,6 +4,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.entity.ai.navigation.PathNavigation;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.pathfinder.Path;
 import net.minecraft.world.phys.Vec3;
 import net.sinedkadis.terracompositio.api.TerraCompositioAPI;
@@ -13,9 +14,11 @@ import net.sinedkadis.terracompositio.api.TCCapabilities;
 import net.sinedkadis.terracompositio.entity.custom.FlowCedarEntEntity;
 import net.sinedkadis.terracompositio.registries.TCTags;
 import net.sinedkadis.terracompositio.util.TCUtil;
+import org.jetbrains.annotations.Nullable;
 
-import java.util.List;
 import java.util.Optional;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 import static net.sinedkadis.terracompositio.registries.TCBlockStateProperties.INFUSED;
 
@@ -38,48 +41,61 @@ public class ReachSourceGoal extends Goal {
     @Override
     public boolean canUse() {
         Optional<ICFEHandler> cfeHandler = mob.getInnerCFEOptional().resolve();
-        if (cfeHandler.isPresent() && cfeHandler.get().getCFE() <= 60){
-            BlockPos sourcePos = mob.getSourcePos();
-            if (sourcePos != null && sourcePos.closerThan(mob.blockPosition(),mob.getRange()-1)) {
-                return false;
+        if (cfeHandler.isPresent() && cfeHandler.get().getCFE() <= 60 && !mob.isExtracting() && !mob.isHolding()){
+            CFENetworkMember cfeNetworkMember = searchMember();
+            if (cfeNetworkMember != null) {
+                targetPosition = cfeNetworkMember.getPos().getCenter();
+                return true;
             }
-            Optional<CFENetworkMember> randomSourceInRange = TerraCompositioAPI.instance().getCFENetworkInstance()
-                    .getAllCFENetworkMembers(level).stream()
-                    //Distance check: needs to be in search limit
-                    .filter(member -> member.getPos().closerThan(mob.getPos(),searchLimit))
-                    //Entity check: don`t take from itself
-                    .filter(member -> !member.getEntity().equals(mob))
-                    .findAny();
-            if (randomSourceInRange.isPresent()){
-                CFENetworkMember cfeNetworkMember = randomSourceInRange.get();
-                boolean targetIsEnt = cfeNetworkMember instanceof FlowCedarEntEntity;
-                boolean targetIsAcceptableEnt = targetIsEnt && ((FlowCedarEntEntity) cfeNetworkMember).getCapability(TCCapabilities.CFE)
-                        .filter(icfeHandler -> icfeHandler.getCFE() > 1000).isPresent();
-                if (!targetIsEnt || targetIsAcceptableEnt) {
-                    BlockPos blockPos = cfeNetworkMember.getPos();
-                    mob.setSourcePos(blockPos);
-                    if (TCUtil.distSqr(blockPos, mob.blockPosition()) > (long) stopDistance * stopDistance) {
-                        targetPosition = blockPos.getCenter();
-                        return true;
-                    }
-                }
+            BlockPos logPos = searchLog();
+            if (logPos != null) {
+                targetPosition = logPos.getCenter();
+                return true;
             }
-            List<BlockPos> list = TCUtil.getNearBlocks(mob.getPos(), 10).stream()
-                    .filter(pos1 -> level.getBlockState(pos1).is(TCTags.Blocks.FLOW_CEDAR_LOGS))
-                    .filter(pos2 -> level.getBlockState(pos2).getValue(INFUSED))
-                    .toList();
-            if (!list.isEmpty()) {
-                int index = level.getRandom().nextInt(list.size());
-                BlockPos pos = list.get(index);
-                mob.setSourcePos(pos);
-                if (!pos.closerThan(mob.blockPosition(),stopDistance)) {
-                    targetPosition = pos.getCenter();
-                    return true;
-                }
-            }
-
         }
-        return false;
+        return targetPosition != null;
+    }
+
+    private @Nullable BlockPos searchLog() {
+        Set<BlockPos> logs = TCUtil.getNearBlocks(mob.getPos(), searchLimit).stream()
+                .filter(pos -> {
+                    BlockState blockState = level.getBlockState(pos);
+                    return blockState.is(TCTags.Blocks.FLOW_CEDAR_LOGS) && blockState.getValue(INFUSED);
+                })
+                .collect(Collectors.toSet());
+
+        for (BlockPos pos : logs) {
+            if (!pos.closerThan(mob.blockPosition(),stopDistance)) {
+                return pos;
+            } else return null;
+        }
+        return null;
+    }
+
+    private @Nullable CFENetworkMember searchMember() {
+        Set<CFENetworkMember> randomSourceInRange = TerraCompositioAPI.instance().getCFENetworkInstance()
+                .getAllCFENetworkMembers(level).stream()
+                //Validate: entity is not removed
+                .filter(TCUtil::validMember)
+                //Distance check: needs to be in search limit
+                .filter(member -> member.getPos().closerThan(mob.getPos(),searchLimit))
+                //Entity check: don`t take from itself
+                .filter(member -> !member.getEntity().equals(mob))
+                //CFE check: needs to be not empty
+                .filter(member -> member.getMainHandler().getCFE() > 0)
+                .collect(Collectors.toSet());
+        for (CFENetworkMember member : randomSourceInRange) {
+            boolean targetIsEnt = member instanceof FlowCedarEntEntity;
+            boolean targetIsAcceptableEnt = targetIsEnt && ((FlowCedarEntEntity) member).getCapability(TCCapabilities.CFE)
+                    .filter(icfeHandler -> icfeHandler.getCFE() > 1000).isPresent();
+            if (!targetIsEnt || targetIsAcceptableEnt) {
+                BlockPos blockPos = member.getPos();
+                if (!blockPos.closerThan(mob.blockPosition(), stopDistance)) {
+                    return member;
+                } else return null;
+            }
+        }
+        return null;
     }
 
     @Override
@@ -109,8 +125,6 @@ public class ReachSourceGoal extends Goal {
     }
 
     private boolean isInStopRange() {
-        double distance = this.mob.distanceToSqr(this.targetPosition.x, this.targetPosition.y, this.targetPosition.z);
-        long stop = (long) (stopDistance-1) * (stopDistance-1);
-        return distance <= stop;
+        return mob.position().closerThan(targetPosition,stopDistance);
     }
 }

@@ -202,16 +202,19 @@ public class CFEBurstProjectileEntity extends ThrowableProjectile {
     }
 
     private void tryConsumeCFENetworkMemberEntity(BlockPos blockPos, int cfe) {
-        level().getEntities(null, AABB.of(BoundingBox.fromCorners(blockPos, blockPos))).stream()
+        level().getEntities(this, new AABB(blockPos)).stream()
                 .filter(entity -> !(entity instanceof CFECloudEntity))
                 .map(entity -> entity instanceof CFENetworkMemberEntity memberEntity ? memberEntity : null)
                 .filter(Objects::nonNull)
-                .forEach(memberEntity -> {
-                    int added = memberEntity.getMainHandler().addCFE(cfe, true);
+                .map(CFENetworkMember::getMainHandler)
+                .forEach(cfeHandler -> {
+                    int added = cfeHandler.addCFE(cfe, true);
                     CFEBurstProjectileEntity burst = this.createPartWithCFE(added);
-                    int consumed = memberEntity.getMainHandler().addCFE(burst.getCFE(), false);
+                    int consumed = cfeHandler.addCFE(burst.getCFE(), false);
                     burst.discard();
-                    if (consumed == cfe) discard();
+                    if (consumed == cfe) {
+                        discard();
+                    }
                 });
     }
 
@@ -234,6 +237,8 @@ public class CFEBurstProjectileEntity extends ThrowableProjectile {
             memberBE.getCapability(TCCapabilities.CFE).orElse(DummyCFEHandler.instance).subFromQueue(getO_CFE());
         } else if (blockEntity instanceof CFENetworkMemberBE memberBE) {
             memberBE.getMainHandler().subFromQueue(getO_CFE());
+        } else if (getOwner() instanceof CFENetworkMemberEntity cfeNetworkMemberEntity) {
+            cfeNetworkMemberEntity.getMainHandler().subFromQueue(getO_CFE());
         }
         super.remove(pReason);
     }
