@@ -2,6 +2,7 @@ package net.sinedkadis.terracompositio.util;
 
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
+import lombok.extern.slf4j.Slf4j;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -35,14 +36,11 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.fluids.FluidStack;
-import net.sinedkadis.terracompositio.api.TCCapabilities;
-import net.sinedkadis.terracompositio.api.dummies.DummyCFEHandler;
 import net.sinedkadis.terracompositio.api.networks.cfe.*;
 import net.sinedkadis.terracompositio.block.custom.FlowCedarLikeBlock;
 
 
 import net.sinedkadis.terracompositio.block.entity.PathPointerBlockEntity;
-import net.sinedkadis.terracompositio.block.entity.TCBlockEntity;
 import net.sinedkadis.terracompositio.cfe.CFEMemberProxy;
 import net.sinedkadis.terracompositio.config.TCCommonConfigs;
 import net.sinedkadis.terracompositio.entity.custom.CFECloudEntity;
@@ -60,6 +58,7 @@ import java.util.function.Predicate;
 import static net.sinedkadis.terracompositio.block.entity.PathPointerBlockEntity.setYawAndPitchFromRot;
 import static net.sinedkadis.terracompositio.registries.TCBlockStateProperties.INFUSED;
 
+@Slf4j
 public class TCUtil {
 
 
@@ -67,7 +66,11 @@ public class TCUtil {
         tryCFETransfer(target, source, TCCommonConfigs.CFE_PER_BURST_TRANSFER_LIMIT.get());
     }
 
-    public static void tryCFETransfer(CFENetworkMember target, CFENetworkMember source, int maxTransfer){
+    public static void tryCFETransfer(CFENetworkMember target, CFENetworkMember source, int maxTransfer) {
+        tryCFETransfer(target, source, maxTransfer, 1 / 20f);
+    }
+
+    public static void tryCFETransfer(CFENetworkMember target, CFENetworkMember source, int maxTransfer, float speed){
         if (!validMember(target)) return;
         if (!validMember(source)) return;
         int taken = source.getMainHandler().takeCFE(maxTransfer,true);
@@ -75,12 +78,15 @@ public class TCUtil {
 
         if (added <= taken){
             if (added > 0 && target instanceof CFEMemberProxy proxy) {
-                PathPointerBlockEntity ppBE = proxy.proxy();
-                if (ppBE.parts.contains(PathPointerBlockEntity.PPPart.INFUSER)) {
-                    setYawAndPitchFromRot(ppBE.getOutputPos().getCenter().vectorTo(proxy.target().getPos().getCenter()),ppBE);
+                BlockPos pos = proxy.proxy().getOutputPos();
+                PathPointerBlockEntity ppBE = ((PathPointerBlockEntity) target.getLevel().getBlockEntity(pos));
+                if (ppBE != null) {
+                    if (ppBE.parts.contains(PathPointerBlockEntity.PPPart.INFUSER)) {
+                        setYawAndPitchFromRot(pos.getCenter().vectorTo(proxy.target().getPos().getCenter()), ppBE);
+                    }
                 }
             }
-            added = source.getMainHandler().sendCFE(added, target, false);
+            added = source.getMainHandler().sendCFE(added, target,speed, false);
             source.getMainHandler().takeCFE(added, false);
         }
 
@@ -105,14 +111,18 @@ public class TCUtil {
         tryCFETransfer(target, source, TCCommonConfigs.CFE_PER_BURST_TRANSFER_LIMIT.get());
     }
 
-    public static void tryCFETransfer(ICFEHandler target, ICFEHandler source, int maxTransfer){
+    public static void tryCFETransfer(ICFEHandler target, ICFEHandler source, int maxTransfer) {
+        tryCFETransfer(target, source, maxTransfer, 1 / 20f);
+    }
+
+    public static void tryCFETransfer(ICFEHandler target, ICFEHandler source, int maxTransfer, float speed){
         int taken = source.takeCFE(maxTransfer,true);
-        int added = source.sendCFE(taken,target,true);
+        int added = source.sendCFE(taken,target,speed,true);
         if (added <= taken){
             if (target.getPos().closerThan(source.getPos(),2))
                 added = target.addCFE(added, false);
             else
-                added = source.sendCFE(added, target, false);
+                added = source.sendCFE(added, target,speed, false);
             source.takeCFE(added, false);
         }
     }
@@ -164,22 +174,14 @@ public class TCUtil {
         return InteractionResult.sidedSuccess(pLevel.isClientSide);
     }
     public static @NotNull InteractionResult handleInWorldBlockCraft(BlockState oldState, BlockState newState, Level pLevel, BlockPos pPos, ItemStack item, int count) {
-        TCBlockEntity be = (TCBlockEntity) pLevel.getBlockEntity(pPos);
         float speed = 1/20f;
-        if (be != null) {
-            speed = be.getCapability(TCCapabilities.CFE).orElse(DummyCFEHandler.instance).getCfeTravelSpeed();
-        }
         return handleInWorldBlockCraft(oldState,newState,pLevel,pPos,item,count, new CFEParticleData(speed),SoundEvents.COPPER_PLACE);
     }
 
 
     public static void spawnParticlesIn(Level pLevel, BlockPos targetPos){
         if (pLevel instanceof ServerLevel level) {
-            TCBlockEntity be = (TCBlockEntity) pLevel.getBlockEntity(targetPos);
             float speed = 1/20f;
-            if (be != null) {
-                speed = be.getCapability(TCCapabilities.CFE).orElse(DummyCFEHandler.instance).getCfeTravelSpeed();
-            }
             level.sendParticles(new CFEParticleData(speed),
                 targetPos.getX()+pLevel.getRandom().nextFloat(),
                 targetPos.getY()+pLevel.getRandom().nextFloat(),
@@ -194,11 +196,7 @@ public class TCUtil {
     public static void spawnParticlesIn(Level pLevel, BlockPos targetPos, int count){
         for (int i = 0; i < count; i++) {
             if (pLevel instanceof ServerLevel level) {
-                TCBlockEntity be = (TCBlockEntity) pLevel.getBlockEntity(targetPos);
                 float speed = 1/20f;
-                if (be != null) {
-                    speed = be.getCapability(TCCapabilities.CFE).orElse(DummyCFEHandler.instance).getCfeTravelSpeed();
-                }
                 level.sendParticles(new CFEParticleData(speed),
                         targetPos.getX() + pLevel.getRandom().nextFloat(),
                         targetPos.getY() + pLevel.getRandom().nextFloat(),
@@ -362,11 +360,6 @@ public class TCUtil {
     public static void sendCFEParticles(ServerLevel level, Vec3 target, Vec3 source, int particleAmount, List<Vec3> offsets,float speed){
         if (particleAmount <= 0 || level == null) return;
         if (target == null) return;
-
-        BlockEntity be = level.getBlockEntity(BlockPos.containing(target));
-        if (be != null) {
-            speed = be.getCapability(TCCapabilities.CFE).orElse(DummyCFEHandler.instance).getCfeTravelSpeed();
-        }
 
         if (offsets == null) {
             offsets = new ArrayList<>();

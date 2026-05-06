@@ -16,6 +16,7 @@ import net.sinedkadis.terracompositio.api.networks.NetworkAction;
 import net.sinedkadis.terracompositio.api.networks.cfe.*;
 import net.sinedkadis.terracompositio.block.entity.TCBlockEntity;
 import net.sinedkadis.terracompositio.cfe.CFEContainer;
+import net.sinedkadis.terracompositio.cfe.CFEMemberProxy;
 import net.sinedkadis.terracompositio.compat.jade.JadeTerraCompositioPlugin;
 import net.sinedkadis.terracompositio.config.TCCommonConfigs;
 import net.sinedkadis.terracompositio.util.TCUtil;
@@ -109,8 +110,12 @@ public class CFEHandlerBehaviour implements IBECFEBehaviour {
     @Override
     public void onCFENetworkMemberUpdate(CFENetworkMember updated) {
         if (getMainHandler().getCFE() > 0 && TCUtil.validMember(updated)){
-            if (updated.getMainHandler().getFreeSpace() > TCCommonConfigs.CFE_PER_BURST_TRANSFER_LIMIT.get())
-                scheduleMemberUpdate(updated);
+            if (updated.getMainHandler().getFreeSpace() > TCCommonConfigs.CFE_PER_BURST_TRANSFER_LIMIT.get()) {
+                if (updated instanceof CFEMemberProxy proxy && proxy.target() instanceof CFENetworkMemberEntity) {
+                    if (updated.getPos().closerThan(proxy.proxy().getOutputPos(),getRange()))
+                        scheduleMemberUpdate(updated);
+                } else scheduleMemberUpdate(updated);
+            }
             TCUtil.tryCFETransfer(updated,this);
         } else onCFENetworkMemberUpdate();
     }
@@ -151,7 +156,6 @@ public class CFEHandlerBehaviour implements IBECFEBehaviour {
 
         compoundTag.putInt("max_cfe",getMainHandler().getMaxCFE());
         compoundTag.putInt("queued",getMainHandler().getQueued());
-        compoundTag.putFloat("speed",getMainHandler().getCfeTravelSpeed());
     }
 
     @Override

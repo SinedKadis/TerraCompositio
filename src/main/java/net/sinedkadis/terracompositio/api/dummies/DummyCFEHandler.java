@@ -16,12 +16,6 @@ import java.util.function.Function;
 @MethodsReturnNonnullByDefault
 public class DummyCFEHandler implements ICFEHandler {
     public static final DummyCFEHandler instance = new DummyCFEHandler();
-    public static final DummyCFEHandler instanceWithSpeed5 = new DummyCFEHandler(){
-        @Override
-        public float getCfeTravelSpeed() {
-            return 5/20f;
-        }
-    };
 
     @Override
     public int getCFE() {
@@ -46,17 +40,17 @@ public class DummyCFEHandler implements ICFEHandler {
     }
 
     @Override
-    public int sendCFE(int cfe, CFENetworkMember target, boolean simulate) {
+    public int sendCFE(int cfe, CFENetworkMember target, float speed, boolean simulate) {
+        return 0;
+    }
+
+    @Override
+    public int sendCFE(int cfe, ICFEHandler target, float speed, boolean simulate) {
         return 0;
     }
 
     @Override
     public int addCFE(int cfe, boolean simulate) {
-        return 0;
-    }
-
-    @Override
-    public int sendCFE(int cfe, ICFEHandler target, boolean simulate) {
         return 0;
     }
 
@@ -71,9 +65,7 @@ public class DummyCFEHandler implements ICFEHandler {
         return 0;
     }
 
-    @Override
-    public void setCfeTravelSpeed(float cfeTravelSpeed) {
-    }
+
 
     @Override
     public ICFEHandler setMaxCFE(int max) {
@@ -152,11 +144,6 @@ public class DummyCFEHandler implements ICFEHandler {
     @Override
     public ServerLevel getLevel() {
         return null;
-    }
-
-    @Override
-    public float getCfeTravelSpeed() {
-        return 0;
     }
 
     @Override

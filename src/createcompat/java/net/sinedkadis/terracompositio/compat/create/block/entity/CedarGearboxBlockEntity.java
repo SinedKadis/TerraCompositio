@@ -123,7 +123,6 @@ public class CedarGearboxBlockEntity extends GeneratingKineticBlockEntity implem
 
         compoundTag.putInt("max_cfe",getMainHandler().getMaxCFE());
         compoundTag.putInt("queued",getMainHandler().getQueued());
-        compoundTag.putFloat("speed",getMainHandler().getCfeTravelSpeed());
     }
 
     public void onAppendTooltip(ITooltip iTooltip, CompoundTag serverData, IPluginConfig iPluginConfig) {

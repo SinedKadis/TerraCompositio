@@ -29,7 +29,6 @@ public class CFEItemWrapper implements ICFEHandler, ICapabilityProvider {
     @Setter
     protected int queued = 0;
     private final LazyOptional<ICFEHandler> holder = LazyOptional.of(() -> this);
-    private Runnable onCFEAppear = () -> {};
     @NotNull
     protected ItemStack container;
 
@@ -59,10 +58,6 @@ public class CFEItemWrapper implements ICFEHandler, ICapabilityProvider {
     public ICFEHandler setOffset(Function<Vec3, Vec3> offset) {
         return this;
     }
-    public ICFEHandler setOnCFEAppear(Runnable onCFEAppear) {
-        this.onCFEAppear = onCFEAppear;
-        return this;
-    }
 
     @Override
     public int takeCFE(int cfe, boolean simulate) {
@@ -75,7 +70,7 @@ public class CFEItemWrapper implements ICFEHandler, ICapabilityProvider {
     }
 
     @Override
-    public int sendCFE(int cfe, CFENetworkMember target, boolean simulate) {
+    public int sendCFE(int cfe, CFENetworkMember target,float speed, boolean simulate) {
         return 0;
     }
 
@@ -85,15 +80,13 @@ public class CFEItemWrapper implements ICFEHandler, ICapabilityProvider {
         if (!simulate) {
             int cfe1 = this.getCFE();
             this.setCFE(cfe1 +toAdd);
-            if (cfe1 == 0)
-                onCFEAppear.run();
         }
         return toAdd;
     }
 
 
     @Override
-    public int sendCFE(int cfe, ICFEHandler target, boolean simulate) {
+    public int sendCFE(int cfe, ICFEHandler target,float speed, boolean simulate) {
         return 0;
     }
 
@@ -107,10 +100,6 @@ public class CFEItemWrapper implements ICFEHandler, ICapabilityProvider {
     public int getMaxCFE() {
         CompoundTag tag = container.getOrCreateTag();
         return tag.getInt("MAX_CFE");
-    }
-
-    @Override
-    public void setCfeTravelSpeed(float cfeTravelSpeed) {
     }
 
     @Override
@@ -179,11 +168,6 @@ public class CFEItemWrapper implements ICFEHandler, ICapabilityProvider {
     @Override
     public ServerLevel getLevel() {
         return null;
-    }
-
-    @Override
-    public float getCfeTravelSpeed() {
-        return 0;
     }
 
     @Override

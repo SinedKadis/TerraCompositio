@@ -779,7 +779,7 @@ public class PathPointerBlockEntity extends TCBlockEntity implements Nameable, C
 
     @Override
     public ICFEHandler getMainHandler() {
-        return DummyCFEHandler.instanceWithSpeed5;
+        return DummyCFEHandler.instance;
     }
 
     @Override
@@ -805,7 +805,9 @@ public class PathPointerBlockEntity extends TCBlockEntity implements Nameable, C
 
     public BlockPos getOutputPos() {
         BlockPos outputPos1 = this.outputPos;
-        if (outputPos1 == null && (parts.contains(PPPart.EMITTER) || parts.contains(PPPart.INFUSER))) {
+        if (outputPos1 == null
+                && (parts.contains(PPPart.EMITTER) || parts.contains(PPPart.INFUSER))
+                && (parts.contains(PPPart.COLLECTOR) || parts.contains(PPPart.EXTRACTOR))) {
             return worldPosition;
         }
         return outputPos1;
@@ -813,7 +815,9 @@ public class PathPointerBlockEntity extends TCBlockEntity implements Nameable, C
 
     public Set<BlockPos> getInputPoses() {
         Set<BlockPos> inputPoses1 = this.inputPoses;
-        if (inputPoses1.isEmpty() && (parts.contains(PPPart.EMITTER) || parts.contains(PPPart.INFUSER))) {
+        if (inputPoses1.isEmpty()
+                && (parts.contains(PPPart.EMITTER) || parts.contains(PPPart.INFUSER))
+                && (parts.contains(PPPart.COLLECTOR) || parts.contains(PPPart.EXTRACTOR))) {
             inputPoses1.add(worldPosition);
         }
         return inputPoses1;

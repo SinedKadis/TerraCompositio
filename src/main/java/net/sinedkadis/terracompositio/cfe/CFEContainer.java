@@ -28,7 +28,6 @@ import java.util.function.Function;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class CFEContainer implements ICFEHandler, INBTSerializable<CompoundTag> {
-    protected float cfeTravelSpeed = 1 / 20f;
     protected CFENetworkMember attachedMember;
     protected boolean isEntity = false;
     protected int index = 0;
@@ -40,11 +39,6 @@ public class CFEContainer implements ICFEHandler, INBTSerializable<CompoundTag> 
     public CFEContainer(CFENetworkMember attachedMember) {
         this.attachedMember = attachedMember;
         if (attachedMember instanceof  CFENetworkMemberEntity) isEntity = true;
-    }
-
-    @Override
-    public void setCfeTravelSpeed(float cfeTravelSpeed) {
-        this.cfeTravelSpeed = cfeTravelSpeed;
     }
 
     public CFEContainer setMaxCFE(int max) {
@@ -78,7 +72,7 @@ public class CFEContainer implements ICFEHandler, INBTSerializable<CompoundTag> 
 
 
     @Override
-    public int sendCFE(int cfe, ICFEHandler target, boolean simulate) {
+    public int sendCFE(int cfe, ICFEHandler target,float speed, boolean simulate) {
         int freeSpace = target.getFreeSpace();
         int available = this.getCFE();
         int added = Mth.clamp(cfe, 0, Math.min(available, freeSpace));
@@ -86,8 +80,7 @@ public class CFEContainer implements ICFEHandler, INBTSerializable<CompoundTag> 
             return 0;
 
         if (!simulate) {
-            float targetCfeTravelSpeed = target.getCfeTravelSpeed();
-            CFEBurstProjectileEntity entity = CFEBurstProjectileEntity.sendBurst(this, target, added, targetCfeTravelSpeed);
+            CFEBurstProjectileEntity entity = CFEBurstProjectileEntity.sendBurst(this, target, added, speed);
             if (entity != null)
                 target.addToQueue(added);
         }
@@ -95,7 +88,7 @@ public class CFEContainer implements ICFEHandler, INBTSerializable<CompoundTag> 
     }
 
     @Override
-    public int sendCFE(int cfe, CFENetworkMember target, boolean simulate) {
+    public int sendCFE(int cfe, CFENetworkMember target,float speed, boolean simulate) {
         int freeSpace = target.getMainHandler().getFreeSpace();
         int available = this.getCFE();
         int added = Mth.clamp(cfe, 0, Math.min(available, freeSpace));
@@ -103,8 +96,7 @@ public class CFEContainer implements ICFEHandler, INBTSerializable<CompoundTag> 
             return 0;
 
         if (!simulate) {
-            float targetCfeTravelSpeed = target.getMainHandler().getCfeTravelSpeed();
-            CFEBurstProjectileEntity entity = CFEBurstProjectileEntity.sendBurst(this, target, added, targetCfeTravelSpeed);
+            CFEBurstProjectileEntity entity = CFEBurstProjectileEntity.sendBurst(this, target, added, speed);
             if (entity != null)
                 target.getMainHandler().addToQueue(added);
         }

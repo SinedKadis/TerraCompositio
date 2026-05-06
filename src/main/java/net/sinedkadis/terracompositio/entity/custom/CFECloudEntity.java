@@ -60,7 +60,7 @@ public class CFECloudEntity extends Entity implements CFENetworkMemberEntity {
         }
 
         @Override
-        public int sendCFE(int cfe, ICFEHandler target, boolean simulate) {
+        public int sendCFE(int cfe, ICFEHandler target, float speed, boolean simulate) {
             int freeSpace = target.getFreeSpace();
             int added = Mth.clamp(cfe, 0, freeSpace);
             if (added < 1)
@@ -72,7 +72,7 @@ public class CFECloudEntity extends Entity implements CFENetworkMemberEntity {
                     target.addCFE(added,false);
                     return added;
                 }
-                CFEBurstProjectileEntity entity = CFEBurstProjectileEntity.sendBurst(this, burstOffset,target,added,getCfeTravelSpeed());
+                CFEBurstProjectileEntity entity = CFEBurstProjectileEntity.sendBurst(this, burstOffset,target,added,speed);
                 if (entity != null)
                     target.addToQueue(added);
             }

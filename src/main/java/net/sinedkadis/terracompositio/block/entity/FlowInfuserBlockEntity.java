@@ -121,9 +121,8 @@ public class FlowInfuserBlockEntity extends TCCraftingBlockEntity {
 
     private void spawnParticles() {
         if (level instanceof ServerLevel serverLevel) {
-            float speed = cfeContainer().getCfeTravelSpeed();
             BlockPos blockPos = getBlockPos();
-            serverLevel.sendParticles(new CFEParticleData(speed),
+            serverLevel.sendParticles(new CFEParticleData(1 / 20f),
                     blockPos.getX() + 0.5D,
                     blockPos.getY() + 0.5D,
                     blockPos.getZ() + 0.5D, 1, 0, -0.1D, 0, 0.1D);

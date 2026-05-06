@@ -15,7 +15,6 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.projectile.ThrowableProjectile;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.levelgen.structure.BoundingBox;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.sinedkadis.terracompositio.api.TCCapabilities;
@@ -26,6 +25,7 @@ import net.sinedkadis.terracompositio.api.networks.cfe.CFENetworkMemberEntity;
 import net.sinedkadis.terracompositio.api.networks.cfe.ICFEHandler;
 import net.sinedkadis.terracompositio.block.entity.PathPointerBlockEntity;
 import net.sinedkadis.terracompositio.block.entity.TCBlockEntity;
+import net.sinedkadis.terracompositio.cfe.CFEMemberProxy;
 import net.sinedkadis.terracompositio.entity.custom.CFECloudEntity;
 import net.sinedkadis.terracompositio.registries.TCEntities;
 import net.sinedkadis.terracompositio.registries.TCItems;
@@ -80,6 +80,12 @@ public class CFEBurstProjectileEntity extends ThrowableProjectile {
     private void init(ICFEHandler pSource,Vec3 offset,BlockPos targetPos, CFENetworkMember attachedMember, int cfe, float cfeTravelSpeed) {
         if (attachedMember instanceof LivingEntity livingEntity) {
             this.setOwner(livingEntity);
+        }
+        if (attachedMember instanceof CFEMemberProxy memberProxy) {
+            CFENetworkMember target = memberProxy.target();
+            if (target instanceof LivingEntity livingEntity) {
+                this.setOwner(livingEntity);
+            }
         }
         this.setO_CFE(cfe);
         this.setCFE(cfe);
@@ -197,7 +203,7 @@ public class CFEBurstProjectileEntity extends ThrowableProjectile {
         } else shootVec = pathPointerBlockEntity.getBlockPos().getCenter().vectorTo(bindPos.getCenter());
 
 
-        this.shoot(shootVec.x(),shootVec.y(),shootVec.z(),pathPointerBlockEntity.getMainHandler().getCfeTravelSpeed(),0);
+        this.shoot(shootVec.x(),shootVec.y(),shootVec.z(),5 / 20f,0);
 
     }
 
@@ -237,8 +243,14 @@ public class CFEBurstProjectileEntity extends ThrowableProjectile {
             memberBE.getCapability(TCCapabilities.CFE).orElse(DummyCFEHandler.instance).subFromQueue(getO_CFE());
         } else if (blockEntity instanceof CFENetworkMemberBE memberBE) {
             memberBE.getMainHandler().subFromQueue(getO_CFE());
-        } else if (getOwner() instanceof CFENetworkMemberEntity cfeNetworkMemberEntity) {
-            cfeNetworkMemberEntity.getMainHandler().subFromQueue(getO_CFE());
+        } else {
+            if (getOwner() instanceof CFEBurstProjectileEntity main) {
+                Entity target = main.getOwner();
+                if (target instanceof CFENetworkMemberEntity cfeNetworkMemberEntity) {
+                    cfeNetworkMemberEntity.getMainHandler().subFromQueue(getO_CFE());
+                }
+            }
+
         }
         super.remove(pReason);
     }

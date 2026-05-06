@@ -351,7 +351,7 @@ public class FlowCedarEntEntity extends AbstractGolem implements CFENetworkMembe
         if (getMainHandler().getCFE() > 0 && TCUtil.validMember(current)){
             if (current.getMainHandler().getFreeSpace() > TCCommonConfigs.CFE_PER_BURST_TRANSFER_LIMIT.get())
                 scheduleMemberUpdate(current);
-            TCUtil.tryCFETransfer(current,this);
+            TCUtil.tryCFETransfer(current,this,TCCommonConfigs.CFE_PER_BURST_TRANSFER_LIMIT.get(),5/20f);
         } else onCFENetworkMemberUpdate();
     }
 
