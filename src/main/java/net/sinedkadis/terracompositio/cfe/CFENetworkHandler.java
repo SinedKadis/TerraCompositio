@@ -7,9 +7,11 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.phys.AABB;
 import net.minecraftforge.common.MinecraftForge;
+import net.sinedkadis.terracompositio.api.TerraCompositioAPI;
 import net.sinedkadis.terracompositio.api.networks.cfe.*;
 import net.sinedkadis.terracompositio.api.networks.NetworkAction;
 import net.sinedkadis.terracompositio.block.entity.PathPointerBlockEntity;
+import net.sinedkadis.terracompositio.entity.custom.FlowCedarEntEntity;
 import net.sinedkadis.terracompositio.events.CFENetworkEvent;
 import net.sinedkadis.terracompositio.registries.TCItems;
 import net.sinedkadis.terracompositio.util.TCUtil;
@@ -37,7 +39,17 @@ public class CFENetworkHandler implements CFENetwork {
 
         while (!queue.isEmpty()) {
             CFENetworkMember current = queue.poll();
-
+            if (current instanceof CFEMemberProxy memberProxy) {
+                PathPointerBlockEntity ppBE = memberProxy.proxy();
+                if (ppBE.parts.contains(PathPointerBlockEntity.PPPart.EXTRACTOR)) {
+                    TerraCompositioAPI.instance().getCFENetworkInstance().getAllCFENetworkMembers(level).stream()
+                            .filter(FlowCedarEntEntity.class::isInstance)
+                            .map(FlowCedarEntEntity.class::cast)
+                            .filter(entEntity -> entEntity.getItemBySlot(EquipmentSlot.HEAD).is(TCItems.TECHNETIUM_CROWN.get()))
+                            .filter(entEntity -> entEntity.position().closerThan(ppBE.getBlockPos().getCenter(),3))
+                            .forEach(entEntity -> entEntity.scheduleMemberUpdate(memberProxy));
+                }
+            }
             for (CFENetworkMember member : members) {
                 if (!current.getPos().closerThan(member.getPos(), Math.max(current.getRange(), member.getRange()))) continue;
                 if (current.getEntity().equals(member.getEntity())) continue;

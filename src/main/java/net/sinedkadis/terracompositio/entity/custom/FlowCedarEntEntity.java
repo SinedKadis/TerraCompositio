@@ -34,11 +34,14 @@ import net.sinedkadis.terracompositio.api.TerraCompositioAPI;
 import net.sinedkadis.terracompositio.api.dummies.DummyCFEHandler;
 import net.sinedkadis.terracompositio.api.networks.NetworkAction;
 import net.sinedkadis.terracompositio.api.networks.cfe.CFENetwork;
+import net.sinedkadis.terracompositio.api.networks.cfe.CFENetworkMember;
 import net.sinedkadis.terracompositio.api.networks.cfe.CFENetworkMemberEntity;
 import net.sinedkadis.terracompositio.api.networks.cfe.ICFEHandler;
 import net.sinedkadis.terracompositio.api.TCCapabilities;
 import net.sinedkadis.terracompositio.block.entity.EntStatueBlockEntity;
 import net.sinedkadis.terracompositio.cfe.CFEContainer;
+import net.sinedkadis.terracompositio.cfe.CFEMemberProxy;
+import net.sinedkadis.terracompositio.config.TCCommonConfigs;
 import net.sinedkadis.terracompositio.config.TCInnerConfig;
 import net.sinedkadis.terracompositio.entity.goals.CFEHoldGoal;
 import net.sinedkadis.terracompositio.entity.goals.ReachSourceGoal;
@@ -49,8 +52,10 @@ import net.sinedkadis.terracompositio.util.TCUtil;
 import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.HashSet;
 import java.util.List;
 import java.util.Optional;
+import java.util.Set;
 
 // /kill @e[type=terracompositio:flow_cedar_ent_entity]
 
@@ -81,7 +86,10 @@ public class FlowCedarEntEntity extends AbstractGolem implements CFENetworkMembe
     public final AnimationState extractionCompleteAnimationState = new AnimationState();
     public final AnimationState cfeHoldState = new AnimationState();
 
-    boolean scheduleUpdate = false;
+    protected int scheduledMembersUpdate = -1;
+    protected Set<CFEMemberProxy> scheduledMembers = new HashSet<>();
+
+    boolean scheduledUpdate = false;
 
     public FlowCedarEntEntity(EntityType<? extends AbstractGolem> pEntityType, Level pLevel) {
         super(pEntityType, pLevel);
@@ -289,19 +297,6 @@ public class FlowCedarEntEntity extends AbstractGolem implements CFENetworkMembe
     }
 
     @Override
-    public void updateIfScheduled() {
-        if (scheduleUpdate) {
-            scheduleUpdate = false;
-            onCFENetworkMemberUpdate();
-        }
-    }
-
-    @Override
-    public void scheduleMemberUpdate() {
-        scheduleUpdate = true;
-    }
-
-    @Override
     public int getRange() {
         return 5;
     }
@@ -350,5 +345,41 @@ public class FlowCedarEntEntity extends AbstractGolem implements CFENetworkMembe
             }
         });
 
+    }
+
+    public void sendViaPP(CFEMemberProxy current) {
+        if (getMainHandler().getCFE() > 0 && TCUtil.validMember(current)){
+            if (current.getMainHandler().getFreeSpace() > TCCommonConfigs.CFE_PER_BURST_TRANSFER_LIMIT.get())
+                scheduleMemberUpdate(current);
+            TCUtil.tryCFETransfer(current,this);
+        } else onCFENetworkMemberUpdate();
+    }
+
+    @Override
+    public void scheduleMemberUpdate(CFENetworkMember updated) {
+        if (updated instanceof CFEMemberProxy proxy) {
+            this.scheduledMembers.add(proxy);
+            if (scheduledMembersUpdate < 0) scheduledMembersUpdate = TCCommonConfigs.TICKS_BETWEEN_BURSTS.get();
+        }
+    }
+
+    @Override
+    public void scheduleMemberUpdate() {
+        scheduledUpdate = true;
+    }
+
+    @Override
+    public void updateIfScheduled() {
+        if (scheduledUpdate) {
+            scheduledUpdate = false;
+            onCFENetworkMemberUpdate();
+        }
+        if (scheduledMembersUpdate == 0) {
+            scheduledMembersUpdate = -1;
+            Set<CFEMemberProxy> scheduledMembers1 = Set.copyOf(this.scheduledMembers);
+            this.scheduledMembers.clear();
+            scheduledMembers1.forEach(this::sendViaPP);
+        } else if (scheduledMembersUpdate > 0)
+            scheduledMembersUpdate--;
     }
 }
