@@ -99,7 +99,7 @@ public class CFECloudEntity extends Entity implements CFENetworkMemberEntity {
             CFENetwork cfeNetwork = TerraCompositioAPI.instance().getCFENetworkInstance();
             Set<CFENetworkMember> targets = cfeNetwork.getAvailableNetworkTargets(this);
             targets.forEach(target -> {
-                if (target.getMainHandler().getFreeSpace() > TCCommonConfigs.CFE_PER_TICK_TRANSFER_LIMIT.get())
+                if (target.getMainHandler().getFreeSpace() > TCCommonConfigs.CFE_PER_BURST_TRANSFER_LIMIT.get())
                     scheduleMemberUpdate(target);
                 TCUtil.tryCFETransfer(target, this);
             });
@@ -109,7 +109,7 @@ public class CFECloudEntity extends Entity implements CFENetworkMemberEntity {
     @Override
     public void onCFENetworkMemberUpdate(CFENetworkMember updated) {
         if (getPriority() < 0 && getMainHandler().getCFE() > 0 && TCUtil.validMember(updated)){
-            if (updated.getMainHandler().getFreeSpace() > TCCommonConfigs.CFE_PER_TICK_TRANSFER_LIMIT.get())
+            if (updated.getMainHandler().getFreeSpace() > TCCommonConfigs.CFE_PER_BURST_TRANSFER_LIMIT.get())
                 scheduleMemberUpdate(updated);
             TCUtil.tryCFETransfer(updated,this);
         }

@@ -99,7 +99,7 @@ public class CFEHandlerBehaviour implements IBECFEBehaviour {
             CFENetwork cfeNetwork = TerraCompositioAPI.instance().getCFENetworkInstance();
             Set<CFENetworkMember> targets = cfeNetwork.getAvailableNetworkTargets(this);
             targets.forEach(target -> {
-                if (target.getMainHandler().getFreeSpace() > TCCommonConfigs.CFE_PER_TICK_TRANSFER_LIMIT.get())
+                if (target.getMainHandler().getFreeSpace() > TCCommonConfigs.CFE_PER_BURST_TRANSFER_LIMIT.get())
                     scheduleMemberUpdate(target);
                 TCUtil.tryCFETransfer(target, this);
             });
@@ -109,7 +109,7 @@ public class CFEHandlerBehaviour implements IBECFEBehaviour {
     @Override
     public void onCFENetworkMemberUpdate(CFENetworkMember updated) {
         if (getMainHandler().getCFE() > 0 && TCUtil.validMember(updated)){
-            if (updated.getMainHandler().getFreeSpace() > TCCommonConfigs.CFE_PER_TICK_TRANSFER_LIMIT.get())
+            if (updated.getMainHandler().getFreeSpace() > TCCommonConfigs.CFE_PER_BURST_TRANSFER_LIMIT.get())
                 scheduleMemberUpdate(updated);
             TCUtil.tryCFETransfer(updated,this);
         } else onCFENetworkMemberUpdate();
@@ -208,6 +208,6 @@ public class CFEHandlerBehaviour implements IBECFEBehaviour {
     @Override
     public void scheduleMemberUpdate(CFENetworkMember updated) {
         this.scheduledMembers.add(updated);
-        if (scheduledMembersUpdate < 0) scheduledMembersUpdate = 5;
+        if (scheduledMembersUpdate < 0) scheduledMembersUpdate = TCCommonConfigs.TICKS_BETWEEN_BURSTS.get();
     }
 }

@@ -64,7 +64,7 @@ public class TCUtil {
 
 
     public static void tryCFETransfer(CFENetworkMember target, CFENetworkMember source) {
-        tryCFETransfer(target, source, TCCommonConfigs.CFE_PER_TICK_TRANSFER_LIMIT.get());
+        tryCFETransfer(target, source, TCCommonConfigs.CFE_PER_BURST_TRANSFER_LIMIT.get());
     }
 
     public static void tryCFETransfer(CFENetworkMember target, CFENetworkMember source, int maxTransfer){
@@ -77,7 +77,7 @@ public class TCUtil {
             if (added > 0 && target instanceof CFEMemberProxy proxy) {
                 PathPointerBlockEntity ppBE = proxy.proxy();
                 if (ppBE.parts.contains(PathPointerBlockEntity.PPPart.INFUSER)) {
-                    setYawAndPitchFromRot(ppBE.getBlockPos().getCenter().vectorTo(proxy.target().getPos().getCenter()),ppBE);
+                    setYawAndPitchFromRot(ppBE.getOutputPos().getCenter().vectorTo(proxy.target().getPos().getCenter()),ppBE);
                 }
             }
             added = source.getMainHandler().sendCFE(added, target, false);
@@ -102,7 +102,7 @@ public class TCUtil {
     }
 
     public static void tryCFETransfer(ICFEHandler target, ICFEHandler source) {
-        tryCFETransfer(target, source, TCCommonConfigs.CFE_PER_TICK_TRANSFER_LIMIT.get());
+        tryCFETransfer(target, source, TCCommonConfigs.CFE_PER_BURST_TRANSFER_LIMIT.get());
     }
 
     public static void tryCFETransfer(ICFEHandler target, ICFEHandler source, int maxTransfer){

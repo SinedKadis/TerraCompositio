@@ -1,7 +1,6 @@
 package net.sinedkadis.terracompositio.entity.custom;
 
 import lombok.Getter;
-import lombok.Setter;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -131,7 +130,7 @@ public class FlowCedarEntEntity extends AbstractGolem implements CFENetworkMembe
                 innerCFEOptional.ifPresent(icfeHandler1 -> {
                     tickCounter--;
                     if (tickCounter <= 0) {
-                        TCUtil.tryCFETransfer(icfeHandler1, icfeHandler, 10);
+                        TCUtil.tryCFETransfer(icfeHandler1, icfeHandler);
                         tickCounter = 20;
                         icfeHandler1.takeCFE(1, false);
                         if (icfeHandler1.getCFE() <= 0) {
