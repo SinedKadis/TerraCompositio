@@ -57,6 +57,7 @@ import org.jetbrains.annotations.Nullable;
 import java.util.*;
 import java.util.function.Predicate;
 
+import static net.sinedkadis.terracompositio.block.entity.PathPointerBlockEntity.setYawAndPitchFromRot;
 import static net.sinedkadis.terracompositio.registries.TCBlockStateProperties.INFUSED;
 
 public class TCUtil {
@@ -73,6 +74,12 @@ public class TCUtil {
         int added = target.getMainHandler().addCFE(taken, true);
 
         if (added <= taken){
+            if (added > 0 && target instanceof CFEMemberProxy proxy) {
+                PathPointerBlockEntity ppBE = proxy.proxy();
+                if (ppBE.parts.contains(PathPointerBlockEntity.PPPart.INFUSER)) {
+                    setYawAndPitchFromRot(ppBE.getBlockPos().getCenter().vectorTo(proxy.target().getPos().getCenter()),ppBE);
+                }
+            }
             added = source.getMainHandler().sendCFE(added, target, false);
             source.getMainHandler().takeCFE(added, false);
         }

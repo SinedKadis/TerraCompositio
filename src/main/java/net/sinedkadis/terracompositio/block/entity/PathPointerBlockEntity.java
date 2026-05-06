@@ -58,7 +58,9 @@ public class PathPointerBlockEntity extends TCBlockEntity implements Nameable, C
     public static final String SENDER_POSES_TAG = "sender_poses";
     public static final String INPUT_POSES_TAG = "input_poses";
 
-    public float rotationYaw, rotationPitch, rotationRoll;
+    public float rotationYaw;
+    public float rotationPitch;
+    public float rotationRoll;
 
     public List<PPPart> parts = NonNullList.withSize(2, PPPart.NONE);
 
@@ -70,6 +72,8 @@ public class PathPointerBlockEntity extends TCBlockEntity implements Nameable, C
     public static boolean validAngle(PathPointerBlockEntity be, Vec3 burstDir) {
 
         if (be.parts.contains(PPPart.COLLECTOR)) return true;
+        if (be.parts.contains(PPPart.INFUSER)) return true;
+
 
         float yaw = be.rotationYaw;
         float pitch = be.rotationPitch;
@@ -113,6 +117,7 @@ public class PathPointerBlockEntity extends TCBlockEntity implements Nameable, C
     }
 
     int infuserTick = 100;
+
     @Override
     public void tick(Level pLevel, BlockPos pPos, BlockState pState) {
         super.tick(pLevel, pPos, pState);
@@ -150,7 +155,7 @@ public class PathPointerBlockEntity extends TCBlockEntity implements Nameable, C
         TerraCompositioAPI.INSTANCE.getCFENetworkInstance().fireCFENetworkEvent(this, NetworkAction.REMOVE);
         assert this.level != null;
         if (!this.level.getBlockState(this.getBlockPos()).equals(this.getBlockState())) {
-            clearAnyBindings(null,this);
+            clearAnyBindings(null, this);
         }
         super.setRemoved();
     }
@@ -233,8 +238,8 @@ public class PathPointerBlockEntity extends TCBlockEntity implements Nameable, C
 
         tryBind(firstPPBE, secondPPBE);
 
-        fullUpdateBE(pPlayer, (ServerLevel) level,firstPPBE);
-        fullUpdateBE(pPlayer, (ServerLevel) level,secondPPBE);
+        fullUpdateBE(pPlayer, (ServerLevel) level, firstPPBE);
+        fullUpdateBE(pPlayer, (ServerLevel) level, secondPPBE);
 
         PathPointerBlockEntity outputPPBE = getOutputOf(secondPPBE);
         Set<PathPointerBlockEntity> inputs = getInputOf(firstPPBE);
@@ -245,10 +250,10 @@ public class PathPointerBlockEntity extends TCBlockEntity implements Nameable, C
         fullUpdateBE(pPlayer, (ServerLevel) level, outputPPBE);
 
         inputs.forEach(inputPPBE ->
-                TerraCompositioAPI.instance().getCFENetworkInstance().updateInRange((Level) level,inputPPBE.getPos(),5));
+                TerraCompositioAPI.instance().getCFENetworkInstance().updateInRange((Level) level, inputPPBE.getPos(), 5));
     }
 
-    private static void tryBindInputsAndOutput(Set<PathPointerBlockEntity> inputs,@Nullable PathPointerBlockEntity outputPPBE) {
+    private static void tryBindInputsAndOutput(Set<PathPointerBlockEntity> inputs, @Nullable PathPointerBlockEntity outputPPBE) {
         if (outputPPBE != null && !inputs.isEmpty()) {
             inputs.forEach(inputPPBE -> {
                 inputPPBE.setOutputPos(outputPPBE.getBlockPos());
@@ -313,7 +318,6 @@ public class PathPointerBlockEntity extends TCBlockEntity implements Nameable, C
     }
 
 
-
     private static @Nullable PathPointerBlockEntity getOutputOf(PathPointerBlockEntity origin) {
         Level level = origin.level;
         if (level == null) return null;
@@ -368,7 +372,7 @@ public class PathPointerBlockEntity extends TCBlockEntity implements Nameable, C
         return toReturn;
     }
 
-    private static void setYawAndPitchFromRot(Vec3 dir, PathPointerBlockEntity be) {
+    public static void setYawAndPitchFromRot(Vec3 dir, PathPointerBlockEntity be) {
         // yaw: 0 = +Z (south)
         double yaw = Math.atan2(dir.x, dir.z);
 
@@ -385,6 +389,7 @@ public class PathPointerBlockEntity extends TCBlockEntity implements Nameable, C
     public static void clearAnyBindings(@Nullable Player pPlayer, LevelAccessor level, BlockPos blockPos) {
         clearAnyBindings(pPlayer, (PathPointerBlockEntity) level.getBlockEntity(blockPos));
     }
+
     public static void clearAnyBindings(@Nullable Player pPlayer, @Nullable PathPointerBlockEntity be) {
         if (be != null) {
             Level level = be.level;
@@ -431,7 +436,6 @@ public class PathPointerBlockEntity extends TCBlockEntity implements Nameable, C
                 }
             });
             be.getSenderPoses().clear();
-
 
 
             update(be);
@@ -664,7 +668,7 @@ public class PathPointerBlockEntity extends TCBlockEntity implements Nameable, C
         if (receiverPos != null)
             compoundTag.put(RECEIVER_POS_TAG, TCUtil.saveBlockPos(receiverPos));
         BlockPos outputPos = getOutputPos();
-            compoundTag.put(OUTPUT_POS_TAG, TCUtil.saveBlockPos(outputPos));
+        compoundTag.put(OUTPUT_POS_TAG, TCUtil.saveBlockPos(outputPos));
 
         PathPointerBlockEntity.saveFromSetToTag(compoundTag, PathPointerBlockEntity.SENDER_POSES_TAG, getSenderPoses());
         PathPointerBlockEntity.saveFromSetToTag(compoundTag, PathPointerBlockEntity.INPUT_POSES_TAG, getInputPoses());
@@ -791,11 +795,28 @@ public class PathPointerBlockEntity extends TCBlockEntity implements Nameable, C
 
     @Override
     public void updateIfScheduled() {
-        inputPoses.forEach(pos -> TerraCompositioAPI.instance().getCFENetworkInstance().updateInRange(level,pos,5));
+        CFENetwork cfeNetworkInstance = TerraCompositioAPI.instance().getCFENetworkInstance();
+        inputPoses.forEach(pos -> cfeNetworkInstance.updateInRange(level, pos, 5));
     }
 
     public void scheduleMemberUpdate() {
         updateScheduled = true;
+    }
+
+    public BlockPos getOutputPos() {
+        BlockPos outputPos1 = this.outputPos;
+        if (outputPos1 == null && (parts.contains(PPPart.EMITTER) || parts.contains(PPPart.INFUSER))) {
+            return worldPosition;
+        }
+        return outputPos1;
+    }
+
+    public Set<BlockPos> getInputPoses() {
+        Set<BlockPos> inputPoses1 = this.inputPoses;
+        if (inputPoses1.isEmpty() && (parts.contains(PPPart.EMITTER) || parts.contains(PPPart.INFUSER))) {
+            inputPoses1.add(worldPosition);
+        }
+        return inputPoses1;
     }
 
     public enum PPPart implements StringRepresentable {

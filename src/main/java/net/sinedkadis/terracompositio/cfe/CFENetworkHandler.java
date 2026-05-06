@@ -16,209 +16,206 @@ import net.sinedkadis.terracompositio.util.TCUtil;
 import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.util.*;
-import java.util.stream.Collectors;
 
 public class CFENetworkHandler implements CFENetwork {
     public static final CFENetworkHandler INSTANCE = new CFENetworkHandler();
 
     private final Map<Level, Set<CFENetworkMember>> cfeSources = new WeakHashMap<>();
 
-    public void onNetworkEvent(CFENetworkMember source, NetworkAction action) {
-        if (action.equals(NetworkAction.ADD)){
-            add(cfeSources,source.getLevel(), source);
-        } else if (action.equals(NetworkAction.REMOVE)){
-            remove(cfeSources,source.getLevel(), source);
-        } else if (action.equals(NetworkAction.UPDATE)){
-            networkMemberUpdated(source);
-        } else throw new RuntimeException("Unsupported Network action: "+ action);
-    }
-
     public void networkMemberUpdated(CFENetworkMember updated) {
         Level level = updated.getLevel();
-        if (cfeSources.containsKey(level)) {
-            Queue<CFENetworkMember> queue = new LinkedList<>();
-            queue.add(updated);
-            Set<PathPointerBlockEntity> updatedEmitters = new HashSet<>();
-            while (!queue.isEmpty()) {
-                CFENetworkMember current = queue.poll();
+        Set<CFENetworkMember> members = cfeSources.get(level);
+        if (members == null) return;
 
-                cfeSources.get(level).stream()
-                        //Range check: taken max range between two
-                        .filter(member -> current.getPos().closerThan(member.getPos(), Math.max(current.getRange(), member.getRange())))
-                        //Entity check: no self update
-                        .filter(member -> !current.getEntity().equals(member.getEntity()))
-                        //Priority check: High priority updates low priority
-                        .filter(member -> current.getPriority() > member.getPriority())
-                        .peek(member -> {
-                            if (member.getEntity() instanceof PathPointerBlockEntity ppBE
-                                    && ppBE.parts.contains(PathPointerBlockEntity.PPPart.EMITTER)
-                                    && !updatedEmitters.contains(ppBE)) {
-                                updatedEmitters.add(ppBE);
-                                Set<BlockPos> inputPoses = ppBE.getInputPoses();
-                                inputPoses.forEach(blockPos -> {
-                                    BlockEntity blockEntity = level.getBlockEntity(blockPos);
-                                    if (blockEntity instanceof PathPointerBlockEntity inputEntity) {
-                                        queue.add(new CFEMemberProxy(updated,inputEntity));
-                                    }
-                                });
-                            }
-                        })
-                        .forEach(cfeNetworkMember -> cfeNetworkMember.scheduleMemberUpdate(current));
+        Queue<CFENetworkMember> queue = new ArrayDeque<>();
+        // Защита от зацикливания: храним entity, а не member (прокси могут отличаться)
+        Set<Object> visitedEntities = new HashSet<>();
+        Set<PathPointerBlockEntity> updatedEmitters = new HashSet<>();
+
+        queue.add(updated);
+        visitedEntities.add(updated.getEntity());
+
+        while (!queue.isEmpty()) {
+            CFENetworkMember current = queue.poll();
+
+            for (CFENetworkMember member : members) {
+                if (!current.getPos().closerThan(member.getPos(), Math.max(current.getRange(), member.getRange()))) continue;
+                if (current.getEntity().equals(member.getEntity())) continue;
+                if (current.getPriority() <= member.getPriority()) continue;
+
+                // PathPointer EMITTER — добавляем входы в очередь
+                if (member.getEntity() instanceof PathPointerBlockEntity ppBE
+                        && ppBE.parts.contains(PathPointerBlockEntity.PPPart.EMITTER)
+                        && updatedEmitters.add(ppBE)) { // add() возвращает false если уже есть
+                    for (BlockPos inputPos : ppBE.getInputPoses()) {
+                        BlockEntity be = level.getBlockEntity(inputPos);
+                        if (be instanceof PathPointerBlockEntity inputEntity
+                                && visitedEntities.add(inputEntity)) { // защита от петли
+                            queue.add(new CFEMemberProxy(updated, inputEntity));
+                        }
+                    }
+                }
+
+                member.scheduleMemberUpdate(current);
             }
         }
-
     }
 
     @Override
     public void updateInRange(Level level, BlockPos origin, int range) {
-        if (cfeSources.containsKey(level)) {
-            cfeSources.get(level).stream()
-                    .filter(member -> member.getPos().closerThan(origin,range))
-                    .forEach(CFENetworkMember::scheduleMemberUpdate);
+        Set<CFENetworkMember> members = cfeSources.get(level);
+        if (members == null) return;
+        for (CFENetworkMember member : members) {
+            if (member.getPos().closerThan(origin, range)) {
+                member.scheduleMemberUpdate();
+            }
         }
     }
 
     @Override
     public @Nullable CFENetworkMember getMemberAt(Level level, BlockPos blockPos) {
-        if (cfeSources.containsKey(level)) {
-            for (CFENetworkMember member : cfeSources.get(level)){
-                if (!member.getPos().equals(blockPos))
-                    continue;
-                return member;
-            }
+        Set<CFENetworkMember> members = cfeSources.get(level);
+        if (members == null) return null;
+        for (CFENetworkMember member : members) {
+            if (member.getPos().equals(blockPos)) return member;
         }
         return null;
     }
 
     @Override
     public Set<CFENetworkMember> getAllCFENetworkMembers(Level level) {
-        if (cfeSources.containsKey(level)) {
-            return cfeSources.get(level);
-        }
-        return Set.of();
+        return cfeSources.getOrDefault(level, Set.of());
     }
 
     @Override
     public Set<CFENetworkMember> getAvailableNetworkTargets(CFENetworkMember requesterMember) {
         Level level = requesterMember.getLevel();
-        if (cfeSources.containsKey(level)) {
-            Set<CFENetworkMember> toReturn = new HashSet<>();
-            Set<CFENetworkMember> cfeNetworkMembers = cfeSources.get(level);
-            Queue<CFENetworkMember> queue = new LinkedList<>();
-            queue.add(requesterMember);
-            while (!queue.isEmpty()) {
-                CFENetworkMember current = queue.poll();
+        Set<CFENetworkMember> members = cfeSources.get(level);
+        if (members == null) return Set.of();
 
-                List<PathPointerBlockEntity.PPPart> parts;
-                PathPointerBlockEntity collector;
+        Set<CFENetworkMember> toReturn = new HashSet<>();
+        Queue<CFENetworkMember> queue = new ArrayDeque<>();
+        // Защита от зацикливания по entity-идентичности
+        Set<Object> visitedEntities = new HashSet<>();
 
-                //Check if proxy and add ents if infuser
-                if (current instanceof CFEMemberProxy proxy) {
-                    PathPointerBlockEntity proxyBE = proxy.proxy();
-                    parts = proxyBE.parts;
+        queue.add(requesterMember);
+        visitedEntities.add(requesterMember.getEntity());
 
-                    BlockPos requesterMemberPos = requesterMember.getPos();
-                    Optional<BlockPos> collectorOpt = proxyBE.getInputPoses().stream()
-                            .reduce((input1, input2) ->
-                                    requesterMemberPos.distSqr(input1) < requesterMemberPos.distSqr(input2)
-                                            ? input1 : input2);
-                    if (collectorOpt.isPresent()) {
-                        collector = (PathPointerBlockEntity) level.getBlockEntity(collectorOpt.get());
-                        if (parts.contains(PathPointerBlockEntity.PPPart.INFUSER)) {
-                            List<CFEMemberProxy> ents = level.getEntitiesOfClass(
-                                            LivingEntity.class,
-                                            new AABB(proxyBE.getPos()).inflate(3),
-                                            flowCedarEntEntity -> flowCedarEntEntity.getItemBySlot(EquipmentSlot.HEAD)
-                                                    .is(TCItems.TECHNETIUM_CROWN.get())).stream()
-                                    .map(livingEntity -> livingEntity instanceof CFENetworkMemberEntity member1 ? member1 : null)
-                                    .filter(Objects::nonNull)
-                                    .map(cfeNetworkMemberEntity ->
-                                            new CFEMemberProxy(cfeNetworkMemberEntity, collector))
-                                    .toList();
-                            toReturn.addAll(ents);
-                        }
-                    } else {
-                        collector = null;
+        while (!queue.isEmpty()) {
+            CFENetworkMember current = queue.poll();
+
+            List<PathPointerBlockEntity.PPPart> parts = null;
+            PathPointerBlockEntity collector = null;
+
+            if (current instanceof CFEMemberProxy proxy) {
+                PathPointerBlockEntity proxyBE = proxy.proxy();
+                parts = proxyBE.parts;
+
+                // Ищем ближайший collector среди входов
+                BlockPos requesterPos = requesterMember.getPos();
+                BlockPos closestInput = null;
+                double closestDist = Double.MAX_VALUE;
+                for (BlockPos inputPos : proxyBE.getInputPoses()) {
+                    double dist = requesterPos.distSqr(inputPos);
+                    if (dist < closestDist) {
+                        closestDist = dist;
+                        closestInput = inputPos;
                     }
-                } else {
-                    parts = null;
-                    collector = null;
                 }
 
-                //filter members and redirect if via path pointers
-                Set<CFENetworkMember> filtered = cfeNetworkMembers.stream()
-                        //Distance check: needs to be in source range
-                        .filter(member -> member.getPos().closerThan(current.getPos(), current.getRange()))
-                        //Priority check: needs to be higher
-                        .filter(member -> member.getPriority() > current.getPriority())
-                        //Space check: needs to have empty space (ignored because of path pointers)
-                        //.filter(member -> member.getMainHandler().getFreeSpace() > 0)
-                        //Entity check: don't send to itself
-                        .filter(member -> !member.getEntity().equals(current.getEntity()))
-                        //Redirect position of target to closest collector
-                        .map(member -> {
-                            if (parts != null && collector != null && parts.contains(PathPointerBlockEntity.PPPart.EMITTER)) {
-                                return new CFEMemberProxy(member, collector);
-                            }
-                            return member;
-                        })
-                        .collect(Collectors.toSet());
+                if (closestInput != null
+                        && level.getBlockEntity(closestInput) instanceof PathPointerBlockEntity collectorBE) {
+                    collector = collectorBE;
+                }
 
-                toReturn.addAll(filtered);
-                filtered.forEach(member -> {
-                            if (member.getEntity() instanceof PathPointerBlockEntity ppBE
-                                    && ppBE.parts.contains(PathPointerBlockEntity.PPPart.COLLECTOR)) {
-                                BlockPos outputPos = ppBE.getOutputPos();
-                                if (outputPos != null) {
-                                    BlockEntity blockEntity = level.getBlockEntity(outputPos);
-                                    if (blockEntity instanceof PathPointerBlockEntity outputEntity) {
-                                        queue.add(new CFEMemberProxy(requesterMember, outputEntity));
-                                    }
-                                }
-                            }
-                        });
-
+                // INFUSER: добавляем живые сущности с короной рядом с proxyBE
+                if (collector != null && parts.contains(PathPointerBlockEntity.PPPart.INFUSER)) {
+                    PathPointerBlockEntity finalCollector = collector;
+                    level.getEntitiesOfClass(
+                            LivingEntity.class,
+                            new AABB(proxyBE.getPos()).inflate(3),
+                            e -> e.getItemBySlot(EquipmentSlot.HEAD).is(TCItems.TECHNETIUM_CROWN.get())
+                    ).forEach(entity -> {
+                        if (entity instanceof CFENetworkMemberEntity memberEntity
+                                && visitedEntities.add(entity)) { // защита: не добавляем уже посещённых
+                            toReturn.add(new CFEMemberProxy(memberEntity, finalCollector));
+                        }
+                    });
+                }
             }
-            return toReturn.stream()
-                    .filter(TCUtil::validMember)
-                    .collect(Collectors.toSet());
+
+            // Фильтруем членов сети в радиусе с нужным приоритетом
+            for (CFENetworkMember member : members) {
+                if (!member.getPos().closerThan(current.getPos(), current.getRange())) continue;
+                if (member.getPriority() <= current.getPriority()) continue;
+                if (member.getEntity().equals(current.getEntity())) continue;
+
+                // Если текущий — EMITTER прокси, перенаправляем позицию к collector
+                CFENetworkMember mapped = (parts != null && collector != null
+                        && parts.contains(PathPointerBlockEntity.PPPart.EMITTER))
+                        ? new CFEMemberProxy(member, collector)
+                        : member;
+
+                toReturn.add(mapped);
+
+                // COLLECTOR: идём дальше по цепочке PathPointer
+                if (member.getEntity() instanceof PathPointerBlockEntity ppBE
+                        && ppBE.parts.contains(PathPointerBlockEntity.PPPart.COLLECTOR)) {
+                    BlockPos outputPos = ppBE.getOutputPos();
+                    if (outputPos != null
+                            && level.getBlockEntity(outputPos) instanceof PathPointerBlockEntity outputEntity
+                            && visitedEntities.add(outputEntity)) { // защита от петли A→B→A
+                        queue.add(new CFEMemberProxy(requesterMember, outputEntity));
+                    }
+                }
+            }
         }
-        return Set.of();
+
+        // validMember фильтр — в конце, один раз
+        toReturn.removeIf(m -> !TCUtil.validMember(m));
+        return toReturn;
     }
 
+    @Override
+    public boolean isIn(Level level, ICFEHandler cfeHandler) {
+        Set<CFENetworkMember> members = cfeSources.get(level);
+        if (members == null) return false;
+        for (CFENetworkMember member : members) {
+            if (member.getMainHandler().equals(cfeHandler)) return true;
+        }
+        return false;
+    }
+
+    @Override
+    public boolean isIn(Level level, CFENetworkMember networkMember) {
+        Set<CFENetworkMember> members = cfeSources.get(level);
+        if (members == null) return false;
+        return members.contains(networkMember);
+    }
+
+    private void remove(Level level, CFENetworkMember thing) {
+        Set<CFENetworkMember> set = cfeSources.get(level);
+        if (set == null) return;
+        networkMemberUpdated(thing);
+        set.remove(thing);
+        if (set.isEmpty()) cfeSources.remove(level);
+    }
+
+    private void add(Level level, CFENetworkMember thing) {
+        cfeSources.computeIfAbsent(level, k -> new HashSet<>()).add(thing);
+        networkMemberUpdated(thing);
+    }
+
+    public void onNetworkEvent(CFENetworkMember source, NetworkAction action) {
+        switch (action) {
+            case ADD    -> add(source.getLevel(), source);
+            case REMOVE -> remove(source.getLevel(), source);
+            case UPDATE -> networkMemberUpdated(source);
+            default     -> throw new RuntimeException("Unsupported Network action: " + action);
+        }
+    }
     @Override
     public void fireCFENetworkEvent(CFENetworkMember source, NetworkAction action) {
         MinecraftForge.EVENT_BUS.post(new CFENetworkEvent(source,action));
-    }
-
-    @Override
-    public boolean isIn(Level pLevel, ICFEHandler cfeHandler) {
-        return cfeSources.getOrDefault(pLevel, Collections.emptySet()).stream()
-                .anyMatch(member -> member.getMainHandler().equals(cfeHandler));
-    }
-
-    @Override
-    public boolean isIn(Level pLevel, CFENetworkMember networkMember) {
-        return cfeSources.getOrDefault(pLevel, Collections.emptySet()).stream()
-                .anyMatch(member -> member.equals(networkMember));
-    }
-
-
-    private <T> void remove(Map<Level, Set<T>> map, Level level, T thing) {
-        if (!map.containsKey(level)) {
-            return;
-        }
-        networkMemberUpdated((CFENetworkMember) thing);
-        var set = map.get(level);
-        set.remove(thing);
-        if (set.isEmpty()) {
-            map.remove(level);
-        }
-
-    }
-
-    private <T> void add(Map<Level, Set<T>> map, Level level, T thing) {
-        map.computeIfAbsent(level, k -> new HashSet<>()).add(thing);
-        networkMemberUpdated((CFENetworkMember) thing);
     }
 }
