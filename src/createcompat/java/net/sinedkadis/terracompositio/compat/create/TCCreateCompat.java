@@ -6,8 +6,8 @@ import dev.engine_room.flywheel.lib.visualization.SimpleBlockEntityVisualizer;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraftforge.client.event.EntityRenderersEvent;
 import net.sinedkadis.terracompositio.compat.CompatUtils;
-import net.sinedkadis.terracompositio.compat.ISoftCompat;
-import net.sinedkadis.terracompositio.compat.ISoftDataGen;
+import net.sinedkadis.terracompositio.compat.soft_compat.ISoftCompat;
+import net.sinedkadis.terracompositio.compat.soft_compat.ISoftDataGen;
 import net.sinedkadis.terracompositio.compat.create.datagen.DataGenerators;
 import net.sinedkadis.terracompositio.compat.create.registries.CreateBlockEntities;
 import net.sinedkadis.terracompositio.compat.create.registries.CreateBlocks;
@@ -15,6 +15,8 @@ import net.sinedkadis.terracompositio.compat.create.registries.CreateBlocks;
 import static com.simibubi.create.api.stress.BlockStressValues.CAPACITIES;
 
 public class TCCreateCompat implements ISoftCompat {
+    public static final String MOD_ID = "terracompositio_cc";
+
     public CreateBlocks blocks;
     public CreateBlockEntities blockEntities;
     public DataGenerators dataGen;

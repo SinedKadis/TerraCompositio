@@ -33,10 +33,8 @@ import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandlerItem;
 import net.minecraftforge.fluids.capability.templates.FluidTank;
 import net.sinedkadis.terracompositio.block.entity.TCBlockEntity;
-import net.sinedkadis.terracompositio.registries.TCBlockEntities;
-import net.sinedkadis.terracompositio.registries.TCBlocks;
-import net.sinedkadis.terracompositio.registries.TCFluids;
-import net.sinedkadis.terracompositio.registries.TCItems;
+import net.sinedkadis.terracompositio.item.custom.WrenchAxeItem;
+import net.sinedkadis.terracompositio.registries.*;
 import net.sinedkadis.terracompositio.util.TCUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -82,11 +80,15 @@ public class FlowCedarTankBlock extends TCBaseEntityBlock{
 
     @Override
     public @NotNull InteractionResult use(@NotNull BlockState pState, @NotNull Level pLevel, @NotNull BlockPos pPos, @NotNull Player pPlayer, @NotNull InteractionHand pHand, @NotNull BlockHitResult pHit) {
-        ItemStack heldItem = pPlayer.getItemInHand(pHand);
+        ItemStack heldItem = pPlayer.getItemInHand(InteractionHand.MAIN_HAND);
+        ItemStack item2 = pPlayer.getItemInHand(InteractionHand.OFF_HAND);
 
-        if (heldItem.is(Items.GLASS) && pState.getValue(STAGE).equals(2)){
-            TCUtil.handleInWorldBlockCraft(pState,pState.setValue(STAGE,3),pLevel,pPos,heldItem,1);
-            return InteractionResult.SUCCESS;
+        if (heldItem.is(Items.GLASS) && pState.getValue(STAGE).equals(2)
+                && (item2.is(TCTags.Items.WRENCHES) || item2.is(TCItems.WRENCH_AXE.get()))) {
+            if (!item2.is(TCItems.WRENCH_AXE.get()) || WrenchAxeItem.getWrenchMode(item2).equals(WrenchAxeItem.WrenchMode.WRENCH)) {
+                    TCUtil.handleInWorldBlockCraft(pState, pState.setValue(STAGE, 3), pLevel, pPos, heldItem, 1);
+                    return InteractionResult.SUCCESS;
+            }
         }
 
         BlockEntity blockEntity = pLevel.getBlockEntity(pPos);

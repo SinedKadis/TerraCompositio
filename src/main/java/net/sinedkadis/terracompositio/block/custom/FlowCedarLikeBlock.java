@@ -28,10 +28,7 @@ import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandlerItem;
 import net.sinedkadis.terracompositio.block.IFluidApplicable;
-import net.sinedkadis.terracompositio.registries.TCBlockStateProperties;
-import net.sinedkadis.terracompositio.registries.TCBlocks;
-import net.sinedkadis.terracompositio.registries.TCFluids;
-import net.sinedkadis.terracompositio.registries.TCItems;
+import net.sinedkadis.terracompositio.registries.*;
 import net.sinedkadis.terracompositio.item.custom.WrenchAxeItem;
 import net.sinedkadis.terracompositio.util.TCUtil;
 import org.jetbrains.annotations.NotNull;
@@ -117,8 +114,8 @@ public class FlowCedarLikeBlock extends RotatedPillarBlock implements IFluidAppl
         if (this.getClass() == FlowCedarLikeBlock.class) {
             if (item.is(TCItems.GOLD_ROD.get())
                     && item.getCount() >= 4
-                    && item2.getItem() instanceof WrenchAxeItem) {
-                if (WrenchAxeItem.getWrenchMode(item2).equals(WrenchAxeItem.WrenchMode.WRENCH)) {
+                    && (item2.is(TCTags.Items.WRENCHES) || item2.is(TCItems.WRENCH_AXE.get()))) {
+                if (!item2.is(TCItems.WRENCH_AXE.get()) || WrenchAxeItem.getWrenchMode(item2).equals(WrenchAxeItem.WrenchMode.WRENCH)) {
                     return handleInWorldBlockCraft(pState, TCBlocks.FLOW_CEDAR_CASING.get().defaultBlockState(), pLevel, pPos, item, 4);
                 }
                 return super.use(pState, pLevel, pPos, pPlayer, pHand, pHit);

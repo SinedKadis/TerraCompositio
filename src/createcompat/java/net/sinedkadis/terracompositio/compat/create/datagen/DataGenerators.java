@@ -8,7 +8,7 @@ import net.minecraft.data.tags.FluidTagsProvider;
 import net.minecraft.data.tags.ItemTagsProvider;
 import net.minecraft.world.level.block.Block;
 import net.minecraftforge.common.data.BlockTagsProvider;
-import net.sinedkadis.terracompositio.compat.ISoftDataGen;
+import net.sinedkadis.terracompositio.compat.soft_compat.ISoftDataGen;
 import net.sinedkadis.terracompositio.compat.create.datagen.loot.CreateCompatBlockLootTables;
 import org.jetbrains.annotations.NotNull;
 

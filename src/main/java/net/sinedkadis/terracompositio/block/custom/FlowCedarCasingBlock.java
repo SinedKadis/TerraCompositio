@@ -28,10 +28,7 @@ import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemStackHandler;
 import net.sinedkadis.terracompositio.block.entity.FlowCedarCasingBlockEntity;
 import net.sinedkadis.terracompositio.item.custom.WrenchAxeItem;
-import net.sinedkadis.terracompositio.registries.TCBlockEntities;
-import net.sinedkadis.terracompositio.registries.TCBlockStateProperties;
-import net.sinedkadis.terracompositio.registries.TCBlocks;
-import net.sinedkadis.terracompositio.registries.TCItems;
+import net.sinedkadis.terracompositio.registries.*;
 import net.sinedkadis.terracompositio.util.FunctionSide;
 import net.sinedkadis.terracompositio.util.TCUtil;
 import org.jetbrains.annotations.NotNull;
@@ -73,8 +70,9 @@ public class FlowCedarCasingBlock extends FlowCedarLikeBlock implements EntityBl
         ItemStack item = pPlayer.getItemInHand(InteractionHand.MAIN_HAND);
         ItemStack item2 = pPlayer.getItemInHand(InteractionHand.OFF_HAND);
         if (pState.getValue(AXIS).isVertical() && item2.getItem() instanceof WrenchAxeItem){
-            if (item.is(TCItems.INFUSED_IRON_ROD.get()) && item.getCount() >= 8){
-                if (WrenchAxeItem.getWrenchMode(item2).equals(WrenchAxeItem.WrenchMode.WRENCH)) {
+            if (item.is(TCItems.INFUSED_IRON_ROD.get()) && item.getCount() >= 8
+                    && (item2.is(TCTags.Items.WRENCHES) || item2.is(TCItems.WRENCH_AXE.get()))) {
+                if (!item2.is(TCItems.WRENCH_AXE.get()) || WrenchAxeItem.getWrenchMode(item2).equals(WrenchAxeItem.WrenchMode.WRENCH)) {
                     return handleInWorldBlockCraft(pState,
                             TCBlocks.FLOW_CEDAR_TANK.get().defaultBlockState()
                                     .setValue(FlowCedarTankBlock.STAGE, pState.getValue(INFUSED) ? 0 : 1),
@@ -194,6 +192,7 @@ public class FlowCedarCasingBlock extends FlowCedarLikeBlock implements EntityBl
         return false;
     }
 
+    @SuppressWarnings("unused")
     public static boolean isUnitAttached(Level level, BlockState blockState, BlockPos pos) {
         Direction facing = FunctionSide.getDirectionByFunctionSide(blockState);
         if (facing != Direction.DOWN){

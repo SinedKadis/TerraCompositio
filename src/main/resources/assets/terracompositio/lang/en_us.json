@@ -61,6 +61,7 @@
   "block.terracompositio.big_flow_cedar_sapling": "Big Flow Cedar Sapling",
   "block.terracompositio.flow_cedar_sapling": "Flow Cedar Sapling",
 
+  "item.terracompositio.wrench_tag_holder": "Infused Iron Axe (Wrench Mode)",
   "item.terracompositio.flow_rotating_axe.axe": "Axe Mode",
   "item.terracompositio.flow_rotating_axe.wrench_axe": "Wrench-Axe Mode",
   "item.terracompositio.flow_rotating_axe.wrench": "Wrench Mode",
@@ -118,6 +119,8 @@
   "item.terracompositio.flow_rotating_axe.constructor_near": "Next to the construction desorber it is somehow difficult to do",
   "block.terracompositio.flow_cedar_pedestal": "Flow Cedar Pedestal",
   "block.terracompositio.flow_cedar_tank": "Flow Cedar Tank",
+  "block.terracompositio.flow_cedar_tank_2": "Flow Cedar Tank",
+  "block.terracompositio.flow_cedar_tank_3": "Flow Cedar Tank",
   "item.terracompositio.technetium_ingot": "Stable Technetium Ingot",
   "block.terracompositio.cfe_saturated_air": "CFE saturated air",
   "item.terracompositio.creation_flow_journal": "Creation Flow Journal",
@@ -184,7 +187,7 @@
 
 
   "key.terracompositio.categories.main": "Terra Compositio",
-
+  "create.recipe.item_with_wrench_application": "Manual Application with Wrench in Offhand",
 
 
 

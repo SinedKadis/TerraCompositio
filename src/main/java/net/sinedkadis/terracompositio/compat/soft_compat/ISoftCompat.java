@@ -1,4 +1,4 @@
-package net.sinedkadis.terracompositio.compat;
+package net.sinedkadis.terracompositio.compat.soft_compat;
 
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraftforge.client.event.EntityRenderersEvent;

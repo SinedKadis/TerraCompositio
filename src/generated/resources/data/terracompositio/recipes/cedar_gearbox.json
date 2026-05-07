@@ -10,7 +10,9 @@
     }
   },
   "pattern": [
-    "SLS"
+    "S",
+    "L",
+    "S"
   ],
   "result": {
     "item": "terracompositio:cedar_gearbox"

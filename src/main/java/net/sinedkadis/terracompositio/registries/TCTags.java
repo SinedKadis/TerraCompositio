@@ -31,6 +31,8 @@ public class TCTags {
         public static final TagKey<Item> UNSTABLE_TECHNETIUM = tag("unstable_technetium");
         public static final TagKey<Item> WRENCHES = ItemTags.create(Objects.requireNonNull(
                 ResourceLocation.tryBuild("forge","tools/wrench")));
+        public static final TagKey<Item> GOLD_RODS = ItemTags.create(Objects.requireNonNull(
+                ResourceLocation.tryBuild("forge","items/gold_rod")));
         public static final TagKey<Item> TORCHES = tag("torches");
 
 

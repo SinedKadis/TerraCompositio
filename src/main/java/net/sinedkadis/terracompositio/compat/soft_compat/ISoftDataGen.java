@@ -1,4 +1,4 @@
-package net.sinedkadis.terracompositio.compat;
+package net.sinedkadis.terracompositio.compat.soft_compat;
 
 import net.minecraft.core.HolderLookup;
 import net.minecraft.data.recipes.FinishedRecipe;
