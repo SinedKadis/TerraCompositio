@@ -29,6 +29,11 @@ public class ForgeEventBusEvents {
     @SubscribeEvent
     public static void onLivingTickEvent(LivingEvent.LivingTickEvent event){
         LivingEntity livingEntity = event.getEntity();
+
+        applyLiquidFlowEffect(livingEntity);
+    }
+
+    private static void applyLiquidFlowEffect(LivingEntity livingEntity) {
         FluidState fluidstate = livingEntity.level().getFluidState(livingEntity.blockPosition());
         if (fluidstate.getFluidType() == TCFluids.FLOW_FLUID.type.get()  && !livingEntity.canStandOnFluid(fluidstate) || livingEntity.hasEffect(TCEffects.FLOW_SATURATION.get())) {
             if (fluidstate.getFluidType() == TCFluids.FLOW_FLUID.type.get() && !livingEntity.canStandOnFluid(fluidstate) && livingEntity.hasEffect(TCEffects.FLOW_SATURATION.get())) {
@@ -40,7 +45,6 @@ public class ForgeEventBusEvents {
                 livingEntity.setDeltaMovement(livingEntity.getDeltaMovement().scale(1.2F));
             }
         }
-
     }
 
     @SubscribeEvent
