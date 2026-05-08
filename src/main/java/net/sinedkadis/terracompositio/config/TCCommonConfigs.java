@@ -8,11 +8,14 @@ public class TCCommonConfigs {
 
     public static final ForgeConfigSpec.ConfigValue<Integer> CFE_PER_BURST_TRANSFER_LIMIT;
     public static final ForgeConfigSpec.ConfigValue<Integer> TICKS_BETWEEN_BURSTS;
+    public static final ForgeConfigSpec.ConfigValue<Integer> PLATFORM_ALIVE_PER_PLAYER;
 //    public static final ForgeConfigSpec.ConfigValue<Integer> CITRINE_ORE_VEIN_SIZE;
 
     static {
         BUILDER.push("Configs for Terracompositio Mod");
 
+        PLATFORM_ALIVE_PER_PLAYER = BUILDER.comment("How many cfe boards from cfe charges can be")
+                .define("Max boards per player", 3);
         CFE_PER_BURST_TRANSFER_LIMIT = BUILDER.comment("How many cfe can be transferred between two entities per burst")
                 .define("CFE/burst transfer limit", 20);
         TICKS_BETWEEN_BURSTS = BUILDER.comment("How many ticks should pass before cfe source shot a new burst")

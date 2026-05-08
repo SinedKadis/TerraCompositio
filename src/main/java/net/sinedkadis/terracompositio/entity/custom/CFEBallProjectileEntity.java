@@ -3,6 +3,9 @@ package net.sinedkadis.terracompositio.entity.custom;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.BlockSource;
+import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.ListTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -12,10 +15,14 @@ import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.projectile.ThrowableItemProjectile;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Blocks;
 import net.sinedkadis.terracompositio.registries.TCEntities;
 import net.sinedkadis.terracompositio.registries.TCItems;
+import net.sinedkadis.terracompositio.util.TCUtil;
 
 import javax.annotation.ParametersAreNonnullByDefault;
+
+import static net.sinedkadis.terracompositio.config.TCCommonConfigs.PLATFORM_ALIVE_PER_PLAYER;
 
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
@@ -31,17 +38,29 @@ public class CFEBallProjectileEntity extends ThrowableItemProjectile {
 
     public CFEBallProjectileEntity( double pX, double pY, double pZ, Level pLevel) {
         super(TCEntities.CFE_BALL_PROJECTILE.get(), pX, pY, pZ, pLevel);
-        setTargetHeight((int) pY-1);
+//        setTargetHeight((int) pY-1);
         setNoGravity(true);
     }
 
     public CFEBallProjectileEntity(Level pLevel, LivingEntity livingEntity) {
         super(TCEntities.CFE_BALL_PROJECTILE.get(), livingEntity, pLevel);
-        Entity owner = this.getOwner();
-        if (owner != null) {
-            setTargetHeight((int) (owner.position().y-1));
-        }
+//        Entity owner = this.getOwner();
+//        if (owner != null) {
+//            setTargetHeight((int) (owner.position().y-1));
+//        }
         setNoGravity(true);
+
+        Entity owner = getOwner();
+        if (owner == null) return;
+        CompoundTag persistentData = owner.getPersistentData();
+        int ballsThrew = persistentData.getInt("balls_threw");
+        persistentData.putInt("balls_threw", ballsThrew + 1);
+        ListTag list = persistentData.getList("platform_on_throw_" + (ballsThrew - PLATFORM_ALIVE_PER_PLAYER.get() + 1), Tag.TAG_COMPOUND);
+        for (Tag tag : list) {
+            BlockPos pPos = TCUtil.loadBlockPos(tag);
+            if (pPos != null)
+                level().setBlock(pPos, Blocks.AIR.defaultBlockState(), 3);
+        }
     }
 
     public CFEBallProjectileEntity(BlockSource pSource) {
