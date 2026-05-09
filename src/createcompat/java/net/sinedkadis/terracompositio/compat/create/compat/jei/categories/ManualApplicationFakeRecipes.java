@@ -1,15 +1,17 @@
-package net.sinedkadis.terracompositio.compat.create.recipes;
+package net.sinedkadis.terracompositio.compat.create.compat.jei.categories;
 
 import com.google.common.collect.Lists;
 import com.simibubi.create.content.kinetics.deployer.ManualApplicationRecipe;
 import com.simibubi.create.content.processing.recipe.ProcessingRecipeBuilder;
 import net.minecraft.core.Holder;
 import net.minecraft.core.registries.BuiltInRegistries;
+import net.minecraft.tags.ItemTags;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.level.block.Blocks;
 import net.sinedkadis.terracompositio.TerraCompositio;
+import net.sinedkadis.terracompositio.compat.create.recipes.ManualApplicationWIthToolRecipe;
 import net.sinedkadis.terracompositio.registries.TCBlocks;
 import net.sinedkadis.terracompositio.registries.TCItems;
 import net.sinedkadis.terracompositio.registries.TCTags;
@@ -22,10 +24,10 @@ public class ManualApplicationFakeRecipes {
     public static List<ManualApplicationRecipe> createRecipes() {
         List<ManualApplicationRecipe> recipes = new ArrayList<>();
 
-        //todo: make axe
-        recipes.add(new ProcessingRecipeBuilder<>(ManualApplicationRecipe::new, TerraCompositio.modLoc("flow_infuser"))
+        recipes.add(new ProcessingRecipeBuilder<>(ManualApplicationWIthToolRecipe::new, TerraCompositio.modLoc("flow_infuser"))
                 .require(TCBlocks.FLOW_CEDAR_LOG.get())
                 .require(TCItems.FLOW_INFUSER_KIT.get())
+                .require(ItemTags.AXES)
                 .output(TCBlocks.FLOW_INFUSER.get())
                 .build());
 

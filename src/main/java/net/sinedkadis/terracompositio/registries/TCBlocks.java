@@ -160,9 +160,9 @@ public class TCBlocks {
     public static final RegistryObject<Block> FLOW_CEDAR_TANK = registerBlock("flow_cedar_tank",
             () -> new FlowCedarTankBlock(BlockBehaviour.Properties.copy(Blocks.OAK_PLANKS).noOcclusion()));
     public static final RegistryObject<Block> FLOW_CEDAR_TANK_2 = registerBlock("flow_cedar_tank_2",
-            () -> new Block(BlockBehaviour.Properties.copy(Blocks.OAK_PLANKS).noOcclusion()));
+            () -> new Block(BlockBehaviour.Properties.copy(Blocks.OAK_PLANKS).noOcclusion().noLootTable()));
     public static final RegistryObject<Block> FLOW_CEDAR_TANK_3 = registerBlock("flow_cedar_tank_3",
-            () -> new Block(BlockBehaviour.Properties.copy(Blocks.OAK_PLANKS).noOcclusion()));
+            () -> new Block(BlockBehaviour.Properties.copy(Blocks.OAK_PLANKS).noOcclusion().noLootTable()));
 
 
     //Path pointers

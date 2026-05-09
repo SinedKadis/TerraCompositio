@@ -112,21 +112,25 @@ public class TCBlockStateProvider extends BlockStateProvider {
     }
 
     private void flowWoodBlockWithItem(RegistryObject<Block> block, RegistryObject<Block> texture){
-        flowLogBlock(block.get(),texture.get(),texture.get(),true);
+        flowLogBlock(block.get(), texture.get(), texture.get(), true, false);
         simpleBlockItem(block.get(), new ModelFile.UncheckedModelFile(TerraCompositio.MOD_ID+":block/"+ Objects.requireNonNull(ForgeRegistries.BLOCKS.getKey(block.get())).getPath()));
     }
 
     private void flowLogBlockWithItem(RegistryObject<Block> block){
-        flowLogBlock(block.get(),block.get(),block.get(),true);
+        flowLogBlock(block.get(), block.get(), block.get(), true, true);
         ResourceLocation key = ForgeRegistries.BLOCKS.getKey(block.get());
         if (key != null) {
             simpleBlockItem(block.get(), new ModelFile.UncheckedModelFile(TerraCompositio.MOD_ID+":block/"+ key.getPath()));
         }
     }
 
-    public void flowLogBlock(Block block,Block sideTexture,Block topTexture,boolean infused) {
+    public void flowLogBlock(Block block, Block sideTexture, Block topTexture, boolean infused, boolean addTopSuffix) {
         ResourceLocation side = this.blockTexture(sideTexture);
-        ResourceLocation end = this.extend(this.blockTexture(topTexture), "_top");
+        ResourceLocation end;
+        if (addTopSuffix)
+            end = this.extend(this.blockTexture(topTexture), "_top");
+        else
+            end = this.blockTexture(topTexture);
 
         ModelFile vertical = this.models().cubeColumn(this.name(block), side, end);
         ModelFile horizontal = this.models().cubeColumnHorizontal(this.name(block) + "_horizontal", side, end);
@@ -150,8 +154,10 @@ public class TCBlockStateProvider extends BlockStateProvider {
         ResourceLocation end_infused;
         if (infused) {
             side_infused = this.extend(this.blockTexture(sideTexture), "_infused");
-            end_infused = this.extend(this.blockTexture(topTexture), "_top_infused");
-
+            if (addTopSuffix)
+                end_infused = this.extend(this.blockTexture(topTexture), "_top_infused");
+            else
+                end_infused = this.extend(this.blockTexture(topTexture), "_infused");
         } else {
             side_infused = this.blockTexture(sideTexture);
             end_infused = this.blockTexture(topTexture);

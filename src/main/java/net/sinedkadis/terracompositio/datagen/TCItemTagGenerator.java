@@ -97,6 +97,9 @@ public class TCItemTagGenerator extends ItemTagsProvider {
                         Items.SOUL_TORCH);
         this.tag(TCTags.Items.GOLD_RODS)
                 .add(TCItems.GOLD_ROD.get());
+        this.tag(TCTags.Items.CHAIN_RIDEABLE)
+                .add(TCItems.WRENCH_AXE.get());
+
         if (ModList.get().isLoaded("create")) {
             TerraCompositio.createCompat.getDataGen().addItemTags(this, pProvider);
         }
