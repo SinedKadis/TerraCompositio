@@ -29,6 +29,7 @@
   "block.terracompositio.flow_infuser": "Flow Infuser",
   "effect.terracompositio.flow_saturation": "Flow Saturation",
   "sounds.terracompositio.flow_leak": "Flow Leaking",
+  "block.terracompositio.technetium_firing": "Technetium Firing",
 
   "item.terracompositio.flow_cedar_helmet": "Flow Cedar Helmet",
   "item.terracompositio.flow_cedar_chestplate": "Flow Cedar Chestplate",
@@ -187,7 +188,7 @@
 
 
   "key.terracompositio.categories.main": "Terra Compositio",
-  "create.recipe.item_with_wrench_application": "Manual Application with Wrench in Offhand",
+  "create.recipe.item_with_wrench_application": "Manual Application with Tool",
 
 
 

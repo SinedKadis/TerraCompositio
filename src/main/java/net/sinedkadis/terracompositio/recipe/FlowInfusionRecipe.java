@@ -84,7 +84,7 @@ public class FlowInfusionRecipe implements Recipe<SimpleContainer> {
     }
     public static class Serializer implements RecipeSerializer<FlowInfusionRecipe>{
         public static final Serializer INSTANCE = new Serializer();
-        //public static final ResourceLocation ID = new ResourceLocation(TerraCompositio.MOD_ID,"flow_infusion");
+        public static final ResourceLocation ID = TerraCompositio.modLoc("flow_infusion");
         @Override
         public @NotNull FlowInfusionRecipe fromJson(@NotNull ResourceLocation pRecipeId, @NotNull JsonObject pSerializedRecipe) {
             ItemStack output = ShapedRecipe.itemStackFromJson(GsonHelper.getAsJsonObject(pSerializedRecipe, "output"));

@@ -178,7 +178,7 @@
   "block.terracompositio.flow_cedar_tank_2": "Flow Cedar Tank",
   "block.terracompositio.flow_cedar_tank_3": "Flow Cedar Tank",
   "item.terracompositio.cfe_ball": "CFE Charge",
-  "create.recipe.item_with_wrench_application": "Manual Application with Wrench in Offhand",
+  "create.recipe.item_with_wrench_application": "Manual Application with tool",
 
   "book.terracompositio.creation_flow_journal.name": "Creation Flow Journal",
   "book.terracompositio.creation_flow_journal.landing_text": "Записи о наблюдении за потоком созидания, автор John Pork",

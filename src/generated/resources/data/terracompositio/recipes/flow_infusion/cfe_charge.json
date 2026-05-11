@@ -1,14 +1,14 @@
 {
   "type": "terracompositio:flow_infusion",
+  "cfe": 10,
   "ingredients": [
     {
-      "item": "minecraft:iron_ingot"
+      "item": "minecraft:snowball"
     }
   ],
   "output": {
     "count": 1,
-    "item": "terracompositio:infused_iron_ingot"
+    "item": "terracompositio:cfe_ball"
   },
-  "cfe": 50,
-  "time": 100
+  "time": 20
 }

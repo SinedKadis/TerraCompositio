@@ -71,14 +71,14 @@ public class MatterInfusionCategory implements IRecipeCategory<MatterInfusionRec
     }
 
     @Override
-    public void setRecipe(IRecipeLayoutBuilder iRecipeLayoutBuilder, MatterInfusionRecipe matterSaturationRecipe, @NotNull IFocusGroup iFocusGroup) {
+    public void setRecipe(IRecipeLayoutBuilder iRecipeLayoutBuilder, MatterInfusionRecipe matterSaturationRecipe, IFocusGroup iFocusGroup) {
         iRecipeLayoutBuilder.addSlot(RecipeIngredientRole.INPUT,20,10).addIngredients(matterSaturationRecipe.getIngredients().get(1));
         iRecipeLayoutBuilder.addSlot(RecipeIngredientRole.CATALYST,55,42).addIngredients(matterSaturationRecipe.getIngredients().get(0));
         iRecipeLayoutBuilder.addSlot(RecipeIngredientRole.OUTPUT,20,74).addItemStack(matterSaturationRecipe.getResultItem(null));
     }
 
     @Override
-    public void draw(MatterInfusionRecipe recipe, @NotNull IRecipeSlotsView recipeSlotsView, GuiGraphics guiGraphics, double mouseX, double mouseY) {
+    public void draw(MatterInfusionRecipe recipe, IRecipeSlotsView recipeSlotsView, GuiGraphics guiGraphics, double mouseX, double mouseY) {
         background.draw(guiGraphics);
         animatedArrow.draw(guiGraphics,40,16);
         String cfe = "CFE: "+ recipe.getCfe();
