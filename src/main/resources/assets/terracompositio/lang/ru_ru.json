@@ -174,6 +174,11 @@
   "block.terracompositio.floating_torch_holder": "Floating Torch Holder",
   "block.terracompositio.infused_iron_pressure_plate": "Infused Iron Pressure Plate",
   "block.terracompositio.infused_iron_door": "Infused Iron Door",
+  "item.terracompositio.wrench_tag_holder": "Infused Iron Axe (Wrench Mode)",
+  "block.terracompositio.flow_cedar_tank_2": "Flow Cedar Tank",
+  "block.terracompositio.flow_cedar_tank_3": "Flow Cedar Tank",
+  "item.terracompositio.cfe_ball": "CFE Charge",
+  "create.recipe.item_with_wrench_application": "Manual Application with Wrench in Offhand",
 
   "book.terracompositio.creation_flow_journal.name": "Creation Flow Journal",
   "book.terracompositio.creation_flow_journal.landing_text": "Записи о наблюдении за потоком созидания, автор John Pork",
@@ -210,26 +215,29 @@
   "book.terracompositio.creation_flow_journal.entry.activated_cedar_armor.page2": " Это работает только при полном наборе брони, а при достаточном повреждении процедуру придется повторять",
 
   "book.terracompositio.creation_flow_journal.entry.desorbers.name": "Десорберы потока",
-  "book.terracompositio.creation_flow_journal.entry.desorbers.page1": " Есть способ более прямого использования потока созидания. Для этого, из него нужно извлечь Энергию Потока Созидания (коротко ЭПС). Посколько жидкий поток, добываемый из деревьев, ее содержит, можно брать энергию оттуда",
+  "book.terracompositio.creation_flow_journal.entry.desorbers.page1": " Есть способ более прямого использования потока созидания. Для этого, из него нужно извлечь Энергию Потока Созидания (коротко ЭПС). Поскольку жидкий поток, добываемый из деревьев, ее содержит, можно брать энергию оттуда",
   "book.terracompositio.creation_flow_journal.entry.desorbers.page2.title": "Десорбер строительства",
-  "book.terracompositio.creation_flow_journal.entry.desorbers.page2": " Извлекает ЭПС из жидкого потока, используя как катализатор созедание, получаемое при строительстве рядом. При разрушении чего либо, просто испаряет жидкий поток",
+  "book.terracompositio.creation_flow_journal.entry.desorbers.page2": " Извлекает ЭПС из жидкого потока, используя как катализатор созидание, получаемое при строительстве рядом. При разрушении чего либо, просто испаряет жидкий поток",
   "book.terracompositio.creation_flow_journal.entry.desorbers.page3.title": "Десорбер Культивации",
-  "book.terracompositio.creation_flow_journal.entry.desorbers.page3": " Извлекает ЭПС из жидкого потока, используя как катализатор созедание, получаемое при росте растений рядом",
+  "book.terracompositio.creation_flow_journal.entry.desorbers.page3": " Извлекает ЭПС из жидкого потока, используя как катализатор созидание, получаемое при росте растений рядом",
   "book.terracompositio.creation_flow_journal.entry.desorbers.page4.title": "Десорбер течения времени",
-  "book.terracompositio.creation_flow_journal.entry.desorbers.page4": " Извлекает ЭПС из жидкого потока, используя как катализатор созедание собраного времени. Прирост не стабильный, требует редстоун сигнал для преобразования собраного времени в ЭПС",
+  "book.terracompositio.creation_flow_journal.entry.desorbers.page4": " Извлекает ЭПС из жидкого потока, используя как катализатор созидание собранного времени. Прирост не стабильный, требует редстоун сигнал для преобразования собранного времени в ЭПС",
 
   "book.terracompositio.creation_flow_journal.category.day_3.name": "День третий",
-  "book.terracompositio.creation_flow_journal.category.day_3.description": "Подробрее об использовании ЭПС",
+  "book.terracompositio.creation_flow_journal.category.day_3.description": "Подробнее об использовании ЭПС",
 
   "book.terracompositio.creation_flow_journal.entry.flow_infuser.name": "Наполнитель потоком",
   "book.terracompositio.creation_flow_journal.entry.flow_infuser.page1": " С помощью данного устройства можно создать интересный материал, обладающий свойствами как и жидкости, так и железа. Для этого нам понадобятся палки, медь, топор и прямые руки.",
-  "book.terracompositio.creation_flow_journal.entry.flow_infuser.page2": " Для его работы устройство должно находится в живом, наполненом потоком кедре",
+  "book.terracompositio.creation_flow_journal.entry.flow_infuser.page2": " Для его работы устройство должно находится в живом, наполненном потоком кедре",
   "book.terracompositio.creation_flow_journal.entry.flow_infuser.page3": " Положив внутрь железо, и добыв немного ЭПС неподалеку, произойдет магия и материал будет получен",
 
   "book.terracompositio.creation_flow_journal.entry.infused_iron_axe.name": "Мульти-инструмент",
   "book.terracompositio.creation_flow_journal.entry.infused_iron_axe.page1": " Благодаря невероятным свойствам материала, назвать данный инструмент топором было б неправильно. Он может иметь форму обычного топора, ключа, монтировки а так же ключа-топора",
   "book.terracompositio.creation_flow_journal.entry.infused_iron_axe.page2": " В режиме топора с ним можно делать все, как и с любым другим.<br> В режиме ключа он способен менять форму разных блоков.<br> В режиме монтировки он может извлекать застрявшие в устройствах предметы ",
-  "book.terracompositio.creation_flow_journal.entry.infused_iron_axe.page3": " А вот режим ключа-топора способен вращать целые деревья. Правда, без листвы"
+  "book.terracompositio.creation_flow_journal.entry.infused_iron_axe.page3": " А вот режим ключа-топора способен вращать целые деревья. Правда, без листвы",
 
-
+  "book.terracompositio.creation_flow_journal.entry.fluid_tanks.name": "Жидкостный резервуар",
+  "book.terracompositio.creation_flow_journal.entry.fluid_tanks.page1": "  Для удобства жидкий поток нужно где-то хранить. Для этого можно собрать такое не сложное устройство. Для него нам понадобится:<br>  - Ключ,<br>  - Топор,<br>  - 1 Бревно кедра,<br>  - 4 золотых стержня,<br>  - 8 стержней из наполненного железа,<br>  - 1 Стекло.",
+  "book.terracompositio.creation_flow_journal.entry.fluid_tanks.page2": "Ключ во вторую руку, к вертикально стоячему бревну крепим стержни, вырезаем топором отверстие и вставляем стекло.",
+  "book.terracompositio.creation_flow_journal.entry.fluid_tanks.page3": "В резервуаре помещается до 8 ведер любой жидкости, а еще его можно поставить под десорбер, для того, что б расширить его вместимость"
 }
