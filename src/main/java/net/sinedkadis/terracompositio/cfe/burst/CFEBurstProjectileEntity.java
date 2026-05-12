@@ -244,13 +244,22 @@ public class CFEBurstProjectileEntity extends ThrowableProjectile {
         } else if (blockEntity instanceof CFENetworkMemberBE memberBE) {
             memberBE.getMainHandler().subFromQueue(getO_CFE());
         } else {
-            if (getOwner() instanceof CFEBurstProjectileEntity main) {
-                Entity target = main.getOwner();
-                if (target instanceof CFENetworkMemberEntity || target instanceof Player) {
-                    assert target instanceof CFENetworkMemberEntity;
-                    CFENetworkMemberEntity cfeNetworkMemberEntity = ((CFENetworkMemberEntity) target);
-                    cfeNetworkMemberEntity.getMainHandler().subFromQueue(Math.max(getCFE(),getO_CFE()));
-                }
+            Entity target;
+            Entity owner = getOwner();
+            if (owner instanceof CFEBurstProjectileEntity main) {
+                target = main.getOwner();
+            } else if (owner instanceof CFENetworkMemberEntity || owner instanceof Player) {
+                target = owner;
+            } else {
+                super.remove(pReason);
+                return;
+            }
+            if (target instanceof CFENetworkMemberEntity || target instanceof Player) {
+                assert target instanceof CFENetworkMemberEntity;
+                CFENetworkMemberEntity cfeNetworkMemberEntity = ((CFENetworkMemberEntity) target);
+                int cfe = getCFE();
+                int oCfe = getO_CFE();
+                cfeNetworkMemberEntity.getMainHandler().subFromQueue(Math.max(cfe, oCfe));
             }
 
         }
