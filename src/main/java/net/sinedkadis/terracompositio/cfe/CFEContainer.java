@@ -36,6 +36,17 @@ public class CFEContainer implements ICFEHandler, INBTSerializable<CompoundTag> 
     protected Function<Vec3, Vec3> offset = t -> t;
     protected int queued = 0;
 
+    @Override
+    public String toString() {
+        return "CFEContainer{" +
+                "\nattachedMember=" + attachedMember +
+                ",\n CFE=" + CFE +
+                ",\n maxCFE=" + maxCFE +
+                ",\n queued=" + queued +
+                ",\n index=" + index +
+                '}';
+    }
+
     public CFEContainer(CFENetworkMember attachedMember) {
         this.attachedMember = attachedMember;
         if (attachedMember instanceof  CFENetworkMemberEntity) isEntity = true;
