@@ -3,7 +3,8 @@
   "render_type": "minecraft:cutout",
   "textures": {
     "top": "terracompositio:block/technetium_board_top",
-    "side": "terracompositio:block/technetium_board_side"
+    "side": "terracompositio:block/technetium_board_side",
+    "particle": "terracompositio:block/technetium_board_top"
   },
 
   "elements": [
