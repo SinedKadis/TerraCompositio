@@ -6,6 +6,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
+import net.sinedkadis.terracompositio.block.custom.TechnetiumBoardBlock;
 import net.sinedkadis.terracompositio.mixin.accessors.LivingEntityAccessor;
 import net.sinedkadis.terracompositio.registries.TCItems;
 import net.sinedkadis.terracompositio.util.LivingEntityAnimationAccessor;
@@ -34,25 +35,40 @@ public abstract class LivingEntityMixin extends Entity implements LivingEntityAn
     @Redirect(method = "baseTick", at = @At(value = "FIELD", target = "Lnet/minecraft/world/entity/LivingEntity;lastPos:Lnet/minecraft/core/BlockPos;", opcode = PUTFIELD))
     private void redirectLastPosAssignment(LivingEntity instance, BlockPos value) {
         LivingEntityAccessor accessor = (LivingEntityAccessor) instance;
-        BlockPos oldPos = accessor.getLastPos();
-        if (oldPos == null) {
+        if (instance.isShiftKeyDown() || instance.getItemBySlot(EquipmentSlot.FEET).is(TCItems.TECHNETIUM_BOOTS.get())) {
             accessor.setLastPos(value);
             return;
         }
-        oldPos = oldPos.below();
-        BlockState blockState = level().getBlockState(oldPos);
-        if (!instance.isShiftKeyDown()
-                && blockState.is(TCBlocks.TECHNETIUM_BOARD.get())
-                && !instance.getItemBySlot(EquipmentSlot.FEET).is(TCItems.TECHNETIUM_BOOTS.get())){
-            List<Entity> entities = level().getEntities(null, new AABB(oldPos.above(), oldPos.above(2)));
-            if (entities.isEmpty()) {
-                BlockState replaceState = blockState.hasProperty(WATERLOGGED)
-                        && blockState.getValue(WATERLOGGED)
-                        ? Blocks.WATER.defaultBlockState()
-                        : Blocks.AIR.defaultBlockState();
-                level().setBlockAndUpdate(oldPos, replaceState);
+        BlockPos lastPos = accessor.getLastPos();
+        if (lastPos != null) {
+            BlockState lastState = level().getBlockState(lastPos.below());
+            if (lastState.is(TCBlocks.TECHNETIUM_BOARD.get())) {
+                level().setBlockAndUpdate(lastPos.below(),lastState.setValue(TechnetiumBoardBlock.WAS_USED,true));
             }
         }
+
+        for (BlockPos pos : BlockPos.betweenClosed(
+                instance.blockPosition().offset(-2,-2,-2),
+                instance.blockPosition().offset(2,2,2))) {
+            BlockState blockState = level().getBlockState(pos);
+
+            if (blockState.is(TCBlocks.TECHNETIUM_BOARD.get())){
+                if (!blockState.getValue(TechnetiumBoardBlock.WAS_USED)) continue;
+                List<Entity> entities = level().getEntities(null, new AABB(
+                        pos.offset(-1,1,-1),
+                        pos.offset(1,2,1)));
+                if (entities.isEmpty()) {
+                    BlockState replaceState = blockState.hasProperty(WATERLOGGED)
+                            && blockState.getValue(WATERLOGGED)
+                            ? Blocks.WATER.defaultBlockState()
+                            : Blocks.AIR.defaultBlockState();
+                    level().setBlockAndUpdate(pos, replaceState);
+                }
+            }
+
+        }
+
+
 
         accessor.setLastPos(value);
     }

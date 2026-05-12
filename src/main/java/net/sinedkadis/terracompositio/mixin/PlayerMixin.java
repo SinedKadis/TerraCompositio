@@ -4,7 +4,6 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.MoverType;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import net.sinedkadis.terracompositio.api.TCCapabilities;
 import net.sinedkadis.terracompositio.api.dummies.DummyCFEHandler;
@@ -62,53 +61,38 @@ public class PlayerMixin implements CFENetworkMemberEntity {
         return ((Player)(Object)this).getCapability(TCCapabilities.CFE).orElse(DummyCFEHandler.instance);
     }
 
+    @Unique
+    private boolean technetium$fakeSneak = false;
+
+
     @Inject(
-            method = "maybeBackOffFromEdge",
+            method = "isStayingOnGroundSurface()Z",
             at = @At("HEAD"),
             cancellable = true
     )
-    private void technetium$edgeSafe(Vec3 movement, MoverType pMover, CallbackInfoReturnable<Vec3> cir) {
+    private void technetium$isOnGround(CallbackInfoReturnable<Boolean> cir) {
         Player self = (Player) (Object) this;
-
-        if (!self.onGround()) return;
-
-        BlockPos below = BlockPos.containing(
-                self.getX(),
-                self.getY() - 0.1,
-                self.getZ()
-        );
-
-        BlockState state = self.level().getBlockState(below);
-
-        if (!(state.getBlock() instanceof TechnetiumBoardBlock)) return;
-
-        Level level = self.level();
-
-        double x = movement.x;
-        double z = movement.z;
-
-        double step = 0.05;
-
-        while (x != 0.0 && level.noCollision(self, self.getBoundingBox().move(x, -1.0, 0))) {
-            if (Math.abs(x) < step) x = 0.0;
-            else x -= Math.signum(x) * step;
+        boolean found = false;
+        for (BlockPos pos : BlockPos.betweenClosed(self.blockPosition().offset(-1, -1, -1), self.blockPosition().offset(1, -1, 1))) {
+            if ((self.level().getBlockState(pos).getBlock() instanceof TechnetiumBoardBlock)) {
+                found = true;
+                break;
+            }
         }
+        if (!found) return;
 
-        while (z != 0.0 && level.noCollision(self, self.getBoundingBox().move(0, -1.0, z))) {
-            if (Math.abs(z) < step) z = 0.0;
-            else z -= Math.signum(z) * step;
+        technetium$fakeSneak = true;
+        cir.setReturnValue(true);
+    }
+
+    @Inject(
+            method = "maybeBackOffFromEdge",
+            at = @At("RETURN")
+    )
+    private void technetium$edgeSafeTail(Vec3 movement, MoverType mover, CallbackInfoReturnable<Vec3> cir) {
+        if (technetium$fakeSneak) {
+            ((Player) (Object) this).setShiftKeyDown(false);
+            technetium$fakeSneak = false;
         }
-
-        while (x != 0.0 && z != 0.0 &&
-                level.noCollision(self, self.getBoundingBox().move(x, -1.0, z))) {
-
-            if (Math.abs(x) < step) x = 0.0;
-            else x -= Math.signum(x) * step;
-
-            if (Math.abs(z) < step) z = 0.0;
-            else z -= Math.signum(z) * step;
-        }
-
-        cir.setReturnValue(new Vec3(x, movement.y, z));
     }
 }
