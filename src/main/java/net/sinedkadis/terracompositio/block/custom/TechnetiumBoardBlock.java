@@ -20,6 +20,7 @@ import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.EntityCollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import net.sinedkadis.terracompositio.registries.TCBlocks;
@@ -76,7 +77,12 @@ public class TechnetiumBoardBlock extends Block implements SimpleWaterloggedBloc
     @SuppressWarnings("deprecation")
     @Override
     public VoxelShape getCollisionShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
-        if (context.isAbove(Shapes.block(), pos, true)) {
+        Entity entity = null;
+        if (context instanceof EntityCollisionContext entityCollisionContext) {
+            entity = entityCollisionContext.getEntity();
+        }
+
+        if (context.isAbove(Shapes.block(), pos, true) || !(entity != null && entity.isShiftKeyDown())) {
             return SHAPE;
         }
         return Shapes.empty();
