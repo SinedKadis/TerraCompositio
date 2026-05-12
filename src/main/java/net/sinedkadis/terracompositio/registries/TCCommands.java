@@ -42,7 +42,55 @@ public class TCCommands {
                                                     .getEntity(ctx,"cfe network member entity");
                                             return TCCommands.printCFEData(ctx,entity);
                                         })
+                        .then(
+                                Commands.literal("clear-cfe-data")
+                                        .executes(TCCommands::clearCFEData)
+                        )
+                        .then(
+                                Commands.argument("clear-cfe-data", EntityArgument.entity()))
+                        .executes(ctx -> {
+                            Entity entity = EntityArgument
+                                    .getEntity(ctx,"cfe network member entity");
+                            return TCCommands.clearCFEData(ctx,entity);
+                        })
                         );
+    }
+
+    private static int clearCFEData(CommandContext<CommandSourceStack> ctx, Entity... entities) {
+        CommandSourceStack source = ctx.getSource();
+        CFENetworkMemberEntity memberEntity;
+        if (Arrays.stream(entities).toList().isEmpty()) {
+            ServerPlayer player = source.getPlayer();
+            if (player == null) {
+                source.sendFailure(Component.literal("No entities were provided"));
+                return 0;
+            }
+            memberEntity = (CFENetworkMemberEntity) player;
+        } else {
+            Entity entity = entities[0];
+            if (entity instanceof CFENetworkMemberEntity memberEntity1)
+                memberEntity = memberEntity1;
+            else {
+                source.sendFailure(Component.literal("Entity has to be CFENetworkMemberEntity"));
+                return 0;
+            }
+        }
+        ICFEHandler mainHandler = memberEntity.getMainHandler();
+        mainHandler.clear();
+
+        NonNullSupplier<Exception> exception = Exception::new;
+        memberEntity.getEntity().getArmorSlots().forEach(itemStack -> {
+            try {
+                itemStack.getCapability(TCCapabilities.CFE).orElseThrow(exception).clear();
+            } catch (Exception ignored) {
+
+            }
+        });
+
+        source.sendSuccess(() ->
+                        Component.literal("Data cleared"),
+                true);
+        return Command.SINGLE_SUCCESS;
     }
 
     private static int printCFEData(CommandContext<CommandSourceStack> ctx, Entity... entities) {

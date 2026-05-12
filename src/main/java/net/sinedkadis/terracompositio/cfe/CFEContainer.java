@@ -47,6 +47,12 @@ public class CFEContainer implements ICFEHandler, INBTSerializable<CompoundTag> 
                 '}';
     }
 
+    @Override
+    public void clear() {
+        CFE = 0;
+        queued = 0;
+    }
+
     public CFEContainer(CFENetworkMember attachedMember) {
         this.attachedMember = attachedMember;
         if (attachedMember instanceof  CFENetworkMemberEntity) isEntity = true;

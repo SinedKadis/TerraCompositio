@@ -45,7 +45,7 @@ public interface ICFEHandler extends BlockSource {
     boolean isEmpty();
     int getFreeSpace();
 
-
+    void clear();
 
     CFENetworkMember getAttachedMember();
 

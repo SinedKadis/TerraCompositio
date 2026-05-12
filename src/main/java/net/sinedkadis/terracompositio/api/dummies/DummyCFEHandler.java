@@ -110,6 +110,11 @@ public class DummyCFEHandler implements ICFEHandler {
         return 0;
     }
 
+    @Override
+    public void clear() {
+
+    }
+
 
     @Override
     public double x() {
