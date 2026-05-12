@@ -65,9 +65,9 @@
   "item.terracompositio.flow_rotating_axe.wrench_axe": "Wrench-Axe Mode",
   "item.terracompositio.flow_rotating_axe.wrench": "Wrench Mode",
   "item.terracompositio.flow_rotating_axe.crowbar": "Crowbar Mode",
-  "message.terracompositio.changed_tool_mode": "Switched to %s",
+  "message.terracompositio.wrench_mode": "Switched to %s",
   "item.terracompositio.flow_rotating_axe": "Infused Iron Axe",
-  "item.terracompositio.tool_mode": "Mode: %s",
+  "item.terracompositio.flow_rotating_axe.mode": "Mode: %s",
   "item.terracompositio.flow_rotating_axe.too_massive_tree": "I can't. Maybe it's too big",
   "item.terracompositio.flow_rotating_axe.no_change": "I can't change anything here",
 
@@ -149,10 +149,6 @@
   "item.terracompositio.fluid_applier": "Fluid Applier",
   "block.terracompositio.technetium_board": "Technetium Board",
   "key.terracompositio.categories.main": "Terra Compositio",
-  "item.terracompositio.technetium_crown.none": "Inert Mode",
-  "item.terracompositio.technetium_crown.receive": "Receive Mode",
-  "item.terracompositio.technetium_crown.send": "Send Mode",
-  "item.terracompositio.technetium_crown.all": "Receive and Send Mode",
   "block.terracompositio.cfe_tick": "CFE/tick: %s",
   "config.jade.plugin_terracompositio.tc_be_tooltip": "CFE",
   "block.terracompositio.pp_extractor": "Path Pointer Extractor",
@@ -179,6 +175,9 @@
   "block.terracompositio.flow_cedar_tank_3": "Flow Cedar Tank",
   "item.terracompositio.cfe_ball": "CFE Charge",
   "create.recipe.item_with_wrench_application": "Manual Application with tool",
+  "block.terracompositio.technetium_firing": "Technetium Firing",
+
+
 
   "book.terracompositio.creation_flow_journal.name": "Creation Flow Journal",
   "book.terracompositio.creation_flow_journal.landing_text": "Записи о наблюдении за потоком созидания, автор John Pork",
@@ -240,4 +239,5 @@
   "book.terracompositio.creation_flow_journal.entry.fluid_tanks.page1": "  Для удобства жидкий поток нужно где-то хранить. Для этого можно собрать такое не сложное устройство. Для него нам понадобится:<br>  - Ключ,<br>  - Топор,<br>  - 1 Бревно кедра,<br>  - 4 золотых стержня,<br>  - 8 стержней из наполненного железа,<br>  - 1 Стекло.",
   "book.terracompositio.creation_flow_journal.entry.fluid_tanks.page2": "Ключ во вторую руку, к вертикально стоячему бревну крепим стержни, вырезаем топором отверстие и вставляем стекло.",
   "book.terracompositio.creation_flow_journal.entry.fluid_tanks.page3": "В резервуаре помещается до 8 ведер любой жидкости, а еще его можно поставить под десорбер, для того, что б расширить его вместимость"
+
 }
