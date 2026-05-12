@@ -12,6 +12,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.ThrowableProjectile;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
@@ -44,7 +45,6 @@ public class CFEBurstProjectileEntity extends ThrowableProjectile {
     private static final EntityDataAccessor<BlockPos> TARGET = SynchedEntityData.defineId(CFEBurstProjectileEntity.class, EntityDataSerializers.BLOCK_POS);
 
 
-    private float cfeTravelSpeed;
     private final BlockPos.MutableBlockPos lastBP = new BlockPos.MutableBlockPos();
     private int timeToLive = 100;
 
@@ -95,7 +95,6 @@ public class CFEBurstProjectileEntity extends ThrowableProjectile {
         BlockPos shootVec = targetPos.subtract(BlockPos.containing(pSource.getPos().getCenter().add(offset)));
         //pp proxy backdoor
         this.setTarget(attachedMember.getMainHandler().getAttachedMember().getPos());
-        this.cfeTravelSpeed = cfeTravelSpeed;
         this.shoot(shootVec.getX(), shootVec.getY(), shootVec.getZ(), cfeTravelSpeed, 0);
         lastBP.set(pSource.getPos());
         pSource.getLevel().addFreshEntity(this);
@@ -129,14 +128,14 @@ public class CFEBurstProjectileEntity extends ThrowableProjectile {
         return new CFEBurstProjectileEntity(cfe,this);
     }
 
-
+    boolean trackCrown = false;
     @Override
     public void tick() {
         super.tick();
-        recalculateCrownOwnerTarget();
         killIfTimeEnded();
         calculateCollisions();
-
+        if (trackCrown)
+            recalculateCrownOwnerTarget();
     }
 
     private void calculateCollisions() {
@@ -172,10 +171,10 @@ public class CFEBurstProjectileEntity extends ThrowableProjectile {
         Entity owner = getOwner();
         if (owner instanceof LivingEntity livingEntity
                 && livingEntity.getItemBySlot(EquipmentSlot.HEAD).is(TCItems.TECHNETIUM_CROWN.get())
-                && tickCount % 20 == 0) {
+                && tickCount % 5 == 0) {
             setDeltaMovement(Vec3.ZERO);
             Vec3 shootVec = livingEntity.position().subtract(this.position());
-            this.shoot(shootVec.x(),shootVec.y(),shootVec.z(),cfeTravelSpeed,0);
+            this.shoot(shootVec.x(),shootVec.y(),shootVec.z(),5/20f,0);
         }
     }
 
@@ -191,6 +190,7 @@ public class CFEBurstProjectileEntity extends ThrowableProjectile {
 
         boolean bindposNotValid = bindPos == null || bindPos.equals(BlockPos.ZERO);
         boolean isEmitter = pathPointerBlockEntity.parts.contains(PathPointerBlockEntity.PPPart.EMITTER);
+        boolean isInfuser = pathPointerBlockEntity.parts.contains(PathPointerBlockEntity.PPPart.INFUSER);
 
         if (bindposNotValid && isEmitter) {
             bindPos = getTarget();
@@ -198,8 +198,8 @@ public class CFEBurstProjectileEntity extends ThrowableProjectile {
         } else if (bindposNotValid) {
                 shootVec = new Vec3(0, 0, 1)
                         .yRot((float) Math.toRadians(pathPointerBlockEntity.getRotationYaw()))
-                        .xRot((float) Math.toRadians(pathPointerBlockEntity.getRotationPitch()))
-                        .normalize();
+                        .xRot((float) Math.toRadians(pathPointerBlockEntity.getRotationPitch()));
+                if (isInfuser) trackCrown = true;
         } else shootVec = pathPointerBlockEntity.getBlockPos().getCenter().vectorTo(bindPos.getCenter());
 
 
@@ -244,11 +244,22 @@ public class CFEBurstProjectileEntity extends ThrowableProjectile {
         } else if (blockEntity instanceof CFENetworkMemberBE memberBE) {
             memberBE.getMainHandler().subFromQueue(getO_CFE());
         } else {
-            if (getOwner() instanceof CFEBurstProjectileEntity main) {
-                Entity target = main.getOwner();
-                if (target instanceof CFENetworkMemberEntity cfeNetworkMemberEntity) {
-                    cfeNetworkMemberEntity.getMainHandler().subFromQueue(getO_CFE());
-                }
+            Entity target;
+            Entity owner = getOwner();
+            if (owner instanceof CFEBurstProjectileEntity main) {
+                target = main.getOwner();
+            } else if (owner instanceof CFENetworkMemberEntity || owner instanceof Player) {
+                target = owner;
+            } else {
+                super.remove(pReason);
+                return;
+            }
+            if (target instanceof CFENetworkMemberEntity || target instanceof Player) {
+                assert target instanceof CFENetworkMemberEntity;
+                CFENetworkMemberEntity cfeNetworkMemberEntity = ((CFENetworkMemberEntity) target);
+                int cfe = getCFE();
+                int oCfe = getO_CFE();
+                cfeNetworkMemberEntity.getMainHandler().subFromQueue(Math.max(cfe, oCfe));
             }
 
         }

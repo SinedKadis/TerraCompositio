@@ -288,7 +288,6 @@ public class TechnetiumArmorItem extends TCArmorItem {
 
     private static void transferCFE(ItemStack pStack, Entity entity, ICFEHandler icfeHandler) {
         if (!(icfeHandler instanceof DummyCFEHandler)) {
-            int cfe = icfeHandler.getCFE();
             Type type = ((ArmorItem) pStack.getItem()).getType();
             ICFEHandler playerCap = entity.getCapability(TCCapabilities.CFE).orElse(DummyCFEHandler.instance);
             if (!type.equals(Type.LEGGINGS)) {
@@ -299,7 +298,7 @@ public class TechnetiumArmorItem extends TCArmorItem {
                         leggings = armor.getCapability(TCCapabilities.CFE).orElse(DummyCFEHandler.instance);
                     }
                 }
-                if (cfe < 1) {
+                if (icfeHandler.getFreeSpace() > 0) {
                     if (leggings.takeCFE(1,true)>0) {
                         int cfe1 = leggings.takeCFE(1, false);
                         icfeHandler.addCFE(

@@ -37,6 +37,22 @@ public class CFEItemWrapper implements ICFEHandler, ICapabilityProvider {
     }
 
     @Override
+    public String toString() {
+        return "CFEItemWrapper{" +
+                "container=" + container +
+                ",\n CFE=" + getCFE() +
+                ",\n Max CFE=" + getMaxCFE() +
+                ",\n queued=" + queued +
+                '}';
+    }
+
+    @Override
+    public void clear() {
+        setCFE(0);
+        queued = 0;
+    }
+
+    @Override
     public <T> LazyOptional<T> getCapability(@NotNull Capability<T> cap, @Nullable Direction side) {
         return TCCapabilities.CFE.orEmpty(cap, holder);
     }
