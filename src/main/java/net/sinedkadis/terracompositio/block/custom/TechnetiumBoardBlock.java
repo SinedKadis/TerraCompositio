@@ -20,6 +20,7 @@ import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.shapes.CollisionContext;
+import net.minecraft.world.phys.shapes.EntityCollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import net.sinedkadis.terracompositio.registries.TCBlocks;
@@ -31,16 +32,17 @@ import java.util.List;
 @MethodsReturnNonnullByDefault
 public class TechnetiumBoardBlock extends Block implements SimpleWaterloggedBlock {
     public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
+    public static final BooleanProperty WAS_USED = BooleanProperty.create("was_used");
     private final VoxelShape SHAPE = Block.box(0, 12, 0, 16, 16, 16);
 
 
     public TechnetiumBoardBlock(Properties pProperties) {
         super(pProperties);
-        registerDefaultState(defaultBlockState().setValue(WATERLOGGED,false));
+        registerDefaultState(defaultBlockState().setValue(WATERLOGGED,false).setValue(WAS_USED,false));
     }
 
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> pBuilder) {
-        pBuilder.add(WATERLOGGED);
+        pBuilder.add(WATERLOGGED,WAS_USED);
     }
 
     @SuppressWarnings("deprecation")
@@ -48,8 +50,8 @@ public class TechnetiumBoardBlock extends Block implements SimpleWaterloggedBloc
     public void tick(BlockState pState, ServerLevel level, BlockPos pPos, RandomSource pRandom) {
         super.tick(pState, level, pPos, pRandom);
         List<Entity> entities = level.getEntities(null, new AABB(
-                pPos.above().relative(Direction.EAST).relative(Direction.SOUTH),
-                pPos.above(2).relative(Direction.WEST).relative(Direction.NORTH)));
+                pPos.offset(-1,1,-1),
+                pPos.offset(1,2,1)));
         if (entities.isEmpty()) {
             BlockState replaceState =
                     Blocks.AIR.defaultBlockState();
@@ -76,7 +78,12 @@ public class TechnetiumBoardBlock extends Block implements SimpleWaterloggedBloc
     @SuppressWarnings("deprecation")
     @Override
     public VoxelShape getCollisionShape(BlockState state, BlockGetter level, BlockPos pos, CollisionContext context) {
-        if (context.isAbove(Shapes.block(), pos, true)) {
+        Entity entity = null;
+        if (context instanceof EntityCollisionContext entityCollisionContext) {
+            entity = entityCollisionContext.getEntity();
+        }
+
+        if (context.isAbove(Shapes.block(), pos, true) || !(entity != null && entity.isShiftKeyDown())) {
             return SHAPE;
         }
         return Shapes.empty();

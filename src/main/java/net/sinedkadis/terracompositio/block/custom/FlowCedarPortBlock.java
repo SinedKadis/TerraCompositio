@@ -80,7 +80,7 @@ public class FlowCedarPortBlock extends TCBaseEntityBlock {
         if (item.is(TCItems.GOLD_ROD.get())
                 && item.getCount() > 4
                 && item2.getItem() instanceof WrenchAxeItem) {
-            if (WrenchAxeItem.getWrenchMode(item2).equals(WrenchAxeItem.WrenchMode.WRENCH)) {
+            if (WrenchAxeItem.getMode(item2).equals(WrenchAxeItem.WrenchMode.WRENCH)) {
                 return handleInWorldBlockCraft(pState, TCBlocks.FLOW_CEDAR_CASING.get().defaultBlockState(), pLevel, pPos, item, 4);
             }
             return super.use(pState, pLevel, pPos, pPlayer, pHand, pHit);

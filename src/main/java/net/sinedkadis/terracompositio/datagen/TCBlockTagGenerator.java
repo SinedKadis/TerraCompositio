@@ -66,11 +66,11 @@ public class TCBlockTagGenerator extends BlockTagsProvider {
                         TCBlocks.FLOW_CEDAR_ENT_STATUE.get());
 
 
-        this.tag(BlockTags.NEEDS_IRON_TOOL)
-                .add(TCBlocks.FLOW_CEDAR_LOG.get(),
-                        TCBlocks.FLOW_CEDAR_LEAVES.get(),
-                        TCBlocks.FLOW_CEDAR_PORT.get(),
-                        TCBlocks.FLOW_CEDAR_WOOD.get());
+//        this.tag(BlockTags.NEEDS_IRON_TOOL)
+//                .add(TCBlocks.FLOW_CEDAR_LOG.get(),
+//                        TCBlocks.FLOW_CEDAR_LEAVES.get(),
+//                        TCBlocks.FLOW_CEDAR_PORT.get(),
+//                        TCBlocks.FLOW_CEDAR_WOOD.get());
 
         this.tag(BlockTags.NEEDS_STONE_TOOL)
                 .add(TCBlocks.PP_SENDER.get(),

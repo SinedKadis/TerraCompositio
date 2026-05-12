@@ -29,6 +29,7 @@
   "block.terracompositio.flow_infuser": "Flow Infuser",
   "effect.terracompositio.flow_saturation": "Flow Saturation",
   "sounds.terracompositio.flow_leak": "Flow Leaking",
+  "block.terracompositio.technetium_firing": "Technetium Firing",
 
   "item.terracompositio.flow_cedar_helmet": "Flow Cedar Helmet",
   "item.terracompositio.flow_cedar_chestplate": "Flow Cedar Chestplate",
@@ -66,15 +67,11 @@
   "item.terracompositio.flow_rotating_axe.wrench_axe": "Wrench-Axe Mode",
   "item.terracompositio.flow_rotating_axe.wrench": "Wrench Mode",
   "item.terracompositio.flow_rotating_axe.crowbar": "Crowbar Mode",
-  "item.terracompositio.tool_mode": "%s",
-  "message.terracompositio.changed_tool_mode": "Switched to %s",
+  "message.terracompositio.wrench_mode": "Switched to %s",
   "item.terracompositio.flow_rotating_axe": "Infused Iron Axe",
+  "item.terracompositio.flow_rotating_axe.mode": "Mode: %s",
   "item.terracompositio.flow_rotating_axe.too_massive_tree": "I can't. Maybe it's too big",
   "item.terracompositio.flow_rotating_axe.no_change": "I can't change anything here",
-  "item.terracompositio.technetium_crown.none": "Inert Mode",
-  "item.terracompositio.technetium_crown.receive": "Receive Mode",
-  "item.terracompositio.technetium_crown.send": "Send Mode",
-  "item.terracompositio.technetium_crown.all": "Receive and Send Mode",
 
   "item.terracompositio.infused_iron_rod": "Infused Iron Rod",
   "item.terracompositio.gold_rod": "Gold Rod",
@@ -187,7 +184,7 @@
 
 
   "key.terracompositio.categories.main": "Terra Compositio",
-  "create.recipe.item_with_wrench_application": "Manual Application with Wrench in Offhand",
+  "create.recipe.item_with_wrench_application": "Manual Application with Tool",
 
 
 
@@ -250,6 +247,11 @@
   "book.terracompositio.creation_flow_journal.entry.infused_iron_axe.name": "test",
   "book.terracompositio.creation_flow_journal.entry.infused_iron_axe.page1": "test",
   "book.terracompositio.creation_flow_journal.entry.infused_iron_axe.page2": "test",
-  "book.terracompositio.creation_flow_journal.entry.infused_iron_axe.page3": "test"
+  "book.terracompositio.creation_flow_journal.entry.infused_iron_axe.page3": "test",
+
+  "book.terracompositio.creation_flow_journal.entry.fluid_tanks.name": "test",
+  "book.terracompositio.creation_flow_journal.entry.fluid_tanks.page1": "test",
+  "book.terracompositio.creation_flow_journal.entry.fluid_tanks.page2": "test",
+  "book.terracompositio.creation_flow_journal.entry.fluid_tanks.page3": "test"
 
 }

@@ -9,6 +9,7 @@ import mezz.jei.api.recipe.IFocusGroup;
 import mezz.jei.api.recipe.RecipeIngredientRole;
 import net.minecraft.ChatFormatting;
 import net.minecraft.world.item.crafting.Ingredient;
+import net.sinedkadis.terracompositio.compat.create.recipes.ManualApplicationWIthToolRecipe;
 import net.sinedkadis.terracompositio.registries.TCTags;
 
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -36,9 +37,15 @@ public class ItemApplicationWithWrenchCategory extends ItemApplicationCategory {
                                 : (view, tooltip) -> {
                         }
                 );
+        Ingredient tool;
+        if (recipe instanceof ManualApplicationWIthToolRecipe toolRecipe) {
+            tool = toolRecipe.getToolHeldItem();
+        } else {
+            tool = Ingredient.of(TCTags.Items.WRENCHES);
+        }
         builder.addSlot(RecipeIngredientRole.INPUT, 31, 5)
                 .setBackground(getRenderedSlot(), -1, -1)
-                .addIngredients(Ingredient.of(TCTags.Items.WRENCHES))
+                .addIngredients(tool)
                 .addRichTooltipCallback(
                         (view, tooltip) -> tooltip.add(CreateLang.translateDirect("recipe.deploying.not_consumed")
                                 .withStyle(ChatFormatting.GOLD))

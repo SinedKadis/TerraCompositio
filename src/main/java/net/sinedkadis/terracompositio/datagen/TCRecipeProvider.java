@@ -16,6 +16,7 @@ import net.minecraftforge.common.crafting.conditions.IConditionBuilder;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.sinedkadis.terracompositio.TerraCompositio;
+import net.sinedkadis.terracompositio.datagen.builders.FlowInfusionRecipeBuilder;
 import net.sinedkadis.terracompositio.datagen.builders.FlowSaturationRecipeBuilder;
 import net.sinedkadis.terracompositio.datagen.builders.MatterInfusionRecipeBuilder;
 import net.sinedkadis.terracompositio.datagen.builders.TechnetiumFiringRecipeBuilder;
@@ -303,6 +304,12 @@ public class TCRecipeProvider extends RecipeProvider implements IConditionBuilde
                 )
                 .unlockedBy(getHasName(Blocks.OAK_SAPLING), has(Blocks.OAK_SAPLING))
                 .save(pWriter, TerraCompositio.modLoc("flow_saturation/cedar_sapling"));
+        FlowInfusionRecipeBuilder.create(
+                TCItems.CFE_BALL.get().getDefaultInstance(),
+                Ingredient.of(Items.SNOWBALL),
+                10,
+                20
+        ).save(pWriter,TerraCompositio.modLoc("flow_infusion/cfe_charge"));
     }
 
     private static void buildDesorbers(@NotNull Consumer<FinishedRecipe> pWriter) {
@@ -342,6 +349,15 @@ public class TCRecipeProvider extends RecipeProvider implements IConditionBuilde
 
     private static void buildInfusedIronMaterials(@NotNull Consumer<FinishedRecipe> pWriter) {
         ResourceLocation key = ForgeRegistries.ITEMS.getKey(TCItems.INFUSED_IRON_INGOT.get());
+
+        FlowInfusionRecipeBuilder.create(
+                TCItems.INFUSED_IRON_INGOT.get().getDefaultInstance(),
+                Ingredient.of(Items.IRON_INGOT),
+                50,
+                100
+        ).save(pWriter,TerraCompositio.modLoc("flow_infusion/infused_iron"));
+
+
         ShapelessRecipeBuilder.shapeless(RecipeCategory.MISC, TCItems.INFUSED_IRON_INGOT.get(), 1)
                 .requires(TCItems.INFUSED_IRON_NUGGET.get(),9)
                 .unlockedBy(getHasName(TCItems.INFUSED_IRON_INGOT.get()), has(TCItems.INFUSED_IRON_INGOT.get()))

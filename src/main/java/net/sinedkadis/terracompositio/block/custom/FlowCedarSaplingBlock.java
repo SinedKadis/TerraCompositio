@@ -35,7 +35,7 @@ public class FlowCedarSaplingBlock extends SaplingBlock {
         ItemStack itemInHand = pPlayer.getItemInHand(pHand);
         if (itemInHand.is(Items.BONE_MEAL)){
             BlockState blockState = pLevel.getBlockState(pPos.above());
-            if (blockState.is(TCBlocks.FLOW_CEDAR_TANK.get())){
+            if (blockState.is(TCBlocks.FLOW_CEDAR_TANK.get()) && blockState.getValue(FlowCedarTankBlock.STAGE).equals(3)) {
                 pLevel.setBlockAndUpdate(pPos, TCBlocks.FLOW_CEDAR_PEDESTAL.get().defaultBlockState());
                 pLevel.setBlockAndUpdate(pPos.above(),blockState.setValue(FlowCedarTankBlock.STAGE,4));
                 itemInHand.shrink(1);
@@ -59,15 +59,6 @@ public class FlowCedarSaplingBlock extends SaplingBlock {
                     1.0F,
                     level.random.nextFloat() * 0.1F + 0.9F
             );
-        }
-    }
-
-    @Override
-    public void onRemove(BlockState pState, Level pLevel, BlockPos pPos, BlockState pNewState, boolean pMovedByPiston) {
-        super.onRemove(pState, pLevel, pPos, pNewState, pMovedByPiston);
-        BlockState blockState = pLevel.getBlockState(pPos.above());
-        if (blockState.hasProperty(FlowCedarTankBlock.STAGE)){
-            pLevel.setBlockAndUpdate(pPos.above(),blockState.setValue(STAGE,3));
         }
     }
 

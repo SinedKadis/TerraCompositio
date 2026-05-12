@@ -23,6 +23,8 @@ import net.sinedkadis.terracompositio.util.TCUtil;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 
+import static net.sinedkadis.terracompositio.config.TCCommonConfigs.PLATFORM_ALIVE_PER_PLAYER;
+
 
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
@@ -64,9 +66,9 @@ public class CFEDropProjectileEntity extends ThrowableProjectile implements Item
             if (owner != null) {
                 CompoundTag persistentData = owner.getPersistentData();
                 int ballsThrew = persistentData.getInt("balls_threw");
-                ListTag list = persistentData.getList("platform_on_throw_" + ballsThrew, Tag.TAG_COMPOUND);
+                ListTag list = persistentData.getList("platform_on_throw_" + (ballsThrew % PLATFORM_ALIVE_PER_PLAYER.get()), Tag.TAG_COMPOUND);
                 list.add(TCUtil.saveBlockPos(blockPos));
-                persistentData.put("platform_on_throw_" + ballsThrew, list);
+                persistentData.put("platform_on_throw_" + (ballsThrew % PLATFORM_ALIVE_PER_PLAYER.get()), list);
 
             }
         }

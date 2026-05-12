@@ -1,26 +1,18 @@
 package net.sinedkadis.terracompositio.item.custom;
 
-import net.minecraft.ChatFormatting;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
-import net.minecraft.nbt.Tag;
-import net.minecraft.network.chat.Component;
 import net.minecraft.tags.BlockTags;
-import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResultHolder;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.client.extensions.common.IClientItemExtensions;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
@@ -33,12 +25,9 @@ import net.sinedkadis.terracompositio.api.TerraCompositioAPI;
 import net.sinedkadis.terracompositio.api.dummies.DummyCFEHandler;
 import net.sinedkadis.terracompositio.api.networks.NetworkAction;
 import net.sinedkadis.terracompositio.api.TCCapabilities;
-import net.sinedkadis.terracompositio.api.networks.cfe.CFENetworkMember;
 import net.sinedkadis.terracompositio.api.networks.cfe.CFENetworkMemberEntity;
 import net.sinedkadis.terracompositio.api.networks.cfe.ICFEHandler;
-import net.sinedkadis.terracompositio.block.entity.PathPointerBlockEntity;
 import net.sinedkadis.terracompositio.cfe.CFEItemWrapper;
-import net.sinedkadis.terracompositio.cfe.CFEMemberProxy;
 import net.sinedkadis.terracompositio.item.models.TechnetiumBootsModel;
 import net.sinedkadis.terracompositio.item.models.TechnetiumCloakModel;
 import net.sinedkadis.terracompositio.item.models.TechnetiumCrownModel;
@@ -47,24 +36,18 @@ import net.sinedkadis.terracompositio.network.packets.C2SBoardSync;
 import net.sinedkadis.terracompositio.registries.TCArmorMaterials;
 import net.sinedkadis.terracompositio.registries.TCBlocks;
 import net.sinedkadis.terracompositio.registries.TCItems;
-import net.sinedkadis.terracompositio.util.TCUtil;
 import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.*;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 
 import static net.minecraft.world.level.block.state.properties.BlockStateProperties.WATERLOGGED;
-import static net.sinedkadis.terracompositio.item.custom.WrenchAxeItem.isPlayerLookingAtBlock;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 @Mod.EventBusSubscriber(modid = TerraCompositio.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class TechnetiumArmorItem extends TCArmorItem {
-
-    public static final String crownModeTag = "crown_mode";
-    private static final String cachedExtractorsTag = "cached_extractors";
 
 
     @Override
@@ -106,6 +89,7 @@ public class TechnetiumArmorItem extends TCArmorItem {
     public void inventoryTick(ItemStack pStack, Level pLevel, Entity entity, int pSlotId, boolean pIsSelected) {
         super.inventoryTick(pStack, pLevel, entity, pSlotId, pIsSelected);
         ICFEHandler icfeHandler = pStack.getCapability(TCCapabilities.CFE).orElse(DummyCFEHandler.instance);
+        transferCFE(pStack, entity, icfeHandler);
         switch (type) {
             case HELMET -> this.helmetInventoryTick(pStack, pLevel, entity, icfeHandler);
             case CHESTPLATE -> this.chestplateInventoryTick(pStack, pLevel, entity, icfeHandler);
@@ -120,49 +104,16 @@ public class TechnetiumArmorItem extends TCArmorItem {
 
     }
 
-    private void helmetInventoryTick(ItemStack pStack, Level pLevel, Entity pEntity, ICFEHandler icfeHandlerCFE) {
-        switch (getCrownMode(pStack)) {
-            case SEND,ALL -> {
-                if (!(pEntity instanceof CFENetworkMember pMember)) return;
+    private void helmetInventoryTick(ItemStack ignoredPStack, Level ignoredPLevel, Entity ignoredEntity, ICFEHandler ignoredIcfeHandler) {
 
-                if (icfeHandlerCFE.getCFE() > 0) {
-                    getCachedExtractors(pStack).stream()
-                            //Convert BlockPoses to PPBlockEntities
-                            .map(pLevel::getBlockEntity)
-                            .map(blockEntity -> blockEntity instanceof PathPointerBlockEntity ppbe ? ppbe : null)
-                            .filter(Objects::nonNull)
-                            //Pick random ppbe
-                            .findAny()
-                            .ifPresent(inputEntity ->  {
-                                BlockEntity outputEntity = pLevel.getBlockEntity(inputEntity.getOutputPos());
-                                //Search targets from output positions with entity member data
-                                TerraCompositioAPI.instance().getCFENetworkInstance().getAvailableNetworkTargets(
-                                        new CFEMemberProxy(pMember, (PathPointerBlockEntity) outputEntity))
-                                        .forEach(cfeNetworkMember ->
-                                                //Try to transfer to input position to the target
-                                                TCUtil.tryCFETransfer(
-                                                        new CFEMemberProxy(cfeNetworkMember,inputEntity),
-                                                        pMember));
-                            });
-                }
-            }
-        }
-    }
-
-    public static Set<BlockPos> getCachedExtractors(ItemStack itemStack) {
-        CompoundTag persistentData = itemStack.getOrCreateTag();
-        ListTag list = persistentData.getList(cachedExtractorsTag, Tag.TAG_COMPOUND);
-        return list.stream()
-                .map(TCUtil::loadBlockPos)
-                .collect(Collectors.toSet());
     }
 
     private void chestplateInventoryTick(ItemStack ignoredPStack, Level ignoredPLevel, Entity ignoredEntity, ICFEHandler ignoredIcfeHandler) {
 
     }
 
-    private void leggingsInventoryTick(ItemStack pStack, Level ignoredPLevel, Entity entity, ICFEHandler icfeHandler) {
-        transferCFE(pStack, entity, icfeHandler);
+    private void leggingsInventoryTick(ItemStack ignoredPStack, Level ignoredPLevel, Entity ignoredEntity, ICFEHandler ignoredIcfeHandler) {
+
     }
 
     private void bootInventoryTick(ItemStack ignoredPStack, Level ignoredPLevel, Entity ignoredEntity, ICFEHandler ignoredIcfeHandler) {
@@ -394,62 +345,6 @@ public class TechnetiumArmorItem extends TCArmorItem {
     @Override
     public @Nullable ICapabilityProvider initCapabilities(ItemStack stack, @Nullable CompoundTag nbt) {
         Type type = ((ArmorItem) stack.getItem()).getType();
-        return (ICapabilityProvider) new CFEItemWrapper(stack)
-                .setMaxCFE(switch (type) {
-            case LEGGINGS -> 100;
-            case HELMET -> 10;
-            default -> 1;
-        });
-    }
-
-    @Override
-    public InteractionResultHolder<ItemStack> use(Level pLevel, Player pPlayer, InteractionHand pUsedHand) {
-        ItemStack stack = pPlayer.getItemInHand(pUsedHand);
-        if (pPlayer.isCrouching() && !isPlayerLookingAtBlock(pPlayer,pLevel)) {
-            setCrownMode(stack,getCrownMode(stack).next());
-            if (!stack.hasTag()) {
-                stack.setTag(new CompoundTag());
-            }
-            if (stack.getTag() != null) {
-                stack.getTag().putInt(crownModeTag, getCrownMode(stack).ordinal());
-            }
-            pPlayer.displayClientMessage(Component.translatable("message.terracompositio.changed_tool_mode",
-                    getCrownMode(stack).getDisplayName()), true);
-            return InteractionResultHolder.sidedSuccess(stack,pLevel.isClientSide);
-        }
-        return super.use(pLevel, pPlayer, pUsedHand);
-    }
-    @Override
-    public void appendHoverText(ItemStack pStack, @Nullable Level pLevel, List<Component> pTooltipComponents, TooltipFlag pIsAdvanced) {
-        super.appendHoverText(pStack, pLevel, pTooltipComponents, pIsAdvanced);
-        CrownMode mode = CrownMode.fromOrdinal(pStack.getOrCreateTag().getInt(crownModeTag));
-        pTooltipComponents.add(Component.translatable("item.terracompositio.tool_mode", mode.getDisplayName()).withStyle(ChatFormatting.GRAY));
-    }
-
-    public static CrownMode getCrownMode(ItemStack stack) {
-        CompoundTag tag = stack.getOrCreateTag();
-        if (tag.contains(crownModeTag)) {
-            return CrownMode.fromOrdinal(tag.getInt(crownModeTag));
-        }
-        return CrownMode.NONE;
-    }
-
-    public static void setCrownMode(ItemStack stack, CrownMode mode) {
-        CompoundTag tag = stack.getOrCreateTag();
-        tag.putInt(crownModeTag, mode.ordinal());
-    }
-    public enum CrownMode {
-        NONE,RECEIVE,SEND,ALL;
-
-        public Component getDisplayName() {
-            return Component.translatable("item.terracompositio.technetium_crown." + name().toLowerCase());
-        }
-        public CrownMode next() {
-            return values()[(this.ordinal() + 1) % values().length];
-        }
-        public static CrownMode fromOrdinal(int ordinal) {
-            return values()[ordinal % values().length];
-        }
-
+        return (ICapabilityProvider) new CFEItemWrapper(stack).setMaxCFE(type.equals(Type.LEGGINGS)?100:1);
     }
 }

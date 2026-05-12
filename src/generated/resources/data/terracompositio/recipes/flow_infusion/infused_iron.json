@@ -1,0 +1,14 @@
+{
+  "type": "terracompositio:flow_infusion",
+  "cfe": 50,
+  "ingredients": [
+    {
+      "item": "minecraft:iron_ingot"
+    }
+  ],
+  "output": {
+    "count": 1,
+    "item": "terracompositio:infused_iron_ingot"
+  },
+  "time": 100
+}
