@@ -5,8 +5,6 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.nbt.ListTag;
-import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.world.InteractionHand;
@@ -20,7 +18,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.client.extensions.common.IClientItemExtensions;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
@@ -33,12 +30,9 @@ import net.sinedkadis.terracompositio.api.TerraCompositioAPI;
 import net.sinedkadis.terracompositio.api.dummies.DummyCFEHandler;
 import net.sinedkadis.terracompositio.api.networks.NetworkAction;
 import net.sinedkadis.terracompositio.api.TCCapabilities;
-import net.sinedkadis.terracompositio.api.networks.cfe.CFENetworkMember;
 import net.sinedkadis.terracompositio.api.networks.cfe.CFENetworkMemberEntity;
 import net.sinedkadis.terracompositio.api.networks.cfe.ICFEHandler;
-import net.sinedkadis.terracompositio.block.entity.PathPointerBlockEntity;
 import net.sinedkadis.terracompositio.cfe.CFEItemWrapper;
-import net.sinedkadis.terracompositio.cfe.CFEMemberProxy;
 import net.sinedkadis.terracompositio.item.models.TechnetiumBootsModel;
 import net.sinedkadis.terracompositio.item.models.TechnetiumCloakModel;
 import net.sinedkadis.terracompositio.item.models.TechnetiumCrownModel;
@@ -47,13 +41,11 @@ import net.sinedkadis.terracompositio.network.packets.C2SBoardSync;
 import net.sinedkadis.terracompositio.registries.TCArmorMaterials;
 import net.sinedkadis.terracompositio.registries.TCBlocks;
 import net.sinedkadis.terracompositio.registries.TCItems;
-import net.sinedkadis.terracompositio.util.TCUtil;
 import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.*;
 import java.util.function.Consumer;
-import java.util.stream.Collectors;
 
 import static net.minecraft.world.level.block.state.properties.BlockStateProperties.WATERLOGGED;
 import static net.sinedkadis.terracompositio.item.custom.WrenchAxeItem.isPlayerLookingAtBlock;
@@ -63,9 +55,7 @@ import static net.sinedkadis.terracompositio.item.custom.WrenchAxeItem.isPlayerL
 @Mod.EventBusSubscriber(modid = TerraCompositio.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class TechnetiumArmorItem extends TCArmorItem {
 
-    public static final String crownModeTag = "crown_mode";
-    private static final String cachedExtractorsTag = "cached_extractors";
-
+    public static String crownModeTag = "crown_mode";
 
     @Override
     public Type getType() {
@@ -121,41 +111,8 @@ public class TechnetiumArmorItem extends TCArmorItem {
 
     }
 
-    private void helmetInventoryTick(ItemStack pStack, Level pLevel, Entity pEntity, ICFEHandler icfeHandlerCFE) {
-        switch (getCrownMode(pStack)) {
-            case SEND,ALL -> {
-                if (!(pEntity instanceof CFENetworkMember pMember)) return;
+    private void helmetInventoryTick(ItemStack ignoredPStack, Level ignoredPLevel, Entity ignoredEntity, ICFEHandler ignoredIcfeHandler) {
 
-                if (icfeHandlerCFE.getCFE() > 0) {
-                    getCachedExtractors(pStack).stream()
-                            //Convert BlockPoses to PPBlockEntities
-                            .map(pLevel::getBlockEntity)
-                            .map(blockEntity -> blockEntity instanceof PathPointerBlockEntity ppbe ? ppbe : null)
-                            .filter(Objects::nonNull)
-                            //Pick random ppbe
-                            .findAny()
-                            .ifPresent(inputEntity ->  {
-                                BlockEntity outputEntity = pLevel.getBlockEntity(inputEntity.getOutputPos());
-                                //Search targets from output positions with entity member data
-                                TerraCompositioAPI.instance().getCFENetworkInstance().getAvailableNetworkTargets(
-                                        new CFEMemberProxy(pMember, (PathPointerBlockEntity) outputEntity))
-                                        .forEach(cfeNetworkMember ->
-                                                //Try to transfer to input position to the target
-                                                TCUtil.tryCFETransfer(
-                                                        new CFEMemberProxy(cfeNetworkMember,inputEntity),
-                                                        pMember));
-                            });
-                }
-            }
-        }
-    }
-
-    public static Set<BlockPos> getCachedExtractors(ItemStack itemStack) {
-        CompoundTag persistentData = itemStack.getOrCreateTag();
-        ListTag list = persistentData.getList(cachedExtractorsTag, Tag.TAG_COMPOUND);
-        return list.stream()
-                .map(TCUtil::loadBlockPos)
-                .collect(Collectors.toSet());
     }
 
     private void chestplateInventoryTick(ItemStack ignoredPStack, Level ignoredPLevel, Entity ignoredEntity, ICFEHandler ignoredIcfeHandler) {
