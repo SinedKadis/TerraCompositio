@@ -106,6 +106,7 @@ public class TechnetiumArmorItem extends TCArmorItem {
     public void inventoryTick(ItemStack pStack, Level pLevel, Entity entity, int pSlotId, boolean pIsSelected) {
         super.inventoryTick(pStack, pLevel, entity, pSlotId, pIsSelected);
         ICFEHandler icfeHandler = pStack.getCapability(TCCapabilities.CFE).orElse(DummyCFEHandler.instance);
+        transferCFE(pStack, entity, icfeHandler);
         switch (type) {
             case HELMET -> this.helmetInventoryTick(pStack, pLevel, entity, icfeHandler);
             case CHESTPLATE -> this.chestplateInventoryTick(pStack, pLevel, entity, icfeHandler);
@@ -161,8 +162,8 @@ public class TechnetiumArmorItem extends TCArmorItem {
 
     }
 
-    private void leggingsInventoryTick(ItemStack pStack, Level ignoredPLevel, Entity entity, ICFEHandler icfeHandler) {
-        transferCFE(pStack, entity, icfeHandler);
+    private void leggingsInventoryTick(ItemStack ignoredPStack, Level ignoredPLevel, Entity ignoredEntity, ICFEHandler ignoredIcfeHandler) {
+
     }
 
     private void bootInventoryTick(ItemStack ignoredPStack, Level ignoredPLevel, Entity ignoredEntity, ICFEHandler ignoredIcfeHandler) {

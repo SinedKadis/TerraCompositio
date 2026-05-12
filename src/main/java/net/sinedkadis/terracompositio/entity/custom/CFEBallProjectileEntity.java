@@ -29,8 +29,6 @@ import static net.sinedkadis.terracompositio.config.TCCommonConfigs.PLATFORM_ALI
 public class CFEBallProjectileEntity extends ThrowableItemProjectile {
     private static final EntityDataAccessor<Integer> DATA_VISITED_BLOCKS = SynchedEntityData.defineId(CFEBallProjectileEntity.class, EntityDataSerializers.INT);
     private static final EntityDataAccessor<Long> DATA_LAST_VISITED = SynchedEntityData.defineId(CFEBallProjectileEntity.class, EntityDataSerializers.LONG);
-    private static final EntityDataAccessor<Integer> DATA_TARGET_HEIGHT = SynchedEntityData.defineId(CFEBallProjectileEntity.class, EntityDataSerializers.INT);
-
 
     public CFEBallProjectileEntity(EntityType<? extends ThrowableItemProjectile> pEntityType, Level pLevel) {
         super(pEntityType, pLevel);
@@ -55,11 +53,12 @@ public class CFEBallProjectileEntity extends ThrowableItemProjectile {
         CompoundTag persistentData = owner.getPersistentData();
         int ballsThrew = persistentData.getInt("balls_threw");
         persistentData.putInt("balls_threw", ballsThrew + 1);
-        ListTag list = persistentData.getList("platform_on_throw_" + (ballsThrew - PLATFORM_ALIVE_PER_PLAYER.get() + 1), Tag.TAG_COMPOUND);
+        ListTag list = persistentData.getList("platform_on_throw_" + (ballsThrew % PLATFORM_ALIVE_PER_PLAYER.get()), Tag.TAG_COMPOUND);
         for (Tag tag : list) {
             BlockPos pPos = TCUtil.loadBlockPos(tag);
             if (pPos != null)
                 level().setBlock(pPos, Blocks.AIR.defaultBlockState(), 3);
+
         }
     }
 
@@ -99,7 +98,6 @@ public class CFEBallProjectileEntity extends ThrowableItemProjectile {
         super.defineSynchedData();
         this.getEntityData().define(DATA_LAST_VISITED, 0L);
         this.getEntityData().define(DATA_VISITED_BLOCKS, 0);
-        this.getEntityData().define(DATA_TARGET_HEIGHT, -64);
     }
 
     public void setLastVisited(long packed) {
@@ -120,14 +118,6 @@ public class CFEBallProjectileEntity extends ThrowableItemProjectile {
 
     public void addVisitedBlocks() {
         this.setVisitedBlocks(this.getVisitedBlocks()+1);
-    }
-
-    public void setTargetHeight(int height) {
-        this.entityData.set(DATA_TARGET_HEIGHT, height);
-    }
-
-    public int getTargetHeight() {
-        return this.entityData.get(DATA_TARGET_HEIGHT);
     }
 
 
