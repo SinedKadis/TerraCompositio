@@ -312,11 +312,11 @@ public class TCRecipeProvider extends RecipeProvider implements IConditionBuilde
                 20
         ).save(pWriter,TerraCompositio.modLoc("flow_infusion/cfe_charge"));
         FlowInfusionRecipeBuilder.create(
-                TCItems.INFUSED_SEED.get().getDefaultInstance(),
+                TCItems.INFUSED_FERTILIZER.get().getDefaultInstance(),
                 Ingredient.of(ItemTags.VILLAGER_PLANTABLE_SEEDS),
                 200,
                 200
-        ).save(pWriter,TerraCompositio.modLoc("flow_infusion/cfe_charge"));
+        ).save(pWriter, TerraCompositio.modLoc("flow_infusion/infused_fertilizer"));
     }
 
     private static void buildDesorbers(@NotNull Consumer<FinishedRecipe> pWriter) {
@@ -507,17 +507,6 @@ public class TCRecipeProvider extends RecipeProvider implements IConditionBuilde
                 .define('S', Items.STICK)
                 .unlockedBy(getHasName(TCItems.TECHNETIUM_INGOT.get()), has(TCItems.TECHNETIUM_INGOT.get()))
                 .save(pWriter);
-        //todo recipe
-//        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, TCItems.CFE_BALL.get())
-//                .pattern(" T ")
-//                .pattern("TQT")
-//                .pattern("SIS")
-//                .define('T', Items.REDSTONE_TORCH)
-//                .define('Q', Items.QUARTZ)
-//                .define('S', Items.STONE)
-//                .define('I',TCItems.INFUSED_IRON_INGOT.get())
-//                .unlockedBy(getHasName(TCItems.INFUSED_IRON_INGOT.get()), has(TCItems.INFUSED_IRON_INGOT.get()))
-//                .save(pWriter);
     }
 
     private static void buildMatterInfuserBlocks(@NotNull Consumer<FinishedRecipe> pWriter) {

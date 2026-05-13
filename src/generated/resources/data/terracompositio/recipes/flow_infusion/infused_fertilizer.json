@@ -1,0 +1,14 @@
+{
+  "type": "terracompositio:flow_infusion",
+  "cfe": 200,
+  "ingredients": [
+    {
+      "tag": "minecraft:villager_plantable_seeds"
+    }
+  ],
+  "output": {
+    "count": 1,
+    "item": "terracompositio:infused_fertilizer"
+  },
+  "time": 200
+}

@@ -92,7 +92,7 @@ public class TCItemModelProvider extends ItemModelProvider {
         simpleItem(TCItems.WRENCH_TAG_HOLDER);
 
         simpleItem(TCItems.CFE_BALL);
-        simpleItem(TCItems.INFUSED_SEED);
+        simpleItem(TCItems.INFUSED_FERTILIZER);
         simpleItem(TCItems.TECHNETIUM_CHESTPLATE);
         simpleItem(TCItems.TECHNETIUM_LEGGINGS);
         simpleItem(TCItems.TECHNETIUM_BOOTS);
