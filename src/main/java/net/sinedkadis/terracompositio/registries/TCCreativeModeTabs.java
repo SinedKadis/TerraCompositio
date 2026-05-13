@@ -32,6 +32,7 @@ public class TCCreativeModeTabs {
                             pOutput.accept(TCItems.SHIELDED_BUNDLE.get());
                             pOutput.accept(TCItems.FLUID_APPLIER.get());
                             pOutput.accept(TCItems.CFE_BALL.get());
+                            pOutput.accept(TCItems.INFUSED_SEED.get());
 
                             //Cedar blocks
                             pOutput.accept(TCBlocks.FLOW_CEDAR_LOG.get());

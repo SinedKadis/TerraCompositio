@@ -43,6 +43,7 @@ public abstract class AbstractDesorberBlockEntity extends TCBlockEntity {
     @Override
     public void addBEBehaviours(@NotNull List<IBEBehaviour> list) {
         list.add(new CFEHandlerBehaviour(this)
+                .maxCFE(1000)
                 .range(5)
                 .priority(TCInnerConfig.DEFAULT_SOURCE_PRIORITY));
     }

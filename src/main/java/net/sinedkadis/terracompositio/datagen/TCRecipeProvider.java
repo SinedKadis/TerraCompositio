@@ -5,6 +5,7 @@ import net.minecraft.data.PackOutput;
 import net.minecraft.data.recipes.*;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.ItemTags;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.AbstractCookingRecipe;
@@ -309,6 +310,12 @@ public class TCRecipeProvider extends RecipeProvider implements IConditionBuilde
                 Ingredient.of(Items.SNOWBALL),
                 10,
                 20
+        ).save(pWriter,TerraCompositio.modLoc("flow_infusion/cfe_charge"));
+        FlowInfusionRecipeBuilder.create(
+                TCItems.INFUSED_SEED.get().getDefaultInstance(),
+                Ingredient.of(ItemTags.VILLAGER_PLANTABLE_SEEDS),
+                200,
+                200
         ).save(pWriter,TerraCompositio.modLoc("flow_infusion/cfe_charge"));
     }
 
