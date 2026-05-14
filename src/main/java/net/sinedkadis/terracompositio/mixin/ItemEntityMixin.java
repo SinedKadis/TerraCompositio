@@ -10,7 +10,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.phys.Vec3;
-import net.sinedkadis.terracompositio.config.TCInnerConfig;
+import net.sinedkadis.terracompositio.config.TCServerConfigs;
 import net.sinedkadis.terracompositio.registries.TCFluids;
 import net.sinedkadis.terracompositio.registries.TCItems;
 import org.spongepowered.asm.mixin.Mixin;
@@ -27,6 +27,8 @@ public abstract class ItemEntityMixin extends Entity {
 
     @Unique
     private int tc$progress = 0;
+    @Unique
+    private double tc$tickScheduled = 0;
 
     public ItemEntityMixin(EntityType<?> entityType, Level level) {
         super(entityType, level);
@@ -73,8 +75,15 @@ public abstract class ItemEntityMixin extends Entity {
                     center.offset(3, 3, 3)
             );
 
-            int totalDuration = TCInnerConfig.instance.TOTAL_TICKS;
-            int totalRandomTicks = TCInnerConfig.instance.TOTAL_RANDOM_TICKS;
+            int totalDuration = TCServerConfigs.IF_DURATION.get();
+            double randomTicks = TCServerConfigs.IF_RANDOM_TICK_PER_TICK.get();
+
+            tc$tickScheduled += randomTicks - (int) randomTicks;
+
+            if (tc$tickScheduled > 1) {
+                randomTicks++;
+                tc$tickScheduled--;
+            }
 
             for (BlockPos pos : positions) {
 
@@ -84,8 +93,7 @@ public abstract class ItemEntityMixin extends Entity {
                     continue;
 
 
-                int RANDOM_TICKS_PER_TICK = totalRandomTicks / totalDuration;
-                for (int i = 0; i < RANDOM_TICKS_PER_TICK; i++) {
+                for (int i = 1; i <= randomTicks; i++) {
                     state.randomTick(
                             serverLevel,
                             pos,
