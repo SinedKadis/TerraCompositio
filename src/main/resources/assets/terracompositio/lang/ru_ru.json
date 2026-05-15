@@ -241,6 +241,9 @@
   "book.terracompositio.creation_flow_journal.entry.fluid_tanks.page3": "В резервуаре помещается до 8 ведер любой жидкости, а еще его можно поставить под десорбер, для того, что б расширить его вместимость",
   "book.terracompositio.creation_flow_journal.entry.infused_fertilizer.name": "Насыщенное удобрение",
   "book.terracompositio.creation_flow_journal.entry.infused_fertilizer.page1": "Изготовленное путем наполнения потоком любой семечки удобрение обладает невероятными способностями в ускорении роста растений. Для того что б его пробудить, необходимо бросить его в жидкий поток, и тогда в течении 5 секунд оно ускорит рост растений вокруг себя ",
-  "book.terracompositio.creation_flow_journal.entry.infused_fertilizer.page2": "Неплохо синергирует с досорбером культивации"
+  "book.terracompositio.creation_flow_journal.entry.infused_fertilizer.page2": "Неплохо синергирует с досорбером культивации",
+  "book.terracompositio.creation_flow_journal.entry.cfe_charge.name": "Заряд ЭПС",
+  "book.terracompositio.creation_flow_journal.entry.cfe_charge.page1": "Есть способ извлечь ЭПС чуть ли не в чистом виде, и законсервировать его в предмете, удобном для транспортировки. Положив снежёк в наполнетель потоком, он втянет в себя энергию и станет ЭПС зарядом. Для того, что б достать энергию обратно, достаточно засунуть его в печь.",
+  "book.terracompositio.creation_flow_journal.entry.cfe_charge.page2": "Если его бросить, то он превратится в удобные летающие платформы"
 
 }
