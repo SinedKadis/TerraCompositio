@@ -30,11 +30,9 @@ import javax.annotation.ParametersAreNonnullByDefault;
 @Data
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
-public class OneSlotItemHandlerBehaviour implements IBEItemBehaviour, WorldlyContainer {
-    protected static final int SLOT = 0;
-
-
+public class ManySlotItemHandlerBehaviour implements IBEItemBehaviour, WorldlyContainer {
     private final TCBlockEntity blockEntity;
+    public boolean ignoreRestrictions = false;
 
     protected ItemStackHandler itemHandler = new ItemStackHandler() {
         @Override
@@ -44,21 +42,52 @@ public class OneSlotItemHandlerBehaviour implements IBEItemBehaviour, WorldlyCon
 
         @Override
         public boolean isItemValid(int slot, ItemStack stack) {
-            return isItemAllowed(slot,stack);
+            return isItemAllowed(slot, stack);
+        }
+
+        @Override
+        public ItemStack insertItem(int slot, ItemStack stack, boolean simulate) {
+            if (!allowInsert(slot, stack) && !ignoreRestrictions) return stack;
+            return super.insertItem(slot, stack, simulate);
+        }
+
+        @Override
+        public ItemStack extractItem(int slot, int amount, boolean simulate) {
+            if (!allowExtract(slot, getStackInSlot(slot)) && !ignoreRestrictions) return ItemStack.EMPTY;
+            return super.extractItem(slot, amount, simulate);
         }
     };
+    protected LazyOptional<IItemHandler> lazyItemHandler = LazyOptional.empty();
+
+    public ManySlotItemHandlerBehaviour(TCBlockEntity blockEntity, int slotCount) {
+        this.blockEntity = blockEntity;
+        itemHandler.setSize(slotCount);
+    }
 
     public int getLimitInSlot(int slot) {
         return 64;
     }
-    public boolean isItemAllowed(int pSlot, ItemStack pStack){
+
+    public boolean isItemAllowed(int pSlot, ItemStack pStack) {
         return true;
     }
 
-    protected LazyOptional<IItemHandler> lazyItemHandler = LazyOptional.empty();
+    private boolean allowExtract(int pSlot, ItemStack pStack) {
+        return allowExtract(pSlot, pStack, null);
+    }
 
-    public OneSlotItemHandlerBehaviour(TCBlockEntity blockEntity) {
-        this.blockEntity = blockEntity;
+    @Override
+    public boolean allowExtract(int pSlot, ItemStack pStack, @Nullable Direction pDirection) {
+        return true;
+    }
+
+    private boolean allowInsert(int pSlot, ItemStack pStack) {
+        return allowInsert(pSlot, pStack, null);
+    }
+
+    @Override
+    public boolean allowInsert(int pSlot, ItemStack pStack, @Nullable Direction pDirection) {
+        return true;
     }
 
     @Override
@@ -111,21 +140,23 @@ public class OneSlotItemHandlerBehaviour implements IBEItemBehaviour, WorldlyCon
 
         ItemStackHandler itemHandler = getItemHandler();
 
-        ItemStack slot = itemHandler.getStackInSlot(0);
+        for (int i = 0; i < itemHandler.getSlots(); i++) {
+            ItemStack slot = itemHandler.getStackInSlot(i);
 
+            if (!slot.isEmpty() && allowExtract(i, slot)) {
+                ItemStack extracted = itemHandler.extractItem(0, 64, false);
+                TCUtil.addOrDropToPlayer(pPlayer, extracted);
+                level.playSound(pPlayer, blockPos, SoundEvents.ITEM_FRAME_REMOVE_ITEM, SoundSource.BLOCKS);
+                return InteractionResult.sidedSuccess(level.isClientSide());
+            }
+            if (!itemInHand.isEmpty() && allowInsert(i, itemInHand)) {
+                ItemStack left = itemHandler.insertItem(0, itemInHand.copy(), false);
+                pPlayer.setItemInHand(pHand, left);
+                level.playSound(pPlayer, blockPos, SoundEvents.ITEM_FRAME_ADD_ITEM, SoundSource.BLOCKS);
+                return InteractionResult.sidedSuccess(level.isClientSide());
+            }
+        }
 
-        if (!slot.isEmpty() && allowExtract(0, slot, null)) {
-            ItemStack extracted = itemHandler.extractItem(0, 64, false);
-            TCUtil.addOrDropToPlayer(pPlayer, extracted);
-            level.playSound(pPlayer, blockPos, SoundEvents.ITEM_FRAME_REMOVE_ITEM, SoundSource.BLOCKS);
-            return InteractionResult.sidedSuccess(level.isClientSide());
-        }
-        if (!itemInHand.isEmpty() && allowInsert(0, itemInHand, null)) {
-            ItemStack left = itemHandler.insertItem(0, itemInHand.copy(), false);
-            pPlayer.setItemInHand(pHand,left);
-            level.playSound(pPlayer,blockPos, SoundEvents.ITEM_FRAME_ADD_ITEM, SoundSource.BLOCKS);
-            return InteractionResult.sidedSuccess(level.isClientSide());
-        }
 
         return InteractionResult.PASS;
     }
@@ -133,21 +164,22 @@ public class OneSlotItemHandlerBehaviour implements IBEItemBehaviour, WorldlyCon
 
     @Override
     public int[] getSlotsForFace(Direction direction) {
-        return new int[]{0};
+        int slots = itemHandler.getSlots();
+        int[] ints = new int[slots];
+        for (int i = 0; i < slots; i++) {
+            ints[i] = i;
+        }
+        return ints;
     }
 
     @Override
     public boolean canPlaceItemThroughFace(int pIndex, ItemStack pItemStack, @Nullable Direction pDirection) {
-        if (getInputSlot().getCount() > 1) return false;
-        if (pDirection != null) {
-            return pIndex == SLOT && pDirection.equals(Direction.UP);
-        }
-        return pIndex == SLOT;
+        return allowInsert(pIndex, pItemStack, pDirection);
     }
 
     @Override
     public boolean canTakeItemThroughFace(int pIndex, ItemStack pStack, Direction pDirection) {
-        return pDirection.equals(Direction.DOWN);
+        return allowExtract(pIndex, pStack, pDirection);
     }
 
     @Override
@@ -157,7 +189,12 @@ public class OneSlotItemHandlerBehaviour implements IBEItemBehaviour, WorldlyCon
 
     @Override
     public boolean isEmpty() {
-        return getItemHandler().getStackInSlot(SLOT).isEmpty();
+        for (int i = 0; i < itemHandler.getSlots(); i++) {
+            ItemStack slot = itemHandler.getStackInSlot(i);
+            if (slot.isEmpty()) continue;
+            return false;
+        }
+        return true;
     }
 
     @Override
@@ -198,21 +235,10 @@ public class OneSlotItemHandlerBehaviour implements IBEItemBehaviour, WorldlyCon
 
     @Override
     public void clearContent() {
-        getItemHandler().setStackInSlot(SLOT, ItemStack.EMPTY);
-    }
-
-    public ItemStack getInputSlot() {
-        return this.getItemHandler().getStackInSlot(SLOT);
+        for (int i = 0; i < itemHandler.getSlots(); i++) {
+            itemHandler.setStackInSlot(i, ItemStack.EMPTY);
+        }
     }
 
 
-    @Override
-    public boolean allowExtract(int pSlot, ItemStack pStack, @Nullable Direction pDirection) {
-        return true;
-    }
-
-    @Override
-    public boolean allowInsert(int pSlot, ItemStack pStack, @Nullable Direction pDirection) {
-        return true;
-    }
 }

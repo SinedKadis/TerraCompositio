@@ -11,15 +11,15 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.items.ItemStackHandler;
+import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBEBehaviour;
 import net.sinedkadis.terracompositio.api.networks.cfe.ICFEHandler;
 import net.sinedkadis.terracompositio.block.behaviours.CFEHandlerBehaviour;
-import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBEBehaviour;
 import net.sinedkadis.terracompositio.block.behaviours.TwoSlotItemHandlerBehaviour;
 import net.sinedkadis.terracompositio.compat.jade.JadeTerraCompositioPlugin;
 import net.sinedkadis.terracompositio.config.TCInnerConfig;
 import net.sinedkadis.terracompositio.particle.CFEParticleData;
-import net.sinedkadis.terracompositio.registries.TCBlockEntities;
 import net.sinedkadis.terracompositio.recipe.FlowInfusionRecipe;
+import net.sinedkadis.terracompositio.registries.TCBlockEntities;
 import snownee.jade.api.ITooltip;
 import snownee.jade.api.config.IPluginConfig;
 
@@ -100,9 +100,9 @@ public class FlowInfuserBlockEntity extends TCCraftingBlockEntity {
     }
 
     protected Optional<FlowInfusionRecipe> getCurrentRecipe() {
-        SimpleContainer inventory = new SimpleContainer(this.itemHandler().getSlots());
-        for(int i = 0; i < itemHandler().getSlots(); i++) {
-            inventory.setItem(i, this.itemHandler().getStackInSlot(i));
+        SimpleContainer inventory = new SimpleContainer(this.getItemHandler().getSlots());
+        for (int i = 0; i < getItemHandler().getSlots(); i++) {
+            inventory.setItem(i, this.getItemHandler().getStackInSlot(i));
         }
 
         assert this.level != null;
@@ -110,7 +110,7 @@ public class FlowInfuserBlockEntity extends TCCraftingBlockEntity {
     }
 
     @Override
-    protected ItemStackHandler itemHandler() {
+    protected ItemStackHandler getItemHandler() {
         return ((TwoSlotItemHandlerBehaviour) behaviours.get(1)).getItemHandler();
     }
 
@@ -137,7 +137,7 @@ public class FlowInfuserBlockEntity extends TCCraftingBlockEntity {
             this.getCapability(ForgeCapabilities.ITEM_HANDLER).ifPresent(iItemHandler -> {
                 if (iItemHandler instanceof TwoSlotItemHandlerBehaviour.SlotSensitiveItemStackHandler slotSensitiveItemStackHandler) {
                     ItemStack left = slotSensitiveItemStackHandler.forceInsertItem(0, result.copy(), false);
-                    itemHandler().setStackInSlot(0,left);
+                    getItemHandler().setStackInSlot(0, left);
                 }
             });
             return result;

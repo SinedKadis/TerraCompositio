@@ -16,13 +16,18 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
 import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBEBehaviour;
+import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBECFEBehaviour;
+import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBEItemBehaviour;
 import org.jetbrains.annotations.Nullable;
 import snownee.jade.api.BlockAccessor;
 import snownee.jade.api.ITooltip;
 import snownee.jade.api.config.IPluginConfig;
 
 import javax.annotation.ParametersAreNonnullByDefault;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.List;
+import java.util.Objects;
+import java.util.Optional;
 
 
 @ParametersAreNonnullByDefault
@@ -37,6 +42,20 @@ public abstract class TCBlockEntity extends BlockEntity{
     }
 
     abstract void addBEBehaviours(List<IBEBehaviour> behaviourList);
+
+    public @Nullable IBEItemBehaviour getItemBehaviour() {
+        for (IBEBehaviour ibeBehaviour : behaviours) {
+            if (ibeBehaviour instanceof IBEItemBehaviour ibeItemBehaviour) return ibeItemBehaviour;
+        }
+        return null;
+    }
+
+    public @Nullable IBECFEBehaviour getCFEBehaviour() {
+        for (IBEBehaviour ibeBehaviour : behaviours) {
+            if (ibeBehaviour instanceof IBECFEBehaviour ibecfeBehaviour) return ibecfeBehaviour;
+        }
+        return null;
+    }
 
     @Override
     public <T> LazyOptional<T> getCapability(Capability<T> cap, @Nullable Direction side) {

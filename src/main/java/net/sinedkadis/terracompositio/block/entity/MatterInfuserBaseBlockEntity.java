@@ -17,13 +17,13 @@ public abstract class MatterInfuserBaseBlockEntity extends TCCraftingBlockEntity
     }
 
     public ItemStack getInputSlot() {
-        ItemStack itemInSlot = this.getItemInSlot(0);
+        ItemStack itemInSlot = this.getItemInSlot(FlowCedarCasingBlockEntity.INPUT_INVENTORY_SLOT);
         if (itemInSlot != null)
             return itemInSlot;
         return ItemStack.EMPTY;
     }
     public ItemStack getSlotOutput() {
-        ItemStack itemInSlot = this.getItemInSlot(1);
+        ItemStack itemInSlot = this.getItemInSlot(FlowCedarCasingBlockEntity.OUTPUT_INVENTORY_SLOT);
         if (itemInSlot != null)
             return itemInSlot;
         return ItemStack.EMPTY;
@@ -32,7 +32,7 @@ public abstract class MatterInfuserBaseBlockEntity extends TCCraftingBlockEntity
     public ItemStack getItemInSlot(int slot) {
         FlowCedarCasingBlockEntity blockEntity = this.getCasingBE();
         if (blockEntity != null){
-            return blockEntity.itemHandler().getStackInSlot(slot);
+            return blockEntity.getItemHandler().getStackInSlot(slot);
         }
         return ItemStack.EMPTY;
     }
@@ -40,7 +40,7 @@ public abstract class MatterInfuserBaseBlockEntity extends TCCraftingBlockEntity
     public ItemStack insertItemStack(int slot, ItemStack itemstack) {
         FlowCedarCasingBlockEntity blockEntity = this.getCasingBE();
         if (blockEntity != null){
-            return blockEntity.itemHandler().insertItem(slot,itemstack,false);
+            return blockEntity.getItemHandler().insertItem(slot, itemstack, false);
         }
         return itemstack;
     }
@@ -49,25 +49,10 @@ public abstract class MatterInfuserBaseBlockEntity extends TCCraftingBlockEntity
         ItemStack itemStack;
         FlowCedarCasingBlockEntity blockEntity = this.getCasingBE();
         if (blockEntity != null){
-            itemStack = blockEntity.itemHandler().extractItem(slot,count,false);
+            itemStack = blockEntity.getItemHandler().extractItem(slot, count, false);
             return itemStack;
         }
         return ItemStack.EMPTY;
-    }
-
-    public void setSlotEmpty(int slot) {
-        FlowCedarCasingBlockEntity casingBE = this.getCasingBE();
-        if (casingBE != null) {
-            casingBE.itemHandler().setStackInSlot(slot,ItemStack.EMPTY);
-        }
-    }
-
-    public int getSlotCount(){
-        FlowCedarCasingBlockEntity casingBE = this.getCasingBE();
-        if (casingBE != null) {
-            return casingBE.itemHandler().getSlots();
-        }
-        return 0;
     }
 
     protected @Nullable FlowCedarCasingBlockEntity getCasingBE() {

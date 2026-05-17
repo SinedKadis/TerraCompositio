@@ -6,7 +6,8 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.world.*;
+import net.minecraft.world.MenuProvider;
+import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -114,12 +115,12 @@ public class FlowCedarPortBlockEntity extends TCCraftingBlockEntity implements M
                 resetProgress();
             }
         }
-        if (pLevel.getRandom().nextFloat() < 0.005f && itemHandler().getStackInSlot(0).isEmpty()) {
+        if (pLevel.getRandom().nextFloat() < 0.005f && getItemHandler().getStackInSlot(0).isEmpty()) {
             pLevel.playSound(null, pPos, SoundEvents.ITEM_FRAME_ADD_ITEM, SoundSource.BLOCKS,2,1);
         }
     }
 
-    protected ItemStackHandler itemHandler() {
+    protected ItemStackHandler getItemHandler() {
         return (ItemStackHandler) this.getCapability(ForgeCapabilities.ITEM_HANDLER).orElse(null);
     }
 
@@ -140,17 +141,17 @@ public class FlowCedarPortBlockEntity extends TCCraftingBlockEntity implements M
         Optional<FlowSaturationRecipe> recipe = getCurrentRecipe();
         if (recipe.isPresent()) {
             ItemStack result = recipe.get().getResultItem(null);
-            this.itemHandler().extractItem(0, 1, false);
-            this.itemHandler().insertItem(1, result,false);
+            this.getItemHandler().extractItem(0, 1, false);
+            this.getItemHandler().insertItem(1, result, false);
             return result;
         }
         return ItemStack.EMPTY;
     }
 
     protected Optional<FlowSaturationRecipe> getCurrentRecipe() {
-        SimpleContainer inventory = new SimpleContainer(this.itemHandler().getSlots());
-        for(int i = 0; i < itemHandler().getSlots(); i++) {
-            inventory.setItem(i, this.itemHandler().getStackInSlot(i));
+        SimpleContainer inventory = new SimpleContainer(this.getItemHandler().getSlots());
+        for (int i = 0; i < getItemHandler().getSlots(); i++) {
+            inventory.setItem(i, this.getItemHandler().getStackInSlot(i));
         }
 
         assert this.level != null;

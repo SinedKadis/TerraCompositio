@@ -17,7 +17,7 @@ public class MatterInfuserPortBlockEntity extends MatterInfuserBaseBlockEntity {
     }
 
     @Override
-    protected ItemStackHandler itemHandler() {
+    protected ItemStackHandler getItemHandler() {
         FlowCedarCasingBlockEntity casingBE = getCasingBE();
         if (casingBE != null)
             return ((TwoSlotItemHandlerBehaviour) casingBE.getBehaviours().get(1)).getItemHandler();

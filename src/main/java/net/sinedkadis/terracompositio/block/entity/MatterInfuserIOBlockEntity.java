@@ -8,12 +8,13 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.items.ItemStackHandler;
+import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBEBehaviour;
+import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBECFEBehaviour;
+import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBEItemBehaviour;
 import net.sinedkadis.terracompositio.api.networks.cfe.ICFEHandler;
 import net.sinedkadis.terracompositio.block.behaviours.CFEHandlerBehaviour;
-import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBEBehaviour;
-import net.sinedkadis.terracompositio.block.behaviours.TwoSlotItemHandlerBehaviour;
+import net.sinedkadis.terracompositio.block.behaviours.ManySlotItemHandlerBehaviour;
 import net.sinedkadis.terracompositio.recipe.MatterInfusionRecipe;
 import net.sinedkadis.terracompositio.registries.TCBlockEntities;
 import org.jetbrains.annotations.NotNull;
@@ -71,15 +72,24 @@ public class MatterInfuserIOBlockEntity extends MatterInfuserBaseBlockEntity{
     protected ItemStack craftItem() {
         Optional<MatterInfusionRecipe> recipe = getCurrentRecipe();
         MatterInfuserPortBlockEntity portBE = this.getPortBE();
-        if (recipe.isPresent() && this.level != null && portBE != null) {
+        FlowCedarCasingBlockEntity casingBE = this.getCasingBE();
+        if (recipe.isPresent()
+                && this.level != null
+                && portBE != null
+                && casingBE != null) {
             ItemStack result = recipe.get().getResultItem(null);
             int takeCount = recipe.get().getIngredients().get(1).getItems()[0].getCount();
-            this.getCapability(ForgeCapabilities.ITEM_HANDLER).ifPresent(iItemHandler -> {
-                if (iItemHandler instanceof TwoSlotItemHandlerBehaviour.SlotSensitiveItemStackHandler itemStackHandler) {
-                    itemStackHandler.forceExtractItem(0, takeCount,false);
-                    itemStackHandler.forceInsertItem(1, result,false);
-                }
-            });
+
+            ItemStackHandler itemHandler = casingBE.getItemHandler();
+            IBEItemBehaviour itemBehaviour = casingBE.getItemBehaviour();
+
+            if (itemBehaviour instanceof ManySlotItemHandlerBehaviour itemHandlerBehaviour) {
+                itemHandlerBehaviour.ignoreRestrictions = true;
+                itemHandler.extractItem(0, takeCount, false);
+                itemHandler.insertItem(1, result, false);
+                itemHandlerBehaviour.ignoreRestrictions = false;
+            }
+
             if (this.level.getRandom().nextInt(100) < catalystDecayRate){
                 portBE.extractItemStack(0,1);
             }
@@ -93,7 +103,7 @@ public class MatterInfuserIOBlockEntity extends MatterInfuserBaseBlockEntity{
     }
 
     protected boolean enoughCFE() {
-        return this.cfeContainer().getCFE() >= Math.ceil(tickCFECost);
+        return this.getCfeContainer().getCFE() >= Math.ceil(tickCFECost);
     }
 
     protected boolean hasRecipe() {
@@ -118,15 +128,19 @@ public class MatterInfuserIOBlockEntity extends MatterInfuserBaseBlockEntity{
     }
 
     @Override
-    protected ItemStackHandler itemHandler() {
+    protected ItemStackHandler getItemHandler() {
         FlowCedarCasingBlockEntity casingBE = getCasingBE();
         if (casingBE != null)
-            return ((TwoSlotItemHandlerBehaviour) casingBE.getBehaviours().get(1)).getItemHandler();
-        return null;
+            return casingBE.getItemHandler();
+        throw new RuntimeException("Item handler not present: " + this);
     }
 
-    protected ICFEHandler cfeContainer() {
-        return ((CFEHandlerBehaviour) behaviours.get(0)).getMainHandler();
+    protected ICFEHandler getCfeContainer() {
+        IBECFEBehaviour cfeBehaviour = getCFEBehaviour();
+        if (cfeBehaviour != null) {
+            return cfeBehaviour.getMainHandler();
+        }
+        throw new RuntimeException("CFE handler not present: " + this);
     }
 
     public Optional<MatterInfusionRecipe> getCurrentRecipe() {
