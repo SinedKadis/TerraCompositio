@@ -1,0 +1,17 @@
+{
+  "name": "book.terracompositio.creation_flow_journal.entry.infused_fertilizer.name",
+  "category": "terracompositio:day_3",
+  "icon": "terracompositio:infused_fertilizer",
+  "flag": "terracompositio:day_3",
+  "pages": [
+    "book.terracompositio.creation_flow_journal.entry.infused_fertilizer.page1",
+    {
+      "type": "patchouli:spotlight",
+      "item": {
+        "item": "terracompositio:infused_fertilizer"
+      },
+      "link_recipe": true,
+      "text": "book.terracompositio.creation_flow_journal.entry.infused_fertilizer.page2"
+    }
+  ]
+}

@@ -27,6 +27,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 public class CedarGearboxBlock extends RotatedPillarKineticBlock implements IBE<CedarGearboxBlockEntity> {
     public CedarGearboxBlock(Properties pProperties) {
         super(pProperties);
+        registerDefaultState(defaultBlockState().setValue(TCBlockStateProperties.INFUSED, false));
     }
 
     @Override

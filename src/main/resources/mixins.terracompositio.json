@@ -9,6 +9,7 @@
   "mixins": [
     "AbstractFurnaceBlockEntityMixin",
     "BlockStateBaseMixin",
+    "ItemEntityMixin",
     "LivingEntityMixin",
     "PlayerMixin",
     "RedStoneWireBlockMixin",

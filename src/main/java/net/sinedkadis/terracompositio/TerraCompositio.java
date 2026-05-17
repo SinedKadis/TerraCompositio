@@ -11,20 +11,18 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.sinedkadis.terracompositio.cfe.CFENetworkHandler;
 import net.sinedkadis.terracompositio.compat.CompatUtils;
 import net.sinedkadis.terracompositio.compat.soft_compat.ISoftCompat;
 import net.sinedkadis.terracompositio.config.TCClientConfigs;
 import net.sinedkadis.terracompositio.config.TCCommonConfigs;
+import net.sinedkadis.terracompositio.config.TCServerConfigs;
+import net.sinedkadis.terracompositio.events.CFENetworkEvent;
 import net.sinedkadis.terracompositio.events.FluidNetworkEvent;
+import net.sinedkadis.terracompositio.fluid.FluidNetworkHandler;
 import net.sinedkadis.terracompositio.network.TCPackets;
 import net.sinedkadis.terracompositio.registries.*;
-import net.sinedkadis.terracompositio.cfe.CFENetworkHandler;
-import net.sinedkadis.terracompositio.registries.TCEffects;
-import net.sinedkadis.terracompositio.registries.TCEntities;
-import net.sinedkadis.terracompositio.events.CFENetworkEvent;
 import net.sinedkadis.terracompositio.screen.TCMenuTypes;
-import net.sinedkadis.terracompositio.registries.TCSounds;
-import net.sinedkadis.terracompositio.fluid.FluidNetworkHandler;
 import net.sinedkadis.terracompositio.worldgen.biome.TCTerrablender;
 import net.sinedkadis.terracompositio.worldgen.tree.TCFoliagePlacers;
 import net.sinedkadis.terracompositio.worldgen.tree.TCTrunkPlacers;
@@ -82,6 +80,8 @@ public class TerraCompositio
 
         context.registerConfig(ModConfig.Type.CLIENT, TCClientConfigs.SPEC, "terracompositio-client.toml");
         context.registerConfig(ModConfig.Type.COMMON, TCCommonConfigs.SPEC, "terracompositio-common.toml");
+        context.registerConfig(ModConfig.Type.SERVER, TCServerConfigs.SPEC, "terracompositio-server.toml");
+
 
 
     }

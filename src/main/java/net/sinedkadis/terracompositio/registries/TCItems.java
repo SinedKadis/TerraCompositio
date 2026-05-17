@@ -144,6 +144,8 @@ public class TCItems {
             () -> new FluidApplierItem(new Item.Properties()));
     public static final RegistryObject<Item> CFE_BALL = ITEMS.register("cfe_ball",
             () -> new CFEBallItem(new Item.Properties()));
+    public static final RegistryObject<Item> INFUSED_FERTILIZER = ITEMS.register("infused_fertilizer",
+            () -> new InfusedFertilizerItem(new Item.Properties()));
 
 
     public static void register(IEventBus eventBus){

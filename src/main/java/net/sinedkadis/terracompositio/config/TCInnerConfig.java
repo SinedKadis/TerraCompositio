@@ -9,5 +9,4 @@ public class TCInnerConfig {
 
     public static final int DEFAULT_SOURCE_PRIORITY = -100;
     public static final int DEFAULT_CONSUMER_PRIORITY = 100;
-
 }

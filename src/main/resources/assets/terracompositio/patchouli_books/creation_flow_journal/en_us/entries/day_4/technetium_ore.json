@@ -1,0 +1,17 @@
+{
+  "name": "book.terracompositio.creation_flow_journal.entry.technetium_ore.name",
+  "category": "terracompositio:day_4",
+  "icon": "terracompositio:technetium_raw_ore",
+  "flag": "terracompositio:day_4",
+  "pages": [
+    "book.terracompositio.creation_flow_journal.entry.technetium_ore.page1",
+    {
+      "title": "book.terracompositio.creation_flow_journal.entry.technetium_ore.name",
+      "type": "patchouli:spotlight",
+      "item": {
+        "tag": "terracompositio:unstable_technetium"
+      },
+      "link_recipe": true
+    }
+  ]
+}

@@ -184,13 +184,12 @@
 
   "book.terracompositio.creation_flow_journal.category.day_1.name": "День первый",
   "book.terracompositio.creation_flow_journal.category.day_1.description": "Если вы это читаете, значит вы нашли способ раздобыть копию моего журнала, через один из портов, что я создал. Я не буду сразу раскрывать все добытые мою знания, так что положите эту книгу в порт на следующий день, и я дам вам больше интересной информации",
-
-  "book.terracompositio.creation_flow_journal.entry.cedar_book_port.name": "Кедровый порт",
-  "book.terracompositio.creation_flow_journal.entry.cedar_book_port.page1": " Данные \"порты\" - моя личная разработка. Я даже сделал так, что б они самопроизвольно вырастали в новых деревьях. Через них я могу добавлять новые главы в вашу книгу раз в день, а так же делать из сажанцев дуба сажанцы кедра.<br><br> Почему бы и нет",
+  "book.terracompositio.creation_flow_journal.entry.cedar_book_port.name": "Об книге",
+  "book.terracompositio.creation_flow_journal.entry.cedar_book_port.page1": "  В кедровом лесу можно найти необычные стволы, с вырезьбленной книгой на них. Данные \"порты\" - моя личная разработка. Я даже сделал так, что б они самопроизвольно вырастали в новых деревьях. Через них я могу добавлять новые главы в вашу книгу раз в день, а так же делать из сажанцев дуба сажанцы кедра.<br><br> Почему бы и нет",
   "book.terracompositio.creation_flow_journal.entry.cedar_book_port.page2": " ",
 
   "book.terracompositio.creation_flow_journal.entry.flow_infusion.name": "Наполненность потоком",
-  "book.terracompositio.creation_flow_journal.entry.flow_infusion.page1": " Наблюдая за кедровыми деревьями, я заметил, как в них течет нечто синее и жидкое. Когда касаешься его, можно почувствовать прилив энергии, желание создавать.<br>  Назову это потоком созидания<br> Я попробовал забрать себе в лабораторию кусочек, до не тут то было. При ломании поток исщезает",
+  "book.terracompositio.creation_flow_journal.entry.flow_infusion.page1": " Наблюдая за кедровыми деревьями, я заметил, как в них течет нечто синее и жидкое. Когда касаешься его, можно почувствовать прилив энергии, желание создавать. Это - Поток Созидания. Его нельзя добыть вместе с бревном, при попытке разрушить дерево, данный поток вытечет так же и из близжайших блоков",
   "book.terracompositio.creation_flow_journal.entry.flow_infusion.page2": " Однако, даже без самого потока, из него получается хороший строй-материал",
   "book.terracompositio.creation_flow_journal.entry.cedar_armor.name": "Броня из кедра",
   "book.terracompositio.creation_flow_journal.entry.cedar_armor.page1": "Кедр, на удивление, неплохой материал для брони. Благодаря своим магическим свойствам, хорошо сидит, хоть и характеристики оставляют желать лучшего.",
@@ -204,7 +203,7 @@
   "book.terracompositio.creation_flow_journal.entry.wedge.page3": " Для добычи березового сока клин тоже хорошо подходит, конечно же",
 
   "book.terracompositio.creation_flow_journal.entry.flow_fluid.name": "Жидкий поток",
-  "book.terracompositio.creation_flow_journal.entry.flow_fluid.page1": "  Необычная жидкость, крайне текучая. Имеет сильную отталкивающую силу, а при употреблении внутрь неплого заряжает энергией, хоть и не на долго",
+  "book.terracompositio.creation_flow_journal.entry.flow_fluid.page1": "  Необычная жидкость, крайне текучая. Имеет сильную отталкивающую силу, а при употреблении внутрь неплого заряжает энергией, хоть и не на долго. Орошает грядки",
   "book.terracompositio.creation_flow_journal.entry.flow_fluid.page2.title": "Жидкий поток",
   "book.terracompositio.creation_flow_journal.entry.flow_fluid.page2": "  Хранит огромное количество энергии созидания",
 
@@ -228,7 +227,7 @@
   "book.terracompositio.creation_flow_journal.entry.flow_infuser.name": "Наполнитель потоком",
   "book.terracompositio.creation_flow_journal.entry.flow_infuser.page1": " С помощью данного устройства можно создать интересный материал, обладающий свойствами как и жидкости, так и железа. Для этого нам понадобятся палки, медь, топор и прямые руки.",
   "book.terracompositio.creation_flow_journal.entry.flow_infuser.page2": " Для его работы устройство должно находится в живом, наполненном потоком кедре",
-  "book.terracompositio.creation_flow_journal.entry.flow_infuser.page3": " Положив внутрь железо, и добыв немного ЭПС неподалеку, произойдет магия и материал будет получен",
+  "book.terracompositio.creation_flow_journal.entry.flow_infuser.page3": " Положив внутрь железо, и добавив немного ЭПС, произойдет наполнение и материал будет получен",
 
   "book.terracompositio.creation_flow_journal.entry.infused_iron_axe.name": "Мульти-инструмент",
   "book.terracompositio.creation_flow_journal.entry.infused_iron_axe.page1": " Благодаря невероятным свойствам материала, назвать данный инструмент топором было б неправильно. Он может иметь форму обычного топора, ключа, монтировки а так же ключа-топора",
@@ -238,6 +237,23 @@
   "book.terracompositio.creation_flow_journal.entry.fluid_tanks.name": "Жидкостный резервуар",
   "book.terracompositio.creation_flow_journal.entry.fluid_tanks.page1": "  Для удобства жидкий поток нужно где-то хранить. Для этого можно собрать такое не сложное устройство. Для него нам понадобится:<br>  - Ключ,<br>  - Топор,<br>  - 1 Бревно кедра,<br>  - 4 золотых стержня,<br>  - 8 стержней из наполненного железа,<br>  - 1 Стекло.",
   "book.terracompositio.creation_flow_journal.entry.fluid_tanks.page2": "Ключ во вторую руку, к вертикально стоячему бревну крепим стержни, вырезаем топором отверстие и вставляем стекло.",
-  "book.terracompositio.creation_flow_journal.entry.fluid_tanks.page3": "В резервуаре помещается до 8 ведер любой жидкости, а еще его можно поставить под десорбер, для того, что б расширить его вместимость"
+  "book.terracompositio.creation_flow_journal.entry.fluid_tanks.page3": "В резервуаре помещается до 8 ведер любой жидкости, а еще его можно поставить под десорбер, для того, что б расширить его вместимость",
+  "book.terracompositio.creation_flow_journal.entry.infused_fertilizer.name": "Насыщенное удобрение",
+  "book.terracompositio.creation_flow_journal.entry.infused_fertilizer.page1": "Изготовленное путем наполнения потоком любой семечки удобрение обладает невероятными способностями в ускорении роста растений. Для того что б его пробудить, необходимо бросить его в жидкий поток, и тогда в течении 5 секунд оно ускорит рост растений вокруг себя ",
+  "book.terracompositio.creation_flow_journal.entry.infused_fertilizer.page2": "Неплохо синергирует с досорбером культивации",
+  "book.terracompositio.creation_flow_journal.entry.cfe_charge.name": "Заряд ЭПС",
+  "book.terracompositio.creation_flow_journal.entry.cfe_charge.page1": "Есть способ извлечь ЭПС чуть ли не в чистом виде, и законсервировать его в предмете, удобном для транспортировки. Положив снежёк в наполнетель потоком, он втянет в себя энергию и станет ЭПС зарядом. Для того, что б достать энергию обратно, достаточно засунуть его в печь.",
+  "book.terracompositio.creation_flow_journal.entry.cfe_charge.page2": "Если его бросить, то он превратится в удобные летающие платформы",
+  "book.terracompositio.creation_flow_journal.entry.cedar_gearbox.name": "Кедровая коробка передач",
+  "book.terracompositio.creation_flow_journal.entry.cedar_gearbox.page1": "Одно из применений ЭПС есть превращение её в кинетическую энергию. Для этого можно сматерить кедровую коробку передач. Она вырабатывает 2048ен и потребляет 1 ЭПС/с. Если его наполнить потоком, он начнет вырабатывать 4096ен при том же потреблении",
+  "book.terracompositio.creation_flow_journal.entry.cfe_mechanic.name": "Механика ЭПС",
+  "book.terracompositio.creation_flow_journal.entry.cfe_mechanic.page1": "  Каждое магическое устройство, что использует ЭПС, способно хранить небольшое количество энергии внутри себя (обычно 100). Для того, что б передать энергию от одного устройства к другому, необходимо расположить их рядом. Для каждого устройства есть свой радиус передачи, при котором оно способно передать или принять энергию",
+  "book.terracompositio.creation_flow_journal.entry.cfe_mechanic.page2": "Передача энергии происходит только от источника (например - десорбер) до потребителя ",
+  "book.terracompositio.creation_flow_journal.category.day_4.name": "Четвертый день",
+  "book.terracompositio.creation_flow_journal.category.day_4.description": "Продвинутые материалы и их применение",
+  "book.terracompositio.creation_flow_journal.entry.technetium_ore.name": "Руда Технеция",
+  "book.terracompositio.creation_flow_journal.entry.technetium_ore.page1": "  В глубинах пещер можно отыскать одну необычно опасную синюю руду. Это - Нестабильный Технеций. От него исходит огромная аура созедания, которая будет истощать того, кто ее держит. По этому, без необходимого обмундирования ее лучше избегать!",
+  "book.terracompositio.creation_flow_journal.entry.shielded_bundle.name": "Экранированный мешочек",
+  "book.terracompositio.creation_flow_journal.entry.shielded_bundle.page1": "Автоматически подбирает в себя любой нестабильный технеций, защищает от ауры созедания"
 
 }

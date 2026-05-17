@@ -5,6 +5,7 @@ import net.minecraft.data.PackOutput;
 import net.minecraft.data.recipes.*;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.tags.ItemTags;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.AbstractCookingRecipe;
@@ -161,18 +162,15 @@ public class TCRecipeProvider extends RecipeProvider implements IConditionBuilde
                 TCItems.LOW_ENRICHED_TECHNETIUM.get(),
                 200
                 )
-                .unlockedBy(getHasName(TCItems.LOW_ENRICHED_TECHNETIUM.get()), has(TCItems.LOW_ENRICHED_TECHNETIUM.get()))
-                .save(pWriter, Objects.requireNonNull(ForgeRegistries.ITEMS.getKey(TCItems.LOW_ENRICHED_TECHNETIUM.get())).withPrefix("recipes/technetium_firing_recipe/"));
+                .save(pWriter, Objects.requireNonNull(ForgeRegistries.ITEMS.getKey(TCItems.LOW_ENRICHED_TECHNETIUM.get())).withPrefix("firing/"));
         TechnetiumFiringRecipeBuilder.create(
                         TCItems.MEDIUM_ENRICHED_TECHNETIUM.get(),
                         2000)
-                .unlockedBy(getHasName(TCItems.MEDIUM_ENRICHED_TECHNETIUM.get()), has(TCItems.MEDIUM_ENRICHED_TECHNETIUM.get()))
-                .save(pWriter, Objects.requireNonNull(ForgeRegistries.ITEMS.getKey(TCItems.MEDIUM_ENRICHED_TECHNETIUM.get())).withPrefix("recipes/technetium_firing_recipe/"));
+                .save(pWriter, Objects.requireNonNull(ForgeRegistries.ITEMS.getKey(TCItems.MEDIUM_ENRICHED_TECHNETIUM.get())).withPrefix("firing/"));
         TechnetiumFiringRecipeBuilder.create(
                         TCItems.HIGH_ENRICHED_TECHNETIUM.get(),
                         20000)
-                .unlockedBy(getHasName(TCItems.HIGH_ENRICHED_TECHNETIUM.get()), has(TCItems.HIGH_ENRICHED_TECHNETIUM.get()))
-                .save(pWriter, Objects.requireNonNull(ForgeRegistries.ITEMS.getKey(TCItems.HIGH_ENRICHED_TECHNETIUM.get())).withPrefix("recipes/technetium_firing_recipe/"));
+                .save(pWriter, Objects.requireNonNull(ForgeRegistries.ITEMS.getKey(TCItems.HIGH_ENRICHED_TECHNETIUM.get())).withPrefix("firing/"));
     }
 
     private static void buildCFJ(@NotNull Consumer<FinishedRecipe> pWriter) {
@@ -310,6 +308,30 @@ public class TCRecipeProvider extends RecipeProvider implements IConditionBuilde
                 10,
                 20
         ).save(pWriter,TerraCompositio.modLoc("flow_infusion/cfe_charge"));
+        TechnetiumFiringRecipeBuilder.create(
+                        TCItems.CFE_BALL.get(),
+                        10)
+                .save(pWriter, TerraCompositio.modLoc("firing/cfe_ball"));
+        oreSmelting(pWriter,
+                List.of(TCItems.CFE_BALL.get()),
+                RecipeCategory.MISC,
+                Items.SNOWBALL,
+                0.0f,
+                40,
+                "technetium");
+        cookSmelting(pWriter,
+                List.of(TCItems.CFE_BALL.get()),
+                RecipeCategory.MISC,
+                Items.SNOWBALL,
+                0.0f,
+                20,
+                "technetium");
+        FlowInfusionRecipeBuilder.create(
+                TCItems.INFUSED_FERTILIZER.get().getDefaultInstance(),
+                Ingredient.of(ItemTags.VILLAGER_PLANTABLE_SEEDS),
+                200,
+                200
+        ).save(pWriter, TerraCompositio.modLoc("flow_infusion/infused_fertilizer"));
     }
 
     private static void buildDesorbers(@NotNull Consumer<FinishedRecipe> pWriter) {
@@ -500,17 +522,6 @@ public class TCRecipeProvider extends RecipeProvider implements IConditionBuilde
                 .define('S', Items.STICK)
                 .unlockedBy(getHasName(TCItems.TECHNETIUM_INGOT.get()), has(TCItems.TECHNETIUM_INGOT.get()))
                 .save(pWriter);
-        //todo recipe
-//        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, TCItems.CFE_BALL.get())
-//                .pattern(" T ")
-//                .pattern("TQT")
-//                .pattern("SIS")
-//                .define('T', Items.REDSTONE_TORCH)
-//                .define('Q', Items.QUARTZ)
-//                .define('S', Items.STONE)
-//                .define('I',TCItems.INFUSED_IRON_INGOT.get())
-//                .unlockedBy(getHasName(TCItems.INFUSED_IRON_INGOT.get()), has(TCItems.INFUSED_IRON_INGOT.get()))
-//                .save(pWriter);
     }
 
     private static void buildMatterInfuserBlocks(@NotNull Consumer<FinishedRecipe> pWriter) {
@@ -609,6 +620,10 @@ public class TCRecipeProvider extends RecipeProvider implements IConditionBuilde
 
     protected static void oreBlasting(@NotNull Consumer<FinishedRecipe> pFinishedRecipeConsumer, List<ItemLike> pIngredients, @NotNull RecipeCategory pCategory, @NotNull ItemLike pResult, float pExperience, int pCookingTime, @NotNull String pGroup) {
         oreCooking(pFinishedRecipeConsumer, RecipeSerializer.BLASTING_RECIPE, pIngredients, pCategory, pResult, pExperience, pCookingTime, pGroup, "_from_blasting");
+    }
+
+    protected static void cookSmelting(@NotNull Consumer<FinishedRecipe> pFinishedRecipeConsumer, List<ItemLike> pIngredients, @NotNull RecipeCategory pCategory, @NotNull ItemLike pResult, float pExperience, int pCookingTime, @NotNull String pGroup) {
+        oreCooking(pFinishedRecipeConsumer, RecipeSerializer.SMOKING_RECIPE, pIngredients, pCategory, pResult, pExperience, pCookingTime, pGroup, "_from_cooking");
     }
 
     protected static void oreCooking(@NotNull Consumer<FinishedRecipe> pFinishedRecipeConsumer, @NotNull RecipeSerializer<? extends AbstractCookingRecipe> pCookingSerializer, List<ItemLike> pIngredients, @NotNull RecipeCategory pCategory, @NotNull ItemLike pResult, float pExperience, int pCookingTime, @NotNull String pGroup, String pRecipeName) {
