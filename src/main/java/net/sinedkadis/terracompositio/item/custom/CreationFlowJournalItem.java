@@ -24,7 +24,7 @@ import java.util.Objects;
 @ParametersAreNonnullByDefault
 public class CreationFlowJournalItem extends Item {
 
-    public static int MAX_DAYS = 3;
+    public static int MAX_DAYS = 5;
     public static String DAY_FLAG = "terracompositio:day_";
 
     public CreationFlowJournalItem(Properties properties) {
