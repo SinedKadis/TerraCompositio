@@ -1,6 +1,6 @@
 {
   "name": "book.terracompositio.creation_flow_journal.category.day_2.name",
   "description": "book.terracompositio.creation_flow_journal.category.day_2.description",
-  "icon": "terracompositio:wedge",
+  "icon": "terracompositio:textures/particle/cfe_particle.png",
   "flag": "terracompositio:day_2"
 }

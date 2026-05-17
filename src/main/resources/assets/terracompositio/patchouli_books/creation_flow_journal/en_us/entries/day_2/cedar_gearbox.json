@@ -1,0 +1,13 @@
+{
+  "name": "book.terracompositio.creation_flow_journal.entry.cedar_gearbox.name",
+  "category": "terracompositio:day_2",
+  "icon": "terracompositio:cedar_gearbox",
+  "flag": "&terracompositio:day_2,mod:create",
+  "pages": [
+    "book.terracompositio.creation_flow_journal.entry.cedar_gearbox.page1",
+    {
+      "type": "patchouli:crafting",
+      "recipe": "terracompositio:cedar_gearbox"
+    }
+  ]
+}

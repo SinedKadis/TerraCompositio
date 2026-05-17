@@ -258,8 +258,14 @@
   "book.terracompositio.creation_flow_journal.entry.infused_fertilizer.name": "test",
   "book.terracompositio.creation_flow_journal.entry.infused_fertilizer.page1": "test",
   "book.terracompositio.creation_flow_journal.entry.infused_fertilizer.page2": "test",
+
   "book.terracompositio.creation_flow_journal.entry.cfe_charge.name": "test",
   "book.terracompositio.creation_flow_journal.entry.cfe_charge.page1": "test",
-  "book.terracompositio.creation_flow_journal.entry.cfe_charge.page2": "test"
+  "book.terracompositio.creation_flow_journal.entry.cfe_charge.page2": "test",
+  "book.terracompositio.creation_flow_journal.entry.cedar_gearbox.name": "test",
+  "book.terracompositio.creation_flow_journal.entry.cedar_gearbox.page1": "test",
+  "book.terracompositio.creation_flow_journal.entry.cfe_mechanic.name": "test",
+  "book.terracompositio.creation_flow_journal.entry.cfe_mechanic.page1": "test",
+  "book.terracompositio.creation_flow_journal.entry.cfe_mechanic.page2": "test"
 
 }
