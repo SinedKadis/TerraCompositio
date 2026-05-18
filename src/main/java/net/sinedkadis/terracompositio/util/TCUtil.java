@@ -3,6 +3,7 @@ package net.sinedkadis.terracompositio.util;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.blaze3d.vertex.VertexConsumer;
 import lombok.extern.slf4j.Slf4j;
+import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -26,6 +27,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.LightLayer;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.RotatedPillarBlock;
@@ -36,10 +38,9 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.fluids.FluidStack;
-import net.sinedkadis.terracompositio.api.networks.cfe.*;
+import net.sinedkadis.terracompositio.api.networks.cfe.CFENetworkMember;
+import net.sinedkadis.terracompositio.api.networks.cfe.ICFEHandler;
 import net.sinedkadis.terracompositio.block.custom.FlowCedarLikeBlock;
-
-
 import net.sinedkadis.terracompositio.block.entity.PathPointerBlockEntity;
 import net.sinedkadis.terracompositio.cfe.CFEMemberProxy;
 import net.sinedkadis.terracompositio.config.TCCommonConfigs;
@@ -632,5 +633,19 @@ public class TCUtil {
                 Containers.dropContents(level, worldPosition,inventory);
             }
         });
+    }
+
+    public static int getLightLevel(Level level, BlockPos pos, @Nullable Direction facing) {
+        int bLight;
+        int sLight;
+        if (facing == null) {
+            bLight = level.getBrightness(LightLayer.BLOCK, pos);
+            sLight = level.getBrightness(LightLayer.SKY, pos);
+        } else {
+            bLight = level.getBrightness(LightLayer.BLOCK, pos.relative(facing));
+            sLight = level.getBrightness(LightLayer.SKY, pos.relative(facing));
+        }
+
+        return LightTexture.pack(bLight, sLight);
     }
 }

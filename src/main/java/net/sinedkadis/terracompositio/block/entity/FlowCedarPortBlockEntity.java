@@ -18,7 +18,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.items.ItemStackHandler;
 import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBEBehaviour;
-import net.sinedkadis.terracompositio.block.behaviours.OneSlotItemHandlerBehaviour;
+import net.sinedkadis.terracompositio.block.behaviours.ManySlotItemHandlerBehaviour;
 import net.sinedkadis.terracompositio.recipe.FlowSaturationRecipe;
 import net.sinedkadis.terracompositio.registries.TCBlockEntities;
 import net.sinedkadis.terracompositio.screen.FlowBlockPortMenu;
@@ -83,7 +83,7 @@ public class FlowCedarPortBlockEntity extends TCCraftingBlockEntity implements M
 
     @Override
     public void addBEBehaviours(List<IBEBehaviour> list) {
-        list.add(new OneSlotItemHandlerBehaviour(this){
+        list.add(new ManySlotItemHandlerBehaviour(this) {
             @Override
             public int getLimitInSlot(int slot) {
                 return 1;

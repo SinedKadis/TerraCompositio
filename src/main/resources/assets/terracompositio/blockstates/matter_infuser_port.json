@@ -1,63 +1,18 @@
 {
   "variants": {
-    "facing=east,up_connection=false,right_connection=false": {
+    "facing=east": {
       "model": "terracompositio:block/matter_infuser_port",
       "y": 270
     },
-    "facing=east,up_connection=true,right_connection=false": {
-      "model": "terracompositio:block/matter_infuser_port_up",
-      "y": 270
-    },
-    "facing=east,up_connection=true,right_connection=true": {
-      "model": "terracompositio:block/matter_infuser_port_up_right",
-      "y": 270
-    },
-    "facing=east,up_connection=false,right_connection=true": {
-      "model": "terracompositio:block/matter_infuser_port_right",
-      "y": 270
-    },
-    "facing=north,up_connection=false,right_connection=false": {
+    "facing=north": {
       "model": "terracompositio:block/matter_infuser_port",
       "y": 180
     },
-    "facing=north,up_connection=true,right_connection=false": {
-      "model": "terracompositio:block/matter_infuser_port_up",
-      "y": 180
-    },
-    "facing=north,up_connection=true,right_connection=true": {
-      "model": "terracompositio:block/matter_infuser_port_up_right",
-      "y": 180
-    },
-    "facing=north,up_connection=false,right_connection=true": {
-      "model": "terracompositio:block/matter_infuser_port_right",
-      "y": 180
-    },
-    "facing=south,up_connection=false,right_connection=false": {
+    "facing=south": {
       "model": "terracompositio:block/matter_infuser_port"
     },
-    "facing=south,up_connection=true,right_connection=false": {
-      "model": "terracompositio:block/matter_infuser_port_up"
-    },
-    "facing=south,up_connection=true,right_connection=true": {
-      "model": "terracompositio:block/matter_infuser_port_up_right"
-    },
-    "facing=south,up_connection=false,right_connection=true": {
-      "model": "terracompositio:block/matter_infuser_port_right"
-    },
-    "facing=west,up_connection=false,right_connection=false": {
+    "facing=west": {
       "model": "terracompositio:block/matter_infuser_port",
-      "y": 90
-    },
-    "facing=west,up_connection=true,right_connection=false": {
-      "model": "terracompositio:block/matter_infuser_port_up",
-      "y": 90
-    },
-    "facing=west,up_connection=true,right_connection=true": {
-      "model": "terracompositio:block/matter_infuser_port_up_right",
-      "y": 90
-    },
-    "facing=west,up_connection=false,right_connection=true": {
-      "model": "terracompositio:block/matter_infuser_port_right",
       "y": 90
     }
   }

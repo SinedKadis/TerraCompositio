@@ -1,6 +1,7 @@
 package net.sinedkadis.terracompositio.block.entity;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.ItemStack;
@@ -12,11 +13,11 @@ import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.fluids.capability.templates.FluidTank;
 import net.minecraftforge.items.IItemHandler;
 import net.sinedkadis.terracompositio.api.TerraCompositioAPI;
+import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBEBehaviour;
 import net.sinedkadis.terracompositio.api.networks.NetworkAction;
 import net.sinedkadis.terracompositio.api.networks.fluid.FluidNetwork;
 import net.sinedkadis.terracompositio.api.networks.fluid.FluidNetworkMemberBE;
-import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBEBehaviour;
-import net.sinedkadis.terracompositio.block.behaviours.OneSlotItemHandlerBehaviour;
+import net.sinedkadis.terracompositio.block.behaviours.ManySlotItemHandlerBehaviour;
 import net.sinedkadis.terracompositio.entity.custom.FlowCedarEntEntity;
 import net.sinedkadis.terracompositio.registries.TCBlockEntities;
 import net.sinedkadis.terracompositio.registries.TCEntities;
@@ -24,6 +25,7 @@ import net.sinedkadis.terracompositio.registries.TCFluids;
 import net.sinedkadis.terracompositio.registries.TCItems;
 import net.sinedkadis.terracompositio.util.TCUtil;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
 import java.util.Optional;
@@ -39,9 +41,9 @@ public class EntStatueBlockEntity extends TCBlockEntity implements FluidNetworkM
 
     @Override
     public void addBEBehaviours(@NotNull List<IBEBehaviour> list) {
-        list.add(new OneSlotItemHandlerBehaviour(this){
+        list.add(new ManySlotItemHandlerBehaviour(this) {
             @Override
-            public boolean isItemAllowed(int pSlot, @NotNull ItemStack pStack) {
+            public boolean allowInsert(int pSlot, @NotNull ItemStack pStack, @Nullable Direction pDirection) {
                 return pStack.is(TCItems.TECHNETIUM_CROWN.get());
             }
         });
@@ -84,7 +86,7 @@ public class EntStatueBlockEntity extends TCBlockEntity implements FluidNetworkM
     }
 
     private IItemHandler itemHandler() {
-        return ((OneSlotItemHandlerBehaviour) (behaviours.get(0))).getItemHandler();
+        return ((ManySlotItemHandlerBehaviour) (behaviours.get(0))).getItemHandler();
     }
 
     @Override

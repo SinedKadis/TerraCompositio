@@ -2,6 +2,7 @@ package net.sinedkadis.terracompositio.block.entity;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.Container;
 import net.minecraft.world.WorldlyContainer;
 import net.minecraft.world.item.ItemStack;
@@ -37,6 +38,8 @@ public class FlowCedarCasingBlockEntity extends TCCraftingBlockEntity{
 
     private int cooldownTime;
 
+    public Direction attachedDir;
+
 
     public FlowCedarCasingBlockEntity(BlockPos pos, BlockState state) {
         super(TCBlockEntities.FLOW_CEDAR_CASING_BE.get(), pos, state);
@@ -49,16 +52,6 @@ public class FlowCedarCasingBlockEntity extends TCCraftingBlockEntity{
     @Override
     public void addBEBehaviours(List<IBEBehaviour> list) {
         list.add(new ManySlotItemHandlerBehaviour(this, 6) {
-            @Override
-            public boolean isItemAllowed(int pSlot, ItemStack pStack) {
-                return switch (pSlot) {
-                    case INPUT_BUS_SLOT -> pStack.is(TCItems.INPUT_BUS.get());
-                    case OUTPUT_BUS_SLOT -> pStack.is(TCItems.OUTPUT_BUS.get());
-                    case UP_CONNECTION_SLOT, DOWN_CONNECTION_SLOT -> pStack.is(TCItems.TECHNETIUM_ROD.get());
-                    default -> true;
-                };
-            }
-
             @Override
             public int getLimitInSlot(int slot) {
                 if (isInventorySlot(slot)) {
@@ -74,7 +67,16 @@ public class FlowCedarCasingBlockEntity extends TCCraftingBlockEntity{
 
             @Override
             public boolean allowInsert(int pSlot, ItemStack pStack, @Nullable Direction pDirection) {
-                return pDirection == null || (pSlot == INPUT_INVENTORY_SLOT && pDirection.equals(Direction.UP));
+                boolean allow = pDirection == null || (pSlot == INPUT_INVENTORY_SLOT && pDirection.equals(Direction.UP));
+                if (allow) {
+                    return switch (pSlot) {
+                        case INPUT_BUS_SLOT -> pStack.is(TCItems.INPUT_BUS.get());
+                        case OUTPUT_BUS_SLOT -> pStack.is(TCItems.OUTPUT_BUS.get());
+                        case UP_CONNECTION_SLOT, DOWN_CONNECTION_SLOT -> pStack.is(TCItems.TECHNETIUM_ROD.get());
+                        default -> true;
+                    };
+                }
+                return false;
             }
         });
     }
@@ -92,12 +94,6 @@ public class FlowCedarCasingBlockEntity extends TCCraftingBlockEntity{
         ItemStackHandler iItemHandler = getItemHandler();
         return !iItemHandler.getStackInSlot(OUTPUT_BUS_SLOT).isEmpty()
                 && !iItemHandler.getStackInSlot(DOWN_CONNECTION_SLOT).isEmpty();
-    }
-
-    private boolean hasInputBusConnection() {
-        ItemStackHandler iItemHandler = getItemHandler();
-        return !iItemHandler.getStackInSlot(INPUT_BUS_SLOT).isEmpty()
-                && !iItemHandler.getStackInSlot(UP_CONNECTION_SLOT).isEmpty();
     }
 
     protected ItemStackHandler getItemHandler() {
@@ -274,6 +270,18 @@ public class FlowCedarCasingBlockEntity extends TCCraftingBlockEntity{
         }
 
         return true;
+    }
+
+    @Override
+    protected void saveAdditional(CompoundTag pTag) {
+        pTag.putInt("attachedDir", attachedDir.get2DDataValue());
+        super.saveAdditional(pTag);
+    }
+
+    @Override
+    public void load(CompoundTag pTag) {
+        super.load(pTag);
+        attachedDir = Direction.from2DDataValue(pTag.getInt("attachedDir"));
     }
 
     private boolean notOnCooldown() {

@@ -15,8 +15,8 @@ import net.sinedkadis.terracompositio.block.entity.TCBlockEntity;
 import net.sinedkadis.terracompositio.registries.TCBlockEntities;
 import net.sinedkadis.terracompositio.registries.TCBlockStateProperties;
 import net.sinedkadis.terracompositio.registries.TCBlocks;
-import net.sinedkadis.terracompositio.util.FunctionSide;
 
+import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 
 @MethodsReturnNonnullByDefault
@@ -24,33 +24,41 @@ import javax.annotation.ParametersAreNonnullByDefault;
 public class FlowCedarCasingBlock extends TCBaseEntityBlock {
     public static final BooleanProperty INFUSED = TCBlockStateProperties.INFUSED;
     public static final EnumProperty<Direction.Axis> AXIS = BlockStateProperties.AXIS;
-    protected static final BooleanProperty FUNCTION_SIDE = TCBlockStateProperties.FUNCTION_SIDE;
     protected static final BooleanProperty WAXED = TCBlockStateProperties.WAXED;
 
     public FlowCedarCasingBlock(Properties pProperties) {
         super(pProperties);
     }
 
-    @Override
-    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> pBuilder) {
-        pBuilder.add(AXIS, FUNCTION_SIDE, INFUSED, WAXED);
+    //returns null if no port, true if clockwise, false if counterclockwise
+    public static @Nullable Boolean isBlockAttached(Level level, BlockState blockState, BlockPos pos, Block... blocks) {
+        Direction.Axis axis = blockState.getValue(AXIS);
+        if (axis.isVertical()) return null;
+
+        for (Block block : blocks) {
+            if (level.getBlockState(pos.relative(Direction.get(Direction.AxisDirection.POSITIVE, axis).getClockWise()))
+                    .is(block))
+                return true;
+            if (level.getBlockState(pos.relative(Direction.get(Direction.AxisDirection.POSITIVE, axis).getCounterClockWise()))
+                    .is(block))
+                return false;
+        }
+
+        return null;
     }
 
-    public static boolean isPortAttached(Level level, BlockState blockState, BlockPos pos) {
-        Direction facing = FunctionSide.getDirectionByFunctionSide(blockState);
-        if (facing != Direction.DOWN){
-            return level.getBlockState(pos.relative(facing)).is(TCBlocks.MATTER_INFUSER_PORT.get());
-        }
-        return false;
+    public static @Nullable Boolean isPortAttached(Level level, BlockState blockState, BlockPos pos) {
+        return isBlockAttached(level, blockState, pos, TCBlocks.MATTER_INFUSER_PORT.get());
     }
 
     @SuppressWarnings("unused")
-    public static boolean isUnitAttached(Level level, BlockState blockState, BlockPos pos) {
-        Direction facing = FunctionSide.getDirectionByFunctionSide(blockState);
-        if (facing != Direction.DOWN){
-            return level.getBlockState(pos.relative(facing)).is(TCBlocks.MATTER_INFUSER_IO.get());
-        }
-        return false;
+    public static @Nullable Boolean isUnitAttached(Level level, BlockState blockState, BlockPos pos) {
+        return isBlockAttached(level, blockState, pos, TCBlocks.MATTER_INFUSER_IO.get());
+    }
+
+    @Override
+    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> pBuilder) {
+        pBuilder.add(AXIS, INFUSED, WAXED);
     }
 
 

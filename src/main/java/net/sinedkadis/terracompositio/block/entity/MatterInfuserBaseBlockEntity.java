@@ -37,25 +37,14 @@ public abstract class MatterInfuserBaseBlockEntity extends TCCraftingBlockEntity
         return ItemStack.EMPTY;
     }
 
-    public ItemStack insertItemStack(int slot, ItemStack itemstack) {
+    public void extractItemStack(int slot, int count) {
         FlowCedarCasingBlockEntity blockEntity = this.getCasingBE();
         if (blockEntity != null){
-            return blockEntity.getItemHandler().insertItem(slot, itemstack, false);
+            blockEntity.getItemHandler().extractItem(slot, count, false);
         }
-        return itemstack;
     }
 
-    public ItemStack extractItemStack(int slot, int count) {
-        ItemStack itemStack;
-        FlowCedarCasingBlockEntity blockEntity = this.getCasingBE();
-        if (blockEntity != null){
-            itemStack = blockEntity.getItemHandler().extractItem(slot, count, false);
-            return itemStack;
-        }
-        return ItemStack.EMPTY;
-    }
-
-    protected @Nullable FlowCedarCasingBlockEntity getCasingBE() {
+    public @Nullable FlowCedarCasingBlockEntity getCasingBE() {
         Direction direction = this.getBlockState().getValue(HORIZONTAL_FACING);
         BlockPos blockpos = this.getBlockPos().relative(direction.getOpposite());
         if (this.level != null && this.level.getBlockState(blockpos).is(TCBlocks.FLOW_CEDAR_CASING.get())){

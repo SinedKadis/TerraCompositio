@@ -35,15 +35,12 @@ import net.sinedkadis.terracompositio.entity.client.FlowCedarEntModel;
 import net.sinedkadis.terracompositio.entity.client.FlowCedarEntRenderer;
 import net.sinedkadis.terracompositio.gui.TCGui;
 import net.sinedkadis.terracompositio.item.custom.CreationFlowJournalItem;
+import net.sinedkadis.terracompositio.item.custom.ShieldedBundleItem;
+import net.sinedkadis.terracompositio.item.custom.WrenchAxeItem;
 import net.sinedkadis.terracompositio.item.models.TechnetiumBootsModel;
 import net.sinedkadis.terracompositio.item.models.TechnetiumCloakModel;
 import net.sinedkadis.terracompositio.item.models.TechnetiumCrownModel;
 import net.sinedkadis.terracompositio.particle.custom.*;
-import net.sinedkadis.terracompositio.registries.TCEntities;
-import net.sinedkadis.terracompositio.registries.TCBoatRenderer;
-import net.sinedkadis.terracompositio.registries.TCModelLayers;
-import net.sinedkadis.terracompositio.item.custom.ShieldedBundleItem;
-import net.sinedkadis.terracompositio.item.custom.WrenchAxeItem;
 import net.sinedkadis.terracompositio.registries.*;
 import net.sinedkadis.terracompositio.screen.FlowBlockPortScreen;
 import net.sinedkadis.terracompositio.screen.TCMenuTypes;
@@ -191,6 +188,8 @@ public class TCEventBusClientEvents {
         event.registerBlockEntityRenderer(TCBlockEntities.FLOW_CEDAR_TANK_BE.get(), FlowCedarTankBlockEntityRenderer::new);
         event.registerBlockEntityRenderer(TCBlockEntities.PATH_POINTER_BE.get(), PathPointerBlockEntityRenderer::new);
         event.registerBlockEntityRenderer(TCBlockEntities.ENT_STATUE_BE.get(), EntStatueBlockEntityRenderer::new);
+        event.registerBlockEntityRenderer(TCBlockEntities.MATTER_INFUSER_IO_BE.get(), MatterInfuserIOBlockEntityRenderer::new);
+        event.registerBlockEntityRenderer(TCBlockEntities.MATTER_INFUSER_PORT_BE.get(), MatterInfuserPortBlockEntityRenderer::new);
 
 
         if (CompatUtils.CREATE_EXISTENCE.get()) {

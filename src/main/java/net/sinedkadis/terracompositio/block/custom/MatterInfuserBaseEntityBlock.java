@@ -1,33 +1,31 @@
 package net.sinedkadis.terracompositio.block.custom;
 
+import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.DirectionProperty;
+import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import net.minecraftforge.common.capabilities.ForgeCapabilities;
-import net.minecraftforge.items.ItemStackHandler;
 import net.sinedkadis.terracompositio.block.entity.FlowCedarCasingBlockEntity;
 import net.sinedkadis.terracompositio.registries.TCBlocks;
-import net.sinedkadis.terracompositio.util.FunctionSide;
-import net.sinedkadis.terracompositio.util.TCUtil;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
-import java.util.Objects;
+import javax.annotation.ParametersAreNonnullByDefault;
 
 import static net.minecraft.world.level.block.state.properties.BlockStateProperties.AXIS;
-import static net.sinedkadis.terracompositio.block.custom.FlowCedarCasingBlock.FUNCTION_SIDE;
 
 @SuppressWarnings("deprecation")
 public abstract class MatterInfuserBaseEntityBlock extends TCBaseEntityBlock {
@@ -68,14 +66,22 @@ public abstract class MatterInfuserBaseEntityBlock extends TCBaseEntityBlock {
         if (pState.getBlock() != pNewState.getBlock()) {
             Direction direction = pState.getValue(FACING);
             BlockPos blockpos = pPos.relative(direction.getOpposite());
-            BlockState blockstate = pLevel.getBlockState(blockpos);
-            if (blockstate.is(TCBlocks.FLOW_CEDAR_CASING.get())) {
-                FlowCedarCasingBlockEntity blockEntity = (FlowCedarCasingBlockEntity) Objects.requireNonNull(pLevel.getBlockEntity(blockpos));
-                TCUtil.dropContents(blockEntity);
-                blockEntity.getCapability(ForgeCapabilities.ITEM_HANDLER)
-                        .ifPresent(iItemHandler -> ((ItemStackHandler) iItemHandler).setSize(slotCount()));
+            BlockEntity blockEntity = pLevel.getBlockEntity(blockpos);
+            if (blockEntity instanceof FlowCedarCasingBlockEntity casingBlockEntity) {
+                casingBlockEntity.attachedDir = null;
             }
         }
+    }
+
+    @ParametersAreNonnullByDefault
+    @MethodsReturnNonnullByDefault
+    @Override
+    public InteractionResult use(BlockState pState, Level pLevel, BlockPos pPos, Player pPlayer, InteractionHand pHand, BlockHitResult pHit) {
+        InteractionResult use = super.use(pState, pLevel, pPos, pPlayer, pHand, pHit);
+        if (!use.equals(InteractionResult.SUCCESS)) {
+            return pLevel.getBlockState(pPos.relative(pState.getValue(FACING).getOpposite())).use(pLevel, pPlayer, pHand, pHit);
+        }
+        return use;
     }
 
     public @NotNull VoxelShape getShape(BlockState pState, @NotNull BlockGetter pLevel, @NotNull BlockPos pPos, @NotNull CollisionContext pContext) {
@@ -98,36 +104,17 @@ public abstract class MatterInfuserBaseEntityBlock extends TCBaseEntityBlock {
                 Direction direction1 = direction.getOpposite();
                 blockstate = blockstate.setValue(FACING, direction1);
                 if (blockstate.canSurvive(levelreader, blockpos)) {
+                    BlockEntity blockEntity = levelreader.getBlockEntity(blockpos.relative(direction1.getOpposite()));
+                    if (blockEntity instanceof FlowCedarCasingBlockEntity casingBlockEntity) {
+                        if (casingBlockEntity.attachedDir != null) return null;
+                        casingBlockEntity.attachedDir = direction1;
+                    }
                     return blockstate;
                 }
             }
         }
 
         return null;
-    }
-
-
-
-    @Override
-    public void setPlacedBy(@NotNull Level pLevel, @NotNull BlockPos pPos, @NotNull BlockState pState, @Nullable LivingEntity pPlacer, @NotNull ItemStack pStack) {
-        super.setPlacedBy(pLevel, pPos, pState, pPlacer, pStack);
-        Direction direction = pState.getValue(FACING);
-        BlockPos casingPos = pPos.relative(direction.getOpposite());
-        BlockState casingState = pLevel.getBlockState(casingPos);
-        if (casingState.is(TCBlocks.FLOW_CEDAR_CASING.get())) {
-            FunctionSide functionSideByDirection = FunctionSide.getFunctionSideByDirection(casingState, direction);
-            pLevel.setBlock(casingPos, casingState.setValue(FUNCTION_SIDE, functionSideByDirection), 3);
-            FlowCedarCasingBlockEntity blockEntity = (FlowCedarCasingBlockEntity) pLevel.getBlockEntity(casingPos);
-            if (blockEntity != null) {
-                TCUtil.dropContents(blockEntity);
-                blockEntity.getCapability(ForgeCapabilities.ITEM_HANDLER)
-                        .ifPresent(iItemHandler -> ((ItemStackHandler) iItemHandler).setSize(slotCount()));
-            }
-        }
-    }
-
-    protected int slotCount() {
-        return 2;
     }
 
     static {

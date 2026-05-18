@@ -1,6 +1,7 @@
 package net.sinedkadis.terracompositio.block.entity;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -17,14 +18,16 @@ import net.sinedkadis.terracompositio.block.behaviours.CFEHandlerBehaviour;
 import net.sinedkadis.terracompositio.block.behaviours.ManySlotItemHandlerBehaviour;
 import net.sinedkadis.terracompositio.recipe.MatterInfusionRecipe;
 import net.sinedkadis.terracompositio.registries.TCBlockEntities;
-import org.jetbrains.annotations.NotNull;
+import net.sinedkadis.terracompositio.registries.TCItems;
 import org.jetbrains.annotations.Nullable;
 
+import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.List;
 import java.util.Optional;
 
 import static net.sinedkadis.terracompositio.registries.TCBlockStateProperties.INFUSED;
 
+@ParametersAreNonnullByDefault
 public class MatterInfuserIOBlockEntity extends MatterInfuserBaseBlockEntity{
 
 
@@ -35,7 +38,7 @@ public class MatterInfuserIOBlockEntity extends MatterInfuserBaseBlockEntity{
     }
 
     @Override
-    public void addBEBehaviours(@NotNull List<IBEBehaviour> list) {
+    public void addBEBehaviours(List<IBEBehaviour> list) {
         list.add(new CFEHandlerBehaviour(this){
             @Override
             public Vec3 particleTargetOffset() {
@@ -48,10 +51,26 @@ public class MatterInfuserIOBlockEntity extends MatterInfuserBaseBlockEntity{
                 };
             }
         }.range(10));
+        list.add(new ManySlotItemHandlerBehaviour(this) {
+            @Override
+            public boolean allowExtract(int pSlot, ItemStack pStack, @Nullable Direction pDirection) {
+                return false;
+            }
+
+            @Override
+            public boolean allowInsert(int pSlot, ItemStack pStack, @Nullable Direction pDirection) {
+                return pDirection == null && pStack.getCount() >= 2 && pStack.is(TCItems.INFUSED_IRON_ROD.get());
+            }
+
+            @Override
+            public int getLimitInSlot(int slot) {
+                return 2;
+            }
+        });
 
     }
 
-    public void tick(@NotNull Level pLevel, @NotNull BlockPos pPos, @NotNull BlockState pState) {
+    public void tick(Level pLevel, BlockPos pPos, BlockState pState) {
         super.tick(pLevel, pPos, pState);
         if(hasRecipe() && enoughCFE()){
             increaseCraftingProgress();

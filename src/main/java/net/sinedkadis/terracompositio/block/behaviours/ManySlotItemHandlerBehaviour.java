@@ -42,7 +42,7 @@ public class ManySlotItemHandlerBehaviour implements IBEItemBehaviour, WorldlyCo
 
         @Override
         public boolean isItemValid(int slot, ItemStack stack) {
-            return isItemAllowed(slot, stack);
+            return allowInsert(slot, stack);
         }
 
         @Override
@@ -59,6 +59,11 @@ public class ManySlotItemHandlerBehaviour implements IBEItemBehaviour, WorldlyCo
     };
     protected LazyOptional<IItemHandler> lazyItemHandler = LazyOptional.empty();
 
+    //One slot
+    public ManySlotItemHandlerBehaviour(TCBlockEntity blockEntity) {
+        this.blockEntity = blockEntity;
+    }
+
     public ManySlotItemHandlerBehaviour(TCBlockEntity blockEntity, int slotCount) {
         this.blockEntity = blockEntity;
         itemHandler.setSize(slotCount);
@@ -66,10 +71,6 @@ public class ManySlotItemHandlerBehaviour implements IBEItemBehaviour, WorldlyCo
 
     public int getLimitInSlot(int slot) {
         return 64;
-    }
-
-    public boolean isItemAllowed(int pSlot, ItemStack pStack) {
-        return true;
     }
 
     private boolean allowExtract(int pSlot, ItemStack pStack) {
@@ -123,11 +124,14 @@ public class ManySlotItemHandlerBehaviour implements IBEItemBehaviour, WorldlyCo
         tag.put("itemHandler", getItemHandler().serializeNBT());
     }
 
-    @Override
-    public void onLoad(CompoundTag tag) {
-        getItemHandler().deserializeNBT(tag);
+    private static boolean hasSpace(ItemStackHandler itemHandler, int i) {
+        return itemHandler.getSlotLimit(i) - itemHandler.getStackInSlot(i).getCount() > 0;
     }
 
+    @Override
+    public void onLoad(CompoundTag tag) {
+        getItemHandler().deserializeNBT(tag.getCompound("itemHandler"));
+    }
 
     @Override
     public InteractionResult onUse(Player pPlayer, InteractionHand pHand, BlockHitResult pHit) {
@@ -144,13 +148,13 @@ public class ManySlotItemHandlerBehaviour implements IBEItemBehaviour, WorldlyCo
             ItemStack slot = itemHandler.getStackInSlot(i);
 
             if (!slot.isEmpty() && allowExtract(i, slot)) {
-                ItemStack extracted = itemHandler.extractItem(0, 64, false);
+                ItemStack extracted = itemHandler.extractItem(i, 64, false);
                 TCUtil.addOrDropToPlayer(pPlayer, extracted);
                 level.playSound(pPlayer, blockPos, SoundEvents.ITEM_FRAME_REMOVE_ITEM, SoundSource.BLOCKS);
                 return InteractionResult.sidedSuccess(level.isClientSide());
             }
-            if (!itemInHand.isEmpty() && allowInsert(i, itemInHand)) {
-                ItemStack left = itemHandler.insertItem(0, itemInHand.copy(), false);
+            if (!itemInHand.isEmpty() && allowInsert(i, itemInHand) && hasSpace(itemHandler, i)) {
+                ItemStack left = itemHandler.insertItem(i, itemInHand.copy(), false);
                 pPlayer.setItemInHand(pHand, left);
                 level.playSound(pPlayer, blockPos, SoundEvents.ITEM_FRAME_ADD_ITEM, SoundSource.BLOCKS);
                 return InteractionResult.sidedSuccess(level.isClientSide());
@@ -217,10 +221,6 @@ public class ManySlotItemHandlerBehaviour implements IBEItemBehaviour, WorldlyCo
     @Override
     public void setItem(int pSlot, ItemStack pStack) {
         getItemHandler().setStackInSlot(pSlot, pStack);
-    }
-
-    public void insertItem(int pSlot, ItemStack pStack) {
-        getItemHandler().insertItem(pSlot, pStack, false);
     }
 
     @Override
