@@ -1,0 +1,5 @@
+{
+  "type": "terracompositio:technetium_firing",
+  "cfe": 20000,
+  "furnace_input": "terracompositio:high_enriched_technetium"
+}
