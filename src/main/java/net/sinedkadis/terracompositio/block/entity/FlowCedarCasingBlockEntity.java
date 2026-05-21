@@ -10,8 +10,9 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.items.IItemHandler;
-import net.minecraftforge.items.ItemHandlerHelper;
+import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.ItemStackHandler;
+import net.minecraftforge.items.wrapper.EmptyHandler;
 import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBEBehaviour;
 import net.sinedkadis.terracompositio.block.behaviours.ManySlotItemHandlerBehaviour;
 import net.sinedkadis.terracompositio.registries.TCBlockEntities;
@@ -61,13 +62,19 @@ public class FlowCedarCasingBlockEntity extends TCCraftingBlockEntity{
             }
 
             @Override
-            public boolean allowExtract(int pSlot, ItemStack pStack, @Nullable Direction pDirection) {
+            public boolean allowExtract(int pSlot, ItemStack pStack, @Nullable Direction pDirection, boolean manual) {
+                if (this.itemHandler.getStackInSlot(OUTPUT_BUS_SLOT).isEmpty()) return false;
                 return pSlot == OUTPUT_INVENTORY_SLOT && (pDirection == null || pDirection.equals(Direction.DOWN));
             }
 
             @Override
-            public boolean allowInsert(int pSlot, ItemStack pStack, @Nullable Direction pDirection) {
-                boolean allow = pDirection == null || (pSlot == INPUT_INVENTORY_SLOT && pDirection.equals(Direction.UP));
+            public boolean allowInsert(int pSlot, ItemStack pStack, @Nullable Direction pDirection, boolean manual) {
+                if (isInventorySlot(pSlot) && this.itemHandler.getStackInSlot(INPUT_BUS_SLOT).isEmpty()) return false;
+                boolean noDir = pDirection == null;
+                boolean isInputSlot = pSlot == INPUT_INVENTORY_SLOT;
+                boolean directionIsUp = !noDir && pDirection.equals(Direction.UP);
+                boolean utilitySlot = !isInventorySlot(pSlot);
+                boolean allow = noDir || (isInputSlot && directionIsUp) || utilitySlot;
                 if (allow) {
                     return switch (pSlot) {
                         case INPUT_BUS_SLOT -> pStack.is(TCItems.INPUT_BUS.get());
@@ -91,57 +98,49 @@ public class FlowCedarCasingBlockEntity extends TCCraftingBlockEntity{
     }
 
     private boolean hasOutputBusConnection() {
-        ItemStackHandler iItemHandler = getItemHandler();
+        IItemHandlerModifiable iItemHandler = getItemHandler();
         return !iItemHandler.getStackInSlot(OUTPUT_BUS_SLOT).isEmpty()
                 && !iItemHandler.getStackInSlot(DOWN_CONNECTION_SLOT).isEmpty();
     }
 
-    protected ItemStackHandler getItemHandler() {
+    protected IItemHandlerModifiable getItemHandler() {
         Optional<IItemHandler> capability = this.getCapability(ForgeCapabilities.ITEM_HANDLER).resolve();
         if (capability.isPresent()) {
             return ((ItemStackHandler) capability.get());
         }
-        throw new RuntimeException("Item handler not present: " + this);
+        return (IItemHandlerModifiable) EmptyHandler.INSTANCE;
+        //throw new RuntimeException("Item handler not present: " + this);
     }
 
     private void tryMoveItems(Level pLevel, BlockPos pPos, BlockState pState) {
         if (!pLevel.isClientSide) {
             if (this.notOnCooldown()) {
-                boolean flag = false;
-                if (!this.getItemHandler().getStackInSlot(1).isEmpty()) {
-                    flag = ejectItems(pLevel, pPos);
+                if (!this.getItemHandler().getStackInSlot(OUTPUT_INVENTORY_SLOT).isEmpty()) {
+                    ejectItems(pLevel, pPos);
                 }
 
-                if (flag) {
-                    this.setCooldown(8);
-                    setChanged(pLevel, pPos, pState);
-                }
+                this.setCooldown(8);
+                setChanged(pLevel, pPos, pState);
             }
-
         }
     }
 
-    private  boolean ejectItems(Level level, BlockPos blockPos) {
-        if (this.vanillaInsertHook()) {
-            return true;
-        } else {
-            Container container = getAttachedContainer(level, blockPos);
-            if (container != null) {
-                Direction direction = Direction.DOWN.getOpposite();
-                if (!isFullContainer(container, direction)) {
-                    ItemStackHandler itemStackHandler = this.getItemHandler();
-                    if (!itemStackHandler.getStackInSlot(1).isEmpty()) {
-                        ItemStack itemstack = itemStackHandler.getStackInSlot(1).copy();
-                        ItemStack itemstack1 = addItem(container, itemStackHandler.extractItem(1, 1, false), direction);
-                        if (itemstack1.isEmpty()) {
-                            container.setChanged();
-                            return true;
-                        }
-                        itemStackHandler.setStackInSlot(1, itemstack);
+    private void ejectItems(Level level, BlockPos blockPos) {
+        Container container = getAttachedContainer(level, blockPos);
+        if (container != null) {
+            Direction direction = Direction.DOWN.getOpposite();
+            if (!isFullContainer(container, direction)) {
+                IItemHandlerModifiable itemStackHandler = this.getItemHandler();
+                if (!itemStackHandler.getStackInSlot(1).isEmpty()) {
+                    ItemStack itemstack = itemStackHandler.getStackInSlot(1).copy();
+                    ItemStack itemstack1 = addItem(container, itemStackHandler.extractItem(1, 1, false), direction);
+                    if (itemstack1.isEmpty()) {
+                        container.setChanged();
+                        return;
                     }
+                    itemStackHandler.setStackInSlot(1, itemstack);
                 }
             }
-            return false;
         }
     }
 
@@ -223,65 +222,26 @@ public class FlowCedarCasingBlockEntity extends TCCraftingBlockEntity{
         return getContainerAt(pLevel, pPos.relative(Direction.DOWN));
     }
 
-    public boolean vanillaInsertHook() {
-        ItemStackHandler itemStackHandler = this.getItemHandler();
-        if (!isFull(itemStackHandler)) {
-            if (!itemStackHandler.getStackInSlot(1).isEmpty()) {
-                ItemStack originalSlotContents = itemStackHandler.getStackInSlot(1).copy();
-                ItemStack insertStack = itemStackHandler.extractItem(1, 1, false);
-                ItemStack remainder = putStackInInventoryAllSlots(itemStackHandler, insertStack);
-                if (remainder.isEmpty()) {
-                    return true;
-                }
-                itemStackHandler.setStackInSlot(1, originalSlotContents);
-            }
-        }
-        return false;
-        
-    }
-
-    private static ItemStack putStackInInventoryAllSlots(IItemHandler destInventory, ItemStack stack) {
-        for(int slot = 0; slot < destInventory.getSlots() && !stack.isEmpty(); ++slot) {
-            stack = insertStack(destInventory, stack, slot);
-        }
-        return stack;
-    }
-
-    private static ItemStack insertStack(IItemHandler destInventory, ItemStack stack, int slot) {
-        ItemStack itemstack = destInventory.getStackInSlot(slot);
-        if (destInventory.insertItem(slot, stack, true).isEmpty()) {
-            if (itemstack.isEmpty()) {
-                destInventory.insertItem(slot, stack, false);
-                stack = ItemStack.EMPTY;
-            } else if (ItemHandlerHelper.canItemStacksStack(itemstack, stack)) {
-                stack = destInventory.insertItem(slot, stack, false);
-            }
-        }
-
-        return stack;
-    }
-
-    private static boolean isFull(IItemHandler itemHandler) {
-        for(int slot = 0; slot < itemHandler.getSlots(); ++slot) {
-            ItemStack stackInSlot = itemHandler.getStackInSlot(slot);
-            if (stackInSlot.isEmpty() || stackInSlot.getCount() < itemHandler.getSlotLimit(slot)) {
-                return false;
-            }
-        }
-
-        return true;
-    }
-
     @Override
     protected void saveAdditional(CompoundTag pTag) {
-        pTag.putInt("attachedDir", attachedDir.get2DDataValue());
+        if (attachedDir != null)
+            pTag.putInt("attachedDir", attachedDir.get2DDataValue());
         super.saveAdditional(pTag);
     }
 
     @Override
     public void load(CompoundTag pTag) {
         super.load(pTag);
-        attachedDir = Direction.from2DDataValue(pTag.getInt("attachedDir"));
+        if (pTag.contains("attachedDir")) {
+            attachedDir = Direction.from2DDataValue(pTag.getInt("attachedDir"));
+        } else {
+            attachedDir = null;
+        }
+    }
+
+    @Override
+    public ItemStack getRenderStack() {
+        return getItemHandler().getStackInSlot(INPUT_INVENTORY_SLOT);
     }
 
     private boolean notOnCooldown() {

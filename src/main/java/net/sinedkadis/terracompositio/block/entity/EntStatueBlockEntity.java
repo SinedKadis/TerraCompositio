@@ -43,7 +43,7 @@ public class EntStatueBlockEntity extends TCBlockEntity implements FluidNetworkM
     public void addBEBehaviours(@NotNull List<IBEBehaviour> list) {
         list.add(new ManySlotItemHandlerBehaviour(this) {
             @Override
-            public boolean allowInsert(int pSlot, @NotNull ItemStack pStack, @Nullable Direction pDirection) {
+            public boolean allowInsert(int pSlot, @NotNull ItemStack pStack, @Nullable Direction pDirection, boolean manual) {
                 return pStack.is(TCItems.TECHNETIUM_CROWN.get());
             }
         });

@@ -16,7 +16,8 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
-import net.minecraftforge.items.ItemStackHandler;
+import net.minecraftforge.items.IItemHandlerModifiable;
+import net.minecraftforge.items.wrapper.EmptyHandler;
 import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBEBehaviour;
 import net.sinedkadis.terracompositio.block.behaviours.ManySlotItemHandlerBehaviour;
 import net.sinedkadis.terracompositio.recipe.FlowSaturationRecipe;
@@ -120,8 +121,8 @@ public class FlowCedarPortBlockEntity extends TCCraftingBlockEntity implements M
         }
     }
 
-    protected ItemStackHandler getItemHandler() {
-        return (ItemStackHandler) this.getCapability(ForgeCapabilities.ITEM_HANDLER).orElse(null);
+    protected IItemHandlerModifiable getItemHandler() {
+        return (IItemHandlerModifiable) this.getCapability(ForgeCapabilities.ITEM_HANDLER).orElse(EmptyHandler.INSTANCE);
     }
 
     protected boolean hasRecipe() {

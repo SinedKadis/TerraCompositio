@@ -147,9 +147,6 @@ public class MatterInfuserIOBlockEntityRenderer implements BlockEntityRenderer<M
 
             pPoseStack.pushPose();
 
-            pPoseStack.mulPose(Axis.YP.rotationDegrees(facing.toYRot()));
-            pPoseStack.mulPose(Axis.ZP.rotationDegrees(45));
-
             //To center
             pPoseStack.translate(0.5f, 0.666f, 0.5f);
             Vec3i normal = facing.getNormal();
@@ -161,10 +158,15 @@ public class MatterInfuserIOBlockEntityRenderer implements BlockEntityRenderer<M
             // To left
             pPoseStack.translate(rotatedVec3.x() * 0.5f, 0, rotatedVec3.z() * 0.5f);
 
+            pPoseStack.mulPose(Axis.YP.rotationDegrees(facing.toYRot()));
+            pPoseStack.mulPose(Axis.ZP.rotationDegrees(45));
+
             itemRenderer.renderStatic(stackInSlot, ItemDisplayContext.FIXED, TCUtil.getLightLevel(level, pBlockEntity.getBlockPos(), Direction.UP),
                     OverlayTexture.NO_OVERLAY, pPoseStack, pBuffer, level, 1);
 
+            pPoseStack.mulPose(Axis.ZP.rotationDegrees(-45));
             pPoseStack.translate(0, -0.333f, 0);
+            pPoseStack.mulPose(Axis.ZP.rotationDegrees(45));
 
             itemRenderer.renderStatic(stackInSlot, ItemDisplayContext.FIXED, TCUtil.getLightLevel(level, pBlockEntity.getBlockPos(), Direction.UP),
                     OverlayTexture.NO_OVERLAY, pPoseStack, pBuffer, level, 1);

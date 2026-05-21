@@ -51,12 +51,7 @@ public abstract class MatterInfuserBaseEntityBlock extends TCBaseEntityBlock {
         BlockPos blockpos = pPos.relative(direction.getOpposite());
         BlockState blockstate = pLevel.getBlockState(blockpos);
         if (blockstate.hasProperty(AXIS) && blockstate.is(TCBlocks.FLOW_CEDAR_CASING.get()))
-            return direction.getAxis().isHorizontal() && blockstate.getValue(AXIS).equals(
-                    switch (direction) {
-                        case NORTH, SOUTH -> Direction.Axis.X;
-                        case WEST, EAST -> Direction.Axis.Z;
-                        default -> Direction.Axis.Y;
-                    });
+            return direction.getAxis().isHorizontal() && !blockstate.getValue(AXIS).equals(direction.getAxis());
         return false;
     }
 
@@ -85,12 +80,15 @@ public abstract class MatterInfuserBaseEntityBlock extends TCBaseEntityBlock {
     }
 
     public @NotNull VoxelShape getShape(BlockState pState, @NotNull BlockGetter pLevel, @NotNull BlockPos pPos, @NotNull CollisionContext pContext) {
-        return switch (pState.getValue(FACING)) {
-            case WEST -> WEST_AABB;
-            case SOUTH -> SOUTH_AABB;
-            case NORTH -> NORTH_AABB;
-            default -> EAST_AABB;
-        };
+        Direction direction = pState.getValue(FACING);
+        if (direction == Direction.SOUTH) {
+            return SOUTH_AABB;
+        } else if (direction == Direction.WEST) {
+            return WEST_AABB;
+        } else if (direction == Direction.NORTH) {
+            return NORTH_AABB;
+        }
+        return EAST_AABB;
     }
 
     @Override
@@ -106,6 +104,7 @@ public abstract class MatterInfuserBaseEntityBlock extends TCBaseEntityBlock {
                 if (blockstate.canSurvive(levelreader, blockpos)) {
                     BlockEntity blockEntity = levelreader.getBlockEntity(blockpos.relative(direction1.getOpposite()));
                     if (blockEntity instanceof FlowCedarCasingBlockEntity casingBlockEntity) {
+                        if (levelreader.isClientSide()) return blockstate;
                         if (casingBlockEntity.attachedDir != null) return null;
                         casingBlockEntity.attachedDir = direction1;
                     }

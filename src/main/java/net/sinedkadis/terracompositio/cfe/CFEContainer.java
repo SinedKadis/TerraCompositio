@@ -15,7 +15,10 @@ import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.network.PacketDistributor;
 import net.sinedkadis.terracompositio.api.TerraCompositioAPI;
 import net.sinedkadis.terracompositio.api.networks.NetworkAction;
-import net.sinedkadis.terracompositio.api.networks.cfe.*;
+import net.sinedkadis.terracompositio.api.networks.cfe.CFENetworkMember;
+import net.sinedkadis.terracompositio.api.networks.cfe.CFENetworkMemberBE;
+import net.sinedkadis.terracompositio.api.networks.cfe.CFENetworkMemberEntity;
+import net.sinedkadis.terracompositio.api.networks.cfe.ICFEHandler;
 import net.sinedkadis.terracompositio.cfe.burst.CFEBurstProjectileEntity;
 import net.sinedkadis.terracompositio.network.TCPackets;
 import net.sinedkadis.terracompositio.network.packets.S2CPlayerCfeContainerSync;
@@ -39,7 +42,7 @@ public class CFEContainer implements ICFEHandler, INBTSerializable<CompoundTag> 
     @Override
     public String toString() {
         return "CFEContainer{" +
-                "\nattachedMember=" + attachedMember +
+                // "\n attachedMember=" + attachedMember +
                 ",\n CFE=" + CFE +
                 ",\n maxCFE=" + maxCFE +
                 ",\n queued=" + queued +

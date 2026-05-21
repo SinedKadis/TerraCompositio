@@ -9,7 +9,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.items.ItemStackHandler;
+import net.minecraftforge.items.IItemHandlerModifiable;
 import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBEBehaviour;
 import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBECFEBehaviour;
 import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBEItemBehaviour;
@@ -53,13 +53,13 @@ public class MatterInfuserIOBlockEntity extends MatterInfuserBaseBlockEntity{
         }.range(10));
         list.add(new ManySlotItemHandlerBehaviour(this) {
             @Override
-            public boolean allowExtract(int pSlot, ItemStack pStack, @Nullable Direction pDirection) {
+            public boolean allowExtract(int pSlot, ItemStack pStack, @Nullable Direction pDirection, boolean manual) {
                 return false;
             }
 
             @Override
-            public boolean allowInsert(int pSlot, ItemStack pStack, @Nullable Direction pDirection) {
-                return pDirection == null && pStack.getCount() >= 2 && pStack.is(TCItems.INFUSED_IRON_ROD.get());
+            public boolean allowInsert(int pSlot, ItemStack pStack, @Nullable Direction pDirection, boolean manual) {
+                return manual && pStack.getCount() >= 2 && pStack.is(TCItems.INFUSED_IRON_ROD.get());
             }
 
             @Override
@@ -99,7 +99,7 @@ public class MatterInfuserIOBlockEntity extends MatterInfuserBaseBlockEntity{
             ItemStack result = recipe.get().getResultItem(null);
             int takeCount = recipe.get().getIngredients().get(1).getItems()[0].getCount();
 
-            ItemStackHandler itemHandler = casingBE.getItemHandler();
+            IItemHandlerModifiable itemHandler = casingBE.getItemHandler();
             IBEItemBehaviour itemBehaviour = casingBE.getItemBehaviour();
 
             if (itemBehaviour instanceof ManySlotItemHandlerBehaviour itemHandlerBehaviour) {
@@ -147,7 +147,7 @@ public class MatterInfuserIOBlockEntity extends MatterInfuserBaseBlockEntity{
     }
 
     @Override
-    protected ItemStackHandler getItemHandler() {
+    protected IItemHandlerModifiable getItemHandler() {
         FlowCedarCasingBlockEntity casingBE = getCasingBE();
         if (casingBE != null)
             return casingBE.getItemHandler();

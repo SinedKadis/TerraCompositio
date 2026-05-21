@@ -2,7 +2,7 @@ package net.sinedkadis.terracompositio.block.entity;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.items.ItemStackHandler;
+import net.minecraftforge.items.IItemHandlerModifiable;
 import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBEBehaviour;
 import net.sinedkadis.terracompositio.registries.TCBlockEntities;
 import org.jetbrains.annotations.NotNull;
@@ -16,7 +16,7 @@ public class MatterInfuserPortBlockEntity extends MatterInfuserBaseBlockEntity {
     }
 
     @Override
-    protected ItemStackHandler getItemHandler() {
+    protected IItemHandlerModifiable getItemHandler() {
         FlowCedarCasingBlockEntity casingBE = getCasingBE();
         if (casingBE != null) {
             return casingBE.getItemHandler();

@@ -41,19 +41,14 @@ public class ManySlotItemHandlerBehaviour implements IBEItemBehaviour, WorldlyCo
         }
 
         @Override
-        public boolean isItemValid(int slot, ItemStack stack) {
-            return allowInsert(slot, stack);
-        }
-
-        @Override
         public ItemStack insertItem(int slot, ItemStack stack, boolean simulate) {
-            if (!allowInsert(slot, stack) && !ignoreRestrictions) return stack;
+            if (!allowInsert(slot, stack, null, false) && !ignoreRestrictions) return stack;
             return super.insertItem(slot, stack, simulate);
         }
 
         @Override
         public ItemStack extractItem(int slot, int amount, boolean simulate) {
-            if (!allowExtract(slot, getStackInSlot(slot)) && !ignoreRestrictions) return ItemStack.EMPTY;
+            if (!allowExtract(slot, getStackInSlot(slot), null, false) && !ignoreRestrictions) return ItemStack.EMPTY;
             return super.extractItem(slot, amount, simulate);
         }
     };
@@ -73,21 +68,13 @@ public class ManySlotItemHandlerBehaviour implements IBEItemBehaviour, WorldlyCo
         return 64;
     }
 
-    private boolean allowExtract(int pSlot, ItemStack pStack) {
-        return allowExtract(pSlot, pStack, null);
-    }
-
     @Override
-    public boolean allowExtract(int pSlot, ItemStack pStack, @Nullable Direction pDirection) {
+    public boolean allowExtract(int pSlot, ItemStack pStack, @Nullable Direction pDirection, boolean manual) {
         return true;
     }
 
-    private boolean allowInsert(int pSlot, ItemStack pStack) {
-        return allowInsert(pSlot, pStack, null);
-    }
-
     @Override
-    public boolean allowInsert(int pSlot, ItemStack pStack, @Nullable Direction pDirection) {
+    public boolean allowInsert(int pSlot, ItemStack pStack, @Nullable Direction pDirection, boolean manual) {
         return true;
     }
 
@@ -147,17 +134,21 @@ public class ManySlotItemHandlerBehaviour implements IBEItemBehaviour, WorldlyCo
         for (int i = 0; i < itemHandler.getSlots(); i++) {
             ItemStack slot = itemHandler.getStackInSlot(i);
 
-            if (!slot.isEmpty() && allowExtract(i, slot)) {
+            if (!slot.isEmpty() && allowExtract(i, slot, pHit.getDirection(), true)) {
+                ignoreRestrictions = true;
                 ItemStack extracted = itemHandler.extractItem(i, 64, false);
+                ignoreRestrictions = false;
                 TCUtil.addOrDropToPlayer(pPlayer, extracted);
                 level.playSound(pPlayer, blockPos, SoundEvents.ITEM_FRAME_REMOVE_ITEM, SoundSource.BLOCKS);
-                return InteractionResult.sidedSuccess(level.isClientSide());
+                return InteractionResult.SUCCESS;
             }
-            if (!itemInHand.isEmpty() && allowInsert(i, itemInHand) && hasSpace(itemHandler, i)) {
+            if (!itemInHand.isEmpty() && allowInsert(i, itemInHand, pHit.getDirection(), true) && hasSpace(itemHandler, i)) {
+                ignoreRestrictions = true;
                 ItemStack left = itemHandler.insertItem(i, itemInHand.copy(), false);
+                ignoreRestrictions = false;
                 pPlayer.setItemInHand(pHand, left);
                 level.playSound(pPlayer, blockPos, SoundEvents.ITEM_FRAME_ADD_ITEM, SoundSource.BLOCKS);
-                return InteractionResult.sidedSuccess(level.isClientSide());
+                return InteractionResult.SUCCESS;
             }
         }
 
@@ -178,12 +169,12 @@ public class ManySlotItemHandlerBehaviour implements IBEItemBehaviour, WorldlyCo
 
     @Override
     public boolean canPlaceItemThroughFace(int pIndex, ItemStack pItemStack, @Nullable Direction pDirection) {
-        return allowInsert(pIndex, pItemStack, pDirection);
+        return allowInsert(pIndex, pItemStack, pDirection, false);
     }
 
     @Override
     public boolean canTakeItemThroughFace(int pIndex, ItemStack pStack, Direction pDirection) {
-        return allowExtract(pIndex, pStack, pDirection);
+        return allowExtract(pIndex, pStack, pDirection, false);
     }
 
     @Override

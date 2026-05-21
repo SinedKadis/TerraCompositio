@@ -64,6 +64,7 @@ public abstract class TCBlockEntity extends BlockEntity{
                 .filter(Objects::nonNull)
                 .findAny();
         return behaviourCap.<LazyOptional<T>>map(LazyOptional::cast).orElseGet(() -> super.getCapability(cap, side));
+        //return super.getCapability(cap, side);
     }
 
     public void tick(Level pLevel, BlockPos pPos, BlockState pState) {

@@ -8,7 +8,7 @@ import org.jetbrains.annotations.Nullable;
 public interface IBEItemBehaviour extends IBEBehaviour {
     ItemStackHandler getItemHandler();
 
-    boolean allowExtract(int pSlot, ItemStack pStack, @Nullable Direction pDirection);
+    boolean allowExtract(int pSlot, ItemStack pStack, @Nullable Direction pDirection, boolean manualExtraction);
 
-    boolean allowInsert(int pSlot, ItemStack pStack, @Nullable Direction pDirection);
+    boolean allowInsert(int pSlot, ItemStack pStack, @Nullable Direction pDirection, boolean manualInsertion);
 }

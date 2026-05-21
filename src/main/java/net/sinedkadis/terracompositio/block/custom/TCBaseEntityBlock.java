@@ -50,6 +50,7 @@ public abstract class TCBaseEntityBlock extends Block implements EntityBlock {
 
     @Override
     public void onRemove(BlockState pState,  Level pLevel, BlockPos pPos, BlockState pNewState, boolean pIsMoving) {
+
         if (pState.getBlock() != pNewState.getBlock()){
             TCBlockEntity blockEntity = (TCBlockEntity) pLevel.getBlockEntity(pPos);
             if (blockEntity != null){
@@ -80,11 +81,12 @@ public abstract class TCBaseEntityBlock extends Block implements EntityBlock {
     public InteractionResult use(BlockState pState,Level pLevel, BlockPos pPos,Player pPlayer, InteractionHand pHand, BlockHitResult pHit) {
         BlockEntity entity =  pLevel.getBlockEntity(pPos);
         if (entity instanceof TCBlockEntity tcBlockEntity) {
-            boolean sidedSuccess = tcBlockEntity.getBehaviours().stream()
+            boolean match = tcBlockEntity.getBehaviours().stream()
                     .map(ibeBehaviour -> ibeBehaviour.onUse(pPlayer, pHand, pHit))
-                    .anyMatch(interactionResult -> interactionResult.equals(InteractionResult.sidedSuccess(pLevel.isClientSide())));
-            return sidedSuccess ? InteractionResult.SUCCESS : InteractionResult.PASS;
+                    .anyMatch(interactionResult -> interactionResult.equals(InteractionResult.SUCCESS));
+            return match ? InteractionResult.SUCCESS : InteractionResult.PASS;
         }
+        //return super.use(pState,pLevel,pPos,pPlayer,pHand,pHit);
         return InteractionResult.PASS;
     }
 
