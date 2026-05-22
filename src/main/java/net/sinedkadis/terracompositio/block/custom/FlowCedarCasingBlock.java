@@ -24,6 +24,7 @@ import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandlerItem;
 import net.sinedkadis.terracompositio.block.IFluidApplicable;
+import net.sinedkadis.terracompositio.block.entity.FlowCedarCasingBlockEntity;
 import net.sinedkadis.terracompositio.block.entity.TCBlockEntity;
 import net.sinedkadis.terracompositio.registries.TCBlockEntities;
 import net.sinedkadis.terracompositio.registries.TCBlockStateProperties;
@@ -95,6 +96,18 @@ public class FlowCedarCasingBlock extends TCBaseEntityBlock implements IFluidApp
     @Override
     protected BlockEntityType<? extends TCBlockEntity> getBlockEntityType() {
         return TCBlockEntities.FLOW_CEDAR_CASING_BE.get();
+    }
+
+    @Override
+    public void onRemove(BlockState pState, Level pLevel, BlockPos pPos, BlockState pNewState, boolean pIsMoving) {
+        FlowCedarCasingBlockEntity blockEntity = ((FlowCedarCasingBlockEntity) pLevel.getBlockEntity(pPos));
+        if (blockEntity != null) {
+            Direction attachedDir = blockEntity.attachedDir;
+            if (attachedDir != null) {
+                pLevel.destroyBlock(pPos.relative(attachedDir), true);
+            }
+        }
+        super.onRemove(pState, pLevel, pPos, pNewState, pIsMoving);
     }
 
     @Override

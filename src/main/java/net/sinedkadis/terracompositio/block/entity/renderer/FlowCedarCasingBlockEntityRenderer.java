@@ -21,6 +21,7 @@ import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemStackHandler;
 import net.sinedkadis.terracompositio.block.custom.FlowCedarCasingBlock;
 import net.sinedkadis.terracompositio.block.entity.FlowCedarCasingBlockEntity;
+import net.sinedkadis.terracompositio.registries.TCItems;
 import net.sinedkadis.terracompositio.util.TCUtil;
 import org.jetbrains.annotations.NotNull;
 
@@ -70,25 +71,53 @@ public class FlowCedarCasingBlockEntityRenderer implements BlockEntityRenderer<F
             if (stackInSlot.isEmpty()) return;
             Direction facing = pBlockEntity.attachedDir;
 
-            pPoseStack.pushPose();
+            {
+                pPoseStack.pushPose();
 
-            pPoseStack.mulPose(Axis.YP.rotationDegrees(facing.toYRot()));
-            pPoseStack.mulPose(Axis.XP.rotationDegrees(90));
-            pPoseStack.mulPose(Axis.YP.rotationDegrees(-45));
-            //Bottom center
-            pPoseStack.translate(0.5f, -0.05f, 0.5f);
-            Vec3i normal = facing.getNormal();
-            //Move to edges
-            pPoseStack.translate(normal.getX() * 0.25f, 0, normal.getZ() * 0.25f);
-            Vec3 vec3 = Vec3.atLowerCornerOf(normal);
-            Vec3 rotatedVec3 = vec3.yRot((float) ((Math.PI) / 2f));
-            //Move lil right
-            pPoseStack.translate(rotatedVec3.x() * 0.1f, 0, normal.getZ() * rotatedVec3.z() * 0.1f);
+                //Bottom center
+                pPoseStack.translate(0.5f, 0.0f, 0.5f);
+                Vec3i normal = facing.getNormal();
+                //Move to edges
+                pPoseStack.translate(normal.getX() * 0.1f, 0, normal.getZ() * 0.25f);
+                Vec3 vec3 = Vec3.atLowerCornerOf(normal);
+                Vec3 rotatedVec3 = vec3.yRot((float) ((Math.PI) / 2f));
+                //Move lil right
+                pPoseStack.translate(rotatedVec3.x() * 0.1f, 0, normal.getZ() * rotatedVec3.z() * 0.1f);
 
-            itemRenderer.renderStatic(stackInSlot, ItemDisplayContext.FIXED, TCUtil.getLightLevel(level, pBlockEntity.getBlockPos(), Direction.DOWN),
-                    OverlayTexture.NO_OVERLAY, pPoseStack, pBuffer, level, 1);
+                pPoseStack.mulPose(Axis.YP.rotationDegrees(facing.toYRot() - 90));
+                pPoseStack.mulPose(Axis.YP.rotationDegrees(-45));
+                pPoseStack.mulPose(Axis.XP.rotationDegrees(90));
 
-            pPoseStack.popPose();
+                itemRenderer.renderStatic(TCItems.HALF_ROD.get().getDefaultInstance(), ItemDisplayContext.FIXED, TCUtil.getLightLevel(level, pBlockEntity.getBlockPos(), Direction.DOWN),
+                        OverlayTexture.NO_OVERLAY, pPoseStack, pBuffer, level, 1);
+
+                pPoseStack.popPose();
+            }
+
+            {
+                pPoseStack.pushPose();
+
+                //To center
+                pPoseStack.translate(0.5f, 0.55f, 0.5f);
+                Vec3i normal = facing.getNormal();
+                Vec3 vec3 = Vec3.atLowerCornerOf(normal);
+                //To MI cords
+                pPoseStack.translate(normal.getX(), 0, normal.getZ());
+                // To face
+                pPoseStack.translate(vec3.scale(-1).x() * 0.5f, 0, vec3.scale(-1).z() * 0.5f);
+
+                Vec3 rotatedVec3 = vec3.yRot((float) ((Math.PI) / 2f));
+                // To right
+                pPoseStack.translate(rotatedVec3.x() * 0.1f, 0, rotatedVec3.z() * 0.1f);
+
+                pPoseStack.mulPose(Axis.YP.rotationDegrees(facing.toYRot()));
+                pPoseStack.mulPose(Axis.ZP.rotationDegrees(135));
+
+                itemRenderer.renderStatic(TCItems.HALF_ROD.get().getDefaultInstance(), ItemDisplayContext.FIXED, TCUtil.getLightLevel(level, pBlockEntity.getBlockPos(), facing),
+                        OverlayTexture.NO_OVERLAY, pPoseStack, pBuffer, level, 1);
+
+                pPoseStack.popPose();
+            }
         }
 
 
@@ -105,26 +134,55 @@ public class FlowCedarCasingBlockEntityRenderer implements BlockEntityRenderer<F
             ItemStack stackInSlot = itemStackHandler.getStackInSlot(FlowCedarCasingBlockEntity.UP_CONNECTION_SLOT);
             if (stackInSlot.isEmpty()) return;
             Direction facing = pBlockEntity.attachedDir;
+            {
+                pPoseStack.pushPose();
 
-            pPoseStack.pushPose();
+                //Top center
+                pPoseStack.translate(0.5f, 1.0f, 0.5f);
+                Vec3i normal = facing.getNormal();
+                //Move to edges
+                float move1 = -0.05f;
+                pPoseStack.translate(normal.getX() * move1, 0, normal.getZ() * move1);
+                Vec3 vec3 = Vec3.atLowerCornerOf(normal);
+                Vec3 rotatedVec3 = vec3.yRot((float) ((3 * Math.PI) / 2f)).normalize();
+                //Move lil left
+                pPoseStack.translate(rotatedVec3.x() * 0.1f, 0, normal.getZ() * rotatedVec3.z() * 0.1f);
 
-            pPoseStack.mulPose(Axis.YP.rotationDegrees(facing.toYRot()));
-            pPoseStack.mulPose(Axis.XP.rotationDegrees(90));
-            pPoseStack.mulPose(Axis.YP.rotationDegrees(-45));
-            //Bottom center
-            pPoseStack.translate(0.5f, 1.05f, 0.5f);
-            Vec3i normal = facing.getNormal();
-            //Move to edges
-            pPoseStack.translate(normal.getX() * 0.25f, 0, normal.getZ() * 0.25f);
-            Vec3 vec3 = Vec3.atLowerCornerOf(normal);
-            Vec3 rotatedVec3 = vec3.yRot((float) ((3 * Math.PI) / 2f));
-            //Move lil left
-            pPoseStack.translate(rotatedVec3.x() * 0.1f, 0, normal.getZ() * rotatedVec3.z() * 0.1f);
+                pPoseStack.mulPose(Axis.ZP.rotationDegrees(180));
+                pPoseStack.mulPose(Axis.YP.rotationDegrees(facing.toYRot() + 90));
+                pPoseStack.mulPose(Axis.YP.rotationDegrees(-45));
+                pPoseStack.mulPose(Axis.XP.rotationDegrees(90));
 
-            itemRenderer.renderStatic(stackInSlot, ItemDisplayContext.FIXED, TCUtil.getLightLevel(level, pBlockEntity.getBlockPos(), Direction.DOWN),
-                    OverlayTexture.NO_OVERLAY, pPoseStack, pBuffer, level, 1);
 
-            pPoseStack.popPose();
+                itemRenderer.renderStatic(TCItems.HALF_ROD.get().getDefaultInstance(), ItemDisplayContext.FIXED, TCUtil.getLightLevel(level, pBlockEntity.getBlockPos(), Direction.UP),
+                        OverlayTexture.NO_OVERLAY, pPoseStack, pBuffer, level, 1);
+
+                pPoseStack.popPose();
+            }
+            {
+                pPoseStack.pushPose();
+
+                //To center
+                pPoseStack.translate(0.5f, 0.45f, 0.5f);
+                Vec3i normal = facing.getNormal();
+                Vec3 vec3 = Vec3.atLowerCornerOf(normal);
+                //To MI cords
+                pPoseStack.translate(normal.getX(), 0, normal.getZ());
+                // To face
+                pPoseStack.translate(vec3.scale(-1).x() * 0.5f, 0, vec3.scale(-1).z() * 0.5f);
+
+                Vec3 rotatedVec3 = vec3.yRot((float) ((3 * Math.PI) / 2f)).normalize();
+                // To left
+                pPoseStack.translate(rotatedVec3.x() * 0.1f, 0, rotatedVec3.z() * 0.1f);
+
+                pPoseStack.mulPose(Axis.YP.rotationDegrees(facing.toYRot() + 180));
+                pPoseStack.mulPose(Axis.ZP.rotationDegrees(-45));
+
+                itemRenderer.renderStatic(TCItems.HALF_ROD.get().getDefaultInstance(), ItemDisplayContext.FIXED, TCUtil.getLightLevel(level, pBlockEntity.getBlockPos(), facing),
+                        OverlayTexture.NO_OVERLAY, pPoseStack, pBuffer, level, 1);
+
+                pPoseStack.popPose();
+            }
         }
 
     }

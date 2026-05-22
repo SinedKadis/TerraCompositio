@@ -74,7 +74,21 @@ public abstract class MatterInfuserBaseEntityBlock extends TCBaseEntityBlock {
     public InteractionResult use(BlockState pState, Level pLevel, BlockPos pPos, Player pPlayer, InteractionHand pHand, BlockHitResult pHit) {
         InteractionResult use = super.use(pState, pLevel, pPos, pPlayer, pHand, pHit);
         if (!use.equals(InteractionResult.SUCCESS)) {
-            return pLevel.getBlockState(pPos.relative(pState.getValue(FACING).getOpposite())).use(pLevel, pPlayer, pHand, pHit);
+            Direction direction = pState.getValue(FACING);
+
+            BlockPos behindPos = pPos.relative(direction.getOpposite());
+            BlockState behindState = pLevel.getBlockState(behindPos);
+            InteractionResult behindUse = behindState.use(pLevel, pPlayer, pHand, pHit.withPosition(behindPos));
+            if (behindUse.equals(InteractionResult.SUCCESS))
+                return InteractionResult.SUCCESS;
+
+            BlockPos rightPos = pPos.relative(direction.getCounterClockWise());
+            BlockState rightState = pLevel.getBlockState(rightPos);
+            InteractionResult rightUse = InteractionResult.PASS;
+            if (rightState.getBlock() instanceof MatterInfuserBaseEntityBlock)
+                rightUse = rightState.use(pLevel, pPlayer, pHand, pHit.withPosition(rightPos));
+            if (rightUse.equals(InteractionResult.SUCCESS))
+                return InteractionResult.SUCCESS;
         }
         return use;
     }

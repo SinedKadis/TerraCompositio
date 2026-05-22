@@ -15,6 +15,7 @@ import net.minecraftforge.items.ItemStackHandler;
 import net.minecraftforge.items.wrapper.EmptyHandler;
 import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBEBehaviour;
 import net.sinedkadis.terracompositio.block.behaviours.ManySlotItemHandlerBehaviour;
+import net.sinedkadis.terracompositio.block.custom.MatterInfuserBaseEntityBlock;
 import net.sinedkadis.terracompositio.registries.TCBlockEntities;
 import net.sinedkadis.terracompositio.registries.TCItems;
 import org.jetbrains.annotations.Nullable;
@@ -69,17 +70,34 @@ public class FlowCedarCasingBlockEntity extends TCCraftingBlockEntity{
 
             @Override
             public boolean allowInsert(int pSlot, ItemStack pStack, @Nullable Direction pDirection, boolean manual) {
-                if (isInventorySlot(pSlot) && this.itemHandler.getStackInSlot(INPUT_BUS_SLOT).isEmpty()) return false;
+                boolean inputBusAbsent = this.itemHandler.getStackInSlot(INPUT_BUS_SLOT).isEmpty();
+                if (isInventorySlot(pSlot) && inputBusAbsent) return false;
                 boolean noDir = pDirection == null;
                 boolean isInputSlot = pSlot == INPUT_INVENTORY_SLOT;
                 boolean directionIsUp = !noDir && pDirection.equals(Direction.UP);
                 boolean utilitySlot = !isInventorySlot(pSlot);
-                boolean allow = noDir || (isInputSlot && directionIsUp) || utilitySlot;
+
+                Level level = FlowCedarCasingBlockEntity.this.level;
+                if (level == null) return false;
+
+                boolean isMIConnected = attachedDir != null
+                        && level.getBlockState(worldPosition.relative(attachedDir)).getBlock() instanceof MatterInfuserBaseEntityBlock;
+
+                boolean isUpConnectionAllow = utilitySlot && !inputBusAbsent && isMIConnected;
+
+                boolean outputBusAbsent = this.itemHandler.getStackInSlot(OUTPUT_BUS_SLOT).isEmpty();
+                boolean isDownConnectionAllow = utilitySlot && !outputBusAbsent && isMIConnected;
+                boolean isBus = pSlot <= OUTPUT_BUS_SLOT;
+
+                boolean allowUtility = utilitySlot && (isBus || isUpConnectionAllow || isDownConnectionAllow);
+                boolean allowInventory = isInputSlot && directionIsUp;
+
+                boolean allow = allowInventory || allowUtility;
                 if (allow) {
                     return switch (pSlot) {
                         case INPUT_BUS_SLOT -> pStack.is(TCItems.INPUT_BUS.get());
                         case OUTPUT_BUS_SLOT -> pStack.is(TCItems.OUTPUT_BUS.get());
-                        case UP_CONNECTION_SLOT, DOWN_CONNECTION_SLOT -> pStack.is(TCItems.TECHNETIUM_ROD.get());
+                        case UP_CONNECTION_SLOT, DOWN_CONNECTION_SLOT -> pStack.is(TCItems.INFUSED_IRON_ROD.get());
                         default -> true;
                     };
                 }

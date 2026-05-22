@@ -19,7 +19,6 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemStackHandler;
-import net.sinedkadis.terracompositio.block.entity.FlowCedarCasingBlockEntity;
 import net.sinedkadis.terracompositio.block.entity.MatterInfuserIOBlockEntity;
 import net.sinedkadis.terracompositio.util.TCUtil;
 import org.jetbrains.annotations.NotNull;
@@ -47,90 +46,6 @@ public class MatterInfuserIOBlockEntityRenderer implements BlockEntityRenderer<M
         if (!(iItemHandler instanceof ItemStackHandler itemStackHandler)) return;
         if (level == null) return;
         renderLeftConnection(pBlockEntity, pPoseStack, pBuffer, level, blockState, itemRenderer, itemStackHandler);
-        renderUpConnection(pBlockEntity, pPoseStack, pBuffer, level, blockState, itemRenderer, itemStackHandler);
-        renderDownConnection(pBlockEntity, pPoseStack, pBuffer, level, blockState, itemRenderer, itemStackHandler);
-
-    }
-
-    private void renderDownConnection(MatterInfuserIOBlockEntity pBlockEntity,
-                                      @NotNull PoseStack pPoseStack,
-                                      @NotNull MultiBufferSource pBuffer,
-                                      Level level,
-                                      BlockState blockState,
-                                      ItemRenderer itemRenderer,
-                                      ItemStackHandler ignoredItemStackHandler) {
-        FlowCedarCasingBlockEntity casingBE = pBlockEntity.getCasingBE();
-        if (casingBE == null) return;
-        @SuppressWarnings("DataFlowIssue")
-        IItemHandler iitemHandler = casingBE.getCapability(ForgeCapabilities.ITEM_HANDLER).orElse(null);
-        if (!(iitemHandler instanceof ItemStackHandler itemHandler)) return;
-
-        ItemStack stackInSlot = itemHandler.getStackInSlot(FlowCedarCasingBlockEntity.DOWN_CONNECTION_SLOT);
-        if (!stackInSlot.isEmpty()) {
-            Direction facing = blockState.getValue(BlockStateProperties.HORIZONTAL_FACING);
-
-            pPoseStack.pushPose();
-
-            pPoseStack.mulPose(Axis.YP.rotationDegrees(facing.toYRot()));
-            pPoseStack.mulPose(Axis.ZP.rotationDegrees(-45));
-
-            //To center
-            pPoseStack.translate(0.5f, 0.25f, 0.5f);
-            Vec3i normal = facing.getNormal();
-            Vec3 vec3 = Vec3.atLowerCornerOf(normal);
-            // To face
-            pPoseStack.translate(vec3.scale(-1).x() * 0.5f, 0, vec3.scale(-1).z() * 0.5f);
-
-            Vec3 rotatedVec3 = vec3.yRot((float) ((Math.PI) / 2f));
-            // To right
-            pPoseStack.translate(rotatedVec3.x() * 0.1f, 0, rotatedVec3.z() * 0.1f);
-
-            itemRenderer.renderStatic(stackInSlot, ItemDisplayContext.FIXED, TCUtil.getLightLevel(level, pBlockEntity.getBlockPos(), Direction.UP),
-                    OverlayTexture.NO_OVERLAY, pPoseStack, pBuffer, level, 1);
-
-            pPoseStack.popPose();
-        }
-
-    }
-
-    private void renderUpConnection(MatterInfuserIOBlockEntity pBlockEntity,
-                                    @NotNull PoseStack pPoseStack,
-                                    @NotNull MultiBufferSource pBuffer,
-                                    Level level,
-                                    BlockState blockState,
-                                    ItemRenderer itemRenderer,
-                                    ItemStackHandler ignoredItemStackHandler) {
-        FlowCedarCasingBlockEntity casingBE = pBlockEntity.getCasingBE();
-        if (casingBE == null) return;
-        @SuppressWarnings("DataFlowIssue")
-        IItemHandler iitemHandler = casingBE.getCapability(ForgeCapabilities.ITEM_HANDLER).orElse(null);
-        if (!(iitemHandler instanceof ItemStackHandler itemHandler)) return;
-
-        ItemStack stackInSlot = itemHandler.getStackInSlot(FlowCedarCasingBlockEntity.UP_CONNECTION_SLOT);
-        if (!stackInSlot.isEmpty()) {
-            Direction facing = blockState.getValue(BlockStateProperties.HORIZONTAL_FACING);
-
-            pPoseStack.pushPose();
-
-            pPoseStack.mulPose(Axis.YP.rotationDegrees(facing.toYRot()));
-            pPoseStack.mulPose(Axis.ZP.rotationDegrees(-45));
-
-            //To center
-            pPoseStack.translate(0.5f, 0.75f, 0.5f);
-            Vec3i normal = facing.getNormal();
-            Vec3 vec3 = Vec3.atLowerCornerOf(normal);
-            // To face
-            pPoseStack.translate(vec3.scale(-1).x() * 0.5f, 0, vec3.scale(-1).z() * 0.5f);
-
-            Vec3 rotatedVec3 = vec3.yRot((float) ((3 * Math.PI) / 2f));
-            // To left
-            pPoseStack.translate(rotatedVec3.x() * 0.1f, 0, rotatedVec3.z() * 0.1f);
-
-            itemRenderer.renderStatic(stackInSlot, ItemDisplayContext.FIXED, TCUtil.getLightLevel(level, pBlockEntity.getBlockPos(), Direction.UP),
-                    OverlayTexture.NO_OVERLAY, pPoseStack, pBuffer, level, 1);
-
-            pPoseStack.popPose();
-        }
 
     }
 

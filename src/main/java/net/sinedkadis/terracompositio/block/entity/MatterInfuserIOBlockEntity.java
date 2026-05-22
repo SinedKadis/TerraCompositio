@@ -2,12 +2,16 @@ package net.sinedkadis.terracompositio.block.entity;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.SimpleContainer;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.items.IItemHandlerModifiable;
 import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBEBehaviour;
@@ -16,9 +20,11 @@ import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBEItemBehaviour
 import net.sinedkadis.terracompositio.api.networks.cfe.ICFEHandler;
 import net.sinedkadis.terracompositio.block.behaviours.CFEHandlerBehaviour;
 import net.sinedkadis.terracompositio.block.behaviours.ManySlotItemHandlerBehaviour;
+import net.sinedkadis.terracompositio.block.custom.MatterInfuserBaseEntityBlock;
 import net.sinedkadis.terracompositio.recipe.MatterInfusionRecipe;
 import net.sinedkadis.terracompositio.registries.TCBlockEntities;
 import net.sinedkadis.terracompositio.registries.TCItems;
+import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -59,12 +65,27 @@ public class MatterInfuserIOBlockEntity extends MatterInfuserBaseBlockEntity{
 
             @Override
             public boolean allowInsert(int pSlot, ItemStack pStack, @Nullable Direction pDirection, boolean manual) {
-                return manual && pStack.getCount() >= 2 && pStack.is(TCItems.INFUSED_IRON_ROD.get());
+                boolean enough = pStack.getCount() >= 2;
+                boolean isRod = pStack.is(TCItems.INFUSED_IRON_ROD.get());
+                return manual && enough && isRod;
             }
 
             @Override
             public int getLimitInSlot(int slot) {
                 return 2;
+            }
+
+            @Override
+            public @NotNull InteractionResult onUse(Player pPlayer, InteractionHand pHand, BlockHitResult pHit) {
+                TCBlockEntity blockEntity = getBlockEntity();
+                Level level = blockEntity.getLevel();
+                if (level != null) {
+                    BlockPos blockPos = blockEntity.getBlockPos();
+                    Direction left = getBlockState().getValue(BlockStateProperties.HORIZONTAL_FACING).getClockWise();
+                    if (level.getBlockState(blockPos.relative(left)).getBlock() instanceof MatterInfuserBaseEntityBlock)
+                        return super.onUse(pPlayer, pHand, pHit);
+                }
+                return InteractionResult.PASS;
             }
         });
 

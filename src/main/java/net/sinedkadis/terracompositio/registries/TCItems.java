@@ -84,6 +84,8 @@ public class TCItems {
             () -> new Item(new Item.Properties()));
     public static final RegistryObject<Item> OUTPUT_BUS = ITEMS.register("copper_output_bus",
             () -> new Item(new Item.Properties()));
+    public static final RegistryObject<Item> HALF_ROD = ITEMS.register("half_rod",
+            () -> new Item(new Item.Properties()));
 
 
 

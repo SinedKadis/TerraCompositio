@@ -85,6 +85,7 @@ public class TCItemModelProvider extends ItemModelProvider {
         simpleItem(TCItems.INPUT_BUS);
         simpleItem(TCItems.OUTPUT_BUS);
         simpleItem(TCItems.COPPER_ROD);
+        simpleItem(TCItems.HALF_ROD);
 
         simpleItem(TCItems.TECHNETIUM_INGOT);
         simpleItem(TCItems.TECHNETIUM_ROD);
