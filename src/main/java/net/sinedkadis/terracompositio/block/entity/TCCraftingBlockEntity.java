@@ -5,7 +5,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.items.ItemStackHandler;
+import net.minecraftforge.items.IItemHandlerModifiable;
 import net.sinedkadis.terracompositio.api.TCCapabilities;
 import net.sinedkadis.terracompositio.api.dummies.DummyCFEHandler;
 
@@ -43,29 +43,29 @@ public abstract class TCCraftingBlockEntity extends TCBlockEntity{
 
 
     protected boolean sameItemInOutput(Item item) {
-        return this.itemHandler().getStackInSlot(getOutputSlotIndex()).isEmpty() || this.itemHandler().getStackInSlot(getOutputSlotIndex()).is(item);
+        return this.getItemHandler().getStackInSlot(getOutputSlotIndex()).isEmpty() || this.getItemHandler().getStackInSlot(getOutputSlotIndex()).is(item);
     }
 
     public int getOutputSlotIndex() {
-        return itemHandler().getSlots() - 1;
+        return getItemHandler().getSlots() - 1;
     }
 
     protected boolean enoughSpaceInOutput(int count) {
-        return this.itemHandler().getStackInSlot(getOutputSlotIndex()).getCount() + count
-                <= Math.min(this.itemHandler().getStackInSlot(getOutputSlotIndex()).getMaxStackSize(),
-                itemHandler().getSlotLimit(1));
+        return this.getItemHandler().getStackInSlot(getOutputSlotIndex()).getCount() + count
+                <= Math.min(this.getItemHandler().getStackInSlot(getOutputSlotIndex()).getMaxStackSize(),
+                getItemHandler().getSlotLimit(1));
     }
 
     protected ItemStack craftItem(){return ItemStack.EMPTY;}
     protected Optional<?> getCurrentRecipe(){return Optional.empty();}
     protected boolean hasRecipe(){return false;}
 
-    abstract protected ItemStackHandler itemHandler();
+    abstract protected IItemHandlerModifiable getItemHandler();
 
     public ItemStack getRenderStack() {
-        for (int i = itemHandler().getSlots()-1; i>=0; i--){
-            if (!itemHandler().getStackInSlot(i).isEmpty()){
-                return itemHandler().getStackInSlot(i);
+        for (int i = getItemHandler().getSlots() - 1; i >= 0; i--) {
+            if (!getItemHandler().getStackInSlot(i).isEmpty()) {
+                return getItemHandler().getStackInSlot(i);
             }
         }
         return ItemStack.EMPTY;

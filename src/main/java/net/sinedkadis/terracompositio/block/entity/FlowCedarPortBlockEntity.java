@@ -6,7 +6,8 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.world.*;
+import net.minecraft.world.MenuProvider;
+import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.inventory.AbstractContainerMenu;
@@ -15,9 +16,10 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
-import net.minecraftforge.items.ItemStackHandler;
+import net.minecraftforge.items.IItemHandlerModifiable;
+import net.minecraftforge.items.wrapper.EmptyHandler;
 import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBEBehaviour;
-import net.sinedkadis.terracompositio.block.behaviours.OneSlotItemHandlerBehaviour;
+import net.sinedkadis.terracompositio.block.behaviours.ManySlotItemHandlerBehaviour;
 import net.sinedkadis.terracompositio.recipe.FlowSaturationRecipe;
 import net.sinedkadis.terracompositio.registries.TCBlockEntities;
 import net.sinedkadis.terracompositio.screen.FlowBlockPortMenu;
@@ -82,7 +84,7 @@ public class FlowCedarPortBlockEntity extends TCCraftingBlockEntity implements M
 
     @Override
     public void addBEBehaviours(List<IBEBehaviour> list) {
-        list.add(new OneSlotItemHandlerBehaviour(this){
+        list.add(new ManySlotItemHandlerBehaviour(this) {
             @Override
             public int getLimitInSlot(int slot) {
                 return 1;
@@ -114,13 +116,13 @@ public class FlowCedarPortBlockEntity extends TCCraftingBlockEntity implements M
                 resetProgress();
             }
         }
-        if (pLevel.getRandom().nextFloat() < 0.005f && itemHandler().getStackInSlot(0).isEmpty()) {
+        if (pLevel.getRandom().nextFloat() < 0.005f && getItemHandler().getStackInSlot(0).isEmpty()) {
             pLevel.playSound(null, pPos, SoundEvents.ITEM_FRAME_ADD_ITEM, SoundSource.BLOCKS,2,1);
         }
     }
 
-    protected ItemStackHandler itemHandler() {
-        return (ItemStackHandler) this.getCapability(ForgeCapabilities.ITEM_HANDLER).orElse(null);
+    protected IItemHandlerModifiable getItemHandler() {
+        return (IItemHandlerModifiable) this.getCapability(ForgeCapabilities.ITEM_HANDLER).orElse(EmptyHandler.INSTANCE);
     }
 
     protected boolean hasRecipe() {
@@ -140,17 +142,17 @@ public class FlowCedarPortBlockEntity extends TCCraftingBlockEntity implements M
         Optional<FlowSaturationRecipe> recipe = getCurrentRecipe();
         if (recipe.isPresent()) {
             ItemStack result = recipe.get().getResultItem(null);
-            this.itemHandler().extractItem(0, 1, false);
-            this.itemHandler().insertItem(1, result,false);
+            this.getItemHandler().extractItem(0, 1, false);
+            this.getItemHandler().insertItem(1, result, false);
             return result;
         }
         return ItemStack.EMPTY;
     }
 
     protected Optional<FlowSaturationRecipe> getCurrentRecipe() {
-        SimpleContainer inventory = new SimpleContainer(this.itemHandler().getSlots());
-        for(int i = 0; i < itemHandler().getSlots(); i++) {
-            inventory.setItem(i, this.itemHandler().getStackInSlot(i));
+        SimpleContainer inventory = new SimpleContainer(this.getItemHandler().getSlots());
+        for (int i = 0; i < getItemHandler().getSlots(); i++) {
+            inventory.setItem(i, this.getItemHandler().getStackInSlot(i));
         }
 
         assert this.level != null;

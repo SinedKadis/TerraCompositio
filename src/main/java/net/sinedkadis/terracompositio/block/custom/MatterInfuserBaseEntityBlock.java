@@ -1,9 +1,11 @@
 package net.sinedkadis.terracompositio.block.custom;
 
+import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.world.entity.LivingEntity;
-import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
@@ -13,21 +15,15 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.DirectionProperty;
+import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import net.minecraftforge.common.capabilities.ForgeCapabilities;
-import net.minecraftforge.items.ItemStackHandler;
-import net.sinedkadis.terracompositio.block.entity.FlowCedarCasingBlockEntity;
 import net.sinedkadis.terracompositio.registries.TCBlocks;
-import net.sinedkadis.terracompositio.util.FunctionSide;
-import net.sinedkadis.terracompositio.util.TCUtil;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
 
-import java.util.Objects;
+import javax.annotation.ParametersAreNonnullByDefault;
 
 import static net.minecraft.world.level.block.state.properties.BlockStateProperties.AXIS;
-import static net.sinedkadis.terracompositio.block.custom.FlowCedarCasingBlock.FUNCTION_SIDE;
 
 @SuppressWarnings("deprecation")
 public abstract class MatterInfuserBaseEntityBlock extends TCBaseEntityBlock {
@@ -53,81 +49,72 @@ public abstract class MatterInfuserBaseEntityBlock extends TCBaseEntityBlock {
         BlockPos blockpos = pPos.relative(direction.getOpposite());
         BlockState blockstate = pLevel.getBlockState(blockpos);
         if (blockstate.hasProperty(AXIS) && blockstate.is(TCBlocks.FLOW_CEDAR_CASING.get()))
-            return direction.getAxis().isHorizontal() && blockstate.getValue(AXIS).equals(
-                    switch (direction) {
-                        case NORTH, SOUTH -> Direction.Axis.X;
-                        case WEST, EAST -> Direction.Axis.Z;
-                        default -> Direction.Axis.Y;
-                    });
+            return direction.getAxis().isHorizontal() && !blockstate.getValue(AXIS).equals(direction.getAxis());
         return false;
     }
 
+
+
+    @ParametersAreNonnullByDefault
+    @MethodsReturnNonnullByDefault
     @Override
-    public void onRemove(@NotNull BlockState pState, @NotNull Level pLevel, @NotNull BlockPos pPos, @NotNull BlockState pNewState, boolean pIsMoving) {
-        super.onRemove(pState, pLevel, pPos, pNewState, pIsMoving);
-        if (pState.getBlock() != pNewState.getBlock()) {
+    public InteractionResult use(BlockState pState, Level pLevel, BlockPos pPos, Player pPlayer, InteractionHand pHand, BlockHitResult pHit) {
+        InteractionResult use = super.use(pState, pLevel, pPos, pPlayer, pHand, pHit);
+        if (!use.equals(InteractionResult.SUCCESS)) {
             Direction direction = pState.getValue(FACING);
-            BlockPos blockpos = pPos.relative(direction.getOpposite());
-            BlockState blockstate = pLevel.getBlockState(blockpos);
-            if (blockstate.is(TCBlocks.FLOW_CEDAR_CASING.get())) {
-                FlowCedarCasingBlockEntity blockEntity = (FlowCedarCasingBlockEntity) Objects.requireNonNull(pLevel.getBlockEntity(blockpos));
-                TCUtil.dropContents(blockEntity);
-                blockEntity.getCapability(ForgeCapabilities.ITEM_HANDLER)
-                        .ifPresent(iItemHandler -> ((ItemStackHandler) iItemHandler).setSize(slotCount()));
-            }
+
+            BlockPos behindPos = pPos.relative(direction.getOpposite());
+            BlockState behindState = pLevel.getBlockState(behindPos);
+            InteractionResult behindUse = behindState.use(pLevel, pPlayer, pHand, pHit.withPosition(behindPos));
+            if (behindUse.equals(InteractionResult.SUCCESS))
+                return InteractionResult.SUCCESS;
+
+            BlockPos rightPos = pPos.relative(direction.getCounterClockWise());
+            BlockState rightState = pLevel.getBlockState(rightPos);
+            InteractionResult rightUse = InteractionResult.PASS;
+            if (rightState.getBlock() instanceof MatterInfuserBaseEntityBlock)
+                rightUse = rightState.use(pLevel, pPlayer, pHand, pHit.withPosition(rightPos));
+            if (rightUse.equals(InteractionResult.SUCCESS))
+                return InteractionResult.SUCCESS;
         }
+        return use;
     }
 
     public @NotNull VoxelShape getShape(BlockState pState, @NotNull BlockGetter pLevel, @NotNull BlockPos pPos, @NotNull CollisionContext pContext) {
-        return switch (pState.getValue(FACING)) {
-            case WEST -> WEST_AABB;
-            case SOUTH -> SOUTH_AABB;
-            case NORTH -> NORTH_AABB;
-            default -> EAST_AABB;
-        };
+        Direction direction = pState.getValue(FACING);
+        if (direction == Direction.SOUTH) {
+            return SOUTH_AABB;
+        } else if (direction == Direction.WEST) {
+            return WEST_AABB;
+        } else if (direction == Direction.NORTH) {
+            return NORTH_AABB;
+        }
+        return EAST_AABB;
     }
 
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext pContext) {
         BlockState blockstate = this.defaultBlockState();
-        LevelReader levelreader = pContext.getLevel();
+        Level level = pContext.getLevel();
         BlockPos blockpos = pContext.getClickedPos();
         Direction[] adirection = pContext.getNearestLookingDirections();
         for (Direction direction : adirection) {
             if (direction.getAxis().isHorizontal()) {
                 Direction direction1 = direction.getOpposite();
                 blockstate = blockstate.setValue(FACING, direction1);
-                if (blockstate.canSurvive(levelreader, blockpos)) {
+                if (blockstate.canSurvive(level, blockpos)) {
+                    BlockPos relative = blockpos.relative(direction1.getOpposite());
+                    BlockState blockState1 = level.getBlockState(relative);
+                    if (blockState1.is(TCBlocks.FLOW_CEDAR_CASING.get())) {
+                        if (blockState1.getValue(BlockStateProperties.FACING).getAxis().isHorizontal()) return null;
+                        level.setBlockAndUpdate(relative, blockState1.setValue(BlockStateProperties.FACING, direction1));
+                    }
                     return blockstate;
                 }
             }
         }
 
         return null;
-    }
-
-
-
-    @Override
-    public void setPlacedBy(@NotNull Level pLevel, @NotNull BlockPos pPos, @NotNull BlockState pState, @Nullable LivingEntity pPlacer, @NotNull ItemStack pStack) {
-        super.setPlacedBy(pLevel, pPos, pState, pPlacer, pStack);
-        Direction direction = pState.getValue(FACING);
-        BlockPos casingPos = pPos.relative(direction.getOpposite());
-        BlockState casingState = pLevel.getBlockState(casingPos);
-        if (casingState.is(TCBlocks.FLOW_CEDAR_CASING.get())) {
-            FunctionSide functionSideByDirection = FunctionSide.getFunctionSideByDirection(casingState, direction);
-            pLevel.setBlock(casingPos, casingState.setValue(FUNCTION_SIDE, functionSideByDirection), 3);
-            FlowCedarCasingBlockEntity blockEntity = (FlowCedarCasingBlockEntity) pLevel.getBlockEntity(casingPos);
-            if (blockEntity != null) {
-                TCUtil.dropContents(blockEntity);
-                blockEntity.getCapability(ForgeCapabilities.ITEM_HANDLER)
-                        .ifPresent(iItemHandler -> ((ItemStackHandler) iItemHandler).setSize(slotCount()));
-            }
-        }
-    }
-
-    protected int slotCount() {
-        return 2;
     }
 
     static {

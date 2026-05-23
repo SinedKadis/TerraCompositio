@@ -8,7 +8,10 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.world.*;
+import net.minecraft.world.Container;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
+import net.minecraft.world.WorldlyContainer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
@@ -165,19 +168,19 @@ public class TwoSlotItemHandlerBehaviour implements IBEItemBehaviour, WorldlyCon
 
 
         InteractionResult interactionResult = InteractionResult.SUCCESS;
-        if (!outputSlot.isEmpty()) {
+        if (!outputSlot.isEmpty() && allowExtract(OUTPUT, outputSlot, pHit.getDirection(), true)) {
             ItemStack extracted = itemHandler.extractItem(OUTPUT, 64, false);
             TCUtil.addOrDropToPlayer(pPlayer, extracted);
             level.playSound(pPlayer, blockPos, SoundEvents.ITEM_FRAME_REMOVE_ITEM, SoundSource.BLOCKS);
             return interactionResult;
         }
-        if(!itemInHand.isEmpty()) {
+        if (!itemInHand.isEmpty() && allowInsert(INPUT, itemInHand, pHit.getDirection(), true)) {
             ItemStack left = itemHandler.insertItem(INPUT, itemInHand.copy(), false);
             pPlayer.setItemInHand(pHand,left);
             level.playSound(pPlayer,blockPos, SoundEvents.ITEM_FRAME_ADD_ITEM, SoundSource.BLOCKS);
             return interactionResult;
         }
-        if (!inputSlot.isEmpty()) {
+        if (!inputSlot.isEmpty() && allowExtract(INPUT, inputSlot, pHit.getDirection(), true)) {
             TCUtil.addOrDropToPlayer(pPlayer, inputSlot);
             itemHandler.setStackInSlot(INPUT, ItemStack.EMPTY);
             level.playSound(pPlayer, blockPos, SoundEvents.ITEM_FRAME_REMOVE_ITEM, SoundSource.BLOCKS);
@@ -266,12 +269,15 @@ public class TwoSlotItemHandlerBehaviour implements IBEItemBehaviour, WorldlyCon
     public ItemStack getOutputSlot(){
         return this.itemHandler.getStackInSlot(OUTPUT);
     }
-    public ItemStack forceInsertItem(int slot, ItemStack stack, boolean simulate) {
-        return itemHandler.forceInsertItem(slot, stack, simulate);
+
+    @Override
+    public boolean allowExtract(int pSlot, ItemStack pStack, @Nullable Direction pDirection, boolean manual) {
+        return true;
     }
 
-    public void forceExtractItem(int slot, int amount, boolean simulate) {
-        itemHandler.forceExtractItem(slot, amount, simulate);
+    @Override
+    public boolean allowInsert(int pSlot, ItemStack pStack, @Nullable Direction pDirection, boolean manual) {
+        return true;
     }
 
     public class SlotSensitiveItemStackHandler extends ItemStackHandler {
@@ -304,8 +310,5 @@ public class TwoSlotItemHandlerBehaviour implements IBEItemBehaviour, WorldlyCon
             return super.insertItem(slot, stack, simulate);
         }
 
-        public void forceExtractItem(int slot, int amount, boolean simulate) {
-            super.extractItem(slot, amount, simulate);
-        }
     }
 }

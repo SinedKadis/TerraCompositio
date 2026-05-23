@@ -1,7 +1,6 @@
 package net.sinedkadis.terracompositio.item.custom;
 
 
-
 import net.minecraft.ChatFormatting;
 import net.minecraft.Util;
 import net.minecraft.core.BlockPos;
@@ -9,6 +8,8 @@ import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.tags.ItemTags;
 import net.minecraft.tags.TagKey;
@@ -30,7 +31,7 @@ import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
-import net.minecraft.world.level.block.state.properties.*;
+import net.minecraft.world.level.block.state.properties.Property;
 import net.minecraft.world.level.material.PushReaction;
 import net.minecraft.world.level.storage.loot.LootParams;
 import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
@@ -43,12 +44,16 @@ import net.minecraftforge.common.util.FakePlayer;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.registries.ForgeRegistries;
+import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBEItemBehaviour;
+import net.sinedkadis.terracompositio.block.behaviours.ManySlotItemHandlerBehaviour;
 import net.sinedkadis.terracompositio.block.custom.PathPointerBlock;
+import net.sinedkadis.terracompositio.block.entity.FlowCedarCasingBlockEntity;
+import net.sinedkadis.terracompositio.block.entity.MatterInfuserBaseBlockEntity;
 import net.sinedkadis.terracompositio.block.entity.PathPointerBlockEntity;
+import net.sinedkadis.terracompositio.block.entity.TCBlockEntity;
 import net.sinedkadis.terracompositio.registries.TCBlocks;
 import net.sinedkadis.terracompositio.registries.TCItems;
 import net.sinedkadis.terracompositio.registries.TCTags;
-import net.sinedkadis.terracompositio.util.FunctionSide;
 import net.sinedkadis.terracompositio.util.TCUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -58,7 +63,7 @@ import java.util.function.Predicate;
 
 import static net.minecraft.world.level.block.Block.dropResources;
 import static net.minecraft.world.level.block.state.properties.BlockStateProperties.*;
-import static net.sinedkadis.terracompositio.registries.TCBlockStateProperties.*;
+import static net.sinedkadis.terracompositio.registries.TCBlockStateProperties.INFUSED;
 import static net.sinedkadis.terracompositio.util.TCUtil.getNearBlocks;
 import static net.sinedkadis.terracompositio.util.TCUtil.getTouchingBlocks;
 
@@ -297,118 +302,43 @@ public class WrenchAxeItem extends AxeItem {
         }
     }
 
-    private boolean crowbarRMBInteraction(Player player, Level level, BlockPos pos, BlockState blockState, Direction clickedFace) {
+    private boolean crowbarRMBInteraction(Player player, Level level, BlockPos pos, BlockState ignoredBlockState, Direction ignoredClickedFace) {
         BlockEntity blockEntity = level.getBlockEntity(pos);
         if (blockEntity != null) {
             Optional<IItemHandler> optional = blockEntity.getCapability(ForgeCapabilities.ITEM_HANDLER).resolve();
             if (optional.isPresent()) {
                 boolean flag = false;
-                for (int i = 0; i < optional.get().getSlots(); i++) {
-                    ItemStack itemStack = optional.get().getStackInSlot(i).copyAndClear();
+                IItemHandler iItemHandler = optional.get();
+                boolean isCasing = blockEntity instanceof FlowCedarCasingBlockEntity;
+                boolean isMI = blockEntity instanceof MatterInfuserBaseBlockEntity;
+                for (int slot = 0; slot < iItemHandler.getSlots(); slot++) {
+                    if (isCasing && !FlowCedarCasingBlockEntity.isInventorySlot(slot)) continue;
+                    if (isMI) continue;
+                    ManySlotItemHandlerBehaviour manySlotItemHandlerBehaviour = null;
+                    if (blockEntity instanceof TCBlockEntity tcBlockEntity) {
+                        IBEItemBehaviour itemBehaviour = tcBlockEntity.getItemBehaviour();
+                        if (itemBehaviour instanceof ManySlotItemHandlerBehaviour) {
+                            manySlotItemHandlerBehaviour = (ManySlotItemHandlerBehaviour) itemBehaviour;
+                            manySlotItemHandlerBehaviour.ignoreRestrictions = true;
+                        }
+                    }
+                    ItemStack itemStack = iItemHandler.extractItem(slot, 512, false);
                     if (itemStack.isEmpty()) continue;
                     if (!player.addItem(itemStack)) {
                         player.drop(itemStack, true);
                     }
                     flag = true;
+                    if (manySlotItemHandlerBehaviour != null) {
+                        manySlotItemHandlerBehaviour.ignoreRestrictions = false;
+                    }
                 }
                 if (flag) {
+                    level.playSound(null, pos, SoundEvents.ITEM_FRAME_REMOVE_ITEM, SoundSource.BLOCKS);
                     player.getItemInHand(InteractionHand.OFF_HAND)
                             .hurtAndBreak(1, player, player1 -> player1.broadcastBreakEvent(InteractionHand.OFF_HAND));
                     return true;
                 }
             }
-        }
-        if (player.isCrouching()){
-            ItemStack itemStack = TCItems.INFUSED_IRON_ROD.get().getDefaultInstance();
-            ItemStack inputBus = TCItems.INPUT_BUS.get().getDefaultInstance();
-            ItemStack outputBus = TCItems.OUTPUT_BUS.get().getDefaultInstance();
-
-
-            if (blockState.hasProperty(HORIZONTAL_FACING)){
-                BlockPos casingPos = pos.relative(blockState.getValue(HORIZONTAL_FACING).getOpposite());
-                BlockState casingState = level.getBlockState(casingPos);
-                if (casingState.is(TCBlocks.FLOW_CEDAR_CASING.get())) {
-                    if (undoBlockState(blockState, UP_CONNECTION, player, itemStack)) {
-                        level.setBlock(casingPos, casingState.setValue(INPUT_BUS_CONNECTION, false), 3);
-                        level.setBlock(pos, blockState.setValue(UP_CONNECTION, false), 3);
-                        player.getItemInHand(InteractionHand.OFF_HAND)
-                                .hurtAndBreak(1, player, player1 -> player1.broadcastBreakEvent(InteractionHand.OFF_HAND));
-                        return true;
-                    }
-                    if (undoBlockState(blockState, DOWN_CONNECTION, player, itemStack)) {
-                        level.setBlock(casingPos, casingState.setValue(OUTPUT_BUS_CONNECTION, false), 3);
-                        level.setBlock(pos, blockState.setValue(DOWN_CONNECTION, false), 3);
-                        player.getItemInHand(InteractionHand.OFF_HAND)
-                                .hurtAndBreak(1, player, player1 -> player1.broadcastBreakEvent(InteractionHand.OFF_HAND));
-                        return true;
-                    }
-
-                }
-            }
-            Direction directionByFunctionSide = FunctionSide.getDirectionByFunctionSide(blockState);
-            if (directionByFunctionSide != Direction.DOWN) {
-                BlockPos matInfPos = pos.relative(directionByFunctionSide);
-                BlockState matInfState = level.getBlockState(matInfPos);
-                if (clickedFace == Direction.UP) {
-                    BlockState newCasing = blockState;
-                    if (undoBlockState(blockState, INPUT_BUS_CONNECTION, player, itemStack)) {
-                        newCasing = blockState.setValue(INPUT_BUS_CONNECTION, false);
-                    }
-                    if (undoBlockState(blockState, INPUT_BUS, player, inputBus)) {
-                        newCasing = blockState.setValue(INPUT_BUS, false);
-                    }
-                    if (!newCasing.equals(blockState)) {
-                        level.setBlock(matInfPos, matInfState.setValue(UP_CONNECTION, false), 3);
-                        level.setBlock(pos, newCasing, 3);
-                        player.getItemInHand(InteractionHand.OFF_HAND)
-                                .hurtAndBreak(1, player, player1 -> player1.broadcastBreakEvent(InteractionHand.OFF_HAND));
-                        return true;
-                    }
-                }
-                if (clickedFace == Direction.DOWN) {
-                    BlockState newCasing = blockState;
-                    if (undoBlockState(blockState, OUTPUT_BUS_CONNECTION, player, itemStack)) {
-                        newCasing = blockState.setValue(OUTPUT_BUS_CONNECTION, false);
-                    }
-                    if (undoBlockState(blockState, OUTPUT_BUS, player, outputBus)) {
-                        newCasing = blockState.setValue(OUTPUT_BUS, false);
-                    }
-                    if (!newCasing.equals(blockState)) {
-                        level.setBlock(matInfPos, matInfState.setValue(DOWN_CONNECTION, false), 3);
-                        level.setBlock(pos, newCasing, 3);
-                        player.getItemInHand(InteractionHand.OFF_HAND)
-                                .hurtAndBreak(1, player, player1 -> player1.broadcastBreakEvent(InteractionHand.OFF_HAND));
-                        return true;
-                    }
-                }
-            }
-            itemStack.grow(1);
-            if (undoBlockState(blockState, LEFT_CONNECTION, player,itemStack)){
-                BlockPos leftPos = pos.relative(blockState.getValue(FACING).getClockWise());
-                level.setBlock(leftPos,level.getBlockState(leftPos).setValue(RIGHT_CONNECTION,false),3);
-                level.setBlock(pos,blockState.setValue(LEFT_CONNECTION,false),3);
-                player.getItemInHand(InteractionHand.OFF_HAND)
-                        .hurtAndBreak(1, player, player1 -> player1.broadcastBreakEvent(InteractionHand.OFF_HAND));
-                return true;
-            }
-            if (undoBlockState(blockState, RIGHT_CONNECTION, player,itemStack)){
-                BlockPos leftPos = pos.relative(blockState.getValue(FACING).getCounterClockWise());
-                level.setBlock(leftPos,level.getBlockState(leftPos).setValue(LEFT_CONNECTION,false),3);
-                level.setBlock(pos,blockState.setValue(RIGHT_CONNECTION,false),3);
-                player.getItemInHand(InteractionHand.OFF_HAND)
-                        .hurtAndBreak(1, player, player1 -> player1.broadcastBreakEvent(InteractionHand.OFF_HAND));
-                return true;
-            }
-        }
-        return false;
-    }
-
-    private static boolean undoBlockState(BlockState blockState, BooleanProperty connectionProperty, Player player, ItemStack itemStack) {
-        if (blockState.hasProperty(connectionProperty) && blockState.getValue(connectionProperty)) {
-            if (!player.addItem(itemStack)) {
-                player.drop(itemStack, true);
-            }
-            return true;
         }
         return false;
     }

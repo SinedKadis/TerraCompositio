@@ -6,7 +6,9 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.sinedkadis.terracompositio.registries.TCBlocks;
+import net.sinedkadis.terracompositio.util.TCUtil;
 import org.jetbrains.annotations.Nullable;
 
 import static net.minecraft.world.level.block.state.properties.BlockStateProperties.HORIZONTAL_FACING;
@@ -17,13 +19,13 @@ public abstract class MatterInfuserBaseBlockEntity extends TCCraftingBlockEntity
     }
 
     public ItemStack getInputSlot() {
-        ItemStack itemInSlot = this.getItemInSlot(0);
+        ItemStack itemInSlot = this.getItemInSlot(FlowCedarCasingBlockEntity.INPUT_INVENTORY_SLOT);
         if (itemInSlot != null)
             return itemInSlot;
         return ItemStack.EMPTY;
     }
     public ItemStack getSlotOutput() {
-        ItemStack itemInSlot = this.getItemInSlot(1);
+        ItemStack itemInSlot = this.getItemInSlot(FlowCedarCasingBlockEntity.OUTPUT_INVENTORY_SLOT);
         if (itemInSlot != null)
             return itemInSlot;
         return ItemStack.EMPTY;
@@ -32,45 +34,19 @@ public abstract class MatterInfuserBaseBlockEntity extends TCCraftingBlockEntity
     public ItemStack getItemInSlot(int slot) {
         FlowCedarCasingBlockEntity blockEntity = this.getCasingBE();
         if (blockEntity != null){
-            return blockEntity.itemHandler().getStackInSlot(slot);
+            return blockEntity.getItemHandler().getStackInSlot(slot);
         }
         return ItemStack.EMPTY;
     }
 
-    public ItemStack insertItemStack(int slot, ItemStack itemstack) {
+    public void extractItemStack(int slot, int count) {
         FlowCedarCasingBlockEntity blockEntity = this.getCasingBE();
         if (blockEntity != null){
-            return blockEntity.itemHandler().insertItem(slot,itemstack,false);
-        }
-        return itemstack;
-    }
-
-    public ItemStack extractItemStack(int slot, int count) {
-        ItemStack itemStack;
-        FlowCedarCasingBlockEntity blockEntity = this.getCasingBE();
-        if (blockEntity != null){
-            itemStack = blockEntity.itemHandler().extractItem(slot,count,false);
-            return itemStack;
-        }
-        return ItemStack.EMPTY;
-    }
-
-    public void setSlotEmpty(int slot) {
-        FlowCedarCasingBlockEntity casingBE = this.getCasingBE();
-        if (casingBE != null) {
-            casingBE.itemHandler().setStackInSlot(slot,ItemStack.EMPTY);
+            blockEntity.getItemHandler().extractItem(slot, count, false);
         }
     }
 
-    public int getSlotCount(){
-        FlowCedarCasingBlockEntity casingBE = this.getCasingBE();
-        if (casingBE != null) {
-            return casingBE.itemHandler().getSlots();
-        }
-        return 0;
-    }
-
-    protected @Nullable FlowCedarCasingBlockEntity getCasingBE() {
+    public @Nullable FlowCedarCasingBlockEntity getCasingBE() {
         Direction direction = this.getBlockState().getValue(HORIZONTAL_FACING);
         BlockPos blockpos = this.getBlockPos().relative(direction.getOpposite());
         if (this.level != null && this.level.getBlockState(blockpos).is(TCBlocks.FLOW_CEDAR_CASING.get())){
@@ -80,5 +56,30 @@ public abstract class MatterInfuserBaseBlockEntity extends TCCraftingBlockEntity
             }
         }
         return null;
+    }
+
+    @Override
+    public void setRemoved() {
+        Direction direction = getBlockState().getValue(HORIZONTAL_FACING);
+        BlockPos blockPos2 = worldPosition.relative(direction.getCounterClockWise());
+        BlockEntity blockEntity1 = null;
+        if (level != null) {
+            blockEntity1 = level.getBlockEntity(blockPos2);
+        }
+        if (blockEntity1 instanceof MatterInfuserIOBlockEntity) {
+            TCUtil.dropContents(blockEntity1);
+        }
+        BlockPos blockpos = worldPosition.relative(direction.getOpposite());
+        BlockState blockState = level.getBlockState(blockpos);
+        if (blockState.is(TCBlocks.FLOW_CEDAR_CASING.get())) {
+            level.setBlockAndUpdate(blockpos, blockState.setValue(BlockStateProperties.FACING, Direction.DOWN));
+            BlockEntity blockEntity = level.getBlockEntity(blockpos);
+            if (blockEntity instanceof FlowCedarCasingBlockEntity) {
+                TCUtil.dropContents(blockEntity,
+                        FlowCedarCasingBlockEntity.UP_CONNECTION_SLOT,
+                        FlowCedarCasingBlockEntity.DOWN_CONNECTION_SLOT);
+            }
+        }
+        super.setRemoved();
     }
 }

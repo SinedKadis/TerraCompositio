@@ -1,29 +1,39 @@
 package net.sinedkadis.terracompositio.block.entity;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.SimpleContainer;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.common.capabilities.ForgeCapabilities;
-import net.minecraftforge.items.ItemStackHandler;
+import net.minecraftforge.items.IItemHandlerModifiable;
+import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBEBehaviour;
+import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBECFEBehaviour;
+import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBEItemBehaviour;
 import net.sinedkadis.terracompositio.api.networks.cfe.ICFEHandler;
 import net.sinedkadis.terracompositio.block.behaviours.CFEHandlerBehaviour;
-import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBEBehaviour;
-import net.sinedkadis.terracompositio.block.behaviours.TwoSlotItemHandlerBehaviour;
+import net.sinedkadis.terracompositio.block.behaviours.ManySlotItemHandlerBehaviour;
+import net.sinedkadis.terracompositio.block.custom.MatterInfuserBaseEntityBlock;
 import net.sinedkadis.terracompositio.recipe.MatterInfusionRecipe;
 import net.sinedkadis.terracompositio.registries.TCBlockEntities;
+import net.sinedkadis.terracompositio.registries.TCItems;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
+import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.List;
 import java.util.Optional;
 
 import static net.sinedkadis.terracompositio.registries.TCBlockStateProperties.INFUSED;
 
+@ParametersAreNonnullByDefault
 public class MatterInfuserIOBlockEntity extends MatterInfuserBaseBlockEntity{
 
 
@@ -34,7 +44,7 @@ public class MatterInfuserIOBlockEntity extends MatterInfuserBaseBlockEntity{
     }
 
     @Override
-    public void addBEBehaviours(@NotNull List<IBEBehaviour> list) {
+    public void addBEBehaviours(List<IBEBehaviour> list) {
         list.add(new CFEHandlerBehaviour(this){
             @Override
             public Vec3 particleTargetOffset() {
@@ -47,10 +57,41 @@ public class MatterInfuserIOBlockEntity extends MatterInfuserBaseBlockEntity{
                 };
             }
         }.range(10));
+        list.add(new ManySlotItemHandlerBehaviour(this) {
+            @Override
+            public boolean allowExtract(int pSlot, ItemStack pStack, @Nullable Direction pDirection, boolean manual) {
+                return false;
+            }
+
+            @Override
+            public boolean allowInsert(int pSlot, ItemStack pStack, @Nullable Direction pDirection, boolean manual) {
+                boolean enough = pStack.getCount() >= 2;
+                boolean isRod = pStack.is(TCItems.INFUSED_IRON_ROD.get());
+                return manual && enough && isRod;
+            }
+
+            @Override
+            public int getLimitInSlot(int slot) {
+                return 2;
+            }
+
+            @Override
+            public @NotNull InteractionResult onUse(Player pPlayer, InteractionHand pHand, BlockHitResult pHit) {
+                TCBlockEntity blockEntity = getBlockEntity();
+                Level level = blockEntity.getLevel();
+                if (level != null) {
+                    BlockPos blockPos = blockEntity.getBlockPos();
+                    Direction left = getBlockState().getValue(BlockStateProperties.HORIZONTAL_FACING).getClockWise();
+                    if (level.getBlockState(blockPos.relative(left)).getBlock() instanceof MatterInfuserBaseEntityBlock)
+                        return super.onUse(pPlayer, pHand, pHit);
+                }
+                return InteractionResult.PASS;
+            }
+        });
 
     }
 
-    public void tick(@NotNull Level pLevel, @NotNull BlockPos pPos, @NotNull BlockState pState) {
+    public void tick(Level pLevel, BlockPos pPos, BlockState pState) {
         super.tick(pLevel, pPos, pState);
         if(hasRecipe() && enoughCFE()){
             increaseCraftingProgress();
@@ -71,15 +112,24 @@ public class MatterInfuserIOBlockEntity extends MatterInfuserBaseBlockEntity{
     protected ItemStack craftItem() {
         Optional<MatterInfusionRecipe> recipe = getCurrentRecipe();
         MatterInfuserPortBlockEntity portBE = this.getPortBE();
-        if (recipe.isPresent() && this.level != null && portBE != null) {
+        FlowCedarCasingBlockEntity casingBE = this.getCasingBE();
+        if (recipe.isPresent()
+                && this.level != null
+                && portBE != null
+                && casingBE != null) {
             ItemStack result = recipe.get().getResultItem(null);
             int takeCount = recipe.get().getIngredients().get(1).getItems()[0].getCount();
-            this.getCapability(ForgeCapabilities.ITEM_HANDLER).ifPresent(iItemHandler -> {
-                if (iItemHandler instanceof TwoSlotItemHandlerBehaviour.SlotSensitiveItemStackHandler itemStackHandler) {
-                    itemStackHandler.forceExtractItem(0, takeCount,false);
-                    itemStackHandler.forceInsertItem(1, result,false);
-                }
-            });
+
+            IItemHandlerModifiable itemHandler = casingBE.getItemHandler();
+            IBEItemBehaviour itemBehaviour = casingBE.getItemBehaviour();
+
+            if (itemBehaviour instanceof ManySlotItemHandlerBehaviour itemHandlerBehaviour) {
+                itemHandlerBehaviour.ignoreRestrictions = true;
+                itemHandler.extractItem(0, takeCount, false);
+                itemHandler.insertItem(1, result, false);
+                itemHandlerBehaviour.ignoreRestrictions = false;
+            }
+
             if (this.level.getRandom().nextInt(100) < catalystDecayRate){
                 portBE.extractItemStack(0,1);
             }
@@ -93,7 +143,7 @@ public class MatterInfuserIOBlockEntity extends MatterInfuserBaseBlockEntity{
     }
 
     protected boolean enoughCFE() {
-        return this.cfeContainer().getCFE() >= Math.ceil(tickCFECost);
+        return this.getCfeContainer().getCFE() >= Math.ceil(tickCFECost);
     }
 
     protected boolean hasRecipe() {
@@ -118,15 +168,19 @@ public class MatterInfuserIOBlockEntity extends MatterInfuserBaseBlockEntity{
     }
 
     @Override
-    protected ItemStackHandler itemHandler() {
+    protected IItemHandlerModifiable getItemHandler() {
         FlowCedarCasingBlockEntity casingBE = getCasingBE();
         if (casingBE != null)
-            return ((TwoSlotItemHandlerBehaviour) casingBE.getBehaviours().get(1)).getItemHandler();
-        return null;
+            return casingBE.getItemHandler();
+        throw new RuntimeException("Item handler not present: " + this);
     }
 
-    protected ICFEHandler cfeContainer() {
-        return ((CFEHandlerBehaviour) behaviours.get(0)).getMainHandler();
+    protected ICFEHandler getCfeContainer() {
+        IBECFEBehaviour cfeBehaviour = getCFEBehaviour();
+        if (cfeBehaviour != null) {
+            return cfeBehaviour.getMainHandler();
+        }
+        throw new RuntimeException("CFE handler not present: " + this);
     }
 
     public Optional<MatterInfusionRecipe> getCurrentRecipe() {

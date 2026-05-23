@@ -1,124 +1,19 @@
 package net.sinedkadis.terracompositio.block.custom;
 
-import net.minecraft.core.BlockPos;
-import net.minecraft.core.Direction;
-import net.minecraft.world.InteractionHand;
-import net.minecraft.world.InteractionResult;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
-import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.state.StateDefinition;
-import net.minecraft.world.level.block.state.properties.BooleanProperty;
-import net.minecraft.world.level.storage.loot.LootParams;
-import net.minecraft.world.phys.BlockHitResult;
 import net.sinedkadis.terracompositio.block.entity.TCBlockEntity;
-import net.sinedkadis.terracompositio.registries.TCBlockStateProperties;
-import net.sinedkadis.terracompositio.registries.TCBlocks;
 import net.sinedkadis.terracompositio.registries.TCBlockEntities;
-import net.sinedkadis.terracompositio.registries.TCItems;
 import org.jetbrains.annotations.NotNull;
-import org.jetbrains.annotations.Nullable;
-
-import java.util.List;
-
-import static net.minecraft.world.level.block.state.properties.BlockStateProperties.HORIZONTAL_FACING;
-import static net.sinedkadis.terracompositio.block.custom.FlowCedarCasingBlock.*;
-import static net.sinedkadis.terracompositio.registries.TCBlockStateProperties.LEFT_CONNECTION;
 
 
 public class MatterInfuserPortBlock extends MatterInfuserBaseEntityBlock {
-    private final static BooleanProperty UP_CONNECTION;
-    private final static BooleanProperty RIGHT_CONNECTION;
 
     public MatterInfuserPortBlock(Properties pProperties) {
         super(pProperties);
-        this.registerDefaultState(this.defaultBlockState()
-                .setValue(UP_CONNECTION,false)
-                .setValue(RIGHT_CONNECTION,false));
-    }
-
-    @Override
-    protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> pBuilder) {
-        pBuilder.add(FACING,UP_CONNECTION,RIGHT_CONNECTION);
-    }
-
-    @Override
-    public void onRemove(@NotNull BlockState pState, @NotNull Level pLevel, @NotNull BlockPos pPos, @NotNull BlockState pNewState, boolean pIsMoving) {
-        super.onRemove(pState, pLevel, pPos, pNewState, pIsMoving);
-        if (pState.getBlock() != pNewState.getBlock()) {
-            if (pState.getValue(RIGHT_CONNECTION)) {
-                BlockPos rightPos = pPos.relative(pState.getValue(FACING).getCounterClockWise());
-                BlockState rightState = pLevel.getBlockState(rightPos);
-                pLevel.setBlock(rightPos, rightState.setValue(LEFT_CONNECTION,false),3);
-            }
-            if (pState.getValue(UP_CONNECTION)) {
-                BlockPos blockpos = pPos.relative(pState.getValue(HORIZONTAL_FACING).getOpposite());
-                pLevel.setBlock(blockpos,pLevel.getBlockState(blockpos).setValue(INPUT_BUS_CONNECTION,false),3);
-            }
-        }
-    }
-
-    @SuppressWarnings("deprecation")
-    @Override
-    public @NotNull List<ItemStack> getDrops(@NotNull BlockState pState, LootParams.@NotNull Builder pParams) {
-        List<ItemStack> drops =  super.getDrops(pState, pParams);
-        if (pState.getValue(RIGHT_CONNECTION)) {
-            drops.add(new ItemStack(TCItems.INFUSED_IRON_ROD.get(), 2));
-        }
-        if (pState.getValue(UP_CONNECTION)) {
-            drops.add(new ItemStack(TCItems.INFUSED_IRON_ROD.get(), 2));
-        }
-        return drops;
-    }
-
-    @Override
-    protected int slotCount() {
-        return 1;
-    }
-
-    @Override
-    public @NotNull InteractionResult use(@NotNull BlockState pState, @NotNull Level pLevel, @NotNull BlockPos pPos, @NotNull Player pPlayer, @NotNull InteractionHand pHand, @NotNull BlockHitResult pHit) {
-        ItemStack item = pPlayer.getItemInHand(pHand);
-        Direction facing = pState.getValue(FACING);
-        BlockPos casingPos = pPos.relative(facing.getOpposite());
-        BlockState casingState = pLevel.getBlockState(casingPos);
-        BlockPos rightPos = pPos.relative(facing.getCounterClockWise());
-        BlockState rightState = pLevel.getBlockState(rightPos);
-        if (item.is(TCItems.INFUSED_IRON_ROD.get())){
-            if (!pState.getValue(RIGHT_CONNECTION) && rightState.is(TCBlocks.MATTER_INFUSER_IO.get())){
-                if (item.getCount() >= 2){
-                    pLevel.setBlock(pPos,pState.setValue(RIGHT_CONNECTION,true),3);
-                    pLevel.setBlock(rightPos,rightState.setValue(LEFT_CONNECTION, true),3);
-                    item.shrink(2);
-                    return InteractionResult.sidedSuccess(pLevel.isClientSide);
-                }
-            }
-        }
-        return ((FlowCedarCasingBlock) casingState.getBlock()).use(casingState,pLevel,casingPos,pPlayer,pHand,pHit);
     }
 
     @Override
     protected @NotNull BlockEntityType<? extends TCBlockEntity> getBlockEntityType() {
         return TCBlockEntities.MATTER_INFUSER_PORT_BE.get();
-    }
-
-    @Nullable
-    @Override
-    public <T extends BlockEntity> BlockEntityTicker<T> getTicker(@NotNull Level pLevel, @NotNull BlockState pState, @NotNull BlockEntityType<T> pBlockEntityType) {
-        if (pLevel.isClientSide()) {
-            return null;
-        }
-        return createTickerHelper(pBlockEntityType, TCBlockEntities.MATTER_INFUSER_PORT_BE.get(),
-                (pLevel1, pPos, pState1, pBlockEntity) -> pBlockEntity.tick(pLevel1,pPos,pState1));
-    }
-
-    static {
-        UP_CONNECTION = TCBlockStateProperties.UP_CONNECTION;
-        RIGHT_CONNECTION = TCBlockStateProperties.RIGHT_CONNECTION;
     }
 }
