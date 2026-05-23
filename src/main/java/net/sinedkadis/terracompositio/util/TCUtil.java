@@ -624,11 +624,18 @@ public class TCUtil {
         return new BlockPos(x,y,z);
     }
 
-    public static void dropContents(BlockEntity blockEntity) {
+    public static void dropContents(BlockEntity blockEntity, int... slots) {
         blockEntity.getCapability(ForgeCapabilities.ITEM_HANDLER).ifPresent(itemHandler -> {
             SimpleContainer inventory = new SimpleContainer(itemHandler.getSlots());
-            for (int i = 0; i < itemHandler.getSlots(); i++){
-                inventory.setItem(i, itemHandler.getStackInSlot(i));
+            if (slots.length == 0) {
+                for (int i = 0; i < itemHandler.getSlots(); i++) {
+                    inventory.setItem(i, itemHandler.getStackInSlot(i));
+                }
+            } else {
+                for (int i = 0; i < slots.length; i++) {
+                    int slot = slots[i];
+                    inventory.setItem(i, itemHandler.getStackInSlot(slot));
+                }
             }
             Level level = blockEntity.getLevel();
             BlockPos worldPosition = blockEntity.getBlockPos();

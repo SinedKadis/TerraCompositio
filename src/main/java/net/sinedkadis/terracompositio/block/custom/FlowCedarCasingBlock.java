@@ -18,13 +18,13 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
+import net.minecraft.world.level.block.state.properties.DirectionProperty;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandlerItem;
 import net.sinedkadis.terracompositio.block.IFluidApplicable;
-import net.sinedkadis.terracompositio.block.entity.FlowCedarCasingBlockEntity;
 import net.sinedkadis.terracompositio.block.entity.TCBlockEntity;
 import net.sinedkadis.terracompositio.registries.TCBlockEntities;
 import net.sinedkadis.terracompositio.registries.TCBlockStateProperties;
@@ -42,10 +42,14 @@ public class FlowCedarCasingBlock extends TCBaseEntityBlock implements IFluidApp
     public static final BooleanProperty INFUSED = TCBlockStateProperties.INFUSED;
     public static final EnumProperty<Direction.Axis> AXIS = BlockStateProperties.AXIS;
     protected static final BooleanProperty WAXED = TCBlockStateProperties.WAXED;
+    public static final DirectionProperty ATTACHED_DIR = BlockStateProperties.FACING;
 
     public FlowCedarCasingBlock(Properties pProperties) {
         super(pProperties);
-        registerDefaultState(defaultBlockState().setValue(INFUSED, false).setValue(WAXED, false));
+        registerDefaultState(defaultBlockState()
+                .setValue(INFUSED, false)
+                .setValue(WAXED, false)
+                .setValue(ATTACHED_DIR, Direction.DOWN));
     }
 
     @Override
@@ -89,7 +93,7 @@ public class FlowCedarCasingBlock extends TCBaseEntityBlock implements IFluidApp
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> pBuilder) {
-        pBuilder.add(AXIS, INFUSED, WAXED);
+        pBuilder.add(AXIS, INFUSED, WAXED, ATTACHED_DIR);
     }
 
 
@@ -100,13 +104,12 @@ public class FlowCedarCasingBlock extends TCBaseEntityBlock implements IFluidApp
 
     @Override
     public void onRemove(BlockState pState, Level pLevel, BlockPos pPos, BlockState pNewState, boolean pIsMoving) {
-        FlowCedarCasingBlockEntity blockEntity = ((FlowCedarCasingBlockEntity) pLevel.getBlockEntity(pPos));
-        if (blockEntity != null) {
-            Direction attachedDir = blockEntity.attachedDir;
-            if (attachedDir != null) {
-                pLevel.destroyBlock(pPos.relative(attachedDir), true);
-            }
+
+        Direction attachedDir = pState.getValue(ATTACHED_DIR);
+        if (attachedDir.getAxis().isHorizontal()) {
+            pLevel.destroyBlock(pPos.relative(attachedDir), true);
         }
+
         super.onRemove(pState, pLevel, pPos, pNewState, pIsMoving);
     }
 

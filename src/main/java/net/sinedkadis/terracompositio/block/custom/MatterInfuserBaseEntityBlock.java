@@ -11,7 +11,6 @@ import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
@@ -19,7 +18,6 @@ import net.minecraft.world.level.block.state.properties.DirectionProperty;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import net.sinedkadis.terracompositio.block.entity.FlowCedarCasingBlockEntity;
 import net.sinedkadis.terracompositio.registries.TCBlocks;
 import org.jetbrains.annotations.NotNull;
 
@@ -55,18 +53,7 @@ public abstract class MatterInfuserBaseEntityBlock extends TCBaseEntityBlock {
         return false;
     }
 
-    @Override
-    public void onRemove(@NotNull BlockState pState, @NotNull Level pLevel, @NotNull BlockPos pPos, @NotNull BlockState pNewState, boolean pIsMoving) {
-        super.onRemove(pState, pLevel, pPos, pNewState, pIsMoving);
-        if (pState.getBlock() != pNewState.getBlock()) {
-            Direction direction = pState.getValue(FACING);
-            BlockPos blockpos = pPos.relative(direction.getOpposite());
-            BlockEntity blockEntity = pLevel.getBlockEntity(blockpos);
-            if (blockEntity instanceof FlowCedarCasingBlockEntity casingBlockEntity) {
-                casingBlockEntity.attachedDir = null;
-            }
-        }
-    }
+
 
     @ParametersAreNonnullByDefault
     @MethodsReturnNonnullByDefault
@@ -108,19 +95,19 @@ public abstract class MatterInfuserBaseEntityBlock extends TCBaseEntityBlock {
     @Override
     public BlockState getStateForPlacement(BlockPlaceContext pContext) {
         BlockState blockstate = this.defaultBlockState();
-        LevelReader levelreader = pContext.getLevel();
+        Level level = pContext.getLevel();
         BlockPos blockpos = pContext.getClickedPos();
         Direction[] adirection = pContext.getNearestLookingDirections();
         for (Direction direction : adirection) {
             if (direction.getAxis().isHorizontal()) {
                 Direction direction1 = direction.getOpposite();
                 blockstate = blockstate.setValue(FACING, direction1);
-                if (blockstate.canSurvive(levelreader, blockpos)) {
-                    BlockEntity blockEntity = levelreader.getBlockEntity(blockpos.relative(direction1.getOpposite()));
-                    if (blockEntity instanceof FlowCedarCasingBlockEntity casingBlockEntity) {
-                        if (levelreader.isClientSide()) return blockstate;
-                        if (casingBlockEntity.attachedDir != null) return null;
-                        casingBlockEntity.attachedDir = direction1;
+                if (blockstate.canSurvive(level, blockpos)) {
+                    BlockPos relative = blockpos.relative(direction1.getOpposite());
+                    BlockState blockState1 = level.getBlockState(relative);
+                    if (blockState1.is(TCBlocks.FLOW_CEDAR_CASING.get())) {
+                        if (blockState1.getValue(BlockStateProperties.FACING).getAxis().isHorizontal()) return null;
+                        level.setBlockAndUpdate(relative, blockState1.setValue(BlockStateProperties.FACING, direction1));
                     }
                     return blockstate;
                 }

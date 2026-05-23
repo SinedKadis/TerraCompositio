@@ -2,12 +2,13 @@ package net.sinedkadis.terracompositio.block.entity;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.Container;
 import net.minecraft.world.WorldlyContainer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.IItemHandlerModifiable;
@@ -16,6 +17,7 @@ import net.minecraftforge.items.wrapper.EmptyHandler;
 import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBEBehaviour;
 import net.sinedkadis.terracompositio.block.behaviours.ManySlotItemHandlerBehaviour;
 import net.sinedkadis.terracompositio.block.custom.MatterInfuserBaseEntityBlock;
+import net.sinedkadis.terracompositio.block.custom.MatterInfuserIOBlock;
 import net.sinedkadis.terracompositio.registries.TCBlockEntities;
 import net.sinedkadis.terracompositio.registries.TCItems;
 import org.jetbrains.annotations.Nullable;
@@ -39,8 +41,6 @@ public class FlowCedarCasingBlockEntity extends TCCraftingBlockEntity{
 
 
     private int cooldownTime;
-
-    public Direction attachedDir;
 
 
     public FlowCedarCasingBlockEntity(BlockPos pos, BlockState state) {
@@ -80,13 +80,15 @@ public class FlowCedarCasingBlockEntity extends TCCraftingBlockEntity{
                 Level level = FlowCedarCasingBlockEntity.this.level;
                 if (level == null) return false;
 
-                boolean isMIConnected = attachedDir != null
-                        && level.getBlockState(worldPosition.relative(attachedDir)).getBlock() instanceof MatterInfuserBaseEntityBlock;
+                Block blockRelative = level.getBlockState(worldPosition.relative(attachedDir())).getBlock();
+                boolean isMIConnected = attachedDir().getAxis().isHorizontal()
+                        && blockRelative instanceof MatterInfuserBaseEntityBlock;
 
-                boolean isUpConnectionAllow = utilitySlot && !inputBusAbsent && isMIConnected;
+                boolean isUpConnectionAllow = utilitySlot && !inputBusAbsent && isMIConnected && pSlot == UP_CONNECTION_SLOT;
 
                 boolean outputBusAbsent = this.itemHandler.getStackInSlot(OUTPUT_BUS_SLOT).isEmpty();
-                boolean isDownConnectionAllow = utilitySlot && !outputBusAbsent && isMIConnected;
+                boolean isMIIO = blockRelative instanceof MatterInfuserIOBlock;
+                boolean isDownConnectionAllow = utilitySlot && !outputBusAbsent && isMIConnected && isMIIO && pSlot == DOWN_CONNECTION_SLOT;
                 boolean isBus = pSlot <= OUTPUT_BUS_SLOT;
 
                 boolean allowUtility = utilitySlot && (isBus || isUpConnectionAllow || isDownConnectionAllow);
@@ -104,6 +106,10 @@ public class FlowCedarCasingBlockEntity extends TCCraftingBlockEntity{
                 return false;
             }
         });
+    }
+
+    public Direction attachedDir() {
+        return getBlockState().getValue(BlockStateProperties.FACING);
     }
 
     public void tick(Level pLevel, BlockPos pPos, BlockState pState) {
@@ -238,23 +244,6 @@ public class FlowCedarCasingBlockEntity extends TCCraftingBlockEntity{
     @Nullable
     private static Container getAttachedContainer(Level pLevel, BlockPos pPos) {
         return getContainerAt(pLevel, pPos.relative(Direction.DOWN));
-    }
-
-    @Override
-    protected void saveAdditional(CompoundTag pTag) {
-        if (attachedDir != null)
-            pTag.putInt("attachedDir", attachedDir.get2DDataValue());
-        super.saveAdditional(pTag);
-    }
-
-    @Override
-    public void load(CompoundTag pTag) {
-        super.load(pTag);
-        if (pTag.contains("attachedDir")) {
-            attachedDir = Direction.from2DDataValue(pTag.getInt("attachedDir"));
-        } else {
-            attachedDir = null;
-        }
     }
 
     @Override

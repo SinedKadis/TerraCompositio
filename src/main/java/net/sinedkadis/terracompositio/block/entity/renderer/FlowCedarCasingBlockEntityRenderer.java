@@ -66,10 +66,10 @@ public class FlowCedarCasingBlockEntityRenderer implements BlockEntityRenderer<F
                                            BlockState ignoredBlockState,
                                            ItemRenderer itemRenderer,
                                            ItemStackHandler itemStackHandler) {
-        if (pBlockEntity.attachedDir != null) {
+        Direction facing = pBlockEntity.attachedDir();
+        if (facing.getAxis().isHorizontal()) {
             ItemStack stackInSlot = itemStackHandler.getStackInSlot(FlowCedarCasingBlockEntity.DOWN_CONNECTION_SLOT);
             if (stackInSlot.isEmpty()) return;
-            Direction facing = pBlockEntity.attachedDir;
 
             {
                 pPoseStack.pushPose();
@@ -78,13 +78,15 @@ public class FlowCedarCasingBlockEntityRenderer implements BlockEntityRenderer<F
                 pPoseStack.translate(0.5f, 0.0f, 0.5f);
                 Vec3i normal = facing.getNormal();
                 //Move to edges
-                pPoseStack.translate(normal.getX() * 0.1f, 0, normal.getZ() * 0.25f);
+                float k = -0.05f;
+                pPoseStack.translate(normal.getX() * k, 0, normal.getZ() * k);
                 Vec3 vec3 = Vec3.atLowerCornerOf(normal);
                 Vec3 rotatedVec3 = vec3.yRot((float) ((Math.PI) / 2f));
                 //Move lil right
                 pPoseStack.translate(rotatedVec3.x() * 0.1f, 0, normal.getZ() * rotatedVec3.z() * 0.1f);
 
-                pPoseStack.mulPose(Axis.YP.rotationDegrees(facing.toYRot() - 90));
+                pPoseStack.mulPose(Axis.ZP.rotationDegrees(180));
+                pPoseStack.mulPose(Axis.YP.rotationDegrees(facing.toYRot() + 90));
                 pPoseStack.mulPose(Axis.YP.rotationDegrees(-45));
                 pPoseStack.mulPose(Axis.XP.rotationDegrees(90));
 
@@ -130,10 +132,10 @@ public class FlowCedarCasingBlockEntityRenderer implements BlockEntityRenderer<F
                                           BlockState ignoredBlockState,
                                           ItemRenderer itemRenderer,
                                           ItemStackHandler itemStackHandler) {
-        if (pBlockEntity.attachedDir != null) {
+        Direction facing = pBlockEntity.attachedDir();
+        if (facing.getAxis().isHorizontal()) {
             ItemStack stackInSlot = itemStackHandler.getStackInSlot(FlowCedarCasingBlockEntity.UP_CONNECTION_SLOT);
             if (stackInSlot.isEmpty()) return;
-            Direction facing = pBlockEntity.attachedDir;
             {
                 pPoseStack.pushPose();
 
