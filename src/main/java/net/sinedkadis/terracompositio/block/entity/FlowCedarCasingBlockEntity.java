@@ -47,7 +47,7 @@ public class FlowCedarCasingBlockEntity extends TCCraftingBlockEntity{
         super(TCBlockEntities.FLOW_CEDAR_CASING_BE.get(), pos, state);
     }
 
-    private static boolean isInventorySlot(int slot) {
+    public static boolean isInventorySlot(int slot) {
         return slot > DOWN_CONNECTION_SLOT;
     }
 
