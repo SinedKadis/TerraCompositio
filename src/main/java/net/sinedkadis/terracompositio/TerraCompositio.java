@@ -13,6 +13,7 @@ import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.sinedkadis.terracompositio.cfe.CFENetworkHandler;
 import net.sinedkadis.terracompositio.compat.CompatUtils;
+import net.sinedkadis.terracompositio.compat.patchouli.TCPatchouliCompat;
 import net.sinedkadis.terracompositio.compat.soft_compat.ISoftCompat;
 import net.sinedkadis.terracompositio.config.TCClientConfigs;
 import net.sinedkadis.terracompositio.config.TCCommonConfigs;
@@ -92,6 +93,8 @@ public class TerraCompositio
         bus.addListener((CFENetworkEvent e) -> CFENetworkHandler.INSTANCE.onNetworkEvent(e.getSource(),e.getAction()));
         bus.addListener((FluidNetworkEvent e) -> FluidNetworkHandler.INSTANCE.onNetworkEvent(e.getSource(),e.getAction()));
         TCPackets.register();
+        TCPatchouliCompat.init();
+
         if (CompatUtils.CREATE_EXISTENCE.get())
             createCompat.commonInit();
         //SurfaceRuleManager.addSurfaceRules(SurfaceRuleManager.RuleCategory.OVERWORLD, MOD_ID, TCSurfaceRules.makeRules());

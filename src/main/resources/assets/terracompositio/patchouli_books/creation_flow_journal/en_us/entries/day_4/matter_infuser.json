@@ -1,0 +1,25 @@
+{
+  "name": "book.terracompositio.creation_flow_journal.entry.matter_infuser.name",
+  "category": "terracompositio:day_4",
+  "icon": "terracompositio:matter_infuser_io",
+  "flag": "terracompositio:day_4",
+  "pages": [
+    "book.terracompositio.creation_flow_journal.entry.matter_infuser.page1",
+    {
+      "type": "patchouli:multiblock",
+      "name": "book.terracompositio.creation_flow_journal.entry.matter_infuser.name",
+      "multiblock_id": "terracompositio:multiblocks/matter_infuser",
+      "text": "book.terracompositio.creation_flow_journal.entry.matter_infuser.page2"
+    },
+    {
+      "title": "book.terracompositio.creation_flow_journal.entry.matter_infuser.name",
+      "type": "patchouli:spotlight",
+
+      "item": "terracompositio:matter_infuser_port,terracompositio:matter_infuser_io,terracompositio:lapis_input_bus,terracompositio:copper_output_bus,terracompositio:infused_iron_rod,terracompositio:flow_cedar_casing",
+
+      "text": "book.terracompositio.creation_flow_journal.entry.matter_infuser.page3",
+      "link_recipe": true
+    }
+
+  ]
+}
