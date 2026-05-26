@@ -93,7 +93,7 @@ public class TerraCompositio
         bus.addListener((CFENetworkEvent e) -> CFENetworkHandler.INSTANCE.onNetworkEvent(e.getSource(),e.getAction()));
         bus.addListener((FluidNetworkEvent e) -> FluidNetworkHandler.INSTANCE.onNetworkEvent(e.getSource(),e.getAction()));
         TCPackets.register();
-        TCPatchouliCompat.init();
+        TCPatchouliCompat.registerMultiblocks();
 
         if (CompatUtils.CREATE_EXISTENCE.get())
             createCompat.commonInit();
