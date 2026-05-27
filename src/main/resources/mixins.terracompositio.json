@@ -5,7 +5,7 @@
   "refmap": "terracompositio.refmap.json",
   "compatibilityLevel": "JAVA_17",
   "plugin": "net.sinedkadis.terracompositio.mixin.MixinPlugin",
-  "priority": 2000,
+  "priority": 1000,
   "mixins": [
     "AbstractFurnaceBlockEntityMixin",
     "BlockStateBaseMixin",

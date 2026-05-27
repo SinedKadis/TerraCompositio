@@ -66,6 +66,10 @@ repositories {
         }
 
     }
+    maven {
+        name = "Illusive Soulworks maven"
+        url = "https://maven.theillusivec4.top/"
+    }
 
 }
 
@@ -77,11 +81,6 @@ sourceSets {
         compileClasspath += sourceSets.main.output
         runtimeClasspath += sourceSets.main.output
     }
-
-//    main {
-//        compileClasspath += sourceSets.createcompat.output
-//        runtimeClasspath += sourceSets.createcompat.output
-//    }
 }
 
 println "Java: ${System.getProperty 'java.version'}, JVM: ${System.getProperty 'java.vm.version'} (${System.getProperty 'java.vendor'}), Arch: ${System.getProperty 'os.arch'}"
@@ -224,8 +223,12 @@ dependencies {
     //compileOnly fg.deobf("vazkii.patchouli:Patchouli:1.20.1-84.1-FORGE:api")
     implementation fg.deobf("vazkii.patchouli:Patchouli:1.20.1-84.1-FORGE")
 
-//    compileOnly fg.deobf("vazkii.botania:Botania:1.20.1-448-FORGE:api")
-//    runtimeOnly fg.deobf("vazkii.botania:Botania:1.20.1-448-FORGE")
+    compileOnly fg.deobf("vazkii.botania:Botania:1.20.1-453-FORGE:api")
+    runtimeOnly fg.deobf("vazkii.botania:Botania:1.20.1-453-FORGE")
+    // Compile against only the API artifact
+    compileOnly fg.deobf("top.theillusivec4.curios:curios-forge:${curios_version}:api")
+    // Use the full Curios API jar at runtime
+    runtimeOnly fg.deobf("top.theillusivec4.curios:curios-forge:${curios_version}")
    // testImplementation 'org.junit.jupiter:junit-jupiter-api:5.8.1'
    // testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.8.1'
     // For more info:

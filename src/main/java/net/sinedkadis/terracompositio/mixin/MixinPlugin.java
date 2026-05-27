@@ -7,14 +7,14 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Set;
-import java.util.function.Predicate;
+import java.util.function.Supplier;
 
 
 public class MixinPlugin implements IMixinConfigPlugin {
-    private static final Map<String, Predicate<Void>> MIXIN_CONDITIONS = new HashMap<>();
+    private static final Map<String, Supplier<Boolean>> MIXIN_CONDITIONS = new HashMap<>();
 
     static {
-        MIXIN_CONDITIONS.put("BookGuiMixin", v -> isModLoaded("patchouli"));
+        MIXIN_CONDITIONS.put("BookGuiMixin", () -> isModLoaded("patchouli"));
     }
 
     private static boolean isModLoaded(String modId) {
@@ -46,7 +46,7 @@ public class MixinPlugin implements IMixinConfigPlugin {
 
         // Проверяем наличие специальных условий
         if (MIXIN_CONDITIONS.containsKey(simpleName)) {
-            return MIXIN_CONDITIONS.get(simpleName).test(null);
+            return MIXIN_CONDITIONS.get(simpleName).get();
         }
 
         // По умолчанию применяем миксин
