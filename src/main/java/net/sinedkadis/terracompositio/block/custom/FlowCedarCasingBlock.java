@@ -13,6 +13,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Rotation;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
@@ -111,6 +112,13 @@ public class FlowCedarCasingBlock extends TCBaseEntityBlock implements IFluidApp
         }
 
         super.onRemove(pState, pLevel, pPos, pNewState, pIsMoving);
+    }
+
+
+    @SuppressWarnings("deprecation")
+    @Override
+    public BlockState rotate(BlockState pState, Rotation pRotation) {
+        return pState.setValue(AXIS,pRotation.rotate(Direction.get(Direction.AxisDirection.POSITIVE,pState.getValue(AXIS))).getAxis());
     }
 
     @Override
