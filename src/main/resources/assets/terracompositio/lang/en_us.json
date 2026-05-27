@@ -79,7 +79,7 @@
   "item.terracompositio.copper_output_bus": "Copper Output Bus",
   "item.terracompositio.lapis_input_bus": "Lapis Input Bus",
   "block.terracompositio.matter_infuser_port": "Matter Infuser Port",
-  "block.terracompositio.matter_infuser_io": "Matter Infuser Unit",
+  "block.terracompositio.matter_infuser_unit": "Matter Infuser Unit",
   "block.terracompositio.flow_cedar_casing": "Flow Cedar Casing",
   "item.terracompositio.flow_rotating_axe.too_hungry": "I'm too hungry for it",
   "death.attack.tree_chop": "had more motivation to chop than to live.",

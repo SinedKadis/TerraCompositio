@@ -89,7 +89,7 @@ public class FlowCedarCasingBlock extends TCBaseEntityBlock implements IFluidApp
 
     @SuppressWarnings("unused")
     public static @Nullable Boolean isUnitAttached(Level level, BlockState blockState, BlockPos pos) {
-        return isBlockAttached(level, blockState, pos, TCBlocks.MATTER_INFUSER_IO.get());
+        return isBlockAttached(level, blockState, pos, TCBlocks.MATTER_INFUSER_UNIT.get());
     }
 
     @Override

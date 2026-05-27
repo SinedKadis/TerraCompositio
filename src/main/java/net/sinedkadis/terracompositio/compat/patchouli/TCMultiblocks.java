@@ -20,7 +20,7 @@ public class TCMultiblocks {
         var casing = TCBlocks.FLOW_CEDAR_CASING.get().defaultBlockState()
                 .setValue(BlockStateProperties.AXIS, Direction.Axis.X)
                 .setValue(TCBlockStateProperties.INFUSED,true);
-        var io = TCBlocks.MATTER_INFUSER_IO.get().defaultBlockState()
+        var io = TCBlocks.MATTER_INFUSER_UNIT.get().defaultBlockState()
                 .setValue(BlockStateProperties.HORIZONTAL_FACING,Direction.get(Direction.AxisDirection.POSITIVE,Direction.Axis.Z));
         var port = TCBlocks.MATTER_INFUSER_PORT.get().defaultBlockState()
                 .setValue(BlockStateProperties.HORIZONTAL_FACING,Direction.get(Direction.AxisDirection.POSITIVE,Direction.Axis.Z));

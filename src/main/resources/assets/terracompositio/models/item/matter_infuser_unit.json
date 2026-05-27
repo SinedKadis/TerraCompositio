@@ -1,6 +1,6 @@
 {
   "parent": "minecraft:item/generated",
   "textures": {
-    "layer0": "terracompositio:block/matter_infuser_io"
+    "layer0": "terracompositio:block/matter_infuser_unit"
   }
 }

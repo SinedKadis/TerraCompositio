@@ -1,8 +1,8 @@
 {
 	"credit": "Made with Blockbench",
 	"textures": {
-		"1": "terracompositio:block/matter_infuser_io",
-		"particle": "terracompositio:block/matter_infuser_io"
+		"1": "terracompositio:block/matter_infuser_unit",
+		"particle": "terracompositio:block/matter_infuser_unit"
 	},
 	"elements": [
 		{

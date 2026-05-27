@@ -39,7 +39,7 @@ public class MatterInfusionCategory implements IRecipeCategory<MatterInfusionRec
 
     public MatterInfusionCategory(IGuiHelper helper) {
         this.background = helper.createDrawable(Objects.requireNonNull(TEXTURE),0,0,176,99);
-        this.icon = helper.createDrawableIngredient(VanillaTypes.ITEM_STACK,new ItemStack(TCBlocks.MATTER_INFUSER_IO.get()));
+        this.icon = helper.createDrawableIngredient(VanillaTypes.ITEM_STACK,new ItemStack(TCBlocks.MATTER_INFUSER_UNIT.get()));
         IDrawableStatic staticArrow = helper.createDrawable(TEXTURE, 0, 100, 112, 79);
         this.animatedArrow = helper.createAnimatedDrawable(staticArrow, 50, IDrawableAnimated.StartDirection.TOP, true);
 

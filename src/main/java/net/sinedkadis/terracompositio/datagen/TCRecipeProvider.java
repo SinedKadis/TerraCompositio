@@ -533,6 +533,14 @@ public class TCRecipeProvider extends RecipeProvider implements IConditionBuilde
                 .define('F',Items.ITEM_FRAME)
                 .unlockedBy(getHasName(Items.ITEM_FRAME), has(Items.ITEM_FRAME))
                 .save(pWriter);
+        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, TCBlocks.MATTER_INFUSER_UNIT.get())
+                .pattern("RRR")
+                .pattern(" I ")
+                .pattern("RRR")
+                .define('R', TCItems.COPPER_ROD.get())
+                .define('I',TCItems.INFUSED_IRON_INGOT.get())
+                .unlockedBy(getHasName(Items.ITEM_FRAME), has(Items.ITEM_FRAME))
+                .save(pWriter);
         ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, TCItems.OUTPUT_BUS.get())
                 .pattern(" R ")
                 .pattern("RHR")

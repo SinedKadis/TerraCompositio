@@ -31,7 +31,7 @@ public class TCBlockTagGenerator extends BlockTagsProvider {
                         TCBlocks.TECHNETIUM_ORE.get(),
                         TCBlocks.TECHNETIUM_DEEPSLATE_ORE.get(),
                         TCBlocks.MATTER_INFUSER_PORT.get(),
-                        TCBlocks.MATTER_INFUSER_IO.get(),
+                        TCBlocks.MATTER_INFUSER_UNIT.get(),
                         TCBlocks.CONSTRUCTION_DESORBER.get(),
                         TCBlocks.CULTIVATION_DESORBER.get(),
                         TCBlocks.TIME_PASSAGE_DESORBER.get(),

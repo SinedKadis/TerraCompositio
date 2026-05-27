@@ -141,7 +141,7 @@ public class TCBlocks {
             () -> new FlowCedarCasingBlock(BlockBehaviour.Properties.copy(Blocks.STRIPPED_OAK_LOG).strength(3f)));
     public static final RegistryObject<Block> MATTER_INFUSER_PORT = registerBlock("matter_infuser_port",
             () -> new MatterInfuserPortBlock(BlockBehaviour.Properties.copy(Blocks.TRIPWIRE_HOOK).sound(SoundType.COPPER).strength(3f)));
-    public static final RegistryObject<Block> MATTER_INFUSER_IO = registerBlock("matter_infuser_io",
+    public static final RegistryObject<Block> MATTER_INFUSER_UNIT = registerBlock("matter_infuser_unit",
             () -> new MatterInfuserIOBlock(BlockBehaviour.Properties.copy(Blocks.TRIPWIRE_HOOK).sound(SoundType.COPPER).strength(3f)));
 
 

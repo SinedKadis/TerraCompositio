@@ -28,6 +28,7 @@ import net.sinedkadis.terracompositio.registries.TCItems;
 import net.sinedkadis.terracompositio.screen.FlowBlockPortScreen;
 import org.jetbrains.annotations.NotNull;
 
+import java.util.Arrays;
 import java.util.List;
 import java.util.Objects;
 
@@ -72,14 +73,14 @@ public class JEITerraCompositioPlugin implements IModPlugin {
 
     @Override
     public void registerRecipeCatalysts(@NotNull IRecipeCatalystRegistration registration) {
-        if (Minecraft.getInstance().level != null) {
-            RecipeManager recipeManager = Minecraft.getInstance().level.getRecipeManager();
-        }
+//        if (Minecraft.getInstance().level != null) {
+//            RecipeManager recipeManager = Minecraft.getInstance().level.getRecipeManager();
+//        }
         registration.addRecipeCatalyst(new ItemStack(TCBlocks.FLOW_INFUSER.get()),FlowInfusionCategory.FLOW_INFUSION_RECIPE_RECIPE_TYPE);
         addCatalysts(registration,MatterInfusionCategory.MATTER_INFUSION_RECIPE_RECIPE_TYPE,
                 TCBlocks.FLOW_CEDAR_CASING.get(),
                 TCBlocks.MATTER_INFUSER_PORT.get(),
-                TCBlocks.MATTER_INFUSER_IO.get(),
+                TCBlocks.MATTER_INFUSER_UNIT.get(),
                 TCItems.INPUT_BUS.get(),
                 TCItems.OUTPUT_BUS.get());
         addCatalysts(registration,TechnetiumFiringCategory.TECHNETIUM_FIRING_RECIPE_RECIPE_TYPE, ForgeRegistries.BLOCKS.getValues().stream()
@@ -90,9 +91,7 @@ public class JEITerraCompositioPlugin implements IModPlugin {
     }
 
     private static void addCatalysts(IRecipeCatalystRegistration registration,RecipeType<?> recipeType, ItemLike... items){
-        for (ItemLike item : items){
-            registration.addRecipeCatalyst(new ItemStack(item.asItem()),recipeType);
-        }
+        addCatalysts(registration,recipeType, Arrays.stream(items).toList());
     }
     private static void addCatalysts(IRecipeCatalystRegistration registration,RecipeType<?> recipeType, List<ItemLike> items){
         for (ItemLike item : items){
