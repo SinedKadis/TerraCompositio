@@ -9,8 +9,10 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.AxeItem;
+import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Rotation;
@@ -56,6 +58,19 @@ public class FlowCedarCasingBlock extends TCBaseEntityBlock implements IFluidApp
     @Override
     public InteractionResult use(BlockState pState, Level pLevel, BlockPos pPos, Player pPlayer, InteractionHand pHand, BlockHitResult pHit) {
         ItemStack item = pPlayer.getItemInHand(InteractionHand.MAIN_HAND);
+        if (item.getItem() instanceof BlockItem blockItem) {
+
+            BlockPlaceContext context = new BlockPlaceContext(
+                    pPlayer,
+                    pHand,
+                    item,
+                    pHit
+            );
+
+            if (blockItem.canPlace(context, blockItem.getBlock().defaultBlockState())) {
+                return InteractionResult.PASS;
+            }
+        }
         if (item.is(Items.HONEYCOMB) && !pState.getValue(WAXED)) {
             return handleInWorldBlockCraft(pState, pState.setValue(WAXED, true), pLevel, pPos, item, 1, ParticleTypes.WAX_ON, SoundEvents.HONEYCOMB_WAX_ON);
         }
