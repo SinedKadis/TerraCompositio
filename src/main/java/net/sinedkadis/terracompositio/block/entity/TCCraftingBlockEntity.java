@@ -1,17 +1,27 @@
 package net.sinedkadis.terracompositio.block.entity;
 
+import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
+import net.minecraft.world.WorldlyContainer;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.items.IItemHandlerModifiable;
 import net.sinedkadis.terracompositio.api.TCCapabilities;
+import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBEItemBehaviour;
+import net.sinedkadis.terracompositio.api.dummies.DummyBehaviour;
 import net.sinedkadis.terracompositio.api.dummies.DummyCFEHandler;
+import org.jetbrains.annotations.Nullable;
 
+import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.Optional;
 
-public abstract class TCCraftingBlockEntity extends TCBlockEntity{
+@ParametersAreNonnullByDefault
+@MethodsReturnNonnullByDefault
+public abstract class TCCraftingBlockEntity extends TCBlockEntity implements WorldlyContainer {
     protected int progress = 0;
     protected int maxProgress;
     protected float tickCFECost;
@@ -69,5 +79,67 @@ public abstract class TCCraftingBlockEntity extends TCBlockEntity{
             }
         }
         return ItemStack.EMPTY;
+    }
+
+
+    @Override
+    public int[] getSlotsForFace(Direction pSide) {
+        return getBehaviour().getSlotsForFace(pSide);
+    }
+
+    public IBEItemBehaviour getBehaviour() {
+        IBEItemBehaviour itemBehaviour = getItemBehaviour();
+        if (itemBehaviour == null) return DummyBehaviour.instance;
+        return itemBehaviour;
+    }
+
+    @Override
+    public boolean canPlaceItemThroughFace(int pIndex, ItemStack pItemStack, @Nullable Direction pDirection) {
+        return getBehaviour().canPlaceItemThroughFace(pIndex,pItemStack,pDirection);
+    }
+
+    @Override
+    public boolean canTakeItemThroughFace(int pIndex, ItemStack pStack, Direction pDirection) {
+        return getBehaviour().canTakeItemThroughFace(pIndex,pStack,pDirection);
+    }
+
+    @Override
+    public int getContainerSize() {
+        return getBehaviour().getContainerSize();
+    }
+
+    @Override
+    public boolean isEmpty() {
+        return getBehaviour().isEmpty();
+    }
+
+    @Override
+    public ItemStack getItem(int pSlot) {
+        return getBehaviour().getItem(pSlot);
+    }
+
+    @Override
+    public ItemStack removeItem(int pSlot, int pAmount) {
+        return getBehaviour().removeItem(pSlot,pAmount);
+    }
+
+    @Override
+    public ItemStack removeItemNoUpdate(int pSlot) {
+        return getBehaviour().removeItemNoUpdate(pSlot);
+    }
+
+    @Override
+    public void setItem(int pSlot, ItemStack pStack) {
+        getBehaviour().setItem(pSlot,pStack);
+    }
+
+    @Override
+    public boolean stillValid(Player pPlayer) {
+        return getBehaviour().stillValid(pPlayer);
+    }
+
+    @Override
+    public void clearContent() {
+        getBehaviour().clearContent();
     }
 }

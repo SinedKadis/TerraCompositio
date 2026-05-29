@@ -66,7 +66,7 @@ public abstract class MatterInfuserBaseBlockEntity extends TCCraftingBlockEntity
         if (level != null) {
             blockEntity1 = level.getBlockEntity(blockPos2);
         }
-        if (blockEntity1 instanceof MatterInfuserIOBlockEntity) {
+        if (blockEntity1 instanceof MatterInfuserUnitBlockEntity) {
             TCUtil.dropContents(blockEntity1);
         }
         BlockPos blockpos = worldPosition.relative(direction.getOpposite());

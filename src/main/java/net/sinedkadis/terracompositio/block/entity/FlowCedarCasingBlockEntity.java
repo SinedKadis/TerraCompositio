@@ -1,5 +1,6 @@
 package net.sinedkadis.terracompositio.block.entity;
 
+import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.Container;
@@ -30,6 +31,7 @@ import java.util.stream.IntStream;
 import static net.minecraft.world.level.block.entity.HopperBlockEntity.getContainerAt;
 
 @ParametersAreNonnullByDefault
+@MethodsReturnNonnullByDefault
 public class FlowCedarCasingBlockEntity extends TCCraftingBlockEntity{
 
     public static final int INPUT_BUS_SLOT = 0;

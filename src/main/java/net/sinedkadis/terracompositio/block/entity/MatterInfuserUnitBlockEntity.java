@@ -1,5 +1,6 @@
 package net.sinedkadis.terracompositio.block.entity;
 
+import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.world.InteractionHand;
@@ -9,11 +10,15 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
+import net.minecraftforge.common.capabilities.ForgeCapabilities;
+import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.IItemHandlerModifiable;
+import net.minecraftforge.items.wrapper.EmptyHandler;
 import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBEBehaviour;
 import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBECFEBehaviour;
 import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBEItemBehaviour;
@@ -24,22 +29,24 @@ import net.sinedkadis.terracompositio.block.custom.MatterInfuserBaseEntityBlock;
 import net.sinedkadis.terracompositio.recipe.MatterInfusionRecipe;
 import net.sinedkadis.terracompositio.registries.TCBlockEntities;
 import net.sinedkadis.terracompositio.registries.TCItems;
-import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.List;
 import java.util.Optional;
 
+import static net.sinedkadis.terracompositio.block.entity.FlowCedarCasingBlockEntity.*;
 import static net.sinedkadis.terracompositio.registries.TCBlockStateProperties.INFUSED;
 
 @ParametersAreNonnullByDefault
-public class MatterInfuserIOBlockEntity extends MatterInfuserBaseBlockEntity{
+@MethodsReturnNonnullByDefault
+public class MatterInfuserUnitBlockEntity extends MatterInfuserBaseBlockEntity{
 
 
     protected float catalystDecayRate;
+    private boolean isAssembled;
 
-    public MatterInfuserIOBlockEntity(BlockPos pos, BlockState state) {
+    public MatterInfuserUnitBlockEntity(BlockPos pos, BlockState state) {
         super(TCBlockEntities.MATTER_INFUSER_IO_BE.get(), pos, state);
     }
 
@@ -76,7 +83,7 @@ public class MatterInfuserIOBlockEntity extends MatterInfuserBaseBlockEntity{
             }
 
             @Override
-            public @NotNull InteractionResult onUse(Player pPlayer, InteractionHand pHand, BlockHitResult pHit) {
+            public InteractionResult onUse(Player pPlayer, InteractionHand pHand, BlockHitResult pHit) {
                 TCBlockEntity blockEntity = getBlockEntity();
                 Level level = blockEntity.getLevel();
                 if (level != null) {
@@ -91,9 +98,15 @@ public class MatterInfuserIOBlockEntity extends MatterInfuserBaseBlockEntity{
 
     }
 
+    int timer = 0;
     public void tick(Level pLevel, BlockPos pPos, BlockState pState) {
         super.tick(pLevel, pPos, pState);
-        if(hasRecipe() && enoughCFE()){
+        if (timer <= 0) {
+            timer = 20;
+            isAssembled = assembleValid();
+        }
+        timer--;
+        if(hasRecipe() && enoughCFE() && isAssembled){
             increaseCraftingProgress();
             consumeCFE();
             setChanged(pLevel, pPos, pState);
@@ -107,6 +120,34 @@ public class MatterInfuserIOBlockEntity extends MatterInfuserBaseBlockEntity{
         }else if(!hasRecipe()) {
             resetProgress();
         }
+    }
+
+    private boolean assembleValid() {
+        if (level == null) return false;
+
+        FlowCedarCasingBlockEntity casingBE = getCasingBE();
+
+        if (casingBE == null) {
+            return false;
+        }
+        IItemHandlerModifiable casingItemHandler = casingBE.getItemHandler();
+        if (casingItemHandler.getStackInSlot(UP_CONNECTION_SLOT).isEmpty()
+                || casingItemHandler.getStackInSlot(DOWN_CONNECTION_SLOT).isEmpty())
+            return false;
+
+        for (int i = 0; i < 9; i++) {
+            Direction dir = getBlockState().getValue(BlockStateProperties.HORIZONTAL_FACING).getClockWise();
+            BlockPos currentPos = worldPosition.relative(dir, i);
+            BlockEntity blockEntity = level.getBlockEntity(currentPos);
+            if (blockEntity instanceof MatterInfuserPortBlockEntity) break;
+            if (blockEntity instanceof MatterInfuserUnitBlockEntity unitBlockEntity) {
+                IItemHandler unitItemHandler = unitBlockEntity.getCapability(ForgeCapabilities.ITEM_HANDLER).orElse(EmptyHandler.INSTANCE);
+                if (unitItemHandler.getStackInSlot(0).isEmpty()) return false;
+                continue;
+            }
+            return false;
+        }
+        return true;
     }
 
     protected ItemStack craftItem() {
@@ -125,8 +166,8 @@ public class MatterInfuserIOBlockEntity extends MatterInfuserBaseBlockEntity{
 
             if (itemBehaviour instanceof ManySlotItemHandlerBehaviour itemHandlerBehaviour) {
                 itemHandlerBehaviour.ignoreRestrictions = true;
-                itemHandler.extractItem(0, takeCount, false);
-                itemHandler.insertItem(1, result, false);
+                itemHandler.extractItem(INPUT_INVENTORY_SLOT, takeCount, false);
+                itemHandler.insertItem(OUTPUT_INVENTORY_SLOT, result, false);
                 itemHandlerBehaviour.ignoreRestrictions = false;
             }
 
@@ -216,12 +257,12 @@ public class MatterInfuserIOBlockEntity extends MatterInfuserBaseBlockEntity{
     }
 
     protected boolean sameItemInOutput(Item item) {
-        ItemStack outputSlot = this.getItemInSlot(1);
+        ItemStack outputSlot = this.getItemInSlot(FlowCedarCasingBlockEntity.OUTPUT_INVENTORY_SLOT);
         return outputSlot.isEmpty() || outputSlot.is(item);
     }
 
     protected boolean enoughSpaceInOutput(int count) {
-        ItemStack outputSlot = this.getItemInSlot(1);
+        ItemStack outputSlot = this.getItemInSlot(FlowCedarCasingBlockEntity.OUTPUT_INVENTORY_SLOT);
         return outputSlot.getCount() + count <= outputSlot.getMaxStackSize();
     }
 }

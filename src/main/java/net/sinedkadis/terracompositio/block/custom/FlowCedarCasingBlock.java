@@ -122,7 +122,8 @@ public class FlowCedarCasingBlock extends TCBaseEntityBlock implements IFluidApp
     public void onRemove(BlockState pState, Level pLevel, BlockPos pPos, BlockState pNewState, boolean pIsMoving) {
 
         Direction attachedDir = pState.getValue(ATTACHED_DIR);
-        if (attachedDir.getAxis().isHorizontal()) {
+        if (!pState.getBlock().equals(pNewState.getBlock())
+                && attachedDir.getAxis().isHorizontal()) {
             pLevel.destroyBlock(pPos.relative(attachedDir), true);
         }
 

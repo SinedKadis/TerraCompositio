@@ -18,7 +18,7 @@ public class JadeTerraCompositioPlugin implements IWailaPlugin {
 
         registration.registerBlockDataProvider(TCBlockEntityComponentProvider.INSTANCE, TCBlockEntity.class);
 
-        registration.registerBlockDataProvider(MatterInfuserIOComponentProvider.INSTANCE, MatterInfuserIOBlockEntity.class);
+        registration.registerBlockDataProvider(MatterInfuserIOComponentProvider.INSTANCE, MatterInfuserUnitBlockEntity.class);
 
         registration.registerBlockDataProvider(TimePassageDesorberComponentProvider.INSTANCE,TimePassageDesorberBlockEntity.class);
         

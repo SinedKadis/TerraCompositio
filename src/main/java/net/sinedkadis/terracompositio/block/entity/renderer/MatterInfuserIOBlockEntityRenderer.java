@@ -19,18 +19,18 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemStackHandler;
-import net.sinedkadis.terracompositio.block.entity.MatterInfuserIOBlockEntity;
+import net.sinedkadis.terracompositio.block.entity.MatterInfuserUnitBlockEntity;
 import net.sinedkadis.terracompositio.util.TCUtil;
 import org.jetbrains.annotations.NotNull;
 
-public class MatterInfuserIOBlockEntityRenderer implements BlockEntityRenderer<MatterInfuserIOBlockEntity> {
+public class MatterInfuserIOBlockEntityRenderer implements BlockEntityRenderer<MatterInfuserUnitBlockEntity> {
     public MatterInfuserIOBlockEntityRenderer(BlockEntityRendererProvider.Context ignoredContext) {
 
     }
 
 
     @Override
-    public void render(MatterInfuserIOBlockEntity pBlockEntity,
+    public void render(MatterInfuserUnitBlockEntity pBlockEntity,
                        float pPartialTick,
                        @NotNull PoseStack pPoseStack,
                        @NotNull MultiBufferSource pBuffer,
@@ -49,7 +49,7 @@ public class MatterInfuserIOBlockEntityRenderer implements BlockEntityRenderer<M
 
     }
 
-    private void renderLeftConnection(MatterInfuserIOBlockEntity pBlockEntity,
+    private void renderLeftConnection(MatterInfuserUnitBlockEntity pBlockEntity,
                                       @NotNull PoseStack pPoseStack,
                                       @NotNull MultiBufferSource pBuffer,
                                       Level level,

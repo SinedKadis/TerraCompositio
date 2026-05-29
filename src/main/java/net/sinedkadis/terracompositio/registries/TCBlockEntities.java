@@ -40,9 +40,9 @@ public class TCBlockEntities {
             BLOCK_ENTITIES.register("matter_infuser_port_be", () ->
                     BlockEntityType.Builder.of(MatterInfuserPortBlockEntity::new,
                             MATTER_INFUSER_PORT.get()).build(null));
-    public static final RegistryObject<BlockEntityType<MatterInfuserIOBlockEntity>> MATTER_INFUSER_IO_BE =
+    public static final RegistryObject<BlockEntityType<MatterInfuserUnitBlockEntity>> MATTER_INFUSER_IO_BE =
             BLOCK_ENTITIES.register("matter_infuser_io_be", () ->
-                    BlockEntityType.Builder.of(MatterInfuserIOBlockEntity::new,
+                    BlockEntityType.Builder.of(MatterInfuserUnitBlockEntity::new,
                             MATTER_INFUSER_UNIT.get()).build(null));
     public static final RegistryObject<BlockEntityType<FlowCedarCasingBlockEntity>> FLOW_CEDAR_CASING_BE =
             BLOCK_ENTITIES.register("flow_cedar_casing_io_be", () ->
