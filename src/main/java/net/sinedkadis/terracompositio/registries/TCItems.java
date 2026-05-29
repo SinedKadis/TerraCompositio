@@ -2,6 +2,8 @@ package net.sinedkadis.terracompositio.registries;
 
 import net.minecraft.ChatFormatting;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.food.FoodProperties;
+import net.minecraft.world.food.Foods;
 import net.minecraft.world.item.*;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.common.ForgeSpawnEggItem;
@@ -148,6 +150,11 @@ public class TCItems {
             () -> new CFEBallItem(new Item.Properties()));
     public static final RegistryObject<Item> INFUSED_FERTILIZER = ITEMS.register("infused_fertilizer",
             () -> new InfusedFertilizerItem(new Item.Properties()));
+
+    //Apples
+    public static final RegistryObject<Item> APPLE_OF_KNOWLEDGE = ITEMS.register("apple_of_knowledge",
+            () -> new Item(new Item.Properties()
+                    .food((new FoodProperties.Builder()).alwaysEat().effect().build())));
 
 
     public static void register(IEventBus eventBus){
