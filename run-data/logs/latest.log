@@ -1,0 +1,56 @@
+[27May2026 22:37:07.732] [main/INFO] [cpw.mods.modlauncher.Launcher/MODLAUNCHER]: ModLauncher running: args [--launchTarget, forgedatauserdev, --assetIndex, 5, --assetsDir, /home/SinedKadis/.gradle/caches/forge_gradle/assets, --gameDir, ., --fml.forgeVersion, 47.4.1, --fml.mcVersion, 1.20.1, --fml.forgeGroup, net.minecraftforge, --fml.mcpVersion, 20230612.114412, --mod, terracompositio, --all, --output, /home/SinedKadis/IdeaProjects/TerraCompositio/src/generated/resources, --existing, /home/SinedKadis/IdeaProjects/TerraCompositio/src/main/resources, --mixin.config, mixins.terracompositio.json]
+[27May2026 22:37:07.740] [main/INFO] [cpw.mods.modlauncher.Launcher/MODLAUNCHER]: ModLauncher 10.0.9+10.0.9+main.dcd20f30 starting: java version 17.0.18 by Microsoft; OS Linux arch amd64 version 7.0.10-arch1-1
+[27May2026 22:37:07.947] [main/INFO] [net.minecraftforge.fml.loading.ImmediateWindowHandler/]: ImmediateWindowProvider not loading because launch target is forgedatauserdev
+[27May2026 22:37:08.033] [main/INFO] [mixin/]: SpongePowered MIXIN Subsystem Version=0.8.5 Source=union:/home/SinedKadis/.gradle/caches/modules-2/files-2.1/org.spongepowered/mixin/0.8.5/9d1c0c3a304ae6697ecd477218fa61b850bf57fc/mixin-0.8.5.jar%23116!/ Service=ModLauncher Env=CLIENT
+[27May2026 22:37:08.613] [main/WARN] [net.minecraftforge.fml.loading.moddiscovery.ModFileParser/LOADING]: Mod file /home/SinedKadis/.gradle/caches/modules-2/files-2.1/net.minecraftforge/javafmllanguage/1.20.1-47.4.1/97b774cead20444ed9d0c2de762881a15d872397/javafmllanguage-1.20.1-47.4.1.jar is missing mods.toml file
+[27May2026 22:37:08.615] [main/WARN] [net.minecraftforge.fml.loading.moddiscovery.ModFileParser/LOADING]: Mod file /home/SinedKadis/.gradle/caches/modules-2/files-2.1/net.minecraftforge/lowcodelanguage/1.20.1-47.4.1/da4a2af4a4ebbbb33e35b292a16fe3f7122b236/lowcodelanguage-1.20.1-47.4.1.jar is missing mods.toml file
+[27May2026 22:37:08.617] [main/WARN] [net.minecraftforge.fml.loading.moddiscovery.ModFileParser/LOADING]: Mod file /home/SinedKadis/.gradle/caches/modules-2/files-2.1/net.minecraftforge/mclanguage/1.20.1-47.4.1/75a8f0757adad78cbd8108dff9e0d39cbdb3d787/mclanguage-1.20.1-47.4.1.jar is missing mods.toml file
+[27May2026 22:37:08.620] [main/WARN] [net.minecraftforge.fml.loading.moddiscovery.ModFileParser/LOADING]: Mod file /home/SinedKadis/.gradle/caches/modules-2/files-2.1/net.minecraftforge/fmlcore/1.20.1-47.4.1/3061e70b85c05f936d9fa24477be4d4205d8f6b8/fmlcore-1.20.1-47.4.1.jar is missing mods.toml file
+[27May2026 22:37:08.965] [main/INFO] [net.minecraftforge.fml.loading.moddiscovery.JarInJarDependencyLocator/]: Found 1 dependencies adding them to mods collection
+[27May2026 22:37:12.430] [main/INFO] [mixin/]: Compatibility level set to JAVA_17
+[27May2026 22:37:12.533] [main/INFO] [cpw.mods.modlauncher.LaunchServiceHandler/MODLAUNCHER]: Launching target 'forgedatauserdev' with arguments [--gameDir, ., --assetsDir, /home/SinedKadis/.gradle/caches/forge_gradle/assets, --assetIndex, 5, --mod, terracompositio, --all, --output, /home/SinedKadis/IdeaProjects/TerraCompositio/src/generated/resources, --existing, /home/SinedKadis/IdeaProjects/TerraCompositio/src/main/resources]
+[27May2026 22:37:12.623] [main/WARN] [mixin/]: Reference map 'terracompositio.refmap.json' for mixins.terracompositio.json could not be read. If this is a development environment you can ignore this message
+[27May2026 22:37:13.736] [main/INFO] [mixin/]: Remapping refMap terrablender.refmap.json using /home/SinedKadis/IdeaProjects/TerraCompositio/build/createSrgToMcp/output.srg
+[27May2026 22:37:13.738] [main/INFO] [mixin/]: Remapping refMap terrablender.refmap.json using /home/SinedKadis/IdeaProjects/TerraCompositio/build/createSrgToMcp/output.srg
+[27May2026 22:37:13.740] [main/INFO] [mixin/]: Remapping refMap jade.refmap.json using /home/SinedKadis/IdeaProjects/TerraCompositio/build/createSrgToMcp/output.srg
+[27May2026 22:37:13.744] [main/INFO] [mixin/]: Remapping refMap botania.refmap.json using /home/SinedKadis/IdeaProjects/TerraCompositio/build/createSrgToMcp/output.srg
+[27May2026 22:37:13.749] [main/INFO] [mixin/]: Remapping refMap botania.refmap.json using /home/SinedKadis/IdeaProjects/TerraCompositio/build/createSrgToMcp/output.srg
+[27May2026 22:37:13.751] [main/INFO] [mixin/]: Remapping refMap backend-flywheel.refmap.json using /home/SinedKadis/IdeaProjects/TerraCompositio/build/createSrgToMcp/output.srg
+[27May2026 22:37:13.753] [main/INFO] [mixin/]: Remapping refMap flywheel.refmap.json using /home/SinedKadis/IdeaProjects/TerraCompositio/build/createSrgToMcp/output.srg
+[27May2026 22:37:13.755] [main/INFO] [mixin/]: Remapping refMap ponder.refmap.json using /home/SinedKadis/IdeaProjects/TerraCompositio/build/createSrgToMcp/output.srg
+[27May2026 22:37:13.757] [main/INFO] [mixin/]: Remapping refMap ponder.refmap.json using /home/SinedKadis/IdeaProjects/TerraCompositio/build/createSrgToMcp/output.srg
+[27May2026 22:37:13.759] [main/INFO] [mixin/]: Remapping refMap curios.refmap.json using /home/SinedKadis/IdeaProjects/TerraCompositio/build/createSrgToMcp/output.srg
+[27May2026 22:37:13.764] [main/INFO] [mixin/]: Remapping refMap create.refmap.json using /home/SinedKadis/IdeaProjects/TerraCompositio/build/createSrgToMcp/output.srg
+[27May2026 22:37:13.766] [main/INFO] [mixin/]: Remapping refMap patchouli.refmap.json using /home/SinedKadis/IdeaProjects/TerraCompositio/build/createSrgToMcp/output.srg
+[27May2026 22:37:15.581] [main/WARN] [mixin/]: Error loading class: journeymap/client/ui/fullscreen/Fullscreen (java.lang.ClassNotFoundException: journeymap.client.ui.fullscreen.Fullscreen)
+[27May2026 22:37:15.582] [main/WARN] [mixin/]: @Mixin target journeymap.client.ui.fullscreen.Fullscreen was not found create.mixins.json:compat.JourneyFullscreenMapMixin
+[27May2026 22:37:16.145] [main/INFO] [net.minecraftforge.data.loading.DatagenModLoader/]: Initializing Data Gatherer for mods [terracompositio]
+[27May2026 22:37:16.157] [main/INFO] [MixinExtras|Service/]: Initializing MixinExtras via com.llamalad7.mixinextras.service.MixinExtrasServiceImpl(version=0.4.1).
+[27May2026 22:37:26.879] [modloading-worker-0/INFO] [net.minecraftforge.common.ForgeMod/FORGEMOD]: Forge mod loading, version 47.4.1, for MC 1.20.1 with MCP 20230612.114412
+[27May2026 22:37:26.880] [modloading-worker-0/INFO] [net.minecraftforge.common.MinecraftForge/FORGE]: MinecraftForge v47.4.1 Initialized
+[27May2026 22:37:26.959] [modloading-worker-0/INFO] [terrablender/]: Registered region minecraft:overworld to index 0 for type OVERWORLD
+[27May2026 22:37:26.960] [modloading-worker-0/INFO] [terrablender/]: Registered region minecraft:nether to index 0 for type NETHER
+[27May2026 22:37:26.961] [modloading-worker-0/INFO] [terrablender/]: Registered region terracompositio:overworld to index 1 for type OVERWORLD
+[27May2026 22:37:27.669] [modloading-worker-0/INFO] [mezz.jei.library.load.PluginCaller/]: Sending ConfigManager...
+[27May2026 22:37:27.687] [modloading-worker-0/INFO] [mezz.jei.library.load.PluginCaller/]: Sending ConfigManager took 8.162 ms
+[27May2026 22:37:27.780] [modloading-worker-0/INFO] [com.simibubi.create.Create/]: Create 6.0.6 initializing! Commit hash: 338bfa0aec952fa51656e8f61bd621ca9b3b2e00
+[27May2026 22:37:36.150] [main/WARN] [net.minecraft.server.packs.VanillaPackResourcesBuilder/]: Assets URL 'union:/home/SinedKadis/IdeaProjects/TerraCompositio/build/fg_cache/net/minecraftforge/forge/1.20.1-47.4.1_mapped_parchment_2023.09.03-1.20.1/forge-1.20.1-47.4.1_mapped_parchment_2023.09.03-1.20.1-recomp.jar%23181!/assets/.mcassetsroot' uses unexpected schema
+[27May2026 22:37:36.151] [main/WARN] [net.minecraft.server.packs.VanillaPackResourcesBuilder/]: Assets URL 'union:/home/SinedKadis/IdeaProjects/TerraCompositio/build/fg_cache/net/minecraftforge/forge/1.20.1-47.4.1_mapped_parchment_2023.09.03-1.20.1/forge-1.20.1-47.4.1_mapped_parchment_2023.09.03-1.20.1-recomp.jar%23181!/data/.mcassetsroot' uses unexpected schema
+[27May2026 22:37:36.732] [main/INFO] [net.minecraft.data.DataGenerator/]: Starting provider: Recipes
+[27May2026 22:37:36.840] [main/INFO] [net.minecraft.data.DataGenerator/]: Recipes finished after 106 ms
+[27May2026 22:37:36.840] [main/INFO] [net.minecraft.data.DataGenerator/]: Starting provider: Loot Tables
+[27May2026 22:37:36.933] [main/INFO] [net.minecraft.data.DataGenerator/]: Loot Tables finished after 92 ms
+[27May2026 22:37:36.934] [main/INFO] [net.minecraft.data.DataGenerator/]: Starting provider: Block States: terracompositio
+[27May2026 22:37:37.145] [main/INFO] [net.minecraft.data.DataGenerator/]: Block States: terracompositio finished after 210 ms
+[27May2026 22:37:37.145] [main/INFO] [net.minecraft.data.DataGenerator/]: Starting provider: Item Models: terracompositio
+[27May2026 22:37:37.193] [main/INFO] [net.minecraft.data.DataGenerator/]: Item Models: terracompositio finished after 47 ms
+[27May2026 22:37:37.193] [main/INFO] [net.minecraft.data.DataGenerator/]: Starting provider: Tags for minecraft:block mod id terracompositio
+[27May2026 22:37:37.221] [main/INFO] [net.minecraft.data.DataGenerator/]: Tags for minecraft:block mod id terracompositio finished after 28 ms
+[27May2026 22:37:37.222] [main/INFO] [net.minecraft.data.DataGenerator/]: Starting provider: Tags for minecraft:item mod id terracompositio
+[27May2026 22:37:37.230] [main/INFO] [net.minecraft.data.DataGenerator/]: Tags for minecraft:item mod id terracompositio finished after 8 ms
+[27May2026 22:37:37.231] [main/INFO] [net.minecraft.data.DataGenerator/]: Starting provider: Tags for minecraft:fluid mod id terracompositio
+[27May2026 22:37:37.232] [main/INFO] [net.minecraft.data.DataGenerator/]: Tags for minecraft:fluid mod id terracompositio finished after 1 ms
+[27May2026 22:37:37.232] [main/INFO] [net.minecraft.data.DataGenerator/]: Starting provider: Registries
+[27May2026 22:37:37.260] [main/INFO] [net.minecraft.data.DataGenerator/]: Registries finished after 27 ms
+[27May2026 22:37:37.260] [main/INFO] [net.minecraft.data.DataGenerator/]: All providers took: 529 ms
+[27May2026 22:37:37.285] [main/INFO] [net.minecraft.data.HashCache/]: Caching: total files: 491, old count: 488, new count: 489, removed stale: 3, written: 4
