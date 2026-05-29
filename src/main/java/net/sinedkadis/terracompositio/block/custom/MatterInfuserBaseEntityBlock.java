@@ -11,6 +11,7 @@ import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelReader;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Rotation;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
@@ -115,6 +116,12 @@ public abstract class MatterInfuserBaseEntityBlock extends TCBaseEntityBlock {
         }
 
         return null;
+    }
+
+    @SuppressWarnings("deprecation")
+    @Override
+    public @NotNull BlockState rotate(BlockState pState, Rotation pRotation) {
+        return pState.setValue(FACING,pRotation.rotate(pState.getValue(FACING)));
     }
 
     static {

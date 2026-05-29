@@ -77,7 +77,7 @@
   "item.terracompositio.copper_output_bus": "Copper Output Bus",
   "item.terracompositio.lapis_input_bus": "Lapis Input Bus",
   "block.terracompositio.matter_infuser_port": "Matter Infuser Port",
-  "block.terracompositio.matter_infuser_io": "Matter Infuser Unit",
+  "block.terracompositio.matter_infuser_unit": "Matter Infuser Unit",
   "block.terracompositio.flow_cedar_casing": "Flow Cedar Casing",
   "item.terracompositio.flow_rotating_axe.too_hungry": "I'm too hungry for it",
   "death.attack.tree_chop": "had more motivation to chop than to live.",
@@ -252,8 +252,15 @@
   "book.terracompositio.creation_flow_journal.category.day_4.name": "Четвертый день",
   "book.terracompositio.creation_flow_journal.category.day_4.description": "Продвинутые материалы и их применение",
   "book.terracompositio.creation_flow_journal.entry.technetium_ore.name": "Руда Технеция",
-  "book.terracompositio.creation_flow_journal.entry.technetium_ore.page1": "  В глубинах пещер можно отыскать одну необычно опасную синюю руду. Это - Нестабильный Технеций. От него исходит огромная аура созедания, которая будет истощать того, кто ее держит. По этому, без необходимого обмундирования ее лучше избегать!",
+  "book.terracompositio.creation_flow_journal.entry.technetium_ore.page1": "  В глубинах пещер можно отыскать одну необычно опасную синюю руду. Это - Нестабильный Технеций. От него исходит огромная аура созидания, которая будет истощать того, кто ее держит. По этому, без необходимого обмундирования ее лучше избегать!",
   "book.terracompositio.creation_flow_journal.entry.shielded_bundle.name": "Экранированный мешочек",
-  "book.terracompositio.creation_flow_journal.entry.shielded_bundle.page1": "Автоматически подбирает в себя любой нестабильный технеций, защищает от ауры созедания"
+  "book.terracompositio.creation_flow_journal.entry.shielded_bundle.page1": "Автоматически подбирает в себя любой нестабильный технеций, защищает от ауры созидания",
+
+
+  "book.terracompositio.creation_flow_journal.entry.matter_infuser.name": "Наполнитель материи",
+  "book.terracompositio.creation_flow_journal.entry.matter_infuser.page1": "  Руда технеция содержит в себе много ЭПС, однако если просто руду переплавить, энергия улетучивается. Для того что бы ее добыть, необходимо раскрыть потенциал, с помощью наполнения руды разными каталитическими материалами. ",
+  "book.terracompositio.creation_flow_journal.entry.matter_infuser.page2": "  Для этого есть Наполнитель материи - многоблочная структура, занимающая от 2х2 до 2х9 блоков по горизонтали.",
+  "book.terracompositio.creation_flow_journal.entry.matter_infuser.page3": "  После размещения блоков, необходимо нацепить на бревна Шины входа/выхода, а так же соединить модули друг с другом и с шинами с помощью стержней из наполненного железа"
+
 
 }

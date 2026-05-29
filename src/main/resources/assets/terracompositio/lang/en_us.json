@@ -79,7 +79,7 @@
   "item.terracompositio.copper_output_bus": "Copper Output Bus",
   "item.terracompositio.lapis_input_bus": "Lapis Input Bus",
   "block.terracompositio.matter_infuser_port": "Matter Infuser Port",
-  "block.terracompositio.matter_infuser_io": "Matter Infuser Unit",
+  "block.terracompositio.matter_infuser_unit": "Matter Infuser Unit",
   "block.terracompositio.flow_cedar_casing": "Flow Cedar Casing",
   "item.terracompositio.flow_rotating_axe.too_hungry": "I'm too hungry for it",
   "death.attack.tree_chop": "had more motivation to chop than to live.",
@@ -268,11 +268,19 @@
   "book.terracompositio.creation_flow_journal.entry.cfe_mechanic.name": "test",
   "book.terracompositio.creation_flow_journal.entry.cfe_mechanic.page1": "test",
   "book.terracompositio.creation_flow_journal.entry.cfe_mechanic.page2": "test",
+
+
   "book.terracompositio.creation_flow_journal.category.day_4.name": "Fourth day",
   "book.terracompositio.creation_flow_journal.category.day_4.description": "yes",
+
+
   "book.terracompositio.creation_flow_journal.entry.technetium_ore.name": "test",
   "book.terracompositio.creation_flow_journal.entry.technetium_ore.page1": "test",
   "book.terracompositio.creation_flow_journal.entry.shielded_bundle.name": "test",
-  "book.terracompositio.creation_flow_journal.entry.shielded_bundle.page1": "test"
+  "book.terracompositio.creation_flow_journal.entry.shielded_bundle.page1": "test",
 
+  "book.terracompositio.creation_flow_journal.entry.matter_infuser.name": "test",
+  "book.terracompositio.creation_flow_journal.entry.matter_infuser.page1": "test",
+  "book.terracompositio.creation_flow_journal.entry.matter_infuser.page2": "test",
+  "book.terracompositio.creation_flow_journal.entry.matter_infuser.page3": "text"
 }

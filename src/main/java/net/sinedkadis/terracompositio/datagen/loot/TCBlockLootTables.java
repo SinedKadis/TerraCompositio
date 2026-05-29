@@ -62,7 +62,7 @@ public class TCBlockLootTables extends BlockLootSubProvider {
 
         this.dropOther(TCBlocks.FLOW_CEDAR_CASING.get(), TCBlocks.FLOW_CEDAR_LOG.get());
         this.dropSelf(TCBlocks.MATTER_INFUSER_PORT.get());
-        this.dropSelf(TCBlocks.MATTER_INFUSER_IO.get());
+        this.dropSelf(TCBlocks.MATTER_INFUSER_UNIT.get());
 
         this.add(TCBlocks.FLOW_CEDAR_SLAB.get(),
                 block -> createSlabItemTable(TCBlocks.FLOW_CEDAR_SLAB.get()));

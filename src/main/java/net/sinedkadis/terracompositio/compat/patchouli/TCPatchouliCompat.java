@@ -5,12 +5,17 @@ import net.minecraft.world.level.Level;
 import net.minecraftforge.fml.ModList;
 import net.sinedkadis.terracompositio.TerraCompositio;
 import net.sinedkadis.terracompositio.registries.TCItems;
+import vazkii.patchouli.api.PatchouliAPI;
 
 import java.lang.reflect.Method;
 
-public class PatchouliCompat {
+public class TCPatchouliCompat {
     private static final String BOOK_CLASS = "vazkii.patchouli.common.book.Book";
     private static final boolean PATCHOULI_LOADED = ModList.get().isLoaded("patchouli");
+
+    public static void registerMultiblocks() {
+        PatchouliAPI.get().registerMultiblock(TerraCompositio.modLoc("multiblocks/matter_infuser"),TCMultiblocks.MATTER_INFUSER_MB.get());
+    }
 
     public static void reloadBookContents(Object book, Level level) {
         if (!PATCHOULI_LOADED) return;

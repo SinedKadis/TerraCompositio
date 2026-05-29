@@ -19,6 +19,7 @@ import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.IItemHandler;
+import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.ItemStackHandler;
 import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBEItemBehaviour;
 import net.sinedkadis.terracompositio.block.entity.TCBlockEntity;
@@ -111,7 +112,7 @@ public class ManySlotItemHandlerBehaviour implements IBEItemBehaviour, WorldlyCo
         tag.put("itemHandler", getItemHandler().serializeNBT());
     }
 
-    private static boolean hasSpace(ItemStackHandler itemHandler, int i) {
+    public static boolean hasSpace(IItemHandlerModifiable itemHandler, int i) {
         return itemHandler.getSlotLimit(i) - itemHandler.getStackInSlot(i).getCount() > 0;
     }
 

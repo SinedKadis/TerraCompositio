@@ -24,7 +24,7 @@ import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemStackHandler;
 import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBEItemBehaviour;
-import net.sinedkadis.terracompositio.block.entity.MatterInfuserIOBlockEntity;
+import net.sinedkadis.terracompositio.block.entity.MatterInfuserUnitBlockEntity;
 import net.sinedkadis.terracompositio.block.entity.TCBlockEntity;
 import net.sinedkadis.terracompositio.util.TCUtil;
 import org.jetbrains.annotations.Nullable;
@@ -101,7 +101,7 @@ public class TwoSlotItemHandlerBehaviour implements IBEItemBehaviour, WorldlyCon
         ItemStack inputSlot = getItemHandler().getStackInSlot(0);
         ItemStack outputSlot = getItemHandler().getStackInSlot(1);
 
-        if (blockEntity instanceof MatterInfuserIOBlockEntity) {
+        if (blockEntity instanceof MatterInfuserUnitBlockEntity) {
             return;
         }
         compoundTag.putInt("input_c", inputSlot.getCount());

@@ -7,7 +7,7 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec2;
 import net.sinedkadis.terracompositio.TerraCompositio;
-import net.sinedkadis.terracompositio.block.entity.MatterInfuserIOBlockEntity;
+import net.sinedkadis.terracompositio.block.entity.MatterInfuserUnitBlockEntity;
 import net.sinedkadis.terracompositio.recipe.MatterInfusionRecipe;
 import snownee.jade.api.BlockAccessor;
 import snownee.jade.api.IBlockComponentProvider;
@@ -57,7 +57,7 @@ public enum MatterInfuserIOComponentProvider implements IBlockComponentProvider,
 
     @Override
     public void appendServerData(CompoundTag compoundTag, BlockAccessor blockAccessor) {
-        MatterInfuserIOBlockEntity blockEntity = (MatterInfuserIOBlockEntity) blockAccessor.getBlockEntity();
+        MatterInfuserUnitBlockEntity blockEntity = (MatterInfuserUnitBlockEntity) blockAccessor.getBlockEntity();
         compoundTag.putInt("catalyst", Item.getId(blockEntity.getCatalyst().getItem()));
         Optional<MatterInfusionRecipe> currentRecipe = blockEntity.getCurrentRecipe();
         currentRecipe.ifPresent(matterInfusionRecipe -> {

@@ -1,0 +1,19 @@
+{
+  "variants": {
+    "facing=south": {
+      "model": "terracompositio:block/matter_infuser_unit"
+    },
+    "facing=west": {
+      "model": "terracompositio:block/matter_infuser_unit",
+      "y": 90
+    },
+    "facing=north": {
+      "model": "terracompositio:block/matter_infuser_unit",
+      "y": 180
+    },
+    "facing=east": {
+      "model": "terracompositio:block/matter_infuser_unit",
+      "y": 270
+    }
+  }
+}

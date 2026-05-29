@@ -108,7 +108,7 @@ public class TCCreativeModeTabs {
                             //matter infuser
                             pOutput.accept(TCBlocks.FLOW_CEDAR_CASING.get());
                             pOutput.accept(TCBlocks.MATTER_INFUSER_PORT.get());
-                            pOutput.accept(TCBlocks.MATTER_INFUSER_IO.get());
+                            pOutput.accept(TCBlocks.MATTER_INFUSER_UNIT.get());
                             pOutput.accept(TCItems.INPUT_BUS.get());
                             pOutput.accept(TCItems.OUTPUT_BUS.get());
 

@@ -8,7 +8,7 @@ import net.minecraft.world.level.Level;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.sinedkadis.terracompositio.TerraCompositio;
-import net.sinedkadis.terracompositio.compat.patchouli.PatchouliCompat;
+import net.sinedkadis.terracompositio.compat.patchouli.TCPatchouliCompat;
 import org.spongepowered.asm.mixin.Final;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -34,7 +34,7 @@ public abstract class BookGuiMixin {
 
         ItemStack bookStack = book.getBookItem();
 
-        if (!PatchouliCompat.isMyBook(bookStack)) return;
+        if (!TCPatchouliCompat.isMyBook(bookStack)) return;
 
         terraCompositio$updateBookContent(book, level);
 
@@ -43,7 +43,7 @@ public abstract class BookGuiMixin {
     @Unique
     private void terraCompositio$updateBookContent(Book book, Level level) {
         try {
-            PatchouliCompat.reloadBookContents(book, level);
+            TCPatchouliCompat.reloadBookContents(book, level);
         } catch (Exception e) {
             TerraCompositio.LOGGER.error("Failed to update book content", e);
         }

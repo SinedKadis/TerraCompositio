@@ -9,10 +9,13 @@ import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.AxeItem;
+import net.minecraft.world.item.BlockItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
+import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Rotation;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
@@ -55,6 +58,19 @@ public class FlowCedarCasingBlock extends TCBaseEntityBlock implements IFluidApp
     @Override
     public InteractionResult use(BlockState pState, Level pLevel, BlockPos pPos, Player pPlayer, InteractionHand pHand, BlockHitResult pHit) {
         ItemStack item = pPlayer.getItemInHand(InteractionHand.MAIN_HAND);
+        if (item.getItem() instanceof BlockItem blockItem) {
+
+            BlockPlaceContext context = new BlockPlaceContext(
+                    pPlayer,
+                    pHand,
+                    item,
+                    pHit
+            );
+
+            if (blockItem.canPlace(context, blockItem.getBlock().defaultBlockState())) {
+                return InteractionResult.PASS;
+            }
+        }
         if (item.is(Items.HONEYCOMB) && !pState.getValue(WAXED)) {
             return handleInWorldBlockCraft(pState, pState.setValue(WAXED, true), pLevel, pPos, item, 1, ParticleTypes.WAX_ON, SoundEvents.HONEYCOMB_WAX_ON);
         }
@@ -88,7 +104,7 @@ public class FlowCedarCasingBlock extends TCBaseEntityBlock implements IFluidApp
 
     @SuppressWarnings("unused")
     public static @Nullable Boolean isUnitAttached(Level level, BlockState blockState, BlockPos pos) {
-        return isBlockAttached(level, blockState, pos, TCBlocks.MATTER_INFUSER_IO.get());
+        return isBlockAttached(level, blockState, pos, TCBlocks.MATTER_INFUSER_UNIT.get());
     }
 
     @Override
@@ -106,11 +122,19 @@ public class FlowCedarCasingBlock extends TCBaseEntityBlock implements IFluidApp
     public void onRemove(BlockState pState, Level pLevel, BlockPos pPos, BlockState pNewState, boolean pIsMoving) {
 
         Direction attachedDir = pState.getValue(ATTACHED_DIR);
-        if (attachedDir.getAxis().isHorizontal()) {
+        if (!pState.getBlock().equals(pNewState.getBlock())
+                && attachedDir.getAxis().isHorizontal()) {
             pLevel.destroyBlock(pPos.relative(attachedDir), true);
         }
 
         super.onRemove(pState, pLevel, pPos, pNewState, pIsMoving);
+    }
+
+
+    @SuppressWarnings("deprecation")
+    @Override
+    public BlockState rotate(BlockState pState, Rotation pRotation) {
+        return pState.setValue(AXIS,pRotation.rotate(Direction.get(Direction.AxisDirection.POSITIVE,pState.getValue(AXIS))).getAxis());
     }
 
     @Override

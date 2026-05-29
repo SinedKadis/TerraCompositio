@@ -246,7 +246,7 @@ public class WrenchAxeItem extends AxeItem {
                 return super.useOn(context);
             }
             case CROWBAR -> {
-                if (player != null && !level.isClientSide ) {
+                if (player != null  ) {
                     if (!this.crowbarRMBInteraction(player, level,pos,blockState,context.getClickedFace())) {
                         return InteractionResult.FAIL;
                     }
