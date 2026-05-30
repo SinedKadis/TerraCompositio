@@ -17,7 +17,6 @@ import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.BlockHitResult;
-import net.minecraft.world.phys.Vec2;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.util.LazyOptional;
@@ -28,12 +27,9 @@ import net.sinedkadis.terracompositio.block.entity.MatterInfuserUnitBlockEntity;
 import net.sinedkadis.terracompositio.block.entity.TCBlockEntity;
 import net.sinedkadis.terracompositio.util.TCUtil;
 import org.jetbrains.annotations.Nullable;
-import snownee.jade.api.ITooltip;
-import snownee.jade.api.config.IPluginConfig;
-import snownee.jade.api.ui.IElement;
-import snownee.jade.api.ui.IElementHelper;
 
 import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.List;
 
 @Data
 @MethodsReturnNonnullByDefault
@@ -113,7 +109,7 @@ public class TwoSlotItemHandlerBehaviour implements IBEItemBehaviour, WorldlyCon
     }
 
     @Override
-    public void onAppendTooltip(ITooltip iTooltip, CompoundTag serverData, IPluginConfig iPluginConfig) {
+    public void onAppendTooltip(List<Component> iTooltip, CompoundTag serverData) {
         if (serverData.contains("input_c")) {
             int inputCount = serverData.getInt("input_c");
             if (inputCount > 0) {
@@ -121,13 +117,15 @@ public class TwoSlotItemHandlerBehaviour implements IBEItemBehaviour, WorldlyCon
                 iTooltip.add(Component.translatable("block.terracompositio.item_io." + "input").append(" "));
                 if (serverData.contains("input")) {
                     Item input = Item.byId(serverData.getInt("input"));
-                    IElementHelper elements = IElementHelper.get();
-                    IElement icon = elements.item(new ItemStack(input),0.7f)
-                            .translate(new Vec2(-2,-4))
-                            ;
-                    iTooltip.add(icon);
-                    iTooltip.append(Component.literal(inputCount +"x "));
-                    iTooltip.append(Component.translatable(input.getDescriptionId()));
+//                    IElementHelper elements = IElementHelper.get();
+//                    IElement icon = elements.item(new ItemStack(input),0.7f)
+//                            .translate(new Vec2(-2,-4))
+//                            ;
+//                    iTooltip.add(icon);
+                    TCUtil.appendToLastComponent(iTooltip,
+                            Component.literal(inputCount + "x "),
+                            Component.translatable(input.getDescriptionId()));
+
                 }
                 //iTooltip.add(Component.empty());
             }
@@ -139,13 +137,15 @@ public class TwoSlotItemHandlerBehaviour implements IBEItemBehaviour, WorldlyCon
                 iTooltip.add(Component.translatable("block.terracompositio.item_io." + "output").append(" "));
                 if (serverData.contains("output")) {
                     Item output = Item.byId(serverData.getInt("output"));
-                    IElementHelper elements = IElementHelper.get();
-                    IElement icon = elements.item(new ItemStack(output), 0.7f)
-                            .translate(new Vec2(-2,-4))
-                            ;
-                    iTooltip.add(icon);
-                    iTooltip.append(Component.literal(outputCount +"x "));
-                    iTooltip.append(Component.translatable(output.getDescriptionId()));
+//                    IElementHelper elements = IElementHelper.get();
+//                    IElement icon = elements.item(new ItemStack(output), 0.7f)
+//                            .translate(new Vec2(-2,-4))
+//                            ;
+//                    iTooltip.add(icon);
+                    TCUtil.appendToLastComponent(iTooltip,
+                            Component.literal(outputCount + "x "),
+                            Component.translatable(output.getDescriptionId()));
+
                 }
                 //iTooltip.add(Component.empty());
             }

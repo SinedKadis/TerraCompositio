@@ -1,6 +1,7 @@
 package net.sinedkadis.terracompositio.compat.create.block.entity;
 
 import com.simibubi.create.content.kinetics.base.GeneratingKineticBlockEntity;
+import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -9,22 +10,27 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
 import net.sinedkadis.terracompositio.TerraCompositio;
+import net.sinedkadis.terracompositio.api.IHaveKnowledge;
 import net.sinedkadis.terracompositio.api.TCCapabilities;
 import net.sinedkadis.terracompositio.api.TerraCompositioAPI;
 import net.sinedkadis.terracompositio.api.networks.NetworkAction;
-import net.sinedkadis.terracompositio.api.networks.cfe.*;
+import net.sinedkadis.terracompositio.api.networks.cfe.CFENetwork;
+import net.sinedkadis.terracompositio.api.networks.cfe.CFENetworkMemberBE;
+import net.sinedkadis.terracompositio.api.networks.cfe.ICFEHandler;
 import net.sinedkadis.terracompositio.cfe.CFEContainer;
 import net.sinedkadis.terracompositio.compat.create.TCCreateCompat;
 import net.sinedkadis.terracompositio.compat.jade.JadeTerraCompositioPlugin;
+import net.sinedkadis.terracompositio.config.TCCommonConfigs;
 import net.sinedkadis.terracompositio.config.TCInnerConfig;
 import net.sinedkadis.terracompositio.registries.TCBlockStateProperties;
 import org.jetbrains.annotations.NotNull;
 import snownee.jade.api.ITooltip;
 import snownee.jade.api.config.IPluginConfig;
 
+import java.util.List;
 import java.util.Objects;
 
-public class CedarGearboxBlockEntity extends GeneratingKineticBlockEntity implements CFENetworkMemberBE {
+public class CedarGearboxBlockEntity extends GeneratingKineticBlockEntity implements CFENetworkMemberBE, IHaveKnowledge {
 
     protected int range;
     protected int priority;
@@ -175,5 +181,18 @@ public class CedarGearboxBlockEntity extends GeneratingKineticBlockEntity implem
     @Override
     public void scheduleMemberUpdate() {
         this.scheduledUpdate = true;
+    }
+
+    @Override
+    public void addToKnowledgeTooltip(List<Component> tooltip, boolean isShifting) {
+        tooltip.add(Component.translatable("block.terracompositio." + "consumer_header"));
+        tooltip.add(Component.translatable("block.terracompositio." + "cfe",
+                Component.literal(cfeHandler.getCFE() + "").withStyle(ChatFormatting.AQUA)).withStyle(ChatFormatting.GRAY));
+        if (TCCommonConfigs.DEBUG.get()) {
+            tooltip.add(Component.translatable("block.terracompositio." + "max_cfe",
+                    Component.literal(cfeHandler.getMaxCFE() + "").withStyle(ChatFormatting.AQUA)).withStyle(ChatFormatting.GRAY));
+            tooltip.add(Component.translatable("block.terracompositio." + "queued",
+                    Component.literal(cfeHandler.getQueued() + "").withStyle(ChatFormatting.AQUA)).withStyle(ChatFormatting.GRAY));
+        }
     }
 }

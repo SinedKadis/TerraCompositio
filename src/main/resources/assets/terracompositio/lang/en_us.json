@@ -178,8 +178,9 @@
   "block.terracompositio.infused_iron_door": "Infused Iron Door",
   "item.terracompositio.cfe_ball": "CFE Charge",
   "item.terracompositio.infused_fertilizer": "Infused Fertilizer",
-
-
+  "item.terracompositio.apple_of_knowledge": "Apple of Knowledge",
+  "item.terracompositio.apple_of_ignorance": "Apple of Ignorance",
+  "block.terracompositio.consumer_header": "Creation Flow Energy info: ",
 
 
 

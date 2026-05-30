@@ -13,19 +13,21 @@ import net.sinedkadis.terracompositio.api.TCCapabilities;
 import net.sinedkadis.terracompositio.api.TerraCompositioAPI;
 import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBECFEBehaviour;
 import net.sinedkadis.terracompositio.api.networks.NetworkAction;
-import net.sinedkadis.terracompositio.api.networks.cfe.*;
+import net.sinedkadis.terracompositio.api.networks.cfe.CFENetwork;
+import net.sinedkadis.terracompositio.api.networks.cfe.CFENetworkMember;
+import net.sinedkadis.terracompositio.api.networks.cfe.CFENetworkMemberEntity;
+import net.sinedkadis.terracompositio.api.networks.cfe.ICFEHandler;
 import net.sinedkadis.terracompositio.block.entity.TCBlockEntity;
 import net.sinedkadis.terracompositio.cfe.CFEContainer;
 import net.sinedkadis.terracompositio.cfe.CFEMemberProxy;
-import net.sinedkadis.terracompositio.compat.jade.JadeTerraCompositioPlugin;
 import net.sinedkadis.terracompositio.config.TCCommonConfigs;
 import net.sinedkadis.terracompositio.util.TCUtil;
 import org.jetbrains.annotations.Nullable;
-import snownee.jade.api.ITooltip;
-import snownee.jade.api.config.IPluginConfig;
 
 import javax.annotation.ParametersAreNonnullByDefault;
-import java.util.*;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 import java.util.function.Function;
 
 @Data
@@ -159,23 +161,23 @@ public class CFEHandlerBehaviour implements IBECFEBehaviour {
     }
 
     @Override
-    public void onAppendTooltip(ITooltip iTooltip, CompoundTag serverData, IPluginConfig iPluginConfig) {
+    public void onAppendTooltip(List<Component> iTooltip, CompoundTag serverData) {
         if (serverData.contains("cfe")) {
             iTooltip.add(Component.translatable("block.terracompositio." + "cfe", serverData.getInt("cfe")));
         }
-        if (serverData.contains("max_cfe")  && iPluginConfig.get(JadeTerraCompositioPlugin.debugConfigRL())) {
+        if (serverData.contains("max_cfe") && TCCommonConfigs.DEBUG.get()) {
             iTooltip.add(Component.translatable("block.terracompositio." + "max_cfe", serverData.getInt("max_cfe")));
         }
-        if (serverData.contains("queued")  && iPluginConfig.get(JadeTerraCompositioPlugin.debugConfigRL())) {
+        if (serverData.contains("queued") && TCCommonConfigs.DEBUG.get()) {
             iTooltip.add(Component.translatable("block.terracompositio." + "queued", serverData.getInt("queued")));
         }
-        if (serverData.contains("priority")  && iPluginConfig.get(JadeTerraCompositioPlugin.debugConfigRL())) {
+        if (serverData.contains("priority") && TCCommonConfigs.DEBUG.get()) {
             iTooltip.add(Component.translatable("block.terracompositio." + "priority", serverData.getInt("priority")));
         }
-        if (serverData.contains("limit")  && iPluginConfig.get(JadeTerraCompositioPlugin.debugConfigRL())) {
+        if (serverData.contains("limit") && TCCommonConfigs.DEBUG.get()) {
             iTooltip.add(Component.translatable("block.terracompositio." + "limit", serverData.getInt("limit")));
         }
-        if (serverData.contains("speed")  && iPluginConfig.get(JadeTerraCompositioPlugin.debugConfigRL())) {
+        if (serverData.contains("speed") && TCCommonConfigs.DEBUG.get()) {
             iTooltip.add(Component.translatable("block.terracompositio." + "speed", serverData.getFloat("speed")));
         }
     }

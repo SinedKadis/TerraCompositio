@@ -25,6 +25,9 @@ public class TCCreativeModeTabs {
                             //Useful
                             pOutput.accept(TCItems.WRENCH_AXE.get());
                             addBooks(pOutput);
+                            pOutput.accept(TCItems.APPLE_OF_KNOWLEDGE.get());
+                            pOutput.accept(TCItems.APPLE_OF_IGNORANCE.get());
+
                             pOutput.accept(TCFluids.FLOW_FLUID.bucket.get());
                             pOutput.accept(TCItems.FLOW_BOTTLE.get());
                             pOutput.accept(TCFluids.BIRCH_JUICE_FLUID.bucket.get());

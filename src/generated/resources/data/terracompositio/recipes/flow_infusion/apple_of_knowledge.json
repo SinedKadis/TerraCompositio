@@ -1,0 +1,14 @@
+{
+  "type": "terracompositio:flow_infusion",
+  "cfe": 100,
+  "ingredients": [
+    {
+      "item": "minecraft:apple"
+    }
+  ],
+  "output": {
+    "count": 1,
+    "item": "terracompositio:apple_of_knowledge"
+  },
+  "time": 200
+}

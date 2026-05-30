@@ -57,9 +57,26 @@ public class TCRecipeProvider extends RecipeProvider implements IConditionBuilde
         buildTechnetiumOreProcessing(pWriter);
         buildMisc(pWriter);
         buildSpecial(pWriter);
+        buildApples(pWriter);
+
         buildCompat(pWriter);
 
 
+    }
+
+    private void buildApples(@NotNull Consumer<FinishedRecipe> pWriter) {
+        FlowInfusionRecipeBuilder.create(
+                TCItems.APPLE_OF_KNOWLEDGE.get().getDefaultInstance(),
+                Ingredient.of(Items.APPLE),
+                100,
+                200
+        ).save(pWriter, TerraCompositio.modLoc("flow_infusion/apple_of_knowledge"));
+        FlowInfusionRecipeBuilder.create(
+                TCItems.APPLE_OF_IGNORANCE.get().getDefaultInstance(),
+                Ingredient.of(Items.GOLDEN_APPLE),
+                100,
+                200
+        ).save(pWriter, TerraCompositio.modLoc("flow_infusion/apple_of_ignorance"));
     }
 
     private void buildCompat(@NotNull Consumer<FinishedRecipe> pWriter) {

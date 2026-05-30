@@ -18,6 +18,7 @@ import net.minecraft.world.level.material.Fluids;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.*;
 import net.minecraftforge.client.extensions.common.IClientFluidTypeExtensions;
+import net.minecraftforge.client.gui.overlay.VanillaGuiOverlay;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidUtil;
@@ -158,7 +159,8 @@ public class TCEventBusClientEvents {
 
     @SubscribeEvent
     public static void onRegisterGuiOverlays(RegisterGuiOverlaysEvent event) {
-        event.registerAboveAll("cfe_hud", TCGui::cfeHud);
+        event.registerAbove(VanillaGuiOverlay.HOTBAR.id(), "cfe_hud", TCGui::cfeHud);
+        event.registerAbove(VanillaGuiOverlay.HOTBAR.id(), "knowledge_hud", TCGui::knowledgeOverlay);
     }
 
     @SubscribeEvent

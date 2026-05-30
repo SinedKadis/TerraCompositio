@@ -1,0 +1,14 @@
+{
+  "type": "terracompositio:flow_infusion",
+  "cfe": 100,
+  "ingredients": [
+    {
+      "item": "minecraft:golden_apple"
+    }
+  ],
+  "output": {
+    "count": 1,
+    "item": "terracompositio:apple_of_ignorance"
+  },
+  "time": 200
+}

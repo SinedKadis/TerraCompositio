@@ -32,7 +32,7 @@ import net.sinedkadis.terracompositio.api.networks.cfe.CFENetwork;
 import net.sinedkadis.terracompositio.api.networks.cfe.CFENetworkMember;
 import net.sinedkadis.terracompositio.api.networks.cfe.ICFEHandler;
 import net.sinedkadis.terracompositio.block.custom.PathPointerBlock;
-import net.sinedkadis.terracompositio.compat.jade.JadeTerraCompositioPlugin;
+import net.sinedkadis.terracompositio.config.TCCommonConfigs;
 import net.sinedkadis.terracompositio.network.TCPackets;
 import net.sinedkadis.terracompositio.network.packets.S2CHighLightNodesSync;
 import net.sinedkadis.terracompositio.registries.TCBlockEntities;
@@ -40,9 +40,6 @@ import net.sinedkadis.terracompositio.util.BindException;
 import net.sinedkadis.terracompositio.util.TCUtil;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import snownee.jade.api.BlockAccessor;
-import snownee.jade.api.ITooltip;
-import snownee.jade.api.config.IPluginConfig;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.*;
@@ -675,18 +672,18 @@ public class PathPointerBlockEntity extends TCBlockEntity implements Nameable, C
     }
 
     @Override
-    public void onAppendTooltip(ITooltip iTooltip, BlockAccessor blockAccessor, IPluginConfig iPluginConfig) {
-        super.onAppendTooltip(iTooltip, blockAccessor, iPluginConfig);
-        CompoundTag serverData = blockAccessor.getServerData();
+    public void onAppendTooltip(List<Component> iTooltip, CompoundTag serverData) {
+        super.onAppendTooltip(iTooltip, serverData);
 
-        if (serverData.contains(RECEIVER_POS_TAG) && iPluginConfig.get(JadeTerraCompositioPlugin.debugConfigRL())) {
+
+        if (serverData.contains(RECEIVER_POS_TAG) && TCCommonConfigs.DEBUG.get()) {
             BlockPos pos = TCUtil.loadBlockPos(serverData.getCompound(RECEIVER_POS_TAG));
             if (pos != null) {
                 iTooltip.add(Component.literal("ReceiverPos: " + pos.getX() + " " + pos.getY() + " " + pos.getZ()));
             }
         }
 
-        if (iPluginConfig.get(JadeTerraCompositioPlugin.debugConfigRL())) {
+        if (TCCommonConfigs.DEBUG.get()) {
             Set<BlockPos> senderPoses = new HashSet<>();
             PathPointerBlockEntity.loadFromTagToSet(serverData, PathPointerBlockEntity.SENDER_POSES_TAG, senderPoses);
             int i = 1;
@@ -696,7 +693,7 @@ public class PathPointerBlockEntity extends TCBlockEntity implements Nameable, C
             }
         }
 
-        if (iPluginConfig.get(JadeTerraCompositioPlugin.debugConfigRL())) {
+        if (TCCommonConfigs.DEBUG.get()) {
             Set<BlockPos> inputPoses = new HashSet<>();
             PathPointerBlockEntity.loadFromTagToSet(serverData, PathPointerBlockEntity.INPUT_POSES_TAG, inputPoses);
             int i = 1;
@@ -706,7 +703,7 @@ public class PathPointerBlockEntity extends TCBlockEntity implements Nameable, C
             }
         }
 
-        if (serverData.contains(OUTPUT_POS_TAG) && iPluginConfig.get(JadeTerraCompositioPlugin.debugConfigRL())) {
+        if (serverData.contains(OUTPUT_POS_TAG) && TCCommonConfigs.DEBUG.get()) {
             BlockPos pos = TCUtil.loadBlockPos(serverData.getCompound(OUTPUT_POS_TAG));
             if (pos != null) {
                 iTooltip.add(Component.literal("OutputPos: " + pos.getX() + " " + pos.getY() + " " + pos.getZ()));
