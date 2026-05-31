@@ -185,7 +185,7 @@ public class CedarGearboxBlockEntity extends GeneratingKineticBlockEntity implem
 
     @Override
     public void addToKnowledgeTooltip(List<Component> tooltip, boolean isShifting) {
-        tooltip.add(Component.translatable("block.terracompositio." + "header"));
+        tooltip.add(Component.translatable("block.terracompositio." + "cfe_header"));
 
         tooltip.add(Component.translatable("block.terracompositio." + "cfe",
                 Component.literal(cfeHandler.getCFE() + "").append(Component.translatable("block.terracompositio.units"))

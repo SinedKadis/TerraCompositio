@@ -17,4 +17,5 @@ public class KnowledgeOverlayHelper {
 
         iTooltip.set(iTooltip.size() - 1, mutableComponent);
     }
+
 }

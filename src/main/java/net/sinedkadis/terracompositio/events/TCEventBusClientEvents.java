@@ -34,7 +34,8 @@ import net.sinedkadis.terracompositio.entity.client.CFECloudRenderer;
 import net.sinedkadis.terracompositio.entity.client.CFECubeModel;
 import net.sinedkadis.terracompositio.entity.client.FlowCedarEntModel;
 import net.sinedkadis.terracompositio.entity.client.FlowCedarEntRenderer;
-import net.sinedkadis.terracompositio.gui.TCGui;
+import net.sinedkadis.terracompositio.gui.CfeHud;
+import net.sinedkadis.terracompositio.gui.KnowledgeOverlay;
 import net.sinedkadis.terracompositio.item.custom.CreationFlowJournalItem;
 import net.sinedkadis.terracompositio.item.custom.ShieldedBundleItem;
 import net.sinedkadis.terracompositio.item.custom.WrenchAxeItem;
@@ -159,8 +160,8 @@ public class TCEventBusClientEvents {
 
     @SubscribeEvent
     public static void onRegisterGuiOverlays(RegisterGuiOverlaysEvent event) {
-        event.registerAbove(VanillaGuiOverlay.HOTBAR.id(), "cfe_hud", TCGui::cfeHud);
-        event.registerAbove(VanillaGuiOverlay.HOTBAR.id(), "knowledge_hud", TCGui::knowledgeOverlay);
+        event.registerAbove(VanillaGuiOverlay.HOTBAR.id(), "cfe_hud", CfeHud::render);
+        event.registerAbove(VanillaGuiOverlay.HOTBAR.id(), "knowledge_hud", KnowledgeOverlay::render);
     }
 
     @SubscribeEvent

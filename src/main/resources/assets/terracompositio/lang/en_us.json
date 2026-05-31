@@ -94,15 +94,19 @@
   "block.terracompositio.range": "Range: %s",
   "block.terracompositio.queued": "Queued: %s",
   "block.terracompositio.extracted_cfe": "Extracted CFE: %s",
-  "block.terracompositio.header": "Creation Flow Energy info: ",
+  "block.terracompositio.cfe_header": "Creation Flow Energy info: ",
   "block.terracompositio.type": "Type: %s",
+
   "block.terracompositio.consumer": "Consumer",
   "block.terracompositio.source": "Source",
+
   "block.terracompositio.consume": "Consuming: %s",
-  "block.terracompositio.generate": "Generate: %s",
+  "block.terracompositio.generate": "Generating: %s",
+
   "block.terracompositio.blocks": " blocks",
   "block.terracompositio.units": " units",
   "block.terracompositio.cfe_second": " cfe/second",
+  "block.terracompositio.items_header": "Items Info: ",
 
 
 

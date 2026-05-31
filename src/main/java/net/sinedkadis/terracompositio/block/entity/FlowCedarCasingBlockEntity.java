@@ -107,7 +107,7 @@ public class FlowCedarCasingBlockEntity extends TCCraftingBlockEntity{
                 }
                 return false;
             }
-        });
+        }.setInvisibleInOverlay(INPUT_BUS_SLOT, OUTPUT_BUS_SLOT, UP_CONNECTION_SLOT, DOWN_CONNECTION_SLOT));
     }
 
     public Direction attachedDir() {

@@ -5,8 +5,10 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.Mth;
 import net.minecraft.world.Container;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -21,19 +23,24 @@ import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.ItemStackHandler;
+import net.sinedkadis.terracompositio.api.IHaveKnowledge;
 import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBEItemBehaviour;
 import net.sinedkadis.terracompositio.block.entity.TCBlockEntity;
+import net.sinedkadis.terracompositio.util.ItemComponent;
 import net.sinedkadis.terracompositio.util.helpers.PlayerHelper;
 import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.Arrays;
+import java.util.List;
 
 @Data
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
-public class ManySlotItemHandlerBehaviour implements IBEItemBehaviour, WorldlyContainer {
+public class ManySlotItemHandlerBehaviour implements IBEItemBehaviour, WorldlyContainer, IHaveKnowledge {
     private final TCBlockEntity blockEntity;
     public boolean ignoreRestrictions = false;
+    private final boolean[] slotsToShowInOverlay;
 
     protected ItemStackHandler itemHandler = new ItemStackHandler() {
         @Override
@@ -58,11 +65,22 @@ public class ManySlotItemHandlerBehaviour implements IBEItemBehaviour, WorldlyCo
     //One slot
     public ManySlotItemHandlerBehaviour(TCBlockEntity blockEntity) {
         this.blockEntity = blockEntity;
+        slotsToShowInOverlay = new boolean[]{true};
     }
 
     public ManySlotItemHandlerBehaviour(TCBlockEntity blockEntity, int slotCount) {
         this.blockEntity = blockEntity;
         itemHandler.setSize(slotCount);
+        slotsToShowInOverlay = new boolean[slotCount];
+        Arrays.fill(slotsToShowInOverlay, true);
+    }
+
+    public ManySlotItemHandlerBehaviour setInvisibleInOverlay(int... slots) {
+        for (Integer slot : slots) {
+            if (Mth.clamp(slot, 0, slotsToShowInOverlay.length - 1) == slot)
+                slotsToShowInOverlay[slot] = false;
+        }
+        return this;
     }
 
     public int getLimitInSlot(int slot) {
@@ -233,4 +251,17 @@ public class ManySlotItemHandlerBehaviour implements IBEItemBehaviour, WorldlyCo
     }
 
 
+    @Override
+    public void addToKnowledgeTooltip(List<Component> tooltip, boolean isShifting) {
+        tooltip.add(Component.translatable("block.terracompositio.items_header"));
+        boolean somethingAdded = false;
+        for (int slot = 0; slot < slotsToShowInOverlay.length; slot++) {
+            if (!slotsToShowInOverlay[slot]) continue;
+            ItemStack stack = itemHandler.getStackInSlot(slot);
+            if (stack.isEmpty()) continue;
+            somethingAdded = true;
+            tooltip.add(ItemComponent.of(stack));
+        }
+        if (!somethingAdded) tooltip.remove(tooltip.size() - 1);
+    }
 }

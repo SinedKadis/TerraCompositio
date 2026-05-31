@@ -94,7 +94,7 @@ public class MatterInfuserUnitBlockEntity extends MatterInfuserBaseBlockEntity{
                 }
                 return InteractionResult.PASS;
             }
-        });
+        }.setInvisibleInOverlay(0));
 
     }
 
