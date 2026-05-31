@@ -27,6 +27,7 @@ import net.sinedkadis.terracompositio.api.IHaveKnowledge;
 import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBEItemBehaviour;
 import net.sinedkadis.terracompositio.block.entity.TCBlockEntity;
 import net.sinedkadis.terracompositio.util.ItemComponent;
+import net.sinedkadis.terracompositio.util.KnowledgeData;
 import net.sinedkadis.terracompositio.util.helpers.PlayerHelper;
 import org.jetbrains.annotations.Nullable;
 
@@ -250,14 +251,23 @@ public class ManySlotItemHandlerBehaviour implements IBEItemBehaviour, WorldlyCo
         }
     }
 
+    @Override
+    public void collectKnowledgeData(KnowledgeData data) {
+        for (int slot = 0; slot < slotsToShowInOverlay.length; slot++) {
+            data.addItem(itemHandler.getStackInSlot(slot));
+        }
+    }
 
     @Override
-    public void addToKnowledgeTooltip(List<Component> tooltip, boolean isShifting) {
+    public void addTooltipLines(KnowledgeData data, List<Component> tooltip, boolean isShifting) {
         tooltip.add(Component.translatable("block.terracompositio.items_header"));
+        List<KnowledgeData.Entry> entries = data.entries();
         boolean somethingAdded = false;
         for (int slot = 0; slot < slotsToShowInOverlay.length; slot++) {
             if (!slotsToShowInOverlay[slot]) continue;
-            ItemStack stack = itemHandler.getStackInSlot(slot);
+            KnowledgeData.Entry entry = entries.get(slot);
+            if (!(entry instanceof KnowledgeData.ItemEntry itemEntry)) continue;
+            ItemStack stack = itemEntry.stack();
             if (stack.isEmpty()) continue;
             somethingAdded = true;
             tooltip.add(ItemComponent.of(stack));

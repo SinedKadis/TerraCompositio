@@ -24,11 +24,13 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.RenderHandEvent;
 import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.living.LivingEvent;
+import net.minecraftforge.event.level.LevelEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.sinedkadis.terracompositio.TerraCompositio;
 import net.sinedkadis.terracompositio.block.entity.PathPointerBlockEntity;
 import net.sinedkadis.terracompositio.item.custom.WrenchAxeItem;
+import net.sinedkadis.terracompositio.network.packets.S2CKnowledgeDataPacket;
 import net.sinedkadis.terracompositio.particle.CFEParticleData;
 import net.sinedkadis.terracompositio.registries.TCEffects;
 import net.sinedkadis.terracompositio.registries.TCItems;
@@ -36,6 +38,14 @@ import net.sinedkadis.terracompositio.util.accessors.LivingEntityAnimationAccess
 
 @Mod.EventBusSubscriber(modid = TerraCompositio.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE,value = Dist.CLIENT)
 public class ForgeEventBusClientEvents {
+
+    @SubscribeEvent
+    public static void onLevelUnload(LevelEvent.Unload event) {
+        if (event.getLevel().isClientSide()) {
+            S2CKnowledgeDataPacket.ClientCache.clear();
+        }
+    }
+
     @SubscribeEvent
     public static void onRenderHand(RenderHandEvent event) {
         Player player = Minecraft.getInstance().player;

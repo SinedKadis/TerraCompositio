@@ -29,8 +29,12 @@ import net.minecraft.world.phys.HitResult;
 import net.minecraftforge.client.gui.overlay.ForgeGui;
 import net.sinedkadis.terracompositio.api.IHaveKnowledge;
 import net.sinedkadis.terracompositio.config.TCClientConfigs;
+import net.sinedkadis.terracompositio.network.TCPackets;
+import net.sinedkadis.terracompositio.network.packets.C2SRequestKnowledgePacket;
+import net.sinedkadis.terracompositio.network.packets.S2CKnowledgeDataPacket;
 import net.sinedkadis.terracompositio.registries.TCItems;
 import net.sinedkadis.terracompositio.util.ItemComponent;
+import net.sinedkadis.terracompositio.util.KnowledgeData;
 import net.sinedkadis.terracompositio.util.accessors.PlayerKnowledgeAccessor;
 
 import java.util.ArrayList;
@@ -39,25 +43,21 @@ import java.util.List;
 public class KnowledgeOverlay {
 
     private static int hoverTicks = 0;
+    // Как часто (в тиках) повторно запрашивать данные у сервера
+    // пока смотрим на блок. 20 = раз в секунду.
+    private static final int REQUEST_INTERVAL = 20;
 
     // ─────────────────────────────────────────────────────────────
-    //  Структура одной строки тултипа: либо текст, либо предмет
+    //  Ширина и высота строки
     // ─────────────────────────────────────────────────────────────
 
-    /**
-     * Считаем ширину строки: предмет занимает иконку + пробел + имя.
-     */
     private static int lineWidth(Font font, FormattedText line) {
         if (line instanceof ItemComponent ic) {
-            // 16px иконка + 4px отступ + ширина имени
-            return 16 + 4 + 34 + font.width(ic.itemStack().getHoverName());
+            return 16 + 4 + 45 + font.width(ic.itemStack().getHoverName());
         }
         return font.width(line) + 15;
     }
 
-    /**
-     * Высота одной строки: у предмета — 16px (размер иконки), у текста — 9px (стандарт).
-     */
     private static int lineHeight(FormattedText line) {
         return (line instanceof ItemComponent) ? 16 : 9;
     }
@@ -73,7 +73,7 @@ public class KnowledgeOverlay {
 
         HitResult hit = mc.hitResult;
         if (!(hit instanceof BlockHitResult result)) {
-            hoverTicks = 0;
+            resetHover();
             return;
         }
 
@@ -81,53 +81,73 @@ public class KnowledgeOverlay {
         if (level == null) return;
 
         BlockPos pos = result.getBlockPos();
-        hoverTicks++;
 
-        BlockEntity be = level.getBlockEntity(pos);
         LocalPlayer player = mc.player;
         if (player == null) return;
 
-        boolean hasCreationKnowledge = ((PlayerKnowledgeAccessor) player).isCreationAcknowledged();
+        if (!((PlayerKnowledgeAccessor) player).isCreationAcknowledged()) {
+            resetHover();
+            return;
+        }
+
+        // Проверяем что блок вообще реализует интерфейс (клиентская копия BE)
+        BlockEntity be = level.getBlockEntity(pos);
+        if (!(be instanceof IHaveKnowledge ihk)) {
+            resetHover();
+            return;
+        }
+
+        hoverTicks++;
+
+        // ── Запрос данных у сервера ──
+        // При первом наведении и потом каждые REQUEST_INTERVAL тиков.
+        if (hoverTicks == 1 || hoverTicks % REQUEST_INTERVAL == 0) {
+            TCPackets.CHANNEL.sendToServer(new C2SRequestKnowledgePacket(pos));
+        }
+
+        // ── Читаем кэш ──
+        KnowledgeData data = S2CKnowledgeDataPacket.ClientCache.get(pos);
+        if (data == null) {
+            // Данные ещё не пришли — ждём, ничего не рендерим
+            return;
+        }
+
+        // ── Строим список компонентов на клиенте ──
         boolean isShifting = player.isShiftKeyDown();
-
-        if (!(be instanceof IHaveKnowledge ihk) || !hasCreationKnowledge) {
-            hoverTicks = 0;
-            return;
-        }
-
         List<Component> tooltip = new ArrayList<>();
-        ihk.addToKnowledgeTooltip(tooltip, isShifting);
+        ihk.addTooltipLines(data, tooltip, isShifting);
 
-        if (tooltip.isEmpty()) {
-            hoverTicks = 0;
-            return;
-        }
+        if (tooltip.isEmpty()) return;
 
         renderOverlay(mc, graphics, partialTicks, width, height, tooltip);
     }
 
+    /**
+     * Сбросить состояние при потере фокуса с блока.
+     */
+    private static void resetHover() {
+        hoverTicks = 0;
+        // Не чистим кэш здесь — он почистится сам при следующем наведении
+        // или при выходе из мира (ClientCache.clear())
+    }
+
     // ─────────────────────────────────────────────────────────────
-    //  Рендер всего оверлея
+    //  Рендер оверлея
     // ─────────────────────────────────────────────────────────────
 
     private static void renderOverlay(Minecraft mc, GuiGraphics graphics, float partialTicks,
                                       int width, int height, List<? extends FormattedText> lines) {
         Font font = mc.font;
 
-        // ── 1. Считаем размеры тултипа (учитываем ВСЕ строки, включая ItemComponent) ──
         int tooltipW = 0;
         int tooltipH = 0;
         for (int i = 0; i < lines.size(); i++) {
             FormattedText line = lines.get(i);
             tooltipW = Math.max(tooltipW, lineWidth(font, line));
             tooltipH += lineHeight(line);
-            if (i < lines.size() - 1) {
-                // Стандартный gap в один пиксель между строками
-                tooltipH += 1;
-            }
+            if (i < lines.size() - 1) tooltipH += 1;
         }
 
-        // ── 2. Позиция тултипа по конфигу ──
         int anchorX = width / 2 + TCClientConfigs.OVERLAY_X_OFFSET.get() - 35;
         int anchorY = height / 2 + TCClientConfigs.OVERLAY_Y_OFFSET.get() - 12;
 
@@ -140,11 +160,9 @@ public class KnowledgeOverlay {
             }
         }
 
-        // Не даём выйти за экран
         anchorX = Math.min(anchorX, width - tooltipW - 20);
         anchorY = Math.min(anchorY, height - tooltipH - 20);
 
-        // ── 3. Fade-in анимация ──
         float fade = Mth.clamp((hoverTicks + partialTicks) / 24f, 0f, 1f);
 
         int colorBg = 0xf0_100010;
@@ -163,9 +181,9 @@ public class KnowledgeOverlay {
             }
         }
 
-        // ── 4. Иконка Apple of Knowledge рядом с тултипом ──
-        ItemStack knowledgeIcon = TCItems.APPLE_OF_KNOWLEDGE.get().getDefaultInstance();
+        // Иконка Apple of Knowledge
         {
+            ItemStack knowledgeIcon = TCItems.APPLE_OF_KNOWLEDGE.get().getDefaultInstance();
             int iconX = anchorX + tooltipW - 13;
             int iconY = anchorY - 3;
             poseStack.pushPose();
@@ -176,19 +194,14 @@ public class KnowledgeOverlay {
             poseStack.popPose();
         }
 
-        // ── 5. Фон тултипа (рисуем первым, на Z=400) ──
         drawTooltipBackground(graphics, anchorX, anchorY, tooltipW, tooltipH,
                 colorBg, colorBorderT, colorBorderB);
 
-        // ── 6. Содержимое строка за строкой ──
-        // Поднимаем весь стек на Z=401 чтобы текст и иконки гарантированно
-        // были выше фона (fillGradient пишет z=400 в depth buffer).
         RenderSystem.disableDepthTest();
         poseStack.pushPose();
         poseStack.translate(0, 0, 401);
 
         int cursorY = anchorY + 2;
-
         for (FormattedText line : lines) {
             if (line instanceof ItemComponent ic) {
                 drawItemLine(poseStack, graphics, font, ic.itemStack(), anchorX + 2, cursorY);
@@ -209,29 +222,25 @@ public class KnowledgeOverlay {
     }
 
     // ─────────────────────────────────────────────────────────────
-    //  Рисуем одну строку с предметом: иконка 16×16 + "Nx Название"
+    //  Строка с предметом
     // ─────────────────────────────────────────────────────────────
 
     private static void drawItemLine(PoseStack poseStack, GuiGraphics graphics,
                                      Font font, ItemStack stack, int x, int y) {
-        // Иконка 16×16, центрирована по высоте строки (16px)
         poseStack.pushPose();
-        poseStack.translate(x + 10, y, 1000); // center of 16×16 cell
+        poseStack.translate(x + 10, y, 1000);
         poseStack.mulPose(Axis.ZP.rotationDegrees(180));
         poseStack.mulPose(Axis.YP.rotationDegrees(180));
         renderItemIntoGUI(poseStack, stack, true);
         poseStack.popPose();
 
-        // Текст: "Nx Локализованное имя"
-        // Используем getHoverName() — это Component с правильной локализацией
         Component label = Component.literal(" -     " + stack.getCount() + "x ")
                 .append(stack.getHoverName());
-        // y + 4 — вертикальное выравнивание по центру 16px-строки
         graphics.drawString(font, label, x, y + 4, 0xFFAAAAAA, false);
     }
 
     // ─────────────────────────────────────────────────────────────
-    //  Фон тултипа (Minecraft-стиль, без форжевых ивентов)
+    //  Фон тултипа
     // ─────────────────────────────────────────────────────────────
 
     private static void drawTooltipBackground(GuiGraphics graphics,
@@ -240,26 +249,19 @@ public class KnowledgeOverlay {
         final int z = 400;
         int x0 = x - 3, y0 = y - 3, x1 = x + w + 3, y1 = y + h + 3;
 
-        // Тело
         graphics.fillGradient(x0, y0, x1, y1, z, bg, bg);
-        // Верхняя и нижняя крышки (для чёткой прямоугольной формы)
         graphics.fillGradient(x0, y0 - 1, x1, y0, z, bg, bg);
         graphics.fillGradient(x0, y1, x1, y1 + 1, z, bg, bg);
-        // Боковые крышки
         graphics.fillGradient(x0 - 1, y0, x0, y1, z, bg, bg);
         graphics.fillGradient(x1, y0, x1 + 1, y1, z, bg, bg);
-        // Левая граница
         graphics.fillGradient(x0, y0 + 1, x0 + 1, y1 - 1, z, borderTop, borderBot);
-        // Правая граница
         graphics.fillGradient(x1 - 1, y0 + 1, x1, y1 - 1, z, borderTop, borderBot);
-        // Верхняя граница
         graphics.fillGradient(x0, y0, x1, y0 + 1, z, borderTop, borderTop);
-        // Нижняя граница
         graphics.fillGradient(x0, y1 - 1, x1, y1, z, borderBot, borderBot);
     }
 
     // ─────────────────────────────────────────────────────────────
-    //  Анимация появления (из конфигурируемого направления)
+    //  Fade анимация
     // ─────────────────────────────────────────────────────────────
 
     private static void applyFadeTranslation(PoseStack poseStack, float fade) {
@@ -283,12 +285,6 @@ public class KnowledgeOverlay {
         return (color & 0x00FFFFFF) | (alpha << 24);
     }
 
-    /**
-     * Рендерит ItemStack в текущую точку PoseStack как 16×16 GUI-иконку.
-     * Вызывающий код обязан:
-     * - translate к центру нужной ячейки
-     * - mulPose ZP 180°, YP 180° (разворот для правильного отображения)
-     */
     public static void renderItemIntoGUI(PoseStack poseStack, ItemStack stack, boolean flatLightingFix) {
         Minecraft mc = Minecraft.getInstance();
         ItemRenderer renderer = mc.getItemRenderer();
@@ -320,5 +316,4 @@ public class KnowledgeOverlay {
         if (needFlatLighting) Lighting.setupFor3DItems();
         poseStack.popPose();
     }
-
 }

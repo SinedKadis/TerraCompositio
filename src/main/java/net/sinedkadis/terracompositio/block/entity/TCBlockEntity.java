@@ -20,6 +20,7 @@ import net.sinedkadis.terracompositio.api.IHaveKnowledge;
 import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBEBehaviour;
 import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBECFEBehaviour;
 import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBEItemBehaviour;
+import net.sinedkadis.terracompositio.util.KnowledgeData;
 import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -121,14 +122,23 @@ public abstract class TCBlockEntity extends BlockEntity implements IHaveKnowledg
     }
 
     @Override
-    public void addToKnowledgeTooltip(List<Component> tooltip, boolean isShifting) {
+    public void addTooltipLines(KnowledgeData data, List<Component> tooltip, boolean isShifting) {
         for (IBEBehaviour behaviour : getBehaviours()) {
             CompoundTag compoundTag = new CompoundTag();
             if (behaviour instanceof IHaveKnowledge iHaveKnowledge) {
-                iHaveKnowledge.addToKnowledgeTooltip(tooltip, isShifting);
+                iHaveKnowledge.addTooltipLines(data, tooltip, isShifting);
             } else {
                 behaviour.onAppendServerData(compoundTag);
                 behaviour.onAppendTooltip(tooltip, compoundTag);
+            }
+        }
+    }
+
+    @Override
+    public void collectKnowledgeData(KnowledgeData data) {
+        for (IBEBehaviour behaviour : getBehaviours()) {
+            if (behaviour instanceof IHaveKnowledge iHaveKnowledge) {
+                iHaveKnowledge.collectKnowledgeData(data);
             }
         }
     }
