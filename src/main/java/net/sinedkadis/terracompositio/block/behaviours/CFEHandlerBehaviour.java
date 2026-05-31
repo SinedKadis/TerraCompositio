@@ -1,6 +1,7 @@
 package net.sinedkadis.terracompositio.block.behaviours;
 
 import lombok.Data;
+import net.minecraft.ChatFormatting;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -9,6 +10,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
+import net.sinedkadis.terracompositio.api.IHaveKnowledge;
 import net.sinedkadis.terracompositio.api.TCCapabilities;
 import net.sinedkadis.terracompositio.api.TerraCompositioAPI;
 import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBECFEBehaviour;
@@ -21,6 +23,7 @@ import net.sinedkadis.terracompositio.block.entity.TCBlockEntity;
 import net.sinedkadis.terracompositio.cfe.CFEContainer;
 import net.sinedkadis.terracompositio.cfe.CFEMemberProxy;
 import net.sinedkadis.terracompositio.config.TCCommonConfigs;
+import net.sinedkadis.terracompositio.config.TCInnerConfig;
 import net.sinedkadis.terracompositio.util.TCUtil;
 import org.jetbrains.annotations.Nullable;
 
@@ -33,7 +36,7 @@ import java.util.function.Function;
 @Data
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
-public class CFEHandlerBehaviour implements IBECFEBehaviour {
+public class CFEHandlerBehaviour implements IBECFEBehaviour, IHaveKnowledge {
     private final TCBlockEntity blockEntity;
 
     protected int range;
@@ -215,5 +218,32 @@ public class CFEHandlerBehaviour implements IBECFEBehaviour {
     public void scheduleMemberUpdate(CFENetworkMember updated) {
         this.scheduledMembers.add(updated);
         if (scheduledMembersUpdate < 0) scheduledMembersUpdate = TCCommonConfigs.TICKS_BETWEEN_BURSTS.get();
+    }
+
+    @Override
+    public void addToKnowledgeTooltip(List<Component> tooltip, boolean isShifting) {
+        tooltip.add(Component.translatable("block.terracompositio." + "header"));
+
+        tooltip.add(Component.translatable("block.terracompositio." + "cfe",
+                Component.literal(cfeHandler.getCFE() + "").append(Component.translatable("block.terracompositio.units"))
+                        .withStyle(ChatFormatting.AQUA)).withStyle(ChatFormatting.GRAY));
+        if (TCCommonConfigs.DEBUG.get()) {
+            tooltip.add(Component.translatable("block.terracompositio." + "max_cfe",
+                    Component.literal(cfeHandler.getMaxCFE() + "").withStyle(ChatFormatting.AQUA)).withStyle(ChatFormatting.GRAY));
+            tooltip.add(Component.translatable("block.terracompositio." + "queued",
+                    Component.literal(cfeHandler.getQueued() + "").withStyle(ChatFormatting.AQUA)).withStyle(ChatFormatting.GRAY));
+            tooltip.add(Component.translatable("block.terracompositio." + "priority",
+                    Component.literal(this.getPriority() + "").withStyle(ChatFormatting.AQUA)).withStyle(ChatFormatting.GRAY));
+        }
+        if (isShifting)
+            tooltip.add(Component.translatable("block.terracompositio." + "range",
+                    Component.literal(this.getRange() + "").append(Component.translatable("block.terracompositio.blocks"))
+                            .withStyle(ChatFormatting.AQUA)).withStyle(ChatFormatting.GRAY));
+        if (priority == TCInnerConfig.DEFAULT_CONSUMER_PRIORITY)
+            tooltip.add(Component.translatable("block.terracompositio." + "type",
+                    Component.translatable("block.terracompositio.consumer").withStyle(ChatFormatting.AQUA)).withStyle(ChatFormatting.GRAY));
+        if (priority == TCInnerConfig.DEFAULT_SOURCE_PRIORITY)
+            tooltip.add(Component.translatable("block.terracompositio." + "type",
+                    Component.translatable("block.terracompositio.source").withStyle(ChatFormatting.AQUA)).withStyle(ChatFormatting.GRAY));
     }
 }

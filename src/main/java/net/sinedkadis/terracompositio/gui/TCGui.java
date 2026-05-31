@@ -19,6 +19,7 @@ import net.minecraft.client.renderer.entity.ItemRenderer;
 import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.FormattedText;
 import net.minecraft.network.chat.Style;
@@ -167,9 +168,16 @@ public class TCGui {
             tooltipHeight += 2; // gap between title lines and next lines
             tooltipHeight += (tooltip.size() - 1) * 10;
         }
-
-        int posX = width / 2 + TCClientConfigs.OVERLAY_X_OFFSET.get() - tooltipTextWidth;
+        int posX = width / 2 + TCClientConfigs.OVERLAY_X_OFFSET.get() - 60;
         int posY = height / 2 + TCClientConfigs.OVERLAY_Y_OFFSET.get();
+        switch (TCClientConfigs.OVERLAY_ANCHOR_CORNER.get()) {
+            case RIGHT_UP -> posX -= tooltipTextWidth;
+            case LEFT_DOWN -> posY -= tooltipHeight;
+            case RIGHT_DOWN -> {
+                posX -= tooltipTextWidth;
+                posY -= tooltipHeight;
+            }
+        }
 
         posX = Math.min(posX, width - tooltipTextWidth - 20);
         posY = Math.min(posY, height - tooltipHeight - 20);
@@ -181,11 +189,31 @@ public class TCGui {
         int colorBorderBot = 0x50_28007f;
 
         if (fade < 1) {
-            poseStack.translate(Math.pow(1 - fade, 3) * Math.signum(TCClientConfigs.OVERLAY_X_OFFSET.get() - .5f) * 8, 0, 0);
-            colorBackground = scaleAlpha(colorBackground, fade);
-            colorBorderTop = scaleAlpha(colorBorderTop, fade);
-            colorBorderBot = scaleAlpha(colorBorderBot, fade);
+            Direction direction = TCClientConfigs.OVERLAY_FADE_DIR.get();
+            switch (direction) {
+                case EAST ->
+                        poseStack.translate(Math.pow(1 - fade, 3) * Math.signum(TCClientConfigs.OVERLAY_X_OFFSET.get() - .5f) * 8,
+                                0,
+                                0);
+                case WEST ->
+                        poseStack.translate(Math.pow(1 - fade, 3) * Math.signum(TCClientConfigs.OVERLAY_X_OFFSET.get() + .5f) * 8,
+                                0,
+                                0);
+                case UP -> poseStack.translate(0,
+                        Math.pow(1 - fade, 3) * Math.signum(TCClientConfigs.OVERLAY_Y_OFFSET.get() + .5f) * 8,
+                        0);
+
+                case DOWN -> poseStack.translate(0,
+                        Math.pow(1 - fade, 3) * Math.signum(TCClientConfigs.OVERLAY_Y_OFFSET.get() - .5f) * 8,
+                        0);
+            }
+            if (!direction.equals(Direction.NORTH)) {
+                colorBackground = scaleAlpha(colorBackground, fade);
+                colorBorderTop = scaleAlpha(colorBorderTop, fade);
+                colorBorderBot = scaleAlpha(colorBorderBot, fade);
+            }
         }
+
         int itemRenderX = posX + tooltipTextWidth + 15;
         int itemRenderY = posY - 16;
 

@@ -86,14 +86,26 @@
   "block.terracompositio.matter_infuser": "Matter Infuser MultiBlock",
   "block.terracompositio.matter_infuser.duration": "Duration: %s s.",
   "block.terracompositio.matter_infuser.decay_chance": "Catalyst decay chance: %s%%",
+
   "block.terracompositio.cfe": "Stored CFE: %s",
   "block.terracompositio.cfe_tick": "CFE/tick: %s",
   "block.terracompositio.max_cfe": "Max CFE: %s",
   "block.terracompositio.priority": "Priority: %s",
-  "block.terracompositio.limit": "Limit: %s",
+  "block.terracompositio.range": "Range: %s",
   "block.terracompositio.queued": "Queued: %s",
-  "block.terracompositio.speed": "Travel Speed To: %s",
   "block.terracompositio.extracted_cfe": "Extracted CFE: %s",
+  "block.terracompositio.header": "Creation Flow Energy info: ",
+  "block.terracompositio.type": "Type: %s",
+  "block.terracompositio.consumer": "Consumer",
+  "block.terracompositio.source": "Source",
+  "block.terracompositio.consume": "Consuming: %s",
+  "block.terracompositio.generate": "Generate: %s",
+  "block.terracompositio.blocks": " blocks",
+  "block.terracompositio.units": " units",
+  "block.terracompositio.cfe_second": " cfe/second",
+
+
+
   "block.terracompositio.item_io.input": "Input: ",
   "block.terracompositio.item_io.output": "Output: ",
   "block.terracompositio.matter_infuser.catalyst": "Catalyst: ",
@@ -180,7 +192,6 @@
   "item.terracompositio.infused_fertilizer": "Infused Fertilizer",
   "item.terracompositio.apple_of_knowledge": "Apple of Knowledge",
   "item.terracompositio.apple_of_ignorance": "Apple of Ignorance",
-  "block.terracompositio.consumer_header": "Creation Flow Energy info: ",
 
 
 

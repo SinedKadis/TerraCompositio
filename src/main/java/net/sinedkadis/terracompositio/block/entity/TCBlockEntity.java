@@ -124,8 +124,12 @@ public abstract class TCBlockEntity extends BlockEntity implements IHaveKnowledg
     public void addToKnowledgeTooltip(List<Component> tooltip, boolean isShifting) {
         for (IBEBehaviour behaviour : getBehaviours()) {
             CompoundTag compoundTag = new CompoundTag();
-            behaviour.onAppendServerData(compoundTag);
-            behaviour.onAppendTooltip(tooltip, compoundTag);
+            if (behaviour instanceof IHaveKnowledge iHaveKnowledge) {
+                iHaveKnowledge.addToKnowledgeTooltip(tooltip, isShifting);
+            } else {
+                behaviour.onAppendServerData(compoundTag);
+                behaviour.onAppendTooltip(tooltip, compoundTag);
+            }
         }
     }
 }
