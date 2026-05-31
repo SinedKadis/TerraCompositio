@@ -3,6 +3,7 @@ package net.sinedkadis.terracompositio.particle.custom;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.particle.*;
+import net.minecraft.core.BlockPos;
 import net.minecraft.core.Vec3i;
 import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.phys.Vec3;
@@ -11,7 +12,6 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import net.minecraftforge.client.extensions.common.IClientFluidTypeExtensions;
 import net.minecraftforge.fluids.FluidStack;
 import net.sinedkadis.terracompositio.particle.FluidParticleData;
-import net.sinedkadis.terracompositio.util.TCUtil;
 import org.jetbrains.annotations.NotNull;
 
 public class FluidFlowParticle extends TextureSheetParticle {
@@ -26,11 +26,11 @@ public class FluidFlowParticle extends TextureSheetParticle {
         this.multiplyColor(clientFluid.getTintColor(fluid));
         this.hasPhysics = false;
         this.gravity = 0.0F;
-        this.lifetime = (int) Math.sqrt(Math.sqrt(
-                        TCUtil.distSqr(
-                                new Vec3i((int) x, (int) y, (int) z),
-                                new Vec3i((int) targetPos.x, (int) targetPos.y, (int) targetPos.z))))
-                +1;
+        this.lifetime = (int) Math.sqrt(
+                Math.sqrt(
+                        new Vec3i((int) x, (int) y, (int) z).distSqr(BlockPos.containing(targetPos))
+                )
+        ) + 1;
         this.scale(0.5F);
     }
 
@@ -59,7 +59,7 @@ public class FluidFlowParticle extends TextureSheetParticle {
     @OnlyIn(Dist.CLIENT)
     public static class Provider implements ParticleProvider<FluidParticleData> {
 
-        public Provider(SpriteSet spriteSet) {
+        public Provider(SpriteSet ignoredSpriteSet) {
         }
 
         @Override

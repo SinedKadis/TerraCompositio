@@ -37,7 +37,8 @@ import net.sinedkadis.terracompositio.network.TCPackets;
 import net.sinedkadis.terracompositio.network.packets.S2CHighLightNodesSync;
 import net.sinedkadis.terracompositio.registries.TCBlockEntities;
 import net.sinedkadis.terracompositio.util.BindException;
-import net.sinedkadis.terracompositio.util.TCUtil;
+import net.sinedkadis.terracompositio.util.helpers.BlockPosHelper;
+import net.sinedkadis.terracompositio.util.helpers.PlayerHelper;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -162,7 +163,7 @@ public class PathPointerBlockEntity extends TCBlockEntity implements Nameable, C
         try {
             wrenchInteraction(pPlayer, level, clickedPos, wrenchStack);
             if (pPlayer != null) {
-                TCUtil.message(pPlayer, Component.translatable("item.terracompositio.flow_rotating_axe.bind_success").withStyle(ChatFormatting.BOLD));
+                PlayerHelper.message(pPlayer, Component.translatable("item.terracompositio.flow_rotating_axe.bind_success").withStyle(ChatFormatting.BOLD));
                 wrenchStack.hurtAndBreak(1, pPlayer, player1 -> {
                     assert player1 != null;
                     player1.broadcastBreakEvent(InteractionHand.MAIN_HAND);
@@ -189,7 +190,7 @@ public class PathPointerBlockEntity extends TCBlockEntity implements Nameable, C
 
         tryStorePosToTag(pPlayer, clickedPos, tag);
 
-        BlockPos storedPos = TCUtil.loadBlockPos(tag.getCompound(RECEIVER_POS_TAG));
+        BlockPos storedPos = BlockPosHelper.loadBlockPos(tag.getCompound(RECEIVER_POS_TAG));
         assert storedPos != null;
 
         clearBindTags(tag);
@@ -449,10 +450,10 @@ public class PathPointerBlockEntity extends TCBlockEntity implements Nameable, C
     }
 
     private static void storeToTag(@Nullable Player pPlayer, BlockPos pos, CompoundTag tag) {
-        tag.put(RECEIVER_POS_TAG, TCUtil.saveBlockPos(pos));
+        tag.put(RECEIVER_POS_TAG, BlockPosHelper.saveBlockPos(pos));
 
         if (pPlayer != null) {
-            TCUtil.message(pPlayer, Component.translatable("item.terracompositio.flow_rotating_axe.bind_begin").withStyle(ChatFormatting.BOLD));
+            PlayerHelper.message(pPlayer, Component.translatable("item.terracompositio.flow_rotating_axe.bind_begin").withStyle(ChatFormatting.BOLD));
         }
     }
 
@@ -472,7 +473,7 @@ public class PathPointerBlockEntity extends TCBlockEntity implements Nameable, C
 
     public static void sendBindMessage(@Nullable Player player, String messageKey) {
         if (player != null) {
-            TCUtil.message(player, Component.translatable(messageKey).withStyle(ChatFormatting.BOLD));
+            PlayerHelper.message(player, Component.translatable(messageKey).withStyle(ChatFormatting.BOLD));
         }
     }
 
@@ -606,6 +607,17 @@ public class PathPointerBlockEntity extends TCBlockEntity implements Nameable, C
         return true;
     }
 
+    public static void saveFromSetToTag(CompoundTag pTag, String tag, Set<BlockPos> senderPoses) {
+        ListTag listTag = new ListTag();
+        listTag.addAll(senderPoses.stream().map(BlockPosHelper::saveBlockPos).toList());
+        pTag.put(tag, listTag);
+    }
+
+    public static void loadFromTagToSet(CompoundTag pTag, String tag, Set<BlockPos> senderPoses) {
+        ListTag tagList = pTag.getList(tag, CompoundTag.TAG_COMPOUND);
+        senderPoses.addAll(tagList.stream().map(BlockPosHelper::loadBlockPos).toList());
+    }
+
     @Override
     protected void saveAdditional(CompoundTag pTag) {
         pTag.putFloat("rot_y", rotationYaw);
@@ -616,9 +628,9 @@ public class PathPointerBlockEntity extends TCBlockEntity implements Nameable, C
         pTag.putInt("part1", parts.get(1).ordinal());
 
         if (receiverPos != null)
-            pTag.put(RECEIVER_POS_TAG, TCUtil.saveBlockPos(receiverPos));
+            pTag.put(RECEIVER_POS_TAG, BlockPosHelper.saveBlockPos(receiverPos));
         if (outputPos != null)
-            pTag.put(OUTPUT_POS_TAG, TCUtil.saveBlockPos(outputPos));
+            pTag.put(OUTPUT_POS_TAG, BlockPosHelper.saveBlockPos(outputPos));
         saveFromSetToTag(pTag, SENDER_POSES_TAG, senderPoses);
         saveFromSetToTag(pTag, INPUT_POSES_TAG, inputPoses);
         super.saveAdditional(pTag);
@@ -635,9 +647,9 @@ public class PathPointerBlockEntity extends TCBlockEntity implements Nameable, C
         parts.set(0, PPPart.fromOrdinal(pTag.getInt("part0")));
         parts.set(1, PPPart.fromOrdinal(pTag.getInt("part1")));
 
-        receiverPos = TCUtil.loadBlockPos(pTag.getCompound(RECEIVER_POS_TAG));
+        receiverPos = BlockPosHelper.loadBlockPos(pTag.getCompound(RECEIVER_POS_TAG));
 
-        outputPos = TCUtil.loadBlockPos(pTag.getCompound(OUTPUT_POS_TAG));
+        outputPos = BlockPosHelper.loadBlockPos(pTag.getCompound(OUTPUT_POS_TAG));
 
         loadFromTagToSet(pTag, SENDER_POSES_TAG, senderPoses);
         loadFromTagToSet(pTag, INPUT_POSES_TAG, inputPoses);
@@ -646,26 +658,15 @@ public class PathPointerBlockEntity extends TCBlockEntity implements Nameable, C
         update(this);
     }
 
-    public static void saveFromSetToTag(CompoundTag pTag, String tag, Set<BlockPos> senderPoses) {
-        ListTag listTag = new ListTag();
-        listTag.addAll(senderPoses.stream().map(TCUtil::saveBlockPos).toList());
-        pTag.put(tag, listTag);
-    }
-
-    public static void loadFromTagToSet(CompoundTag pTag, String tag, Set<BlockPos> senderPoses) {
-        ListTag tagList = pTag.getList(tag, CompoundTag.TAG_COMPOUND);
-        senderPoses.addAll(tagList.stream().map(TCUtil::loadBlockPos).toList());
-    }
-
     @Override
     public void onAppendServerData(CompoundTag compoundTag) {
         super.onAppendServerData(compoundTag);
 
         BlockPos receiverPos = getReceiverPos();
         if (receiverPos != null)
-            compoundTag.put(RECEIVER_POS_TAG, TCUtil.saveBlockPos(receiverPos));
+            compoundTag.put(RECEIVER_POS_TAG, BlockPosHelper.saveBlockPos(receiverPos));
         BlockPos outputPos = getOutputPos();
-        compoundTag.put(OUTPUT_POS_TAG, TCUtil.saveBlockPos(outputPos));
+        compoundTag.put(OUTPUT_POS_TAG, BlockPosHelper.saveBlockPos(outputPos));
 
         PathPointerBlockEntity.saveFromSetToTag(compoundTag, PathPointerBlockEntity.SENDER_POSES_TAG, getSenderPoses());
         PathPointerBlockEntity.saveFromSetToTag(compoundTag, PathPointerBlockEntity.INPUT_POSES_TAG, getInputPoses());
@@ -677,7 +678,7 @@ public class PathPointerBlockEntity extends TCBlockEntity implements Nameable, C
 
 
         if (serverData.contains(RECEIVER_POS_TAG) && TCCommonConfigs.DEBUG.get()) {
-            BlockPos pos = TCUtil.loadBlockPos(serverData.getCompound(RECEIVER_POS_TAG));
+            BlockPos pos = BlockPosHelper.loadBlockPos(serverData.getCompound(RECEIVER_POS_TAG));
             if (pos != null) {
                 iTooltip.add(Component.literal("ReceiverPos: " + pos.getX() + " " + pos.getY() + " " + pos.getZ()));
             }
@@ -704,7 +705,7 @@ public class PathPointerBlockEntity extends TCBlockEntity implements Nameable, C
         }
 
         if (serverData.contains(OUTPUT_POS_TAG) && TCCommonConfigs.DEBUG.get()) {
-            BlockPos pos = TCUtil.loadBlockPos(serverData.getCompound(OUTPUT_POS_TAG));
+            BlockPos pos = BlockPosHelper.loadBlockPos(serverData.getCompound(OUTPUT_POS_TAG));
             if (pos != null) {
                 iTooltip.add(Component.literal("OutputPos: " + pos.getX() + " " + pos.getY() + " " + pos.getZ()));
             }

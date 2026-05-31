@@ -7,13 +7,13 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.pathfinder.Path;
 import net.minecraft.world.phys.Vec3;
+import net.sinedkadis.terracompositio.api.TCCapabilities;
 import net.sinedkadis.terracompositio.api.TerraCompositioAPI;
 import net.sinedkadis.terracompositio.api.networks.cfe.CFENetworkMember;
 import net.sinedkadis.terracompositio.api.networks.cfe.ICFEHandler;
-import net.sinedkadis.terracompositio.api.TCCapabilities;
 import net.sinedkadis.terracompositio.entity.custom.FlowCedarEntEntity;
 import net.sinedkadis.terracompositio.registries.TCTags;
-import net.sinedkadis.terracompositio.util.TCUtil;
+import net.sinedkadis.terracompositio.util.helpers.CFEHelper;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.EnumSet;
@@ -95,7 +95,7 @@ public class ReachSourceGoal extends Goal {
                 .getCFENetworkInstance()
                 .getAllCFENetworkMembers(level)) {
 
-            if (!TCUtil.validMember(member)) continue;
+            if (!CFEHelper.validMember(member)) continue;
 
             BlockPos memberPos = member.getPos();
             if (!memberPos.closerThan(mobPos, searchLimit)) continue;

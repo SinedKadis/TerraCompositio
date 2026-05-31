@@ -23,7 +23,7 @@ import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.ItemStackHandler;
 import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBEItemBehaviour;
 import net.sinedkadis.terracompositio.block.entity.TCBlockEntity;
-import net.sinedkadis.terracompositio.util.TCUtil;
+import net.sinedkadis.terracompositio.util.helpers.PlayerHelper;
 import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -139,7 +139,7 @@ public class ManySlotItemHandlerBehaviour implements IBEItemBehaviour, WorldlyCo
                 ignoreRestrictions = true;
                 ItemStack extracted = itemHandler.extractItem(i, 64, false);
                 ignoreRestrictions = false;
-                TCUtil.addOrDropToPlayer(pPlayer, extracted);
+                PlayerHelper.addOrDropToPlayer(pPlayer, extracted);
                 level.playSound(pPlayer, blockPos, SoundEvents.ITEM_FRAME_REMOVE_ITEM, SoundSource.BLOCKS);
                 return InteractionResult.SUCCESS;
             }

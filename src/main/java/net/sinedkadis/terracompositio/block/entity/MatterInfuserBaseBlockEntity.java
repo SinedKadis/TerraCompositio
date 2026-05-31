@@ -8,7 +8,7 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.sinedkadis.terracompositio.registries.TCBlocks;
-import net.sinedkadis.terracompositio.util.TCUtil;
+import net.sinedkadis.terracompositio.util.helpers.ItemHelper;
 import org.jetbrains.annotations.Nullable;
 
 import static net.minecraft.world.level.block.state.properties.BlockStateProperties.HORIZONTAL_FACING;
@@ -67,7 +67,7 @@ public abstract class MatterInfuserBaseBlockEntity extends TCCraftingBlockEntity
             blockEntity1 = level.getBlockEntity(blockPos2);
         }
         if (blockEntity1 instanceof MatterInfuserUnitBlockEntity) {
-            TCUtil.dropContents(blockEntity1);
+            ItemHelper.dropContents(blockEntity1);
         }
         BlockPos blockpos = worldPosition.relative(direction.getOpposite());
         BlockState blockState = level.getBlockState(blockpos);
@@ -75,7 +75,7 @@ public abstract class MatterInfuserBaseBlockEntity extends TCCraftingBlockEntity
             level.setBlockAndUpdate(blockpos, blockState.setValue(BlockStateProperties.FACING, Direction.DOWN));
             BlockEntity blockEntity = level.getBlockEntity(blockpos);
             if (blockEntity instanceof FlowCedarCasingBlockEntity) {
-                TCUtil.dropContents(blockEntity,
+                ItemHelper.dropContents(blockEntity,
                         FlowCedarCasingBlockEntity.UP_CONNECTION_SLOT,
                         FlowCedarCasingBlockEntity.DOWN_CONNECTION_SLOT);
             }

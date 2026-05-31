@@ -11,6 +11,7 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
+import net.sinedkadis.terracompositio.api.TerraCompositioAPI;
 import net.sinedkadis.terracompositio.cfe.CFENetworkHandler;
 import net.sinedkadis.terracompositio.compat.CompatUtils;
 import net.sinedkadis.terracompositio.compat.patchouli.TCPatchouliCompat;
@@ -30,11 +31,11 @@ import net.sinedkadis.terracompositio.worldgen.tree.TCTrunkPlacers;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-//6011371823902440939
+//6011371823902440939 - cool seed
 @Mod(TerraCompositio.MOD_ID)
 public class TerraCompositio
 {
-    public static final String MOD_ID = "terracompositio";
+    public static final String MOD_ID = TerraCompositioAPI.MOD_ID;
     public static ResourceLocation modLoc(String location){
         return ResourceLocation.tryBuild(MOD_ID,location);
     }

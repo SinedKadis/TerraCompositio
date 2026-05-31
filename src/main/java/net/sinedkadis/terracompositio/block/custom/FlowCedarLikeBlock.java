@@ -28,16 +28,16 @@ import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandlerItem;
 import net.sinedkadis.terracompositio.block.IFluidApplicable;
-import net.sinedkadis.terracompositio.registries.*;
 import net.sinedkadis.terracompositio.item.custom.WrenchAxeItem;
-import net.sinedkadis.terracompositio.util.TCUtil;
+import net.sinedkadis.terracompositio.registries.*;
+import net.sinedkadis.terracompositio.util.helpers.WorldHelper;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Supplier;
 
-import static net.sinedkadis.terracompositio.util.TCUtil.getNearBlocks;
-import static net.sinedkadis.terracompositio.util.TCUtil.handleInWorldBlockCraft;
+import static net.sinedkadis.terracompositio.util.helpers.BlockPosHelper.getNearBlocks;
+import static net.sinedkadis.terracompositio.util.helpers.WorldHelper.handleInWorldBlockCraft;
 
 
 @SuppressWarnings("deprecation")
@@ -137,11 +137,11 @@ public class FlowCedarLikeBlock extends RotatedPillarBlock implements IFluidAppl
     @Override
     public void onRemove(@NotNull BlockState pState, @NotNull Level pLevel, @NotNull BlockPos pPos, @NotNull BlockState pNewState, boolean pIsMoving) {
         super.onRemove(pState, pLevel, pPos, pNewState, pIsMoving);
-        if (pState.getBlock() != pNewState.getBlock() && TCUtil.onRemoveHandlerBlacklist(pNewState,
+        if (pState.getBlock() != pNewState.getBlock() && WorldHelper.onRemoveHandlerBlacklist(pNewState,
                 Blocks.STRUCTURE_VOID,
                 TCBlocks.FLOW_CEDAR_CASING.get(),
                 TCBlocks.FLOW_CEDAR_PORT.get())) {
-            TCUtil.flowLeak(pState, pLevel, pPos,false);
+            WorldHelper.flowLeak(pState, pLevel, pPos, false);
         }
     }
 

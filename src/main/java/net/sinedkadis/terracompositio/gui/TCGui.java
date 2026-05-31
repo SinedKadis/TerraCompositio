@@ -44,7 +44,7 @@ import net.sinedkadis.terracompositio.api.dummies.DummyCFEHandler;
 import net.sinedkadis.terracompositio.api.networks.cfe.ICFEHandler;
 import net.sinedkadis.terracompositio.config.TCClientConfigs;
 import net.sinedkadis.terracompositio.registries.TCItems;
-import net.sinedkadis.terracompositio.util.PlayerKnowledgeAccessor;
+import net.sinedkadis.terracompositio.util.accessors.PlayerKnowledgeAccessor;
 import org.joml.Matrix4f;
 import org.lwjgl.opengl.GL11;
 

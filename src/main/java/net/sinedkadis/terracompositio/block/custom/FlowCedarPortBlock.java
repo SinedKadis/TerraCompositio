@@ -1,7 +1,6 @@
 package net.sinedkadis.terracompositio.block.custom;
 
 
-
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.server.level.ServerLevel;
@@ -16,7 +15,8 @@ import net.minecraft.world.item.context.BlockPlaceContext;
 import net.minecraft.world.item.context.UseOnContext;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.*;
+import net.minecraft.world.level.block.Block;
+import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
@@ -27,14 +27,18 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraftforge.common.ToolAction;
 import net.sinedkadis.terracompositio.block.entity.TCBlockEntity;
 import net.sinedkadis.terracompositio.item.custom.WrenchAxeItem;
-import net.sinedkadis.terracompositio.registries.*;
+import net.sinedkadis.terracompositio.registries.TCBlockEntities;
+import net.sinedkadis.terracompositio.registries.TCBlockStateProperties;
+import net.sinedkadis.terracompositio.registries.TCBlocks;
+import net.sinedkadis.terracompositio.registries.TCItems;
+import net.sinedkadis.terracompositio.util.helpers.BlockPosHelper;
+import net.sinedkadis.terracompositio.util.helpers.WorldHelper;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Supplier;
 
-import static net.sinedkadis.terracompositio.util.TCUtil.flowLeak;
-import static net.sinedkadis.terracompositio.util.TCUtil.*;
+import static net.sinedkadis.terracompositio.util.helpers.WorldHelper.flowLeak;
 
 
 public class FlowCedarPortBlock extends TCBaseEntityBlock {
@@ -81,12 +85,12 @@ public class FlowCedarPortBlock extends TCBaseEntityBlock {
                 && item.getCount() > 4
                 && item2.getItem() instanceof WrenchAxeItem) {
             if (WrenchAxeItem.getMode(item2).equals(WrenchAxeItem.WrenchMode.WRENCH)) {
-                return handleInWorldBlockCraft(pState, TCBlocks.FLOW_CEDAR_CASING.get().defaultBlockState(), pLevel, pPos, item, 4);
+                return WorldHelper.handleInWorldBlockCraft(pState, TCBlocks.FLOW_CEDAR_CASING.get().defaultBlockState(), pLevel, pPos, item, 4);
             }
             return super.use(pState, pLevel, pPos, pPlayer, pHand, pHit);
         } else if (item.is(TCItems.FLOW_INFUSER_KIT.get())
                 && item2.is(ItemTags.AXES)) {
-            return handleInWorldBlockCraft(pState, TCBlocks.FLOW_INFUSER.get().defaultBlockState(), pLevel, pPos, item, 1);
+            return WorldHelper.handleInWorldBlockCraft(pState, TCBlocks.FLOW_INFUSER.get().defaultBlockState(), pLevel, pPos, item, 1);
         }
         return super.use(pState, pLevel, pPos, pPlayer, pHand, pHit);
     }
@@ -94,7 +98,7 @@ public class FlowCedarPortBlock extends TCBaseEntityBlock {
     @Override
     public void onRemove(@NotNull BlockState pState, @NotNull Level pLevel, @NotNull BlockPos pPos, @NotNull BlockState pNewState, boolean pIsMoving) {
         super.onRemove(pState, pLevel, pPos, pNewState, pIsMoving);
-        if (pState.getBlock() != pNewState.getBlock() && onRemoveHandlerBlacklist(pNewState,
+        if (pState.getBlock() != pNewState.getBlock() && WorldHelper.onRemoveHandlerBlacklist(pNewState,
                 Blocks.STRUCTURE_VOID,
                 TCBlocks.FLOW_CEDAR_CASING.get(),
                 TCBlocks.FLOW_CEDAR_PORT.get())) {
@@ -120,7 +124,7 @@ public class FlowCedarPortBlock extends TCBaseEntityBlock {
     @Override
     public void tick(BlockState pState, @NotNull ServerLevel pLevel, @NotNull BlockPos pPos, @NotNull RandomSource pRandom) {
         if (pState.getValue(INFUSED)) {
-            for (BlockPos blockPos : getNearBlocks(pPos)) {
+            for (BlockPos blockPos : BlockPosHelper.getNearBlocks(pPos)) {
                 if (blockPos.getX() != pPos.getX()
                         && blockPos.getY() != pPos.getY()
                         && blockPos.getZ() != pPos.getZ()) {

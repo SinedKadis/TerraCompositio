@@ -30,6 +30,7 @@ import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.ItemStackHandler;
+import net.sinedkadis.terracompositio.api.TCCapabilities;
 import net.sinedkadis.terracompositio.api.TerraCompositioAPI;
 import net.sinedkadis.terracompositio.api.dummies.DummyCFEHandler;
 import net.sinedkadis.terracompositio.api.networks.NetworkAction;
@@ -37,18 +38,18 @@ import net.sinedkadis.terracompositio.api.networks.cfe.CFENetwork;
 import net.sinedkadis.terracompositio.api.networks.cfe.CFENetworkMember;
 import net.sinedkadis.terracompositio.api.networks.cfe.CFENetworkMemberEntity;
 import net.sinedkadis.terracompositio.api.networks.cfe.ICFEHandler;
-import net.sinedkadis.terracompositio.api.TCCapabilities;
 import net.sinedkadis.terracompositio.block.entity.EntStatueBlockEntity;
 import net.sinedkadis.terracompositio.cfe.CFEContainer;
 import net.sinedkadis.terracompositio.cfe.CFEMemberProxy;
 import net.sinedkadis.terracompositio.config.TCCommonConfigs;
 import net.sinedkadis.terracompositio.config.TCInnerConfig;
+import net.sinedkadis.terracompositio.entity.goals.CFEExtractGoal;
 import net.sinedkadis.terracompositio.entity.goals.CFEHoldGoal;
 import net.sinedkadis.terracompositio.entity.goals.ReachSourceGoal;
-import net.sinedkadis.terracompositio.entity.goals.CFEExtractGoal;
 import net.sinedkadis.terracompositio.registries.TCBlocks;
 import net.sinedkadis.terracompositio.registries.TCItems;
-import net.sinedkadis.terracompositio.util.TCUtil;
+import net.sinedkadis.terracompositio.util.helpers.CFEHelper;
+import net.sinedkadis.terracompositio.util.helpers.ParticleHelper;
 import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -138,7 +139,7 @@ public class FlowCedarEntEntity extends AbstractGolem implements CFENetworkMembe
                 innerCFEOptional.ifPresent(icfeHandler1 -> {
                     tickCounter--;
                     if (tickCounter <= 0) {
-                        TCUtil.tryCFETransfer(icfeHandler1, icfeHandler);
+                        CFEHelper.tryCFETransfer(icfeHandler1, icfeHandler);
                         tickCounter = 20;
                         icfeHandler1.takeCFE(1, false);
                         if (icfeHandler1.getCFE() <= 0) {
@@ -340,7 +341,7 @@ public class FlowCedarEntEntity extends AbstractGolem implements CFENetworkMembe
         lazyCFEOptional.ifPresent(icfeHandler -> {
             if (!this.level().isClientSide()){
                 float scale = (0.1f + (icfeHandler.getCFE() / (float) icfeHandler.getMaxCFE())) * 10;
-                TCUtil.spawnParticlesIn(this.level(), BlockPos.containing(this.position().add(0,this.getBbHeight() + scale * 0.2f,0)),icfeHandler.getCFE()/10);
+                ParticleHelper.spawnParticlesIn(this.level(), BlockPos.containing(this.position().add(0, this.getBbHeight() + scale * 0.2f, 0)), icfeHandler.getCFE() / 10);
                 icfeHandler.setCFE(0);
             }
         });
@@ -348,10 +349,10 @@ public class FlowCedarEntEntity extends AbstractGolem implements CFENetworkMembe
     }
 
     public void sendViaPP(CFEMemberProxy current) {
-        if (getMainHandler().getCFE() > 0 && TCUtil.validMember(current)){
+        if (getMainHandler().getCFE() > 0 && CFEHelper.validMember(current)) {
             if (current.getMainHandler().getFreeSpace() > TCCommonConfigs.CFE_PER_BURST_TRANSFER_LIMIT.get())
                 scheduleMemberUpdate(current);
-            TCUtil.tryCFETransfer(current,this,TCCommonConfigs.CFE_PER_BURST_TRANSFER_LIMIT.get(),5/20f);
+            CFEHelper.tryCFETransfer(current, this, TCCommonConfigs.CFE_PER_BURST_TRANSFER_LIMIT.get(), 5 / 20f);
         } else onCFENetworkMemberUpdate();
     }
 

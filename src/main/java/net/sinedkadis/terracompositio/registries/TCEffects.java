@@ -9,7 +9,7 @@ import net.minecraftforge.registries.ForgeRegistries;
 import net.minecraftforge.registries.RegistryObject;
 import net.sinedkadis.terracompositio.TerraCompositio;
 import net.sinedkadis.terracompositio.effect.custom.TCEffectBase;
-import net.sinedkadis.terracompositio.util.PlayerKnowledgeAccessor;
+import net.sinedkadis.terracompositio.util.accessors.PlayerKnowledgeAccessor;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 

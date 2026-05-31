@@ -1,4 +1,4 @@
-package net.sinedkadis.terracompositio.util;
+package net.sinedkadis.terracompositio.util.accessors;
 
 public interface PlayerKnowledgeAccessor {
     boolean isCreationAcknowledged();

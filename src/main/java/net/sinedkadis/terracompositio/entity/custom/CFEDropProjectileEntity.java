@@ -19,7 +19,7 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.sinedkadis.terracompositio.registries.TCBlocks;
 import net.sinedkadis.terracompositio.registries.TCEntities;
 import net.sinedkadis.terracompositio.registries.TCItems;
-import net.sinedkadis.terracompositio.util.TCUtil;
+import net.sinedkadis.terracompositio.util.helpers.BlockPosHelper;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 
@@ -67,7 +67,7 @@ public class CFEDropProjectileEntity extends ThrowableProjectile implements Item
                 CompoundTag persistentData = owner.getPersistentData();
                 int ballsThrew = persistentData.getInt("balls_threw");
                 ListTag list = persistentData.getList("platform_on_throw_" + (ballsThrew % PLATFORM_ALIVE_PER_PLAYER.get()), Tag.TAG_COMPOUND);
-                list.add(TCUtil.saveBlockPos(blockPos));
+                list.add(BlockPosHelper.saveBlockPos(blockPos));
                 persistentData.put("platform_on_throw_" + (ballsThrew % PLATFORM_ALIVE_PER_PLAYER.get()), list);
 
             }

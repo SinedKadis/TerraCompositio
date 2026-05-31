@@ -23,7 +23,7 @@ import net.sinedkadis.terracompositio.registries.TCBlockEntities;
 import net.sinedkadis.terracompositio.registries.TCEntities;
 import net.sinedkadis.terracompositio.registries.TCFluids;
 import net.sinedkadis.terracompositio.registries.TCItems;
-import net.sinedkadis.terracompositio.util.TCUtil;
+import net.sinedkadis.terracompositio.util.helpers.ParticleHelper;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -114,7 +114,7 @@ public class EntStatueBlockEntity extends TCBlockEntity implements FluidNetworkM
                     FluidStack amount = sourceTank.drain(500, IFluidHandler.FluidAction.SIMULATE);
                     if (amount.getAmount() == 500){
                         sourceTank.drain(500, IFluidHandler.FluidAction.EXECUTE);
-                        TCUtil.sendFluidParticles((ServerLevel) level,pos,source.getBlockPos(), amount.getAmount() /10,amount);
+                        ParticleHelper.sendFluidParticles((ServerLevel) level, pos, source.getBlockPos(), amount.getAmount() / 10, amount);
                         jojoReference();
                     }
                 }

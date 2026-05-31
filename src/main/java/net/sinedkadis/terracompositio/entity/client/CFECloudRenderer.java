@@ -13,10 +13,9 @@ import net.minecraft.world.phys.AABB;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.sinedkadis.terracompositio.TerraCompositio;
-
-import net.sinedkadis.terracompositio.entity.custom.CFECloudEntity;
 import net.sinedkadis.terracompositio.config.TCInnerConfig;
-import net.sinedkadis.terracompositio.util.TCUtil;
+import net.sinedkadis.terracompositio.entity.custom.CFECloudEntity;
+import net.sinedkadis.terracompositio.util.helpers.ParticleHelper;
 import org.joml.Vector3f;
 
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -66,7 +65,7 @@ public class CFECloudRenderer extends EntityRenderer<CFECloudEntity> {
             pPoseStack.translate(oX*k, oY*k, oZ*k);
             pPoseStack.mulPose(entityRenderDispatcher.camera.rotation());
             pPoseStack.mulPose(Axis.YP.rotationDegrees(180.0F));
-            TCUtil.drawCfeParticle(pPoseStack, pPackedLight, buffer);
+            ParticleHelper.drawCfeParticle(pPoseStack, pPackedLight, buffer);
             pPoseStack.popPose();
         }
         pPoseStack.popPose();
@@ -82,7 +81,7 @@ public class CFECloudRenderer extends EntityRenderer<CFECloudEntity> {
         if (offsets == null || offsets.length < count) {
             offsets = new Vector3f[(int) Math.ceil(count)];
             for (int i = 0; i < count; i++) {
-                offsets[i] = TCUtil.getSpreadParticleOffset(entity.level().random, (int) (count)).toVector3f();
+                offsets[i] = ParticleHelper.getSpreadParticleOffset(entity.level().random, (int) (count)).toVector3f();
             }
         }
     }

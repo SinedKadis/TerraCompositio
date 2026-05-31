@@ -25,7 +25,8 @@ import net.minecraftforge.items.ItemStackHandler;
 import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBEItemBehaviour;
 import net.sinedkadis.terracompositio.block.entity.MatterInfuserUnitBlockEntity;
 import net.sinedkadis.terracompositio.block.entity.TCBlockEntity;
-import net.sinedkadis.terracompositio.util.TCUtil;
+import net.sinedkadis.terracompositio.util.helpers.KnowledgeOverlayHelper;
+import net.sinedkadis.terracompositio.util.helpers.PlayerHelper;
 import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -122,7 +123,7 @@ public class TwoSlotItemHandlerBehaviour implements IBEItemBehaviour, WorldlyCon
 //                            .translate(new Vec2(-2,-4))
 //                            ;
 //                    iTooltip.add(icon);
-                    TCUtil.appendToLastComponent(iTooltip,
+                    KnowledgeOverlayHelper.appendToLastComponent(iTooltip,
                             Component.literal(inputCount + "x "),
                             Component.translatable(input.getDescriptionId()));
 
@@ -142,7 +143,7 @@ public class TwoSlotItemHandlerBehaviour implements IBEItemBehaviour, WorldlyCon
 //                            .translate(new Vec2(-2,-4))
 //                            ;
 //                    iTooltip.add(icon);
-                    TCUtil.appendToLastComponent(iTooltip,
+                    KnowledgeOverlayHelper.appendToLastComponent(iTooltip,
                             Component.literal(outputCount + "x "),
                             Component.translatable(output.getDescriptionId()));
 
@@ -170,7 +171,7 @@ public class TwoSlotItemHandlerBehaviour implements IBEItemBehaviour, WorldlyCon
         InteractionResult interactionResult = InteractionResult.SUCCESS;
         if (!outputSlot.isEmpty() && allowExtract(OUTPUT, outputSlot, pHit.getDirection(), true)) {
             ItemStack extracted = itemHandler.extractItem(OUTPUT, 64, false);
-            TCUtil.addOrDropToPlayer(pPlayer, extracted);
+            PlayerHelper.addOrDropToPlayer(pPlayer, extracted);
             level.playSound(pPlayer, blockPos, SoundEvents.ITEM_FRAME_REMOVE_ITEM, SoundSource.BLOCKS);
             return interactionResult;
         }
@@ -181,7 +182,7 @@ public class TwoSlotItemHandlerBehaviour implements IBEItemBehaviour, WorldlyCon
             return interactionResult;
         }
         if (!inputSlot.isEmpty() && allowExtract(INPUT, inputSlot, pHit.getDirection(), true)) {
-            TCUtil.addOrDropToPlayer(pPlayer, inputSlot);
+            PlayerHelper.addOrDropToPlayer(pPlayer, inputSlot);
             itemHandler.setStackInSlot(INPUT, ItemStack.EMPTY);
             level.playSound(pPlayer, blockPos, SoundEvents.ITEM_FRAME_REMOVE_ITEM, SoundSource.BLOCKS);
             return interactionResult;

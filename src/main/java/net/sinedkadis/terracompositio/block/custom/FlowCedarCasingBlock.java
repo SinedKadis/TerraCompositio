@@ -37,7 +37,7 @@ import net.sinedkadis.terracompositio.registries.TCFluids;
 import javax.annotation.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 
-import static net.sinedkadis.terracompositio.util.TCUtil.handleInWorldBlockCraft;
+import static net.sinedkadis.terracompositio.util.helpers.WorldHelper.handleInWorldBlockCraft;
 
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault

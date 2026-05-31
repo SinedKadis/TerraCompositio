@@ -7,11 +7,10 @@ import net.minecraft.world.level.material.Fluids;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.IFluidHandler;
-import net.sinedkadis.terracompositio.api.networks.fluid.FluidNetworkMemberBE;
 import net.sinedkadis.terracompositio.api.networks.NetworkAction;
 import net.sinedkadis.terracompositio.api.networks.fluid.FluidNetwork;
+import net.sinedkadis.terracompositio.api.networks.fluid.FluidNetworkMemberBE;
 import net.sinedkadis.terracompositio.events.FluidNetworkEvent;
-import net.sinedkadis.terracompositio.util.TCUtil;
 
 import java.util.*;
 
@@ -62,7 +61,7 @@ public class FluidNetworkHandler implements FluidNetwork {
     public void networkMemberUpdated(FluidNetworkMemberBE updated) {
         if (fluidSources.containsKey(updated.getLevel())) {
             for (FluidNetworkMemberBE source : fluidSources.get(updated.getLevel())) {
-                if (TCUtil.distSqr(source.getBlockPos(), updated.getBlockPos()) <= 10) {
+                if (source.getBlockPos().closerThan(updated.getBlockPos(), 10)) {
                     source.scheduleMemberUpdate();
                 }
             }
@@ -77,7 +76,7 @@ public class FluidNetworkHandler implements FluidNetwork {
             FluidNetworkMemberBE closest = null;
 
             for (FluidNetworkMemberBE source : fluidSources.get(level)) {
-                long distance = TCUtil.distSqr(source.getBlockPos(), pos);
+                long distance = (long) source.getBlockPos().distSqr(pos);
                 Optional<IFluidHandler> fluidHandler = FluidNetwork.getFluidHandler(source);
                 FluidStack fluidInTank = FluidStack.EMPTY;
                 if (fluidHandler.isPresent()) {
@@ -105,7 +104,7 @@ public class FluidNetworkHandler implements FluidNetwork {
             List<FluidNetworkMemberBE> sources = new ArrayList<>(fluidSources.get(level));
             Collections.shuffle(sources);
             for (FluidNetworkMemberBE source : sources) {
-                long distance = TCUtil.distSqr(source.getBlockPos(), pos);
+                long distance = (long) source.getBlockPos().distSqr(pos);
                 Optional<IFluidHandler> fluidHandler = FluidNetwork.getFluidHandler(source);
                 FluidStack fluidInTank = FluidStack.EMPTY;
                 if (fluidHandler.isPresent()) {

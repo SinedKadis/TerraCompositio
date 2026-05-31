@@ -13,7 +13,7 @@ import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
 import net.sinedkadis.terracompositio.TerraCompositio;
 import net.sinedkadis.terracompositio.config.TCInnerConfig;
-import net.sinedkadis.terracompositio.util.TCUtil;
+import net.sinedkadis.terracompositio.util.helpers.ParticleHelper;
 import org.joml.Vector3f;
 
 import javax.annotation.Nullable;
@@ -65,7 +65,7 @@ public class CFEBurstRenderer extends EntityRenderer<CFEBurstProjectileEntity> {
                 pPoseStack.mulPose(this.entityRenderDispatcher.cameraOrientation());
                 pPoseStack.mulPose(Axis.YP.rotationDegrees(180.0F));
 
-                TCUtil.drawCfeParticle(pPoseStack, pPackedLight, buffer);
+                ParticleHelper.drawCfeParticle(pPoseStack, pPackedLight, buffer);
 
                 pPoseStack.popPose();
             }
@@ -80,7 +80,7 @@ public class CFEBurstRenderer extends EntityRenderer<CFEBurstProjectileEntity> {
         if (offsets1 == null || offsets1.length < count) {
             offsets1 = new Vector3f[(int) Math.ceil(count)];
             for (int i = 0; i < count; i++) {
-                offsets1[i] = TCUtil.getSpreadParticleOffset(entity.level().random, (int) (count)).toVector3f();
+                offsets1[i] = ParticleHelper.getSpreadParticleOffset(entity.level().random, (int) (count)).toVector3f();
             }
             setOffsets(entity,offsets1);
         }

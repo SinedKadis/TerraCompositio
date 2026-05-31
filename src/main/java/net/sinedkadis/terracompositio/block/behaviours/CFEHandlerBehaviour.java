@@ -24,7 +24,7 @@ import net.sinedkadis.terracompositio.cfe.CFEContainer;
 import net.sinedkadis.terracompositio.cfe.CFEMemberProxy;
 import net.sinedkadis.terracompositio.config.TCCommonConfigs;
 import net.sinedkadis.terracompositio.config.TCInnerConfig;
-import net.sinedkadis.terracompositio.util.TCUtil;
+import net.sinedkadis.terracompositio.util.helpers.CFEHelper;
 import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -107,21 +107,21 @@ public class CFEHandlerBehaviour implements IBECFEBehaviour, IHaveKnowledge {
             targets.forEach(target -> {
                 if (target.getMainHandler().getFreeSpace() > TCCommonConfigs.CFE_PER_BURST_TRANSFER_LIMIT.get())
                     scheduleMemberUpdate(target);
-                TCUtil.tryCFETransfer(target, this);
+                CFEHelper.tryCFETransfer(target, this);
             });
         }
     }
 
     @Override
     public void onCFENetworkMemberUpdate(CFENetworkMember updated) {
-        if (getMainHandler().getCFE() > 0 && TCUtil.validMember(updated)){
+        if (getMainHandler().getCFE() > 0 && CFEHelper.validMember(updated)) {
             if (updated.getMainHandler().getFreeSpace() > TCCommonConfigs.CFE_PER_BURST_TRANSFER_LIMIT.get()) {
                 if (updated instanceof CFEMemberProxy proxy && proxy.target() instanceof CFENetworkMemberEntity) {
                     if (updated.getPos().closerThan(proxy.proxy().getOutputPos(),getRange()))
                         scheduleMemberUpdate(updated);
                 } else scheduleMemberUpdate(updated);
             }
-            TCUtil.tryCFETransfer(updated,this);
+            CFEHelper.tryCFETransfer(updated, this);
         } else onCFENetworkMemberUpdate();
     }
 
