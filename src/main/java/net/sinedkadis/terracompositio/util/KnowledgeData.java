@@ -69,7 +69,8 @@ public final class KnowledgeData {
      * Добавить предмет.
      */
     public KnowledgeData addItem(ItemStack stack) {
-        if (!stack.isEmpty()) entries.add(new ItemEntry(stack.copy()));
+        //if (!stack.isEmpty())
+            entries.add(new ItemEntry(stack.copy()));
         return this;
     }
 

@@ -187,9 +187,9 @@ public class CedarGearboxBlockEntity extends GeneratingKineticBlockEntity implem
         data.addText("val.cfe", cfeHandler.getCFE());
 
         if (TCCommonConfigs.DEBUG.get()) {
-            data.addText("val.max_cfe", cfeHandler.getMaxCFE());
-            data.addText("val.queued", cfeHandler.getQueued());
-            data.addText("val.priority", this.getPriority());
+            data.addText("val.max_cfe", cfeHandler.getMaxCFE())
+                .addText("val.queued", cfeHandler.getQueued())
+                .addText("val.priority", this.getPriority());
         }
 
         data.addText("val.range", this.getRange());

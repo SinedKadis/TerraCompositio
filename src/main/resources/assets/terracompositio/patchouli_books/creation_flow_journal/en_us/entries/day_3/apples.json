@@ -1,0 +1,14 @@
+{
+  "name": "book.terracompositio.creation_flow_journal.entry.apples.name",
+  "category": "terracompositio:day_3",
+  "icon": "terracompositio:apple_of_knowledge",
+  "flag": "terracompositio:day_3",
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "terracompositio:apple_of_knowledge,terracompositio:apple_of_ignorance",
+      "link_recipe": true,
+      "text": "book.terracompositio.creation_flow_journal.entry.apples.page1"
+    }
+  ]
+}

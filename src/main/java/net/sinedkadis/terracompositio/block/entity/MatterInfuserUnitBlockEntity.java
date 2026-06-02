@@ -26,6 +26,7 @@ import net.sinedkadis.terracompositio.api.networks.cfe.ICFEHandler;
 import net.sinedkadis.terracompositio.block.behaviours.CFEHandlerBehaviour;
 import net.sinedkadis.terracompositio.block.behaviours.ManySlotItemHandlerBehaviour;
 import net.sinedkadis.terracompositio.block.custom.MatterInfuserBaseEntityBlock;
+import net.sinedkadis.terracompositio.config.TCInnerConfig;
 import net.sinedkadis.terracompositio.recipe.MatterInfusionRecipe;
 import net.sinedkadis.terracompositio.registries.TCBlockEntities;
 import net.sinedkadis.terracompositio.registries.TCItems;
@@ -63,7 +64,7 @@ public class MatterInfuserUnitBlockEntity extends MatterInfuserBaseBlockEntity{
                     default -> super.particleTargetOffset();
                 };
             }
-        }.range(10));
+        }.range(10).priority(TCInnerConfig.DEFAULT_CONSUMER_PRIORITY));
         list.add(new ManySlotItemHandlerBehaviour(this) {
             @Override
             public boolean allowExtract(int pSlot, ItemStack pStack, @Nullable Direction pDirection, boolean manual) {
