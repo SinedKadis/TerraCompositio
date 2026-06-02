@@ -1,10 +1,12 @@
 package net.sinedkadis.terracompositio.entity.custom;
 
 import lombok.Getter;
+import net.minecraft.ChatFormatting;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -30,6 +32,8 @@ import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.ItemStackHandler;
+import net.sinedkadis.terracompositio.api.IHaveKnowledge;
+import net.sinedkadis.terracompositio.api.IKnowledgeData;
 import net.sinedkadis.terracompositio.api.TCCapabilities;
 import net.sinedkadis.terracompositio.api.TerraCompositioAPI;
 import net.sinedkadis.terracompositio.api.dummies.DummyCFEHandler;
@@ -48,6 +52,7 @@ import net.sinedkadis.terracompositio.entity.goals.CFEHoldGoal;
 import net.sinedkadis.terracompositio.entity.goals.ReachSourceGoal;
 import net.sinedkadis.terracompositio.registries.TCBlocks;
 import net.sinedkadis.terracompositio.registries.TCItems;
+import net.sinedkadis.terracompositio.util.KnowledgeData;
 import net.sinedkadis.terracompositio.util.helpers.CFEHelper;
 import net.sinedkadis.terracompositio.util.helpers.ParticleHelper;
 import org.jetbrains.annotations.Nullable;
@@ -62,7 +67,7 @@ import java.util.Set;
 
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
-public class FlowCedarEntEntity extends AbstractGolem implements CFENetworkMemberEntity {
+public class FlowCedarEntEntity extends AbstractGolem implements CFENetworkMemberEntity, IHaveKnowledge {
     private static final EntityDataAccessor<Boolean> EXTRACTING =
             SynchedEntityData.defineId(FlowCedarEntEntity.class, EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<Boolean> HOLDING =
@@ -379,5 +384,144 @@ public class FlowCedarEntEntity extends AbstractGolem implements CFENetworkMembe
             scheduledMembers1.forEach(this::sendViaPP);
         } else if (scheduledMembersUpdate > 0)
             scheduledMembersUpdate--;
+    }
+
+    @Override
+    public void collectKnowledgeData(IKnowledgeData data) {
+
+        lazyCFEOptional.ifPresent(cfeHandler -> {
+            data.addText("val.cfe", cfeHandler.getCFE());
+            if (TCCommonConfigs.DEBUG.get()) {
+                data.addText("val.max_cfe", cfeHandler.getMaxCFE());
+                data.addText("val.queued", cfeHandler.getQueued());
+            }
+        });
+        innerCFEOptional.ifPresent(cfeHandler -> {
+            data.addText("val.cfe2", cfeHandler.getCFE());
+            if (TCCommonConfigs.DEBUG.get()) {
+                data.addText("val.max_cfe2", cfeHandler.getMaxCFE());
+                data.addText("val.queued2", cfeHandler.getQueued());
+            }
+        });
+
+        int priority = this.getPriority();
+
+        if (TCCommonConfigs.DEBUG.get()) {
+            data.addText("val.priority", priority);
+        }
+
+        data.addText("val.range", this.getRange());
+
+        if (priority == TCInnerConfig.DEFAULT_CONSUMER_PRIORITY) {
+            data.addText("flag.type.consumer");
+        } else if (priority == TCInnerConfig.DEFAULT_SOURCE_PRIORITY) {
+            data.addText("flag.type.source");
+        }
+
+    }
+
+    @Override
+    public void addTooltipLines(IKnowledgeData data, List<Component> tooltip, boolean isShifting) {
+
+        tooltip.add(Component.translatable("block.terracompositio.cfe_header"));
+
+        for (KnowledgeData.Entry entry : data.entries()) {
+            if (!(entry instanceof KnowledgeData.TextEntry textEntry)) continue;
+
+            String translationKey = textEntry.translationKey();
+            String[] args = textEntry.args();
+
+            tooltip.add(Component.translatable("entity.terracompositio.ent_hold_header"));
+            switch (translationKey) {
+                case "val.cfe" -> {
+                    tooltip.add(
+                            Component.translatable("block.terracompositio.cfe",
+                                            Component.literal(args[0])
+                                                    .append(Component.translatable("block.terracompositio.units"))
+                                                    .withStyle(ChatFormatting.AQUA))
+                                    .withStyle(ChatFormatting.GRAY));
+                    continue;
+                }
+
+                case "val.max_cfe" -> {
+                    tooltip.add(
+                            Component.translatable("block.terracompositio.max_cfe",
+                                            Component.literal(args[0])
+                                                    .withStyle(ChatFormatting.AQUA))
+                                    .withStyle(ChatFormatting.GRAY));
+                    continue;
+                }
+
+                case "val.queued" -> {
+                    tooltip.add(
+                            Component.translatable("block.terracompositio.queued",
+                                            Component.literal(args[0])
+                                                    .withStyle(ChatFormatting.AQUA))
+                                    .withStyle(ChatFormatting.GRAY));
+                    continue;
+                }
+
+            }
+            tooltip.add(Component.translatable("entity.terracompositio.ent_inner_header"));
+            switch (translationKey) {
+                case "val.cfe2" -> {
+                    tooltip.add(
+                            Component.translatable("block.terracompositio.cfe",
+                                            Component.literal(args[0])
+                                                    .append(Component.translatable("block.terracompositio.units"))
+                                                    .withStyle(ChatFormatting.AQUA))
+                                    .withStyle(ChatFormatting.GRAY));
+                    continue;
+                }
+
+                case "val.max_cfe2" -> {
+                    tooltip.add(
+                            Component.translatable("block.terracompositio.max_cfe",
+                                            Component.literal(args[0])
+                                                    .withStyle(ChatFormatting.AQUA))
+                                    .withStyle(ChatFormatting.GRAY));
+                    continue;
+                }
+
+                case "val.queued2" -> {
+                    tooltip.add(
+                            Component.translatable("block.terracompositio.queued",
+                                            Component.literal(args[0])
+                                                    .withStyle(ChatFormatting.AQUA))
+                                    .withStyle(ChatFormatting.GRAY));
+                    continue;
+                }
+
+            }
+            tooltip.add(Component.translatable("entity.terracompositio.ent_common_header"));
+            switch (translationKey) {
+                case "val.priority" -> tooltip.add(
+                        Component.translatable("block.terracompositio.priority",
+                                        Component.literal(args[0])
+                                                .withStyle(ChatFormatting.AQUA))
+                                .withStyle(ChatFormatting.GRAY));
+
+                case "val.range" -> {
+                    if (isShifting) tooltip.add(
+                            Component.translatable("block.terracompositio.range",
+                                            Component.literal(args[0])
+                                                    .append(Component.translatable("block.terracompositio.blocks"))
+                                                    .withStyle(ChatFormatting.AQUA))
+                                    .withStyle(ChatFormatting.GRAY));
+                }
+
+                case "flag.type.consumer" -> tooltip.add(
+                        Component.translatable("block.terracompositio.type",
+                                        Component.translatable("block.terracompositio.consumer")
+                                                .withStyle(ChatFormatting.AQUA))
+                                .withStyle(ChatFormatting.GRAY));
+
+                case "flag.type.source" -> tooltip.add(
+                        Component.translatable("block.terracompositio.type",
+                                        Component.translatable("block.terracompositio.source")
+                                                .withStyle(ChatFormatting.AQUA))
+                                .withStyle(ChatFormatting.GRAY));
+            }
+        }
     }
 }

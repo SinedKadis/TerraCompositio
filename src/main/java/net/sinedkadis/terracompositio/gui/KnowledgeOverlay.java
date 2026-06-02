@@ -19,18 +19,21 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.FormattedText;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.util.Mth;
+import net.minecraft.world.entity.Entity;
 import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraftforge.client.gui.overlay.ForgeGui;
 import net.sinedkadis.terracompositio.api.IHaveKnowledge;
 import net.sinedkadis.terracompositio.config.TCClientConfigs;
 import net.sinedkadis.terracompositio.network.TCPackets;
-import net.sinedkadis.terracompositio.network.packets.C2SRequestKnowledgePacket;
+import net.sinedkadis.terracompositio.network.packets.C2SRequestBlockKnowledgePacket;
+import net.sinedkadis.terracompositio.network.packets.C2SRequestEntityKnowledgePacket;
 import net.sinedkadis.terracompositio.network.packets.S2CKnowledgeDataPacket;
 import net.sinedkadis.terracompositio.registries.TCItems;
 import net.sinedkadis.terracompositio.util.ItemComponent;
@@ -71,16 +74,8 @@ public class KnowledgeOverlay {
         Minecraft mc = Minecraft.getInstance();
         if (mc.options.hideGui || mc.gameMode == null) return;
 
-        HitResult hit = mc.hitResult;
-        if (!(hit instanceof BlockHitResult result)) {
-            resetHover();
-            return;
-        }
-
         Level level = mc.level;
         if (level == null) return;
-
-        BlockPos pos = result.getBlockPos();
 
         LocalPlayer player = mc.player;
         if (player == null) return;
@@ -89,37 +84,58 @@ public class KnowledgeOverlay {
             resetHover();
             return;
         }
-
-        // Проверяем что блок вообще реализует интерфейс (клиентская копия BE)
-        BlockEntity be = level.getBlockEntity(pos);
-        if (!(be instanceof IHaveKnowledge ihk)) {
-            resetHover();
-            return;
-        }
-
-        hoverTicks++;
-
-        // ── Запрос данных у сервера ──
-        // При первом наведении и потом каждые REQUEST_INTERVAL тиков.
-        if (hoverTicks == 1 || hoverTicks % REQUEST_INTERVAL == 0) {
-            TCPackets.CHANNEL.sendToServer(new C2SRequestKnowledgePacket(pos));
-        }
-
-        // ── Читаем кэш ──
-        KnowledgeData data = S2CKnowledgeDataPacket.ClientCache.get(pos);
-        if (data == null) {
-            // Данные ещё не пришли — ждём, ничего не рендерим
-            return;
-        }
-
-        // ── Строим список компонентов на клиенте ──
         boolean isShifting = player.isShiftKeyDown();
+
         List<Component> tooltip = new ArrayList<>();
-        ihk.addTooltipLines(data, tooltip, isShifting);
+        HitResult hit = mc.hitResult;
+
+        if (hit instanceof BlockHitResult result) {
+            BlockPos pos = result.getBlockPos();
+
+            BlockEntity be = level.getBlockEntity(pos);
+            if (!(be instanceof IHaveKnowledge ihk)) {
+                resetHover();
+                return;
+            }
+
+            hoverTicks++;
+
+            if (hoverTicks == 1 || hoverTicks % REQUEST_INTERVAL == 0) {
+                TCPackets.CHANNEL.sendToServer(new C2SRequestBlockKnowledgePacket(pos));
+            }
+
+
+            KnowledgeData data = S2CKnowledgeDataPacket.ClientCache.get(pos);
+            if (data == null) {
+                return;
+            }
+
+            ihk.addTooltipLines(data, tooltip, isShifting);
+        } else if (hit instanceof EntityHitResult result) {
+            Entity entity = result.getEntity();
+            if (!(entity instanceof IHaveKnowledge ihk)) {
+                resetHover();
+                return;
+            }
+
+            hoverTicks++;
+
+            if (hoverTicks == 1 || hoverTicks % REQUEST_INTERVAL == 0) {
+                TCPackets.CHANNEL.sendToServer(new C2SRequestEntityKnowledgePacket(entity.getUUID()));
+            }
+
+            KnowledgeData data = S2CKnowledgeDataPacket.ClientCache.get(entity.getUUID());
+            if (data == null) {
+                return;
+            }
+
+            ihk.addTooltipLines(data, tooltip, isShifting);
+        }
 
         if (tooltip.isEmpty()) return;
 
         renderOverlay(mc, graphics, partialTicks, width, height, tooltip);
+
     }
 
     /**

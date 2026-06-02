@@ -1,10 +1,9 @@
 package net.sinedkadis.terracompositio.network.packets;
 
-import net.minecraft.core.BlockPos;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
-import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.entity.Entity;
 import net.minecraftforge.network.NetworkEvent;
 import net.minecraftforge.network.PacketDistributor;
 import net.sinedkadis.terracompositio.api.IHaveKnowledge;
@@ -12,54 +11,53 @@ import net.sinedkadis.terracompositio.network.TCPackets;
 import net.sinedkadis.terracompositio.util.KnowledgeData;
 import net.sinedkadis.terracompositio.util.accessors.PlayerKnowledgeAccessor;
 
+import java.util.UUID;
 import java.util.function.Supplier;
 
-public class C2SRequestKnowledgePacket {
+public class C2SRequestEntityKnowledgePacket {
 
-    private final BlockPos pos;
 
-    public C2SRequestKnowledgePacket(BlockPos pos) {
-        this.pos = pos;
+    private final UUID entityUUID;
+
+    public C2SRequestEntityKnowledgePacket(UUID entityUUID) {
+        this.entityUUID = entityUUID;
     }
 
     // ─── Сериализация ────────────────────────────────────────────
 
-    public static void encode(C2SRequestKnowledgePacket pkt, FriendlyByteBuf buf) {
-        buf.writeBlockPos(pkt.pos);
+    public static void encode(C2SRequestEntityKnowledgePacket pkt, FriendlyByteBuf buf) {
+        buf.writeUUID(pkt.entityUUID);
     }
 
-    public static C2SRequestKnowledgePacket decode(FriendlyByteBuf buf) {
-        return new C2SRequestKnowledgePacket(buf.readBlockPos());
+    public static C2SRequestEntityKnowledgePacket decode(FriendlyByteBuf buf) {
+        return new C2SRequestEntityKnowledgePacket(buf.readUUID());
     }
 
     // ─── Обработка на сервере ────────────────────────────────────
 
-    public static void handle(C2SRequestKnowledgePacket pkt, Supplier<NetworkEvent.Context> ctx) {
+    public static void handle(C2SRequestEntityKnowledgePacket pkt, Supplier<NetworkEvent.Context> ctx) {
         ctx.get().enqueueWork(() -> {
             ServerPlayer player = ctx.get().getSender();
             if (player == null) return;
 
-            // Проверяем что у игрока есть знание
             if (!((PlayerKnowledgeAccessor) player).isCreationAcknowledged()) return;
 
             ServerLevel level = player.serverLevel();
-            BlockEntity be = level.getBlockEntity(pkt.pos);
-            if (!(be instanceof IHaveKnowledge ihk)) return;
+            Entity entity = level.getEntity(pkt.entityUUID);
+            if (!(entity instanceof IHaveKnowledge ihk)) return;
 
-            // Проверяем дистанцию (защита от спама с дальней дистанции)
+
             if (player.distanceToSqr(
-                    pkt.pos.getX() + 0.5,
-                    pkt.pos.getY() + 0.5,
-                    pkt.pos.getZ() + 0.5) > 64 * 64) return;
+                    entity.position().x() + 0.5,
+                    entity.position().y() + 0.5,
+                    entity.position().z() + 0.5) > 64 * 64) return;
 
-            // Собираем данные на сервере
             KnowledgeData data = new KnowledgeData();
             ihk.collectKnowledgeData(data);
 
             if (data.isEmpty()) return;
 
-            // Отправляем обратно клиенту
-            TCPackets.CHANNEL.send(PacketDistributor.PLAYER.with(() -> player), new S2CKnowledgeDataPacket(pkt.pos, data));
+            TCPackets.CHANNEL.send(PacketDistributor.PLAYER.with(() -> player), new S2CKnowledgeDataPacket(pkt.entityUUID, data));
         });
         ctx.get().setPacketHandled(true);
     }

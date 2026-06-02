@@ -5,22 +5,15 @@ import net.minecraft.nbt.ListTag;
 import net.minecraft.nbt.Tag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.world.item.ItemStack;
+import net.sinedkadis.terracompositio.api.IKnowledgeData;
 
+import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.List;
 
-/**
- * Сырые данные для оверлея знаний.
- * Собирается на сервере через IHaveKnowledge.collectKnowledgeData(),
- * сериализуется в пакет и на клиенте превращается в List<Component>
- * через IHaveKnowledge.addTooltipLines().
- * <p>
- * Поддерживает два типа записей:
- * - текстовые (translation key + аргументы)
- * - предметные (ItemStack)
- */
-public final class KnowledgeData {
+@ParametersAreNonnullByDefault
+public final class KnowledgeData implements IKnowledgeData {
 
     // ─── Типы записей ────────────────────────────────────────────
 
@@ -46,6 +39,7 @@ public final class KnowledgeData {
     /**
      * Добавить текстовую строку без аргументов.
      */
+    @Override
     public KnowledgeData addText(String translationKey) {
         entries.add(new TextEntry(translationKey));
         return this;
@@ -56,6 +50,7 @@ public final class KnowledgeData {
     /**
      * Добавить текстовую строку с аргументами (числа, имена и т.д.).
      */
+    @Override
     public KnowledgeData addText(String translationKey, Object... args) {
         String[] strArgs = new String[args.length];
         for (int i = 0; i < args.length; i++) strArgs[i] = String.valueOf(args[i]);
@@ -68,6 +63,7 @@ public final class KnowledgeData {
     /**
      * Добавить предмет.
      */
+    @Override
     public KnowledgeData addItem(ItemStack stack) {
         //if (!stack.isEmpty())
             entries.add(new ItemEntry(stack.copy()));
@@ -77,6 +73,7 @@ public final class KnowledgeData {
     /**
      * Все записи (только для чтения).
      */
+    @Override
     public List<Entry> entries() {
         return Collections.unmodifiableList(entries);
     }

@@ -17,10 +17,10 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
 import net.sinedkadis.terracompositio.api.IHaveKnowledge;
+import net.sinedkadis.terracompositio.api.IKnowledgeData;
 import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBEBehaviour;
 import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBECFEBehaviour;
 import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBEItemBehaviour;
-import net.sinedkadis.terracompositio.util.KnowledgeData;
 import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -122,7 +122,7 @@ public abstract class TCBlockEntity extends BlockEntity implements IHaveKnowledg
     }
 
     @Override
-    public void addTooltipLines(KnowledgeData data, List<Component> tooltip, boolean isShifting) {
+    public void addTooltipLines(IKnowledgeData data, List<Component> tooltip, boolean isShifting) {
         for (IBEBehaviour behaviour : getBehaviours()) {
             CompoundTag compoundTag = new CompoundTag();
             if (behaviour instanceof IHaveKnowledge iHaveKnowledge) {
@@ -135,7 +135,7 @@ public abstract class TCBlockEntity extends BlockEntity implements IHaveKnowledg
     }
 
     @Override
-    public void collectKnowledgeData(KnowledgeData data) {
+    public void collectKnowledgeData(IKnowledgeData data) {
         for (IBEBehaviour behaviour : getBehaviours()) {
             if (behaviour instanceof IHaveKnowledge iHaveKnowledge) {
                 iHaveKnowledge.collectKnowledgeData(data);

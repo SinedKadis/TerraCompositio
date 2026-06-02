@@ -11,6 +11,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
 import net.sinedkadis.terracompositio.api.IHaveKnowledge;
+import net.sinedkadis.terracompositio.api.IKnowledgeData;
 import net.sinedkadis.terracompositio.api.TCCapabilities;
 import net.sinedkadis.terracompositio.api.TerraCompositioAPI;
 import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBECFEBehaviour;
@@ -219,7 +220,7 @@ public class CFEHandlerBehaviour implements IBECFEBehaviour, IHaveKnowledge {
 
 
     @Override
-    public void collectKnowledgeData(KnowledgeData data) {
+    public void collectKnowledgeData(IKnowledgeData data) {
 
         data.addText("val.cfe", cfeHandler.getCFE());
 
@@ -240,7 +241,7 @@ public class CFEHandlerBehaviour implements IBECFEBehaviour, IHaveKnowledge {
     }
 
     @Override
-    public void addTooltipLines(KnowledgeData data, List<Component> tooltip, boolean isShifting) {
+    public void addTooltipLines(IKnowledgeData data, List<Component> tooltip, boolean isShifting) {
 
         // Заголовок — всегда первым, не зависит от данных
         tooltip.add(Component.translatable("block.terracompositio.cfe_header"));

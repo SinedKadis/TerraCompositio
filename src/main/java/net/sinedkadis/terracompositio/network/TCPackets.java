@@ -38,10 +38,17 @@ public class TCPackets {
                 .add();
         CHANNEL.registerMessage(
                 id++,
-                C2SRequestKnowledgePacket.class,
-                C2SRequestKnowledgePacket::encode,
-                C2SRequestKnowledgePacket::decode,
-                C2SRequestKnowledgePacket::handle
+                C2SRequestBlockKnowledgePacket.class,
+                C2SRequestBlockKnowledgePacket::encode,
+                C2SRequestBlockKnowledgePacket::decode,
+                C2SRequestBlockKnowledgePacket::handle
+        );
+        CHANNEL.registerMessage(
+                id++,
+                C2SRequestEntityKnowledgePacket.class,
+                C2SRequestEntityKnowledgePacket::encode,
+                C2SRequestEntityKnowledgePacket::decode,
+                C2SRequestEntityKnowledgePacket::handle
         );
 
         CHANNEL.registerMessage(

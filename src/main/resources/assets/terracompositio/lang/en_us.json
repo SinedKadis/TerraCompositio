@@ -108,6 +108,10 @@
   "block.terracompositio.cfe_second": " cfe/second",
   "block.terracompositio.items_header": "Items Info: ",
 
+  "entity.terracompositio.ent_hold_header": "Holds: ",
+  "entity.terracompositio.ent_inner_header": "In Stomach: ",
+  "entity.terracompositio.ent_common_header": "Common: ",
+
 
 
   "block.terracompositio.item_io.input": "Input: ",

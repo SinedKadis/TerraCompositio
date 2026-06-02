@@ -24,6 +24,7 @@ import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.ItemStackHandler;
 import net.sinedkadis.terracompositio.api.IHaveKnowledge;
+import net.sinedkadis.terracompositio.api.IKnowledgeData;
 import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBEItemBehaviour;
 import net.sinedkadis.terracompositio.block.entity.TCBlockEntity;
 import net.sinedkadis.terracompositio.util.ItemComponent;
@@ -252,14 +253,14 @@ public class ManySlotItemHandlerBehaviour implements IBEItemBehaviour, WorldlyCo
     }
 
     @Override
-    public void collectKnowledgeData(KnowledgeData data) {
+    public void collectKnowledgeData(IKnowledgeData data) {
         for (int slot = 0; slot < slotsToShowInOverlay.length; slot++) {
             data.addItem(itemHandler.getStackInSlot(slot));
         }
     }
 
     @Override
-    public void addTooltipLines(KnowledgeData data, List<Component> tooltip, boolean isShifting) {
+    public void addTooltipLines(IKnowledgeData data, List<Component> tooltip, boolean isShifting) {
         tooltip.add(Component.translatable("block.terracompositio.items_header"));
         List<KnowledgeData.Entry> entries = data.entries();
         boolean somethingAdded = false;
