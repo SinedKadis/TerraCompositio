@@ -158,7 +158,10 @@ public class CFEExtractGoal extends Goal {
         if (this.extractAnimationTick < 4 * 20) {
             if (!targetPosition.equals(mob.blockPosition())) {
                 if (targetMember != null) {
-                    CFEHelper.tryCFETransfer(mob, targetMember, 1000);
+                    CFEHelper.CFETransferBuilder.create()
+                            .fromMembers(mob, targetMember)
+                            .maxTransfer(1000)
+                            .build();
                 } else {
                     extractFromLog();
                 }

@@ -142,7 +142,7 @@ public class FlowCedarEntEntity extends AbstractGolem implements CFENetworkMembe
 
                 innerCFEOptional.ifPresent(icfeHandler1 -> {
                     if (tickCount % 200 == 0) {
-                        CFEHelper.tryCFETransfer(icfeHandler1, icfeHandler);
+                        CFEHelper.CFETransferBuilder.create().fromHandlers(icfeHandler1, icfeHandler).build();
                         icfeHandler1.takeCFE(1, false);
                         if (icfeHandler1.getCFE() <= 0) {
                             this.turnIntoStatue();

@@ -105,7 +105,7 @@ public class CFEHandlerBehaviour implements IBECFEBehaviour, IHaveKnowledge {
             targets.forEach(target -> {
                 if (target.getMainHandler().getFreeSpace() > TCCommonConfigs.CFE_PER_BURST_TRANSFER_LIMIT.get())
                     scheduleMemberUpdate(target);
-                CFEHelper.tryCFETransfer(target, this);
+                CFEHelper.CFETransferBuilder.create().fromMembers(target, this).build();
             });
         }
     }
@@ -119,7 +119,7 @@ public class CFEHandlerBehaviour implements IBECFEBehaviour, IHaveKnowledge {
                         scheduleMemberUpdate(updated);
                 } else scheduleMemberUpdate(updated);
             }
-            CFEHelper.tryCFETransfer(updated, this);
+            CFEHelper.CFETransferBuilder.create().fromMembers(updated, this).build();
         } else onCFENetworkMemberUpdate();
     }
 
