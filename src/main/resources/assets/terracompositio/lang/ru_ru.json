@@ -91,18 +91,24 @@
 
 
   "book.terracompositio.creation_flow_journal.entry.fluid_tanks_2.name": "Жидкостные резервуары 2",
-  "book.terracompositio.creation_flow_journal.entry.fluid_tanks_2.page1": "  Жидкостные резервуары могут большее, чем было показано в предыдущей главе. Из них можно собрать беспроводную сеть передачи и хранения жидкостей. Для этого нужно поставить резервуар на саженец кедра и проращиваем его с помощью костной муки",
-  "book.terracompositio.creation_flow_journal.entry.fluid_tanks_2.page2": "Если все правильно, на резервуаре прорастут листочки, и его кора наполнится жидким потоком",
-  "book.terracompositio.creation_flow_journal.entry.fluid_tanks_2.page3": "При подаче редстоун сигнала, одинаковые жидкости будут перемещаться от меньшего сигнала к большему",
+  "book.terracompositio.creation_flow_journal.entry.fluid_tanks_2.page1": "  Жидкостные резервуары могут большее, чем было показано в предыдущей главе. Из них можно собрать беспроводную сеть передачи и хранения жидкостей. Для этого нужно поставить резервуар на саженец кедра и проращиваем его с помощью костной муки.",
+  "book.terracompositio.creation_flow_journal.entry.fluid_tanks_2.page2": "Если все правильно, на резервуаре прорастут листочки",
+  "book.terracompositio.creation_flow_journal.entry.fluid_tanks_2.page3": "При подаче редстоун сигнала, жидкости будут перемещаться от меньшего сигнала к большему",
   "book.terracompositio.creation_flow_journal.entry.fluid_tanks_2.page4": "Если резервуар пуст, он притянет любую жидкость из другого резервуара",
   "book.terracompositio.creation_flow_journal.entry.fluid_tanks_2.page5": "Если рядом нет подходящих резервуаров, то жидкость может быть высосана из ствола кедра",
+  "book.terracompositio.creation_flow_journal.entry.fluid_tanks_2.page6": "  Если рядом с таким резервуаром стоит статуя кедрового энта, а в резервуаре достаточно жидкого потока, то энт оживет ценой в ведро потока",
 
   "book.terracompositio.creation_flow_journal.entry.air_saturator.name": "Обогатитель воздуха",
   "book.terracompositio.creation_flow_journal.entry.air_saturator.page1": "  Есть еще способ получения облака ЭПС, а именно с помощью обогатителя воздуха. Подав на него редстоун сигнал, он начнет распылять в воздух ЭПС. Если наполнить кору устройства жидким потоком, обогатитель будет распылять ЭПС быстрее",
 
 
   "book.terracompositio.creation_flow_journal.entry.cfe_cloud.name": "Облако ЭПС",
-  "book.terracompositio.creation_flow_journal.entry.cfe_cloud.page1": " Облако ЭПС - обогащенный воздух, что получается при обжиге зарядов ЭПС или обогащенной руды технеция в печи. Облако постепенно рассасывается в окружение, а также в окружающие устройства. "
+  "book.terracompositio.creation_flow_journal.entry.cfe_cloud.page1": " Облако ЭПС - обогащенный воздух, что получается при обжиге зарядов ЭПС или обогащенной руды технеция в печи. Облако постепенно рассасывается в окружение, а также в окружающие устройства. ",
+
+
+  "book.terracompositio.creation_flow_journal.entry.cedar_ent.name": "Кедровые Энты",
+  "book.terracompositio.creation_flow_journal.entry.cedar_ent.page1": "В кедровом лесу можно найти помимо красивой флоры, еще и местную уникальную фауну - Кедровых Энтов. Они состоят из кедра, имеют 3 ноги, 2 руки и голод. Они питаются Энергией Потока Созидания вырабатывая её напрямую из жидкого потока, что содержится в бревнах кедра, или разных устройств, содержащих ЭПС.",
+  "book.terracompositio.creation_flow_journal.entry.cedar_ent.page2": "Если он долго не будет кушать, то погибнет от голода, превратившись в статую"
 
 
 }

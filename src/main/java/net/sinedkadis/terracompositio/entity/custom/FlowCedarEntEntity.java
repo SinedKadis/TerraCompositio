@@ -76,7 +76,7 @@ public class FlowCedarEntEntity extends AbstractGolem implements CFENetworkMembe
             .setIndex(0));
     @Getter
     protected LazyOptional<ICFEHandler> innerCFEOptional = LazyOptional.of(() -> new CFEContainer(this)
-            .setMaxCFE(5 * 6 + 6)
+            .setMaxCFE(100)
             .setOffset(vec3 -> vec3.add(0,1,0))
             .setIndex(1));
 
@@ -166,7 +166,7 @@ public class FlowCedarEntEntity extends AbstractGolem implements CFENetworkMembe
     @SuppressWarnings("deprecation")
     @Override
     public @Nullable SpawnGroupData finalizeSpawn(ServerLevelAccessor pLevel, DifficultyInstance pDifficulty, MobSpawnType pReason, @Nullable SpawnGroupData pSpawnData, @Nullable CompoundTag pDataTag) {
-        this.innerCFEOptional.ifPresent(icfeHandler -> icfeHandler.setCFE(level().getRandom().nextInt(60,360)));
+        this.innerCFEOptional.ifPresent(icfeHandler -> icfeHandler.setCFE(level().getRandom().nextInt(6,36)));
         return super.finalizeSpawn(pLevel, pDifficulty, pReason, pSpawnData, pDataTag);
     }
 
