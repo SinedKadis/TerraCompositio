@@ -18,12 +18,20 @@ import java.util.Optional;
 import static net.sinedkadis.terracompositio.block.entity.PathPointerBlockEntity.setYawAndPitchFromRot;
 
 public class CFEHelper {
-    public static void tryCFETransfer(CFENetworkMember target, CFENetworkMember source) {
-        tryCFETransfer(target, source, TCCommonConfigs.CFE_PER_BURST_TRANSFER_LIMIT.get());
-    }
 
-    public static void tryCFETransfer(CFENetworkMember target, CFENetworkMember source, int maxTransfer) {
-        tryCFETransfer(target, source, maxTransfer, 1 / 20f);
+    public static void tryCFETransfer(ICFEHandler target,
+                                      ICFEHandler source,
+                                      int maxTransfer,
+                                      float speed) {
+        int taken = source.takeCFE(maxTransfer, true);
+        int added = source.sendCFE(taken, target, speed, true);
+        if (added <= taken) {
+            if (target.getPos().closerThan(source.getPos(), 2) && !(target.getAttachedMember() instanceof Entity))
+                added = target.addCFE(added, false);
+            else
+                added = source.sendCFE(added, target, speed, false);
+            source.takeCFE(added, false);
+        }
     }
 
     public static void tryCFETransfer(CFENetworkMember target, CFENetworkMember source, int maxTransfer, float speed) {
@@ -63,24 +71,48 @@ public class CFEHelper {
         return false;
     }
 
-    public static void tryCFETransfer(ICFEHandler target, ICFEHandler source) {
-        tryCFETransfer(target, source, TCCommonConfigs.CFE_PER_BURST_TRANSFER_LIMIT.get());
-    }
+    public static class CFETransferBuilder {
+        CFENetworkMember target = null;
+        CFENetworkMember source = null;
+        ICFEHandler target1 = null;
+        ICFEHandler source1 = null;
+        int maxTransfer = TCCommonConfigs.CFE_PER_BURST_TRANSFER_LIMIT.get();
+        float speed = 1 / 20f;
 
-    public static void tryCFETransfer(ICFEHandler target, ICFEHandler source, int maxTransfer) {
-        tryCFETransfer(target, source, maxTransfer, 1 / 20f);
-    }
-
-    public static void tryCFETransfer(ICFEHandler target, ICFEHandler source, int maxTransfer, float speed) {
-        int taken = source.takeCFE(maxTransfer, true);
-        int added = source.sendCFE(taken, target, speed, true);
-        if (added <= taken) {
-            if (target.getPos().closerThan(source.getPos(), 2))
-                added = target.addCFE(added, false);
-            else
-                added = source.sendCFE(added, target, speed, false);
-            source.takeCFE(added, false);
+        public static CFETransferBuilder create() {
+            return new CFETransferBuilder();
         }
+
+        public CFETransferBuilder fromMembers(CFENetworkMember target, CFENetworkMember source) {
+            this.target = target;
+            this.source = source;
+            return this;
+        }
+
+        public CFETransferBuilder fromHandlers(ICFEHandler target, ICFEHandler source) {
+            this.target1 = target;
+            this.source1 = source;
+            return this;
+        }
+
+        public CFETransferBuilder maxTransfer(int maxTransfer) {
+            this.maxTransfer = maxTransfer;
+            return this;
+        }
+
+        public CFETransferBuilder speed(float speed) {
+            this.speed = speed;
+            return this;
+        }
+
+        public void build() {
+            if (target != null) {
+                tryCFETransfer(target, source, maxTransfer, speed);
+            } else {
+                tryCFETransfer(target1, source1, maxTransfer, speed);
+            }
+        }
+
     }
 
     public static int placeCFECloud(Level pLevel, BlockPos targetPos, int cfe) {
