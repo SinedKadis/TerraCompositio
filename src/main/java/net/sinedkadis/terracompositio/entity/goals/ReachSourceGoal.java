@@ -49,7 +49,7 @@ public class ReachSourceGoal extends Goal {
         searchCooldown = SEARCH_INTERVAL;
 
         Optional<ICFEHandler> cfeHandler = mob.getInnerCFEOptional().resolve();
-        if (cfeHandler.isEmpty() || cfeHandler.get().getCFE() > 60) return false;
+        if (cfeHandler.isEmpty() || cfeHandler.get().getCFE() > 6) return false;
         if (mob.isExtracting() || mob.isHolding()) return false;
 
         CFENetworkMember member = searchMember();

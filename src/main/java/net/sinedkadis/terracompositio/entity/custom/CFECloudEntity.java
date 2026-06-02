@@ -23,6 +23,7 @@ import net.sinedkadis.terracompositio.api.networks.cfe.CFENetwork;
 import net.sinedkadis.terracompositio.api.networks.cfe.CFENetworkMember;
 import net.sinedkadis.terracompositio.api.networks.cfe.CFENetworkMemberEntity;
 import net.sinedkadis.terracompositio.api.networks.cfe.ICFEHandler;
+import net.sinedkadis.terracompositio.block.entity.AirSaturatorBlockEntity;
 import net.sinedkadis.terracompositio.cfe.LimitlessCFEContainer;
 import net.sinedkadis.terracompositio.cfe.burst.CFEBurstProjectileEntity;
 import net.sinedkadis.terracompositio.config.TCCommonConfigs;
@@ -62,10 +63,14 @@ public class CFECloudEntity extends Entity implements CFENetworkMemberEntity {
 
         @Override
         public int sendCFE(int cfe, ICFEHandler target, float speed, boolean simulate) {
+
+            if (target.getAttachedMember().getEntity() instanceof AirSaturatorBlockEntity) return 0;
+
             int freeSpace = target.getFreeSpace();
             int added = Mth.clamp(cfe, 0, freeSpace);
             if (added < 1)
                 return 0;
+
             if (!simulate) {
                 Vec3 burstOffset = getBurstOffset(target);
                 BlockPos offset = BlockPos.containing(this.getPos().getCenter().add(burstOffset));
@@ -109,6 +114,7 @@ public class CFECloudEntity extends Entity implements CFENetworkMemberEntity {
 
     @Override
     public void onCFENetworkMemberUpdate(CFENetworkMember updated) {
+        if (updated.getEntity() instanceof AirSaturatorBlockEntity) return;
         if (getPriority() < 0 && getMainHandler().getCFE() > 0 && CFEHelper.validMember(updated)) {
             if (updated.getMainHandler().getFreeSpace() > TCCommonConfigs.CFE_PER_BURST_TRANSFER_LIMIT.get())
                 scheduleMemberUpdate(updated);
@@ -169,6 +175,9 @@ public class CFECloudEntity extends Entity implements CFENetworkMemberEntity {
             setSyncedCFE(getSyncedCFE()+toAdd);
         }
 
+        if (tickCount % 20 == 1) {
+            setSyncedCFE(getSyncedCFE()-1);
+        }
     }
 
     public AABB getBoundingBox() {

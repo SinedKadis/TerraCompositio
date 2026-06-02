@@ -66,7 +66,7 @@
   "book.terracompositio.creation_flow_journal.entry.infused_fertilizer.page1": "Изготовленное путем наполнения потоком любой семечки удобрение обладает невероятными способностями в ускорении роста растений. Для того что б его пробудить, необходимо бросить его в жидкий поток, и тогда в течении 5 секунд оно ускорит рост растений вокруг себя ",
   "book.terracompositio.creation_flow_journal.entry.infused_fertilizer.page2": "Неплохо синергирует с досорбером культивации",
   "book.terracompositio.creation_flow_journal.entry.cfe_charge.name": "Заряд ЭПС",
-  "book.terracompositio.creation_flow_journal.entry.cfe_charge.page1": "Есть способ извлечь ЭПС чуть ли не в чистом виде, и законсервировать его в предмете, удобном для транспортировки. Положив снежёк в наполнетель потоком, он втянет в себя энергию и станет ЭПС зарядом. Для того, что б достать энергию обратно, достаточно засунуть его в печь.",
+  "book.terracompositio.creation_flow_journal.entry.cfe_charge.page1": "Есть способ извлечь ЭПС чуть ли не в чистом виде, и законсервировать его в предмете, удобном для транспортировки. Положив снежёк в наполнетель потоком, он втянет в себя энергию и станет ЭПС зарядом.",
   "book.terracompositio.creation_flow_journal.entry.cfe_charge.page2": "Если его бросить, то он превратится в удобные летающие платформы",
   "book.terracompositio.creation_flow_journal.entry.cedar_gearbox.name": "Кедровая коробка передач",
   "book.terracompositio.creation_flow_journal.entry.cedar_gearbox.page1": "Одно из применений ЭПС есть превращение её в кинетическую энергию. Для этого можно сматерить кедровую коробку передач. Она вырабатывает 2048ен и потребляет 1 ЭПС/с. Если его наполнить потоком, он начнет вырабатывать 4096ен при том же потреблении",
@@ -95,7 +95,14 @@
   "book.terracompositio.creation_flow_journal.entry.fluid_tanks_2.page2": "Если все правильно, на резервуаре прорастут листочки, и его кора наполнится жидким потоком",
   "book.terracompositio.creation_flow_journal.entry.fluid_tanks_2.page3": "При подаче редстоун сигнала, одинаковые жидкости будут перемещаться от меньшего сигнала к большему",
   "book.terracompositio.creation_flow_journal.entry.fluid_tanks_2.page4": "Если резервуар пуст, он притянет любую жидкость из другого резервуара",
-  "book.terracompositio.creation_flow_journal.entry.fluid_tanks_2.page5": "Если рядом нет подходящих резервуаров, то жидкость может быть высосана из ствола кедра"
+  "book.terracompositio.creation_flow_journal.entry.fluid_tanks_2.page5": "Если рядом нет подходящих резервуаров, то жидкость может быть высосана из ствола кедра",
+
+  "book.terracompositio.creation_flow_journal.entry.air_saturator.name": "Обогатитель воздуха",
+  "book.terracompositio.creation_flow_journal.entry.air_saturator.page1": "  Есть еще способ получения облака ЭПС, а именно с помощью обогатителя воздуха. Подав на него редстоун сигнал, он начнет распылять в воздух ЭПС. Если наполнить кору устройства жидким потоком, обогатитель будет распылять ЭПС быстрее",
+
+
+  "book.terracompositio.creation_flow_journal.entry.cfe_cloud.name": "Облако ЭПС",
+  "book.terracompositio.creation_flow_journal.entry.cfe_cloud.page1": " Облако ЭПС - обогащенный воздух, что получается при обжиге зарядов ЭПС или обогащенной руды технеция в печи. Облако постепенно рассасывается в окружение, а также в окружающие устройства. "
 
 
 }

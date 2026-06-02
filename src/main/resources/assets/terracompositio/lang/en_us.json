@@ -308,5 +308,11 @@
   "book.terracompositio.creation_flow_journal.entry.fluid_tanks_2.page2": "test",
   "book.terracompositio.creation_flow_journal.entry.fluid_tanks_2.page3": "text",
   "book.terracompositio.creation_flow_journal.entry.fluid_tanks_2.page4": "test",
-  "book.terracompositio.creation_flow_journal.entry.fluid_tanks_2.page5": "text"
+  "book.terracompositio.creation_flow_journal.entry.fluid_tanks_2.page5": "text",
+
+  "book.terracompositio.creation_flow_journal.entry.air_saturator.name": "test",
+  "book.terracompositio.creation_flow_journal.entry.air_saturator.page1": "test",
+
+  "book.terracompositio.creation_flow_journal.entry.cfe_cloud.name": "test",
+  "book.terracompositio.creation_flow_journal.entry.cfe_cloud.page1": "test"
 }

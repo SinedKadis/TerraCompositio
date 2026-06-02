@@ -4,15 +4,21 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraftforge.fluids.FluidStack;
+import net.minecraftforge.fluids.capability.IFluidHandler;
+import net.minecraftforge.fluids.capability.IFluidHandlerItem;
 import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBEBehaviour;
 import net.sinedkadis.terracompositio.api.networks.cfe.ICFEHandler;
+import net.sinedkadis.terracompositio.block.IFluidApplicable;
 import net.sinedkadis.terracompositio.block.behaviours.CFEHandlerBehaviour;
 import net.sinedkadis.terracompositio.config.TCInnerConfig;
 import net.sinedkadis.terracompositio.registries.TCBlockEntities;
 import net.sinedkadis.terracompositio.registries.TCBlockStateProperties;
+import net.sinedkadis.terracompositio.registries.TCFluids;
 import net.sinedkadis.terracompositio.util.helpers.CFEHelper;
 
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -20,7 +26,7 @@ import java.util.List;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class AirSaturatorBlockEntity extends TCBlockEntity{
+public class AirSaturatorBlockEntity extends TCBlockEntity implements IFluidApplicable{
     public AirSaturatorBlockEntity(BlockPos pos, BlockState state) {
         super(TCBlockEntities.AIR_SATURATOR_BE.get(), pos, state);
     }
@@ -71,5 +77,18 @@ public class AirSaturatorBlockEntity extends TCBlockEntity{
 
     private void scheduleMemberUpdate() {
         ((CFEHandlerBehaviour) behaviours.get(0)).scheduleMemberUpdate();
+    }
+
+    @Override
+    public IFluidApplicable.FluidApplyResult tryApply(Level level, BlockPos blockPos, ItemStack itemStack, IFluidHandlerItem handlerItem) {
+        FluidStack resource = new FluidStack(TCFluids.FLOW_FLUID.source.get(), 1000);
+        FluidStack result = handlerItem.drain(resource, IFluidHandler.FluidAction.SIMULATE);
+        BlockState blockState = level.getBlockState(blockPos);
+        if (result.getAmount() >= 1000 && !blockState.getValue(TCBlockStateProperties.INFUSED)) {
+            level.setBlockAndUpdate(blockPos, blockState.setValue(TCBlockStateProperties.INFUSED, true));
+            handlerItem.drain(1000, IFluidHandler.FluidAction.EXECUTE);
+            return IFluidApplicable.FluidApplyResult.SUCCESS;
+        }
+        return IFluidApplicable.FluidApplyResult.SKIP;
     }
 }

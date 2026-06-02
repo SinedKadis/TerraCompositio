@@ -76,7 +76,7 @@ public class FlowCedarEntEntity extends AbstractGolem implements CFENetworkMembe
             .setIndex(0));
     @Getter
     protected LazyOptional<ICFEHandler> innerCFEOptional = LazyOptional.of(() -> new CFEContainer(this)
-            .setMaxCFE(5 * 60 + 60)
+            .setMaxCFE(5 * 6 + 6)
             .setOffset(vec3 -> vec3.add(0,1,0))
             .setIndex(1));
 
@@ -108,7 +108,6 @@ public class FlowCedarEntEntity extends AbstractGolem implements CFENetworkMembe
         return super.getCapability(capability, facing);
     }
 
-    int tickCounter = 20;
     private int lastSyncedEnergy = -1;
     @Override
     public void tick() {
@@ -137,10 +136,8 @@ public class FlowCedarEntEntity extends AbstractGolem implements CFENetworkMembe
                 }
 
                 innerCFEOptional.ifPresent(icfeHandler1 -> {
-                    tickCounter--;
-                    if (tickCounter <= 0) {
+                    if (tickCount % 200 == 0) {
                         CFEHelper.tryCFETransfer(icfeHandler1, icfeHandler);
-                        tickCounter = 20;
                         icfeHandler1.takeCFE(1, false);
                         if (icfeHandler1.getCFE() <= 0) {
                             this.turnIntoStatue();
@@ -252,7 +249,7 @@ public class FlowCedarEntEntity extends AbstractGolem implements CFENetworkMembe
 //        this.goalSelector.addGoal(1, new BreedGoal(this, 1.15D));
 //        this.goalSelector.addGoal(2, new TemptGoal(this, 1.2D, Ingredient.of(Items.COOKED_BEEF), false));
 
-        this.goalSelector.addGoal(3, new ReachSourceGoal(this,1.2D,32,3));
+        this.goalSelector.addGoal(3, new ReachSourceGoal(this,1.2D,32,2));
         this.goalSelector.addGoal(3, new CFEExtractGoal(this,3));
         this.goalSelector.addGoal(4, new WaterAvoidingRandomStrollGoal(this, 1.0D));
         this.goalSelector.addGoal(5, new LookAtPlayerGoal(this, Player.class, 3f));

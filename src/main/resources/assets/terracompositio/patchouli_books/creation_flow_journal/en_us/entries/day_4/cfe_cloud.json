@@ -1,0 +1,9 @@
+{
+  "name": "book.terracompositio.creation_flow_journal.entry.cfe_cloud.name",
+  "category": "terracompositio:day_4",
+  "icon": "terracompositio:textures/particle/cfe_particle.png",
+  "flag": "terracompositio:day_4",
+  "pages": [
+    "book.terracompositio.creation_flow_journal.entry.cfe_cloud.page1"
+  ]
+}

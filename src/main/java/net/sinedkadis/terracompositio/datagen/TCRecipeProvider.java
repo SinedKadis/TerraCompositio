@@ -539,6 +539,16 @@ public class TCRecipeProvider extends RecipeProvider implements IConditionBuilde
                 .define('S', Items.STICK)
                 .unlockedBy(getHasName(TCItems.TECHNETIUM_INGOT.get()), has(TCItems.TECHNETIUM_INGOT.get()))
                 .save(pWriter);
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, TCBlocks.AIR_SATURATOR.get())
+                .pattern(" I ")
+                .pattern("RCR")
+                .pattern(" L ")
+                .define('I', Items.IRON_INGOT)
+                .define('C', Items.COBWEB)
+                .define('R', TCItems.INFUSED_IRON_ROD.get())
+                .define('L', TCBlocks.FLOW_CEDAR_LOG.get())
+                .unlockedBy(getHasName(TCItems.INFUSED_IRON_INGOT.get()), has(TCItems.INFUSED_IRON_INGOT.get()))
+                .save(pWriter);
     }
 
     private static void buildMatterInfuserBlocks(@NotNull Consumer<FinishedRecipe> pWriter) {
