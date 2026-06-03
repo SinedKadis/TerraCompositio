@@ -283,7 +283,7 @@ public class CFEHandlerBehaviour implements IBECFEBehaviour, IHaveKnowledge {
             tooltip.add(
                     Component.translatable("block.terracompositio.range",
                                     Component.literal(String.valueOf(data.getInt("val.range")))
-                                            .append(Component.translatable("block.terracompositio.units"))
+                                            .append(Component.translatable("block.terracompositio.blocks"))
                                             .withStyle(ChatFormatting.AQUA))
                             .withStyle(ChatFormatting.GRAY));
 
@@ -299,7 +299,7 @@ public class CFEHandlerBehaviour implements IBECFEBehaviour, IHaveKnowledge {
         if (data.contains("flag.type.source") && data.getBoolean("flag.type.source")) {
             tooltip.add(
                     Component.translatable("block.terracompositio.type",
-                                    Component.translatable("block.terracompositio.consumer")
+                                    Component.translatable("block.terracompositio.source")
                                             .withStyle(ChatFormatting.AQUA))
                             .withStyle(ChatFormatting.GRAY));
         }

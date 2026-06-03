@@ -1,9 +1,11 @@
 package net.sinedkadis.terracompositio.entity.custom;
 
+import net.minecraft.ChatFormatting;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -15,6 +17,7 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
+import net.sinedkadis.terracompositio.api.IHaveKnowledge;
 import net.sinedkadis.terracompositio.api.TCCapabilities;
 import net.sinedkadis.terracompositio.api.TerraCompositioAPI;
 import net.sinedkadis.terracompositio.api.dummies.DummyCFEHandler;
@@ -34,6 +37,7 @@ import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.HashSet;
+import java.util.List;
 import java.util.Set;
 import java.util.function.ToIntFunction;
 
@@ -41,7 +45,7 @@ import java.util.function.ToIntFunction;
 
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
-public class CFECloudEntity extends Entity implements CFENetworkMemberEntity {
+public class CFECloudEntity extends Entity implements CFENetworkMemberEntity, IHaveKnowledge {
     private static final EntityDataAccessor<Integer> CFE_DATA =
             SynchedEntityData.defineId(CFECloudEntity.class, EntityDataSerializers.INT);
     private int queuedCFE;
@@ -276,5 +280,97 @@ public class CFECloudEntity extends Entity implements CFENetworkMemberEntity {
     public void readAdditionalSaveData(CompoundTag pCompound) {
         lazyCFEOptional.ifPresent(cap -> cap.readFromNBT(pCompound));
         queuedCFE = pCompound.getInt("queuedCFE");
+    }
+
+    @Override
+    public void collectKnowledgeData(CompoundTag data) {
+
+        lazyCFEOptional.ifPresent(cfeHandler -> {
+            data.putInt("val.cfe", cfeHandler.getCFE());
+            if (TCCommonConfigs.DEBUG.get()) {
+                data.putInt("val.max_cfe", cfeHandler.getMaxCFE());
+                data.putInt("val.queued", cfeHandler.getQueued());
+            }
+        });
+
+        int priority = this.getPriority();
+
+        if (TCCommonConfigs.DEBUG.get()) {
+            data.putInt("val.priority", priority);
+        }
+
+        data.putInt("val.range", this.getRange());
+
+        if (priority == TCInnerConfig.DEFAULT_CONSUMER_PRIORITY) {
+            data.putBoolean("flag.type.consumer", true);
+        } else if (priority == TCInnerConfig.DEFAULT_SOURCE_PRIORITY) {
+            data.putBoolean("flag.type.source", true);
+        }
+
+    }
+
+    @Override
+    public void addTooltipLines(CompoundTag data, List<Component> tooltip, boolean isShifting) {
+
+        if (isShifting) {
+            tooltip.add(Component.translatable("block.terracompositio.cfe_header"));
+
+
+            if (data.contains("val.cfe")) {
+                tooltip.add(
+                        Component.translatable("block.terracompositio.cfe",
+                                        Component.literal(String.valueOf(data.getInt("val.cfe")))
+                                                .append(Component.translatable("block.terracompositio.units"))
+                                                .withStyle(ChatFormatting.AQUA))
+                                .withStyle(ChatFormatting.GRAY));
+            }
+            if (data.contains("val.max_cfe")) {
+                tooltip.add(
+                        Component.translatable("block.terracompositio.max_cfe",
+                                        Component.literal(String.valueOf(data.getInt("val.max_cfe")))
+                                                .append(Component.translatable("block.terracompositio.units"))
+                                                .withStyle(ChatFormatting.AQUA))
+                                .withStyle(ChatFormatting.GRAY));
+            }
+            if (data.contains("val.queued")) {
+                tooltip.add(
+                        Component.translatable("block.terracompositio.queued",
+                                        Component.literal(String.valueOf(data.getInt("val.queued")))
+                                                .append(Component.translatable("block.terracompositio.units"))
+                                                .withStyle(ChatFormatting.AQUA))
+                                .withStyle(ChatFormatting.GRAY));
+            }
+
+            if (data.contains("val.priority")) {
+                tooltip.add(
+                        Component.translatable("block.terracompositio.priority",
+                                        Component.literal(String.valueOf(data.getInt("val.priority")))
+                                                .append(Component.translatable("block.terracompositio.units"))
+                                                .withStyle(ChatFormatting.AQUA))
+                                .withStyle(ChatFormatting.GRAY));
+            }
+            if (data.contains("val.range")) {
+                tooltip.add(
+                        Component.translatable("block.terracompositio.range",
+                                        Component.literal(String.valueOf(data.getInt("val.range")))
+                                                .append(Component.translatable("block.terracompositio.blocks"))
+                                                .withStyle(ChatFormatting.AQUA))
+                                .withStyle(ChatFormatting.GRAY));
+            }
+            if (data.contains("flag.type.consumer") && data.getBoolean("flag.type.consumer")) {
+                tooltip.add(
+                        Component.translatable("block.terracompositio.type",
+                                        Component.translatable("block.terracompositio.consumer")
+                                                .withStyle(ChatFormatting.AQUA))
+                                .withStyle(ChatFormatting.GRAY));
+            }
+            if (data.contains("flag.type.source") && data.getBoolean("flag.type.source")) {
+                tooltip.add(
+                        Component.translatable("block.terracompositio.type",
+                                        Component.translatable("block.terracompositio.source")
+                                                .withStyle(ChatFormatting.AQUA))
+                                .withStyle(ChatFormatting.GRAY));
+            }
+        }
     }
 }
