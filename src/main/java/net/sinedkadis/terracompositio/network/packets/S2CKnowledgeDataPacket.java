@@ -1,9 +1,9 @@
 package net.sinedkadis.terracompositio.network.packets;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraftforge.network.NetworkEvent;
-import net.sinedkadis.terracompositio.util.KnowledgeData;
 
 import java.util.Map;
 import java.util.UUID;
@@ -16,16 +16,16 @@ public class S2CKnowledgeDataPacket {
     private static final BlockPos emptyPos = BlockPos.ZERO.atY(-64);
     private static final UUID emptyUUID = UUID.randomUUID();
     private final BlockPos pos;
-    private final KnowledgeData data;
+    private final CompoundTag data;
     private final UUID entityUUID;
 
-    public S2CKnowledgeDataPacket(BlockPos pos, KnowledgeData data) {
+    public S2CKnowledgeDataPacket(BlockPos pos, CompoundTag data) {
         this.entityUUID = emptyUUID;
         this.pos = pos;
         this.data = data;
     }
 
-    public S2CKnowledgeDataPacket(UUID entityUUID, KnowledgeData data) {
+    public S2CKnowledgeDataPacket(UUID entityUUID, CompoundTag data) {
         this.entityUUID = entityUUID;
         this.pos = emptyPos;
         this.data = data;
@@ -43,7 +43,7 @@ public class S2CKnowledgeDataPacket {
             buf.writeBoolean(false);
             buf.writeUUID(pkt.entityUUID);
         }
-        pkt.data.toNetwork(buf);
+        buf.writeNbt(pkt.data);
     }
 
     public static S2CKnowledgeDataPacket decode(FriendlyByteBuf buf) {
@@ -56,7 +56,7 @@ public class S2CKnowledgeDataPacket {
         else
             entityUUID = buf.readUUID();
 
-        KnowledgeData data = KnowledgeData.fromNetwork(buf);
+        CompoundTag data = buf.readNbt();
         if (posWasSent)
             return new S2CKnowledgeDataPacket(pos, data);
         else
@@ -84,18 +84,19 @@ public class S2CKnowledgeDataPacket {
     // ─── Клиентский кэш ──────────────────────────────────────────
     public static final class ClientCache {
 
-        private static final Map<Object, KnowledgeData> cache = new ConcurrentHashMap<>();
+        private static final Map<Object, CompoundTag> cache = new ConcurrentHashMap<>();
 
 
-        public static void put(BlockPos pos, KnowledgeData data) {
+        public static void put(BlockPos pos, CompoundTag data) {
             cache.put(pos, data);
         }
-        public static void put(UUID entityUUID, KnowledgeData data) {
+
+        public static void put(UUID entityUUID, CompoundTag data) {
             cache.put(entityUUID, data);
         }
 
 
-        public static KnowledgeData get(Object posOrUUID) {
+        public static CompoundTag get(Object posOrUUID) {
             return cache.get(posOrUUID);
         }
 

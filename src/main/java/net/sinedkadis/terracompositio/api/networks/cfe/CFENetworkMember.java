@@ -19,6 +19,10 @@ public interface CFENetworkMember {
     //Cfe Handler reference
     ICFEHandler getMainHandler();
 
+    default ICFEHandler getHandler(int index) {
+        return getMainHandler();
+    }
+
     //World data getters
     <T> T getEntity();
     Level getLevel();

@@ -12,15 +12,17 @@ public class LimitlessCFEContainer extends CFEContainer{
     }
 
     @Override
-    public int sendCFE(int cfe, @NotNull ICFEHandler target, float speed, boolean simulate) {
+    public int sendCFE(int cfe, @NotNull ICFEHandler target, float speed, boolean noCol, boolean simulate) {
         int freeSpace = target.getFreeSpace();
         int added = Mth.clamp(cfe, 0, freeSpace);
         if (added < 1)
             return 0;
         if (!simulate) {
             CFEBurstProjectileEntity entity = CFEBurstProjectileEntity.sendBurst(this, target, added, speed);
-            if (entity != null)
+            if (entity != null) {
+                entity.noCollision(noCol);
                 target.addToQueue(added);
+            }
         }
         return added;
     }

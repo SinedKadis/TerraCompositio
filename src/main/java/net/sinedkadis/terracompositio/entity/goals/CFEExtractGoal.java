@@ -55,7 +55,7 @@ public class CFEExtractGoal extends Goal {
         cachedHeld = mob.getCapability(TCCapabilities.CFE).resolve().orElse(null);
         cachedInner = mob.getInnerCFEOptional().resolve().orElse(null);
 
-        if (cachedInner == null || cachedInner.getCFE() >= 60) return false;
+        if (cachedInner == null || cachedInner.getCFE() >= 6) return false;
         if (!isCFEQueueEmpty()) return false;
 
         targetMember = searchMember();
@@ -158,7 +158,7 @@ public class CFEExtractGoal extends Goal {
         if (this.extractAnimationTick < 4 * 20) {
             if (!targetPosition.equals(mob.blockPosition())) {
                 if (targetMember != null) {
-                    CFEHelper.CFETransferBuilder.create()
+                    CFEHelper.createTransfer()
                             .fromMembers(mob, targetMember)
                             .maxTransfer(1000)
                             .build();

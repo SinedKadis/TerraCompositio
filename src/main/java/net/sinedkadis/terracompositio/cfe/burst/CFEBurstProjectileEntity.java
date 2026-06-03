@@ -47,10 +47,13 @@ public class CFEBurstProjectileEntity extends ThrowableProjectile {
 
     private final BlockPos.MutableBlockPos lastBP = new BlockPos.MutableBlockPos();
     private int timeToLive = 100;
+    private boolean noCollision = false;
+    private int targetIndex = 0;
 
     @Getter
     @Setter
     Vector3f[] offsets = null;
+    private double tickToLiveNoCol = 0;
 
     public CFEBurstProjectileEntity(EntityType<? extends ThrowableProjectile> pEntityType, Level pLevel) {
         super(pEntityType, pLevel);
@@ -63,21 +66,26 @@ public class CFEBurstProjectileEntity extends ThrowableProjectile {
 
     private CFEBurstProjectileEntity(ICFEHandler pSource, ICFEHandler target, int cfe, float cfeTravelSpeed) {
         this(pSource.x(), pSource.y(), pSource.z(), pSource.getLevel());
-        init(pSource,Vec3.ZERO, target.getPos(),target.getAttachedMember(), cfe, cfeTravelSpeed);
+        targetIndex = target.getIndex();
+        init(pSource, pSource.getOffset().apply(Vec3.ZERO), target.getAttachedMember(), target.getOffset().apply(Vec3.ZERO), cfe, cfeTravelSpeed);
     }
     private CFEBurstProjectileEntity(ICFEHandler pSource, CFENetworkMember target, int cfe, float cfeTravelSpeed) {
         this(pSource.x(), pSource.y(), pSource.z(), pSource.getLevel());
-        init(pSource,Vec3.ZERO, target.getPos(),target, cfe, cfeTravelSpeed);
+        init(pSource, Vec3.ZERO, target, target.getMainHandler().getOffset().apply(Vec3.ZERO), cfe, cfeTravelSpeed);
     }
 
 
 
     private CFEBurstProjectileEntity(ICFEHandler pSource,Vec3 offset, ICFEHandler target, int cfe, float cfeTravelSpeed) {
         this(pSource.x()+offset.x,pSource.y()+offset.y,pSource.z()+offset.z,pSource.getLevel());
-        init(pSource,offset,target.getPos(),target.getAttachedMember(),cfe,cfeTravelSpeed);
+        init(pSource, offset, target.getAttachedMember(), target.getOffset().apply(Vec3.ZERO), cfe, cfeTravelSpeed);
     }
 
-    private void init(ICFEHandler pSource,Vec3 offset,BlockPos targetPos, CFENetworkMember attachedMember, int cfe, float cfeTravelSpeed) {
+    public void noCollision(boolean noCollision) {
+        this.noCollision = noCollision;
+    }
+
+    private void init(ICFEHandler pSource, Vec3 startOffset, CFENetworkMember attachedMember, Vec3 targetOffset, int cfe, float cfeTravelSpeed) {
         if (attachedMember instanceof LivingEntity livingEntity) {
             this.setOwner(livingEntity);
         }
@@ -92,10 +100,13 @@ public class CFEBurstProjectileEntity extends ThrowableProjectile {
         this.setNoGravity(true);
         float size = 0f;
         this.setBoundingBox(new AABB(size, size, size, size, size, size));
-        BlockPos shootVec = targetPos.subtract(BlockPos.containing(pSource.getPos().getCenter().add(offset)));
+        Vec3 targetPos = attachedMember.getPos().getCenter().add(targetOffset);
+        Vec3 startPos = pSource.getPos().getCenter().add(startOffset);
+        Vec3 shootVec = targetPos.subtract(startPos);
+        tickToLiveNoCol = shootVec.length() / cfeTravelSpeed;
         //pp proxy backdoor
         this.setTarget(attachedMember.getMainHandler().getAttachedMember().getPos());
-        this.shoot(shootVec.getX(), shootVec.getY(), shootVec.getZ(), cfeTravelSpeed, 0);
+        this.shoot(shootVec.x(), shootVec.y(), shootVec.z(), cfeTravelSpeed, 0);
         lastBP.set(pSource.getPos());
         pSource.getLevel().addFreshEntity(this);
     }
@@ -133,9 +144,33 @@ public class CFEBurstProjectileEntity extends ThrowableProjectile {
     public void tick() {
         super.tick();
         killIfTimeEnded();
-        calculateCollisions();
+        if (noCollision) {
+            if (tickCount >= tickToLiveNoCol) {
+                consumeTarget();
+            }
+        } else {
+            calculateCollisions();
+        }
         if (trackCrown)
             recalculateCrownOwnerTarget();
+    }
+
+    private void consumeTarget() {
+        Entity owner = getOwner();
+        if (owner instanceof CFENetworkMember cfeNetworkMember) {
+            int cfe = this.getCFE();
+            ICFEHandler cfeHandler = cfeNetworkMember.getHandler(targetIndex);
+            int added = cfeHandler.addCFE(cfe, true);
+            CFEBurstProjectileEntity burst = this.createPartWithCFE(added);
+            int consumed = cfeHandler.addCFE(burst.getCFE(), false);
+            burst.discard();
+            if (consumed == cfe) {
+                discard();
+            } else {
+                noCollision = false;
+            }
+        }
+
     }
 
     private void calculateCollisions() {
@@ -242,7 +277,7 @@ public class CFEBurstProjectileEntity extends ThrowableProjectile {
         if (blockEntity instanceof TCBlockEntity memberBE) {
             memberBE.getCapability(TCCapabilities.CFE).orElse(DummyCFEHandler.instance).subFromQueue(getO_CFE());
         } else if (blockEntity instanceof CFENetworkMemberBE memberBE) {
-            memberBE.getMainHandler().subFromQueue(getO_CFE());
+            memberBE.getHandler(targetIndex).subFromQueue(getO_CFE());
         } else {
             Entity target;
             Entity owner = getOwner();
@@ -259,7 +294,7 @@ public class CFEBurstProjectileEntity extends ThrowableProjectile {
                 CFENetworkMemberEntity cfeNetworkMemberEntity = ((CFENetworkMemberEntity) target);
                 int cfe = getCFE();
                 int oCfe = getO_CFE();
-                cfeNetworkMemberEntity.getMainHandler().subFromQueue(Math.max(cfe, oCfe));
+                cfeNetworkMemberEntity.getHandler(targetIndex).subFromQueue(Math.max(cfe, oCfe));
             }
 
         }

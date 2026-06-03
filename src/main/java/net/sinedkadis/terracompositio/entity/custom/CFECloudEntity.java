@@ -62,7 +62,7 @@ public class CFECloudEntity extends Entity implements CFENetworkMemberEntity {
         }
 
         @Override
-        public int sendCFE(int cfe, ICFEHandler target, float speed, boolean simulate) {
+        public int sendCFE(int cfe, ICFEHandler target, float speed, boolean noCol, boolean simulate) {
 
             if (target.getAttachedMember().getEntity() instanceof AirSaturatorBlockEntity) return 0;
 
@@ -79,8 +79,10 @@ public class CFECloudEntity extends Entity implements CFENetworkMemberEntity {
                     return added;
                 }
                 CFEBurstProjectileEntity entity = CFEBurstProjectileEntity.sendBurst(this, burstOffset,target,added,speed);
-                if (entity != null)
+                if (entity != null) {
+                    entity.noCollision(noCol);
                     target.addToQueue(added);
+                }
             }
             return added;
         }
@@ -107,7 +109,7 @@ public class CFECloudEntity extends Entity implements CFENetworkMemberEntity {
             targets.forEach(target -> {
                 if (target.getMainHandler().getFreeSpace() > TCCommonConfigs.CFE_PER_BURST_TRANSFER_LIMIT.get())
                     scheduleMemberUpdate(target);
-                CFEHelper.CFETransferBuilder.create().fromMembers(target, this).build();
+                CFEHelper.createTransfer().fromMembers(target, this).build();
             });
         }
     }
@@ -118,7 +120,7 @@ public class CFECloudEntity extends Entity implements CFENetworkMemberEntity {
         if (getPriority() < 0 && getMainHandler().getCFE() > 0 && CFEHelper.validMember(updated)) {
             if (updated.getMainHandler().getFreeSpace() > TCCommonConfigs.CFE_PER_BURST_TRANSFER_LIMIT.get())
                 scheduleMemberUpdate(updated);
-            CFEHelper.CFETransferBuilder.create().fromMembers(updated, this).build();
+            CFEHelper.createTransfer().fromMembers(updated, this).build();
         }
     }
 

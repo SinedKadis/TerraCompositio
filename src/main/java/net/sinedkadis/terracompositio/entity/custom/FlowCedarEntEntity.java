@@ -33,7 +33,6 @@ import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.ItemStackHandler;
 import net.sinedkadis.terracompositio.api.IHaveKnowledge;
-import net.sinedkadis.terracompositio.api.IKnowledgeData;
 import net.sinedkadis.terracompositio.api.TCCapabilities;
 import net.sinedkadis.terracompositio.api.TerraCompositioAPI;
 import net.sinedkadis.terracompositio.api.dummies.DummyCFEHandler;
@@ -52,7 +51,6 @@ import net.sinedkadis.terracompositio.entity.goals.CFEHoldGoal;
 import net.sinedkadis.terracompositio.entity.goals.ReachSourceGoal;
 import net.sinedkadis.terracompositio.registries.TCBlocks;
 import net.sinedkadis.terracompositio.registries.TCItems;
-import net.sinedkadis.terracompositio.util.KnowledgeData;
 import net.sinedkadis.terracompositio.util.helpers.CFEHelper;
 import net.sinedkadis.terracompositio.util.helpers.ParticleHelper;
 import org.jetbrains.annotations.Nullable;
@@ -141,8 +139,13 @@ public class FlowCedarEntEntity extends AbstractGolem implements CFENetworkMembe
                 }
 
                 innerCFEOptional.ifPresent(icfeHandler1 -> {
+                    if (tickCount % 20 == 0) {
+                        CFEHelper.createTransfer()
+                                .fromHandlers(icfeHandler1, icfeHandler)
+                                .noCollision()
+                                .build();
+                    }
                     if (tickCount % 200 == 0) {
-                        CFEHelper.CFETransferBuilder.create().fromHandlers(icfeHandler1, icfeHandler).build();
                         icfeHandler1.takeCFE(1, false);
                         if (icfeHandler1.getCFE() <= 0) {
                             this.turnIntoStatue();
@@ -254,8 +257,8 @@ public class FlowCedarEntEntity extends AbstractGolem implements CFENetworkMembe
 //        this.goalSelector.addGoal(1, new BreedGoal(this, 1.15D));
 //        this.goalSelector.addGoal(2, new TemptGoal(this, 1.2D, Ingredient.of(Items.COOKED_BEEF), false));
 
-        this.goalSelector.addGoal(3, new ReachSourceGoal(this,1.2D,32,2));
-        this.goalSelector.addGoal(3, new CFEExtractGoal(this,3));
+        this.goalSelector.addGoal(3, new ReachSourceGoal(this, 1.2D, 32, 3));
+        this.goalSelector.addGoal(3, new CFEExtractGoal(this, 4));
         this.goalSelector.addGoal(4, new WaterAvoidingRandomStrollGoal(this, 1.0D));
         this.goalSelector.addGoal(5, new LookAtPlayerGoal(this, Player.class, 3f));
         this.goalSelector.addGoal(6, new RandomLookAroundGoal(this));
@@ -325,6 +328,14 @@ public class FlowCedarEntEntity extends AbstractGolem implements CFENetworkMembe
     }
 
     @Override
+    public ICFEHandler getHandler(int index) {
+        return cfeHandlers.stream()
+                .map(icfeHandlerLazyOptional -> icfeHandlerLazyOptional.orElse(DummyCFEHandler.instance))
+                .filter(icfeHandler -> icfeHandler.getIndex() == index)
+                .findAny().orElse(DummyCFEHandler.instance);
+    }
+
+    @Override
     public void addAdditionalSaveData(CompoundTag pCompound) {
         super.addAdditionalSaveData(pCompound);
         lazyCFEOptional.ifPresent(cap -> cap.writeToNBT(pCompound));
@@ -387,141 +398,130 @@ public class FlowCedarEntEntity extends AbstractGolem implements CFENetworkMembe
     }
 
     @Override
-    public void collectKnowledgeData(IKnowledgeData data) {
+    public void collectKnowledgeData(CompoundTag data) {
 
         lazyCFEOptional.ifPresent(cfeHandler -> {
-            data.addText("val.cfe", cfeHandler.getCFE());
+            data.putInt("val.cfe", cfeHandler.getCFE());
             if (TCCommonConfigs.DEBUG.get()) {
-                data.addText("val.max_cfe", cfeHandler.getMaxCFE());
-                data.addText("val.queued", cfeHandler.getQueued());
+                data.putInt("val.max_cfe", cfeHandler.getMaxCFE());
+                data.putInt("val.queued", cfeHandler.getQueued());
             }
         });
         innerCFEOptional.ifPresent(cfeHandler -> {
-            data.addText("val.cfe2", cfeHandler.getCFE());
+            data.putInt("val.cfe2", cfeHandler.getCFE());
             if (TCCommonConfigs.DEBUG.get()) {
-                data.addText("val.max_cfe2", cfeHandler.getMaxCFE());
-                data.addText("val.queued2", cfeHandler.getQueued());
+                data.putInt("val.max_cfe2", cfeHandler.getMaxCFE());
+                data.putInt("val.queued2", cfeHandler.getQueued());
             }
         });
 
         int priority = this.getPriority();
 
         if (TCCommonConfigs.DEBUG.get()) {
-            data.addText("val.priority", priority);
+            data.putInt("val.priority", priority);
         }
 
-        data.addText("val.range", this.getRange());
+        data.putInt("val.range", this.getRange());
 
         if (priority == TCInnerConfig.DEFAULT_CONSUMER_PRIORITY) {
-            data.addText("flag.type.consumer");
+            data.putBoolean("flag.type.consumer", true);
         } else if (priority == TCInnerConfig.DEFAULT_SOURCE_PRIORITY) {
-            data.addText("flag.type.source");
+            data.putBoolean("flag.type.source", true);
         }
 
     }
 
     @Override
-    public void addTooltipLines(IKnowledgeData data, List<Component> tooltip, boolean isShifting) {
+    public void addTooltipLines(CompoundTag data, List<Component> tooltip, boolean isShifting) {
 
         tooltip.add(Component.translatable("block.terracompositio.cfe_header"));
 
-        for (KnowledgeData.Entry entry : data.entries()) {
-            if (!(entry instanceof KnowledgeData.TextEntry textEntry)) continue;
+        tooltip.add(Component.translatable("entity.terracompositio.ent_hold_header"));
 
-            String translationKey = textEntry.translationKey();
-            String[] args = textEntry.args();
+        if (data.contains("val.cfe")) {
+            tooltip.add(
+                    Component.translatable("block.terracompositio.cfe",
+                                    Component.literal(String.valueOf(data.getInt("val.cfe")))
+                                            .append(Component.translatable("block.terracompositio.units"))
+                                            .withStyle(ChatFormatting.AQUA))
+                            .withStyle(ChatFormatting.GRAY));
+        }
+        if (data.contains("val.max_cfe")) {
+            tooltip.add(
+                    Component.translatable("block.terracompositio.max_cfe",
+                                    Component.literal(String.valueOf(data.getInt("val.max_cfe")))
+                                            .append(Component.translatable("block.terracompositio.units"))
+                                            .withStyle(ChatFormatting.AQUA))
+                            .withStyle(ChatFormatting.GRAY));
+        }
+        if (data.contains("val.queued")) {
+            tooltip.add(
+                    Component.translatable("block.terracompositio.queued",
+                                    Component.literal(String.valueOf(data.getInt("val.queued")))
+                                            .append(Component.translatable("block.terracompositio.units"))
+                                            .withStyle(ChatFormatting.AQUA))
+                            .withStyle(ChatFormatting.GRAY));
+        }
 
-            tooltip.add(Component.translatable("entity.terracompositio.ent_hold_header"));
-            switch (translationKey) {
-                case "val.cfe" -> {
-                    tooltip.add(
-                            Component.translatable("block.terracompositio.cfe",
-                                            Component.literal(args[0])
-                                                    .append(Component.translatable("block.terracompositio.units"))
-                                                    .withStyle(ChatFormatting.AQUA))
-                                    .withStyle(ChatFormatting.GRAY));
-                    continue;
-                }
+        tooltip.add(Component.translatable("entity.terracompositio.ent_inner_header"));
 
-                case "val.max_cfe" -> {
-                    tooltip.add(
-                            Component.translatable("block.terracompositio.max_cfe",
-                                            Component.literal(args[0])
-                                                    .withStyle(ChatFormatting.AQUA))
-                                    .withStyle(ChatFormatting.GRAY));
-                    continue;
-                }
+        if (data.contains("val.cfe2")) {
+            tooltip.add(
+                    Component.translatable("block.terracompositio.cfe",
+                                    Component.literal(String.valueOf(data.getInt("val.cfe2")))
+                                            .append(Component.translatable("block.terracompositio.units"))
+                                            .withStyle(ChatFormatting.AQUA))
+                            .withStyle(ChatFormatting.GRAY));
+        }
+        if (data.contains("val.max_cfe2")) {
+            tooltip.add(
+                    Component.translatable("block.terracompositio.max_cfe",
+                                    Component.literal(String.valueOf(data.getInt("val.max_cfe2")))
+                                            .append(Component.translatable("block.terracompositio.units"))
+                                            .withStyle(ChatFormatting.AQUA))
+                            .withStyle(ChatFormatting.GRAY));
+        }
+        if (data.contains("val.queued2")) {
+            tooltip.add(
+                    Component.translatable("block.terracompositio.queued",
+                                    Component.literal(String.valueOf(data.getInt("val.queued2")))
+                                            .append(Component.translatable("block.terracompositio.units"))
+                                            .withStyle(ChatFormatting.AQUA))
+                            .withStyle(ChatFormatting.GRAY));
+        }
 
-                case "val.queued" -> {
-                    tooltip.add(
-                            Component.translatable("block.terracompositio.queued",
-                                            Component.literal(args[0])
-                                                    .withStyle(ChatFormatting.AQUA))
-                                    .withStyle(ChatFormatting.GRAY));
-                    continue;
-                }
+        tooltip.add(Component.translatable("entity.terracompositio.ent_common_header"));
 
-            }
-            tooltip.add(Component.translatable("entity.terracompositio.ent_inner_header"));
-            switch (translationKey) {
-                case "val.cfe2" -> {
-                    tooltip.add(
-                            Component.translatable("block.terracompositio.cfe",
-                                            Component.literal(args[0])
-                                                    .append(Component.translatable("block.terracompositio.units"))
-                                                    .withStyle(ChatFormatting.AQUA))
-                                    .withStyle(ChatFormatting.GRAY));
-                    continue;
-                }
-
-                case "val.max_cfe2" -> {
-                    tooltip.add(
-                            Component.translatable("block.terracompositio.max_cfe",
-                                            Component.literal(args[0])
-                                                    .withStyle(ChatFormatting.AQUA))
-                                    .withStyle(ChatFormatting.GRAY));
-                    continue;
-                }
-
-                case "val.queued2" -> {
-                    tooltip.add(
-                            Component.translatable("block.terracompositio.queued",
-                                            Component.literal(args[0])
-                                                    .withStyle(ChatFormatting.AQUA))
-                                    .withStyle(ChatFormatting.GRAY));
-                    continue;
-                }
-
-            }
-            tooltip.add(Component.translatable("entity.terracompositio.ent_common_header"));
-            switch (translationKey) {
-                case "val.priority" -> tooltip.add(
-                        Component.translatable("block.terracompositio.priority",
-                                        Component.literal(args[0])
+        if (data.contains("val.priority")) {
+            tooltip.add(
+                    Component.translatable("block.terracompositio.priority",
+                                    Component.literal(String.valueOf(data.getInt("val.priority")))
+                                            .append(Component.translatable("block.terracompositio.units"))
+                                            .withStyle(ChatFormatting.AQUA))
+                            .withStyle(ChatFormatting.GRAY));
+        }
+        if (data.contains("val.range")) {
+            if (isShifting)
+                tooltip.add(
+                        Component.translatable("block.terracompositio.range",
+                                        Component.literal(String.valueOf(data.getInt("val.range")))
+                                                .append(Component.translatable("block.terracompositio.units"))
                                                 .withStyle(ChatFormatting.AQUA))
                                 .withStyle(ChatFormatting.GRAY));
-
-                case "val.range" -> {
-                    if (isShifting) tooltip.add(
-                            Component.translatable("block.terracompositio.range",
-                                            Component.literal(args[0])
-                                                    .append(Component.translatable("block.terracompositio.blocks"))
-                                                    .withStyle(ChatFormatting.AQUA))
-                                    .withStyle(ChatFormatting.GRAY));
-                }
-
-                case "flag.type.consumer" -> tooltip.add(
-                        Component.translatable("block.terracompositio.type",
-                                        Component.translatable("block.terracompositio.consumer")
-                                                .withStyle(ChatFormatting.AQUA))
-                                .withStyle(ChatFormatting.GRAY));
-
-                case "flag.type.source" -> tooltip.add(
-                        Component.translatable("block.terracompositio.type",
-                                        Component.translatable("block.terracompositio.source")
-                                                .withStyle(ChatFormatting.AQUA))
-                                .withStyle(ChatFormatting.GRAY));
-            }
+        }
+        if (data.contains("flag.type.consumer") && data.getBoolean("flag.type.consumer")) {
+            tooltip.add(
+                    Component.translatable("block.terracompositio.type",
+                                    Component.translatable("block.terracompositio.consumer")
+                                            .withStyle(ChatFormatting.AQUA))
+                            .withStyle(ChatFormatting.GRAY));
+        }
+        if (data.contains("flag.type.source") && data.getBoolean("flag.type.source")) {
+            tooltip.add(
+                    Component.translatable("block.terracompositio.type",
+                                    Component.translatable("block.terracompositio.consumer")
+                                            .withStyle(ChatFormatting.AQUA))
+                            .withStyle(ChatFormatting.GRAY));
         }
     }
 }

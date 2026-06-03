@@ -1,6 +1,7 @@
 package net.sinedkadis.terracompositio.network.packets;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -9,7 +10,6 @@ import net.minecraftforge.network.NetworkEvent;
 import net.minecraftforge.network.PacketDistributor;
 import net.sinedkadis.terracompositio.api.IHaveKnowledge;
 import net.sinedkadis.terracompositio.network.TCPackets;
-import net.sinedkadis.terracompositio.util.KnowledgeData;
 import net.sinedkadis.terracompositio.util.accessors.PlayerKnowledgeAccessor;
 
 import java.util.function.Supplier;
@@ -53,7 +53,7 @@ public class C2SRequestBlockKnowledgePacket {
                     pkt.pos.getZ() + 0.5) > 64 * 64) return;
 
             // Собираем данные на сервере
-            KnowledgeData data = new KnowledgeData();
+            CompoundTag data = new CompoundTag();
             ihk.collectKnowledgeData(data);
 
             if (data.isEmpty()) return;

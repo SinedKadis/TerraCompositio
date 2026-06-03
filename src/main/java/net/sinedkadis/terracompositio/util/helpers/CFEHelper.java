@@ -22,14 +22,15 @@ public class CFEHelper {
     public static void tryCFETransfer(ICFEHandler target,
                                       ICFEHandler source,
                                       int maxTransfer,
-                                      float speed) {
+                                      float speed,
+                                      boolean noCol) {
         int taken = source.takeCFE(maxTransfer, true);
-        int added = source.sendCFE(taken, target, speed, true);
+        int added = source.sendCFE(taken, target, speed, noCol, true);
         if (added <= taken) {
             if (target.getPos().closerThan(source.getPos(), 2) && !(target.getAttachedMember() instanceof Entity))
                 added = target.addCFE(added, false);
             else
-                added = source.sendCFE(added, target, speed, false);
+                added = source.sendCFE(added, target, speed, noCol, false);
             source.takeCFE(added, false);
         }
     }
@@ -71,6 +72,10 @@ public class CFEHelper {
         return false;
     }
 
+    public static CFETransferBuilder createTransfer() {
+        return new CFETransferBuilder();
+    }
+
     public static class CFETransferBuilder {
         CFENetworkMember target = null;
         CFENetworkMember source = null;
@@ -78,10 +83,7 @@ public class CFEHelper {
         ICFEHandler source1 = null;
         int maxTransfer = TCCommonConfigs.CFE_PER_BURST_TRANSFER_LIMIT.get();
         float speed = 1 / 20f;
-
-        public static CFETransferBuilder create() {
-            return new CFETransferBuilder();
-        }
+        boolean noCollision = false;
 
         public CFETransferBuilder fromMembers(CFENetworkMember target, CFENetworkMember source) {
             this.target = target;
@@ -105,11 +107,16 @@ public class CFEHelper {
             return this;
         }
 
+        public CFETransferBuilder noCollision() {
+            this.noCollision = true;
+            return this;
+        }
+
         public void build() {
             if (target != null) {
                 tryCFETransfer(target, source, maxTransfer, speed);
-            } else {
-                tryCFETransfer(target1, source1, maxTransfer, speed);
+            } else if (target1 != null) {
+                tryCFETransfer(target1, source1, maxTransfer, speed, noCollision);
             }
         }
 

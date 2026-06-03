@@ -12,6 +12,7 @@ import net.minecraftforge.common.capabilities.ForgeCapabilities;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.function.Function;
 
 public class ItemHelper {
     public static List<ItemStack> getContainerContents(ItemStack containerStack) {
@@ -26,32 +27,49 @@ public class ItemHelper {
 
         CompoundTag blockEntityTag = stackTag.getCompound("BlockEntityTag");
         if (blockEntityTag.contains("Items", CompoundTag.TAG_LIST)) {
-            return getItemsFromNBT(blockEntityTag.getList("Items", CompoundTag.TAG_COMPOUND));
+            return readItemList(blockEntityTag.getList("Items", CompoundTag.TAG_COMPOUND));
         }
 
         if (stackTag.contains("Items", CompoundTag.TAG_LIST)) {
-            return getItemsFromNBT(stackTag.getList("Items", CompoundTag.TAG_COMPOUND));
+            return readItemList(stackTag.getList("Items", CompoundTag.TAG_COMPOUND));
         }
 
         if (stackTag.contains("Inventory", CompoundTag.TAG_LIST)) {
-            return getItemsFromNBT(stackTag.getList("Inventory", CompoundTag.TAG_COMPOUND));
+            return readItemList(stackTag.getList("Inventory", CompoundTag.TAG_COMPOUND));
         }
 
         return List.of();
     }
 
-    private static List<ItemStack> getItemsFromNBT(ListTag itemsTag) {
+    public static List<ItemStack> readItemList(ListTag itemsTag) {
         List<ItemStack> items = new ArrayList<>(itemsTag.size());
 
         for (int i = 0; i < itemsTag.size(); i++) {
             CompoundTag itemTag = itemsTag.getCompound(i);
             ItemStack itemStack = ItemStack.of(itemTag);
-            if (!itemStack.isEmpty()) {
-                items.add(itemStack);
-            }
+            items.add(itemStack);
         }
 
         return items;
+    }
+
+    public static ListTag writeItemList(Iterable<ItemStack> stacks) {
+        return writeCompoundList(stacks, itemStack -> {
+            CompoundTag tag = new CompoundTag();
+            itemStack.save(tag);
+            return tag;
+        });
+    }
+
+    public static <T> ListTag writeCompoundList(Iterable<T> list, Function<T, CompoundTag> serializer) {
+        ListTag listNBT = new ListTag();
+        list.forEach(t -> {
+            CompoundTag apply = serializer.apply(t);
+            if (apply == null)
+                return;
+            listNBT.add(apply);
+        });
+        return listNBT;
     }
 
     public static void dropContents(BlockEntity blockEntity, int... slots) {

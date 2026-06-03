@@ -1,5 +1,6 @@
 package net.sinedkadis.terracompositio.network.packets;
 
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.FriendlyByteBuf;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.server.level.ServerPlayer;
@@ -8,7 +9,6 @@ import net.minecraftforge.network.NetworkEvent;
 import net.minecraftforge.network.PacketDistributor;
 import net.sinedkadis.terracompositio.api.IHaveKnowledge;
 import net.sinedkadis.terracompositio.network.TCPackets;
-import net.sinedkadis.terracompositio.util.KnowledgeData;
 import net.sinedkadis.terracompositio.util.accessors.PlayerKnowledgeAccessor;
 
 import java.util.UUID;
@@ -52,7 +52,7 @@ public class C2SRequestEntityKnowledgePacket {
                     entity.position().y() + 0.5,
                     entity.position().z() + 0.5) > 64 * 64) return;
 
-            KnowledgeData data = new KnowledgeData();
+            CompoundTag data = new CompoundTag();
             ihk.collectKnowledgeData(data);
 
             if (data.isEmpty()) return;

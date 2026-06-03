@@ -5,6 +5,7 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
@@ -24,15 +25,15 @@ import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.ItemStackHandler;
 import net.sinedkadis.terracompositio.api.IHaveKnowledge;
-import net.sinedkadis.terracompositio.api.IKnowledgeData;
 import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBEItemBehaviour;
 import net.sinedkadis.terracompositio.block.entity.TCBlockEntity;
 import net.sinedkadis.terracompositio.util.ItemComponent;
-import net.sinedkadis.terracompositio.util.KnowledgeData;
+import net.sinedkadis.terracompositio.util.helpers.ItemHelper;
 import net.sinedkadis.terracompositio.util.helpers.PlayerHelper;
 import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.List;
 
@@ -253,22 +254,22 @@ public class ManySlotItemHandlerBehaviour implements IBEItemBehaviour, WorldlyCo
     }
 
     @Override
-    public void collectKnowledgeData(IKnowledgeData data) {
-        for (int slot = 0; slot < slotsToShowInOverlay.length; slot++) {
-            data.addItem(itemHandler.getStackInSlot(slot));
+    public void collectKnowledgeData(CompoundTag data) {
+        List<ItemStack> list = new ArrayList<>();
+        for (int i = 0; i < itemHandler.getSlots(); i++) {
+            list.add(itemHandler.getStackInSlot(i));
         }
+        data.put("inventory", ItemHelper.writeItemList(list));
     }
 
     @Override
-    public void addTooltipLines(IKnowledgeData data, List<Component> tooltip, boolean isShifting) {
+    public void addTooltipLines(CompoundTag data, List<Component> tooltip, boolean isShifting) {
         tooltip.add(Component.translatable("block.terracompositio.items_header"));
-        List<KnowledgeData.Entry> entries = data.entries();
+        List<ItemStack> entries = ItemHelper.readItemList(data.getList("inventory", Tag.TAG_COMPOUND));
         boolean somethingAdded = false;
         for (int slot = 0; slot < slotsToShowInOverlay.length; slot++) {
             if (!slotsToShowInOverlay[slot]) continue;
-            KnowledgeData.Entry entry = entries.get(slot);
-            if (!(entry instanceof KnowledgeData.ItemEntry itemEntry)) continue;
-            ItemStack stack = itemEntry.stack();
+            ItemStack stack = entries.get(slot);
             if (stack.isEmpty()) continue;
             somethingAdded = true;
             tooltip.add(ItemComponent.of(stack));

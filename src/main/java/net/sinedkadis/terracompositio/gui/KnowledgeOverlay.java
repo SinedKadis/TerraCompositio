@@ -15,6 +15,7 @@ import net.minecraft.client.renderer.texture.OverlayTexture;
 import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.FormattedText;
 import net.minecraft.util.FormattedCharSequence;
@@ -37,7 +38,6 @@ import net.sinedkadis.terracompositio.network.packets.C2SRequestEntityKnowledgeP
 import net.sinedkadis.terracompositio.network.packets.S2CKnowledgeDataPacket;
 import net.sinedkadis.terracompositio.registries.TCItems;
 import net.sinedkadis.terracompositio.util.ItemComponent;
-import net.sinedkadis.terracompositio.util.KnowledgeData;
 import net.sinedkadis.terracompositio.util.accessors.PlayerKnowledgeAccessor;
 
 import java.util.ArrayList;
@@ -105,7 +105,7 @@ public class KnowledgeOverlay {
             }
 
 
-            KnowledgeData data = S2CKnowledgeDataPacket.ClientCache.get(pos);
+            CompoundTag data = S2CKnowledgeDataPacket.ClientCache.get(pos);
             if (data == null) {
                 return;
             }
@@ -124,7 +124,7 @@ public class KnowledgeOverlay {
                 TCPackets.CHANNEL.sendToServer(new C2SRequestEntityKnowledgePacket(entity.getUUID()));
             }
 
-            KnowledgeData data = S2CKnowledgeDataPacket.ClientCache.get(entity.getUUID());
+            CompoundTag data = S2CKnowledgeDataPacket.ClientCache.get(entity.getUUID());
             if (data == null) {
                 return;
             }

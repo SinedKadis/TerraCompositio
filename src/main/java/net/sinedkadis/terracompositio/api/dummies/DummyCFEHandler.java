@@ -45,9 +45,10 @@ public class DummyCFEHandler implements ICFEHandler {
     }
 
     @Override
-    public int sendCFE(int cfe, ICFEHandler target, float speed, boolean simulate) {
+    public int sendCFE(int cfe, ICFEHandler target, float speed, boolean noCollision, boolean simulate) {
         return 0;
     }
+
 
     @Override
     public int addCFE(int cfe, boolean simulate) {
