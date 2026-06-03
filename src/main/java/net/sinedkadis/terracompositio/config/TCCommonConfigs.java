@@ -9,7 +9,8 @@ public class TCCommonConfigs {
     public static final ForgeConfigSpec.ConfigValue<Integer> CFE_PER_BURST_TRANSFER_LIMIT;
     public static final ForgeConfigSpec.ConfigValue<Integer> TICKS_BETWEEN_BURSTS;
     public static final ForgeConfigSpec.ConfigValue<Integer> PLATFORM_ALIVE_PER_PLAYER;
-//    public static final ForgeConfigSpec.ConfigValue<Integer> CITRINE_ORE_VEIN_SIZE;
+    public static final ForgeConfigSpec.ConfigValue<Boolean> DEBUG;
+
 
     static {
         BUILDER.push("Configs for Terracompositio Mod");
@@ -20,8 +21,9 @@ public class TCCommonConfigs {
                 .define("CFE/burst transfer limit", 20);
         TICKS_BETWEEN_BURSTS = BUILDER.comment("How many ticks should pass before cfe source shot a new burst")
                 .define("Ticks for burst", 20);
-//        CITRINE_ORE_VEIN_SIZE = BUILDER.comment("How many Citrine Ore Blocks spawn in one Vein!")
-//                .defineInRange("Vein Size", 9, 4, 20);
+        DEBUG = BUILDER.comment("Enables extra info in knowledge tooltip")
+                .define("Debug mode", false);
+
 
         BUILDER.pop();
         SPEC = BUILDER.build();

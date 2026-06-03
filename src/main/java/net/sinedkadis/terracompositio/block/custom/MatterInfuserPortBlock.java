@@ -18,7 +18,7 @@ import net.sinedkadis.terracompositio.block.behaviours.ManySlotItemHandlerBehavi
 import net.sinedkadis.terracompositio.block.entity.FlowCedarCasingBlockEntity;
 import net.sinedkadis.terracompositio.block.entity.TCBlockEntity;
 import net.sinedkadis.terracompositio.registries.TCBlockEntities;
-import net.sinedkadis.terracompositio.util.TCUtil;
+import net.sinedkadis.terracompositio.util.helpers.PlayerHelper;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 
@@ -52,7 +52,7 @@ public class MatterInfuserPortBlock extends MatterInfuserBaseEntityBlock {
                     itemBehaviour.ignoreRestrictions = true;
                     ItemStack extracted = itemHandler.extractItem(i, 64, false);
                     itemBehaviour.ignoreRestrictions = false;
-                    TCUtil.addOrDropToPlayer(pPlayer, extracted,true);
+                    PlayerHelper.addOrDropToPlayer(pPlayer, extracted, true);
                     pLevel.playSound(pPlayer, pPos, SoundEvents.ITEM_FRAME_REMOVE_ITEM, SoundSource.BLOCKS);
                     return InteractionResult.SUCCESS;
                 }

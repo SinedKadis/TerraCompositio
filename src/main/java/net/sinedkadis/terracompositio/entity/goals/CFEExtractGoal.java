@@ -7,13 +7,14 @@ import net.minecraft.world.entity.ai.goal.Goal;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.event.ForgeEventFactory;
-import net.sinedkadis.terracompositio.api.TerraCompositioAPI;
-import net.sinedkadis.terracompositio.api.networks.cfe.*;
 import net.sinedkadis.terracompositio.api.TCCapabilities;
+import net.sinedkadis.terracompositio.api.TerraCompositioAPI;
+import net.sinedkadis.terracompositio.api.networks.cfe.CFENetworkMember;
+import net.sinedkadis.terracompositio.api.networks.cfe.ICFEHandler;
 import net.sinedkadis.terracompositio.entity.custom.FlowCedarEntEntity;
 import net.sinedkadis.terracompositio.registries.TCBlockStateProperties;
 import net.sinedkadis.terracompositio.registries.TCTags;
-import net.sinedkadis.terracompositio.util.TCUtil;
+import net.sinedkadis.terracompositio.util.helpers.CFEHelper;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.EnumSet;
@@ -54,7 +55,7 @@ public class CFEExtractGoal extends Goal {
         cachedHeld = mob.getCapability(TCCapabilities.CFE).resolve().orElse(null);
         cachedInner = mob.getInnerCFEOptional().resolve().orElse(null);
 
-        if (cachedInner == null || cachedInner.getCFE() >= 60) return false;
+        if (cachedInner == null || cachedInner.getCFE() >= 6) return false;
         if (!isCFEQueueEmpty()) return false;
 
         targetMember = searchMember();
@@ -87,7 +88,7 @@ public class CFEExtractGoal extends Goal {
                 .getCFENetworkInstance()
                 .getAllCFENetworkMembers(level)) {
 
-            if (!TCUtil.validMember(member)) continue;
+            if (!CFEHelper.validMember(member)) continue;
             if (!member.getPos().closerThan(mobPos, extractRange)) continue;
             if (member.getEntity().equals(mob)) continue;
             if (member.getMainHandler().getCFE() <= 0) continue;
@@ -157,7 +158,10 @@ public class CFEExtractGoal extends Goal {
         if (this.extractAnimationTick < 4 * 20) {
             if (!targetPosition.equals(mob.blockPosition())) {
                 if (targetMember != null) {
-                    TCUtil.tryCFETransfer(mob, targetMember, 1000);
+                    CFEHelper.createTransfer()
+                            .fromMembers(mob, targetMember)
+                            .maxTransfer(1000)
+                            .build();
                 } else {
                     extractFromLog();
                 }

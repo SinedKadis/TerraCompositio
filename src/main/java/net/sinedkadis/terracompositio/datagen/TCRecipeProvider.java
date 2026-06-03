@@ -57,9 +57,26 @@ public class TCRecipeProvider extends RecipeProvider implements IConditionBuilde
         buildTechnetiumOreProcessing(pWriter);
         buildMisc(pWriter);
         buildSpecial(pWriter);
+        buildApples(pWriter);
+
         buildCompat(pWriter);
 
 
+    }
+
+    private void buildApples(@NotNull Consumer<FinishedRecipe> pWriter) {
+        FlowInfusionRecipeBuilder.create(
+                TCItems.APPLE_OF_KNOWLEDGE.get().getDefaultInstance(),
+                Ingredient.of(Items.APPLE),
+                100,
+                200
+        ).save(pWriter, TerraCompositio.modLoc("flow_infusion/apple_of_knowledge"));
+        FlowInfusionRecipeBuilder.create(
+                TCItems.APPLE_OF_IGNORANCE.get().getDefaultInstance(),
+                Ingredient.of(Items.GOLDEN_APPLE),
+                100,
+                200
+        ).save(pWriter, TerraCompositio.modLoc("flow_infusion/apple_of_ignorance"));
     }
 
     private void buildCompat(@NotNull Consumer<FinishedRecipe> pWriter) {
@@ -521,6 +538,16 @@ public class TCRecipeProvider extends RecipeProvider implements IConditionBuilde
                 .define('N', TCItems.INFUSED_IRON_NUGGET.get())
                 .define('S', Items.STICK)
                 .unlockedBy(getHasName(TCItems.TECHNETIUM_INGOT.get()), has(TCItems.TECHNETIUM_INGOT.get()))
+                .save(pWriter);
+        ShapedRecipeBuilder.shaped(RecipeCategory.MISC, TCBlocks.AIR_SATURATOR.get())
+                .pattern(" I ")
+                .pattern("RCR")
+                .pattern(" L ")
+                .define('I', Items.IRON_INGOT)
+                .define('C', Items.COBWEB)
+                .define('R', TCItems.INFUSED_IRON_ROD.get())
+                .define('L', TCBlocks.FLOW_CEDAR_LOG.get())
+                .unlockedBy(getHasName(TCItems.INFUSED_IRON_INGOT.get()), has(TCItems.INFUSED_IRON_INGOT.get()))
                 .save(pWriter);
     }
 

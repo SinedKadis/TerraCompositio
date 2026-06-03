@@ -5,8 +5,11 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.nbt.Tag;
+import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
+import net.minecraft.util.Mth;
 import net.minecraft.world.Container;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -21,19 +24,26 @@ import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.ItemStackHandler;
+import net.sinedkadis.terracompositio.api.IHaveKnowledge;
 import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBEItemBehaviour;
 import net.sinedkadis.terracompositio.block.entity.TCBlockEntity;
-import net.sinedkadis.terracompositio.util.TCUtil;
+import net.sinedkadis.terracompositio.util.ItemComponent;
+import net.sinedkadis.terracompositio.util.helpers.ItemHelper;
+import net.sinedkadis.terracompositio.util.helpers.PlayerHelper;
 import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.List;
 
 @Data
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
-public class ManySlotItemHandlerBehaviour implements IBEItemBehaviour, WorldlyContainer {
+public class ManySlotItemHandlerBehaviour implements IBEItemBehaviour, WorldlyContainer, IHaveKnowledge {
     private final TCBlockEntity blockEntity;
     public boolean ignoreRestrictions = false;
+    private final boolean[] slotsToShowInOverlay;
 
     protected ItemStackHandler itemHandler = new ItemStackHandler() {
         @Override
@@ -58,11 +68,22 @@ public class ManySlotItemHandlerBehaviour implements IBEItemBehaviour, WorldlyCo
     //One slot
     public ManySlotItemHandlerBehaviour(TCBlockEntity blockEntity) {
         this.blockEntity = blockEntity;
+        slotsToShowInOverlay = new boolean[]{true};
     }
 
     public ManySlotItemHandlerBehaviour(TCBlockEntity blockEntity, int slotCount) {
         this.blockEntity = blockEntity;
         itemHandler.setSize(slotCount);
+        slotsToShowInOverlay = new boolean[slotCount];
+        Arrays.fill(slotsToShowInOverlay, true);
+    }
+
+    public ManySlotItemHandlerBehaviour setInvisibleInOverlay(int... slots) {
+        for (Integer slot : slots) {
+            if (Mth.clamp(slot, 0, slotsToShowInOverlay.length - 1) == slot)
+                slotsToShowInOverlay[slot] = false;
+        }
+        return this;
     }
 
     public int getLimitInSlot(int slot) {
@@ -139,7 +160,7 @@ public class ManySlotItemHandlerBehaviour implements IBEItemBehaviour, WorldlyCo
                 ignoreRestrictions = true;
                 ItemStack extracted = itemHandler.extractItem(i, 64, false);
                 ignoreRestrictions = false;
-                TCUtil.addOrDropToPlayer(pPlayer, extracted);
+                PlayerHelper.addOrDropToPlayer(pPlayer, extracted);
                 level.playSound(pPlayer, blockPos, SoundEvents.ITEM_FRAME_REMOVE_ITEM, SoundSource.BLOCKS);
                 return InteractionResult.SUCCESS;
             }
@@ -232,5 +253,27 @@ public class ManySlotItemHandlerBehaviour implements IBEItemBehaviour, WorldlyCo
         }
     }
 
+    @Override
+    public void collectKnowledgeData(CompoundTag data) {
+        List<ItemStack> list = new ArrayList<>();
+        for (int i = 0; i < itemHandler.getSlots(); i++) {
+            list.add(itemHandler.getStackInSlot(i));
+        }
+        data.put("inventory", ItemHelper.writeItemList(list));
+    }
 
+    @Override
+    public void addTooltipLines(CompoundTag data, List<Component> tooltip, boolean isShifting) {
+        tooltip.add(Component.translatable("block.terracompositio.items_header"));
+        List<ItemStack> entries = ItemHelper.readItemList(data.getList("inventory", Tag.TAG_COMPOUND));
+        boolean somethingAdded = false;
+        for (int slot = 0; slot < slotsToShowInOverlay.length; slot++) {
+            if (!slotsToShowInOverlay[slot]) continue;
+            ItemStack stack = entries.get(slot);
+            if (stack.isEmpty()) continue;
+            somethingAdded = true;
+            tooltip.add(ItemComponent.of(stack));
+        }
+        if (!somethingAdded) tooltip.remove(tooltip.size() - 1);
+    }
 }

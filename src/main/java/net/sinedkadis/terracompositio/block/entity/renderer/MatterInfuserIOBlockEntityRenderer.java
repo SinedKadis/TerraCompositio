@@ -20,7 +20,7 @@ import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemStackHandler;
 import net.sinedkadis.terracompositio.block.entity.MatterInfuserUnitBlockEntity;
-import net.sinedkadis.terracompositio.util.TCUtil;
+import net.sinedkadis.terracompositio.util.helpers.WorldHelper;
 import org.jetbrains.annotations.NotNull;
 
 public class MatterInfuserIOBlockEntityRenderer implements BlockEntityRenderer<MatterInfuserUnitBlockEntity> {
@@ -76,14 +76,14 @@ public class MatterInfuserIOBlockEntityRenderer implements BlockEntityRenderer<M
             pPoseStack.mulPose(Axis.YP.rotationDegrees(facing.toYRot()));
             pPoseStack.mulPose(Axis.ZP.rotationDegrees(45));
 
-            itemRenderer.renderStatic(stackInSlot, ItemDisplayContext.FIXED, TCUtil.getLightLevel(level, pBlockEntity.getBlockPos(), Direction.UP),
+            itemRenderer.renderStatic(stackInSlot, ItemDisplayContext.FIXED, WorldHelper.getLightLevel(level, pBlockEntity.getBlockPos(), Direction.UP),
                     OverlayTexture.NO_OVERLAY, pPoseStack, pBuffer, level, 1);
 
             pPoseStack.mulPose(Axis.ZP.rotationDegrees(-45));
             pPoseStack.translate(0, -0.333f, 0);
             pPoseStack.mulPose(Axis.ZP.rotationDegrees(45));
 
-            itemRenderer.renderStatic(stackInSlot, ItemDisplayContext.FIXED, TCUtil.getLightLevel(level, pBlockEntity.getBlockPos(), Direction.UP),
+            itemRenderer.renderStatic(stackInSlot, ItemDisplayContext.FIXED, WorldHelper.getLightLevel(level, pBlockEntity.getBlockPos(), Direction.UP),
                     OverlayTexture.NO_OVERLAY, pPoseStack, pBuffer, level, 1);
 
             pPoseStack.popPose();

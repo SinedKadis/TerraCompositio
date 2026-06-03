@@ -11,17 +11,17 @@ import net.minecraft.world.entity.player.Inventory;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.client.gui.overlay.ForgeGui;
 import net.sinedkadis.terracompositio.TerraCompositio;
-import net.sinedkadis.terracompositio.api.dummies.DummyCFEHandler;
 import net.sinedkadis.terracompositio.api.TCCapabilities;
+import net.sinedkadis.terracompositio.api.dummies.DummyCFEHandler;
 import net.sinedkadis.terracompositio.api.networks.cfe.ICFEHandler;
 import org.lwjgl.opengl.GL11;
 
-public class TCGui {
-    public static final ResourceLocation CFE_HUD = TerraCompositio.modLoc("textures/gui/cfe_hud.png");
+public class CfeHud {
+    public static final ResourceLocation CFE_HUD_RL = TerraCompositio.modLoc("textures/gui/cfe_hud.png");
 
-    public static void cfeHud(ForgeGui gui,
+    public static void render(ForgeGui ignoredGui,
                               GuiGraphics guiGraphics,
-                              float partialTick,
+                              float ignoredPartialTick,
                               int screenWidth,
                               int screenHeight) {
         LocalPlayer player = Minecraft.getInstance().player;
@@ -33,8 +33,8 @@ public class TCGui {
         for (ItemStack itemStack : inventory.armor) {
             ICFEHandler handler = itemStack.getCapability(TCCapabilities.CFE).orElse(DummyCFEHandler.instance);
             if (!(handler instanceof DummyCFEHandler)) {
-                cfeTotal += handler.getCFE()-1;
-                cfeMaxTotal += handler.getMaxCFE()-1;
+                cfeTotal += handler.getCFE() - 1;
+                cfeMaxTotal += handler.getMaxCFE() - 1;
             }
         }
 
@@ -45,7 +45,7 @@ public class TCGui {
         if (cfeMaxTotal == 0) {
             width = 0;
         } else {
-            float width1 = width * ( (float) cfeTotal /  cfeMaxTotal);
+            float width1 = width * ((float) cfeTotal / cfeMaxTotal);
             width = Math.round(width1);
         }
 
@@ -65,7 +65,7 @@ public class TCGui {
 
         RenderSystem.enableBlend();
         RenderSystem.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
-        guiGraphics.blit(CFE_HUD, x+10, y, 0, 0, 0, width,40, 256, 256);
+        guiGraphics.blit(CFE_HUD_RL, x + 10, y, 0, 0, 0, width, 40, 256, 256);
         RenderSystem.disableBlend();
         RenderSystem.setShaderColor(1, 1, 1, 1);
     }

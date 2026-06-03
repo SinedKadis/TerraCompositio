@@ -149,6 +149,14 @@ public class TCItems {
     public static final RegistryObject<Item> INFUSED_FERTILIZER = ITEMS.register("infused_fertilizer",
             () -> new InfusedFertilizerItem(new Item.Properties()));
 
+    //Apples
+    public static final RegistryObject<Item> APPLE_OF_KNOWLEDGE = ITEMS.register("apple_of_knowledge",
+            () -> new Item(new Item.Properties()
+                    .food((TCFoods.CREATION_KNOWLEDGE))));
+    public static final RegistryObject<Item> APPLE_OF_IGNORANCE = ITEMS.register("apple_of_ignorance",
+            () -> new Item(new Item.Properties()
+                    .food((TCFoods.IGNORANCE))));
+
 
     public static void register(IEventBus eventBus){
         ITEMS.register(eventBus);

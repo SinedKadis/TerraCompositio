@@ -15,7 +15,7 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.sinedkadis.terracompositio.block.entity.TCBlockEntity;
-import net.sinedkadis.terracompositio.util.TCUtil;
+import net.sinedkadis.terracompositio.util.helpers.ItemHelper;
 import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -54,7 +54,7 @@ public abstract class TCBaseEntityBlock extends Block implements EntityBlock {
         if (pState.getBlock() != pNewState.getBlock()){
             TCBlockEntity blockEntity = (TCBlockEntity) pLevel.getBlockEntity(pPos);
             if (blockEntity != null){
-                TCUtil.dropContents(blockEntity);
+                ItemHelper.dropContents(blockEntity);
             }
         }
         super.onRemove(pState, pLevel, pPos, pNewState, pIsMoving);

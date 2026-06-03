@@ -15,13 +15,11 @@ import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBEBehaviour;
 import net.sinedkadis.terracompositio.api.networks.cfe.ICFEHandler;
 import net.sinedkadis.terracompositio.block.behaviours.CFEHandlerBehaviour;
 import net.sinedkadis.terracompositio.block.behaviours.TwoSlotItemHandlerBehaviour;
-import net.sinedkadis.terracompositio.compat.jade.JadeTerraCompositioPlugin;
+import net.sinedkadis.terracompositio.config.TCCommonConfigs;
 import net.sinedkadis.terracompositio.config.TCInnerConfig;
 import net.sinedkadis.terracompositio.particle.CFEParticleData;
 import net.sinedkadis.terracompositio.recipe.FlowInfusionRecipe;
 import net.sinedkadis.terracompositio.registries.TCBlockEntities;
-import snownee.jade.api.ITooltip;
-import snownee.jade.api.config.IPluginConfig;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.List;
@@ -46,9 +44,9 @@ public class FlowInfuserBlockEntity extends TCCraftingBlockEntity {
             }
 
             @Override
-            public void onAppendTooltip(ITooltip iTooltip, CompoundTag serverData, IPluginConfig iPluginConfig) {
-                super.onAppendTooltip(iTooltip, serverData, iPluginConfig);
-                if (serverData.contains("cfe_tick")  && iPluginConfig.get(JadeTerraCompositioPlugin.debugConfigRL())) {
+            public void onAppendTooltip(List<Component> iTooltip, CompoundTag serverData) {
+                super.onAppendTooltip(iTooltip, serverData);
+                if (serverData.contains("cfe_tick") && TCCommonConfigs.DEBUG.get()) {
                     iTooltip.add(Component.translatable("block.terracompositio." + "cfe_tick", serverData.getFloat("cfe_tick")));
                 }
             }

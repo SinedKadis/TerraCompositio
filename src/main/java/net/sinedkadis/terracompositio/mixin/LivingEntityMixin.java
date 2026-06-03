@@ -8,9 +8,9 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.AABB;
 import net.sinedkadis.terracompositio.block.custom.TechnetiumBoardBlock;
 import net.sinedkadis.terracompositio.mixin.accessors.LivingEntityAccessor;
-import net.sinedkadis.terracompositio.registries.TCItems;
-import net.sinedkadis.terracompositio.util.LivingEntityAnimationAccessor;
 import net.sinedkadis.terracompositio.registries.TCBlocks;
+import net.sinedkadis.terracompositio.registries.TCItems;
+import net.sinedkadis.terracompositio.util.accessors.LivingEntityAnimationAccessor;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
@@ -18,8 +18,6 @@ import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Redirect;
 
 import java.util.List;
-
-
 
 import static net.minecraft.world.level.block.state.properties.BlockStateProperties.WATERLOGGED;
 import static org.objectweb.asm.Opcodes.PUTFIELD;

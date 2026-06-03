@@ -22,7 +22,7 @@ import net.minecraftforge.items.ItemStackHandler;
 import net.sinedkadis.terracompositio.block.custom.FlowCedarCasingBlock;
 import net.sinedkadis.terracompositio.block.entity.FlowCedarCasingBlockEntity;
 import net.sinedkadis.terracompositio.registries.TCItems;
-import net.sinedkadis.terracompositio.util.TCUtil;
+import net.sinedkadis.terracompositio.util.helpers.WorldHelper;
 import org.jetbrains.annotations.NotNull;
 
 public class FlowCedarCasingBlockEntityRenderer implements BlockEntityRenderer<FlowCedarCasingBlockEntity> {
@@ -90,7 +90,7 @@ public class FlowCedarCasingBlockEntityRenderer implements BlockEntityRenderer<F
                 pPoseStack.mulPose(Axis.YP.rotationDegrees(-45));
                 pPoseStack.mulPose(Axis.XP.rotationDegrees(90));
 
-                itemRenderer.renderStatic(TCItems.HALF_ROD.get().getDefaultInstance(), ItemDisplayContext.FIXED, TCUtil.getLightLevel(level, pBlockEntity.getBlockPos(), Direction.DOWN),
+                itemRenderer.renderStatic(TCItems.HALF_ROD.get().getDefaultInstance(), ItemDisplayContext.FIXED, WorldHelper.getLightLevel(level, pBlockEntity.getBlockPos(), Direction.DOWN),
                         OverlayTexture.NO_OVERLAY, pPoseStack, pBuffer, level, 1);
 
                 pPoseStack.popPose();
@@ -115,7 +115,7 @@ public class FlowCedarCasingBlockEntityRenderer implements BlockEntityRenderer<F
                 pPoseStack.mulPose(Axis.YP.rotationDegrees(facing.toYRot()));
                 pPoseStack.mulPose(Axis.ZP.rotationDegrees(135));
 
-                itemRenderer.renderStatic(TCItems.HALF_ROD.get().getDefaultInstance(), ItemDisplayContext.FIXED, TCUtil.getLightLevel(level, pBlockEntity.getBlockPos(), facing),
+                itemRenderer.renderStatic(TCItems.HALF_ROD.get().getDefaultInstance(), ItemDisplayContext.FIXED, WorldHelper.getLightLevel(level, pBlockEntity.getBlockPos(), facing),
                         OverlayTexture.NO_OVERLAY, pPoseStack, pBuffer, level, 1);
 
                 pPoseStack.popPose();
@@ -156,7 +156,7 @@ public class FlowCedarCasingBlockEntityRenderer implements BlockEntityRenderer<F
                 pPoseStack.mulPose(Axis.XP.rotationDegrees(90));
 
 
-                itemRenderer.renderStatic(TCItems.HALF_ROD.get().getDefaultInstance(), ItemDisplayContext.FIXED, TCUtil.getLightLevel(level, pBlockEntity.getBlockPos(), Direction.UP),
+                itemRenderer.renderStatic(TCItems.HALF_ROD.get().getDefaultInstance(), ItemDisplayContext.FIXED, WorldHelper.getLightLevel(level, pBlockEntity.getBlockPos(), Direction.UP),
                         OverlayTexture.NO_OVERLAY, pPoseStack, pBuffer, level, 1);
 
                 pPoseStack.popPose();
@@ -180,7 +180,7 @@ public class FlowCedarCasingBlockEntityRenderer implements BlockEntityRenderer<F
                 pPoseStack.mulPose(Axis.YP.rotationDegrees(facing.toYRot() + 180));
                 pPoseStack.mulPose(Axis.ZP.rotationDegrees(-45));
 
-                itemRenderer.renderStatic(TCItems.HALF_ROD.get().getDefaultInstance(), ItemDisplayContext.FIXED, TCUtil.getLightLevel(level, pBlockEntity.getBlockPos(), facing),
+                itemRenderer.renderStatic(TCItems.HALF_ROD.get().getDefaultInstance(), ItemDisplayContext.FIXED, WorldHelper.getLightLevel(level, pBlockEntity.getBlockPos(), facing),
                         OverlayTexture.NO_OVERLAY, pPoseStack, pBuffer, level, 1);
 
                 pPoseStack.popPose();
@@ -204,7 +204,7 @@ public class FlowCedarCasingBlockEntityRenderer implements BlockEntityRenderer<F
             pPoseStack.translate(0.5f, -0.05f, 0.5f);
             pPoseStack.mulPose(Axis.XP.rotationDegrees(90));
 
-            itemRenderer.renderStatic(stackInSlot, ItemDisplayContext.FIXED, TCUtil.getLightLevel(level, pBlockEntity.getBlockPos(), Direction.DOWN),
+            itemRenderer.renderStatic(stackInSlot, ItemDisplayContext.FIXED, WorldHelper.getLightLevel(level, pBlockEntity.getBlockPos(), Direction.DOWN),
                     OverlayTexture.NO_OVERLAY, pPoseStack, pBuffer, level, 1);
 
             pPoseStack.popPose();
@@ -229,7 +229,7 @@ public class FlowCedarCasingBlockEntityRenderer implements BlockEntityRenderer<F
             pPoseStack.translate(0.5f, 1.05f, 0.5f);
             pPoseStack.mulPose(Axis.XP.rotationDegrees(90));
 
-            itemRenderer.renderStatic(stackInSlot, ItemDisplayContext.FIXED, TCUtil.getLightLevel(level, pBlockEntity.getBlockPos(), Direction.UP),
+            itemRenderer.renderStatic(stackInSlot, ItemDisplayContext.FIXED, WorldHelper.getLightLevel(level, pBlockEntity.getBlockPos(), Direction.UP),
                     OverlayTexture.NO_OVERLAY, pPoseStack, pBuffer, level, 1);
 
             pPoseStack.popPose();
@@ -268,7 +268,7 @@ public class FlowCedarCasingBlockEntityRenderer implements BlockEntityRenderer<F
                 case EAST -> 270;
                 default -> 0;
             }));
-            itemRenderer.renderStatic(itemStack, ItemDisplayContext.FIXED, TCUtil.getLightLevel(level, pBlockEntity.getBlockPos(), facing),
+            itemRenderer.renderStatic(itemStack, ItemDisplayContext.FIXED, WorldHelper.getLightLevel(level, pBlockEntity.getBlockPos(), facing),
                     OverlayTexture.NO_OVERLAY, pPoseStack, pBuffer, level, 1);
             pPoseStack.popPose();
         }

@@ -1,6 +1,7 @@
 package net.sinedkadis.terracompositio.mixin;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.MoverType;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
@@ -11,15 +12,20 @@ import net.sinedkadis.terracompositio.api.networks.cfe.CFENetworkMemberEntity;
 import net.sinedkadis.terracompositio.api.networks.cfe.ICFEHandler;
 import net.sinedkadis.terracompositio.block.custom.TechnetiumBoardBlock;
 import net.sinedkadis.terracompositio.config.TCInnerConfig;
+import net.sinedkadis.terracompositio.util.accessors.PlayerKnowledgeAccessor;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
+import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
 @SuppressWarnings("AddedMixinMembersNamePattern")
 @Mixin(Player.class)
-public class PlayerMixin implements CFENetworkMemberEntity {
+public class PlayerMixin implements CFENetworkMemberEntity, PlayerKnowledgeAccessor {
+    @Unique
+    boolean creationKnowledge = false;
+
     @Unique
     boolean scheduleUpdate = false;
 
@@ -94,5 +100,30 @@ public class PlayerMixin implements CFENetworkMemberEntity {
             ((Player) (Object) this).setShiftKeyDown(false);
             technetium$fakeSneak = false;
         }
+    }
+
+    @Override
+    public boolean isCreationAcknowledged() {
+        return creationKnowledge;
+    }
+
+    @Override
+    public void setCreationKnowledge(boolean knowledge) {
+        creationKnowledge = knowledge;
+    }
+
+    @Inject(
+            method = "readAdditionalSaveData",
+            at = @At("HEAD")
+    )
+    private void tc$onSave(CompoundTag pCompound, CallbackInfo ci) {
+        creationKnowledge = pCompound.getBoolean("tc_creation_knowledge");
+    }
+    @Inject(
+            method = "addAdditionalSaveData",
+            at = @At("RETURN")
+    )
+    private void tc$onLoad(CompoundTag pCompound, CallbackInfo ci) {
+        pCompound.putBoolean("tc_creation_knowledge",creationKnowledge);
     }
 }

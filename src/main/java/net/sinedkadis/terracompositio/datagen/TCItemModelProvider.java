@@ -98,6 +98,9 @@ public class TCItemModelProvider extends ItemModelProvider {
         simpleItem(TCItems.TECHNETIUM_LEGGINGS);
         simpleItem(TCItems.TECHNETIUM_BOOTS);
 
+        simpleItem(TCItems.APPLE_OF_KNOWLEDGE);
+        simpleItem(TCItems.APPLE_OF_IGNORANCE);
+
 
         saplingItem(TCBlocks.FLOW_CEDAR_SAPLING);
 

@@ -86,14 +86,34 @@
   "block.terracompositio.matter_infuser": "Matter Infuser MultiBlock",
   "block.terracompositio.matter_infuser.duration": "Duration: %s s.",
   "block.terracompositio.matter_infuser.decay_chance": "Catalyst decay chance: %s%%",
+
   "block.terracompositio.cfe": "Stored CFE: %s",
   "block.terracompositio.cfe_tick": "CFE/tick: %s",
   "block.terracompositio.max_cfe": "Max CFE: %s",
   "block.terracompositio.priority": "Priority: %s",
-  "block.terracompositio.limit": "Limit: %s",
+  "block.terracompositio.range": "Range: %s",
   "block.terracompositio.queued": "Queued: %s",
-  "block.terracompositio.speed": "Travel Speed To: %s",
   "block.terracompositio.extracted_cfe": "Extracted CFE: %s",
+  "block.terracompositio.cfe_header": "Creation Flow Energy info: ",
+  "block.terracompositio.type": "Type: %s",
+
+  "block.terracompositio.consumer": "Consumer",
+  "block.terracompositio.source": "Source",
+
+  "block.terracompositio.consume": "Consuming: %s",
+  "block.terracompositio.generate": "Generating: %s",
+
+  "block.terracompositio.blocks": " blocks",
+  "block.terracompositio.units": " units",
+  "block.terracompositio.cfe_second": " cfe/second",
+  "block.terracompositio.items_header": "Items Info: ",
+
+  "entity.terracompositio.ent_hold_header": "Holds: ",
+  "entity.terracompositio.ent_inner_header": "In Stomach: ",
+  "entity.terracompositio.ent_common_header": "Common: ",
+
+
+
   "block.terracompositio.item_io.input": "Input: ",
   "block.terracompositio.item_io.output": "Output: ",
   "block.terracompositio.matter_infuser.catalyst": "Catalyst: ",
@@ -178,8 +198,8 @@
   "block.terracompositio.infused_iron_door": "Infused Iron Door",
   "item.terracompositio.cfe_ball": "CFE Charge",
   "item.terracompositio.infused_fertilizer": "Infused Fertilizer",
-
-
+  "item.terracompositio.apple_of_knowledge": "Apple of Knowledge",
+  "item.terracompositio.apple_of_ignorance": "Apple of Ignorance",
 
 
 
@@ -282,5 +302,26 @@
   "book.terracompositio.creation_flow_journal.entry.matter_infuser.name": "test",
   "book.terracompositio.creation_flow_journal.entry.matter_infuser.page1": "test",
   "book.terracompositio.creation_flow_journal.entry.matter_infuser.page2": "test",
-  "book.terracompositio.creation_flow_journal.entry.matter_infuser.page3": "text"
+  "book.terracompositio.creation_flow_journal.entry.matter_infuser.page3": "text",
+
+  "book.terracompositio.creation_flow_journal.entry.apples.name": "test",
+  "book.terracompositio.creation_flow_journal.entry.apples.page1": "test",
+
+  "book.terracompositio.creation_flow_journal.entry.fluid_tanks_2.name": "test",
+  "book.terracompositio.creation_flow_journal.entry.fluid_tanks_2.page1": "test",
+  "book.terracompositio.creation_flow_journal.entry.fluid_tanks_2.page2": "test",
+  "book.terracompositio.creation_flow_journal.entry.fluid_tanks_2.page3": "text",
+  "book.terracompositio.creation_flow_journal.entry.fluid_tanks_2.page4": "test",
+  "book.terracompositio.creation_flow_journal.entry.fluid_tanks_2.page5": "text",
+  "book.terracompositio.creation_flow_journal.entry.fluid_tanks_2.page6": "text",
+
+  "book.terracompositio.creation_flow_journal.entry.air_saturator.name": "test",
+  "book.terracompositio.creation_flow_journal.entry.air_saturator.page1": "test",
+
+  "book.terracompositio.creation_flow_journal.entry.cfe_cloud.name": "test",
+  "book.terracompositio.creation_flow_journal.entry.cfe_cloud.page1": "test",
+
+  "book.terracompositio.creation_flow_journal.entry.cedar_ent.name": "test",
+  "book.terracompositio.creation_flow_journal.entry.cedar_ent.page1": "test",
+  "book.terracompositio.creation_flow_journal.entry.cedar_ent.page2": "test"
 }

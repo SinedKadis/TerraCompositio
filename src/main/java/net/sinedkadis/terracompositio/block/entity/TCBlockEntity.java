@@ -5,6 +5,7 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
 import net.minecraft.network.protocol.Packet;
 import net.minecraft.network.protocol.game.ClientGamePacketListener;
 import net.minecraft.network.protocol.game.ClientboundBlockEntityDataPacket;
@@ -15,13 +16,11 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
+import net.sinedkadis.terracompositio.api.IHaveKnowledge;
 import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBEBehaviour;
 import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBECFEBehaviour;
 import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBEItemBehaviour;
 import org.jetbrains.annotations.Nullable;
-import snownee.jade.api.BlockAccessor;
-import snownee.jade.api.ITooltip;
-import snownee.jade.api.config.IPluginConfig;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;
@@ -32,7 +31,7 @@ import java.util.Optional;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public abstract class TCBlockEntity extends BlockEntity{
+public abstract class TCBlockEntity extends BlockEntity implements IHaveKnowledge {
     @Getter
     protected List<IBEBehaviour> behaviours = new ArrayList<>();
 
@@ -102,9 +101,8 @@ public abstract class TCBlockEntity extends BlockEntity{
         behaviours.forEach(iBehaviour -> iBehaviour.onLoad(pTag));
     }
 
-    public void onAppendTooltip(ITooltip iTooltip, BlockAccessor blockAccessor, IPluginConfig iPluginConfig){
-        CompoundTag serverData = blockAccessor.getServerData();
-        getBehaviours().forEach(ibeBehaviour -> ibeBehaviour.onAppendTooltip(iTooltip,serverData,iPluginConfig));
+    public void onAppendTooltip(List<Component> iTooltip, CompoundTag serverData) {
+        getBehaviours().forEach(ibeBehaviour -> ibeBehaviour.onAppendTooltip(iTooltip, serverData));
     }
 
     public void onAppendServerData(CompoundTag compoundTag){
@@ -122,5 +120,25 @@ public abstract class TCBlockEntity extends BlockEntity{
         return saveWithoutMetadata();
     }
 
+    @Override
+    public void addTooltipLines(CompoundTag data, List<Component> tooltip, boolean isShifting) {
+        for (IBEBehaviour behaviour : getBehaviours()) {
+            CompoundTag compoundTag = new CompoundTag();
+            if (behaviour instanceof IHaveKnowledge iHaveKnowledge) {
+                iHaveKnowledge.addTooltipLines(data, tooltip, isShifting);
+            } else {
+                behaviour.onAppendServerData(compoundTag);
+                behaviour.onAppendTooltip(tooltip, compoundTag);
+            }
+        }
+    }
 
+    @Override
+    public void collectKnowledgeData(CompoundTag data) {
+        for (IBEBehaviour behaviour : getBehaviours()) {
+            if (behaviour instanceof IHaveKnowledge iHaveKnowledge) {
+                iHaveKnowledge.collectKnowledgeData(data);
+            }
+        }
+    }
 }

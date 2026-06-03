@@ -90,12 +90,17 @@ public class FluidApplierItem extends Item implements DispensibleContainerItem {
                 Direction direction = blockhitresult.getDirection();
                 BlockPos blockpos1 = blockpos.relative(direction);
                 BlockState blockState = pLevel.getBlockState(blockpos);
-                if (blockState.getBlock() instanceof IFluidApplicable fluidApplicable
-                    && !pPlayer.isShiftKeyDown()) {
-                    IFluidApplicable.FluidApplyResult result = fluidApplicable.tryApply(pLevel,blockpos,itemstack,fluidHandlerItem);
+                IFluidApplicable fluidApplicable = null;
+                if (pLevel.getBlockEntity(blockpos) instanceof IFluidApplicable fluidApplicableEntity) {
+                    fluidApplicable = fluidApplicableEntity;
+                } else if (blockState.getBlock() instanceof IFluidApplicable fluidApplicableBlock) {
+                    fluidApplicable = fluidApplicableBlock;
+                }
+                if (!pPlayer.isShiftKeyDown() && fluidApplicable != null) {
+                    IFluidApplicable.FluidApplyResult result = fluidApplicable.tryApply(pLevel, blockpos, itemstack, fluidHandlerItem);
                     if (result.cancel()) return InteractionResultHolder.pass(itemstack);
                     if (result.success()) {
-                        pLevel.playSound(null,blockpos,SoundEvents.NOTE_BLOCK_PLING.value(),SoundSource.BLOCKS);
+                        pLevel.playSound(null, blockpos, SoundEvents.NOTE_BLOCK_PLING.value(), SoundSource.BLOCKS);
                         return InteractionResultHolder.sidedSuccess(itemstack, pLevel.isClientSide);
                     }
                 }

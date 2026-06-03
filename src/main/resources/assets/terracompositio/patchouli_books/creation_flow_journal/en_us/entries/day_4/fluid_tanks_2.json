@@ -1,0 +1,38 @@
+{
+  "name": "book.terracompositio.creation_flow_journal.entry.fluid_tanks_2.name",
+  "category": "terracompositio:day_4",
+  "icon": "terracompositio:flow_cedar_tank",
+  "flag": "terracompositio:day_4",
+  "pages": [
+    "book.terracompositio.creation_flow_journal.entry.fluid_tanks_2.page1",
+    {
+      "type": "patchouli:image",
+      "images": [
+        "terracompositio:textures/illustrations/fluid_tank_assemble_2_image.png"
+      ],
+      "text": "book.terracompositio.creation_flow_journal.entry.fluid_tanks_2.page2"
+    },
+    {
+      "type": "patchouli:image",
+      "images": [
+        "terracompositio:textures/illustrations/fluid_tank_transmission_1_image.png"
+      ],
+      "text": "book.terracompositio.creation_flow_journal.entry.fluid_tanks_2.page3"
+    },
+    {
+      "type": "patchouli:image",
+      "images": [
+        "terracompositio:textures/illustrations/fluid_tank_transmission_2_image.png"
+      ],
+      "text": "book.terracompositio.creation_flow_journal.entry.fluid_tanks_2.page4"
+    },
+    {
+      "type": "patchouli:image",
+      "images": [
+        "terracompositio:textures/illustrations/fluid_tank_transmission_3_image.png"
+      ],
+      "text": "book.terracompositio.creation_flow_journal.entry.fluid_tanks_2.page5"
+    },
+    "book.terracompositio.creation_flow_journal.entry.fluid_tanks_2.page6"
+  ]
+}

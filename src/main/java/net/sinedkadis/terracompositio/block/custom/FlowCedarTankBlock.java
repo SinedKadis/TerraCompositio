@@ -35,7 +35,7 @@ import net.minecraftforge.fluids.capability.templates.FluidTank;
 import net.sinedkadis.terracompositio.block.entity.TCBlockEntity;
 import net.sinedkadis.terracompositio.item.custom.WrenchAxeItem;
 import net.sinedkadis.terracompositio.registries.*;
-import net.sinedkadis.terracompositio.util.TCUtil;
+import net.sinedkadis.terracompositio.util.helpers.WorldHelper;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -64,7 +64,7 @@ public class FlowCedarTankBlock extends TCBaseEntityBlock{
         Integer stage = state.getValue(STAGE);
         if (context.getItemInHand().getItem() instanceof AxeItem && (stage.equals(0) || stage.equals(1))) {
             if (stage.equals(0)){
-                TCUtil.flowLeak(state,context.getLevel(),context.getClickedPos(),false);
+                WorldHelper.flowLeak(state, context.getLevel(), context.getClickedPos(), false);
             }
             return state.setValue(STAGE, 2);
         }
@@ -86,7 +86,7 @@ public class FlowCedarTankBlock extends TCBaseEntityBlock{
         if (heldItem.is(Items.GLASS) && pState.getValue(STAGE).equals(2)
                 && (item2.is(TCTags.Items.WRENCHES) || item2.is(TCItems.WRENCH_AXE.get()))) {
             if (!item2.is(TCItems.WRENCH_AXE.get()) || WrenchAxeItem.getWrenchMode(item2).equals(WrenchAxeItem.WrenchMode.WRENCH)) {
-                    TCUtil.handleInWorldBlockCraft(pState, pState.setValue(STAGE, 3), pLevel, pPos, heldItem, 1);
+                WorldHelper.handleInWorldBlockCraft(pState, pState.setValue(STAGE, 3), pLevel, pPos, heldItem, 1);
                     return InteractionResult.SUCCESS;
             }
         }

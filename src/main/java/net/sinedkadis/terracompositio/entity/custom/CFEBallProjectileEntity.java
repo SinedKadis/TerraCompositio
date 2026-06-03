@@ -18,7 +18,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.sinedkadis.terracompositio.registries.TCEntities;
 import net.sinedkadis.terracompositio.registries.TCItems;
-import net.sinedkadis.terracompositio.util.TCUtil;
+import net.sinedkadis.terracompositio.util.helpers.BlockPosHelper;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 
@@ -55,7 +55,7 @@ public class CFEBallProjectileEntity extends ThrowableItemProjectile {
         persistentData.putInt("balls_threw", ballsThrew + 1);
         ListTag list = persistentData.getList("platform_on_throw_" + (ballsThrew % PLATFORM_ALIVE_PER_PLAYER.get()), Tag.TAG_COMPOUND);
         for (Tag tag : list) {
-            BlockPos pPos = TCUtil.loadBlockPos(tag);
+            BlockPos pPos = BlockPosHelper.loadBlockPos(tag);
             if (pPos != null)
                 level().setBlock(pPos, Blocks.AIR.defaultBlockState(), 3);
 

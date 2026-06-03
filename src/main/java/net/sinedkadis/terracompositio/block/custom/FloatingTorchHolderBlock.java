@@ -31,7 +31,7 @@ import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import net.sinedkadis.terracompositio.util.HoldTorch;
-import net.sinedkadis.terracompositio.util.TCUtil;
+import net.sinedkadis.terracompositio.util.helpers.PlayerHelper;
 import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -136,7 +136,7 @@ public class FloatingTorchHolderBlock extends RedstoneTorchBlock {
         for (Map.Entry<HoldTorch,Item> entry : map.entrySet()){
             if (itemInHand.isEmpty() || itemInHand.is(entry.getValue())) {
                 if (torch.equals(entry.getKey())){
-                    TCUtil.addOrDropToPlayer(pPlayer, entry.getValue().getDefaultInstance());
+                    PlayerHelper.addOrDropToPlayer(pPlayer, entry.getValue().getDefaultInstance());
                     pLevel.setBlockAndUpdate(pPos, pState.setValue(HOLD_TORCH, HoldTorch.NONE));
                     pLevel.playSound(null, pPos, SoundEvents.WOOD_BREAK, SoundSource.BLOCKS);
                     return InteractionResult.SUCCESS;

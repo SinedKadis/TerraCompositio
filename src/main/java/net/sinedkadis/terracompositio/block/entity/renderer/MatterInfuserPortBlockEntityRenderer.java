@@ -21,7 +21,7 @@ import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemStackHandler;
 import net.sinedkadis.terracompositio.block.entity.FlowCedarCasingBlockEntity;
 import net.sinedkadis.terracompositio.block.entity.MatterInfuserPortBlockEntity;
-import net.sinedkadis.terracompositio.util.TCUtil;
+import net.sinedkadis.terracompositio.util.helpers.WorldHelper;
 import org.jetbrains.annotations.NotNull;
 
 public class MatterInfuserPortBlockEntityRenderer implements BlockEntityRenderer<MatterInfuserPortBlockEntity> {
@@ -85,7 +85,7 @@ public class MatterInfuserPortBlockEntityRenderer implements BlockEntityRenderer
             // To left
             pPoseStack.translate(rotatedVec3.x() * 0.1f, 0, rotatedVec3.z() * 0.1f);
 
-            itemRenderer.renderStatic(stackInSlot, ItemDisplayContext.FIXED, TCUtil.getLightLevel(level, pBlockEntity.getBlockPos(), Direction.UP),
+            itemRenderer.renderStatic(stackInSlot, ItemDisplayContext.FIXED, WorldHelper.getLightLevel(level, pBlockEntity.getBlockPos(), Direction.UP),
                     OverlayTexture.NO_OVERLAY, pPoseStack, pBuffer, level, 1);
 
             pPoseStack.popPose();

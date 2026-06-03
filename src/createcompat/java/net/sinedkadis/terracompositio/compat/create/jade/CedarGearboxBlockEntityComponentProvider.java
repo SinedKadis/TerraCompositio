@@ -1,6 +1,7 @@
 package net.sinedkadis.terracompositio.compat.create.jade;
 
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.sinedkadis.terracompositio.TerraCompositio;
@@ -12,6 +13,9 @@ import snownee.jade.api.IServerDataProvider;
 import snownee.jade.api.ITooltip;
 import snownee.jade.api.config.IPluginConfig;
 
+import java.util.ArrayList;
+import java.util.List;
+
 public enum CedarGearboxBlockEntityComponentProvider implements IBlockComponentProvider, IServerDataProvider<BlockAccessor> {
     INSTANCE;
 
@@ -21,8 +25,10 @@ public enum CedarGearboxBlockEntityComponentProvider implements IBlockComponentP
         if (!CompatUtils.CREATE_EXISTENCE.get()) return;
         BlockEntity blockEntity = blockAccessor.getBlockEntity();
         if (blockEntity instanceof CedarGearboxBlockEntity cedarGearboxBlockEntity) {
+            List<Component> list = new ArrayList<>();
             CompoundTag serverData = blockAccessor.getServerData();
-            cedarGearboxBlockEntity.onAppendTooltip(iTooltip,serverData,iPluginConfig);
+            cedarGearboxBlockEntity.onAppendTooltip(list, serverData);
+            iTooltip.addAll(list);
         }
 
     }

@@ -12,7 +12,7 @@ import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.world.level.block.state.BlockState;
 import net.sinedkadis.terracompositio.block.entity.PathPointerBlockEntity;
 import net.sinedkadis.terracompositio.registries.TCBlocks;
-import net.sinedkadis.terracompositio.util.VecHelper;
+import net.sinedkadis.terracompositio.util.helpers.VecHelper;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.Map;

@@ -1,4 +1,4 @@
-package net.sinedkadis.terracompositio.util;
+package net.sinedkadis.terracompositio.util.helpers;
 
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
@@ -6,7 +6,6 @@ import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.Vec3;
 import org.joml.Quaternionf;
 
-//Taken from Botania mod. Thank you for that code
 public class VecHelper {
     public static final Vec3 ONE = new Vec3(1, 1, 1);
 
@@ -23,8 +22,6 @@ public class VecHelper {
         if (Mth.equal(theta, 0)) {
             return v;
         }
-
-        // Rodrigues rotation formula
         Vec3 k = axis.normalize();
 
         float cosTheta = Mth.cos((float) theta);

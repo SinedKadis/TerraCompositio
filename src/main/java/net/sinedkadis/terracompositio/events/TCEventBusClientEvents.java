@@ -18,6 +18,7 @@ import net.minecraft.world.level.material.Fluids;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.client.event.*;
 import net.minecraftforge.client.extensions.common.IClientFluidTypeExtensions;
+import net.minecraftforge.client.gui.overlay.VanillaGuiOverlay;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidUtil;
@@ -33,7 +34,8 @@ import net.sinedkadis.terracompositio.entity.client.CFECloudRenderer;
 import net.sinedkadis.terracompositio.entity.client.CFECubeModel;
 import net.sinedkadis.terracompositio.entity.client.FlowCedarEntModel;
 import net.sinedkadis.terracompositio.entity.client.FlowCedarEntRenderer;
-import net.sinedkadis.terracompositio.gui.TCGui;
+import net.sinedkadis.terracompositio.gui.CfeHud;
+import net.sinedkadis.terracompositio.gui.KnowledgeOverlay;
 import net.sinedkadis.terracompositio.item.custom.CreationFlowJournalItem;
 import net.sinedkadis.terracompositio.item.custom.ShieldedBundleItem;
 import net.sinedkadis.terracompositio.item.custom.WrenchAxeItem;
@@ -158,7 +160,8 @@ public class TCEventBusClientEvents {
 
     @SubscribeEvent
     public static void onRegisterGuiOverlays(RegisterGuiOverlaysEvent event) {
-        event.registerAboveAll("cfe_hud", TCGui::cfeHud);
+        event.registerAbove(VanillaGuiOverlay.HOTBAR.id(), "cfe_hud", CfeHud::render);
+        event.registerAbove(VanillaGuiOverlay.HOTBAR.id(), "knowledge_hud", KnowledgeOverlay::render);
     }
 
     @SubscribeEvent

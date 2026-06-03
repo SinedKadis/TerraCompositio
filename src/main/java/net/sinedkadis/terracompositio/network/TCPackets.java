@@ -4,9 +4,7 @@ import net.minecraftforge.network.NetworkDirection;
 import net.minecraftforge.network.NetworkRegistry;
 import net.minecraftforge.network.simple.SimpleChannel;
 import net.sinedkadis.terracompositio.TerraCompositio;
-import net.sinedkadis.terracompositio.network.packets.C2SBoardSync;
-import net.sinedkadis.terracompositio.network.packets.S2CHighLightNodesSync;
-import net.sinedkadis.terracompositio.network.packets.S2CPlayerCfeContainerSync;
+import net.sinedkadis.terracompositio.network.packets.*;
 
 import java.util.Optional;
 
@@ -38,6 +36,29 @@ public class TCPackets {
                 .decoder(S2CHighLightNodesSync::decode)
                 .consumerMainThread(S2CHighLightNodesSync::handle)
                 .add();
+        CHANNEL.registerMessage(
+                id++,
+                C2SRequestBlockKnowledgePacket.class,
+                C2SRequestBlockKnowledgePacket::encode,
+                C2SRequestBlockKnowledgePacket::decode,
+                C2SRequestBlockKnowledgePacket::handle
+        );
+        CHANNEL.registerMessage(
+                id++,
+                C2SRequestEntityKnowledgePacket.class,
+                C2SRequestEntityKnowledgePacket::encode,
+                C2SRequestEntityKnowledgePacket::decode,
+                C2SRequestEntityKnowledgePacket::handle
+        );
+
+        CHANNEL.registerMessage(
+                id++,
+                S2CKnowledgeDataPacket.class,
+                S2CKnowledgeDataPacket::encode,
+                S2CKnowledgeDataPacket::decode,
+                S2CKnowledgeDataPacket::handle
+        );
+
     }
 
 

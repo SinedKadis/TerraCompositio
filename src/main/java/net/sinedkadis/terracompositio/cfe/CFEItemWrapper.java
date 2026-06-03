@@ -102,7 +102,7 @@ public class CFEItemWrapper implements ICFEHandler, ICapabilityProvider {
 
 
     @Override
-    public int sendCFE(int cfe, ICFEHandler target,float speed, boolean simulate) {
+    public int sendCFE(int cfe, ICFEHandler target, float speed, boolean noCol, boolean simulate) {
         return 0;
     }
 

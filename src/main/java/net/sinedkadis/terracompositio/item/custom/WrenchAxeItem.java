@@ -54,7 +54,7 @@ import net.sinedkadis.terracompositio.block.entity.TCBlockEntity;
 import net.sinedkadis.terracompositio.registries.TCBlocks;
 import net.sinedkadis.terracompositio.registries.TCItems;
 import net.sinedkadis.terracompositio.registries.TCTags;
-import net.sinedkadis.terracompositio.util.TCUtil;
+import net.sinedkadis.terracompositio.util.helpers.PlayerHelper;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -64,8 +64,8 @@ import java.util.function.Predicate;
 import static net.minecraft.world.level.block.Block.dropResources;
 import static net.minecraft.world.level.block.state.properties.BlockStateProperties.*;
 import static net.sinedkadis.terracompositio.registries.TCBlockStateProperties.INFUSED;
-import static net.sinedkadis.terracompositio.util.TCUtil.getNearBlocks;
-import static net.sinedkadis.terracompositio.util.TCUtil.getTouchingBlocks;
+import static net.sinedkadis.terracompositio.util.helpers.BlockPosHelper.getNearBlocks;
+import static net.sinedkadis.terracompositio.util.helpers.BlockPosHelper.getTouchingBlocks;
 
 public class WrenchAxeItem extends AxeItem {
     private static final TagKey<Block> LOGS_TAG = BlockTags.LOGS;
@@ -623,7 +623,7 @@ public class WrenchAxeItem extends AxeItem {
         String name = Objects.requireNonNull(ForgeRegistries.BLOCKS.getKey(block)).toString();
         if (properties.isEmpty()) {
             if (pPlayer != null)
-                TCUtil.message(pPlayer, Component.translatable("item.terracompositio.flow_rotating_axe.no_change").withStyle(ChatFormatting.BOLD));
+                PlayerHelper.message(pPlayer, Component.translatable("item.terracompositio.flow_rotating_axe.no_change").withStyle(ChatFormatting.BOLD));
             return false;
         } else {
             CompoundTag debugProperty = wrenchStack.getOrCreateTagElement("DebugProperty");
@@ -649,7 +649,7 @@ public class WrenchAxeItem extends AxeItem {
                 }
                 level.getChunkSource().getLightEngine().checkBlock(pos);
                 ((Level) level).getChunkAt(pos).setBlockState(pos, newState, false);
-                TCUtil.message(pPlayer, Component.translatable(Items.DEBUG_STICK.getDescriptionId() + ".update", blockStateDefinitionProperty.getName(), getNameHelper(newState, blockStateDefinitionProperty)).withStyle(ChatFormatting.BOLD));
+                PlayerHelper.message(pPlayer, Component.translatable(Items.DEBUG_STICK.getDescriptionId() + ".update", blockStateDefinitionProperty.getName(), getNameHelper(newState, blockStateDefinitionProperty)).withStyle(ChatFormatting.BOLD));
             } else {
                 if (pPlayer != null) {
                     blockStateDefinitionProperty = getRelative(properties, blockStateDefinitionProperty, pPlayer.isSecondaryUseActive());
@@ -659,7 +659,7 @@ public class WrenchAxeItem extends AxeItem {
                 String $$14 = blockStateDefinitionProperty.getName();
                 debugProperty.putString(name, $$14);
                 if (pPlayer != null)
-                    TCUtil.message(pPlayer, Component.translatable(Items.DEBUG_STICK.getDescriptionId() + ".select", $$14, getNameHelper(pStateClicked, blockStateDefinitionProperty)).withStyle(ChatFormatting.BOLD));
+                    PlayerHelper.message(pPlayer, Component.translatable(Items.DEBUG_STICK.getDescriptionId() + ".select", $$14, getNameHelper(pStateClicked, blockStateDefinitionProperty)).withStyle(ChatFormatting.BOLD));
             }
             return true;
         }
