@@ -8,11 +8,11 @@ import net.minecraftforge.fluids.capability.IFluidHandlerItem;
 
 public interface IFluidApplicable {
 
-//    default FluidApplyResult tryApply(Level level, BlockPos blockPos, ItemStack itemStack) {
-//        Optional<IFluidHandlerItem> capability = itemStack.getCapability(ForgeCapabilities.FLUID_HANDLER_ITEM).resolve();
+    //    default FluidApplyResult tryApply(Level level, BlockPos blockPos, ItemStack fluidStack) {
+//        Optional<IFluidHandlerItem> capability = fluidStack.getCapability(ForgeCapabilities.FLUID_HANDLER_ITEM).resolve();
 //        if (capability.isPresent()) {
 //            IFluidHandlerItem iFluidHandlerItem = capability.get();
-//            return tryApply(level,blockPos,itemStack,iFluidHandlerItem);
+//            return tryApply(level,blockPos,fluidStack,iFluidHandlerItem);
 //        }
 //        return FluidApplyResult.SKIP;
 //    }

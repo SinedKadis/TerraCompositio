@@ -1,8 +1,10 @@
 package net.sinedkadis.terracompositio.block.entity;
 
+import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
@@ -23,18 +25,23 @@ import net.sinedkadis.terracompositio.registries.TCBlockEntities;
 import net.sinedkadis.terracompositio.registries.TCBlocks;
 import net.sinedkadis.terracompositio.registries.TCFluids;
 import net.sinedkadis.terracompositio.registries.TCTags;
+import net.sinedkadis.terracompositio.util.FluidComponent;
 import net.sinedkadis.terracompositio.util.helpers.BlockPosHelper;
 import net.sinedkadis.terracompositio.util.helpers.CFEHelper;
 import net.sinedkadis.terracompositio.util.helpers.ParticleHelper;
-import org.jetbrains.annotations.NotNull;
+import net.sinedkadis.terracompositio.util.helpers.TooltipHelper;
 import org.jetbrains.annotations.Nullable;
 
+import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
 import static net.sinedkadis.terracompositio.registries.TCBlockStateProperties.INFUSED;
 
+@ParametersAreNonnullByDefault
+@MethodsReturnNonnullByDefault
 public class FlowCedarTankBlockEntity extends TCBlockEntity implements FluidNetworkMemberBE {
     protected final TCFluidTank fluidHandler = new TCFluidTank(8000, this);
     protected LazyOptional<IFluidHandler> lazyFluidHandler = LazyOptional.empty();
@@ -49,16 +56,16 @@ public class FlowCedarTankBlockEntity extends TCBlockEntity implements FluidNetw
     }
 
     public boolean onPedestal(Level level, BlockPos pos) {
-        return level != null && level.getBlockState(pos.below()).is(TCBlocks.FLOW_CEDAR_PEDESTAL.get());
+        return level.getBlockState(pos.below()).is(TCBlocks.FLOW_CEDAR_PEDESTAL.get());
     }
 
     @Override
-    public void addBEBehaviours(@NotNull List<IBEBehaviour> list) {
+    public void addBEBehaviours(List<IBEBehaviour> list) {
 
     }
 
     @Override
-    public @NotNull <T> LazyOptional<T> getCapability(@NotNull Capability<T> cap, @Nullable Direction side) {
+    public <T> LazyOptional<T> getCapability(Capability<T> cap, @Nullable Direction side) {
         if (cap == ForgeCapabilities.FLUID_HANDLER) {
             return lazyFluidHandler.cast();
         }
@@ -72,18 +79,18 @@ public class FlowCedarTankBlockEntity extends TCBlockEntity implements FluidNetw
     }
 
     @Override
-    protected void saveAdditional(@NotNull CompoundTag pTag) {
+    protected void saveAdditional(CompoundTag pTag) {
         fluidHandler.writeToNBT(pTag);
         super.saveAdditional(pTag);
     }
 
     @Override
-    public void load(@NotNull CompoundTag pTag) {
+    public void load(CompoundTag pTag) {
         super.load(pTag);
         fluidHandler.readFromNBT(pTag);
     }
 
-    public void tick(@NotNull Level level, @NotNull BlockPos pos, @NotNull BlockState state) {
+    public void tick(Level level, BlockPos pos, BlockState state) {
         FluidNetwork fluidNetworkInstance = TerraCompositioAPI.INSTANCE.getFluidNetworkInstance();
         if (!level.isClientSide) {
             boolean inNetwork = fluidNetworkInstance.isIn(level, this.fluidHandler);
@@ -102,7 +109,7 @@ public class FlowCedarTankBlockEntity extends TCBlockEntity implements FluidNetw
             tickCounter = 20;
             FluidStack fluidStack = new FluidStack(TCFluids.FLOW_FLUID.source.get(), 1000);
             if (fluidHandler.fill(fluidStack, IFluidHandler.FluidAction.SIMULATE)>=1000){
-                List<BlockPos> list = new java.util.ArrayList<>(BlockPosHelper.getNearBlocks(pos, 10).stream()
+                List<BlockPos> list = new ArrayList<>(BlockPosHelper.getNearBlocks(pos, 10).stream()
                         .filter(pos1 -> level.getBlockState(pos1).is(TCTags.Blocks.FLOW_CEDAR_LOGS))
                         .filter(pos2 -> level.getBlockState(pos2).getValue(INFUSED))
                         .toList());
@@ -218,4 +225,40 @@ public class FlowCedarTankBlockEntity extends TCBlockEntity implements FluidNetw
         } else onFluidNetworkMemberUpdate();
     }
 
+    @Override
+    public void collectKnowledgeData(CompoundTag data) {
+        FluidStack fluidInTank = fluidHandler.getFluidInTank(0);
+        CompoundTag compoundTag = new CompoundTag();
+        fluidInTank.writeToNBT(compoundTag);
+        data.put("val.fluid", compoundTag);
+        data.putInt("val.range", getRange());
+
+        if (TCCommonConfigs.DEBUG.get()) {
+            data.putInt("val.priority", getPriority());
+        }
+
+        super.collectKnowledgeData(data);
+    }
+
+    @Override
+    public void addTooltipLines(CompoundTag data, List<Component> tooltip, boolean isShifting) {
+        tooltip.add(Component.translatable("block.terracompositio.block_header"));
+
+        if (isShifting)
+            tooltip.add(TooltipHelper
+                    .defaultTextWithArg("block.terracompositio.range", data.getInt("val.range"), TooltipHelper.Units.BLOCKS));
+
+        if (data.contains("val.priority"))
+            tooltip.add(TooltipHelper
+                    .defaultTextWithArg("block.terracompositio.priority", data.getInt("val.priority")));
+
+        FluidStack fluidStack = FluidStack.loadFluidStackFromNBT(data.getCompound("val.fluid"));
+        if (!fluidStack.isEmpty()) {
+
+            tooltip.add(Component.translatable("block.terracompositio.fluids_header"));
+
+            tooltip.add(FluidComponent.of(fluidStack));
+        }
+        super.addTooltipLines(data, tooltip, isShifting);
+    }
 }

@@ -25,6 +25,7 @@ import net.sinedkadis.terracompositio.cfe.CFEMemberProxy;
 import net.sinedkadis.terracompositio.config.TCCommonConfigs;
 import net.sinedkadis.terracompositio.config.TCInnerConfig;
 import net.sinedkadis.terracompositio.util.helpers.CFEHelper;
+import net.sinedkadis.terracompositio.util.helpers.TooltipHelper;
 import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -241,16 +242,32 @@ public class CFEHandlerBehaviour implements IBECFEBehaviour, IHaveKnowledge {
     @Override
     public void addTooltipLines(CompoundTag data, List<Component> tooltip, boolean isShifting) {
 
-        // Заголовок — всегда первым, не зависит от данных
-        tooltip.add(Component.translatable("block.terracompositio.cfe_header"));
+        tooltip.add(Component.translatable("block.terracompositio.block_header"));
 
-        if (data.contains("val.cfe")) {
+        if (data.contains("val.priority")) {
             tooltip.add(
-                    Component.translatable("block.terracompositio.cfe",
-                                    Component.literal(String.valueOf(data.getInt("val.cfe")))
+                    Component.translatable("block.terracompositio.priority",
+                                    Component.literal(String.valueOf(data.getInt("val.priority")))
                                             .append(Component.translatable("block.terracompositio.units"))
                                             .withStyle(ChatFormatting.AQUA))
                             .withStyle(ChatFormatting.GRAY));
+
+        }
+        if (data.contains("val.range")) {
+            if (isShifting)
+                tooltip.add(
+                        Component.translatable("block.terracompositio.range",
+                                        Component.literal(String.valueOf(data.getInt("val.range")))
+                                                .append(Component.translatable("block.terracompositio.blocks"))
+                                                .withStyle(ChatFormatting.AQUA))
+                                .withStyle(ChatFormatting.GRAY));
+
+        }
+
+        tooltip.add(Component.translatable("block.terracompositio.cfe_header"));
+
+        if (data.contains("val.cfe")) {
+            tooltip.add(TooltipHelper.defaultTextWithArg("block.terracompositio.cfe", data.getInt("val.cfe")));
         }
         if (data.contains("val.max_cfe")) {
             tooltip.add(
@@ -270,25 +287,6 @@ public class CFEHandlerBehaviour implements IBECFEBehaviour, IHaveKnowledge {
                             .withStyle(ChatFormatting.GRAY));
 
         }
-        if (data.contains("val.priority")) {
-            tooltip.add(
-                    Component.translatable("block.terracompositio.priority",
-                                    Component.literal(String.valueOf(data.getInt("val.priority")))
-                                            .append(Component.translatable("block.terracompositio.units"))
-                                            .withStyle(ChatFormatting.AQUA))
-                            .withStyle(ChatFormatting.GRAY));
-
-        }
-        if (data.contains("val.range")) {
-            tooltip.add(
-                    Component.translatable("block.terracompositio.range",
-                                    Component.literal(String.valueOf(data.getInt("val.range")))
-                                            .append(Component.translatable("block.terracompositio.blocks"))
-                                            .withStyle(ChatFormatting.AQUA))
-                            .withStyle(ChatFormatting.GRAY));
-
-        }
-
         if (data.contains("flag.type.consumer") && data.getBoolean("flag.type.consumer")) {
             tooltip.add(
                     Component.translatable("block.terracompositio.type",
@@ -304,4 +302,5 @@ public class CFEHandlerBehaviour implements IBECFEBehaviour, IHaveKnowledge {
                             .withStyle(ChatFormatting.GRAY));
         }
     }
+
 }

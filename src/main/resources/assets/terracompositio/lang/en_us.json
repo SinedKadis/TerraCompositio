@@ -106,8 +106,12 @@
 
   "block.terracompositio.blocks": " blocks",
   "block.terracompositio.units": " units",
+  "block.terracompositio.milibuckets": " milibuckets",
   "block.terracompositio.cfe_second": " cfe/second",
+  "block.terracompositio.block_header": "Block Info: ",
+  "block.terracompositio.entity_header": "Entity Info: ",
   "block.terracompositio.items_header": "Items Info: ",
+  "block.terracompositio.fluids_header": "Fluids Info: ",
 
   "entity.terracompositio.ent_hold_header": "Holds: ",
   "entity.terracompositio.ent_inner_header": "In Stomach: ",

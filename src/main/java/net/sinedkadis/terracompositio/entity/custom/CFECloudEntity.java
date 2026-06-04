@@ -319,6 +319,23 @@ public class CFECloudEntity extends Entity implements CFENetworkMemberEntity, IH
     public void addTooltipLines(CompoundTag data, List<Component> tooltip, boolean isShifting) {
 
         if (isShifting) {
+            tooltip.add(Component.translatable("block.terracompositio.block_header"));
+            if (data.contains("val.priority")) {
+                tooltip.add(
+                        Component.translatable("block.terracompositio.priority",
+                                        Component.literal(String.valueOf(data.getInt("val.priority")))
+                                                .append(Component.translatable("block.terracompositio.units"))
+                                                .withStyle(ChatFormatting.AQUA))
+                                .withStyle(ChatFormatting.GRAY));
+            }
+            if (data.contains("val.range")) {
+                tooltip.add(
+                        Component.translatable("block.terracompositio.range",
+                                        Component.literal(String.valueOf(data.getInt("val.range")))
+                                                .append(Component.translatable("block.terracompositio.blocks"))
+                                                .withStyle(ChatFormatting.AQUA))
+                                .withStyle(ChatFormatting.GRAY));
+            }
             tooltip.add(Component.translatable("block.terracompositio.cfe_header"));
 
 
@@ -347,22 +364,7 @@ public class CFECloudEntity extends Entity implements CFENetworkMemberEntity, IH
                                 .withStyle(ChatFormatting.GRAY));
             }
 
-            if (data.contains("val.priority")) {
-                tooltip.add(
-                        Component.translatable("block.terracompositio.priority",
-                                        Component.literal(String.valueOf(data.getInt("val.priority")))
-                                                .append(Component.translatable("block.terracompositio.units"))
-                                                .withStyle(ChatFormatting.AQUA))
-                                .withStyle(ChatFormatting.GRAY));
-            }
-            if (data.contains("val.range")) {
-                tooltip.add(
-                        Component.translatable("block.terracompositio.range",
-                                        Component.literal(String.valueOf(data.getInt("val.range")))
-                                                .append(Component.translatable("block.terracompositio.blocks"))
-                                                .withStyle(ChatFormatting.AQUA))
-                                .withStyle(ChatFormatting.GRAY));
-            }
+
             if (data.contains("flag.type.consumer") && data.getBoolean("flag.type.consumer")) {
                 tooltip.add(
                         Component.translatable("block.terracompositio.type",
