@@ -11,16 +11,19 @@ import mezz.jei.api.recipe.IFocusGroup;
 import mezz.jei.api.recipe.RecipeIngredientRole;
 import mezz.jei.api.recipe.RecipeType;
 import mezz.jei.api.recipe.category.IRecipeCategory;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
 import net.sinedkadis.terracompositio.TerraCompositio;
-import net.sinedkadis.terracompositio.registries.TCBlocks;
 import net.sinedkadis.terracompositio.recipe.FlowSaturationRecipe;
+import net.sinedkadis.terracompositio.registries.TCBlocks;
+import net.sinedkadis.terracompositio.registries.TCItems;
 import org.jetbrains.annotations.NotNull;
 
 import javax.annotation.ParametersAreNonnullByDefault;
+import java.awt.*;
 import java.util.Objects;
 
 @SuppressWarnings("DataFlowIssue")
@@ -70,7 +73,7 @@ public class FlowPortCategory implements IRecipeCategory<FlowSaturationRecipe> {
     }
 
     @Override
-    public void setRecipe(IRecipeLayoutBuilder iRecipeLayoutBuilder, FlowSaturationRecipe flowSaturationRecipe, @NotNull IFocusGroup iFocusGroup) {
+    public void setRecipe(IRecipeLayoutBuilder iRecipeLayoutBuilder, FlowSaturationRecipe flowSaturationRecipe, IFocusGroup iFocusGroup) {
         iRecipeLayoutBuilder.addSlot(RecipeIngredientRole.INPUT,41,16).addIngredients(flowSaturationRecipe.getIngredients().get(0));
         iRecipeLayoutBuilder.addSlot(RecipeIngredientRole.OUTPUT,121,48).addItemStack(flowSaturationRecipe.getResultItem(null));
     }
@@ -79,5 +82,7 @@ public class FlowPortCategory implements IRecipeCategory<FlowSaturationRecipe> {
     public void draw(FlowSaturationRecipe recipe, IRecipeSlotsView recipeSlotsView, GuiGraphics guiGraphics, double mouseX, double mouseY) {
         background.draw(guiGraphics);
         animatedArrow.draw(guiGraphics,47,34);
+        if (recipe.getIngredients().get(0).getItems()[0].is(TCItems.CREATION_FLOW_JOURNAL.get()))
+            guiGraphics.drawString(Minecraft.getInstance().font, Component.translatable("block.terracompositio.flow_cedar_port_wait"), 5, 75, Color.WHITE.getRGB());
     }
 }

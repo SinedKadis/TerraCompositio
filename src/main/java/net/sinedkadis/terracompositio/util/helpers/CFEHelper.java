@@ -7,6 +7,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.phys.AABB;
 import net.sinedkadis.terracompositio.api.networks.cfe.CFENetworkMember;
 import net.sinedkadis.terracompositio.api.networks.cfe.ICFEHandler;
+import net.sinedkadis.terracompositio.block.entity.CFETrashCanBlockEntity;
 import net.sinedkadis.terracompositio.block.entity.PathPointerBlockEntity;
 import net.sinedkadis.terracompositio.cfe.CFEMemberProxy;
 import net.sinedkadis.terracompositio.config.TCCommonConfigs;
@@ -38,6 +39,7 @@ public class CFEHelper {
     public static void tryCFETransfer(CFENetworkMember target, CFENetworkMember source, int maxTransfer, float speed) {
         if (!validMember(target)) return;
         if (!validMember(source)) return;
+        if (target.getEntity() instanceof CFETrashCanBlockEntity) maxTransfer = Integer.MAX_VALUE;
         int taken = source.getMainHandler().takeCFE(maxTransfer, true);
         int added = target.getMainHandler().addCFE(taken, true);
 

@@ -17,6 +17,7 @@
   "block.terracompositio.flow_cedar_door": "Flow Cedar Door",
   "block.terracompositio.flow_cedar_trapdoor": "Flow Cedar Trapdoor",
   "block.terracompositio.flow_cedar_port": "Flow Cedar Port",
+  "block.terracompositio.flow_cedar_port_wait": "1 day after previous craft",
   "item.terracompositio.flow_bucket": "Bucket of Flow",
   "item.terracompositio.birch_juice_bucket": "Bucket of Birch Juice",
   "block.terracompositio.flow_cauldron": "Flow Cauldron",
@@ -111,8 +112,7 @@
   "entity.terracompositio.ent_hold_header": "Holds: ",
   "entity.terracompositio.ent_inner_header": "In Stomach: ",
   "entity.terracompositio.ent_common_header": "Common: ",
-
-
+  "item.terracompositio.creation_flow_journal.tooltip": "%s bookmarks",
 
   "block.terracompositio.item_io.input": "Input: ",
   "block.terracompositio.item_io.output": "Output: ",

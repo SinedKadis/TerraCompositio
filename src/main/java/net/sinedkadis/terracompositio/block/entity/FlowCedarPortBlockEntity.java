@@ -84,7 +84,7 @@ public class FlowCedarPortBlockEntity extends TCCraftingBlockEntity implements M
 
     @Override
     public void addBEBehaviours(List<IBEBehaviour> list) {
-        list.add(new ManySlotItemHandlerBehaviour(this) {
+        list.add(new ManySlotItemHandlerBehaviour(this, 2) {
             @Override
             public int getLimitInSlot(int slot) {
                 return 1;
@@ -111,6 +111,7 @@ public class FlowCedarPortBlockEntity extends TCCraftingBlockEntity implements M
                     if (nearestPlayer != null)
                         crafted.onCraftedBy(pLevel, nearestPlayer,crafted.getCount());
                     resetProgress();
+                    pLevel.sendBlockUpdated(pPos, pState, pState, 3);
                 }
             } else {
                 resetProgress();

@@ -67,6 +67,7 @@ public class CFECloudEntity extends Entity implements CFENetworkMemberEntity, IH
 
         @Override
         public int sendCFE(int cfe, ICFEHandler target, float speed, boolean noCol, boolean simulate) {
+            if (target instanceof DummyCFEHandler) return 0;
 
             if (target.getAttachedMember().getEntity() instanceof AirSaturatorBlockEntity) return 0;
 
@@ -78,17 +79,22 @@ public class CFECloudEntity extends Entity implements CFENetworkMemberEntity, IH
             if (!simulate) {
                 Vec3 burstOffset = getBurstOffset(target);
                 BlockPos offset = BlockPos.containing(this.getPos().getCenter().add(burstOffset));
-                if (offset.closerThan(target.getPos(),2)) {
-                    target.addCFE(added,false);
+                if (offset.closerThan(target.getPos(), 2)) {
+                    target.addCFE(added, false);
                     return added;
                 }
-                CFEBurstProjectileEntity entity = CFEBurstProjectileEntity.sendBurst(this, burstOffset,target,added,speed);
+                CFEBurstProjectileEntity entity = CFEBurstProjectileEntity.sendBurst(this, burstOffset, target, added, speed);
                 if (entity != null) {
                     entity.noCollision(noCol);
                     target.addToQueue(added);
                 }
             }
             return added;
+        }
+
+        @Override
+        public int sendCFE(int cfe, CFENetworkMember target, float speed, boolean simulate) {
+            return this.sendCFE(cfe, target.getMainHandler(), speed, false, simulate);
         }
 
         @Override
