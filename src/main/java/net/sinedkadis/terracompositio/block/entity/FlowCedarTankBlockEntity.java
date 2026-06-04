@@ -211,7 +211,7 @@ public class FlowCedarTankBlockEntity extends TCBlockEntity implements FluidNetw
 
     @Override
     public void onFluidNetworkMemberUpdate(FluidNetworkMemberBE updated) {
-        if (updated.getPriority() > 0 && getMainHandler().getFluidInTank(0).getAmount() > 0 && CFEHelper.validMember(updated)) {
+        if (updated.getPriority() > this.getPriority() && getMainHandler().getFluidInTank(0).getAmount() > 0 && CFEHelper.validMember(updated)) {
             IFluidHandler mainHandler = updated.getMainHandler();
             if (mainHandler.getTankCapacity(0) - mainHandler.getFluidInTank(0).getAmount() > 0) {
                 scheduleMemberUpdate(updated);

@@ -187,7 +187,7 @@ public class CFEBurstProjectileEntity extends ThrowableProjectile {
             if (blockEntity instanceof TCBlockEntity memberBE) {
                 tryConsumeTCBE(memberBE, cfe);
             } else if (blockEntity instanceof CFENetworkMemberBE memberBE) {
-                tryConsumeCFENetworkMemberBE(memberBE.getMainHandler(), cfe);
+                tryConsumeCFEHandler(memberBE.getMainHandler(), cfe);
             } else {
                 tryConsumeCFENetworkMemberEntity(blockPos, cfe);
             }
@@ -248,27 +248,16 @@ public class CFEBurstProjectileEntity extends ThrowableProjectile {
                 .map(entity -> entity instanceof CFENetworkMemberEntity memberEntity ? memberEntity : null)
                 .filter(Objects::nonNull)
                 .map(CFENetworkMember::getMainHandler)
-                .forEach(cfeHandler -> {
-                    int added = cfeHandler.addCFE(cfe, true);
-                    CFEBurstProjectileEntity burst = this.createPartWithCFE(added);
-                    int consumed = cfeHandler.addCFE(burst.getCFE(), false);
-                    burst.discard();
-                    if (consumed == cfe) {
-                        discard();
-                    }
-                });
+                .forEach(cfeHandler -> tryConsumeCFEHandler(cfeHandler, cfe));
     }
 
-    private void tryConsumeCFENetworkMemberBE(ICFEHandler icfeHandler, int cfe) {
-        int added = icfeHandler.addCFE(cfe, true);
-        CFEBurstProjectileEntity burst = this.createPartWithCFE(added);
-        int consumed = icfeHandler.addCFE(burst.getCFE(), false);
-        burst.discard();
-        if (consumed == cfe) discard();
+    private void tryConsumeCFEHandler(ICFEHandler icfeHandler, int cfe) {
+        int consumed = icfeHandler.addCFE(cfe, false);
+        this.setCFE(this.getCFE() - consumed);
     }
 
     private void tryConsumeTCBE(TCBlockEntity memberBE, int cfe) {
-        tryConsumeCFENetworkMemberBE(memberBE.getCapability(TCCapabilities.CFE).orElse(DummyCFEHandler.instance), cfe);
+        tryConsumeCFEHandler(memberBE.getCapability(TCCapabilities.CFE).orElse(DummyCFEHandler.instance), cfe);
     }
 
     @Override
