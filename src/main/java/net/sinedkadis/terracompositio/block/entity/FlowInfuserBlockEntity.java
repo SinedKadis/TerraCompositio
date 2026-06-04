@@ -2,6 +2,7 @@ package net.sinedkadis.terracompositio.block.entity;
 
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
@@ -10,16 +11,18 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
-import net.minecraftforge.items.ItemStackHandler;
+import net.minecraftforge.items.IItemHandlerModifiable;
+import net.minecraftforge.items.wrapper.EmptyHandler;
 import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBEBehaviour;
 import net.sinedkadis.terracompositio.api.networks.cfe.ICFEHandler;
 import net.sinedkadis.terracompositio.block.behaviours.CFEHandlerBehaviour;
-import net.sinedkadis.terracompositio.block.behaviours.TwoSlotItemHandlerBehaviour;
+import net.sinedkadis.terracompositio.block.behaviours.ItemHandlerBehaviour;
 import net.sinedkadis.terracompositio.config.TCCommonConfigs;
 import net.sinedkadis.terracompositio.config.TCInnerConfig;
 import net.sinedkadis.terracompositio.particle.CFEParticleData;
 import net.sinedkadis.terracompositio.recipe.FlowInfusionRecipe;
 import net.sinedkadis.terracompositio.registries.TCBlockEntities;
+import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.List;
@@ -51,7 +54,17 @@ public class FlowInfuserBlockEntity extends TCCraftingBlockEntity {
                 }
             }
         }.priority(TCInnerConfig.DEFAULT_CONSUMER_PRIORITY));
-        list.add(new TwoSlotItemHandlerBehaviour(this){
+        list.add(new ItemHandlerBehaviour(this, 2) {
+            @Override
+            public boolean allowInsert(int pSlot, ItemStack pStack, @Nullable Direction pDirection, boolean manual) {
+                return manual && pSlot == 0;
+            }
+
+            @Override
+            public boolean allowExtract(int pSlot, ItemStack pStack, @Nullable Direction pDirection, boolean manual) {
+                return manual;
+            }
+
             @Override
             public int getLimitInSlot(int slot) {
                 return 1;
@@ -108,8 +121,8 @@ public class FlowInfuserBlockEntity extends TCCraftingBlockEntity {
     }
 
     @Override
-    protected ItemStackHandler getItemHandler() {
-        return ((TwoSlotItemHandlerBehaviour) behaviours.get(1)).getItemHandler();
+    protected IItemHandlerModifiable getItemHandler() {
+        return (IItemHandlerModifiable) getCapability(ForgeCapabilities.ITEM_HANDLER).orElse(EmptyHandler.INSTANCE);
     }
 
     protected ICFEHandler cfeContainer() {
@@ -133,9 +146,15 @@ public class FlowInfuserBlockEntity extends TCCraftingBlockEntity {
         if (recipe.isPresent()) {
             ItemStack result = recipe.get().getResultItem(null);
             this.getCapability(ForgeCapabilities.ITEM_HANDLER).ifPresent(iItemHandler -> {
-                if (iItemHandler instanceof TwoSlotItemHandlerBehaviour.SlotSensitiveItemStackHandler slotSensitiveItemStackHandler) {
-                    ItemStack left = slotSensitiveItemStackHandler.forceInsertItem(0, result.copy(), false);
-                    getItemHandler().setStackInSlot(0, left);
+                if (getItemBehaviour() instanceof ItemHandlerBehaviour itemHandlerBehaviour) {
+                    itemHandlerBehaviour.ignoreRestrictions = true;
+                    iItemHandler.extractItem(0, 1, false);
+                    iItemHandler.insertItem(1, result.copy(), false);
+                    itemHandlerBehaviour.ignoreRestrictions = false;
+                    if (level != null) {
+                        BlockState blockState = getBlockState();
+                        level.sendBlockUpdated(worldPosition, blockState, blockState, 3);
+                    }
                 }
             });
             return result;

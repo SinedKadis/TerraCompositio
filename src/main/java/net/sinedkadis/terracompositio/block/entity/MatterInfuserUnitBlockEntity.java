@@ -24,7 +24,7 @@ import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBECFEBehaviour;
 import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBEItemBehaviour;
 import net.sinedkadis.terracompositio.api.networks.cfe.ICFEHandler;
 import net.sinedkadis.terracompositio.block.behaviours.CFEHandlerBehaviour;
-import net.sinedkadis.terracompositio.block.behaviours.ManySlotItemHandlerBehaviour;
+import net.sinedkadis.terracompositio.block.behaviours.ItemHandlerBehaviour;
 import net.sinedkadis.terracompositio.block.custom.MatterInfuserBaseEntityBlock;
 import net.sinedkadis.terracompositio.config.TCInnerConfig;
 import net.sinedkadis.terracompositio.recipe.MatterInfusionRecipe;
@@ -65,7 +65,7 @@ public class MatterInfuserUnitBlockEntity extends MatterInfuserBaseBlockEntity{
                 };
             }
         }.range(10).priority(TCInnerConfig.DEFAULT_CONSUMER_PRIORITY));
-        list.add(new ManySlotItemHandlerBehaviour(this) {
+        list.add(new ItemHandlerBehaviour(this) {
             @Override
             public boolean allowExtract(int pSlot, ItemStack pStack, @Nullable Direction pDirection, boolean manual) {
                 return false;
@@ -165,7 +165,7 @@ public class MatterInfuserUnitBlockEntity extends MatterInfuserBaseBlockEntity{
             IItemHandlerModifiable itemHandler = casingBE.getItemHandler();
             IBEItemBehaviour itemBehaviour = casingBE.getItemBehaviour();
 
-            if (itemBehaviour instanceof ManySlotItemHandlerBehaviour itemHandlerBehaviour) {
+            if (itemBehaviour instanceof ItemHandlerBehaviour itemHandlerBehaviour) {
                 itemHandlerBehaviour.ignoreRestrictions = true;
                 itemHandler.extractItem(INPUT_INVENTORY_SLOT, takeCount, false);
                 itemHandler.insertItem(OUTPUT_INVENTORY_SLOT, result, false);

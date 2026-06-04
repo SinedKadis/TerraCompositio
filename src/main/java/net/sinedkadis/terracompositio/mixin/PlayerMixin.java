@@ -2,16 +2,20 @@ package net.sinedkadis.terracompositio.mixin;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.MoverType;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
+import net.minecraftforge.network.PacketDistributor;
 import net.sinedkadis.terracompositio.api.TCCapabilities;
 import net.sinedkadis.terracompositio.api.dummies.DummyCFEHandler;
 import net.sinedkadis.terracompositio.api.networks.cfe.CFENetworkMemberEntity;
 import net.sinedkadis.terracompositio.api.networks.cfe.ICFEHandler;
 import net.sinedkadis.terracompositio.block.custom.TechnetiumBoardBlock;
 import net.sinedkadis.terracompositio.config.TCInnerConfig;
+import net.sinedkadis.terracompositio.network.TCPackets;
+import net.sinedkadis.terracompositio.network.packets.S2CPlayerCfeContainerAndKnowledgeSync;
 import net.sinedkadis.terracompositio.util.accessors.PlayerKnowledgeAccessor;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
@@ -102,6 +106,7 @@ public class PlayerMixin implements CFENetworkMemberEntity, PlayerKnowledgeAcces
         }
     }
 
+
     @Override
     public boolean isCreationAcknowledged() {
         return creationKnowledge;
@@ -112,18 +117,36 @@ public class PlayerMixin implements CFENetworkMemberEntity, PlayerKnowledgeAcces
         creationKnowledge = knowledge;
     }
 
+    @Unique
+    boolean wasSent = false;
+
+    @Inject(
+            method = "tick()V",
+            at = @At("RETURN")
+    )
+    private void tc$onTick(CallbackInfo ci) {
+        if (!wasSent)
+            if (((Player) (Object) this) instanceof ServerPlayer serverPlayer) {
+                wasSent = true;
+                TCPackets.CHANNEL.send(PacketDistributor.PLAYER.with(() -> serverPlayer),
+                        new S2CPlayerCfeContainerAndKnowledgeSync(this.getMainHandler().getCFE(), ((PlayerKnowledgeAccessor) serverPlayer).isCreationAcknowledged()));
+
+            }
+    }
+
     @Inject(
             method = "readAdditionalSaveData",
             at = @At("HEAD")
     )
-    private void tc$onSave(CompoundTag pCompound, CallbackInfo ci) {
-        creationKnowledge = pCompound.getBoolean("tc_creation_knowledge");
+    private void tc$onLoad(CompoundTag pCompound, CallbackInfo ci) {
+        setCreationKnowledge(pCompound.getBoolean("tc_creation_knowledge"));
     }
+
     @Inject(
             method = "addAdditionalSaveData",
             at = @At("RETURN")
     )
-    private void tc$onLoad(CompoundTag pCompound, CallbackInfo ci) {
-        pCompound.putBoolean("tc_creation_knowledge",creationKnowledge);
+    private void tc$onSave(CompoundTag pCompound, CallbackInfo ci) {
+        pCompound.putBoolean("tc_creation_knowledge", isCreationAcknowledged());
     }
 }

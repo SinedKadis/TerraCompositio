@@ -243,9 +243,9 @@ public class CFEHandlerBehaviour implements IBECFEBehaviour, IHaveKnowledge {
     public void addTooltipLines(CompoundTag data, List<Component> tooltip, boolean isShifting) {
 
         tooltip.add(Component.translatable("block.terracompositio.block_header"));
-
+        boolean added = false;
         if (data.contains("val.priority")) {
-            tooltip.add(
+            added = tooltip.add(
                     Component.translatable("block.terracompositio.priority",
                                     Component.literal(String.valueOf(data.getInt("val.priority")))
                                             .append(Component.translatable("block.terracompositio.units"))
@@ -255,7 +255,7 @@ public class CFEHandlerBehaviour implements IBECFEBehaviour, IHaveKnowledge {
         }
         if (data.contains("val.range")) {
             if (isShifting)
-                tooltip.add(
+                added = tooltip.add(
                         Component.translatable("block.terracompositio.range",
                                         Component.literal(String.valueOf(data.getInt("val.range")))
                                                 .append(Component.translatable("block.terracompositio.blocks"))
@@ -263,6 +263,7 @@ public class CFEHandlerBehaviour implements IBECFEBehaviour, IHaveKnowledge {
                                 .withStyle(ChatFormatting.GRAY));
 
         }
+        if (!added) tooltip.remove(tooltip.size() - 1);
 
         tooltip.add(Component.translatable("block.terracompositio.cfe_header"));
 

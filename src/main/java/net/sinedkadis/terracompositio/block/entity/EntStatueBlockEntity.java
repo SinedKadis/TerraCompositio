@@ -16,7 +16,7 @@ import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBEBehaviour;
 import net.sinedkadis.terracompositio.api.networks.NetworkAction;
 import net.sinedkadis.terracompositio.api.networks.fluid.FluidNetwork;
 import net.sinedkadis.terracompositio.api.networks.fluid.FluidNetworkMemberBE;
-import net.sinedkadis.terracompositio.block.behaviours.ManySlotItemHandlerBehaviour;
+import net.sinedkadis.terracompositio.block.behaviours.ItemHandlerBehaviour;
 import net.sinedkadis.terracompositio.entity.custom.FlowCedarEntEntity;
 import net.sinedkadis.terracompositio.registries.TCBlockEntities;
 import net.sinedkadis.terracompositio.registries.TCEntities;
@@ -52,7 +52,7 @@ public class EntStatueBlockEntity extends TCBlockEntity implements FluidNetworkM
 
     @Override
     public void addBEBehaviours(@NotNull List<IBEBehaviour> list) {
-        list.add(new ManySlotItemHandlerBehaviour(this) {
+        list.add(new ItemHandlerBehaviour(this) {
             @Override
             public boolean allowInsert(int pSlot, @NotNull ItemStack pStack, @Nullable Direction pDirection, boolean manual) {
                 return pStack.is(TCItems.TECHNETIUM_CROWN.get());
@@ -97,7 +97,7 @@ public class EntStatueBlockEntity extends TCBlockEntity implements FluidNetworkM
     }
 
     private IItemHandler itemHandler() {
-        return ((ManySlotItemHandlerBehaviour) (behaviours.get(0))).getItemHandler();
+        return ((ItemHandlerBehaviour) (behaviours.get(0))).getItemHandler();
     }
 
     @Override

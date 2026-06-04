@@ -20,10 +20,10 @@ public class TCPackets {
 
     public static void register()  {
 
-        CHANNEL.messageBuilder(S2CPlayerCfeContainerSync.class, id++,NetworkDirection.PLAY_TO_CLIENT)
-                .encoder(S2CPlayerCfeContainerSync::encode)
-                .decoder(S2CPlayerCfeContainerSync::decode)
-                .consumerMainThread(S2CPlayerCfeContainerSync::handle)
+        CHANNEL.messageBuilder(S2CPlayerCfeContainerAndKnowledgeSync.class, id++, NetworkDirection.PLAY_TO_CLIENT)
+                .encoder(S2CPlayerCfeContainerAndKnowledgeSync::encode)
+                .decoder(S2CPlayerCfeContainerAndKnowledgeSync::decode)
+                .consumerMainThread(S2CPlayerCfeContainerAndKnowledgeSync::handle)
                 .add();
         CHANNEL.registerMessage(id++,
                 C2SBoardSync.class,

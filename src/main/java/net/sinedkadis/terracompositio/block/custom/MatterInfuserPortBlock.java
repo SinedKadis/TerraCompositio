@@ -14,7 +14,7 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraftforge.items.IItemHandlerModifiable;
-import net.sinedkadis.terracompositio.block.behaviours.ManySlotItemHandlerBehaviour;
+import net.sinedkadis.terracompositio.block.behaviours.ItemHandlerBehaviour;
 import net.sinedkadis.terracompositio.block.entity.FlowCedarCasingBlockEntity;
 import net.sinedkadis.terracompositio.block.entity.TCBlockEntity;
 import net.sinedkadis.terracompositio.registries.TCBlockEntities;
@@ -22,7 +22,7 @@ import net.sinedkadis.terracompositio.util.helpers.PlayerHelper;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 
-import static net.sinedkadis.terracompositio.block.behaviours.ManySlotItemHandlerBehaviour.hasSpace;
+import static net.sinedkadis.terracompositio.block.behaviours.ItemHandlerBehaviour.hasSpace;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -43,7 +43,7 @@ public class MatterInfuserPortBlock extends MatterInfuserBaseEntityBlock {
         BlockPos casingPos = pPos.relative(pState.getValue(FACING).getOpposite());
         FlowCedarCasingBlockEntity casingBE = (FlowCedarCasingBlockEntity) pLevel.getBlockEntity(casingPos);
         if (casingBE != null) {
-            ManySlotItemHandlerBehaviour itemBehaviour = ((ManySlotItemHandlerBehaviour) casingBE.getItemBehaviour());
+            ItemHandlerBehaviour itemBehaviour = ((ItemHandlerBehaviour) casingBE.getItemBehaviour());
             if (itemBehaviour != null) {
                 IItemHandlerModifiable itemHandler = itemBehaviour.getItemHandler();
                 int i = FlowCedarCasingBlockEntity.INPUT_INVENTORY_SLOT;

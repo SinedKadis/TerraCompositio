@@ -40,7 +40,7 @@ import java.util.List;
 @Data
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
-public class ManySlotItemHandlerBehaviour implements IBEItemBehaviour, WorldlyContainer, IHaveKnowledge {
+public class ItemHandlerBehaviour implements IBEItemBehaviour, WorldlyContainer, IHaveKnowledge {
     private final TCBlockEntity blockEntity;
     public boolean ignoreRestrictions = false;
     private final boolean[] slotsToShowInOverlay;
@@ -66,19 +66,19 @@ public class ManySlotItemHandlerBehaviour implements IBEItemBehaviour, WorldlyCo
     protected LazyOptional<IItemHandler> lazyItemHandler = LazyOptional.empty();
 
     //One slot
-    public ManySlotItemHandlerBehaviour(TCBlockEntity blockEntity) {
+    public ItemHandlerBehaviour(TCBlockEntity blockEntity) {
         this.blockEntity = blockEntity;
         slotsToShowInOverlay = new boolean[]{true};
     }
 
-    public ManySlotItemHandlerBehaviour(TCBlockEntity blockEntity, int slotCount) {
+    public ItemHandlerBehaviour(TCBlockEntity blockEntity, int slotCount) {
         this.blockEntity = blockEntity;
         itemHandler.setSize(slotCount);
         slotsToShowInOverlay = new boolean[slotCount];
         Arrays.fill(slotsToShowInOverlay, true);
     }
 
-    public ManySlotItemHandlerBehaviour setInvisibleInOverlay(int... slots) {
+    public ItemHandlerBehaviour setInvisibleInOverlay(int... slots) {
         for (Integer slot : slots) {
             if (Mth.clamp(slot, 0, slotsToShowInOverlay.length - 1) == slot)
                 slotsToShowInOverlay[slot] = false;
@@ -130,7 +130,8 @@ public class ManySlotItemHandlerBehaviour implements IBEItemBehaviour, WorldlyCo
 
     @Override
     public void onSave(CompoundTag tag) {
-        tag.put("itemHandler", getItemHandler().serializeNBT());
+        CompoundTag pValue = getItemHandler().serializeNBT();
+        tag.put("itemHandler", pValue);
     }
 
     public static boolean hasSpace(IItemHandlerModifiable itemHandler, int i) {
@@ -139,7 +140,8 @@ public class ManySlotItemHandlerBehaviour implements IBEItemBehaviour, WorldlyCo
 
     @Override
     public void onLoad(CompoundTag tag) {
-        getItemHandler().deserializeNBT(tag.getCompound("itemHandler"));
+        CompoundTag itemHandler1 = tag.getCompound("itemHandler");
+        getItemHandler().deserializeNBT(itemHandler1);
     }
 
     @Override
@@ -162,6 +164,7 @@ public class ManySlotItemHandlerBehaviour implements IBEItemBehaviour, WorldlyCo
                 ignoreRestrictions = false;
                 PlayerHelper.addOrDropToPlayer(pPlayer, extracted);
                 level.playSound(pPlayer, blockPos, SoundEvents.ITEM_FRAME_REMOVE_ITEM, SoundSource.BLOCKS);
+                blockEntity.setChanged();
                 return InteractionResult.SUCCESS;
             }
             if (!itemInHand.isEmpty() && allowInsert(i, itemInHand, pHit.getDirection(), true) && hasSpace(itemHandler, i)) {
@@ -170,6 +173,7 @@ public class ManySlotItemHandlerBehaviour implements IBEItemBehaviour, WorldlyCo
                 ignoreRestrictions = false;
                 pPlayer.setItemInHand(pHand, left);
                 level.playSound(pPlayer, blockPos, SoundEvents.ITEM_FRAME_ADD_ITEM, SoundSource.BLOCKS);
+                blockEntity.setChanged();
                 return InteractionResult.SUCCESS;
             }
         }
