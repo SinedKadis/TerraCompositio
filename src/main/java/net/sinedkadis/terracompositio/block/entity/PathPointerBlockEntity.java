@@ -654,8 +654,6 @@ public class PathPointerBlockEntity extends TCBlockEntity implements Nameable, C
         loadFromTagToSet(pTag, SENDER_POSES_TAG, senderPoses);
         loadFromTagToSet(pTag, INPUT_POSES_TAG, inputPoses);
 
-
-        update(this);
     }
 
     @Override
@@ -666,7 +664,8 @@ public class PathPointerBlockEntity extends TCBlockEntity implements Nameable, C
         if (receiverPos != null)
             compoundTag.put(RECEIVER_POS_TAG, BlockPosHelper.saveBlockPos(receiverPos));
         BlockPos outputPos = getOutputPos();
-        compoundTag.put(OUTPUT_POS_TAG, BlockPosHelper.saveBlockPos(outputPos));
+        if (outputPos != null)
+            compoundTag.put(OUTPUT_POS_TAG, BlockPosHelper.saveBlockPos(outputPos));
 
         PathPointerBlockEntity.saveFromSetToTag(compoundTag, PathPointerBlockEntity.SENDER_POSES_TAG, getSenderPoses());
         PathPointerBlockEntity.saveFromSetToTag(compoundTag, PathPointerBlockEntity.INPUT_POSES_TAG, getInputPoses());

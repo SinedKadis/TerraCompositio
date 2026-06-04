@@ -46,7 +46,7 @@ public class CFEBurstProjectileEntity extends ThrowableProjectile {
 
 
     private final BlockPos.MutableBlockPos lastBP = new BlockPos.MutableBlockPos();
-    private int timeToLive = 100;
+    private int timeToLive = 130;
     private boolean noCollision = false;
     private int targetIndex = 0;
 
@@ -254,6 +254,7 @@ public class CFEBurstProjectileEntity extends ThrowableProjectile {
     private void tryConsumeCFEHandler(ICFEHandler icfeHandler, int cfe) {
         int consumed = icfeHandler.addCFE(cfe, false);
         this.setCFE(this.getCFE() - consumed);
+        if (this.getCFE() == 0) discard();
     }
 
     private void tryConsumeTCBE(TCBlockEntity memberBE, int cfe) {
