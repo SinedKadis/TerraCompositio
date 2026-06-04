@@ -2,15 +2,13 @@ package net.sinedkadis.terracompositio.fluid;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.material.Fluid;
-import net.minecraft.world.level.material.Fluids;
 import net.minecraftforge.common.MinecraftForge;
-import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.sinedkadis.terracompositio.api.networks.NetworkAction;
 import net.sinedkadis.terracompositio.api.networks.fluid.FluidNetwork;
 import net.sinedkadis.terracompositio.api.networks.fluid.FluidNetworkMemberBE;
 import net.sinedkadis.terracompositio.events.FluidNetworkEvent;
+import net.sinedkadis.terracompositio.util.helpers.CFEHelper;
 
 import java.util.*;
 
@@ -46,93 +44,69 @@ public class FluidNetworkHandler implements FluidNetwork {
     }
 
     @Override
-    public boolean isIn(Level pLevel, IFluidHandler fluidHandler) {
-        return fluidSources.getOrDefault(pLevel, Collections.emptySet()).stream().anyMatch(fluidSource -> {
-            Optional<IFluidHandler> fluidHandler2 = FluidNetwork.getFluidHandler(fluidSource);
-            return fluidHandler2.map(iFluidHandler -> iFluidHandler.equals(fluidHandler)).orElse(false);
-        });
+    public boolean isIn(Level pLevel, FluidNetworkMemberBE fluidNetworkMemberBE) {
+        return fluidSources.getOrDefault(pLevel, Collections.emptySet()).stream().anyMatch(fluidSource -> fluidSource.equals(fluidNetworkMemberBE));
     }
 
     @Override
-    public boolean isIn(Level pLevel, FluidNetworkMemberBE fluidNetworkMemberBE) {
-        return fluidSources.getOrDefault(pLevel, Collections.emptySet()).stream().anyMatch(fluidSource -> fluidSource.equals(fluidNetworkMemberBE));
+    public void updateInRange(Level level, BlockPos origin, int range) {
+        Set<FluidNetworkMemberBE> members = fluidSources.get(level);
+        if (members == null) return;
+        for (FluidNetworkMemberBE member : members) {
+            if (member.getPos().closerThan(origin, range)) {
+                member.scheduleMemberUpdate();
+            }
+        }
+    }
+
+    @Override
+    public Set<FluidNetworkMemberBE> getAvailableNetworkTargets(FluidNetworkMemberBE requesterMember) {
+        Level level = requesterMember.getLevel();
+        Set<FluidNetworkMemberBE> members = fluidSources.get(level);
+        if (members == null) return Set.of();
+
+        Set<FluidNetworkMemberBE> toReturn = new HashSet<>();
+
+        for (FluidNetworkMemberBE member : members) {
+            if (!member.getPos().closerThan(requesterMember.getPos(), requesterMember.getRange())) continue;
+            if (member.getPriority() <= requesterMember.getPriority()) continue;
+            if (member.getEntity().equals(requesterMember.getEntity())) continue;
+
+            toReturn.add(member);
+        }
+
+
+        toReturn.removeIf(m -> !CFEHelper.validMember(m));
+        return toReturn;
+    }
+
+    @Override
+    public Set<FluidNetworkMemberBE> getAllFluidNetworkMembers(Level level) {
+        return fluidSources.get(level);
     }
 
     public void networkMemberUpdated(FluidNetworkMemberBE updated) {
         if (fluidSources.containsKey(updated.getLevel())) {
             for (FluidNetworkMemberBE source : fluidSources.get(updated.getLevel())) {
-                if (source.getBlockPos().closerThan(updated.getBlockPos(), 10)) {
+                if (source.getPos().closerThan(updated.getPos(), updated.getRange())) {
                     source.scheduleMemberUpdate();
                 }
             }
         }
     }
 
-    @Override
-    public FluidNetworkMemberBE getClosestFluidHandlerWithMatchingContent(BlockPos pos, Level level, Fluid current, int limit, int priority) {
-        if (fluidSources.containsKey(level)) {
-            long minDist = Long.MAX_VALUE;
-            long limitSquared = (long) limit * limit;
-            FluidNetworkMemberBE closest = null;
-
-            for (FluidNetworkMemberBE source : fluidSources.get(level)) {
-                long distance = (long) source.getBlockPos().distSqr(pos);
-                Optional<IFluidHandler> fluidHandler = FluidNetwork.getFluidHandler(source);
-                FluidStack fluidInTank = FluidStack.EMPTY;
-                if (fluidHandler.isPresent()) {
-                    fluidInTank = fluidHandler.get().getFluidInTank(0);
-                }
-                if (distance <= limitSquared
-                        && distance < minDist
-                        && fluidInTank.getAmount() > 0
-                        && (fluidInTank.getFluid().isSame(current) || current.isSame(Fluids.EMPTY))
-                        && source.getPriority() < priority) {
-                    minDist = distance;
-                    closest = source;
-                }
-            }
-
-            return closest;
-        }
-        return null;
-    }
-
-    @Override
-    public FluidNetworkMemberBE getRandomFluidHandlerInRange(BlockPos pos, Level level, Fluid current, int limit, int priority) {
-        if (fluidSources.containsKey(level)) {
-            long limitSquared = (long) limit * limit;
-            List<FluidNetworkMemberBE> sources = new ArrayList<>(fluidSources.get(level));
-            Collections.shuffle(sources);
-            for (FluidNetworkMemberBE source : sources) {
-                long distance = (long) source.getBlockPos().distSqr(pos);
-                Optional<IFluidHandler> fluidHandler = FluidNetwork.getFluidHandler(source);
-                FluidStack fluidInTank = FluidStack.EMPTY;
-                if (fluidHandler.isPresent()) {
-                    fluidInTank = fluidHandler.get().getFluidInTank(0);
-                }
-                if (distance <= limitSquared
-                        && fluidInTank.getAmount() > 0
-                        && (fluidInTank.getFluid().isSame(current) || current.isSame(Fluids.EMPTY))
-                        && source.getPriority() < priority) {
-                    return source;
-                }
-            }
-        }
-        return null;
-    }
-
-    @Override
-    public List<FluidNetworkMemberBE> getAllFluidSources(Level level) {
-        if (fluidSources.containsKey(level)) {
-            return fluidSources.get(level).stream().toList();
-        }
-        return List.of();
-
-    }
 
     @Override
     public void fireFluidNetworkEvent(FluidNetworkMemberBE source, NetworkAction action) {
         MinecraftForge.EVENT_BUS.post(new FluidNetworkEvent(source,action));
+    }
+
+    @Override
+    public boolean isIn(Level pLevel, IFluidHandler fluidHandler) {
+        return fluidSources.getOrDefault(pLevel, Collections.emptySet()).stream().anyMatch(fluidSource -> {
+            IFluidHandler fluidHandler2 = fluidSource.getMainHandler();
+            return fluidHandler2.equals(fluidHandler);
+        });
     }
 
 

@@ -5,6 +5,7 @@ import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.phys.AABB;
+import net.sinedkadis.terracompositio.api.networks.AnyNetworkMember;
 import net.sinedkadis.terracompositio.api.networks.cfe.CFENetworkMember;
 import net.sinedkadis.terracompositio.api.networks.cfe.ICFEHandler;
 import net.sinedkadis.terracompositio.block.entity.CFETrashCanBlockEntity;
@@ -59,7 +60,7 @@ public class CFEHelper {
 
     }
 
-    public static boolean validMember(CFENetworkMember target) {
+    public static boolean validMember(AnyNetworkMember target) {
         if (target instanceof CFEMemberProxy proxy) {
             if (proxy.proxy().parts.contains(PathPointerBlockEntity.PPPart.COLLECTOR)) {
                 if (proxy.proxy().getOutputPos() == null) return false;

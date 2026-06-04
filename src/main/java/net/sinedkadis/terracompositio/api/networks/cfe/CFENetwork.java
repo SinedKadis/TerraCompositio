@@ -3,7 +3,6 @@ package net.sinedkadis.terracompositio.api.networks.cfe;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
 import net.sinedkadis.terracompositio.api.networks.NetworkAction;
-import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.util.Set;
 
@@ -17,8 +16,6 @@ public interface CFENetwork {
 
     void updateInRange(Level level, BlockPos origin, int range);
 
-    //Member getters
-    @Nullable CFENetworkMember getMemberAt(Level level,BlockPos blockPos);
     Set<CFENetworkMember> getAvailableNetworkTargets(CFENetworkMember requesterMember);
     Set<CFENetworkMember> getAllCFENetworkMembers(Level level);
 

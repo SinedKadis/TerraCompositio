@@ -7,10 +7,9 @@ import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.capability.IFluidHandler;
-import net.minecraftforge.fluids.capability.templates.FluidTank;
+import net.minecraftforge.fluids.capability.templates.EmptyFluidHandler;
 import net.minecraftforge.items.IItemHandler;
 import net.sinedkadis.terracompositio.api.TerraCompositioAPI;
 import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBEBehaviour;
@@ -23,14 +22,26 @@ import net.sinedkadis.terracompositio.registries.TCBlockEntities;
 import net.sinedkadis.terracompositio.registries.TCEntities;
 import net.sinedkadis.terracompositio.registries.TCFluids;
 import net.sinedkadis.terracompositio.registries.TCItems;
-import net.sinedkadis.terracompositio.util.helpers.ParticleHelper;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.List;
-import java.util.Optional;
 
 public class EntStatueBlockEntity extends TCBlockEntity implements FluidNetworkMemberBE {
+
+    private final EmptyFluidHandler fluidHandler = new EmptyFluidHandler() {
+        @Override
+        public int fill(FluidStack resource, FluidAction action) {
+            if (resource.getFluid().isSame(TCFluids.FLOW_FLUID.source.get()) && resource.getAmount() == 1000) {
+                if (action.execute()) {
+                    jojoReference();
+                }
+                return 1000;
+            }
+            return super.fill(resource, action);
+        }
+    };
+
     public EntStatueBlockEntity(BlockPos pos, BlockState state) {
         super(TCBlockEntities.ENT_STATUE_BE.get(), pos, state);
     }
@@ -58,7 +69,7 @@ public class EntStatueBlockEntity extends TCBlockEntity implements FluidNetworkM
             fluidNetworkInstance.fireFluidNetworkEvent(this, NetworkAction.ADD);
         }
         if (cd<= 0) {
-            fluidNetworkInstance.fireFluidNetworkEvent(this, NetworkAction.UPDATE);
+            fluidNetworkInstance.updateInRange(pLevel, pPos, getRange());
             cd = 20;
         }
         cd--;
@@ -90,35 +101,27 @@ public class EntStatueBlockEntity extends TCBlockEntity implements FluidNetworkM
     }
 
     @Override
+    public IFluidHandler getMainHandler() {
+        return fluidHandler;
+    }
+
+    @Override
     public int getPriority() {
         return 100;
     }
 
     @Override
-    public int getLimit() {
+    public int getRange() {
         return 5;
     }
 
     @Override
-    public void onFluidNetworkMemberUpdate() {
-        FluidNetwork fluidNetworkInstance = TerraCompositioAPI.INSTANCE.getFluidNetworkInstance();
-        BlockPos pos = this.getBlockPos();
-        if (getPriority() > 0) {
-            FluidNetworkMemberBE source = fluidNetworkInstance
-                    .getClosestFluidHandlerWithMatchingContent(pos, level, TCFluids.FLOW_FLUID.source.get(), 10, getPriority());
+    public void updateIfScheduled() {
 
-            if (source != null) {
-                Optional<IFluidHandler> fluidHandlerOptional = source.getEntity().getCapability(ForgeCapabilities.FLUID_HANDLER).resolve();
-                if (fluidHandlerOptional.isPresent() && fluidHandlerOptional.get() instanceof FluidTank sourceTank) {
+    }
 
-                    FluidStack amount = sourceTank.drain(500, IFluidHandler.FluidAction.SIMULATE);
-                    if (amount.getAmount() == 500){
-                        sourceTank.drain(500, IFluidHandler.FluidAction.EXECUTE);
-                        ParticleHelper.sendFluidParticles((ServerLevel) level, pos, source.getBlockPos(), amount.getAmount() / 10, amount);
-                        jojoReference();
-                    }
-                }
-            }
-        }
+    @Override
+    public void scheduleMemberUpdate() {
+
     }
 }

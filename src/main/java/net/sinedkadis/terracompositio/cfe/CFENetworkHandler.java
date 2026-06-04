@@ -18,7 +18,6 @@ import net.sinedkadis.terracompositio.entity.custom.FlowCedarEntEntity;
 import net.sinedkadis.terracompositio.events.CFENetworkEvent;
 import net.sinedkadis.terracompositio.registries.TCItems;
 import net.sinedkadis.terracompositio.util.helpers.CFEHelper;
-import org.checkerframework.checker.nullness.qual.Nullable;
 
 import java.util.*;
 
@@ -54,7 +53,8 @@ public class CFENetworkHandler implements CFENetwork {
                 }
             }
             for (CFENetworkMember member : members) {
-                if (!current.getPos().closerThan(member.getPos(), Math.max(current.getRange(), member.getRange()))) continue;
+                if (!current.getPos().closerThan(member.getPos(), Math.min(current.getRange(), member.getRange())))
+                    continue;
                 if (current.getEntity().equals(member.getEntity())) continue;
                 if (current.getPriority() <= member.getPriority()) continue;
 
@@ -85,16 +85,6 @@ public class CFENetworkHandler implements CFENetwork {
                 member.scheduleMemberUpdate();
             }
         }
-    }
-
-    @Override
-    public @Nullable CFENetworkMember getMemberAt(Level level, BlockPos blockPos) {
-        Set<CFENetworkMember> members = cfeSources.get(level);
-        if (members == null) return null;
-        for (CFENetworkMember member : members) {
-            if (member.getPos().equals(blockPos)) return member;
-        }
-        return null;
     }
 
     @Override
