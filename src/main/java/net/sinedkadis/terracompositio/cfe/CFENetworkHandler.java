@@ -9,10 +9,7 @@ import net.minecraft.world.phys.AABB;
 import net.minecraftforge.common.MinecraftForge;
 import net.sinedkadis.terracompositio.api.TerraCompositioAPI;
 import net.sinedkadis.terracompositio.api.networks.NetworkAction;
-import net.sinedkadis.terracompositio.api.networks.cfe.CFENetwork;
-import net.sinedkadis.terracompositio.api.networks.cfe.CFENetworkMember;
-import net.sinedkadis.terracompositio.api.networks.cfe.CFENetworkMemberEntity;
-import net.sinedkadis.terracompositio.api.networks.cfe.ICFEHandler;
+import net.sinedkadis.terracompositio.api.networks.cfe.*;
 import net.sinedkadis.terracompositio.block.entity.PathPointerBlockEntity;
 import net.sinedkadis.terracompositio.entity.custom.FlowCedarEntEntity;
 import net.sinedkadis.terracompositio.events.CFENetworkEvent;
@@ -218,7 +215,17 @@ public class CFENetworkHandler implements CFENetwork {
     }
 
     private void add(Level level, CFENetworkMember thing) {
-        cfeSources.computeIfAbsent(level, k -> new HashSet<>()).add(thing);
+        Set<CFENetworkMember> cfeNetworkMembers = cfeSources.computeIfAbsent(level, k -> new HashSet<>());
+
+        Optional<CFENetworkMember> any = cfeNetworkMembers.stream()
+                .filter(CFENetworkMemberBE.class::isInstance)
+                .filter(cfeNetworkMember -> cfeNetworkMember.getPos().equals(thing.getPos()))
+                .findAny();
+
+        if (any.isPresent()) return;
+
+        cfeNetworkMembers.add(thing);
+
         networkMemberUpdated(thing);
     }
 

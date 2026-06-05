@@ -102,7 +102,18 @@ public class KnowledgeOverlay {
 
         EntityHitResult entityResult = getEntityHitResult(mc, player, level);
 
-        if (entityResult == null && hit instanceof BlockHitResult result) {
+        boolean isEntity = false;
+        Entity entity = null;
+        IHaveKnowledge entityKnowledge = null;
+        if (entityResult != null) {
+            entity = entityResult.getEntity();
+            if ((entity instanceof IHaveKnowledge ihk)) {
+                isEntity = true;
+                entityKnowledge = ihk;
+            }
+        }
+
+        if (!isEntity && hit instanceof BlockHitResult result) {
             BlockPos pos = result.getBlockPos();
 
             BlockEntity be = level.getBlockEntity(pos);
@@ -124,17 +135,11 @@ public class KnowledgeOverlay {
             }
 
             ihk.addTooltipLines(data, tooltip, isShifting);
-        } else if (entityResult != null) {
-
-            Entity entity = entityResult.getEntity();
-            if (!(entity instanceof IHaveKnowledge ihk)) {
-                resetHover();
-                return;
-            }
-
+        } else if (isEntity) {
             hoverTicks++;
 
             if (hoverTicks == 1 || hoverTicks % REQUEST_INTERVAL == 0) {
+
                 TCPackets.CHANNEL.sendToServer(new C2SRequestEntityKnowledgePacket(entity.getUUID()));
             }
 
@@ -143,7 +148,7 @@ public class KnowledgeOverlay {
                 return;
             }
 
-            ihk.addTooltipLines(data, tooltip, isShifting);
+            entityKnowledge.addTooltipLines(data, tooltip, isShifting);
         }
 
         if (tooltip.isEmpty()) return;

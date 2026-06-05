@@ -151,10 +151,6 @@ public class PathPointerBlockEntity extends TCBlockEntity implements Nameable, C
     @Override
     public void setRemoved() {
         TerraCompositioAPI.INSTANCE.getCFENetworkInstance().fireCFENetworkEvent(this, NetworkAction.REMOVE);
-        assert this.level != null;
-        if (!this.level.getBlockState(this.getBlockPos()).equals(this.getBlockState())) {
-            clearAnyBindings(null, this);
-        }
         super.setRemoved();
     }
 
@@ -766,7 +762,7 @@ public class PathPointerBlockEntity extends TCBlockEntity implements Nameable, C
 
     @Override
     public int getRange() {
-        return 0;
+        return 5;
     }
 
     @Override
@@ -792,8 +788,8 @@ public class PathPointerBlockEntity extends TCBlockEntity implements Nameable, C
 
     @Override
     public void updateIfScheduled() {
-        CFENetwork cfeNetworkInstance = TerraCompositioAPI.instance().getCFENetworkInstance();
-        inputPoses.forEach(pos -> cfeNetworkInstance.updateInRange(level, pos, 5));
+//        CFENetwork cfeNetworkInstance = TerraCompositioAPI.instance().getCFENetworkInstance();
+//        inputPoses.forEach(pos -> cfeNetworkInstance.updateInRange(level, pos, 5));
     }
 
     public void scheduleMemberUpdate() {

@@ -43,7 +43,7 @@ public class CedarGearboxBlockEntity extends GeneratingKineticBlockEntity implem
 
     public CedarGearboxBlockEntity(BlockPos pPos, BlockState pBlockState) {
         super(Objects.requireNonNull(((TCCreateCompat) TerraCompositio.createCompat).blockEntities.CEDAR_GEARBOX_BE).get(),pPos, pBlockState);
-        setLazyTickRate(60);
+        setLazyTickRate(20);
         this.range = 5;
         this.priority = TCInnerConfig.DEFAULT_CONSUMER_PRIORITY;
         this.capacity = 256f;
