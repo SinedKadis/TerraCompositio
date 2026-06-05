@@ -214,5 +214,4 @@ public class CFEContainer implements ICFEHandler, INBTSerializable<CompoundTag> 
     public int getMaxCFE() {
         return Math.max(this.maxCFE, this.CFE);
     }
-
 }

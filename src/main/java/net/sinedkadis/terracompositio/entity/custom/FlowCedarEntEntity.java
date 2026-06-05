@@ -140,8 +140,8 @@ public class FlowCedarEntEntity extends AbstractGolem implements CFENetworkMembe
 
                 innerCFEOptional.ifPresent(icfeHandler1 -> {
                     if (tickCount % 20 == 0) {
-                        CFEHelper.createTransfer()
-                                .fromHandlers(icfeHandler1, icfeHandler)
+                        CFEHelper.newTransfer()
+                                .targetAndSource(icfeHandler1, icfeHandler)
                                 .noCollision()
                                 .build();
                     }
@@ -365,7 +365,7 @@ public class FlowCedarEntEntity extends AbstractGolem implements CFENetworkMembe
         if (getMainHandler().getCFE() > 0 && CFEHelper.validMember(current)) {
             if (current.getMainHandler().getFreeSpace() > TCCommonConfigs.CFE_PER_BURST_TRANSFER_LIMIT.get())
                 scheduleMemberUpdate(current);
-            CFEHelper.tryCFETransfer(current, this, TCCommonConfigs.CFE_PER_BURST_TRANSFER_LIMIT.get(), 5 / 20f);
+            CFEHelper.newTransfer().targetAndSource(current, this).speed(5 / 20f).build();
         } else onCFENetworkMemberUpdate();
     }
 

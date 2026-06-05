@@ -14,6 +14,8 @@ import net.sinedkadis.terracompositio.cfe.CFEMemberProxy;
 import net.sinedkadis.terracompositio.config.TCCommonConfigs;
 import net.sinedkadis.terracompositio.entity.custom.CFECloudEntity;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -21,44 +23,7 @@ import static net.sinedkadis.terracompositio.block.entity.PathPointerBlockEntity
 
 public class CFEHelper {
 
-    public static void tryCFETransfer(ICFEHandler target,
-                                      ICFEHandler source,
-                                      int maxTransfer,
-                                      float speed,
-                                      boolean noCol) {
-        int taken = source.takeCFE(maxTransfer, true);
-        int added = source.sendCFE(taken, target, speed, noCol, true);
-        if (added <= taken) {
-            if (target.getPos().closerThan(source.getPos(), 2) && !(target.getAttachedMember() instanceof Entity))
-                added = target.addCFE(added, false);
-            else
-                added = source.sendCFE(added, target, speed, noCol, false);
-            source.takeCFE(added, false);
-        }
-    }
-
-    public static void tryCFETransfer(CFENetworkMember target, CFENetworkMember source, int maxTransfer, float speed) {
-        if (!validMember(target)) return;
-        if (!validMember(source)) return;
-        if (target.getEntity() instanceof CFETrashCanBlockEntity) maxTransfer = Integer.MAX_VALUE;
-        int taken = source.getMainHandler().takeCFE(maxTransfer, true);
-        int added = target.getMainHandler().addCFE(taken, true);
-
-        if (added <= taken) {
-            if (added > 0 && target instanceof CFEMemberProxy proxy) {
-                BlockPos pos = proxy.proxy().getOutputPos();
-                PathPointerBlockEntity ppBE = ((PathPointerBlockEntity) target.getLevel().getBlockEntity(pos));
-                if (ppBE != null) {
-                    if (ppBE.parts.contains(PathPointerBlockEntity.PPPart.INFUSER)) {
-                        setYawAndPitchFromRot(pos.getCenter().vectorTo(proxy.target().getPos().getCenter()), ppBE);
-                    }
-                }
-            }
-            added = source.getMainHandler().sendCFE(added, target, speed, false);
-            source.getMainHandler().takeCFE(added, false);
-        }
-
-    }
+    static CFETransferManager instance = new CFETransferManager();
 
     public static boolean validMember(AnyNetworkMember target) {
         if (target instanceof CFEMemberProxy proxy) {
@@ -75,28 +40,87 @@ public class CFEHelper {
         return false;
     }
 
-    public static CFETransferBuilder createTransfer() {
+    public static void tryCFETransfer(CFENetworkMember target,
+                                      CFENetworkMember source,
+                                      int maxTransfer,
+                                      float speed,
+                                      boolean noCol) {
+        if (!validMember(target)) return;
+        if (!validMember(source)) return;
+        if (target.getEntity() instanceof CFETrashCanBlockEntity) maxTransfer = Integer.MAX_VALUE;
+        ICFEHandler sourceMainHandler = source.getMainHandler();
+        int taken = sourceMainHandler.takeCFE(maxTransfer, true);
+        ICFEHandler targetMainHandler = target.getMainHandler();
+        int added = targetMainHandler.addCFE(taken, true);
+
+        if (added <= taken) {
+            if (added > 0 && target instanceof CFEMemberProxy proxy) {
+                BlockPos pos = proxy.proxy().getOutputPos();
+                PathPointerBlockEntity ppBE = ((PathPointerBlockEntity) target.getLevel().getBlockEntity(pos));
+                if (ppBE != null) {
+                    if (ppBE.parts.contains(PathPointerBlockEntity.PPPart.INFUSER)) {
+                        setYawAndPitchFromRot(pos.getCenter().vectorTo(proxy.target().getPos().getCenter()), ppBE);
+                    }
+                }
+            }
+            if (target.getPos().closerThan(source.getPos(), 2) && !(target instanceof Entity))
+                added = targetMainHandler.addCFE(added, false);
+            else if (noCol) {
+                added = sourceMainHandler.sendCFE(added, targetMainHandler, speed, true, false);
+            } else {
+                added = sourceMainHandler.sendCFE(added, target, speed, false);
+            }
+
+            sourceMainHandler.takeCFE(added, false);
+        }
+
+    }
+
+    public static CFETransferManager transferManager() {
+        return instance;
+    }
+
+    public static CFETransferBuilder newTransfer() {
         return new CFETransferBuilder();
     }
 
+    public static class CFETransferManager {
+
+        Map<CFENetworkMember, TransferData> transferDataMap = new HashMap<>();
+
+        public void addToTransfers(CFENetworkMember target, TransferData data) {
+            if (!transferDataMap.containsKey(target)) {
+                transferDataMap.put(target, data);
+            } else {
+                transferDataMap.computeIfPresent(target, (k, was) -> new TransferData(
+                        data.source,
+                        Math.max(was.maxTransfer(), data.maxTransfer), Math.max(was.speed,
+                        data.speed), data.noCollision || was.noCollision
+                ));
+            }
+        }
+
+        public void applyTransfers() {
+            for (Map.Entry<CFENetworkMember, TransferData> entry : transferDataMap.entrySet()) {
+                TransferData value = entry.getValue();
+                tryCFETransfer(entry.getKey(), value.source(), value.maxTransfer, value.speed, value.noCollision);
+            }
+            transferDataMap.clear();
+        }
+
+
+    }
     public static class CFETransferBuilder {
         CFENetworkMember target = null;
         CFENetworkMember source = null;
-        ICFEHandler target1 = null;
-        ICFEHandler source1 = null;
+
         int maxTransfer = TCCommonConfigs.CFE_PER_BURST_TRANSFER_LIMIT.get();
         float speed = 1 / 20f;
         boolean noCollision = false;
 
-        public CFETransferBuilder fromMembers(CFENetworkMember target, CFENetworkMember source) {
+        public CFETransferBuilder targetAndSource(CFENetworkMember target, CFENetworkMember source) {
             this.target = target;
             this.source = source;
-            return this;
-        }
-
-        public CFETransferBuilder fromHandlers(ICFEHandler target, ICFEHandler source) {
-            this.target1 = target;
-            this.source1 = source;
             return this;
         }
 
@@ -116,12 +140,14 @@ public class CFEHelper {
         }
 
         public void build() {
-            if (target != null) {
-                tryCFETransfer(target, source, maxTransfer, speed);
-            } else if (target1 != null) {
-                tryCFETransfer(target1, source1, maxTransfer, speed, noCollision);
+            if (target != null && source != null) {
+                transferManager().addToTransfers(target, new TransferData(source, maxTransfer, speed, noCollision));
             }
         }
+
+    }
+
+    public record TransferData(CFENetworkMember source, int maxTransfer, float speed, boolean noCollision) {
 
     }
 

@@ -119,7 +119,7 @@ public class CFECloudEntity extends Entity implements CFENetworkMemberEntity, IH
             targets.forEach(target -> {
                 if (target.getMainHandler().getFreeSpace() > TCCommonConfigs.CFE_PER_BURST_TRANSFER_LIMIT.get())
                     scheduleMemberUpdate(target);
-                CFEHelper.createTransfer().fromMembers(target, this).build();
+                CFEHelper.newTransfer().targetAndSource(target, this).build();
             });
         }
     }
@@ -130,7 +130,7 @@ public class CFECloudEntity extends Entity implements CFENetworkMemberEntity, IH
         if (getPriority() < 0 && getMainHandler().getCFE() > 0 && CFEHelper.validMember(updated)) {
             if (updated.getMainHandler().getFreeSpace() > TCCommonConfigs.CFE_PER_BURST_TRANSFER_LIMIT.get())
                 scheduleMemberUpdate(updated);
-            CFEHelper.createTransfer().fromMembers(updated, this).build();
+            CFEHelper.newTransfer().targetAndSource(updated, this).build();
         }
     }
 
