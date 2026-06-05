@@ -27,16 +27,20 @@ import net.sinedkadis.terracompositio.util.accessors.PlayerKnowledgeAccessor;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.function.Function;
 
-@Getter
 @Setter
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class CFEContainer implements ICFEHandler, INBTSerializable<CompoundTag> {
+    @Getter
     protected CFENetworkMember attachedMember;
+    @Getter
     protected boolean isEntity = false;
+    @Getter
     protected int index = 0;
+    @Getter
     protected int CFE = 0;
     protected int maxCFE = 100;
+    @Getter
     protected Function<Vec3, Vec3> offset = t -> t;
     protected int queued = 0;
 
@@ -59,7 +63,7 @@ public class CFEContainer implements ICFEHandler, INBTSerializable<CompoundTag> 
 
     public CFEContainer(CFENetworkMember attachedMember) {
         this.attachedMember = attachedMember;
-        if (attachedMember instanceof  CFENetworkMemberEntity) isEntity = true;
+        if (attachedMember instanceof CFENetworkMemberEntity) isEntity = true;
     }
 
     public CFEContainer setMaxCFE(int max) {
@@ -83,7 +87,7 @@ public class CFEContainer implements ICFEHandler, INBTSerializable<CompoundTag> 
         int taken = Mth.clamp(cfe, 0, getCFE());
 
         if (!simulate) {
-            setCFE(getCFE()-taken);
+            setCFE(getCFE() - taken);
 
             sendCFEUpdate();
             onContentsChanged();
@@ -111,7 +115,7 @@ public class CFEContainer implements ICFEHandler, INBTSerializable<CompoundTag> 
     }
 
     @Override
-    public int sendCFE(int cfe, CFENetworkMember target,float speed, boolean simulate) {
+    public int sendCFE(int cfe, CFENetworkMember target, float speed, boolean simulate) {
         int freeSpace = target.getMainHandler().getFreeSpace();
         int available = this.getCFE();
         int added = Mth.clamp(cfe, 0, Math.min(available, freeSpace));
@@ -126,19 +130,17 @@ public class CFEContainer implements ICFEHandler, INBTSerializable<CompoundTag> 
         return added;
     }
 
-    public int addCFE(int cfe,boolean simulate) {
+    public int addCFE(int cfe, boolean simulate) {
         int pMax = getMaxCFE() - getCFE();
         int added = Mth.clamp(cfe, 0, pMax);
         if (!simulate) {
-            setCFE(getCFE()+added);
-            
+            setCFE(getCFE() + added);
+
             getAttachedMember().scheduleMemberUpdate();
             onContentsChanged();
         }
         return added;
     }
-
-
 
 
     protected void onContentsChanged() {
@@ -207,6 +209,10 @@ public class CFEContainer implements ICFEHandler, INBTSerializable<CompoundTag> 
     @Override
     public void deserializeNBT(CompoundTag tag) {
         setCFE(tag.getInt("CFE"));
+    }
+
+    public int getMaxCFE() {
+        return Math.max(this.maxCFE, this.CFE);
     }
 
 }

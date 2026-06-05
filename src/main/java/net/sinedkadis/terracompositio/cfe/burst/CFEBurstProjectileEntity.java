@@ -254,7 +254,7 @@ public class CFEBurstProjectileEntity extends ThrowableProjectile {
     private void tryConsumeCFEHandler(ICFEHandler icfeHandler, int cfe) {
         int consumed = icfeHandler.addCFE(cfe, false);
         this.setCFE(this.getCFE() - consumed);
-        if (this.getCFE() == 0) discard();
+        if (this.getCFE() <= 0) discard();
     }
 
     private void tryConsumeTCBE(TCBlockEntity memberBE, int cfe) {

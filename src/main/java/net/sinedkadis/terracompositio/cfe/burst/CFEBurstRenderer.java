@@ -76,6 +76,7 @@ public class CFEBurstRenderer extends EntityRenderer<CFEBurstProjectileEntity> {
     private void genOffsets(CFEBurstProjectileEntity entity) {
         int cfe = entity.getCFE();
         float count = TCInnerConfig.RENDER_COUNT_FUNCTION.applyAsInt(cfe);
+        if (count > 100000) throw new RuntimeException("Particles amount is suspicious large: " + count);
         Vector3f[] offsets1 = getOffsets(entity);
         if (offsets1 == null || offsets1.length < count) {
             offsets1 = new Vector3f[(int) Math.ceil(count)];
