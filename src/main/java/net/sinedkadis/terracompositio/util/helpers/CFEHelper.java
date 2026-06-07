@@ -14,10 +14,7 @@ import net.sinedkadis.terracompositio.cfe.CFEMemberProxy;
 import net.sinedkadis.terracompositio.config.TCCommonConfigs;
 import net.sinedkadis.terracompositio.entity.custom.CFECloudEntity;
 
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 import static net.sinedkadis.terracompositio.block.entity.PathPointerBlockEntity.setYawAndPitchFromRot;
 
@@ -101,11 +98,12 @@ public class CFEHelper {
         }
 
         public void applyTransfers() {
-            for (Map.Entry<CFENetworkMember, TransferData> entry : transferDataMap.entrySet()) {
+            Set<Map.Entry<CFENetworkMember, TransferData>> entries = Set.copyOf(transferDataMap.entrySet());
+            transferDataMap.clear();
+            for (Map.Entry<CFENetworkMember, TransferData> entry : entries) {
                 TransferData value = entry.getValue();
                 tryCFETransfer(entry.getKey(), value.source(), value.maxTransfer, value.speed, value.noCollision);
             }
-            transferDataMap.clear();
         }
 
 
