@@ -13,9 +13,13 @@ import net.sinedkadis.terracompositio.block.entity.CFETrashCanBlockEntity;
 import net.sinedkadis.terracompositio.block.entity.PathPointerBlockEntity;
 import net.sinedkadis.terracompositio.cfe.CFEMemberProxy;
 import net.sinedkadis.terracompositio.config.TCCommonConfigs;
+import net.sinedkadis.terracompositio.config.TCServerConfigs;
 import net.sinedkadis.terracompositio.entity.custom.CFECloudEntity;
 
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.concurrent.CopyOnWriteArrayList;
 
 import static net.sinedkadis.terracompositio.block.entity.PathPointerBlockEntity.setYawAndPitchFromRot;
 
@@ -28,6 +32,7 @@ public class CFEHelper {
             if (proxy.proxy().parts.contains(PathPointerBlockEntity.PPPart.COLLECTOR)) {
                 if (proxy.proxy().getOutputPos() == null) return false;
             }
+            target = proxy.target();
         }
         if (target.getEntity() instanceof BlockEntity memberBE) {
             return !memberBE.isRemoved();
@@ -83,44 +88,80 @@ public class CFEHelper {
     }
 
     public static class CFETransferManager {
+        // Ключ — пара (source, target), значение — накопленные данные
+        private final ConcurrentHashMap<TransferKey, TransferData> transferDataMap = new ConcurrentHashMap<>();
+        // Очередь для запросов, пришедших во время копирования entries
+        private final ConcurrentLinkedQueue<Pair<TransferKey, TransferData>> queueList = new ConcurrentLinkedQueue<>();
+        // Список записей для равномерного размазывания вызовов
+        private final List<Map.Entry<TransferKey, TransferData>> entries = new CopyOnWriteArrayList<>();
 
-        Map<CFENetworkMember, TransferData> transferDataMap = new HashMap<>();
-        //exist to avoid ConcurrentModificationException
-        List<Pair<CFENetworkMember, TransferData>> queueList = new ArrayList<>();
-        boolean applying = false;
+        private volatile boolean applying = false;
 
-        public void addToTransfers(CFENetworkMember target, TransferData data) {
+        public void addToTransfers(CFENetworkMember target, CFENetworkMember source, TransferData data) {
+            TransferKey key = new TransferKey(source, target);
             if (applying) {
-                queueList.add(new Pair<>(target, data));
+                queueList.add(new Pair<>(key, data));
                 return;
             }
-            if (!transferDataMap.containsKey(target)) {
-                transferDataMap.put(target, data);
-            } else {
-                transferDataMap.computeIfPresent(target, (k, was) -> new TransferData(
-                        data.source,
-                        Math.max(was.maxTransfer(), data.maxTransfer), Math.max(was.speed,
-                        data.speed), data.noCollision || was.noCollision
-                ));
-            }
+            mergeIntoMap(key, data);
         }
 
-        public void applyTransfers() {
-            applying = true;
-            Set<Map.Entry<CFENetworkMember, TransferData>> entries = Set.copyOf(transferDataMap.entrySet());
-            transferDataMap.clear();
-            for (Map.Entry<CFENetworkMember, TransferData> entry : entries) {
+        private void mergeIntoMap(TransferKey key, TransferData data) {
+            transferDataMap.merge(key, data, (was, incoming) -> new TransferData(
+                    was.maxTransfer() + incoming.maxTransfer(),   // сумма maxTransfer
+                    Math.max(was.speed(), incoming.speed()),      // максимальная скорость
+                    incoming.noCollision() || was.noCollision()   // объединение флага
+            ));
+        }
+
+        public void applyTransfers(long gameTime) {
+            int frequency = TCServerConfigs.CFE_SEND_FREQUENCY.get();
+            int time = Math.toIntExact(gameTime % frequency);
+
+            if (time == 0) {
+                applying = true;
+                // Копируем все записи из карты в список для размазывания
+                entries.addAll(transferDataMap.entrySet().stream()
+                        .map(e -> Map.entry(e.getKey(), e.getValue()))
+                        .toList());
+                transferDataMap.clear();
+                applying = false;
+
+                // Обрабатываем накопившуюся очередь
+                Pair<TransferKey, TransferData> queued;
+                while ((queued = queueList.poll()) != null) {
+                    mergeIntoMap(queued.getFirst(), queued.getSecond());
+                }
+            }
+
+            if (entries.isEmpty()) return;
+
+            int size = entries.size();
+            List<Map.Entry<TransferKey, TransferData>> toApply = new ArrayList<>();
+            for (int i = 0; i < size; i++) {
+                // Тик, на котором должна обработаться запись i
+                int scheduledTick = (i * frequency) / size;
+                if (scheduledTick == time) {
+                    toApply.add(entries.get(i));
+                }
+            }
+
+            entries.removeAll(toApply);
+
+            for (Map.Entry<TransferKey, TransferData> entry : toApply) {
                 TransferData value = entry.getValue();
-                tryCFETransfer(entry.getKey(), value.source(), value.maxTransfer, value.speed, value.noCollision);
+                TransferKey key = entry.getKey();
+                tryCFETransfer(key.target(), key.source(), value.maxTransfer(), value.speed(), value.noCollision());
             }
-            applying = false;
-            queueList.forEach(entry ->
-                    addToTransfers(entry.getFirst(), entry.getSecond()));
-            queueList.clear();
         }
 
-
+        public record TransferKey(CFENetworkMember source, CFENetworkMember target) {
+        }
     }
+
+    public record TransferData(int maxTransfer, float speed, boolean noCollision) {
+    }
+
     public static class CFETransferBuilder {
         CFENetworkMember target = null;
         CFENetworkMember source = null;
@@ -152,13 +193,9 @@ public class CFEHelper {
 
         public void build() {
             if (target != null && source != null) {
-                transferManager().addToTransfers(target, new TransferData(source, maxTransfer, speed, noCollision));
+                transferManager().addToTransfers(target, source, new TransferData(maxTransfer, speed, noCollision));
             }
         }
-
-    }
-
-    public record TransferData(CFENetworkMember source, int maxTransfer, float speed, boolean noCollision) {
 
     }
 

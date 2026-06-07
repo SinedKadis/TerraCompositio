@@ -19,7 +19,6 @@ import net.minecraftforge.fml.common.Mod;
 import net.sinedkadis.terracompositio.TerraCompositio;
 import net.sinedkadis.terracompositio.api.TCCapabilities;
 import net.sinedkadis.terracompositio.cfe.PlayerCFEProvider;
-import net.sinedkadis.terracompositio.config.TCServerConfigs;
 import net.sinedkadis.terracompositio.entity.custom.FlowCedarEntEntity;
 import net.sinedkadis.terracompositio.registries.TCEffects;
 import net.sinedkadis.terracompositio.registries.TCFluids;
@@ -31,8 +30,7 @@ public class ForgeEventBusEvents {
     @SubscribeEvent
     public static void onTickLevelTick(TickEvent.LevelTickEvent event) {
         long gameTime = event.level.getGameTime();
-        if (gameTime % TCServerConfigs.CFE_SEND_FREQUENCY.get() == 0)
-            CFEHelper.transferManager().applyTransfers();
+        CFEHelper.transferManager().applyTransfers(gameTime);
     }
 
     @SubscribeEvent
