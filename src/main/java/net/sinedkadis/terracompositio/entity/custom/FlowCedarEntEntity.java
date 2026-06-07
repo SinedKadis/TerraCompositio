@@ -10,6 +10,7 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.DifficultyInstance;
@@ -44,6 +45,7 @@ import net.sinedkadis.terracompositio.api.networks.cfe.ICFEHandler;
 import net.sinedkadis.terracompositio.block.entity.EntStatueBlockEntity;
 import net.sinedkadis.terracompositio.cfe.CFEContainer;
 import net.sinedkadis.terracompositio.cfe.CFEMemberProxy;
+import net.sinedkadis.terracompositio.config.TCClientConfigs;
 import net.sinedkadis.terracompositio.config.TCCommonConfigs;
 import net.sinedkadis.terracompositio.config.TCInnerConfig;
 import net.sinedkadis.terracompositio.entity.goals.CFEExtractGoal;
@@ -53,6 +55,7 @@ import net.sinedkadis.terracompositio.registries.TCBlocks;
 import net.sinedkadis.terracompositio.registries.TCItems;
 import net.sinedkadis.terracompositio.util.helpers.CFEHelper;
 import net.sinedkadis.terracompositio.util.helpers.ParticleHelper;
+import net.sinedkadis.terracompositio.util.helpers.TooltipHelper;
 import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -140,10 +143,20 @@ public class FlowCedarEntEntity extends AbstractGolem implements CFENetworkMembe
 
                 innerCFEOptional.ifPresent(icfeHandler1 -> {
                     if (tickCount % 20 == 0) {
-                        CFEHelper.newTransfer()
-                                .targetAndSource(icfeHandler1, icfeHandler)
-                                .noCollision()
-                                .build();
+                        int cfe = TCCommonConfigs.CFE_PER_BURST_TRANSFER_LIMIT.get();
+                        int taken = icfeHandler.takeCFE(cfe, false);
+                        icfeHandler1.addCFE(
+                                taken,
+                                false
+                        );
+                        if (taken > 0) {
+                            if (getLevel() instanceof ServerLevel serverLevel)
+                                ParticleHelper.sendCFEParticles(
+                                        serverLevel,
+                                        icfeHandler1.getOffset().apply(position()),
+                                        icfeHandler.getOffset().apply(position()),
+                                        (int) Math.floor(cfe * TCClientConfigs.CFE_RENDER_MULTIPLIER.get()));
+                        }
                     }
                     if (tickCount % 200 == 0) {
                         icfeHandler1.takeCFE(1, false);
@@ -328,14 +341,6 @@ public class FlowCedarEntEntity extends AbstractGolem implements CFENetworkMembe
     }
 
     @Override
-    public ICFEHandler getHandler(int index) {
-        return cfeHandlers.stream()
-                .map(icfeHandlerLazyOptional -> icfeHandlerLazyOptional.orElse(DummyCFEHandler.instance))
-                .filter(icfeHandler -> icfeHandler.getIndex() == index)
-                .findAny().orElse(DummyCFEHandler.instance);
-    }
-
-    @Override
     public void addAdditionalSaveData(CompoundTag pCompound) {
         super.addAdditionalSaveData(pCompound);
         lazyCFEOptional.ifPresent(cap -> cap.writeToNBT(pCompound));
@@ -423,11 +428,11 @@ public class FlowCedarEntEntity extends AbstractGolem implements CFENetworkMembe
 
         data.putInt("val.range", this.getRange());
 
-        if (priority == TCInnerConfig.DEFAULT_CONSUMER_PRIORITY) {
-            data.putBoolean("flag.type.consumer", true);
-        } else if (priority == TCInnerConfig.DEFAULT_SOURCE_PRIORITY) {
-            data.putBoolean("flag.type.source", true);
-        }
+//        if (priority == TCInnerConfig.DEFAULT_CONSUMER_PRIORITY) {
+//            data.putBoolean("flag.type.consumer", true);
+//        } else if (priority == TCInnerConfig.DEFAULT_SOURCE_PRIORITY) {
+//            data.putBoolean("flag.type.source", true);
+//        }
 
     }
 
@@ -473,6 +478,9 @@ public class FlowCedarEntEntity extends AbstractGolem implements CFENetworkMembe
                                             .withStyle(ChatFormatting.AQUA))
                             .withStyle(ChatFormatting.GRAY));
         }
+        if (isShifting) {
+            tooltip.add(TooltipHelper.defaultTextWithArg("block.terracompositio.consume", 0.1, TooltipHelper.Units.CFE_SECOND));
+        }
         if (data.contains("val.max_cfe2")) {
             tooltip.add(
                     Component.translatable("block.terracompositio.max_cfe",
@@ -491,9 +499,9 @@ public class FlowCedarEntEntity extends AbstractGolem implements CFENetworkMembe
         }
 
         tooltip.add(Component.translatable("entity.terracompositio.ent_common_header"));
-
+        boolean shown = false;
         if (data.contains("val.priority")) {
-            tooltip.add(
+            shown = tooltip.add(
                     Component.translatable("block.terracompositio.priority",
                                     Component.literal(String.valueOf(data.getInt("val.priority")))
                                             .append(Component.translatable("block.terracompositio.units"))
@@ -502,26 +510,27 @@ public class FlowCedarEntEntity extends AbstractGolem implements CFENetworkMembe
         }
         if (data.contains("val.range")) {
             if (isShifting)
-                tooltip.add(
+                shown = tooltip.add(
                         Component.translatable("block.terracompositio.range",
                                         Component.literal(String.valueOf(data.getInt("val.range")))
                                                 .append(Component.translatable("block.terracompositio.blocks"))
                                                 .withStyle(ChatFormatting.AQUA))
                                 .withStyle(ChatFormatting.GRAY));
         }
-        if (data.contains("flag.type.consumer") && data.getBoolean("flag.type.consumer")) {
-            tooltip.add(
-                    Component.translatable("block.terracompositio.type",
-                                    Component.translatable("block.terracompositio.consumer")
-                                            .withStyle(ChatFormatting.AQUA))
-                            .withStyle(ChatFormatting.GRAY));
-        }
-        if (data.contains("flag.type.source") && data.getBoolean("flag.type.source")) {
-            tooltip.add(
-                    Component.translatable("block.terracompositio.type",
-                                    Component.translatable("block.terracompositio.source")
-                                            .withStyle(ChatFormatting.AQUA))
-                            .withStyle(ChatFormatting.GRAY));
-        }
+        if (!shown) tooltip.remove(tooltip.size() - 1);
+//        if (data.contains("flag.type.consumer") && data.getBoolean("flag.type.consumer")) {
+//            tooltip.add(
+//                    Component.translatable("block.terracompositio.type",
+//                                    Component.translatable("block.terracompositio.consumer")
+//                                            .withStyle(ChatFormatting.AQUA))
+//                            .withStyle(ChatFormatting.GRAY));
+//        }
+//        if (data.contains("flag.type.source") && data.getBoolean("flag.type.source")) {
+//            tooltip.add(
+//                    Component.translatable("block.terracompositio.type",
+//                                    Component.translatable("block.terracompositio.source")
+//                                            .withStyle(ChatFormatting.AQUA))
+//                            .withStyle(ChatFormatting.GRAY));
+//        }
     }
 }

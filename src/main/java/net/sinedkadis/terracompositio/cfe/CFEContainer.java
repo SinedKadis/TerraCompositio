@@ -95,27 +95,8 @@ public class CFEContainer implements ICFEHandler, INBTSerializable<CompoundTag> 
         return taken;
     }
 
-
     @Override
-    public int sendCFE(int cfe, ICFEHandler target, float speed, boolean noCol, boolean simulate) {
-        int freeSpace = target.getFreeSpace();
-        int available = this.getCFE();
-        int added = Mth.clamp(cfe, 0, Math.min(available, freeSpace));
-        if (added < 1)
-            return 0;
-
-        if (!simulate) {
-            CFEBurstProjectileEntity entity = CFEBurstProjectileEntity.sendBurst(this, target, added, speed);
-            if (entity != null) {
-                entity.noCollision(noCol);
-                target.addToQueue(added);
-            }
-        }
-        return added;
-    }
-
-    @Override
-    public int sendCFE(int cfe, CFENetworkMember target, float speed, boolean simulate) {
+    public int sendCFE(CFENetworkMember target, int cfe, float speed, boolean simulate) {
         int freeSpace = target.getMainHandler().getFreeSpace();
         int available = this.getCFE();
         int added = Mth.clamp(cfe, 0, Math.min(available, freeSpace));

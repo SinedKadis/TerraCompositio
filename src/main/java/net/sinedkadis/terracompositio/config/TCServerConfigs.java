@@ -10,6 +10,7 @@ public class TCServerConfigs {
     public static final ForgeConfigSpec.ConfigValue<Double> IF_RANDOM_TICK_PER_TICK;
 
     public static final ForgeConfigSpec.ConfigValue<Integer> CFE_SEND_FREQUENCY;
+    public static final ForgeConfigSpec.ConfigValue<Integer> STRESS_UNIT_GEN;
 
     static {
         BUILDER.push("Infused Fertiliser");
@@ -24,6 +25,12 @@ public class TCServerConfigs {
 
         CFE_SEND_FREQUENCY = BUILDER.comment("How often cfe will transfer between blocks")
                 .define("Send Cooldown", 40);
+
+        BUILDER.pop();
+        BUILDER.push("Compatibility");
+
+        STRESS_UNIT_GEN = BUILDER.comment("How many su cedar gearbox generated(infused version generates twice more)")
+                .define("Stress Unit Generation", 2048);
 
         BUILDER.pop();
 

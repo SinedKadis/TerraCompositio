@@ -20,7 +20,8 @@ public class TooltipHelper {
     public enum Units {
         BLOCKS("block.terracompositio.blocks"),
         UNITS("block.terracompositio.units"),
-        MILIBUCKETS("block.terracompositio.milibuckets");
+        MILIBUCKETS("block.terracompositio.milibuckets"),
+        CFE_SECOND("block.terracompositio.cfe_second");
 
         private final String translationKey;
 

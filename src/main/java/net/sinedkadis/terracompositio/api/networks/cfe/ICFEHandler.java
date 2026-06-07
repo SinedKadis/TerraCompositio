@@ -24,9 +24,7 @@ public interface ICFEHandler extends BlockSource, CFENetworkMember {
     int addCFE(int cfe, boolean simulate);
     int takeCFE(int cfe, boolean simulate);
 
-    int sendCFE(int cfe, CFENetworkMember target, float speed, boolean simulate);
-
-    int sendCFE(int cfe, ICFEHandler target, float speed, boolean noCollision, boolean simulate);
+    int sendCFE(CFENetworkMember target, int cfe, float speed, boolean simulate);
 
     void writeToNBT(CompoundTag pTag);
     void readFromNBT(CompoundTag pTag);

@@ -85,7 +85,7 @@ public class CFEItemWrapper implements ICFEHandler, ICapabilityProvider {
     }
 
     @Override
-    public int sendCFE(int cfe, CFENetworkMember target,float speed, boolean simulate) {
+    public int sendCFE(CFENetworkMember target, int cfe, float speed, boolean simulate) {
         return 0;
     }
 
@@ -97,12 +97,6 @@ public class CFEItemWrapper implements ICFEHandler, ICapabilityProvider {
             this.setCFE(cfe1 +toAdd);
         }
         return toAdd;
-    }
-
-
-    @Override
-    public int sendCFE(int cfe, ICFEHandler target, float speed, boolean noCol, boolean simulate) {
-        return 0;
     }
 
     @Override

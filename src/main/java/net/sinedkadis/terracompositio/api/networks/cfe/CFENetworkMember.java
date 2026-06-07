@@ -18,10 +18,6 @@ public interface CFENetworkMember extends AnyNetworkMember {
     //Cfe Handler reference
     ICFEHandler getMainHandler();
 
-    default ICFEHandler getHandler(int index) {
-        return getMainHandler();
-    }
-
     //Updates
     void updateIfScheduled();
 

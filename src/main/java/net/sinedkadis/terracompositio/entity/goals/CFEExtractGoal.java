@@ -155,12 +155,14 @@ public class CFEExtractGoal extends Goal {
 
         this.mob.lookAt(EntityAnchorArgument.Anchor.EYES, targetPosition.getCenter());
 
-        if (this.extractAnimationTick < 4 * 20) {
+        if (this.extractAnimationTick < 5 * 20) {
             if (!targetPosition.equals(mob.blockPosition())) {
                 if (targetMember != null) {
                     CFEHelper.newTransfer()
                             .targetAndSource(mob, targetMember)
                             .maxTransfer(1000)
+                            .speed(2 / 20f)
+                            .instant()
                             .build();
                 } else {
                     extractFromLog();

@@ -8,6 +8,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.phys.AABB;
 import net.sinedkadis.terracompositio.api.networks.AnyNetworkMember;
 import net.sinedkadis.terracompositio.api.networks.cfe.CFENetworkMember;
+import net.sinedkadis.terracompositio.api.networks.cfe.CFENetworkMemberEntity;
 import net.sinedkadis.terracompositio.api.networks.cfe.ICFEHandler;
 import net.sinedkadis.terracompositio.block.entity.CFETrashCanBlockEntity;
 import net.sinedkadis.terracompositio.block.entity.PathPointerBlockEntity;
@@ -43,11 +44,10 @@ public class CFEHelper {
         return false;
     }
 
-    public static void tryCFETransfer(CFENetworkMember target,
-                                      CFENetworkMember source,
-                                      int maxTransfer,
-                                      float speed,
-                                      boolean noCol) {
+    public static void doCFETransfer(CFENetworkMember target,
+                                     CFENetworkMember source,
+                                     int maxTransfer,
+                                     float speed) {
         if (!validMember(target)) return;
         if (!validMember(source)) return;
         if (target.getEntity() instanceof CFETrashCanBlockEntity) maxTransfer = Integer.MAX_VALUE;
@@ -57,7 +57,7 @@ public class CFEHelper {
         int added = targetMainHandler.addCFE(taken, true);
 
         if (added <= taken) {
-            if (added > 0 && target instanceof CFEMemberProxy proxy) {
+            if (added > 0 && target instanceof CFEMemberProxy proxy && proxy.target() instanceof CFENetworkMemberEntity) {
                 BlockPos pos = proxy.proxy().getOutputPos();
                 PathPointerBlockEntity ppBE = ((PathPointerBlockEntity) target.getLevel().getBlockEntity(pos));
                 if (ppBE != null) {
@@ -68,10 +68,8 @@ public class CFEHelper {
             }
             if (target.getPos().closerThan(source.getPos(), 2) && !(target instanceof Entity))
                 added = targetMainHandler.addCFE(added, false);
-            else if (noCol) {
-                added = sourceMainHandler.sendCFE(added, targetMainHandler, speed, true, false);
-            } else {
-                added = sourceMainHandler.sendCFE(added, target, speed, false);
+            else {
+                added = sourceMainHandler.sendCFE(target, added, speed, false);
             }
 
             sourceMainHandler.takeCFE(added, false);
@@ -97,8 +95,12 @@ public class CFEHelper {
 
         private volatile boolean applying = false;
 
-        public void addToTransfers(CFENetworkMember target, CFENetworkMember source, TransferData data) {
+        public void addToTransfers(CFENetworkMember target, CFENetworkMember source, TransferData data, boolean instant) {
             TransferKey key = new TransferKey(source, target);
+            if (instant) {
+                doTransfer(key, data);
+                return;
+            }
             if (applying) {
                 queueList.add(new Pair<>(key, data));
                 return;
@@ -108,9 +110,8 @@ public class CFEHelper {
 
         private void mergeIntoMap(TransferKey key, TransferData data) {
             transferDataMap.merge(key, data, (was, incoming) -> new TransferData(
-                    was.maxTransfer() + incoming.maxTransfer(),   // сумма maxTransfer
-                    Math.max(was.speed(), incoming.speed()),      // максимальная скорость
-                    incoming.noCollision() || was.noCollision()   // объединение флага
+                    was.maxTransfer() + incoming.maxTransfer(),
+                    Math.max(was.speed(), incoming.speed())
             ));
         }
 
@@ -149,17 +150,19 @@ public class CFEHelper {
             entries.removeAll(toApply);
 
             for (Map.Entry<TransferKey, TransferData> entry : toApply) {
-                TransferData value = entry.getValue();
-                TransferKey key = entry.getKey();
-                tryCFETransfer(key.target(), key.source(), value.maxTransfer(), value.speed(), value.noCollision());
+                doTransfer(entry.getKey(), entry.getValue());
             }
+        }
+
+        private void doTransfer(TransferKey key, TransferData value) {
+            doCFETransfer(key.target(), key.source(), value.maxTransfer(), value.speed());
         }
 
         public record TransferKey(CFENetworkMember source, CFENetworkMember target) {
         }
     }
 
-    public record TransferData(int maxTransfer, float speed, boolean noCollision) {
+    public record TransferData(int maxTransfer, float speed) {
     }
 
     public static class CFETransferBuilder {
@@ -168,7 +171,8 @@ public class CFEHelper {
 
         int maxTransfer = TCCommonConfigs.CFE_PER_BURST_TRANSFER_LIMIT.get();
         float speed = 1 / 20f;
-        boolean noCollision = false;
+        boolean instant = false;
+
 
         public CFETransferBuilder targetAndSource(CFENetworkMember target, CFENetworkMember source) {
             this.target = target;
@@ -186,14 +190,14 @@ public class CFEHelper {
             return this;
         }
 
-        public CFETransferBuilder noCollision() {
-            this.noCollision = true;
+        public CFETransferBuilder instant() {
+            this.instant = true;
             return this;
         }
 
         public void build() {
             if (target != null && source != null) {
-                transferManager().addToTransfers(target, source, new TransferData(maxTransfer, speed, noCollision));
+                transferManager().addToTransfers(target, source, new TransferData(maxTransfer, speed), instant);
             }
         }
 

@@ -6,6 +6,7 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.common.capabilities.Capability;
@@ -104,7 +105,11 @@ public class CFEHandlerBehaviour implements IBECFEBehaviour, IHaveKnowledge {
             targets.forEach(target -> {
                 if (target.getMainHandler().getFreeSpace() > TCCommonConfigs.CFE_PER_BURST_TRANSFER_LIMIT.get())
                     scheduleMemberUpdate(target);
-                CFEHelper.newTransfer().targetAndSource(target, this).build();
+                CFEHelper.CFETransferBuilder cfeTransferBuilder = CFEHelper.newTransfer().targetAndSource(target, this);
+                if (target.getEntity() instanceof Player) {
+                    cfeTransferBuilder.instant();
+                }
+                cfeTransferBuilder.build();
             });
         }
     }
@@ -118,7 +123,11 @@ public class CFEHandlerBehaviour implements IBECFEBehaviour, IHaveKnowledge {
                         scheduleMemberUpdate(updated);
                 } else scheduleMemberUpdate(updated);
             }
-            CFEHelper.newTransfer().targetAndSource(updated, this).build();
+            CFEHelper.CFETransferBuilder cfeTransferBuilder = CFEHelper.newTransfer().targetAndSource(updated, this);
+            if (updated.getEntity() instanceof Player) {
+                cfeTransferBuilder.instant();
+            }
+            cfeTransferBuilder.build();
         } else onCFENetworkMemberUpdate();
     }
 

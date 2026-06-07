@@ -77,7 +77,6 @@ public class CFENetworkHandler implements CFENetwork {
                     TerraCompositioAPI.instance().getCFENetworkInstance().getAllCFENetworkMembers(level).stream()
                             .filter(FlowCedarEntEntity.class::isInstance)
                             .map(FlowCedarEntEntity.class::cast)
-                            .filter(entEntity -> entEntity.getItemBySlot(EquipmentSlot.HEAD).is(TCItems.TECHNETIUM_CROWN.get()))
                             .filter(entEntity -> entEntity.position().closerThan(ppBE.getBlockPos().getCenter(), 3))
                             .forEach(entEntity -> entEntity.scheduleMemberUpdate(memberProxy));
                 }
@@ -91,7 +90,8 @@ public class CFENetworkHandler implements CFENetwork {
 
                 // PathPointer EMITTER — добавляем входы в очередь
                 if (member.getEntity() instanceof PathPointerBlockEntity ppBE
-                        && ppBE.parts.contains(PathPointerBlockEntity.PPPart.EMITTER)
+                        && (ppBE.parts.contains(PathPointerBlockEntity.PPPart.EMITTER)
+                        || (ppBE.parts.contains(PathPointerBlockEntity.PPPart.INFUSER) && updated instanceof CFENetworkMemberEntity))
                         && updatedEmitters.add(ppBE)) { // add() возвращает false если уже есть
                     for (BlockPos inputPos : ppBE.getInputPoses()) {
                         BlockEntity be = level.getBlockEntity(inputPos);

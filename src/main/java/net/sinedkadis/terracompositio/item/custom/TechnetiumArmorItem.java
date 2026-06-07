@@ -21,10 +21,11 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.network.PacketDistributor;
 import net.sinedkadis.terracompositio.TerraCompositio;
+import net.sinedkadis.terracompositio.api.TCCapabilities;
 import net.sinedkadis.terracompositio.api.TerraCompositioAPI;
 import net.sinedkadis.terracompositio.api.dummies.DummyCFEHandler;
 import net.sinedkadis.terracompositio.api.networks.NetworkAction;
-import net.sinedkadis.terracompositio.api.TCCapabilities;
+import net.sinedkadis.terracompositio.api.networks.cfe.CFENetworkMember;
 import net.sinedkadis.terracompositio.api.networks.cfe.CFENetworkMemberEntity;
 import net.sinedkadis.terracompositio.api.networks.cfe.ICFEHandler;
 import net.sinedkadis.terracompositio.cfe.CFEItemWrapper;
@@ -39,7 +40,6 @@ import net.sinedkadis.terracompositio.registries.TCItems;
 import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.ParametersAreNonnullByDefault;
-import java.util.*;
 import java.util.function.Consumer;
 
 import static net.minecraft.world.level.block.state.properties.BlockStateProperties.WATERLOGGED;
@@ -104,8 +104,18 @@ public class TechnetiumArmorItem extends TCArmorItem {
 
     }
 
-    private void helmetInventoryTick(ItemStack ignoredPStack, Level ignoredPLevel, Entity ignoredEntity, ICFEHandler ignoredIcfeHandler) {
-
+    private void helmetInventoryTick(ItemStack ignoredPStack, Level ignoredPLevel, Entity pEntity, ICFEHandler ignoredIcfeHandler) {
+        if (pEntity.tickCount % 20 != 0) return;
+        ICFEHandler playerHandler = pEntity.getCapability(TCCapabilities.CFE).orElse(DummyCFEHandler.instance);
+        boolean hasSpace = playerHandler.getFreeSpace() > 0;
+        if (!hasSpace) {
+            for (ItemStack slot : pEntity.getArmorSlots()) {
+                hasSpace |= slot.getCapability(TCCapabilities.CFE).orElse(DummyCFEHandler.instance).getFreeSpace() > 0;
+            }
+        }
+        if (hasSpace) {
+            TerraCompositioAPI.instance().getCFENetworkInstance().fireCFENetworkEvent((CFENetworkMember) pEntity, NetworkAction.UPDATE);
+        }
     }
 
     private void chestplateInventoryTick(ItemStack ignoredPStack, Level ignoredPLevel, Entity ignoredEntity, ICFEHandler ignoredIcfeHandler) {
