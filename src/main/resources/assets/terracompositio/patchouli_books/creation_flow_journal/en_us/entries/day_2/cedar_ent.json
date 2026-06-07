@@ -1,7 +1,7 @@
 {
   "name": "book.terracompositio.creation_flow_journal.entry.cedar_ent.name",
   "category": "terracompositio:day_2",
-  "icon": "terracompositio:flow_cedar_ent_spawn_egg",
+  "icon": "terracompositio:flow_cedar_ent_statue",
   "flag": "terracompositio:day_2",
   "pages": [
     "book.terracompositio.creation_flow_journal.entry.cedar_ent.page1",

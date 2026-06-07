@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import net.minecraft.ChatFormatting;
+import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.NonNullList;
 import net.minecraft.core.particles.ParticleTypes;
@@ -37,6 +38,7 @@ import net.sinedkadis.terracompositio.network.TCPackets;
 import net.sinedkadis.terracompositio.network.packets.S2CHighLightNodesSync;
 import net.sinedkadis.terracompositio.registries.TCBlockEntities;
 import net.sinedkadis.terracompositio.util.BindException;
+import net.sinedkadis.terracompositio.util.accessors.PlayerKnowledgeAccessor;
 import net.sinedkadis.terracompositio.util.helpers.BlockPosHelper;
 import net.sinedkadis.terracompositio.util.helpers.PlayerHelper;
 import org.jetbrains.annotations.NotNull;
@@ -709,6 +711,10 @@ public class PathPointerBlockEntity extends TCBlockEntity implements Nameable, C
 
     public void highlightNodes() {
         if (level != null && level.isClientSide) {
+
+            PlayerKnowledgeAccessor player = (PlayerKnowledgeAccessor) Minecraft.getInstance().player;
+            if (player == null || !player.isCreationAcknowledged()) return;
+
             if (receiverPos != null) {
                 addParticle(level, receiverPos, ParticleTypes.FLAME);
             }

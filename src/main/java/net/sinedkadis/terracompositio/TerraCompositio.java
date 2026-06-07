@@ -13,7 +13,6 @@ import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.sinedkadis.terracompositio.api.TerraCompositioAPI;
 import net.sinedkadis.terracompositio.cfe.CFENetworkHandler;
-import net.sinedkadis.terracompositio.compat.CompatUtils;
 import net.sinedkadis.terracompositio.compat.patchouli.TCPatchouliCompat;
 import net.sinedkadis.terracompositio.compat.soft_compat.ISoftCompat;
 import net.sinedkadis.terracompositio.config.TCClientConfigs;
@@ -28,8 +27,6 @@ import net.sinedkadis.terracompositio.screen.TCMenuTypes;
 import net.sinedkadis.terracompositio.worldgen.biome.TCTerrablender;
 import net.sinedkadis.terracompositio.worldgen.tree.TCFoliagePlacers;
 import net.sinedkadis.terracompositio.worldgen.tree.TCTrunkPlacers;
-import org.slf4j.Logger;
-import org.slf4j.LoggerFactory;
 
 //6011371823902440939 - cool seed
 @Mod(TerraCompositio.MOD_ID)
@@ -39,7 +36,7 @@ public class TerraCompositio
     public static ResourceLocation modLoc(String location){
         return ResourceLocation.tryBuild(MOD_ID,location);
     }
-    public static final Logger LOGGER = LoggerFactory.getLogger(MOD_ID);
+
     public static ISoftCompat createCompat;
 
     public TerraCompositio(FMLJavaModLoadingContext context) {
@@ -94,9 +91,10 @@ public class TerraCompositio
         bus.addListener((CFENetworkEvent e) -> CFENetworkHandler.INSTANCE.onNetworkEvent(e.getSource(),e.getAction()));
         bus.addListener((FluidNetworkEvent e) -> FluidNetworkHandler.INSTANCE.onNetworkEvent(e.getSource(),e.getAction()));
         TCPackets.register();
-        TCPatchouliCompat.registerMultiblocks();
+        if (ModList.get().isLoaded("patchouli"))
+            TCPatchouliCompat.registerMultiblocks();
 
-        if (CompatUtils.CREATE_EXISTENCE.get())
+        if (ModList.get().isLoaded("create"))
             createCompat.commonInit();
         //SurfaceRuleManager.addSurfaceRules(SurfaceRuleManager.RuleCategory.OVERWORLD, MOD_ID, TCSurfaceRules.makeRules());
     }

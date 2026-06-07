@@ -1,5 +1,6 @@
 package net.sinedkadis.terracompositio.util.helpers;
 
+import com.mojang.datafixers.util.Pair;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.Level;
@@ -84,8 +85,15 @@ public class CFEHelper {
     public static class CFETransferManager {
 
         Map<CFENetworkMember, TransferData> transferDataMap = new HashMap<>();
+        //exist to avoid ConcurrentModificationException
+        List<Pair<CFENetworkMember, TransferData>> queueList = new ArrayList<>();
+        boolean applying = false;
 
         public void addToTransfers(CFENetworkMember target, TransferData data) {
+            if (applying) {
+                queueList.add(new Pair<>(target, data));
+                return;
+            }
             if (!transferDataMap.containsKey(target)) {
                 transferDataMap.put(target, data);
             } else {
@@ -98,12 +106,17 @@ public class CFEHelper {
         }
 
         public void applyTransfers() {
+            applying = true;
             Set<Map.Entry<CFENetworkMember, TransferData>> entries = Set.copyOf(transferDataMap.entrySet());
             transferDataMap.clear();
             for (Map.Entry<CFENetworkMember, TransferData> entry : entries) {
                 TransferData value = entry.getValue();
                 tryCFETransfer(entry.getKey(), value.source(), value.maxTransfer, value.speed, value.noCollision);
             }
+            applying = false;
+            queueList.forEach(entry ->
+                    addToTransfers(entry.getFirst(), entry.getSecond()));
+            queueList.clear();
         }
 
 

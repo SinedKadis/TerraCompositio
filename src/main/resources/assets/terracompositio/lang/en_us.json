@@ -327,5 +327,17 @@
 
   "book.terracompositio.creation_flow_journal.entry.cedar_ent.name": "test",
   "book.terracompositio.creation_flow_journal.entry.cedar_ent.page1": "test",
-  "book.terracompositio.creation_flow_journal.entry.cedar_ent.page2": "test"
+  "book.terracompositio.creation_flow_journal.entry.cedar_ent.page2": "test",
+  "book.terracompositio.creation_flow_journal.entry.path_pointers.name": "test",
+  "book.terracompositio.creation_flow_journal.entry.path_pointers.desc": "test",
+  "book.terracompositio.creation_flow_journal.entry.path_pointers.collector": "test",
+  "book.terracompositio.creation_flow_journal.entry.path_pointers.emitter": "text",
+  "book.terracompositio.creation_flow_journal.entry.path_pointers.sender": "test",
+  "book.terracompositio.creation_flow_journal.entry.path_pointers.receiver": "text",
+  "book.terracompositio.creation_flow_journal.entry.path_pointers.binding": "text",
+  "book.terracompositio.creation_flow_journal.entry.path_pointers.infuser": "test",
+  "book.terracompositio.creation_flow_journal.entry.path_pointers.extractor": "text",
+  "book.terracompositio.creation_flow_journal.entry.path_pointers.storing": "text",
+  "book.terracompositio.creation_flow_journal.entry.path_pointers.apple": "text"
+
 }

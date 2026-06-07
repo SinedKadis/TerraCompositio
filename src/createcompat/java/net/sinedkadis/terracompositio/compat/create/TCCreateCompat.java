@@ -5,12 +5,12 @@ import com.simibubi.create.content.kinetics.base.SingleAxisRotatingVisual;
 import dev.engine_room.flywheel.lib.visualization.SimpleBlockEntityVisualizer;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraftforge.client.event.EntityRenderersEvent;
-import net.sinedkadis.terracompositio.compat.CompatUtils;
-import net.sinedkadis.terracompositio.compat.soft_compat.ISoftCompat;
-import net.sinedkadis.terracompositio.compat.soft_compat.ISoftDataGen;
+import net.minecraftforge.fml.ModList;
 import net.sinedkadis.terracompositio.compat.create.datagen.DataGenerators;
 import net.sinedkadis.terracompositio.compat.create.registries.CreateBlockEntities;
 import net.sinedkadis.terracompositio.compat.create.registries.CreateBlocks;
+import net.sinedkadis.terracompositio.compat.soft_compat.ISoftCompat;
+import net.sinedkadis.terracompositio.compat.soft_compat.ISoftDataGen;
 
 import static com.simibubi.create.api.stress.BlockStressValues.CAPACITIES;
 
@@ -45,7 +45,7 @@ public class TCCreateCompat implements ISoftCompat {
 
     @Override
     public void registerCreateBER(EntityRenderersEvent.RegisterRenderers event) {
-        if (CompatUtils.CREATE_EXISTENCE.get()) {
+        if (ModList.get().isLoaded("create")) {
             assert blockEntities.CEDAR_GEARBOX_BE != null;
             event.registerBlockEntityRenderer(
                     blockEntities.CEDAR_GEARBOX_BE.get(),

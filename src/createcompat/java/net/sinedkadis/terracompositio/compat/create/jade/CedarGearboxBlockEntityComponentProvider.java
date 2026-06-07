@@ -4,8 +4,8 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraftforge.fml.ModList;
 import net.sinedkadis.terracompositio.TerraCompositio;
-import net.sinedkadis.terracompositio.compat.CompatUtils;
 import net.sinedkadis.terracompositio.compat.create.block.entity.CedarGearboxBlockEntity;
 import snownee.jade.api.BlockAccessor;
 import snownee.jade.api.IBlockComponentProvider;
@@ -22,7 +22,7 @@ public enum CedarGearboxBlockEntityComponentProvider implements IBlockComponentP
 
     @Override
     public void appendTooltip(ITooltip iTooltip, BlockAccessor blockAccessor, IPluginConfig iPluginConfig) {
-        if (!CompatUtils.CREATE_EXISTENCE.get()) return;
+        if (!ModList.get().isLoaded("create")) return;
         BlockEntity blockEntity = blockAccessor.getBlockEntity();
         if (blockEntity instanceof CedarGearboxBlockEntity cedarGearboxBlockEntity) {
             List<Component> list = new ArrayList<>();

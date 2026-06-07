@@ -5,6 +5,7 @@ import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
@@ -142,7 +143,6 @@ public class CFEBurstProjectileEntity extends ThrowableProjectile {
     boolean trackCrown = false;
     @Override
     public void tick() {
-        super.tick();
         killIfTimeEnded();
         if (noCollision) {
             if (tickCount >= tickToLiveNoCol) {
@@ -153,6 +153,36 @@ public class CFEBurstProjectileEntity extends ThrowableProjectile {
         }
         if (trackCrown)
             recalculateCrownOwnerTarget();
+
+        Vec3 vec3 = this.getDeltaMovement();
+        double d2 = this.getX() + vec3.x;
+        double d0 = this.getY() + vec3.y;
+        double d1 = this.getZ() + vec3.z;
+        this.updateRotation();
+        float f;
+        if (this.isInWater()) {
+            for (int i = 0; i < 4; ++i) {
+                float f1 = 0.25F;
+                this.level().addParticle(ParticleTypes.BUBBLE,
+                        d2 - vec3.x * f1,
+                        d0 - vec3.y * f1,
+                        d1 - vec3.z * f1,
+                        vec3.x,
+                        vec3.y,
+                        vec3.z);
+            }
+            f = 0.8F;
+        } else {
+            f = 0.99F;
+        }
+
+        this.setDeltaMovement(vec3.scale(f));
+        if (!this.isNoGravity()) {
+            Vec3 vec31 = this.getDeltaMovement();
+            this.setDeltaMovement(vec31.x, vec31.y - (double) this.getGravity(), vec31.z);
+        }
+
+        this.setPos(d2, d0, d1);
     }
 
     private void consumeTarget() {
