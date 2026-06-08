@@ -44,10 +44,20 @@ public class PlayerCFEProvider implements net.minecraftforge.common.capabilities
                         for (ItemStack stack : player.getArmorSlots()) {
                             ICFEHandler icfeHandler = stack.getCapability(TCCapabilities.CFE).orElse(DummyCFEHandler.instance);
                             toReturn += icfeHandler.addCFE(cfe,true);
-                            return toReturn;
                         }
+                        return toReturn;
                     }
-                    return super.addCFE(cfe, simulate);
+                    return super.addCFE(cfe, false);
+                }
+
+                @Override
+                public int getFreeSpace() {
+                    int toReturn = super.getFreeSpace();
+                    for (ItemStack stack : player.getArmorSlots()) {
+                        ICFEHandler icfeHandler = stack.getCapability(TCCapabilities.CFE).orElse(DummyCFEHandler.instance);
+                        toReturn += icfeHandler.getFreeSpace();
+                    }
+                    return toReturn;
                 }
             }
                     .setMaxCFE(10)

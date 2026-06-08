@@ -56,8 +56,8 @@ public class CFEHelper {
         ICFEHandler targetMainHandler = target.getMainHandler();
         int added = targetMainHandler.addCFE(taken, true);
 
-        if (added <= taken) {
-            if (added > 0 && target instanceof CFEMemberProxy proxy && proxy.target() instanceof CFENetworkMemberEntity) {
+        if (added > 0) {
+            if (target instanceof CFEMemberProxy proxy && proxy.target() instanceof CFENetworkMemberEntity) {
                 BlockPos pos = proxy.proxy().getOutputPos();
                 PathPointerBlockEntity ppBE = ((PathPointerBlockEntity) target.getLevel().getBlockEntity(pos));
                 if (ppBE != null) {
