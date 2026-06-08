@@ -4,6 +4,7 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.tags.BlockTags;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
@@ -14,6 +15,7 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraftforge.client.extensions.common.IClientItemExtensions;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.event.entity.living.LivingEvent;
@@ -89,7 +91,6 @@ public class TechnetiumArmorItem extends TCArmorItem {
     public void inventoryTick(ItemStack pStack, Level pLevel, Entity entity, int pSlotId, boolean pIsSelected) {
         super.inventoryTick(pStack, pLevel, entity, pSlotId, pIsSelected);
         ICFEHandler icfeHandler = pStack.getCapability(TCCapabilities.CFE).orElse(DummyCFEHandler.instance);
-        transferCFE(pStack, entity, icfeHandler);
         switch (type) {
             case HELMET -> this.helmetInventoryTick(pStack, pLevel, entity, icfeHandler);
             case CHESTPLATE -> this.chestplateInventoryTick(pStack, pLevel, entity, icfeHandler);
@@ -126,121 +127,65 @@ public class TechnetiumArmorItem extends TCArmorItem {
 
     }
 
-    private void bootInventoryTick(ItemStack ignoredPStack, Level ignoredPLevel, Entity ignoredEntity, ICFEHandler ignoredIcfeHandler) {
-    }
+    static final String height = "Height";
+    static final String cd = "cd";
+    private void bootInventoryTick(ItemStack ignoredPStack, Level level, Entity entity, ICFEHandler icfeHandler) {
 
-    @SubscribeEvent
-    public static void onLivingTick(LivingEvent.LivingTickEvent event) {
-        LivingEntity livingEntity = event.getEntity();
-        Level pLevel = livingEntity.level();
-        //if (pLevel.isClientSide) return;
-        BlockPos onPos = BlockPos.containing(livingEntity.position().add(0,-1,0));
-        CompoundTag persistentData = livingEntity.getPersistentData();
-        String blockPosBelow = "BlockPosBelow";
-        String height = "Height";
+        BlockPos onPos = BlockPos.containing(entity.position().add(0,-1,0));
+        BlockPos standingPos = entity.getOnPos();
 
-        ItemStack stack = livingEntity.getItemBySlot(EquipmentSlot.FEET);
+        if (onPos.equals(standingPos)) return;
 
-        ICFEHandler handler = stack.getCapability(TCCapabilities.CFE).orElse(DummyCFEHandler.instance);
+        BlockState blockStateOn = level.getBlockState(onPos);
+        BlockState standingState = level.getBlockState(standingPos);
 
-        BlockState blockStateOn = pLevel.getBlockState(onPos);
+        CompoundTag persistentData = entity.getPersistentData();
 
-        if (livingEntity.fallDistance > 3 && !livingEntity.isShiftKeyDown()
-                && handler.getCFE() >= 1) {
+        //Save on falling
+        if (entity.fallDistance > 3 && !entity.isShiftKeyDown()
+                && icfeHandler.getCFE() >= 1) {
 
-            BlockState blockStateOn1 = pLevel.getBlockState(onPos.below(3));
+            BlockState blockStateBelow1 = level.getBlockState(onPos.below());
+            BlockState blockStateBelow3 = level.getBlockState(onPos.below(3));
 
-            if (blockStateOn.is(BlockTags.REPLACEABLE)
-//                    && !persistentData.contains(blockPosBelow)
-                    && !blockStateOn1.isAir()) {
-                persistentData.putLong(blockPosBelow, onPos.asLong());
+            if (blockStateBelow1.is(BlockTags.REPLACEABLE)
+                    && !blockStateBelow3.isAir()) {
                 persistentData.putInt(height,onPos.getY()-1);
             }
         }
 
+        BlockPos posOnHeight = onPos.atY(persistentData.getInt(height));
+        BlockState blockStateOnHeight = level.getBlockState(posOnHeight);
+        boolean allowBoardPlace = blockStateOnHeight.is(BlockTags.REPLACEABLE)
+                && !blockStateOnHeight.is(TCBlocks.TECHNETIUM_BOARD.get())
+                && standingState.is(TCBlocks.TECHNETIUM_BOARD.get())
+                && (!persistentData.contains(cd) || (entity.tickCount - persistentData.getInt(cd) > 20));
 
-        if (!stack.is(TCItems.TECHNETIUM_BOOTS.get())
-                || handler instanceof DummyCFEHandler
-                || handler.getCFE() < 1) {
-            if (persistentData.contains(blockPosBelow)) {
-                BlockPos last = BlockPos.of(persistentData.getLong(blockPosBelow));
-                BlockState lastBlockState = pLevel.getBlockState(last);
-                BlockState replaceState = lastBlockState.hasProperty(WATERLOGGED)
-                        && lastBlockState.getValue(WATERLOGGED)
-                        ? Blocks.WATER.defaultBlockState()
-                        : Blocks.AIR.defaultBlockState();
-                if (lastBlockState.is(TCBlocks.TECHNETIUM_BOARD.get()))
-                    pLevel.setBlockAndUpdate(last, replaceState);
-                persistentData.remove(blockPosBelow);
-                persistentData.remove(height);
-            }
+        if (!allowBoardPlace) return;
+
+        boolean waterlogged = blockStateOn.hasProperty(WATERLOGGED) && blockStateOn.getValue(WATERLOGGED);
+
+        BlockState boardState = TCBlocks.TECHNETIUM_BOARD.get().defaultBlockState().setValue(WATERLOGGED,waterlogged);
+
+        if (icfeHandler.takeCFE(1,false) > 0 && level.isClientSide()) {
+            level.destroyBlock(posOnHeight,true);
+            level.setBlockAndUpdate(posOnHeight,boardState);
         }
 
-        boolean condition = !blockStateOn.is(BlockTags.REPLACEABLE)
-                && !blockStateOn.is(TCBlocks.TECHNETIUM_BOARD.get());
+    }
 
-//        BlockPos.MutableBlockPos mutableBlockPos = onPos.mutable();
-//        boolean remove = false;
-//
-//        float speed = livingEntity.getSpeed();
-//        for (int i = 0; i <= speed*40; i++) {
-//            BlockState blockStateOn = pLevel.getBlockState(mutableBlockPos);
-//            boolean condition = !blockStateOn.is(BlockTags.REPLACEABLE)
-//                    && !blockStateOn.is(TCBlocks.TECHNETIUM_BOARD.get());
-//            remove = condition;
-//            if (!condition) break;
-//            mutableBlockPos.move(livingEntity.getDirection(),1);
-//        }
-        String cd = "cd";
-        boolean cooldown = persistentData.contains(cd) && persistentData.getInt(cd) <= 0;
-        if (condition && cooldown) {
-            if (persistentData.contains(blockPosBelow)) {
-                BlockPos last = BlockPos.of(persistentData.getLong(blockPosBelow));
-                BlockState lastBlockState = pLevel.getBlockState(last);
-                BlockState replaceState = lastBlockState.hasProperty(WATERLOGGED)
-                        && lastBlockState.getValue(WATERLOGGED)
-                        ? Blocks.WATER.defaultBlockState()
-                        : Blocks.AIR.defaultBlockState();
-                if (lastBlockState.is(TCBlocks.TECHNETIUM_BOARD.get()))
-                    pLevel.setBlockAndUpdate(last, replaceState);
-                persistentData.remove(blockPosBelow);
-                persistentData.remove(height);
-            }
-        } else if (persistentData.contains(cd) && !(persistentData.getInt(cd) <= 0)) {
-            persistentData.putInt(cd,persistentData.getInt(cd)-1);
-        }
 
-        if (persistentData.contains(blockPosBelow)) {
-            if (!livingEntity.isShiftKeyDown()) {
-                BlockPos last = BlockPos.of(persistentData.getLong(blockPosBelow));
-                int h = persistentData.getInt(height);
-                BlockPos target = onPos.atY(h);
-                BlockState boardState = TCBlocks.TECHNETIUM_BOARD.get().defaultBlockState().setValue(WATERLOGGED,
-//                        blockStateOn.getFluidState().is(Fluids.WATER));
-                        false);
-                BlockState lastBlockState = pLevel.getBlockState(last);
-//                BlockState replaceState = lastBlockState.hasProperty(WATERLOGGED)
-//                        && lastBlockState.getValue(WATERLOGGED)
-//                        ? Blocks.WATER.defaultBlockState()
-//                        : Blocks.AIR.defaultBlockState();
-                BlockState replaceState = Blocks.AIR.defaultBlockState();
-                BlockState targetState = pLevel.getBlockState(target);
-                if (!target.equals(last)) {
-                    persistentData.putLong(blockPosBelow, target.asLong());
-                    if (targetState.is(BlockTags.REPLACEABLE)) {
-                        if (pLevel.isClientSide) {
-                            pLevel.destroyBlock(target, true);
-                            pLevel.setBlockAndUpdate(target, boardState);
-                            TCPackets.CHANNEL.send(PacketDistributor.SERVER.noArg(),new C2SBoardSync(target,last));
-                        } else {
-                            handler.takeCFE(1, false);
-                        }
-                    }
-                    if (lastBlockState.is(TCBlocks.TECHNETIUM_BOARD.get())) {
-                        pLevel.setBlock(last, replaceState,0);
-                    }
-                }
-            }
+    public static void onBlockChanged(LivingEntity livingEntity) {
+
+        Level pLevel = livingEntity.level();
+
+        BlockPos onPos = BlockPos.containing(livingEntity.position().add(0,-1,0));
+        BlockPos standingPos = livingEntity.getOnPos();
+
+        for (BlockPos blockPos : BlockPos.betweenClosed(onPos.offset(-2,-2,-2),onPos.offset(2,2,2))) {
+            if (!pLevel.getBlockState(blockPos).is(TCBlocks.TECHNETIUM_BOARD.get())) return;
+            if (blockPos.equals(onPos) || blockPos.equals(standingPos)) return;
+            pLevel.destroyBlock(blockPos,true);
         }
     }
 
@@ -250,13 +195,9 @@ public class TechnetiumArmorItem extends TCArmorItem {
     public static void onLivingJump(LivingEvent.LivingJumpEvent event) {
         LivingEntity livingEntity = event.getEntity();
         Level pLevel = livingEntity.level();
-        //if (pLevel.isClientSide) return;
         ItemStack stack = livingEntity.getItemBySlot(EquipmentSlot.FEET);
         if (stack.is(TCItems.TECHNETIUM_BOOTS.get())){
             CompoundTag persistentData = livingEntity.getPersistentData();
-            String blockPosBelow = "BlockPosBelow";
-            String height = "Height";
-            String cd = "cd";
 
             BlockPos onPos = BlockPos.containing(
                     livingEntity.position().add(0,-1,0)
@@ -265,13 +206,12 @@ public class TechnetiumArmorItem extends TCArmorItem {
 
             BlockPos.MutableBlockPos mutableBlockPos = onPos.mutable();
             ICFEHandler handler = stack.getCapability(TCCapabilities.CFE).orElse(DummyCFEHandler.instance);
-            if (handler instanceof DummyCFEHandler || handler.getCFE() < 1) return;
+            if (handler.getCFE() < 1) return;
             float speed = livingEntity.getSpeed();
             for (int i = 0; i <= speed*30; i++) {
                 BlockState blockStateOn = pLevel.getBlockState(mutableBlockPos);
-                if (blockStateOn.is(BlockTags.REPLACEABLE) && !persistentData.contains(blockPosBelow)) {
-                    persistentData.putLong(blockPosBelow, onPos.asLong());
-                    persistentData.putInt(height,onPos.getY());
+                if (blockStateOn.is(BlockTags.REPLACEABLE)) {
+                    persistentData.putInt(height, onPos.getY());
                     persistentData.putInt(cd,20);
                     break;
                 }
@@ -291,38 +231,6 @@ public class TechnetiumArmorItem extends TCArmorItem {
                     h--;
                 }
                 persistentData.putInt(height,h);
-            }
-        }
-    }
-
-
-    private static void transferCFE(ItemStack pStack, Entity entity, ICFEHandler icfeHandler) {
-        if (!(icfeHandler instanceof DummyCFEHandler)) {
-            Type type = ((ArmorItem) pStack.getItem()).getType();
-            ICFEHandler playerCap = entity.getCapability(TCCapabilities.CFE).orElse(DummyCFEHandler.instance);
-            if (!type.equals(Type.LEGGINGS)) {
-                ICFEHandler leggings = DummyCFEHandler.instance;
-                for (ItemStack armor : entity.getArmorSlots()) {
-                    if (armor.getItem() instanceof ArmorItem armorItem
-                            && armorItem.getType().equals(Type.LEGGINGS)) {
-                        leggings = armor.getCapability(TCCapabilities.CFE).orElse(DummyCFEHandler.instance);
-                    }
-                }
-                if (icfeHandler.getFreeSpace() > 0) {
-                    if (leggings.takeCFE(1,true)>0) {
-                        int cfe1 = leggings.takeCFE(1, false);
-                        icfeHandler.addCFE(
-                                cfe1,false);
-                    } else if (playerCap.takeCFE(1,true)>0) {
-                        icfeHandler.addCFE(
-                                playerCap.takeCFE(1,false), false);
-                    }
-                }
-            } else {
-                if (playerCap.takeCFE(icfeHandler.getFreeSpace(),true)>0) {
-                    icfeHandler.addCFE(
-                            playerCap.takeCFE(icfeHandler.getFreeSpace(),false),false);
-                }
             }
         }
     }
@@ -354,6 +262,7 @@ public class TechnetiumArmorItem extends TCArmorItem {
     @Override
     public @Nullable ICapabilityProvider initCapabilities(ItemStack stack, @Nullable CompoundTag nbt) {
         Type type = ((ArmorItem) stack.getItem()).getType();
+        if (type.equals(Type.HELMET)) return null;
         return (ICapabilityProvider) new CFEItemWrapper(stack).setMaxCFE(type.equals(Type.LEGGINGS)?100:1);
     }
 }

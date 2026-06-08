@@ -15,6 +15,7 @@ import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.entity.projectile.ThrowableProjectile;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.phys.AABB;
@@ -156,8 +157,18 @@ public class CFEBurstProjectileEntity extends ThrowableProjectile {
 
     private void consumeOwner() {
         Entity owner = getOwner();
-        if (owner instanceof CFENetworkMember cfeNetworkMember) {
-            tryConsumeCFEHandler(cfeNetworkMember.getMainHandler(), this.getCFE());
+        if (owner instanceof CFENetworkMemberEntity memberEntity) {
+            int oCfe = this.getCFE();
+            int cfe = oCfe - tryConsumeCFEHandler(memberEntity.getMainHandler(), oCfe);
+
+            if (cfe > 0) {
+                for (ItemStack stack : owner.getArmorSlots()) {
+                    ICFEHandler icfeHandler = stack.getCapability(TCCapabilities.CFE).orElse(DummyCFEHandler.instance);
+                    cfe -= icfeHandler.addCFE(cfe,false);
+                    if (cfe <= 0) break;
+                }
+            }
+
         }
     }
 
@@ -198,9 +209,11 @@ public class CFEBurstProjectileEntity extends ThrowableProjectile {
         Entity owner = getOwner();
         if (owner instanceof LivingEntity livingEntity
                 && livingEntity.getItemBySlot(EquipmentSlot.HEAD).is(TCItems.TECHNETIUM_CROWN.get())
-                && tickCount % 5 == 0) {
+                && tickCount % 5 == 0
+                && owner instanceof CFENetworkMemberEntity memberEntity) {
             setDeltaMovement(Vec3.ZERO);
-            Vec3 shootVec = livingEntity.position().subtract(this.position());
+            Vec3 shootVec = memberEntity.getMainHandler()
+                    .getOffset().apply(livingEntity.position()).subtract(this.position());
             this.shoot(shootVec.x(),shootVec.y(),shootVec.z(),5/20f,0);
         }
     }
@@ -234,9 +247,10 @@ public class CFEBurstProjectileEntity extends ThrowableProjectile {
 
     }
 
-    private void tryConsumeCFEHandler(ICFEHandler icfeHandler, int cfe) {
-        icfeHandler.addCFE(cfe, false);
+    private int tryConsumeCFEHandler(ICFEHandler icfeHandler, int cfe) {
+        int added = icfeHandler.addCFE(cfe, false);
         discard();
+        return added;
     }
 
     @Override
