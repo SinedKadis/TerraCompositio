@@ -137,19 +137,15 @@ public class TechnetiumArmorItem extends TCArmorItem {
 
     static final String height = "Height";
     static final String cd = "cd";
-    private void bootInventoryTick(ItemStack ignoredPStack, Level level, Entity entity, ICFEHandler icfeHandler) {
+    private void bootInventoryTick(ItemStack ignoredPStack, Level ignoredLevel, Entity ignoredEntity, ICFEHandler ignoredIcfeHandler) {
 
-        BlockPos onPos = BlockPos.containing(entity.position().add(0,-1,0));
-        BlockPos standingPos = entity.getOnPos();
+    }
 
-        if (onPos.equals(standingPos)) return;
+    public static boolean isOnCoolDown(Entity entity, CompoundTag persistentData) {
+        return !persistentData.contains(cd) || (entity.tickCount - persistentData.getInt(cd) > 20);
+    }
 
-        BlockState blockStateOn = level.getBlockState(onPos);
-        BlockState standingState = level.getBlockState(standingPos);
-
-        CompoundTag persistentData = entity.getPersistentData();
-
-        //Save on falling
+    public static boolean setHeightIfFalling(Level level, Entity entity, ICFEHandler icfeHandler, BlockPos onPos, CompoundTag persistentData) {
         if (entity.fallDistance > 3 && !entity.isShiftKeyDown()
                 && icfeHandler.getCFE() >= 1) {
 
@@ -158,47 +154,59 @@ public class TechnetiumArmorItem extends TCArmorItem {
 
             if (blockStateBelow1.is(BlockTags.REPLACEABLE)
                     && !blockStateBelow3.isAir()) {
-                persistentData.putInt(height,onPos.getY()-1);
+                persistentData.putInt(height, onPos.getY()-1);
+                return true;
             }
         }
+        return false;
+    }
+
+
+    public static void onBlockChanged(LivingEntity livingEntity) {
+        if (!(livingEntity instanceof Player player)) return;
+        Level level = livingEntity.level();
+
+        BlockPos onPos = BlockPos.containing(player.position().add(0,-1,0));
+        BlockPos standingPos = player.getOnPos();
+
+        //if (onPos.equals(standingPos)) return;
+
+        BlockState standingState = level.getBlockState(standingPos);
+
+        CompoundTag persistentData = player.getPersistentData();
+
+        ICFEHandler icfeHandler = player.getCapability(TCCapabilities.CFE).orElse(DummyCFEHandler.instance);
+
+        boolean fallSaveActivated = setHeightIfFalling(level, player, icfeHandler, onPos, persistentData);
 
         BlockPos posOnHeight = onPos.atY(persistentData.getInt(height));
         BlockState blockStateOnHeight = level.getBlockState(posOnHeight);
+
         boolean allowBoardPlace = blockStateOnHeight.is(BlockTags.REPLACEABLE)
                 && !blockStateOnHeight.is(TCBlocks.TECHNETIUM_BOARD.get())
-                && standingState.is(TCBlocks.TECHNETIUM_BOARD.get())
-                && (!persistentData.contains(cd) || (entity.tickCount - persistentData.getInt(cd) > 20));
+                && (standingState.is(TCBlocks.TECHNETIUM_BOARD.get()) || fallSaveActivated)
+                && isOnCoolDown(player, persistentData);
 
         if (!allowBoardPlace) return;
 
-        boolean waterlogged = blockStateOn.hasProperty(WATERLOGGED) && blockStateOn.getValue(WATERLOGGED);
+
+        boolean waterlogged = blockStateOnHeight.hasProperty(WATERLOGGED) && blockStateOnHeight.getValue(WATERLOGGED);
 
         BlockState boardState = TCBlocks.TECHNETIUM_BOARD.get().defaultBlockState().setValue(WATERLOGGED,waterlogged);
 
         if (icfeHandler.takeCFE(1,false) > 0 && level.isClientSide()) {
             level.destroyBlock(posOnHeight,true);
             level.setBlockAndUpdate(posOnHeight,boardState);
-            TCPackets.CHANNEL.send(PacketDistributor.SERVER.noArg(),new C2SBoardSync(posOnHeight,BlockPos.ZERO.atY(-64)));
+            TCPackets.CHANNEL.send(PacketDistributor.SERVER.noArg(),new C2SBoardSync(posOnHeight));
         }
 
-    }
-
-
-    public static void onBlockChanged(LivingEntity livingEntity) {
-        if (!(livingEntity instanceof Player)) return;
-        Level pLevel = livingEntity.level();
-
-        BlockPos onPos = BlockPos.containing(livingEntity.position().add(0,-1,0));
-        BlockPos standingPos = livingEntity.getOnPos();
-
-        BlockState standingState = pLevel.getBlockState(standingPos);
         if (!standingState.is(TCBlocks.TECHNETIUM_BOARD.get())) return;
 
         for (BlockPos blockPos : BlockPos.betweenClosed(onPos.offset(-2,-2,-2),onPos.offset(2,2,2))) {
-            BlockState blockState = pLevel.getBlockState(blockPos);
+            BlockState blockState = level.getBlockState(blockPos);
             if (!blockState.is(TCBlocks.TECHNETIUM_BOARD.get())) continue;
             if (blockPos.equals(onPos) || blockPos.equals(standingPos)) continue;
-            pLevel.destroyBlock(blockPos,true);
+            level.destroyBlock(blockPos,true);
         }
     }
 
@@ -232,7 +240,7 @@ public class TechnetiumArmorItem extends TCArmorItem {
                 if (icfeHandler.takeCFE(1,false) > 0 && level.isClientSide()) {
                     level.destroyBlock(onPos,true);
                     level.setBlockAndUpdate(onPos,boardState);
-                    TCPackets.CHANNEL.send(PacketDistributor.SERVER.noArg(),new C2SBoardSync(onPos,BlockPos.ZERO.atY(-64)));
+                    TCPackets.CHANNEL.send(PacketDistributor.SERVER.noArg(),new C2SBoardSync(onPos));
                     return;
                 }
 
@@ -255,7 +263,7 @@ public class TechnetiumArmorItem extends TCArmorItem {
                 if (level.getBlockState(pPos).is(BlockTags.REPLACEABLE) && icfeHandler.takeCFE(1,false) > 0 && level.isClientSide()) {
                     level.destroyBlock(onPos,true);
                     level.setBlockAndUpdate(pPos,boardState);
-                    TCPackets.CHANNEL.send(PacketDistributor.SERVER.noArg(),new C2SBoardSync(pPos,BlockPos.ZERO.atY(-64)));
+                    TCPackets.CHANNEL.send(PacketDistributor.SERVER.noArg(),new C2SBoardSync(pPos));
                 }
                 persistentData.putInt(height,h);
             }
