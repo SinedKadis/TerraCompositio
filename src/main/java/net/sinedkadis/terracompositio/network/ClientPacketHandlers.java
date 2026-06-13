@@ -2,7 +2,9 @@ package net.sinedkadis.terracompositio.network;
 
 import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
+import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.api.distmarker.Dist;
@@ -24,7 +26,19 @@ public class ClientPacketHandlers {
             player.getCapability(TCCapabilities.CFE)
                     .orElse(DummyCFEHandler.instance)
                     .setCFE(msg.cfe());
-            ((PlayerKnowledgeAccessor) player).setCreationKnowledge(msg.knowledge());
+            for (ItemStack itemStack : player.getArmorSlots()) {
+                EquipmentSlot equipmentSlot = itemStack.getEquipmentSlot();
+                if (equipmentSlot == null) return;
+
+                int index = equipmentSlot.getFilterFlag();
+
+                if (index == 0 || index == 5) return;
+
+                itemStack.getCapability(TCCapabilities.CFE)
+                        .orElse(DummyCFEHandler.instance)
+                        .setCFE(msg.armor()[index]);
+
+            }
         }
     }
     public static void handleAddPlayerKnowledge() {

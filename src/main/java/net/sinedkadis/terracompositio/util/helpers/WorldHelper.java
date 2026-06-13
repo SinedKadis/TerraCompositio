@@ -9,14 +9,18 @@ import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionResult;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LightLayer;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.RotatedPillarBlock;
+import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.Property;
+import net.minecraft.world.level.gameevent.GameEvent;
+import net.minecraft.world.level.material.FluidState;
 import net.sinedkadis.terracompositio.block.custom.FlowCedarLikeBlock;
 import net.sinedkadis.terracompositio.particle.CFEParticleData;
 import net.sinedkadis.terracompositio.registries.TCBlockStateProperties;
@@ -120,5 +124,22 @@ public class WorldHelper {
         }
 
         return LightTexture.pack(bLight, sLight);
+    }
+
+    public static void destroyBlockNoUpdate(Level level, BlockPos pPos, Player player) {
+        BlockState blockstate = level.getBlockState(pPos);
+
+        if (blockstate.isAir()) return;
+
+        FluidState fluidstate = level.getFluidState(pPos);
+
+        BlockEntity blockentity = blockstate.hasBlockEntity() ? level.getBlockEntity(pPos) : null;
+        Block.dropResources(blockstate, level, pPos, blockentity, player, ItemStack.EMPTY);
+
+        boolean flag = level.setBlock(pPos, fluidstate.createLegacyBlock(), 3, 512);
+        if (flag) {
+            level.gameEvent(GameEvent.BLOCK_DESTROY, pPos, GameEvent.Context.of(player, blockstate));
+        }
+
     }
 }

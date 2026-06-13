@@ -7,13 +7,17 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Mth;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.network.PacketDistributor;
+import net.sinedkadis.terracompositio.api.TCCapabilities;
 import net.sinedkadis.terracompositio.api.TerraCompositioAPI;
+import net.sinedkadis.terracompositio.api.dummies.DummyCFEHandler;
 import net.sinedkadis.terracompositio.api.networks.NetworkAction;
 import net.sinedkadis.terracompositio.api.networks.cfe.CFENetworkMember;
 import net.sinedkadis.terracompositio.api.networks.cfe.CFENetworkMemberBE;
@@ -22,7 +26,6 @@ import net.sinedkadis.terracompositio.api.networks.cfe.ICFEHandler;
 import net.sinedkadis.terracompositio.cfe.burst.CFEBurstProjectileEntity;
 import net.sinedkadis.terracompositio.network.TCPackets;
 import net.sinedkadis.terracompositio.network.packets.S2CPlayerCfeContainerSync;
-import net.sinedkadis.terracompositio.util.accessors.PlayerKnowledgeAccessor;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.function.Function;
@@ -137,17 +140,28 @@ public class CFEContainer implements ICFEHandler, INBTSerializable<CompoundTag> 
 
     protected void sendCFEUpdate() {
         if (getAttachedMember() instanceof CFENetworkMemberBE cfeNetworkMemberBE) {
-//            TerraCompositioAPI.INSTANCE.getCFENetworkInstance().fireCFENetworkEvent(cfeNetworkMemberBE, NetworkAction.UPDATE);
-            //TerraCompositioAPI.INSTANCE.getCFENetworkInstance().networkMemberUpdated(cfeNetworkMemberBE);
-
             TerraCompositioAPI.INSTANCE.getCFENetworkInstance().fireCFENetworkEvent(cfeNetworkMemberBE, NetworkAction.UPDATE);
-
         }
         if (isEntity) {
             TerraCompositioAPI.INSTANCE.getCFENetworkInstance().fireCFENetworkEvent(getAttachedMember(), NetworkAction.UPDATE);
             if (getAttachedMember() instanceof ServerPlayer serverPlayer) {
+                int[] armorCFE = new int[4];
+                for (ItemStack itemStack : serverPlayer.getArmorSlots()) {
+                    EquipmentSlot equipmentSlot = itemStack.getEquipmentSlot();
+                    if (equipmentSlot == null) return;
+
+                    int index = equipmentSlot.getFilterFlag();
+
+                    if (index == 0 || index == 5) return;
+
+                    int cfe = itemStack.getCapability(TCCapabilities.CFE)
+                            .orElse(DummyCFEHandler.instance)
+                            .getCFE();
+                    armorCFE[index - 1] = cfe;
+
+                }
                 TCPackets.CHANNEL.send(PacketDistributor.PLAYER.with(() -> serverPlayer),
-                        new S2CPlayerCfeContainerSync(getCFE(), ((PlayerKnowledgeAccessor) serverPlayer).isCreationAcknowledged()));
+                        new S2CPlayerCfeContainerSync(getCFE(), armorCFE));
             }
         }
     }
@@ -190,6 +204,7 @@ public class CFEContainer implements ICFEHandler, INBTSerializable<CompoundTag> 
     @Override
     public void deserializeNBT(CompoundTag tag) {
         setCFE(tag.getInt("CFE"));
+        sendCFEUpdate();
     }
 
     public int getMaxCFE() {

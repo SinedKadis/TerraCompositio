@@ -17,7 +17,8 @@
     "accessors.LivingEntityAccessor"
   ],
   "client": [
-    "HumanoidArmorLayerMixin"
+    "HumanoidArmorLayerMixin",
+    "LocalPlayerMixin"
   ],
   "server": [],
   "injectors": {

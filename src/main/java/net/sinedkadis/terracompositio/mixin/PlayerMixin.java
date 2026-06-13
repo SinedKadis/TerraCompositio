@@ -135,6 +135,20 @@ public class PlayerMixin implements CFENetworkMemberEntity, PlayerKnowledgeAcces
     }
 
     @Inject(
+            method = "tick()V",
+            at = @At("HEAD")
+    )
+    private void tc$onTickStart(CallbackInfo ci) {
+        if (!wasSent)
+            if (((Player) (Object) this) instanceof ServerPlayer serverPlayer) {
+                wasSent = true;
+                if (((PlayerKnowledgeAccessor) serverPlayer).isCreationAcknowledged())
+                    TCPackets.CHANNEL.send(PacketDistributor.PLAYER.with(() -> serverPlayer),
+                            new S2CAddPlayerKnowledge());
+            }
+    }
+
+    @Inject(
             method = "readAdditionalSaveData",
             at = @At("HEAD")
     )
