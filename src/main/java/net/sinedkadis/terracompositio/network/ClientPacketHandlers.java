@@ -24,7 +24,6 @@ public class ClientPacketHandlers {
             player.getCapability(TCCapabilities.CFE)
                     .orElse(DummyCFEHandler.instance)
                     .setCFE(msg.cfe());
-            ((PlayerKnowledgeAccessor) player).setCreationKnowledge(msg.knowledge());
         }
     }
     public static void handleAddPlayerKnowledge() {

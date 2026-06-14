@@ -142,7 +142,7 @@ public class CFEContainer implements ICFEHandler, INBTSerializable<CompoundTag> 
             TerraCompositioAPI.INSTANCE.getCFENetworkInstance().fireCFENetworkEvent(getAttachedMember(), NetworkAction.UPDATE);
             if (getAttachedMember() instanceof ServerPlayer serverPlayer) {
                 TCPackets.CHANNEL.send(PacketDistributor.PLAYER.with(() -> serverPlayer),
-                        new S2CPlayerCfeContainerSync(getCFE(), ((PlayerKnowledgeAccessor) serverPlayer).isCreationAcknowledged()));
+                        new S2CPlayerCfeContainerSync(getCFE()));
             }
         }
     }
