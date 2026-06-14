@@ -1,22 +1,33 @@
 package net.sinedkadis.terracompositio.block;
 
 import net.minecraft.core.BlockPos;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
+import net.minecraftforge.fluids.FluidStack;
+import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandlerItem;
+import net.sinedkadis.terracompositio.registries.TCBlockStateProperties;
+import net.sinedkadis.terracompositio.registries.TCFluids;
 
 
 public interface IFluidApplicable {
 
-//    default FluidApplyResult tryApply(Level level, BlockPos blockPos, ItemStack itemStack) {
-//        Optional<IFluidHandlerItem> capability = itemStack.getCapability(ForgeCapabilities.FLUID_HANDLER_ITEM).resolve();
-//        if (capability.isPresent()) {
-//            IFluidHandlerItem iFluidHandlerItem = capability.get();
-//            return tryApply(level,blockPos,itemStack,iFluidHandlerItem);
-//        }
-//        return FluidApplyResult.SKIP;
-//    }
-    FluidApplyResult tryApply(Level level, BlockPos blockPos, ItemStack itemStack, IFluidHandlerItem handlerItem);
+    default FluidApplyResult tryApply(Level level, BlockPos blockPos, ItemStack itemStack, IFluidHandlerItem handlerItem, Player player) {
+        FluidStack resource = new FluidStack(TCFluids.FLOW_FLUID.source.get(), 1000);
+        FluidStack result = handlerItem.drain(resource, IFluidHandler.FluidAction.SIMULATE);
+        BlockState blockState = level.getBlockState(blockPos);
+        if (result.getAmount() >= 1000
+                && blockState.hasProperty(TCBlockStateProperties.INFUSED)
+                && !blockState.getValue(TCBlockStateProperties.INFUSED)) {
+            level.setBlockAndUpdate(blockPos, blockState.setValue(TCBlockStateProperties.INFUSED, true));
+            if (!player.isCreative())
+                handlerItem.drain(1000, IFluidHandler.FluidAction.EXECUTE);
+            return FluidApplyResult.SUCCESS;
+        }
+        return FluidApplyResult.SKIP;
+    }
 
     enum FluidApplyResult {
         SUCCESS,SKIP,CANCEL;

@@ -1,11 +1,10 @@
 package net.sinedkadis.terracompositio.api.networks.cfe;
 
-import net.minecraft.core.BlockPos;
-import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
+import net.sinedkadis.terracompositio.api.networks.AnyNetworkMember;
 
 
-public interface CFENetworkMember {
+public interface CFENetworkMember extends AnyNetworkMember {
     //Filter values
     int getRange();
     int getPriority();
@@ -18,15 +17,6 @@ public interface CFENetworkMember {
 
     //Cfe Handler reference
     ICFEHandler getMainHandler();
-
-    default ICFEHandler getHandler(int index) {
-        return getMainHandler();
-    }
-
-    //World data getters
-    <T> T getEntity();
-    Level getLevel();
-    BlockPos getPos();
 
     //Updates
     void updateIfScheduled();

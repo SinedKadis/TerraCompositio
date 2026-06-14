@@ -1,7 +1,6 @@
 package net.sinedkadis.terracompositio.api;
 
-import net.sinedkadis.terracompositio.api.dummies.DummyCFENetwork;
-import net.sinedkadis.terracompositio.api.dummies.DummyFluidNetwork;
+import net.sinedkadis.terracompositio.api.dummies.DummyNetwork;
 import net.sinedkadis.terracompositio.api.networks.cfe.CFENetwork;
 import net.sinedkadis.terracompositio.api.networks.fluid.FluidNetwork;
 import org.slf4j.Logger;
@@ -15,9 +14,9 @@ public interface TerraCompositioAPI {
         return INSTANCE;
     }
     default CFENetwork getCFENetworkInstance(){
-        return DummyCFENetwork.instance;
+        return DummyNetwork.instance;
     }
     default FluidNetwork getFluidNetworkInstance(){
-        return DummyFluidNetwork.instance;
+        return DummyNetwork.instance;
     }
 }

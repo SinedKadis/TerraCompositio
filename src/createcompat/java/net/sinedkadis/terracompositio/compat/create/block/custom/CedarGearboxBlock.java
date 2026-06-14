@@ -16,6 +16,7 @@ import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
 import net.minecraftforge.registries.RegistryObject;
 import net.sinedkadis.terracompositio.TerraCompositio;
+import net.sinedkadis.terracompositio.block.IFluidApplicable;
 import net.sinedkadis.terracompositio.compat.create.TCCreateCompat;
 import net.sinedkadis.terracompositio.compat.create.block.entity.CedarGearboxBlockEntity;
 import net.sinedkadis.terracompositio.registries.TCBlockStateProperties;
@@ -24,7 +25,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
-public class CedarGearboxBlock extends RotatedPillarKineticBlock implements IBE<CedarGearboxBlockEntity> {
+public class CedarGearboxBlock extends RotatedPillarKineticBlock implements IBE<CedarGearboxBlockEntity>, IFluidApplicable {
     public CedarGearboxBlock(Properties pProperties) {
         super(pProperties);
         registerDefaultState(defaultBlockState().setValue(TCBlockStateProperties.INFUSED, false));
@@ -96,5 +97,4 @@ public class CedarGearboxBlock extends RotatedPillarKineticBlock implements IBE<
     public boolean hasShaftTowards(LevelReader world, BlockPos pos, BlockState state, Direction face) {
         return state.getValue(AXIS) == face.getAxis();
     }
-
 }

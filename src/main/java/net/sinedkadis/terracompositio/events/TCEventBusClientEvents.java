@@ -23,13 +23,13 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidUtil;
 import net.minecraftforge.fluids.capability.IFluidHandlerItem;
+import net.minecraftforge.fml.ModList;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.sinedkadis.terracompositio.TerraCompositio;
 import net.sinedkadis.terracompositio.block.entity.renderer.*;
 import net.sinedkadis.terracompositio.cfe.burst.CFEBurstRenderer;
-import net.sinedkadis.terracompositio.compat.CompatUtils;
 import net.sinedkadis.terracompositio.entity.client.CFECloudRenderer;
 import net.sinedkadis.terracompositio.entity.client.CFECubeModel;
 import net.sinedkadis.terracompositio.entity.client.FlowCedarEntModel;
@@ -106,7 +106,7 @@ public class TCEventBusClientEvents {
                 (stack, level, entity, seed) ->
                         CreationFlowJournalItem.isOpen() ? 1.0F : 0.0F
         );
-        if (CompatUtils.CREATE_EXISTENCE.get())
+        if (ModList.get().isLoaded("create"))
             TerraCompositio.createCompat.clientInit();
     }
     static final Map<String, Integer> HARDCODED_COLORS = Map.of(
@@ -195,7 +195,7 @@ public class TCEventBusClientEvents {
         event.registerBlockEntityRenderer(TCBlockEntities.MATTER_INFUSER_PORT_BE.get(), MatterInfuserPortBlockEntityRenderer::new);
 
 
-        if (CompatUtils.CREATE_EXISTENCE.get()) {
+        if (ModList.get().isLoaded("create")) {
             TerraCompositio.createCompat.registerCreateBER(event);
         }
     }

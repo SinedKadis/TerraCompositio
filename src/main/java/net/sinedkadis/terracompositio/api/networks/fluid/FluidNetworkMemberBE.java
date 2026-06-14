@@ -1,29 +1,44 @@
 package net.sinedkadis.terracompositio.api.networks.fluid;
 
 import net.minecraft.core.BlockPos;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraftforge.fluids.capability.IFluidHandler;
+import net.sinedkadis.terracompositio.api.networks.AnyNetworkMember;
 
 
-public interface FluidNetworkMemberBE {
-    String UPDATE_TAG = "scheduledFluidUpdate";
-    Level getLevel();
-    BlockPos getBlockPos();
+public interface FluidNetworkMemberBE extends AnyNetworkMember {
+    //Cfe Handler reference
+    IFluidHandler getMainHandler();
+
     int getPriority();
-    int getLimit();
-    default void scheduleMemberUpdate() {
-        getEntity().getPersistentData().putBoolean(UPDATE_TAG,true);
+
+    int getRange();
+
+    //Updates
+    void updateIfScheduled();
+
+    //Causeless updates
+    void scheduleMemberUpdate();
+
+    default void onFluidNetworkMemberUpdate() {
     }
-    default void updateIfScheduled() {
-        CompoundTag persistentData = getEntity().getPersistentData();
-        if (persistentData.contains(UPDATE_TAG) && persistentData.getBoolean(UPDATE_TAG)) {
-            onFluidNetworkMemberUpdate();
-            persistentData.putBoolean(UPDATE_TAG,false);
-        }
+
+    //Update because of "updated"
+    default void scheduleMemberUpdate(FluidNetworkMemberBE updated) {
+        scheduleMemberUpdate();
     }
-    void onFluidNetworkMemberUpdate();
+
+    default void onFluidNetworkMemberUpdate(FluidNetworkMemberBE updated) {
+        onFluidNetworkMemberUpdate();
+    }
+
+    @SuppressWarnings("unchecked")
     default BlockEntity getEntity(){
         return  ((BlockEntity) this);
+    }
+
+    @Override
+    default BlockPos getPos() {
+        return getEntity().getBlockPos();
     }
 }

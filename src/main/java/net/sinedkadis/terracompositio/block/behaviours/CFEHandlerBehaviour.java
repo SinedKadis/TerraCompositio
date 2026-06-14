@@ -6,6 +6,7 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
+import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.common.capabilities.Capability;
@@ -21,10 +22,11 @@ import net.sinedkadis.terracompositio.api.networks.cfe.CFENetworkMemberEntity;
 import net.sinedkadis.terracompositio.api.networks.cfe.ICFEHandler;
 import net.sinedkadis.terracompositio.block.entity.TCBlockEntity;
 import net.sinedkadis.terracompositio.cfe.CFEContainer;
-import net.sinedkadis.terracompositio.cfe.CFEMemberProxy;
+import net.sinedkadis.terracompositio.cfe.PPCFEMemberProxy;
 import net.sinedkadis.terracompositio.config.TCCommonConfigs;
 import net.sinedkadis.terracompositio.config.TCInnerConfig;
 import net.sinedkadis.terracompositio.util.helpers.CFEHelper;
+import net.sinedkadis.terracompositio.util.helpers.TooltipHelper;
 import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -103,7 +105,11 @@ public class CFEHandlerBehaviour implements IBECFEBehaviour, IHaveKnowledge {
             targets.forEach(target -> {
                 if (target.getMainHandler().getFreeSpace() > TCCommonConfigs.CFE_PER_BURST_TRANSFER_LIMIT.get())
                     scheduleMemberUpdate(target);
-                CFEHelper.createTransfer().fromMembers(target, this).build();
+                CFEHelper.CFETransferBuilder cfeTransferBuilder = CFEHelper.newTransfer().targetAndSource(target, this);
+                if (target.getEntity() instanceof Player) {
+                    cfeTransferBuilder.instant();
+                }
+                cfeTransferBuilder.build();
             });
         }
     }
@@ -112,12 +118,16 @@ public class CFEHandlerBehaviour implements IBECFEBehaviour, IHaveKnowledge {
     public void onCFENetworkMemberUpdate(CFENetworkMember updated) {
         if (getMainHandler().getCFE() > 0 && CFEHelper.validMember(updated)) {
             if (updated.getMainHandler().getFreeSpace() > TCCommonConfigs.CFE_PER_BURST_TRANSFER_LIMIT.get()) {
-                if (updated instanceof CFEMemberProxy proxy && proxy.target() instanceof CFENetworkMemberEntity) {
+                if (updated instanceof PPCFEMemberProxy proxy && proxy.target() instanceof CFENetworkMemberEntity) {
                     if (updated.getPos().closerThan(proxy.proxy().getOutputPos(),getRange()))
                         scheduleMemberUpdate(updated);
                 } else scheduleMemberUpdate(updated);
             }
-            CFEHelper.createTransfer().fromMembers(updated, this).build();
+            CFEHelper.CFETransferBuilder cfeTransferBuilder = CFEHelper.newTransfer().targetAndSource(updated, this);
+            if (updated.getEntity() instanceof Player) {
+                cfeTransferBuilder.instant();
+            }
+            cfeTransferBuilder.build();
         } else onCFENetworkMemberUpdate();
     }
 
@@ -241,16 +251,33 @@ public class CFEHandlerBehaviour implements IBECFEBehaviour, IHaveKnowledge {
     @Override
     public void addTooltipLines(CompoundTag data, List<Component> tooltip, boolean isShifting) {
 
-        // Заголовок — всегда первым, не зависит от данных
-        tooltip.add(Component.translatable("block.terracompositio.cfe_header"));
-
-        if (data.contains("val.cfe")) {
-            tooltip.add(
-                    Component.translatable("block.terracompositio.cfe",
-                                    Component.literal(String.valueOf(data.getInt("val.cfe")))
+        tooltip.add(Component.translatable("block.terracompositio.block_header"));
+        boolean added = false;
+        if (data.contains("val.priority")) {
+            added = tooltip.add(
+                    Component.translatable("block.terracompositio.priority",
+                                    Component.literal(String.valueOf(data.getInt("val.priority")))
                                             .append(Component.translatable("block.terracompositio.units"))
                                             .withStyle(ChatFormatting.AQUA))
                             .withStyle(ChatFormatting.GRAY));
+
+        }
+        if (data.contains("val.range")) {
+            if (isShifting)
+                added = tooltip.add(
+                        Component.translatable("block.terracompositio.range",
+                                        Component.literal(String.valueOf(data.getInt("val.range")))
+                                                .append(Component.translatable("block.terracompositio.blocks"))
+                                                .withStyle(ChatFormatting.AQUA))
+                                .withStyle(ChatFormatting.GRAY));
+
+        }
+        if (!added) tooltip.remove(tooltip.size() - 1);
+
+        tooltip.add(Component.translatable("block.terracompositio.cfe_header"));
+
+        if (data.contains("val.cfe")) {
+            tooltip.add(TooltipHelper.defaultTextWithArg("block.terracompositio.cfe", data.getInt("val.cfe")));
         }
         if (data.contains("val.max_cfe")) {
             tooltip.add(
@@ -270,25 +297,6 @@ public class CFEHandlerBehaviour implements IBECFEBehaviour, IHaveKnowledge {
                             .withStyle(ChatFormatting.GRAY));
 
         }
-        if (data.contains("val.priority")) {
-            tooltip.add(
-                    Component.translatable("block.terracompositio.priority",
-                                    Component.literal(String.valueOf(data.getInt("val.priority")))
-                                            .append(Component.translatable("block.terracompositio.units"))
-                                            .withStyle(ChatFormatting.AQUA))
-                            .withStyle(ChatFormatting.GRAY));
-
-        }
-        if (data.contains("val.range")) {
-            tooltip.add(
-                    Component.translatable("block.terracompositio.range",
-                                    Component.literal(String.valueOf(data.getInt("val.range")))
-                                            .append(Component.translatable("block.terracompositio.blocks"))
-                                            .withStyle(ChatFormatting.AQUA))
-                            .withStyle(ChatFormatting.GRAY));
-
-        }
-
         if (data.contains("flag.type.consumer") && data.getBoolean("flag.type.consumer")) {
             tooltip.add(
                     Component.translatable("block.terracompositio.type",
@@ -304,4 +312,5 @@ public class CFEHandlerBehaviour implements IBECFEBehaviour, IHaveKnowledge {
                             .withStyle(ChatFormatting.GRAY));
         }
     }
+
 }

@@ -24,12 +24,12 @@ import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraftforge.common.ToolAction;
-import net.minecraftforge.fluids.FluidStack;
-import net.minecraftforge.fluids.capability.IFluidHandler;
-import net.minecraftforge.fluids.capability.IFluidHandlerItem;
 import net.sinedkadis.terracompositio.block.IFluidApplicable;
 import net.sinedkadis.terracompositio.item.custom.WrenchAxeItem;
-import net.sinedkadis.terracompositio.registries.*;
+import net.sinedkadis.terracompositio.registries.TCBlockStateProperties;
+import net.sinedkadis.terracompositio.registries.TCBlocks;
+import net.sinedkadis.terracompositio.registries.TCItems;
+import net.sinedkadis.terracompositio.registries.TCTags;
 import net.sinedkadis.terracompositio.util.helpers.WorldHelper;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
@@ -170,18 +170,5 @@ public class FlowCedarLikeBlock extends RotatedPillarBlock implements IFluidAppl
     static {
         WAXED = TCBlockStateProperties.WAXED;
         INFUSED = TCBlockStateProperties.INFUSED;
-    }
-
-    @Override
-    public FluidApplyResult tryApply(Level level, BlockPos blockPos, ItemStack itemStack, IFluidHandlerItem handlerItem) {
-        FluidStack resource = new FluidStack(TCFluids.FLOW_FLUID.source.get(), 1000);
-        FluidStack result = handlerItem.drain(resource, IFluidHandler.FluidAction.SIMULATE);
-        BlockState blockState = level.getBlockState(blockPos);
-        if (result.getAmount() >= 1000 && !blockState.getValue(INFUSED)) {
-            level.setBlockAndUpdate(blockPos, blockState.setValue(INFUSED,true));
-            handlerItem.drain(1000, IFluidHandler.FluidAction.EXECUTE);
-            return FluidApplyResult.SUCCESS;
-        }
-        return FluidApplyResult.SKIP;
     }
 }

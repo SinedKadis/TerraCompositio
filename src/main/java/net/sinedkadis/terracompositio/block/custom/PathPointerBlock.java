@@ -137,6 +137,16 @@ public class PathPointerBlock extends TCBaseEntityBlock {
         return TCBlockEntities.PATH_POINTER_BE.get();
     }
 
+    @Override
+    public void onRemove(BlockState pState, Level pLevel, BlockPos pPos, BlockState pNewState, boolean pIsMoving) {
+        if (!pState.is(pNewState.getBlock())) {
+            if (pLevel.getBlockEntity(pPos) instanceof PathPointerBlockEntity be) {
+                PathPointerBlockEntity.clearAnyBindings(null, be);
+            }
+        }
+        super.onRemove(pState, pLevel, pPos, pNewState, pIsMoving);
+    }
+
     @SuppressWarnings("deprecation")
     @Override
     public List<ItemStack> getDrops(BlockState pState, LootParams.Builder pParams) {

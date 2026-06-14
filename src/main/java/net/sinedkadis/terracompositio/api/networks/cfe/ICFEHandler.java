@@ -14,7 +14,7 @@ import java.util.function.Function;
 
 
 @MethodsReturnNonnullByDefault
-public interface ICFEHandler extends BlockSource {
+public interface ICFEHandler extends BlockSource, CFENetworkMember {
     int getCFE();
     void setCFE(int cfe);
 
@@ -24,9 +24,7 @@ public interface ICFEHandler extends BlockSource {
     int addCFE(int cfe, boolean simulate);
     int takeCFE(int cfe, boolean simulate);
 
-    int sendCFE(int cfe, CFENetworkMember target, float speed, boolean simulate);
-
-    int sendCFE(int cfe, ICFEHandler target, float speed, boolean noCollision, boolean simulate);
+    int sendCFE(CFENetworkMember target, int cfe, float speed, boolean simulate);
 
     void writeToNBT(CompoundTag pTag);
     void readFromNBT(CompoundTag pTag);
@@ -83,8 +81,33 @@ public interface ICFEHandler extends BlockSource {
         return (ServerLevel) getAttachedMember().getLevel();
     }
 
-    default <T extends BlockEntity> T getEntity() {
-        //noinspection unchecked
-        return (T) Objects.requireNonNull(this.getLevel().getBlockEntity(this.getPos()));
+    @SuppressWarnings("unchecked")
+    default BlockEntity getEntity() {
+        return Objects.requireNonNull(this.getLevel().getBlockEntity(this.getPos()));
+    }
+
+    @Override
+    default int getRange() {
+        return getAttachedMember().getRange();
+    }
+
+    @Override
+    default int getPriority() {
+        return getAttachedMember().getPriority();
+    }
+
+    @Override
+    default ICFEHandler getMainHandler() {
+        return this;
+    }
+
+    @Override
+    default void updateIfScheduled() {
+        getAttachedMember().updateIfScheduled();
+    }
+
+    @Override
+    default void scheduleMemberUpdate() {
+        getAttachedMember().scheduleMemberUpdate();
     }
 }

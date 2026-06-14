@@ -4,6 +4,7 @@ import lombok.Getter;
 import lombok.Setter;
 import lombok.extern.slf4j.Slf4j;
 import net.minecraft.ChatFormatting;
+import net.minecraft.client.Minecraft;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.NonNullList;
 import net.minecraft.core.particles.ParticleTypes;
@@ -37,6 +38,7 @@ import net.sinedkadis.terracompositio.network.TCPackets;
 import net.sinedkadis.terracompositio.network.packets.S2CHighLightNodesSync;
 import net.sinedkadis.terracompositio.registries.TCBlockEntities;
 import net.sinedkadis.terracompositio.util.BindException;
+import net.sinedkadis.terracompositio.util.accessors.PlayerKnowledgeAccessor;
 import net.sinedkadis.terracompositio.util.helpers.BlockPosHelper;
 import net.sinedkadis.terracompositio.util.helpers.PlayerHelper;
 import org.jetbrains.annotations.NotNull;
@@ -151,10 +153,6 @@ public class PathPointerBlockEntity extends TCBlockEntity implements Nameable, C
     @Override
     public void setRemoved() {
         TerraCompositioAPI.INSTANCE.getCFENetworkInstance().fireCFENetworkEvent(this, NetworkAction.REMOVE);
-        assert this.level != null;
-        if (!this.level.getBlockState(this.getBlockPos()).equals(this.getBlockState())) {
-            clearAnyBindings(null, this);
-        }
         super.setRemoved();
     }
 
@@ -654,8 +652,6 @@ public class PathPointerBlockEntity extends TCBlockEntity implements Nameable, C
         loadFromTagToSet(pTag, SENDER_POSES_TAG, senderPoses);
         loadFromTagToSet(pTag, INPUT_POSES_TAG, inputPoses);
 
-
-        update(this);
     }
 
     @Override
@@ -666,7 +662,8 @@ public class PathPointerBlockEntity extends TCBlockEntity implements Nameable, C
         if (receiverPos != null)
             compoundTag.put(RECEIVER_POS_TAG, BlockPosHelper.saveBlockPos(receiverPos));
         BlockPos outputPos = getOutputPos();
-        compoundTag.put(OUTPUT_POS_TAG, BlockPosHelper.saveBlockPos(outputPos));
+        if (outputPos != null)
+            compoundTag.put(OUTPUT_POS_TAG, BlockPosHelper.saveBlockPos(outputPos));
 
         PathPointerBlockEntity.saveFromSetToTag(compoundTag, PathPointerBlockEntity.SENDER_POSES_TAG, getSenderPoses());
         PathPointerBlockEntity.saveFromSetToTag(compoundTag, PathPointerBlockEntity.INPUT_POSES_TAG, getInputPoses());
@@ -714,6 +711,10 @@ public class PathPointerBlockEntity extends TCBlockEntity implements Nameable, C
 
     public void highlightNodes() {
         if (level != null && level.isClientSide) {
+
+            PlayerKnowledgeAccessor player = (PlayerKnowledgeAccessor) Minecraft.getInstance().player;
+            if (player == null || !player.isCreationAcknowledged()) return;
+
             if (receiverPos != null) {
                 addParticle(level, receiverPos, ParticleTypes.FLAME);
             }
@@ -767,7 +768,7 @@ public class PathPointerBlockEntity extends TCBlockEntity implements Nameable, C
 
     @Override
     public int getRange() {
-        return 0;
+        return 5;
     }
 
     @Override
@@ -793,8 +794,8 @@ public class PathPointerBlockEntity extends TCBlockEntity implements Nameable, C
 
     @Override
     public void updateIfScheduled() {
-        CFENetwork cfeNetworkInstance = TerraCompositioAPI.instance().getCFENetworkInstance();
-        inputPoses.forEach(pos -> cfeNetworkInstance.updateInRange(level, pos, 5));
+//        CFENetwork cfeNetworkInstance = TerraCompositioAPI.instance().getCFENetworkInstance();
+//        inputPoses.forEach(pos -> cfeNetworkInstance.updateInRange(level, pos, 5));
     }
 
     public void scheduleMemberUpdate() {

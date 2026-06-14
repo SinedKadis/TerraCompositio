@@ -2,9 +2,11 @@ package net.sinedkadis.terracompositio.block.entity;
 
 
 import lombok.Getter;
+import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
@@ -16,18 +18,22 @@ import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidUtil;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.fluids.capability.templates.FluidTank;
+import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBEBehaviour;
 import net.sinedkadis.terracompositio.api.networks.cfe.ICFEHandler;
 import net.sinedkadis.terracompositio.block.behaviours.CFEHandlerBehaviour;
-import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBEBehaviour;
 import net.sinedkadis.terracompositio.config.TCInnerConfig;
 import net.sinedkadis.terracompositio.registries.TCBlockStateProperties;
 import net.sinedkadis.terracompositio.registries.TCFluids;
-import org.jetbrains.annotations.NotNull;
+import net.sinedkadis.terracompositio.util.FluidComponent;
 import org.jetbrains.annotations.Nullable;
 
+import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.List;
 import java.util.Optional;
+
 @Getter
+@ParametersAreNonnullByDefault
+@MethodsReturnNonnullByDefault
 public abstract class AbstractDesorberBlockEntity extends TCBlockEntity {
 
     protected final FluidTank fluidHandler = new FluidTank(getTankCapacity()){
@@ -41,7 +47,7 @@ public abstract class AbstractDesorberBlockEntity extends TCBlockEntity {
     };
 
     @Override
-    public void addBEBehaviours(@NotNull List<IBEBehaviour> list) {
+    public void addBEBehaviours(List<IBEBehaviour> list) {
         list.add(new CFEHandlerBehaviour(this)
                 .maxCFE(1000)
                 .range(5)
@@ -60,7 +66,7 @@ public abstract class AbstractDesorberBlockEntity extends TCBlockEntity {
         super(type, pos, state);
     }
 
-    public void tick(@NotNull Level pLevel, @NotNull BlockPos pPos, @NotNull BlockState pState) {
+    public void tick(Level pLevel, BlockPos pPos, BlockState pState) {
         super.tick(pLevel,pPos,pState);
         if (!fluidHandler.isEmpty() && !pState.getValue(TCBlockStateProperties.INFUSED)) {
             pLevel.setBlockAndUpdate(pPos, pState.setValue(TCBlockStateProperties.INFUSED, true));
@@ -78,7 +84,7 @@ public abstract class AbstractDesorberBlockEntity extends TCBlockEntity {
     }
 
     @Override
-    public @NotNull <T> LazyOptional<T> getCapability(@NotNull Capability<T> cap, @Nullable Direction side) {
+    public <T> LazyOptional<T> getCapability(Capability<T> cap, @Nullable Direction side) {
         if (cap == ForgeCapabilities.FLUID_HANDLER && (side == null || side == Direction.DOWN)) {
             return lazyFluidHandler.cast();
         }
@@ -92,13 +98,13 @@ public abstract class AbstractDesorberBlockEntity extends TCBlockEntity {
     }
 
     @Override
-    protected void saveAdditional(@NotNull CompoundTag pTag) {
+    protected void saveAdditional(CompoundTag pTag) {
         fluidHandler.writeToNBT(pTag);
         super.saveAdditional(pTag);
     }
 
     @Override
-    public void load(@NotNull CompoundTag pTag) {
+    public void load(CompoundTag pTag) {
         super.load(pTag);
         fluidHandler.readFromNBT(pTag);
     }
@@ -113,4 +119,28 @@ public abstract class AbstractDesorberBlockEntity extends TCBlockEntity {
         return ((CFEHandlerBehaviour) behaviours.get(0)).getMainHandler();
     }
 
+    @Override
+    public void collectKnowledgeData(CompoundTag data) {
+        super.collectKnowledgeData(data);
+
+        FluidStack fluidInTank = fluidHandler.getFluidInTank(0);
+        CompoundTag compoundTag = new CompoundTag();
+        fluidInTank.writeToNBT(compoundTag);
+        data.put("val.fluid", compoundTag);
+
+    }
+
+    @Override
+    public void addTooltipLines(CompoundTag data, List<Component> tooltip, boolean isShifting) {
+        super.addTooltipLines(data, tooltip, isShifting);
+
+        FluidStack fluidStack = FluidStack.loadFluidStackFromNBT(data.getCompound("val.fluid"));
+        if (!fluidStack.isEmpty()) {
+
+            tooltip.add(Component.translatable("block.terracompositio.fluids_header"));
+
+            tooltip.add(FluidComponent.of(fluidStack));
+        }
+
+    }
 }

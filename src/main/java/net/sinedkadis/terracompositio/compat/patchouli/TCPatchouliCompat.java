@@ -4,37 +4,30 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.fml.ModList;
 import net.sinedkadis.terracompositio.TerraCompositio;
-import net.sinedkadis.terracompositio.registries.TCItems;
+import net.sinedkadis.terracompositio.item.custom.CreationFlowJournalItem;
 import vazkii.patchouli.api.PatchouliAPI;
-
-import java.lang.reflect.Method;
+import vazkii.patchouli.common.book.Book;
+import vazkii.patchouli.common.util.ItemStackUtil;
 
 public class TCPatchouliCompat {
-    private static final String BOOK_CLASS = "vazkii.patchouli.common.book.Book";
-    private static final boolean PATCHOULI_LOADED = ModList.get().isLoaded("patchouli");
+
 
     public static void registerMultiblocks() {
         PatchouliAPI.get().registerMultiblock(TerraCompositio.modLoc("multiblocks/matter_infuser"),TCMultiblocks.MATTER_INFUSER_MB.get());
     }
 
     public static void reloadBookContents(Object book, Level level) {
-        if (!PATCHOULI_LOADED) return;
+        if (!ModList.get().isLoaded("patchouli")) return;
 
-        try {
-            Class<?> bookClass = Class.forName(BOOK_CLASS);
-            if (bookClass.isInstance(book)) {
-                Method reloadMethod = bookClass.getDeclaredMethod("reloadContents", Level.class, boolean.class);
-                reloadMethod.setAccessible(true);
-                reloadMethod.invoke(book, level, true);
-            }
-        } catch (Exception e) {
-            TerraCompositio.LOGGER.error("Failed to reload Patchouli book contents", e);
+
+        if (book instanceof ItemStack itemStack) {
+            book = ItemStackUtil.getBookFromStack(itemStack);
+            CreationFlowJournalItem.setFlags(CreationFlowJournalItem.getDay(itemStack));
         }
-    }
+        if (book instanceof Book book1) {
+            book1.reloadContents(level, true);
+        }
 
-    public static boolean isMyBook(ItemStack book) {
-        if (!PATCHOULI_LOADED) return false;
 
-        return book.is(TCItems.CREATION_FLOW_JOURNAL.get());
     }
 }

@@ -19,6 +19,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.FormattedText;
+import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
@@ -32,6 +33,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.phys.*;
 import net.minecraftforge.client.gui.overlay.ForgeGui;
+import net.minecraftforge.fluids.FluidStack;
 import net.sinedkadis.terracompositio.api.IHaveKnowledge;
 import net.sinedkadis.terracompositio.config.TCClientConfigs;
 import net.sinedkadis.terracompositio.network.TCPackets;
@@ -39,6 +41,7 @@ import net.sinedkadis.terracompositio.network.packets.C2SRequestBlockKnowledgePa
 import net.sinedkadis.terracompositio.network.packets.C2SRequestEntityKnowledgePacket;
 import net.sinedkadis.terracompositio.network.packets.S2CKnowledgeDataPacket;
 import net.sinedkadis.terracompositio.registries.TCItems;
+import net.sinedkadis.terracompositio.util.FluidComponent;
 import net.sinedkadis.terracompositio.util.ItemComponent;
 import net.sinedkadis.terracompositio.util.accessors.PlayerKnowledgeAccessor;
 import org.jetbrains.annotations.Nullable;
@@ -63,12 +66,14 @@ public class KnowledgeOverlay {
     private static int lineWidth(Font font, FormattedText line) {
         if (line instanceof ItemComponent ic) {
             return 16 + 4 + 45 + font.width(ic.itemStack().getHoverName());
+        } else if (line instanceof FluidComponent fc) {
+            return 16 + 4 + 25 + font.width(fc.fluidStack().getFluid().getBucket().getDefaultInstance().getHoverName());
         }
         return font.width(line) + 15;
     }
 
     private static int lineHeight(FormattedText line) {
-        return (line instanceof ItemComponent) ? 16 : 9;
+        return (line instanceof MutableComponent) ? 9 : 16;
     }
 
     // ─────────────────────────────────────────────────────────────
@@ -97,7 +102,18 @@ public class KnowledgeOverlay {
 
         EntityHitResult entityResult = getEntityHitResult(mc, player, level);
 
-        if (entityResult == null && hit instanceof BlockHitResult result) {
+        boolean isEntity = false;
+        Entity entity = null;
+        IHaveKnowledge entityKnowledge = null;
+        if (entityResult != null) {
+            entity = entityResult.getEntity();
+            if ((entity instanceof IHaveKnowledge ihk)) {
+                isEntity = true;
+                entityKnowledge = ihk;
+            }
+        }
+
+        if (!isEntity && hit instanceof BlockHitResult result) {
             BlockPos pos = result.getBlockPos();
 
             BlockEntity be = level.getBlockEntity(pos);
@@ -119,17 +135,11 @@ public class KnowledgeOverlay {
             }
 
             ihk.addTooltipLines(data, tooltip, isShifting);
-        } else if (entityResult != null) {
-
-            Entity entity = entityResult.getEntity();
-            if (!(entity instanceof IHaveKnowledge ihk)) {
-                resetHover();
-                return;
-            }
-
+        } else if (isEntity) {
             hoverTicks++;
 
             if (hoverTicks == 1 || hoverTicks % REQUEST_INTERVAL == 0) {
+
                 TCPackets.CHANNEL.sendToServer(new C2SRequestEntityKnowledgePacket(entity.getUUID()));
             }
 
@@ -138,7 +148,7 @@ public class KnowledgeOverlay {
                 return;
             }
 
-            ihk.addTooltipLines(data, tooltip, isShifting);
+            entityKnowledge.addTooltipLines(data, tooltip, isShifting);
         }
 
         if (tooltip.isEmpty()) return;
@@ -230,7 +240,7 @@ public class KnowledgeOverlay {
             }
         }
 
-        // Иконка Apple of Knowledge
+
         {
             ItemStack knowledgeIcon = TCItems.APPLE_OF_KNOWLEDGE.get().getDefaultInstance();
             int iconX = anchorX + tooltipW - 13;
@@ -254,6 +264,8 @@ public class KnowledgeOverlay {
         for (FormattedText line : lines) {
             if (line instanceof ItemComponent ic) {
                 drawItemLine(poseStack, graphics, font, ic.itemStack(), anchorX + 2, cursorY);
+            } else if (line instanceof FluidComponent fc) {
+                drawFluidLine(poseStack, graphics, font, fc.fluidStack(), anchorX + 2, cursorY);
             } else {
                 FormattedCharSequence seq = line instanceof FormattedCharSequence fcs
                         ? fcs
@@ -285,6 +297,20 @@ public class KnowledgeOverlay {
 
         Component label = Component.literal(" -     " + stack.getCount() + "x ")
                 .append(stack.getHoverName());
+        graphics.drawString(font, label, x, y + 4, 0xFFAAAAAA, false);
+    }
+
+    private static void drawFluidLine(PoseStack poseStack, GuiGraphics graphics,
+                                      Font font, FluidStack stack, int x, int y) {
+        poseStack.pushPose();
+        poseStack.translate(x + 10, y, 1000);
+        poseStack.mulPose(Axis.ZP.rotationDegrees(180));
+        poseStack.mulPose(Axis.YP.rotationDegrees(180));
+        renderItemIntoGUI(poseStack, stack.getFluid().getBucket().getDefaultInstance(), true);
+        poseStack.popPose();
+
+        Component label = Component.literal(" -     " + stack.getAmount() + "mb ")
+                .append(stack.getFluid().getFluidType().getDescription());
         graphics.drawString(font, label, x, y + 4, 0xFFAAAAAA, false);
     }
 

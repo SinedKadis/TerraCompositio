@@ -4,7 +4,6 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import net.sinedkadis.terracompositio.api.networks.cfe.CFENetworkMember;
@@ -40,12 +39,7 @@ public class DummyCFEHandler implements ICFEHandler {
     }
 
     @Override
-    public int sendCFE(int cfe, CFENetworkMember target, float speed, boolean simulate) {
-        return 0;
-    }
-
-    @Override
-    public int sendCFE(int cfe, ICFEHandler target, float speed, boolean noCollision, boolean simulate) {
+    public int sendCFE(CFENetworkMember target, int cfe, float speed, boolean simulate) {
         return 0;
     }
 
@@ -139,11 +133,6 @@ public class DummyCFEHandler implements ICFEHandler {
 
     @Override
     public BlockState getBlockState() {
-        return null;
-    }
-
-    @Override
-    public <T extends BlockEntity> T getEntity() {
         return null;
     }
 

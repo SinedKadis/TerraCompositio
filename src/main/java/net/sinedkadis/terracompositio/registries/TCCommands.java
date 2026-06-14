@@ -9,15 +9,19 @@ import net.minecraft.commands.arguments.EntityArgument;
 import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.LivingEntity;
 import net.minecraftforge.common.util.NonNullSupplier;
 import net.minecraftforge.event.RegisterCommandsEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
+import net.minecraftforge.network.PacketDistributor;
 import net.sinedkadis.terracompositio.TerraCompositio;
 import net.sinedkadis.terracompositio.api.TCCapabilities;
+import net.sinedkadis.terracompositio.api.TerraCompositioAPI;
+import net.sinedkadis.terracompositio.api.networks.cfe.CFENetworkMember;
 import net.sinedkadis.terracompositio.api.networks.cfe.CFENetworkMemberEntity;
 import net.sinedkadis.terracompositio.api.networks.cfe.ICFEHandler;
+import net.sinedkadis.terracompositio.network.TCPackets;
+import net.sinedkadis.terracompositio.network.packets.S2CPlayerCfeContainerSync;
 
 import java.util.Arrays;
 
@@ -53,7 +57,18 @@ public class TCCommands {
                                     .getEntity(ctx,"cfe network member entity");
                             return TCCommands.clearCFEData(ctx,entity);
                         })
+                        .then(
+                                Commands.literal("clear-all-queues")
+                                        .executes(TCCommands::clearAllQueues)
+                        )
                         );
+    }
+
+    private static int clearAllQueues(CommandContext<CommandSourceStack> ctx) {
+        TerraCompositioAPI.instance().getCFENetworkInstance().getAllCFENetworkMembers(ctx.getSource().getLevel()).stream()
+                .map(CFENetworkMember::getMainHandler)
+                .forEach(icfeHandler -> icfeHandler.setQueued(0));
+        return 0;
     }
 
     private static int clearCFEData(CommandContext<CommandSourceStack> ctx, Entity... entities) {
@@ -77,6 +92,10 @@ public class TCCommands {
         }
         ICFEHandler mainHandler = memberEntity.getMainHandler();
         mainHandler.clear();
+        if (memberEntity instanceof ServerPlayer serverPlayer) {
+            TCPackets.CHANNEL.send(PacketDistributor.PLAYER.with(() -> serverPlayer),
+                    new S2CPlayerCfeContainerSync(mainHandler.getCFE()));
+        }
 
         NonNullSupplier<Exception> exception = Exception::new;
         memberEntity.getEntity().getArmorSlots().forEach(itemStack -> {
@@ -113,29 +132,10 @@ public class TCCommands {
             }
         }
 
-
-
         StringBuilder message = new StringBuilder();
-
-
-
 
         ICFEHandler mainHandler = memberEntity.getMainHandler();
         message.append(mainHandler.toString()).append("\n\n");
-
-        NonNullSupplier<Exception> exception = Exception::new;
-        memberEntity.getEntity().getArmorSlots().forEach(itemStack -> {
-            try {
-                switch (LivingEntity.getEquipmentSlotForItem(itemStack)) {
-                    case HEAD -> message.append("Head:\n ").append(itemStack.getCapability(TCCapabilities.CFE).orElseThrow(exception)).append("\n\n");
-                    case CHEST -> message.append("Chest:\n ").append(itemStack.getCapability(TCCapabilities.CFE).orElseThrow(exception)).append("\n\n");
-                    case LEGS -> message.append("Legs:\n ").append(itemStack.getCapability(TCCapabilities.CFE).orElseThrow(exception)).append("\n\n");
-                    case FEET -> message.append("Feet:\n ").append(itemStack.getCapability(TCCapabilities.CFE).orElseThrow(exception)).append("\n\n");
-                }
-            } catch (Exception ignored) {
-
-            }
-        });
 
         source.sendSuccess(() ->
                         Component.literal(message.toString()),

@@ -26,16 +26,20 @@ import net.sinedkadis.terracompositio.network.packets.S2CPlayerCfeContainerSync;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.function.Function;
 
-@Getter
 @Setter
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class CFEContainer implements ICFEHandler, INBTSerializable<CompoundTag> {
+    @Getter
     protected CFENetworkMember attachedMember;
+    @Getter
     protected boolean isEntity = false;
+    @Getter
     protected int index = 0;
+    @Getter
     protected int CFE = 0;
     protected int maxCFE = 100;
+    @Getter
     protected Function<Vec3, Vec3> offset = t -> t;
     protected int queued = 0;
 
@@ -58,7 +62,7 @@ public class CFEContainer implements ICFEHandler, INBTSerializable<CompoundTag> 
 
     public CFEContainer(CFENetworkMember attachedMember) {
         this.attachedMember = attachedMember;
-        if (attachedMember instanceof  CFENetworkMemberEntity) isEntity = true;
+        if (attachedMember instanceof CFENetworkMemberEntity) isEntity = true;
     }
 
     public CFEContainer setMaxCFE(int max) {
@@ -82,7 +86,7 @@ public class CFEContainer implements ICFEHandler, INBTSerializable<CompoundTag> 
         int taken = Mth.clamp(cfe, 0, getCFE());
 
         if (!simulate) {
-            setCFE(getCFE()-taken);
+            setCFE(getCFE() - taken);
 
             sendCFEUpdate();
             onContentsChanged();
@@ -90,27 +94,8 @@ public class CFEContainer implements ICFEHandler, INBTSerializable<CompoundTag> 
         return taken;
     }
 
-
     @Override
-    public int sendCFE(int cfe, ICFEHandler target, float speed, boolean noCol, boolean simulate) {
-        int freeSpace = target.getFreeSpace();
-        int available = this.getCFE();
-        int added = Mth.clamp(cfe, 0, Math.min(available, freeSpace));
-        if (added < 1)
-            return 0;
-
-        if (!simulate) {
-            CFEBurstProjectileEntity entity = CFEBurstProjectileEntity.sendBurst(this, target, added, speed);
-            if (entity != null) {
-                entity.noCollision(noCol);
-                target.addToQueue(added);
-            }
-        }
-        return added;
-    }
-
-    @Override
-    public int sendCFE(int cfe, CFENetworkMember target,float speed, boolean simulate) {
+    public int sendCFE(CFENetworkMember target, int cfe, float speed, boolean simulate) {
         int freeSpace = target.getMainHandler().getFreeSpace();
         int available = this.getCFE();
         int added = Mth.clamp(cfe, 0, Math.min(available, freeSpace));
@@ -119,25 +104,25 @@ public class CFEContainer implements ICFEHandler, INBTSerializable<CompoundTag> 
 
         if (!simulate) {
             CFEBurstProjectileEntity entity = CFEBurstProjectileEntity.sendBurst(this, target, added, speed);
-            if (entity != null)
+            if (entity != null) {
+                getLevel().addFreshEntity(entity);
                 target.getMainHandler().addToQueue(added);
+            }
         }
         return added;
     }
 
-    public int addCFE(int cfe,boolean simulate) {
+    public int addCFE(int cfe, boolean simulate) {
         int pMax = getMaxCFE() - getCFE();
         int added = Mth.clamp(cfe, 0, pMax);
         if (!simulate) {
-            setCFE(getCFE()+added);
-            
+            setCFE(getCFE() + added);
+
             getAttachedMember().scheduleMemberUpdate();
             onContentsChanged();
         }
         return added;
     }
-
-
 
 
     protected void onContentsChanged() {
@@ -153,16 +138,13 @@ public class CFEContainer implements ICFEHandler, INBTSerializable<CompoundTag> 
 
     protected void sendCFEUpdate() {
         if (getAttachedMember() instanceof CFENetworkMemberBE cfeNetworkMemberBE) {
-//            TerraCompositioAPI.INSTANCE.getCFENetworkInstance().fireCFENetworkEvent(cfeNetworkMemberBE, NetworkAction.UPDATE);
-            //TerraCompositioAPI.INSTANCE.getCFENetworkInstance().networkMemberUpdated(cfeNetworkMemberBE);
-
             TerraCompositioAPI.INSTANCE.getCFENetworkInstance().fireCFENetworkEvent(cfeNetworkMemberBE, NetworkAction.UPDATE);
-
         }
         if (isEntity) {
             TerraCompositioAPI.INSTANCE.getCFENetworkInstance().fireCFENetworkEvent(getAttachedMember(), NetworkAction.UPDATE);
             if (getAttachedMember() instanceof ServerPlayer serverPlayer) {
-                TCPackets.CHANNEL.send(PacketDistributor.PLAYER.with(() -> serverPlayer),new S2CPlayerCfeContainerSync(getCFE()));
+                TCPackets.CHANNEL.send(PacketDistributor.PLAYER.with(() -> serverPlayer),
+                        new S2CPlayerCfeContainerSync(getCFE()));
             }
         }
     }
@@ -207,4 +189,7 @@ public class CFEContainer implements ICFEHandler, INBTSerializable<CompoundTag> 
         setCFE(tag.getInt("CFE"));
     }
 
+    public int getMaxCFE() {
+        return Math.max(this.maxCFE, this.CFE);
+    }
 }

@@ -5,9 +5,9 @@ import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.eventbus.api.IEventBus;
+import net.minecraftforge.fml.ModList;
 import net.minecraftforge.registries.DeferredRegister;
 import net.sinedkadis.terracompositio.TerraCompositio;
-import net.sinedkadis.terracompositio.compat.CompatUtils;
 
 public class TCCreativeModeTabs {
     public static final DeferredRegister<CreativeModeTab> Creative_mode_tabs =
@@ -148,7 +148,7 @@ public class TCCreativeModeTabs {
 
 
                             //create compat
-                            if (CompatUtils.CREATE_EXISTENCE.get())
+                            if (ModList.get().isLoaded("create"))
                                 TerraCompositio.createCompat.addCreativeTab(pOutput);
 
                         })

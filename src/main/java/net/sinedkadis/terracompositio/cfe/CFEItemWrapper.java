@@ -8,7 +8,6 @@ import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.capabilities.Capability;
@@ -30,6 +29,7 @@ public class CFEItemWrapper implements ICFEHandler, ICapabilityProvider {
     protected int queued = 0;
     private final LazyOptional<ICFEHandler> holder = LazyOptional.of(() -> this);
     @NotNull
+    @Getter
     protected ItemStack container;
 
     public CFEItemWrapper(@NotNull ItemStack container) {
@@ -86,7 +86,7 @@ public class CFEItemWrapper implements ICFEHandler, ICapabilityProvider {
     }
 
     @Override
-    public int sendCFE(int cfe, CFENetworkMember target,float speed, boolean simulate) {
+    public int sendCFE(CFENetworkMember target, int cfe, float speed, boolean simulate) {
         return 0;
     }
 
@@ -98,12 +98,6 @@ public class CFEItemWrapper implements ICFEHandler, ICapabilityProvider {
             this.setCFE(cfe1 +toAdd);
         }
         return toAdd;
-    }
-
-
-    @Override
-    public int sendCFE(int cfe, ICFEHandler target, float speed, boolean noCol, boolean simulate) {
-        return 0;
     }
 
     @Override
@@ -173,11 +167,6 @@ public class CFEItemWrapper implements ICFEHandler, ICapabilityProvider {
 
     @Override
     public BlockState getBlockState() {
-        return null;
-    }
-
-    @Override
-    public <T extends BlockEntity> T getEntity() {
         return null;
     }
 

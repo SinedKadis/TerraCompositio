@@ -14,7 +14,7 @@ import org.jetbrains.annotations.Nullable;
 
 public class PlayerCFEProvider implements net.minecraftforge.common.capabilities.ICapabilityProvider, INBTSerializable<CompoundTag> {
 
-    private ICFEHandler simpleCFEContainer = null;
+    private CFEHandlerProxy handler = null;
 
     public PlayerCFEProvider(Player player) {
         this.player = player;
@@ -33,11 +33,15 @@ public class PlayerCFEProvider implements net.minecraftforge.common.capabilities
     }
 
     private ICFEHandler createPlayerCFEContainer() {
-        if(this.simpleCFEContainer == null) {
-            this.simpleCFEContainer = new CFEContainer((CFENetworkMemberEntity)player).setMaxCFE(10).setOffset(vec3 -> vec3.add(0,1,0));
+        if (this.handler == null) {
+            this.handler = new CFEHandlerProxy();
+            handler.getHandlerList().add(
+                    new CFEContainer((CFENetworkMemberEntity) player)
+                            .setMaxCFE(10)
+                            .setOffset(vec3 -> vec3.add(0, 1, 0)));
         }
 
-        return this.simpleCFEContainer;
+        return this.handler;
     }
 
     @Override

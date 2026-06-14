@@ -8,20 +8,20 @@ import net.sinedkadis.terracompositio.network.ClientPacketHandlers;
 import java.util.function.Supplier;
 
 
-public record S2CPlayerCfeContainerSync(int cfe) {
-    public static void encode(S2CPlayerCfeContainerSync msg, FriendlyByteBuf buf) {
-        buf.writeVarInt(msg.cfe);
+public record S2CAddPlayerKnowledge() {
+    public static void encode(S2CAddPlayerKnowledge ignoredMsg, FriendlyByteBuf ignoredBuf) {
+
     }
 
-    public static S2CPlayerCfeContainerSync decode(FriendlyByteBuf buf) {
-        return new S2CPlayerCfeContainerSync(buf.readVarInt());
+    public static S2CAddPlayerKnowledge decode(FriendlyByteBuf ignoredBuf) {
+        return new S2CAddPlayerKnowledge();
     }
 
 
-    public static void handle(S2CPlayerCfeContainerSync msg, Supplier<NetworkEvent.Context> ctx) {
+    public static void handle(S2CAddPlayerKnowledge ignoredMsg, Supplier<NetworkEvent.Context> ctx) {
         ctx.get().enqueueWork(() -> {
             if (ctx.get().getDirection().getReceptionSide() == LogicalSide.CLIENT) {
-                ClientPacketHandlers.handlePlayerCfeSync(msg);
+                ClientPacketHandlers.handleAddPlayerKnowledge();
             }
         });
         ctx.get().setPacketHandled(true);

@@ -45,7 +45,7 @@ import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBEItemBehaviour;
-import net.sinedkadis.terracompositio.block.behaviours.ManySlotItemHandlerBehaviour;
+import net.sinedkadis.terracompositio.block.behaviours.ItemHandlerBehaviour;
 import net.sinedkadis.terracompositio.block.custom.PathPointerBlock;
 import net.sinedkadis.terracompositio.block.entity.FlowCedarCasingBlockEntity;
 import net.sinedkadis.terracompositio.block.entity.MatterInfuserBaseBlockEntity;
@@ -314,12 +314,12 @@ public class WrenchAxeItem extends AxeItem {
                 for (int slot = 0; slot < iItemHandler.getSlots(); slot++) {
                     if (isCasing && !FlowCedarCasingBlockEntity.isInventorySlot(slot)) continue;
                     if (isMI) continue;
-                    ManySlotItemHandlerBehaviour manySlotItemHandlerBehaviour = null;
+                    ItemHandlerBehaviour itemHandlerBehaviour = null;
                     if (blockEntity instanceof TCBlockEntity tcBlockEntity) {
                         IBEItemBehaviour itemBehaviour = tcBlockEntity.getItemBehaviour();
-                        if (itemBehaviour instanceof ManySlotItemHandlerBehaviour) {
-                            manySlotItemHandlerBehaviour = (ManySlotItemHandlerBehaviour) itemBehaviour;
-                            manySlotItemHandlerBehaviour.ignoreRestrictions = true;
+                        if (itemBehaviour instanceof ItemHandlerBehaviour) {
+                            itemHandlerBehaviour = (ItemHandlerBehaviour) itemBehaviour;
+                            itemHandlerBehaviour.ignoreRestrictions = true;
                         }
                     }
                     ItemStack itemStack = iItemHandler.extractItem(slot, 512, false);
@@ -328,8 +328,8 @@ public class WrenchAxeItem extends AxeItem {
                         player.drop(itemStack, true);
                     }
                     flag = true;
-                    if (manySlotItemHandlerBehaviour != null) {
-                        manySlotItemHandlerBehaviour.ignoreRestrictions = false;
+                    if (itemHandlerBehaviour != null) {
+                        itemHandlerBehaviour.ignoreRestrictions = false;
                     }
                 }
                 if (flag) {

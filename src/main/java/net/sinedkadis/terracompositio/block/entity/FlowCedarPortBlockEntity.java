@@ -19,7 +19,7 @@ import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.wrapper.EmptyHandler;
 import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBEBehaviour;
-import net.sinedkadis.terracompositio.block.behaviours.ManySlotItemHandlerBehaviour;
+import net.sinedkadis.terracompositio.block.behaviours.ItemHandlerBehaviour;
 import net.sinedkadis.terracompositio.recipe.FlowSaturationRecipe;
 import net.sinedkadis.terracompositio.registries.TCBlockEntities;
 import net.sinedkadis.terracompositio.screen.FlowBlockPortMenu;
@@ -84,7 +84,7 @@ public class FlowCedarPortBlockEntity extends TCCraftingBlockEntity implements M
 
     @Override
     public void addBEBehaviours(List<IBEBehaviour> list) {
-        list.add(new ManySlotItemHandlerBehaviour(this) {
+        list.add(new ItemHandlerBehaviour(this, 2) {
             @Override
             public int getLimitInSlot(int slot) {
                 return 1;
@@ -111,6 +111,7 @@ public class FlowCedarPortBlockEntity extends TCCraftingBlockEntity implements M
                     if (nearestPlayer != null)
                         crafted.onCraftedBy(pLevel, nearestPlayer,crafted.getCount());
                     resetProgress();
+                    pLevel.sendBlockUpdated(pPos, pState, pState, 3);
                 }
             } else {
                 resetProgress();

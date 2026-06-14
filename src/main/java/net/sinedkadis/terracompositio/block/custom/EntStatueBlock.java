@@ -53,7 +53,7 @@ public class EntStatueBlock extends TCBaseEntityBlock implements IFluidApplicabl
     }
 
     @Override
-    public FluidApplyResult tryApply(Level level, BlockPos blockPos, ItemStack itemStack,IFluidHandlerItem iFluidHandlerItem) {
+    public FluidApplyResult tryApply(Level level, BlockPos blockPos, ItemStack itemStack, IFluidHandlerItem iFluidHandlerItem, Player player) {
         EntStatueBlockEntity blockEntity = ((EntStatueBlockEntity) level.getBlockEntity(blockPos));
         FluidStack resource = new FluidStack(TCFluids.FLOW_FLUID.source.get(), 500);
         FluidStack result = iFluidHandlerItem.drain(resource, IFluidHandler.FluidAction.SIMULATE);

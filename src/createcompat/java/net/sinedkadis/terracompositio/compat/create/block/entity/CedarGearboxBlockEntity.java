@@ -7,8 +7,10 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
+import net.minecraftforge.fml.DistExecutor;
 import net.sinedkadis.terracompositio.TerraCompositio;
 import net.sinedkadis.terracompositio.api.IHaveKnowledge;
 import net.sinedkadis.terracompositio.api.TCCapabilities;
@@ -43,7 +45,7 @@ public class CedarGearboxBlockEntity extends GeneratingKineticBlockEntity implem
 
     public CedarGearboxBlockEntity(BlockPos pPos, BlockState pBlockState) {
         super(Objects.requireNonNull(((TCCreateCompat) TerraCompositio.createCompat).blockEntities.CEDAR_GEARBOX_BE).get(),pPos, pBlockState);
-        setLazyTickRate(60);
+        setLazyTickRate(20);
         this.range = 5;
         this.priority = TCInnerConfig.DEFAULT_CONSUMER_PRIORITY;
         this.capacity = 256f;
@@ -75,6 +77,10 @@ public class CedarGearboxBlockEntity extends GeneratingKineticBlockEntity implem
         } else {
             if (getSpeed() != 0)
                 updateGeneratedRotation();
+        }
+        if (level.isClientSide) {
+            DistExecutor.unsafeRunWhenOn(Dist.CLIENT, () -> this::tickAudio);
+            return;
         }
         updateIfScheduled();
     }

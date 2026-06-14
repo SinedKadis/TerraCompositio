@@ -17,8 +17,8 @@
     "accessors.LivingEntityAccessor"
   ],
   "client": [
-    "BookGuiMixin",
-    "HumanoidArmorLayerMixin"
+    "HumanoidArmorLayerMixin",
+    "LocalPlayerMixin"
   ],
   "server": [],
   "injectors": {

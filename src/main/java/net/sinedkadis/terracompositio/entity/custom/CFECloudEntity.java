@@ -66,26 +66,28 @@ public class CFECloudEntity extends Entity implements CFENetworkMemberEntity, IH
         }
 
         @Override
-        public int sendCFE(int cfe, ICFEHandler target, float speed, boolean noCol, boolean simulate) {
+        public int sendCFE(CFENetworkMember target, int cfe, float speed, boolean simulate) {
+            if (target instanceof DummyCFEHandler) return 0;
 
-            if (target.getAttachedMember().getEntity() instanceof AirSaturatorBlockEntity) return 0;
+            if (target.getEntity() instanceof AirSaturatorBlockEntity) return 0;
 
-            int freeSpace = target.getFreeSpace();
+            ICFEHandler mainHandler = target.getMainHandler();
+            int freeSpace = mainHandler.getFreeSpace();
             int added = Mth.clamp(cfe, 0, freeSpace);
             if (added < 1)
                 return 0;
 
             if (!simulate) {
-                Vec3 burstOffset = getBurstOffset(target);
+                Vec3 burstOffset = getBurstOffset(mainHandler);
                 BlockPos offset = BlockPos.containing(this.getPos().getCenter().add(burstOffset));
-                if (offset.closerThan(target.getPos(),2)) {
-                    target.addCFE(added,false);
+                if (offset.closerThan(target.getPos(), 2)) {
+                    mainHandler.addCFE(added, false);
                     return added;
                 }
-                CFEBurstProjectileEntity entity = CFEBurstProjectileEntity.sendBurst(this, burstOffset,target,added,speed);
+                CFEBurstProjectileEntity entity = CFEBurstProjectileEntity.sendBurst(this, burstOffset, target, added, speed);
                 if (entity != null) {
-                    entity.noCollision(noCol);
-                    target.addToQueue(added);
+                    level().addFreshEntity(entity);
+                    mainHandler.addToQueue(added);
                 }
             }
             return added;
@@ -113,7 +115,7 @@ public class CFECloudEntity extends Entity implements CFENetworkMemberEntity, IH
             targets.forEach(target -> {
                 if (target.getMainHandler().getFreeSpace() > TCCommonConfigs.CFE_PER_BURST_TRANSFER_LIMIT.get())
                     scheduleMemberUpdate(target);
-                CFEHelper.createTransfer().fromMembers(target, this).build();
+                CFEHelper.newTransfer().targetAndSource(target, this).build();
             });
         }
     }
@@ -124,7 +126,7 @@ public class CFECloudEntity extends Entity implements CFENetworkMemberEntity, IH
         if (getPriority() < 0 && getMainHandler().getCFE() > 0 && CFEHelper.validMember(updated)) {
             if (updated.getMainHandler().getFreeSpace() > TCCommonConfigs.CFE_PER_BURST_TRANSFER_LIMIT.get())
                 scheduleMemberUpdate(updated);
-            CFEHelper.createTransfer().fromMembers(updated, this).build();
+            CFEHelper.newTransfer().targetAndSource(updated, this).build();
         }
     }
 
@@ -313,6 +315,23 @@ public class CFECloudEntity extends Entity implements CFENetworkMemberEntity, IH
     public void addTooltipLines(CompoundTag data, List<Component> tooltip, boolean isShifting) {
 
         if (isShifting) {
+            tooltip.add(Component.translatable("block.terracompositio.block_header"));
+            if (data.contains("val.priority")) {
+                tooltip.add(
+                        Component.translatable("block.terracompositio.priority",
+                                        Component.literal(String.valueOf(data.getInt("val.priority")))
+                                                .append(Component.translatable("block.terracompositio.units"))
+                                                .withStyle(ChatFormatting.AQUA))
+                                .withStyle(ChatFormatting.GRAY));
+            }
+            if (data.contains("val.range")) {
+                tooltip.add(
+                        Component.translatable("block.terracompositio.range",
+                                        Component.literal(String.valueOf(data.getInt("val.range")))
+                                                .append(Component.translatable("block.terracompositio.blocks"))
+                                                .withStyle(ChatFormatting.AQUA))
+                                .withStyle(ChatFormatting.GRAY));
+            }
             tooltip.add(Component.translatable("block.terracompositio.cfe_header"));
 
 
@@ -341,22 +360,7 @@ public class CFECloudEntity extends Entity implements CFENetworkMemberEntity, IH
                                 .withStyle(ChatFormatting.GRAY));
             }
 
-            if (data.contains("val.priority")) {
-                tooltip.add(
-                        Component.translatable("block.terracompositio.priority",
-                                        Component.literal(String.valueOf(data.getInt("val.priority")))
-                                                .append(Component.translatable("block.terracompositio.units"))
-                                                .withStyle(ChatFormatting.AQUA))
-                                .withStyle(ChatFormatting.GRAY));
-            }
-            if (data.contains("val.range")) {
-                tooltip.add(
-                        Component.translatable("block.terracompositio.range",
-                                        Component.literal(String.valueOf(data.getInt("val.range")))
-                                                .append(Component.translatable("block.terracompositio.blocks"))
-                                                .withStyle(ChatFormatting.AQUA))
-                                .withStyle(ChatFormatting.GRAY));
-            }
+
             if (data.contains("flag.type.consumer") && data.getBoolean("flag.type.consumer")) {
                 tooltip.add(
                         Component.translatable("block.terracompositio.type",

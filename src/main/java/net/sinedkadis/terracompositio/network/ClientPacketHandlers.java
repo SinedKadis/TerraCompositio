@@ -7,11 +7,12 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.sinedkadis.terracompositio.api.dummies.DummyCFEHandler;
 import net.sinedkadis.terracompositio.api.TCCapabilities;
+import net.sinedkadis.terracompositio.api.dummies.DummyCFEHandler;
 import net.sinedkadis.terracompositio.block.entity.PathPointerBlockEntity;
 import net.sinedkadis.terracompositio.network.packets.S2CHighLightNodesSync;
 import net.sinedkadis.terracompositio.network.packets.S2CPlayerCfeContainerSync;
+import net.sinedkadis.terracompositio.util.accessors.PlayerKnowledgeAccessor;
 
 import java.util.Set;
 
@@ -23,6 +24,12 @@ public class ClientPacketHandlers {
             player.getCapability(TCCapabilities.CFE)
                     .orElse(DummyCFEHandler.instance)
                     .setCFE(msg.cfe());
+        }
+    }
+    public static void handleAddPlayerKnowledge() {
+        Player player = Minecraft.getInstance().player;
+        if (player != null) {
+            ((PlayerKnowledgeAccessor) player).setCreationKnowledge(true);
         }
     }
 

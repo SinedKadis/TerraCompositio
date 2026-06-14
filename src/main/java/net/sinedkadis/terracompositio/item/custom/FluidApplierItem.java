@@ -97,7 +97,7 @@ public class FluidApplierItem extends Item implements DispensibleContainerItem {
                     fluidApplicable = fluidApplicableBlock;
                 }
                 if (!pPlayer.isShiftKeyDown() && fluidApplicable != null) {
-                    IFluidApplicable.FluidApplyResult result = fluidApplicable.tryApply(pLevel, blockpos, itemstack, fluidHandlerItem);
+                    IFluidApplicable.FluidApplyResult result = fluidApplicable.tryApply(pLevel, blockpos, itemstack, fluidHandlerItem, pPlayer);
                     if (result.cancel()) return InteractionResultHolder.pass(itemstack);
                     if (result.success()) {
                         pLevel.playSound(null, blockpos, SoundEvents.NOTE_BLOCK_PLING.value(), SoundSource.BLOCKS);

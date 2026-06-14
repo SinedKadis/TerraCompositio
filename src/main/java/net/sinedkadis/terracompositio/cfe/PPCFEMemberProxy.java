@@ -6,7 +6,7 @@ import net.sinedkadis.terracompositio.api.networks.cfe.CFENetworkMember;
 import net.sinedkadis.terracompositio.api.networks.cfe.ICFEHandler;
 import net.sinedkadis.terracompositio.block.entity.PathPointerBlockEntity;
 
-public record CFEMemberProxy(CFENetworkMember target, PathPointerBlockEntity proxy) implements CFENetworkMember {
+public record PPCFEMemberProxy(CFENetworkMember target, PathPointerBlockEntity proxy) implements CFENetworkMember {
 
     @Override
     public int getRange() {
