@@ -7,8 +7,6 @@ import net.minecraft.client.gui.GuiGraphics;
 import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
-import net.minecraft.world.entity.player.Inventory;
-import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.client.gui.overlay.ForgeGui;
 import net.sinedkadis.terracompositio.TerraCompositio;
 import net.sinedkadis.terracompositio.api.TCCapabilities;
@@ -26,17 +24,9 @@ public class CfeHud {
                               int screenHeight) {
         LocalPlayer player = Minecraft.getInstance().player;
         if (player == null) return;
-        Inventory inventory = player.getInventory();
         ICFEHandler playerHandler = player.getCapability(TCCapabilities.CFE).orElse(DummyCFEHandler.instance);
         int cfeTotal = playerHandler.getCFE();
         int cfeMaxTotal = playerHandler.getMaxCFE();
-        for (ItemStack itemStack : inventory.armor) {
-            ICFEHandler handler = itemStack.getCapability(TCCapabilities.CFE).orElse(DummyCFEHandler.instance);
-            if (!(handler instanceof DummyCFEHandler)) {
-                cfeTotal += handler.getCFE() - 1;
-                cfeMaxTotal += handler.getMaxCFE() - 1;
-            }
-        }
 
         int width = 50;
         int x = screenWidth / 2 + 90;

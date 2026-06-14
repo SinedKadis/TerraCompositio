@@ -13,6 +13,7 @@ import net.minecraft.client.renderer.entity.EntityRenderers;
 import net.minecraft.client.renderer.entity.ThrownItemRenderer;
 import net.minecraft.client.renderer.item.ItemProperties;
 import net.minecraft.resources.ResourceLocation;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.level.block.RedStoneWireBlock;
 import net.minecraft.world.level.material.Fluids;
 import net.minecraftforge.api.distmarker.Dist;
@@ -34,10 +35,12 @@ import net.sinedkadis.terracompositio.entity.client.CFECloudRenderer;
 import net.sinedkadis.terracompositio.entity.client.CFECubeModel;
 import net.sinedkadis.terracompositio.entity.client.FlowCedarEntModel;
 import net.sinedkadis.terracompositio.entity.client.FlowCedarEntRenderer;
+import net.sinedkadis.terracompositio.gui.CFEBarRenderer;
 import net.sinedkadis.terracompositio.gui.CfeHud;
 import net.sinedkadis.terracompositio.gui.KnowledgeOverlay;
 import net.sinedkadis.terracompositio.item.custom.CreationFlowJournalItem;
 import net.sinedkadis.terracompositio.item.custom.ShieldedBundleItem;
+import net.sinedkadis.terracompositio.item.custom.TechnetiumArmorItem;
 import net.sinedkadis.terracompositio.item.custom.WrenchAxeItem;
 import net.sinedkadis.terracompositio.item.models.TechnetiumBootsModel;
 import net.sinedkadis.terracompositio.item.models.TechnetiumCloakModel;
@@ -215,6 +218,15 @@ public class TCEventBusClientEvents {
                 BirchJuiceSplashParticle.Provider::new);
         Minecraft.getInstance().particleEngine.register(TCParticles.FLUID_FLOW.get(),
                 FluidFlowParticle.Provider::new);
+    }
+
+    @SubscribeEvent
+    public static void onRegisterItemDecorations(RegisterItemDecorationsEvent event) {
+        for (Item item : ForgeRegistries.ITEMS) {
+            if (item instanceof TechnetiumArmorItem) {
+                event.register(item, CFEBarRenderer.INSTANCE);
+            }
+        }
     }
 }
 

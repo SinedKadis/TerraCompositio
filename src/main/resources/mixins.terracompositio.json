@@ -18,7 +18,8 @@
   ],
   "client": [
     "HumanoidArmorLayerMixin",
-    "LocalPlayerMixin"
+    "LocalPlayerMixin",
+    "accessors.GuiGraphicsAccessor"
   ],
   "server": [],
   "injectors": {
