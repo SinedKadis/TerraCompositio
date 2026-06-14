@@ -16,6 +16,8 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.sinedkadis.terracompositio.TerraCompositio;
 import net.sinedkadis.terracompositio.api.TCCapabilities;
+import net.sinedkadis.terracompositio.api.TerraCompositioAPI;
+import net.sinedkadis.terracompositio.api.networks.cfe.CFENetworkMember;
 import net.sinedkadis.terracompositio.api.networks.cfe.CFENetworkMemberEntity;
 import net.sinedkadis.terracompositio.api.networks.cfe.ICFEHandler;
 
@@ -53,7 +55,18 @@ public class TCCommands {
                                     .getEntity(ctx,"cfe network member entity");
                             return TCCommands.clearCFEData(ctx,entity);
                         })
+                        .then(
+                                Commands.literal("clear-all-queues")
+                                        .executes(TCCommands::clearAllQueues)
+                        )
                         );
+    }
+
+    private static int clearAllQueues(CommandContext<CommandSourceStack> ctx) {
+        TerraCompositioAPI.instance().getCFENetworkInstance().getAllCFENetworkMembers(ctx.getSource().getLevel()).stream()
+                .map(CFENetworkMember::getMainHandler)
+                .forEach(icfeHandler -> icfeHandler.setQueued(0));
+        return 0;
     }
 
     private static int clearCFEData(CommandContext<CommandSourceStack> ctx, Entity... entities) {

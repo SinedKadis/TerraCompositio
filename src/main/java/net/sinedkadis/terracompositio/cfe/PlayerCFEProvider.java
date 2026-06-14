@@ -3,12 +3,10 @@ package net.sinedkadis.terracompositio.cfe;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.common.util.LazyOptional;
 import net.sinedkadis.terracompositio.api.TCCapabilities;
-import net.sinedkadis.terracompositio.api.dummies.DummyCFEHandler;
 import net.sinedkadis.terracompositio.api.networks.cfe.CFENetworkMemberEntity;
 import net.sinedkadis.terracompositio.api.networks.cfe.ICFEHandler;
 import org.jetbrains.annotations.NotNull;
@@ -16,7 +14,7 @@ import org.jetbrains.annotations.Nullable;
 
 public class PlayerCFEProvider implements net.minecraftforge.common.capabilities.ICapabilityProvider, INBTSerializable<CompoundTag> {
 
-    private ICFEHandler simpleCFEContainer = null;
+    private CFEHandlerProxy handler = null;
 
     public PlayerCFEProvider(Player player) {
         this.player = player;
@@ -35,36 +33,15 @@ public class PlayerCFEProvider implements net.minecraftforge.common.capabilities
     }
 
     private ICFEHandler createPlayerCFEContainer() {
-        if(this.simpleCFEContainer == null) {
-            this.simpleCFEContainer = new CFEContainer((CFENetworkMemberEntity)player) {
-                @Override
-                public int addCFE(int cfe, boolean simulate) {
-                    if (simulate) {
-                        int toReturn = super.addCFE(cfe, true);
-                        for (ItemStack stack : player.getArmorSlots()) {
-                            ICFEHandler icfeHandler = stack.getCapability(TCCapabilities.CFE).orElse(DummyCFEHandler.instance);
-                            toReturn += icfeHandler.addCFE(cfe,true);
-                        }
-                        return toReturn;
-                    }
-                    return super.addCFE(cfe, false);
-                }
-
-                @Override
-                public int getFreeSpace() {
-                    int toReturn = super.getFreeSpace();
-                    for (ItemStack stack : player.getArmorSlots()) {
-                        ICFEHandler icfeHandler = stack.getCapability(TCCapabilities.CFE).orElse(DummyCFEHandler.instance);
-                        toReturn += icfeHandler.getFreeSpace();
-                    }
-                    return toReturn;
-                }
-            }
-                    .setMaxCFE(10)
-                    .setOffset(vec3 -> vec3.add(0,1,0));
+        if (this.handler == null) {
+            this.handler = new CFEHandlerProxy();
+            handler.getHandlerList().add(
+                    new CFEContainer((CFENetworkMemberEntity) player)
+                            .setMaxCFE(10)
+                            .setOffset(vec3 -> vec3.add(0, 1, 0)));
         }
 
-        return this.simpleCFEContainer;
+        return this.handler;
     }
 
     @Override

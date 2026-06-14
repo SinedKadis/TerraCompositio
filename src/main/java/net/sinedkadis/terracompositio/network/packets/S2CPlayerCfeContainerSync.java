@@ -14,7 +14,7 @@ public record S2CPlayerCfeContainerSync(int cfe) {
     }
 
     public static S2CPlayerCfeContainerSync decode(FriendlyByteBuf buf) {
-        return new S2CPlayerCfeContainerSync(buf.readInt());
+        return new S2CPlayerCfeContainerSync(buf.readVarInt());
     }
 
 

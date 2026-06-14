@@ -29,6 +29,7 @@ public class CFEItemWrapper implements ICFEHandler, ICapabilityProvider {
     protected int queued = 0;
     private final LazyOptional<ICFEHandler> holder = LazyOptional.of(() -> this);
     @NotNull
+    @Getter
     protected ItemStack container;
 
     public CFEItemWrapper(@NotNull ItemStack container) {

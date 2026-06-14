@@ -71,7 +71,7 @@ public class CFENetworkHandler implements CFENetwork {
 
         while (!queue.isEmpty()) {
             CFENetworkMember current = queue.poll();
-            if (current instanceof CFEMemberProxy memberProxy) {
+            if (current instanceof PPCFEMemberProxy memberProxy) {
                 PathPointerBlockEntity ppBE = memberProxy.proxy();
                 if (ppBE != null && ppBE.parts.contains(PathPointerBlockEntity.PPPart.EXTRACTOR)) {
                     TerraCompositioAPI.instance().getCFENetworkInstance().getAllCFENetworkMembers(level).stream()
@@ -97,7 +97,7 @@ public class CFENetworkHandler implements CFENetwork {
                         BlockEntity be = level.getBlockEntity(inputPos);
                         if (be instanceof PathPointerBlockEntity inputEntity
                                 && visitedEntities.add(inputEntity)) { // защита от петли
-                            queue.add(new CFEMemberProxy(updated, inputEntity));
+                            queue.add(new PPCFEMemberProxy(updated, inputEntity));
                         }
                     }
                 }
@@ -127,7 +127,7 @@ public class CFENetworkHandler implements CFENetwork {
             List<PathPointerBlockEntity.PPPart> parts = null;
             PathPointerBlockEntity collector = null;
 
-            if (current instanceof CFEMemberProxy proxy) {
+            if (current instanceof PPCFEMemberProxy proxy) {
                 PathPointerBlockEntity proxyBE = proxy.proxy();
                 if (proxyBE != null) {
                     parts = proxyBE.parts;
@@ -151,7 +151,7 @@ public class CFENetworkHandler implements CFENetwork {
                     ).forEach(entity -> {
                         if (entity instanceof CFENetworkMemberEntity memberEntity
                                 && visitedEntities.add(entity)) { // защита: не добавляем уже посещённых
-                            toReturn.add(new CFEMemberProxy(memberEntity, finalCollector));
+                            toReturn.add(new PPCFEMemberProxy(memberEntity, finalCollector));
                         }
                     });
                 }
@@ -166,7 +166,7 @@ public class CFENetworkHandler implements CFENetwork {
                 // Если текущий — EMITTER прокси, перенаправляем позицию к collector
                 CFENetworkMember mapped = (parts != null && collector != null
                         && parts.contains(PathPointerBlockEntity.PPPart.EMITTER))
-                        ? new CFEMemberProxy(member, collector)
+                        ? new PPCFEMemberProxy(member, collector)
                         : member;
 
                 toReturn.add(mapped);
@@ -178,7 +178,7 @@ public class CFENetworkHandler implements CFENetwork {
                     if (outputPos != null
                             && level.getBlockEntity(outputPos) instanceof PathPointerBlockEntity outputEntity
                             && visitedEntities.add(outputEntity)) { // защита от петли A→B→A
-                        queue.add(new CFEMemberProxy(requesterMember, outputEntity));
+                        queue.add(new PPCFEMemberProxy(requesterMember, outputEntity));
                     }
                 }
             }

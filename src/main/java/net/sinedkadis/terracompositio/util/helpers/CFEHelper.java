@@ -12,7 +12,7 @@ import net.sinedkadis.terracompositio.api.networks.cfe.CFENetworkMemberEntity;
 import net.sinedkadis.terracompositio.api.networks.cfe.ICFEHandler;
 import net.sinedkadis.terracompositio.block.entity.CFETrashCanBlockEntity;
 import net.sinedkadis.terracompositio.block.entity.PathPointerBlockEntity;
-import net.sinedkadis.terracompositio.cfe.CFEMemberProxy;
+import net.sinedkadis.terracompositio.cfe.PPCFEMemberProxy;
 import net.sinedkadis.terracompositio.config.TCCommonConfigs;
 import net.sinedkadis.terracompositio.config.TCServerConfigs;
 import net.sinedkadis.terracompositio.entity.custom.CFECloudEntity;
@@ -29,7 +29,7 @@ public class CFEHelper {
     static CFETransferManager instance = new CFETransferManager();
 
     public static boolean validMember(AnyNetworkMember target) {
-        if (target instanceof CFEMemberProxy proxy) {
+        if (target instanceof PPCFEMemberProxy proxy) {
             if (proxy.proxy().parts.contains(PathPointerBlockEntity.PPPart.COLLECTOR)) {
                 if (proxy.proxy().getOutputPos() == null) return false;
             }
@@ -57,7 +57,7 @@ public class CFEHelper {
         int added = targetMainHandler.addCFE(taken, true);
 
         if (added > 0) {
-            if (target instanceof CFEMemberProxy proxy && proxy.target() instanceof CFENetworkMemberEntity) {
+            if (target instanceof PPCFEMemberProxy proxy && proxy.target() instanceof CFENetworkMemberEntity) {
                 BlockPos pos = proxy.proxy().getOutputPos();
                 PathPointerBlockEntity ppBE = ((PathPointerBlockEntity) target.getLevel().getBlockEntity(pos));
                 if (ppBE != null) {

@@ -16,6 +16,7 @@ import net.sinedkadis.terracompositio.block.custom.TechnetiumBoardBlock;
 import net.sinedkadis.terracompositio.config.TCInnerConfig;
 import net.sinedkadis.terracompositio.network.TCPackets;
 import net.sinedkadis.terracompositio.network.packets.S2CAddPlayerKnowledge;
+import net.sinedkadis.terracompositio.network.packets.S2CPlayerCfeContainerSync;
 import net.sinedkadis.terracompositio.util.accessors.PlayerKnowledgeAccessor;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
@@ -145,6 +146,8 @@ public class PlayerMixin implements CFENetworkMemberEntity, PlayerKnowledgeAcces
                 if (((PlayerKnowledgeAccessor) serverPlayer).isCreationAcknowledged())
                     TCPackets.CHANNEL.send(PacketDistributor.PLAYER.with(() -> serverPlayer),
                             new S2CAddPlayerKnowledge());
+                TCPackets.CHANNEL.send(PacketDistributor.PLAYER.with(() -> serverPlayer),
+                        new S2CPlayerCfeContainerSync(((CFENetworkMemberEntity) serverPlayer).getMainHandler().getCFE()));
             }
     }
 

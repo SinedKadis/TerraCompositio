@@ -28,7 +28,7 @@ import net.sinedkadis.terracompositio.api.networks.cfe.CFENetworkMemberEntity;
 import net.sinedkadis.terracompositio.api.networks.cfe.ICFEHandler;
 import net.sinedkadis.terracompositio.block.entity.PathPointerBlockEntity;
 import net.sinedkadis.terracompositio.block.entity.TCBlockEntity;
-import net.sinedkadis.terracompositio.cfe.CFEMemberProxy;
+import net.sinedkadis.terracompositio.cfe.PPCFEMemberProxy;
 import net.sinedkadis.terracompositio.registries.TCEntities;
 import net.sinedkadis.terracompositio.registries.TCItems;
 import org.joml.Vector3f;
@@ -69,7 +69,7 @@ public class CFEBurstProjectileEntity extends ThrowableProjectile {
         this(pSource.x() + startOffset.x, pSource.y() + startOffset.y, pSource.z() + startOffset.z, pSource.getLevel());
 
         Vec3 offset;
-        if (target instanceof CFEMemberProxy) {
+        if (target instanceof PPCFEMemberProxy) {
             offset = Vec3.ZERO;
         } else {
             offset = target.getMainHandler().getOffset().apply(Vec3.ZERO);
@@ -77,7 +77,7 @@ public class CFEBurstProjectileEntity extends ThrowableProjectile {
         if (target instanceof LivingEntity livingEntity) {
             this.setOwner(livingEntity);
         }
-        if (target instanceof CFEMemberProxy memberProxy) {
+        if (target instanceof PPCFEMemberProxy memberProxy) {
             CFENetworkMember target1 = memberProxy.target();
             if (target1 instanceof LivingEntity livingEntity) {
                 this.setOwner(livingEntity);
@@ -107,9 +107,7 @@ public class CFEBurstProjectileEntity extends ThrowableProjectile {
         if (cfe < 1) {
             return null;
         }
-        CFEBurstProjectileEntity cfeBurstProjectileEntity = new CFEBurstProjectileEntity(pSource, offset, target, cfe, cfeTravelSpeed);
-        pSource.getLevel().addFreshEntity(cfeBurstProjectileEntity);
-        return cfeBurstProjectileEntity;
+        return new CFEBurstProjectileEntity(pSource, offset, target, cfe, cfeTravelSpeed);
     }
 
     boolean trackCrown = false;

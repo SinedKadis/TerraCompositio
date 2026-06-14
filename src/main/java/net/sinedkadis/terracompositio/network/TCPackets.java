@@ -20,35 +20,42 @@ public class TCPackets {
 
     public static void register()  {
 
-        CHANNEL.messageBuilder(S2CPlayerCfeContainerSync.class, id++, NetworkDirection.PLAY_TO_CLIENT)
-                .encoder(S2CPlayerCfeContainerSync::encode)
-                .decoder(S2CPlayerCfeContainerSync::decode)
-                .consumerMainThread(S2CPlayerCfeContainerSync::handle)
-                .add();
+        CHANNEL.registerMessage(id++,
+                S2CPlayerCfeContainerSync.class,
+                S2CPlayerCfeContainerSync::encode,
+                S2CPlayerCfeContainerSync::decode,
+                S2CPlayerCfeContainerSync::handle,
+                Optional.of(NetworkDirection.PLAY_TO_CLIENT)
+        );
         CHANNEL.registerMessage(id++,
                 C2SBoardSync.class,
                 C2SBoardSync::encode,
                 C2SBoardSync::decode,
                 C2SBoardSync::handle,
-                Optional.of(NetworkDirection.PLAY_TO_SERVER));
-        CHANNEL.messageBuilder(S2CHighLightNodesSync.class, id++,NetworkDirection.PLAY_TO_CLIENT)
-                .encoder(S2CHighLightNodesSync::encode)
-                .decoder(S2CHighLightNodesSync::decode)
-                .consumerMainThread(S2CHighLightNodesSync::handle)
-                .add();
+                Optional.of(NetworkDirection.PLAY_TO_SERVER)
+        );
+        CHANNEL.registerMessage(id++,
+                S2CHighLightNodesSync.class,
+                S2CHighLightNodesSync::encode,
+                S2CHighLightNodesSync::decode,
+                S2CHighLightNodesSync::handle,
+                Optional.of(NetworkDirection.PLAY_TO_CLIENT)
+        );
         CHANNEL.registerMessage(
                 id++,
                 C2SRequestBlockKnowledgePacket.class,
                 C2SRequestBlockKnowledgePacket::encode,
                 C2SRequestBlockKnowledgePacket::decode,
-                C2SRequestBlockKnowledgePacket::handle
+                C2SRequestBlockKnowledgePacket::handle,
+                Optional.of(NetworkDirection.PLAY_TO_SERVER)
         );
         CHANNEL.registerMessage(
                 id++,
                 C2SRequestEntityKnowledgePacket.class,
                 C2SRequestEntityKnowledgePacket::encode,
                 C2SRequestEntityKnowledgePacket::decode,
-                C2SRequestEntityKnowledgePacket::handle
+                C2SRequestEntityKnowledgePacket::handle,
+                Optional.of(NetworkDirection.PLAY_TO_SERVER)
         );
 
         CHANNEL.registerMessage(
@@ -56,14 +63,16 @@ public class TCPackets {
                 S2CKnowledgeDataPacket.class,
                 S2CKnowledgeDataPacket::encode,
                 S2CKnowledgeDataPacket::decode,
-                S2CKnowledgeDataPacket::handle
+                S2CKnowledgeDataPacket::handle,
+                Optional.of(NetworkDirection.PLAY_TO_CLIENT)
         );
         CHANNEL.registerMessage(
                 id++,
                 S2CAddPlayerKnowledge.class,
                 S2CAddPlayerKnowledge::encode,
                 S2CAddPlayerKnowledge::decode,
-                S2CAddPlayerKnowledge::handle
+                S2CAddPlayerKnowledge::handle,
+                Optional.of(NetworkDirection.PLAY_TO_CLIENT)
         );
 
     }

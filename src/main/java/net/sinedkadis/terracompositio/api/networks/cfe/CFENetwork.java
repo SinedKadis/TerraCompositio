@@ -18,5 +18,4 @@ public interface CFENetwork {
 
     Set<CFENetworkMember> getAvailableNetworkTargets(CFENetworkMember requesterMember);
     Set<CFENetworkMember> getAllCFENetworkMembers(Level level);
-
 }

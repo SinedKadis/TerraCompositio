@@ -86,6 +86,7 @@ public class CFECloudEntity extends Entity implements CFENetworkMemberEntity, IH
                 }
                 CFEBurstProjectileEntity entity = CFEBurstProjectileEntity.sendBurst(this, burstOffset, target, added, speed);
                 if (entity != null) {
+                    level().addFreshEntity(entity);
                     mainHandler.addToQueue(added);
                 }
             }

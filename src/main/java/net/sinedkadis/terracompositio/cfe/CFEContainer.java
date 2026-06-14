@@ -104,8 +104,10 @@ public class CFEContainer implements ICFEHandler, INBTSerializable<CompoundTag> 
 
         if (!simulate) {
             CFEBurstProjectileEntity entity = CFEBurstProjectileEntity.sendBurst(this, target, added, speed);
-            if (entity != null)
+            if (entity != null) {
+                getLevel().addFreshEntity(entity);
                 target.getMainHandler().addToQueue(added);
+            }
         }
         return added;
     }
@@ -185,7 +187,6 @@ public class CFEContainer implements ICFEHandler, INBTSerializable<CompoundTag> 
     @Override
     public void deserializeNBT(CompoundTag tag) {
         setCFE(tag.getInt("CFE"));
-        sendCFEUpdate();
     }
 
     public int getMaxCFE() {

@@ -28,6 +28,7 @@ import net.sinedkadis.terracompositio.api.networks.NetworkAction;
 import net.sinedkadis.terracompositio.api.networks.cfe.CFENetworkMember;
 import net.sinedkadis.terracompositio.api.networks.cfe.CFENetworkMemberEntity;
 import net.sinedkadis.terracompositio.api.networks.cfe.ICFEHandler;
+import net.sinedkadis.terracompositio.cfe.CFEHandlerProxy;
 import net.sinedkadis.terracompositio.cfe.CFEItemWrapper;
 import net.sinedkadis.terracompositio.config.TCCommonConfigs;
 import net.sinedkadis.terracompositio.item.models.TechnetiumBootsModel;
@@ -41,6 +42,7 @@ import net.sinedkadis.terracompositio.registries.TCItems;
 import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.List;
 import java.util.function.Consumer;
 
 import static net.minecraft.world.level.block.state.properties.BlockStateProperties.WATERLOGGED;
@@ -74,12 +76,6 @@ public class TechnetiumArmorItem extends TCArmorItem {
                     CFENetworkMemberEntity member = ((CFENetworkMemberEntity) entity);
                     TerraCompositioAPI.INSTANCE.getCFENetworkInstance().fireCFENetworkEvent(member, NetworkAction.UPDATE);
                 }
-                if (armorType.equals(EquipmentSlot.FEET)) {
-                    CompoundTag tag = stack.getOrCreateTag();
-                    if (!tag.contains("boot_height")) {
-                        tag.putInt("boot_height", (int) (entity.position().y-1));
-                    }
-                }
             }
         }
 
@@ -100,7 +96,26 @@ public class TechnetiumArmorItem extends TCArmorItem {
             }
 
         }
-
+        if (entity instanceof LivingEntity living && living.getItemBySlot(type.getSlot()).equals(pStack)) {
+            ICFEHandler playerHandler = living.getCapability(TCCapabilities.CFE).orElse(DummyCFEHandler.instance);
+            if (playerHandler instanceof CFEHandlerProxy proxy) {
+                List<ICFEHandler> handlerList = proxy.getHandlerList();
+                for (ICFEHandler handler : handlerList) {
+                    if (handler instanceof CFEItemWrapper slotHandler) {
+                        if (slotHandler.getContainer().equals(pStack)) {
+                            return;
+                        }
+                    }
+                }
+                handlerList.add(icfeHandler);
+            }
+        } else {
+            ICFEHandler playerHandler = entity.getCapability(TCCapabilities.CFE).orElse(DummyCFEHandler.instance);
+            if (playerHandler instanceof CFEHandlerProxy proxy) {
+                List<ICFEHandler> handlerList = proxy.getHandlerList();
+                handlerList.remove(icfeHandler);
+            }
+        }
 
     }
 
@@ -337,6 +352,6 @@ public class TechnetiumArmorItem extends TCArmorItem {
     public @Nullable ICapabilityProvider initCapabilities(ItemStack stack, @Nullable CompoundTag nbt) {
         Type type = ((ArmorItem) stack.getItem()).getType();
         if (type.equals(Type.HELMET)) return null;
-        return (ICapabilityProvider) new CFEItemWrapper(stack).setMaxCFE(type.equals(Type.LEGGINGS)?100:1);
+        return (ICapabilityProvider) new CFEItemWrapper(stack).setMaxCFE(100);
     }
 }

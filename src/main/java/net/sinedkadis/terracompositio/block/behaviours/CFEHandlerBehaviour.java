@@ -22,7 +22,7 @@ import net.sinedkadis.terracompositio.api.networks.cfe.CFENetworkMemberEntity;
 import net.sinedkadis.terracompositio.api.networks.cfe.ICFEHandler;
 import net.sinedkadis.terracompositio.block.entity.TCBlockEntity;
 import net.sinedkadis.terracompositio.cfe.CFEContainer;
-import net.sinedkadis.terracompositio.cfe.CFEMemberProxy;
+import net.sinedkadis.terracompositio.cfe.PPCFEMemberProxy;
 import net.sinedkadis.terracompositio.config.TCCommonConfigs;
 import net.sinedkadis.terracompositio.config.TCInnerConfig;
 import net.sinedkadis.terracompositio.util.helpers.CFEHelper;
@@ -118,7 +118,7 @@ public class CFEHandlerBehaviour implements IBECFEBehaviour, IHaveKnowledge {
     public void onCFENetworkMemberUpdate(CFENetworkMember updated) {
         if (getMainHandler().getCFE() > 0 && CFEHelper.validMember(updated)) {
             if (updated.getMainHandler().getFreeSpace() > TCCommonConfigs.CFE_PER_BURST_TRANSFER_LIMIT.get()) {
-                if (updated instanceof CFEMemberProxy proxy && proxy.target() instanceof CFENetworkMemberEntity) {
+                if (updated instanceof PPCFEMemberProxy proxy && proxy.target() instanceof CFENetworkMemberEntity) {
                     if (updated.getPos().closerThan(proxy.proxy().getOutputPos(),getRange()))
                         scheduleMemberUpdate(updated);
                 } else scheduleMemberUpdate(updated);

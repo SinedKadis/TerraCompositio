@@ -44,7 +44,7 @@ import net.sinedkadis.terracompositio.api.networks.cfe.CFENetworkMemberEntity;
 import net.sinedkadis.terracompositio.api.networks.cfe.ICFEHandler;
 import net.sinedkadis.terracompositio.block.entity.EntStatueBlockEntity;
 import net.sinedkadis.terracompositio.cfe.CFEContainer;
-import net.sinedkadis.terracompositio.cfe.CFEMemberProxy;
+import net.sinedkadis.terracompositio.cfe.PPCFEMemberProxy;
 import net.sinedkadis.terracompositio.config.TCClientConfigs;
 import net.sinedkadis.terracompositio.config.TCCommonConfigs;
 import net.sinedkadis.terracompositio.config.TCInnerConfig;
@@ -94,7 +94,7 @@ public class FlowCedarEntEntity extends AbstractGolem implements CFENetworkMembe
     public final AnimationState cfeHoldState = new AnimationState();
 
     protected int scheduledMembersUpdate = -1;
-    protected Set<CFEMemberProxy> scheduledMembers = new HashSet<>();
+    protected Set<PPCFEMemberProxy> scheduledMembers = new HashSet<>();
 
     boolean scheduledUpdate = false;
 
@@ -366,7 +366,7 @@ public class FlowCedarEntEntity extends AbstractGolem implements CFENetworkMembe
 
     }
 
-    public void sendViaPP(CFEMemberProxy current) {
+    public void sendViaPP(PPCFEMemberProxy current) {
         if (getMainHandler().getCFE() > 0 && CFEHelper.validMember(current)) {
             if (current.getMainHandler().getFreeSpace() > TCCommonConfigs.CFE_PER_BURST_TRANSFER_LIMIT.get())
                 scheduleMemberUpdate(current);
@@ -376,7 +376,7 @@ public class FlowCedarEntEntity extends AbstractGolem implements CFENetworkMembe
 
     @Override
     public void scheduleMemberUpdate(CFENetworkMember updated) {
-        if (updated instanceof CFEMemberProxy proxy) {
+        if (updated instanceof PPCFEMemberProxy proxy) {
             this.scheduledMembers.add(proxy);
             if (scheduledMembersUpdate < 0) scheduledMembersUpdate = TCCommonConfigs.TICKS_BETWEEN_BURSTS.get();
         }
@@ -395,7 +395,7 @@ public class FlowCedarEntEntity extends AbstractGolem implements CFENetworkMembe
         }
         if (scheduledMembersUpdate == 0) {
             scheduledMembersUpdate = -1;
-            Set<CFEMemberProxy> scheduledMembers1 = Set.copyOf(this.scheduledMembers);
+            Set<PPCFEMemberProxy> scheduledMembers1 = Set.copyOf(this.scheduledMembers);
             this.scheduledMembers.clear();
             scheduledMembers1.forEach(this::sendViaPP);
         } else if (scheduledMembersUpdate > 0)
