@@ -8,14 +8,13 @@ import net.sinedkadis.terracompositio.network.ClientPacketHandlers;
 import java.util.function.Supplier;
 
 
-public record S2CPlayerCfeContainerSync(int cfe, boolean knowledge) {
+public record S2CPlayerCfeContainerSync(int cfe) {
     public static void encode(S2CPlayerCfeContainerSync msg, FriendlyByteBuf buf) {
-        buf.writeInt(msg.cfe);
-        buf.writeBoolean(msg.knowledge());
+        buf.writeVarInt(msg.cfe);
     }
 
     public static S2CPlayerCfeContainerSync decode(FriendlyByteBuf buf) {
-        return new S2CPlayerCfeContainerSync(buf.readInt(), buf.readBoolean());
+        return new S2CPlayerCfeContainerSync(buf.readInt());
     }
 
 

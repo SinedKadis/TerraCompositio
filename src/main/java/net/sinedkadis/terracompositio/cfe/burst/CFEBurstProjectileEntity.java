@@ -94,7 +94,6 @@ public class CFEBurstProjectileEntity extends ThrowableProjectile {
         this.setTarget(target.getMainHandler().getAttachedMember().getPos());
         this.shoot(shootVec.x(), shootVec.y(), shootVec.z(), cfeTravelSpeed, 0);
         lastBP.set(pSource.getPos());
-        pSource.getLevel().addFreshEntity(this);
     }
 
     public static @Nullable CFEBurstProjectileEntity sendBurst(ICFEHandler pSource, CFENetworkMember target, int cfe, float cfeTravelSpeed) {
@@ -108,7 +107,9 @@ public class CFEBurstProjectileEntity extends ThrowableProjectile {
         if (cfe < 1) {
             return null;
         }
-        return new CFEBurstProjectileEntity(pSource,offset, target, cfe, cfeTravelSpeed);
+        CFEBurstProjectileEntity cfeBurstProjectileEntity = new CFEBurstProjectileEntity(pSource, offset, target, cfe, cfeTravelSpeed);
+        pSource.getLevel().addFreshEntity(cfeBurstProjectileEntity);
+        return cfeBurstProjectileEntity;
     }
 
     boolean trackCrown = false;
@@ -255,6 +256,9 @@ public class CFEBurstProjectileEntity extends ThrowableProjectile {
 
     @Override
     public void remove(RemovalReason pReason) {
+        if (isRemoved()) {
+            return;
+        }
         BlockEntity blockEntity = level().getBlockEntity(getTarget());
         int cfe = getCFE();
         if (blockEntity instanceof CFENetworkMemberBE memberBE) {

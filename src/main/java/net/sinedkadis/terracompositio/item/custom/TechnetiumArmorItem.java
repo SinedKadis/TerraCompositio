@@ -13,6 +13,7 @@ import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
+import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.client.extensions.common.IClientItemExtensions;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.event.entity.living.LivingEvent;
@@ -162,8 +163,9 @@ public class TechnetiumArmorItem extends TCArmorItem {
     }
 
 
-    public static void onBlockChanged(LivingEntity livingEntity) {
-        if (!(livingEntity instanceof Player player)) return;
+    public static void onBlockChanged(LivingEntity livingEntity, BlockPos lastPos) {
+        if (!(livingEntity instanceof Player player))
+            return;
         Level level = livingEntity.level();
 
         BlockPos onPos = BlockPos.containing(player.position().add(0,-1,0));
@@ -179,94 +181,131 @@ public class TechnetiumArmorItem extends TCArmorItem {
 
         boolean fallSaveActivated = setHeightIfFalling(level, player, icfeHandler, onPos, persistentData);
 
+        boolean standingOnBoard = standingState.is(TCBlocks.TECHNETIUM_BOARD.get());
+
+        if (!standingOnBoard && !fallSaveActivated && isOnCoolDown(player, persistentData)) {
+            persistentData.remove(height);
+        }
+
+        if (!persistentData.contains(height))
+            return;
+
         BlockPos posOnHeight = onPos.atY(persistentData.getInt(height));
         BlockState blockStateOnHeight = level.getBlockState(posOnHeight);
 
         boolean allowBoardPlace = blockStateOnHeight.is(BlockTags.REPLACEABLE)
                 && !blockStateOnHeight.is(TCBlocks.TECHNETIUM_BOARD.get())
-                && (standingState.is(TCBlocks.TECHNETIUM_BOARD.get()) || fallSaveActivated)
-                && isOnCoolDown(player, persistentData);
+                && (standingState.is(TCBlocks.TECHNETIUM_BOARD.get()) || fallSaveActivated);
 
-        if (!allowBoardPlace) return;
+        if (!allowBoardPlace)
+            return;
 
 
         boolean waterlogged = blockStateOnHeight.hasProperty(WATERLOGGED) && blockStateOnHeight.getValue(WATERLOGGED);
 
         BlockState boardState = TCBlocks.TECHNETIUM_BOARD.get().defaultBlockState().setValue(WATERLOGGED,waterlogged);
 
-        if (icfeHandler.takeCFE(1,false) > 0 && level.isClientSide()) {
-            level.destroyBlock(posOnHeight,true);
-            level.setBlockAndUpdate(posOnHeight,boardState);
-            TCPackets.CHANNEL.send(PacketDistributor.SERVER.noArg(),new C2SBoardSync(posOnHeight));
-        }
+        takeCFEAndSetBoard(icfeHandler, level, posOnHeight, boardState);
 
-        if (!standingState.is(TCBlocks.TECHNETIUM_BOARD.get())) return;
 
-        for (BlockPos blockPos : BlockPos.betweenClosed(onPos.offset(-2,-2,-2),onPos.offset(2,2,2))) {
-            BlockState blockState = level.getBlockState(blockPos);
-            if (!blockState.is(TCBlocks.TECHNETIUM_BOARD.get())) continue;
-            if (blockPos.equals(onPos) || blockPos.equals(standingPos)) continue;
-            level.destroyBlock(blockPos,true);
-        }
+        if (!standingOnBoard)
+            return;
+
+
+        BlockPos lastPosOn = lastPos.below();
+        BlockState blockState = level.getBlockState(lastPosOn);
+
+        if (!blockState.is(TCBlocks.TECHNETIUM_BOARD.get()))
+            return;
+        BlockPos newOnPos = player.getOnPos();
+        if (lastPosOn.equals(onPos) || lastPosOn.equals(newOnPos))
+            return;
+
+        level.destroyBlock(lastPosOn, true);
     }
 
+    private static void takeCFEAndSetBoard(ICFEHandler icfeHandler, Level level, BlockPos posOnHeight, BlockState boardState) {
+        if (icfeHandler.takeCFE(1,false) > 0 && level.isClientSide()) {
+            level.destroyBlock(posOnHeight,true);
+            level.setBlock(posOnHeight, boardState, 1);
+            TCPackets.CHANNEL.send(PacketDistributor.SERVER.noArg(),new C2SBoardSync(posOnHeight));
+        }
+    }
 
 
     @SubscribeEvent
     public static void onLivingJump(LivingEvent.LivingJumpEvent event) {
         LivingEntity livingEntity = event.getEntity();
+        if (!(livingEntity instanceof Player)) return;
+
         Level level = livingEntity.level();
         ItemStack stack = livingEntity.getItemBySlot(EquipmentSlot.FEET);
-        if (stack.is(TCItems.TECHNETIUM_BOOTS.get())){
-            CompoundTag persistentData = livingEntity.getPersistentData();
 
-            BlockPos onPos = BlockPos.containing(
-                    livingEntity.position().add(0,-1,0)
-            );
-            BlockState blockStateOn = level.getBlockState(onPos);
+        if (!stack.is(TCItems.TECHNETIUM_BOOTS.get())) return;
 
-            boolean waterlogged = blockStateOn.hasProperty(WATERLOGGED) && blockStateOn.getValue(WATERLOGGED);
-            BlockState boardState = TCBlocks.TECHNETIUM_BOARD.get().defaultBlockState().setValue(WATERLOGGED,waterlogged);
+        CompoundTag persistentData = livingEntity.getPersistentData();
 
+        BlockPos onPos = BlockPos.containing(
+                livingEntity.position().add(0, -1, 0)
+        );
+        BlockState blockStateOn = level.getBlockState(onPos);
 
-            ICFEHandler icfeHandler = stack.getCapability(TCCapabilities.CFE).orElse(DummyCFEHandler.instance);
-            if (icfeHandler.getCFE() < 1) return;
+        boolean waterlogged = blockStateOn.hasProperty(WATERLOGGED) && blockStateOn.getValue(WATERLOGGED);
+        BlockState boardState = TCBlocks.TECHNETIUM_BOARD.get().defaultBlockState().setValue(WATERLOGGED, waterlogged);
 
 
-            if (blockStateOn.is(BlockTags.REPLACEABLE)) {
-                persistentData.putInt(height, onPos.getY());
-                persistentData.putInt(cd,20);
+        ICFEHandler icfeHandler = stack.getCapability(TCCapabilities.CFE).orElse(DummyCFEHandler.instance);
+        if (icfeHandler.getCFE() < 1) return;
 
-                if (icfeHandler.takeCFE(1,false) > 0 && level.isClientSide()) {
-                    level.destroyBlock(onPos,true);
-                    level.setBlockAndUpdate(onPos,boardState);
-                    TCPackets.CHANNEL.send(PacketDistributor.SERVER.noArg(),new C2SBoardSync(onPos));
-                    return;
-                }
+        if (!blockStateOn.is(TCBlocks.TECHNETIUM_BOARD.get())) {
+            calculateVelocityAndSetBoard(onPos, livingEntity, level, persistentData, icfeHandler, boardState);
+        } else {
+            changeHeightByView(livingEntity, persistentData, onPos, level, icfeHandler, boardState);
+        }
+    }
+
+    private static void changeHeightByView(LivingEntity livingEntity,
+                                           CompoundTag persistentData,
+                                           BlockPos onPos,
+                                           Level level,
+                                           ICFEHandler icfeHandler,
+                                           BlockState boardState) {
+        if (!livingEntity.isShiftKeyDown()) {
+            int h = persistentData.getInt(height);
+
+            float viewXRot = -livingEntity.getXRot();
+
+            if (viewXRot > 30) {
+                h++;
 
             }
-
-
-            if (!livingEntity.isShiftKeyDown()) {
-                int h = persistentData.getInt(height);
-
-                float viewXRot = -livingEntity.getXRot();
-
-                if (viewXRot > 30) {
-                    h++;
-
-                }
-                if (viewXRot < -30) {
-                    h--;
-                }
-                BlockPos pPos = onPos.atY(h);
-                if (level.getBlockState(pPos).is(BlockTags.REPLACEABLE) && icfeHandler.takeCFE(1,false) > 0 && level.isClientSide()) {
-                    level.destroyBlock(onPos,true);
-                    level.setBlockAndUpdate(pPos,boardState);
-                    TCPackets.CHANNEL.send(PacketDistributor.SERVER.noArg(),new C2SBoardSync(pPos));
-                }
-                persistentData.putInt(height,h);
+            if (viewXRot < -30) {
+                h--;
             }
+            BlockPos pPos = onPos.atY(h);
+            if (level.getBlockState(pPos).is(BlockTags.REPLACEABLE)) {
+                takeCFEAndSetBoard(icfeHandler, level, pPos, boardState);
+            }
+            persistentData.putInt(height, h);
+        }
+    }
+
+    private static void calculateVelocityAndSetBoard(BlockPos onPos,
+                                                     LivingEntity livingEntity,
+                                                     Level level,
+                                                     CompoundTag persistentData,
+                                                     ICFEHandler icfeHandler,
+                                                     BlockState boardState) {
+
+        Vec3 deltaMovement = livingEntity.getDeltaMovement();
+
+        double deltaX = Math.round(deltaMovement.x() * 10);
+        double deltaZ = Math.round(deltaMovement.z() * 10);
+        BlockPos relative = onPos.offset((int) deltaX, 0, (int) deltaZ);
+        if (level.getBlockState(relative).is(BlockTags.REPLACEABLE)) {
+            persistentData.putInt(height, onPos.getY());
+            persistentData.putInt(cd, livingEntity.tickCount);
+            takeCFEAndSetBoard(icfeHandler, level, relative, boardState);
         }
     }
 

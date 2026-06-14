@@ -22,7 +22,6 @@ import net.sinedkadis.terracompositio.api.networks.cfe.ICFEHandler;
 import net.sinedkadis.terracompositio.cfe.burst.CFEBurstProjectileEntity;
 import net.sinedkadis.terracompositio.network.TCPackets;
 import net.sinedkadis.terracompositio.network.packets.S2CPlayerCfeContainerSync;
-import net.sinedkadis.terracompositio.util.accessors.PlayerKnowledgeAccessor;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.function.Function;
@@ -137,11 +136,7 @@ public class CFEContainer implements ICFEHandler, INBTSerializable<CompoundTag> 
 
     protected void sendCFEUpdate() {
         if (getAttachedMember() instanceof CFENetworkMemberBE cfeNetworkMemberBE) {
-//            TerraCompositioAPI.INSTANCE.getCFENetworkInstance().fireCFENetworkEvent(cfeNetworkMemberBE, NetworkAction.UPDATE);
-            //TerraCompositioAPI.INSTANCE.getCFENetworkInstance().networkMemberUpdated(cfeNetworkMemberBE);
-
             TerraCompositioAPI.INSTANCE.getCFENetworkInstance().fireCFENetworkEvent(cfeNetworkMemberBE, NetworkAction.UPDATE);
-
         }
         if (isEntity) {
             TerraCompositioAPI.INSTANCE.getCFENetworkInstance().fireCFENetworkEvent(getAttachedMember(), NetworkAction.UPDATE);
@@ -190,6 +185,7 @@ public class CFEContainer implements ICFEHandler, INBTSerializable<CompoundTag> 
     @Override
     public void deserializeNBT(CompoundTag tag) {
         setCFE(tag.getInt("CFE"));
+        sendCFEUpdate();
     }
 
     public int getMaxCFE() {

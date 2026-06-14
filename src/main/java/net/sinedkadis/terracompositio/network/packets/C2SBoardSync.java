@@ -9,6 +9,7 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraftforge.fml.LogicalSide;
 import net.minecraftforge.network.NetworkEvent;
 import net.sinedkadis.terracompositio.registries.TCBlocks;
+import net.sinedkadis.terracompositio.util.helpers.WorldHelper;
 
 import java.util.function.Supplier;
 
@@ -36,6 +37,7 @@ public record C2SBoardSync(int x, short y, int z) {
                     Level level = player.level();
                     BlockPos pPos = new BlockPos(msg.x, msg.y, msg.z);
                     BlockState blockState = level.getBlockState(pPos);
+                    WorldHelper.destroyBlockNoUpdate(level, pPos, player);
                     level.setBlock(pPos,
                             TCBlocks.TECHNETIUM_BOARD.get().defaultBlockState()
                                     .setValue(BlockStateProperties.WATERLOGGED,
