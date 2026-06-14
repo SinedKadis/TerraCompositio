@@ -279,6 +279,9 @@ public class CFEBurstProjectileEntity extends ThrowableProjectile {
             cfeNetworkMemberEntity.getMainHandler().subFromQueue(cfe);
 
         }
+        if (isRemoved()) {
+            return;
+        }
         super.remove(pReason);
     }
 

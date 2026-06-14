@@ -4,7 +4,6 @@ import com.mojang.authlib.GameProfile;
 import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.player.LocalPlayer;
-import net.minecraft.core.BlockPos;
 import net.sinedkadis.terracompositio.item.custom.TechnetiumArmorItem;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -32,8 +31,9 @@ public class LocalPlayerMixin extends AbstractClientPlayer {
     private void tc$onTick(CallbackInfo ci) {
         double x = getX();
         double z = getZ();
-        if (Math.floor(xLast) != Math.floor(x) || Math.floor(zLast) != Math.floor(z)) {
-            TechnetiumArmorItem.onBlockChanged(this, BlockPos.containing(xLast, yLast1, zLast));
+        double y = getY();
+        if (Math.floor(xLast) != Math.floor(x) || Math.floor(zLast) != Math.floor(z) || Math.floor(yLast1) != Math.floor(y)) {
+            TechnetiumArmorItem.onBlockChanged(this);
         }
     }
 
