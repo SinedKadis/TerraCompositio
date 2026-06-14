@@ -33,8 +33,8 @@ public class CFEHandlerProxy implements ICFEHandler {
                 .append("CFEHandlerProxy{");
         handlerList.forEach(icfeHandler ->
                 stringBuilder.append("\n").append(icfeHandler.toString()).append("\n"));
-        stringBuilder.append(",\n queued=").append(queued)
-                .append('}');
+        stringBuilder.append(",\n\n\n queued=").append(queued)
+                .append("\n\n}");
         return stringBuilder.toString();
     }
 
@@ -142,6 +142,7 @@ public class CFEHandlerProxy implements ICFEHandler {
     @Override
     public void clear() {
         handlerList.forEach(ICFEHandler::clear);
+        queued = 0;
     }
 
     @Override
