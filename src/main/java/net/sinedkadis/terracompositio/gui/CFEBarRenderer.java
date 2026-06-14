@@ -32,7 +32,7 @@ public final class CFEBarRenderer implements IItemDecorator {
     private CFEBarRenderer() {
     }
 
-    public static void render(GuiGraphics graphics, int level, int xPosition, int yPosition, int offset, boolean shadow,
+    public static void render(GuiGraphics graphics, int level, int xPosition, int yPosition, int offset,
                               int left, int right, boolean doDepletedColor) {
         if (doDepletedColor && level <= BAR_W / 4) {
             left = colorBarLeftDepleted;
@@ -41,35 +41,49 @@ public final class CFEBarRenderer implements IItemDecorator {
 
         int x = xPosition + 2;
         int y = yPosition + 13 - offset;
-        if (left == colorBarLeftDurability) {
-            graphics.fill(RenderType.gui(), x, y, x + 13, y + (shadow ? 2 : 1), 190, colorShadow);
-        }
+
         fillHorizontalGradient(graphics, RenderType.gui(), x, y, x + level, y + 1, left, right, 190);
     }
 
     public static void renderBarsTool(GuiGraphics graphics, ICFEHandler handler, ItemStack stack, int xPosition,
                                       int yPosition) {
-        boolean renderedDurability;
 
-        renderedDurability = renderDurabilityBar(graphics, stack.getBarWidth(), xPosition, yPosition);
+        boolean renderedDurability = false;
 
+        boolean damaged = stack.isDamaged();
+
+        renderShadow(graphics, xPosition, yPosition, damaged);
+
+        if (damaged) {
+            renderedDurability = renderDurabilityBar(graphics, stack.getBarWidth(), xPosition, yPosition);
+        }
 
         renderElectricBar(graphics, handler.getCFE(), handler.getMaxCFE(), xPosition, yPosition,
                 renderedDurability);
 
     }
 
+    private static void renderShadow(GuiGraphics graphics, int xPosition, int yPosition, boolean damaged) {
+        int x = xPosition + 2;
+        int y = yPosition + 13 - 2;
+        if (damaged) {
+            y++;
+        }
+        graphics.fill(RenderType.gui(), x, y, x + 13, y + (2), 190, colorShadow);
+    }
+
     public static void renderElectricBar(GuiGraphics graphics, long charge, long maxCharge, int xPosition,
                                          int yPosition, boolean renderedDurability) {
         if (charge > 0 && maxCharge > 0) {
             int level = Math.round(charge * 13.0F / maxCharge);
-            render(graphics, level, xPosition, yPosition, renderedDurability ? 1 : 0, true, colorBarLeftEnergy,
+            render(graphics, level, xPosition, yPosition, renderedDurability ? 1 : 0, colorBarLeftEnergy,
                     colorBarRightEnergy, true);
         }
     }
 
     private static boolean renderDurabilityBar(GuiGraphics graphics, int level, int xPosition, int yPosition) {
-        render(graphics, level, xPosition, yPosition, 0, true, colorBarLeftDurability, colorBarRightDurability, true);
+
+        render(graphics, level, xPosition, yPosition, 0, colorBarLeftDurability, colorBarRightDurability, true);
         return true;
     }
 

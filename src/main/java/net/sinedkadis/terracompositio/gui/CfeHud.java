@@ -11,7 +11,7 @@ import net.minecraftforge.client.gui.overlay.ForgeGui;
 import net.sinedkadis.terracompositio.TerraCompositio;
 import net.sinedkadis.terracompositio.api.TCCapabilities;
 import net.sinedkadis.terracompositio.api.dummies.DummyCFEHandler;
-import net.sinedkadis.terracompositio.api.networks.cfe.ICFEHandler;
+import net.sinedkadis.terracompositio.cfe.CFEHandlerPlayerArmor;
 import org.lwjgl.opengl.GL11;
 
 public class CfeHud {
@@ -24,13 +24,13 @@ public class CfeHud {
                               int screenHeight) {
         LocalPlayer player = Minecraft.getInstance().player;
         if (player == null) return;
-        ICFEHandler playerHandler = player.getCapability(TCCapabilities.CFE).orElse(DummyCFEHandler.instance);
-        int cfeTotal = playerHandler.getCFE();
-        int cfeMaxTotal = playerHandler.getMaxCFE();
+        CFEHandlerPlayerArmor playerHandler = ((CFEHandlerPlayerArmor) player.getCapability(TCCapabilities.CFE).orElse(DummyCFEHandler.instance));
+        int cfeTotal = playerHandler.getHandler().getCFE();
+        int cfeMaxTotal = playerHandler.getHandler().getMaxCFE();
 
-        int width = 50;
+        int width = 64;
         int x = screenWidth / 2 + 90;
-        int y = screenHeight - 15;
+        int y = screenHeight - 20;
 
         if (cfeMaxTotal == 0) {
             width = 0;
@@ -47,7 +47,8 @@ public class CfeHud {
             }
         }
 
-        int color = Mth.hsvToRgb(0.55F, (float) Math.min(1F, Math.sin(Util.getMillis() / 200D) * 0.5 + 1F), 1F);
+        float saturation = (float) Math.min(1F, Math.sin(Util.getMillis() / 200D) * 0.1 + 1F);
+        int color = Mth.hsvToRgb(0.55F, saturation, 1F);
         int r = (color >> 16 & 0xFF);
         int g = (color >> 8 & 0xFF);
         int b = color & 0xFF;

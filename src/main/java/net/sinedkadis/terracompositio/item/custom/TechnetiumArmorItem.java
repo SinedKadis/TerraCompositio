@@ -31,7 +31,6 @@ import net.sinedkadis.terracompositio.api.networks.NetworkAction;
 import net.sinedkadis.terracompositio.api.networks.cfe.CFENetworkMember;
 import net.sinedkadis.terracompositio.api.networks.cfe.CFENetworkMemberEntity;
 import net.sinedkadis.terracompositio.api.networks.cfe.ICFEHandler;
-import net.sinedkadis.terracompositio.cfe.CFEHandlerProxy;
 import net.sinedkadis.terracompositio.cfe.CFEItemWrapper;
 import net.sinedkadis.terracompositio.config.TCCommonConfigs;
 import net.sinedkadis.terracompositio.item.models.TechnetiumBootsModel;
@@ -46,7 +45,6 @@ import net.sinedkadis.terracompositio.util.helpers.BlockPosHelper;
 import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.ParametersAreNonnullByDefault;
-import java.util.List;
 import java.util.function.Consumer;
 
 import static net.minecraft.world.level.block.state.properties.BlockStateProperties.WATERLOGGED;
@@ -100,27 +98,6 @@ public class TechnetiumArmorItem extends TCArmorItem {
             }
 
         }
-        if (entity instanceof LivingEntity living && living.getItemBySlot(type.getSlot()).equals(pStack)) {
-            ICFEHandler playerHandler = living.getCapability(TCCapabilities.CFE).orElse(DummyCFEHandler.instance);
-            if (playerHandler instanceof CFEHandlerProxy proxy) {
-                List<ICFEHandler> handlerList = proxy.getHandlerList();
-                for (ICFEHandler handler : handlerList) {
-                    if (handler instanceof CFEItemWrapper slotHandler) {
-                        if (slotHandler.getContainer().equals(pStack)) {
-                            return;
-                        }
-                    }
-                }
-                handlerList.add(icfeHandler);
-            }
-        } else {
-            ICFEHandler playerHandler = entity.getCapability(TCCapabilities.CFE).orElse(DummyCFEHandler.instance);
-            if (playerHandler instanceof CFEHandlerProxy proxy) {
-                List<ICFEHandler> handlerList = proxy.getHandlerList();
-                handlerList.remove(icfeHandler);
-            }
-        }
-
     }
 
     private void helmetInventoryTick(ItemStack ignoredPStack, Level ignoredPLevel, Entity pEntity, ICFEHandler ignoredIcfeHandler) {
