@@ -31,6 +31,7 @@ import net.sinedkadis.terracompositio.api.networks.NetworkAction;
 import net.sinedkadis.terracompositio.api.networks.cfe.CFENetworkMember;
 import net.sinedkadis.terracompositio.api.networks.cfe.CFENetworkMemberEntity;
 import net.sinedkadis.terracompositio.api.networks.cfe.ICFEHandler;
+import net.sinedkadis.terracompositio.cfe.CFEHandlerPlayerArmor;
 import net.sinedkadis.terracompositio.cfe.CFEItemWrapper;
 import net.sinedkadis.terracompositio.config.TCCommonConfigs;
 import net.sinedkadis.terracompositio.item.models.TechnetiumBootsModel;
@@ -120,16 +121,18 @@ public class TechnetiumArmorItem extends TCArmorItem {
 
     private void leggingsInventoryTick(ItemStack itemStack, Level ignoredPLevel, Entity entity, ICFEHandler thisHandler) {
         for (ItemStack stack : entity.getArmorSlots()) {
-            if (stack.equals(itemStack)) return;
+            if (stack.equals(itemStack)) {
+                ICFEHandler playerHandler = ((CFEHandlerPlayerArmor) entity.getCapability(TCCapabilities.CFE).orElse(DummyCFEHandler.instance)).getHandler();
+                int taken = thisHandler.addCFE(TCCommonConfigs.CFE_PER_BURST_TRANSFER_LIMIT.get(), true);
+                int added = playerHandler.takeCFE(taken, false);
+                thisHandler.addCFE(added, false);
+                continue;
+            }
             ICFEHandler icfeHandler = stack.getCapability(TCCapabilities.CFE).orElse(DummyCFEHandler.instance);
             int taken = thisHandler.takeCFE(TCCommonConfigs.CFE_PER_BURST_TRANSFER_LIMIT.get(), true);
             int added = icfeHandler.addCFE(taken,false);
             thisHandler.takeCFE(added,false);
         }
-        ICFEHandler playerHandler = entity.getCapability(TCCapabilities.CFE).orElse(DummyCFEHandler.instance);
-        int taken = thisHandler.addCFE(TCCommonConfigs.CFE_PER_BURST_TRANSFER_LIMIT.get(), true);
-        int added = playerHandler.takeCFE(taken,false);
-        thisHandler.addCFE(added,false);
     }
 
     static final String height = "Height";

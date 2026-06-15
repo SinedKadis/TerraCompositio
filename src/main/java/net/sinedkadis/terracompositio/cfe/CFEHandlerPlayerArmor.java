@@ -83,7 +83,7 @@ public class CFEHandlerPlayerArmor implements ICFEHandler {
     @Override
     public int addCFE(int cfe, boolean simulate) {
         int allAdded = 0;
-        int toAdd = cfe;
+        int toAdd = cfe - handler.addCFE(cfe, false);
         for (ItemStack itemStack : handlerList) {
             ICFEHandler icfeHandler = itemStack.getCapability(TCCapabilities.CFE).orElse(DummyCFEHandler.instance);
             int added = icfeHandler.addCFE(toAdd, simulate);
@@ -96,7 +96,7 @@ public class CFEHandlerPlayerArmor implements ICFEHandler {
     @Override
     public int takeCFE(int cfe, boolean simulate) {
         int allTaken = 0;
-        int toTake = cfe;
+        int toTake = cfe - handler.takeCFE(cfe, false);
         for (ItemStack itemStack : handlerList) {
             ICFEHandler icfeHandler = itemStack.getCapability(TCCapabilities.CFE).orElse(DummyCFEHandler.instance);
             int taken = icfeHandler.takeCFE(toTake, simulate);
@@ -158,6 +158,7 @@ public class CFEHandlerPlayerArmor implements ICFEHandler {
 
     @Override
     public void clear() {
+        handler.clear();
         for (ItemStack itemStack : handlerList) {
             ICFEHandler icfeHandler = itemStack.getCapability(TCCapabilities.CFE).orElse(DummyCFEHandler.instance);
             icfeHandler.clear();

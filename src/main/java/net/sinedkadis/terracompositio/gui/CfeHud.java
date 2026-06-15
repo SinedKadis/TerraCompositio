@@ -16,6 +16,7 @@ import org.lwjgl.opengl.GL11;
 
 public class CfeHud {
     public static final ResourceLocation CFE_HUD_RL = TerraCompositio.modLoc("textures/gui/cfe_hud.png");
+    public static final ResourceLocation CFE_HUD_SHADOW_RL = TerraCompositio.modLoc("textures/gui/cfe_hud_shadow.png");
 
     public static void render(ForgeGui ignoredGui,
                               GuiGraphics guiGraphics,
@@ -52,11 +53,16 @@ public class CfeHud {
         int r = (color >> 16 & 0xFF);
         int g = (color >> 8 & 0xFF);
         int b = color & 0xFF;
+
+        guiGraphics.blit(CFE_HUD_SHADOW_RL, x + 10, y, 0, 0, 0, 64, 40, 256, 256);
+
         RenderSystem.setShaderColor(r / 255F, g / 255F, b / 255F, 1 - (r / 255F));
 
         RenderSystem.enableBlend();
         RenderSystem.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
+
         guiGraphics.blit(CFE_HUD_RL, x + 10, y, 0, 0, 0, width, 40, 256, 256);
+
         RenderSystem.disableBlend();
         RenderSystem.setShaderColor(1, 1, 1, 1);
     }
