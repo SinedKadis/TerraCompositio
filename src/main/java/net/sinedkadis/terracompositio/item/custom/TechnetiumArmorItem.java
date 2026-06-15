@@ -1,16 +1,24 @@
 package net.sinedkadis.terracompositio.item.custom;
 
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.Util;
+import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.HumanoidModel;
+import net.minecraft.client.player.LocalPlayer;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.tags.BlockTags;
+import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ArmorItem;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.item.TooltipFlag;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
@@ -19,6 +27,7 @@ import net.minecraft.world.level.material.Fluids;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.client.extensions.common.IClientItemExtensions;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
+import net.minecraftforge.event.entity.living.LivingAttackEvent;
 import net.minecraftforge.event.entity.living.LivingEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
@@ -31,18 +40,20 @@ import net.sinedkadis.terracompositio.api.networks.NetworkAction;
 import net.sinedkadis.terracompositio.api.networks.cfe.CFENetworkMember;
 import net.sinedkadis.terracompositio.api.networks.cfe.CFENetworkMemberEntity;
 import net.sinedkadis.terracompositio.api.networks.cfe.ICFEHandler;
-import net.sinedkadis.terracompositio.cfe.CFEHandlerProxy;
 import net.sinedkadis.terracompositio.cfe.CFEItemWrapper;
 import net.sinedkadis.terracompositio.config.TCCommonConfigs;
 import net.sinedkadis.terracompositio.item.models.TechnetiumBootsModel;
-import net.sinedkadis.terracompositio.item.models.TechnetiumCloakModel;
+import net.sinedkadis.terracompositio.item.models.TechnetiumChestplateModel;
 import net.sinedkadis.terracompositio.item.models.TechnetiumCrownModel;
 import net.sinedkadis.terracompositio.network.TCPackets;
 import net.sinedkadis.terracompositio.network.packets.C2SBoardSync;
 import net.sinedkadis.terracompositio.registries.TCArmorMaterials;
 import net.sinedkadis.terracompositio.registries.TCBlocks;
 import net.sinedkadis.terracompositio.registries.TCItems;
+import net.sinedkadis.terracompositio.util.accessors.PlayerKnowledgeAccessor;
 import net.sinedkadis.terracompositio.util.helpers.BlockPosHelper;
+import net.sinedkadis.terracompositio.util.helpers.ParticleHelper;
+import net.sinedkadis.terracompositio.util.helpers.TooltipHelper;
 import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -56,6 +67,9 @@ import static net.minecraft.world.level.block.state.properties.BlockStatePropert
 @Mod.EventBusSubscriber(modid = TerraCompositio.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class TechnetiumArmorItem extends TCArmorItem {
 
+    private static final String last = "last";
+    private static final String height = "Height";
+    private static final String cd = "cd";
 
     @Override
     public Type getType() {
@@ -86,102 +100,41 @@ public class TechnetiumArmorItem extends TCArmorItem {
         return canEquip;
     }
 
-    @Override
-    public void inventoryTick(ItemStack pStack, Level pLevel, Entity entity, int pSlotId, boolean pIsSelected) {
-        super.inventoryTick(pStack, pLevel, entity, pSlotId, pIsSelected);
-        ICFEHandler icfeHandler = pStack.getCapability(TCCapabilities.CFE).orElse(DummyCFEHandler.instance);
-        switch (type) {
-            case HELMET -> this.helmetInventoryTick(pStack, pLevel, entity, icfeHandler);
-            case CHESTPLATE -> this.chestplateInventoryTick(pStack, pLevel, entity, icfeHandler);
-            case LEGGINGS -> this.leggingsInventoryTick(pStack, pLevel, entity, icfeHandler);
-            case BOOTS -> this.bootInventoryTick(pStack, pLevel, entity, icfeHandler);
+    public static void onLivingHurtEvent(LivingAttackEvent event) {
+        LivingEntity livingEntity = event.getEntity();
+        if (!(livingEntity instanceof Player)) return;
 
-            default -> {
-            }
+        DamageSource source = event.getSource();
+        Entity damager = source.getEntity();
+        if (damager == null) return;
 
-        }
-        if (entity instanceof LivingEntity living && living.getItemBySlot(type.getSlot()).equals(pStack)) {
-            ICFEHandler playerHandler = living.getCapability(TCCapabilities.CFE).orElse(DummyCFEHandler.instance);
-            if (playerHandler instanceof CFEHandlerProxy proxy) {
-                List<ICFEHandler> handlerList = proxy.getHandlerList();
-                for (ICFEHandler handler : handlerList) {
-                    if (handler instanceof CFEItemWrapper slotHandler) {
-                        if (slotHandler.getContainer().equals(pStack)) {
-                            return;
-                        }
+        ItemStack itemBySlot = livingEntity.getItemBySlot(EquipmentSlot.CHEST);
+        if (itemBySlot.is(TCItems.TECHNETIUM_CHESTPLATE.get())) {
+            ICFEHandler icfeHandler = itemBySlot.getCapability(TCCapabilities.CFE).orElse(DummyCFEHandler.instance);
+            if (icfeHandler.takeCFE(1, true) > 0) {
+                Level level = livingEntity.level();
+                BlockPos pPos = livingEntity.blockPosition();
+                if (livingEntity.getRandom().nextFloat() > 0.3f) {
+                    icfeHandler.takeCFE(1, false);
+                    if (icfeHandler.getCFE() <= 0) {
+                        level.playSound(null,
+                                pPos,
+                                SoundEvents.SHIELD_BREAK,
+                                SoundSource.PLAYERS);
                     }
                 }
-                handlerList.add(icfeHandler);
-            }
-        } else {
-            ICFEHandler playerHandler = entity.getCapability(TCCapabilities.CFE).orElse(DummyCFEHandler.instance);
-            if (playerHandler instanceof CFEHandlerProxy proxy) {
-                List<ICFEHandler> handlerList = proxy.getHandlerList();
-                handlerList.remove(icfeHandler);
-            }
-        }
 
-    }
 
-    private void helmetInventoryTick(ItemStack ignoredPStack, Level ignoredPLevel, Entity pEntity, ICFEHandler ignoredIcfeHandler) {
-        if (pEntity.tickCount % 20 != 0) return;
-        ICFEHandler playerHandler = pEntity.getCapability(TCCapabilities.CFE).orElse(DummyCFEHandler.instance);
-        boolean hasSpace = playerHandler.getFreeSpace() > 0;
-        if (!hasSpace) {
-            for (ItemStack slot : pEntity.getArmorSlots()) {
-                hasSpace |= slot.getCapability(TCCapabilities.CFE).orElse(DummyCFEHandler.instance).getFreeSpace() > 0;
+                level.playSound(null,
+                        pPos,
+                        SoundEvents.SHIELD_BLOCK,
+                        SoundSource.PLAYERS);
+
+                ParticleHelper.spawnParticlesIn(level, pPos.above());
+                event.setCanceled(true);
             }
         }
-        if (hasSpace) {
-            TerraCompositioAPI.instance().getCFENetworkInstance().fireCFENetworkEvent((CFENetworkMember) pEntity, NetworkAction.UPDATE);
-        }
     }
-
-    private void chestplateInventoryTick(ItemStack ignoredPStack, Level ignoredPLevel, Entity ignoredEntity, ICFEHandler ignoredIcfeHandler) {
-
-    }
-
-    private void leggingsInventoryTick(ItemStack itemStack, Level ignoredPLevel, Entity entity, ICFEHandler thisHandler) {
-        for (ItemStack stack : entity.getArmorSlots()) {
-            if (stack.equals(itemStack)) return;
-            ICFEHandler icfeHandler = stack.getCapability(TCCapabilities.CFE).orElse(DummyCFEHandler.instance);
-            int taken = thisHandler.takeCFE(TCCommonConfigs.CFE_PER_BURST_TRANSFER_LIMIT.get(), true);
-            int added = icfeHandler.addCFE(taken,false);
-            thisHandler.takeCFE(added,false);
-        }
-        ICFEHandler playerHandler = entity.getCapability(TCCapabilities.CFE).orElse(DummyCFEHandler.instance);
-        int taken = thisHandler.addCFE(TCCommonConfigs.CFE_PER_BURST_TRANSFER_LIMIT.get(), true);
-        int added = playerHandler.takeCFE(taken,false);
-        thisHandler.addCFE(added,false);
-    }
-
-    static final String height = "Height";
-    static final String cd = "cd";
-    private void bootInventoryTick(ItemStack ignoredPStack, Level ignoredLevel, Entity ignoredEntity, ICFEHandler ignoredIcfeHandler) {
-
-    }
-
-    public static boolean justJumped(Entity entity, CompoundTag persistentData) {
-        return persistentData.contains(cd) && (entity.tickCount - persistentData.getInt(cd) < 30);
-    }
-
-    public static boolean setHeightIfFalling(Level level, Entity entity, ICFEHandler icfeHandler, BlockPos onPos, CompoundTag persistentData) {
-        float fallDistance = entity.fallDistance;
-        if (fallDistance > 3 && !entity.isShiftKeyDown()
-                && icfeHandler.getCFE() >= 1) {
-
-            BlockState blockStateBelow1 = level.getBlockState(onPos.below());
-            BlockState blockStateBelow3 = level.getBlockState(onPos.below(3));
-
-            if (blockStateBelow1.is(BlockTags.REPLACEABLE)
-                    && !blockStateBelow3.isAir()) {
-                persistentData.putInt(height, onPos.getY()-1);
-                return true;
-            }
-        }
-        return false;
-    }
-
 
     public static void onBlockChanged(LivingEntity livingEntity) {
         if (!(livingEntity instanceof Player player))
@@ -214,7 +167,7 @@ public class TechnetiumArmorItem extends TCArmorItem {
             persistentData.remove(height);
         }
 
-        String last = "last";
+        String last = TechnetiumArmorItem.last;
         BlockPos destroyPos = null;
         if (persistentData.contains(last)) {
             if (level.isClientSide()) {
@@ -254,6 +207,84 @@ public class TechnetiumArmorItem extends TCArmorItem {
 
             takeCFEAndSetBoard(icfeHandler, level, posOnHeight, boardState);
             persistentData.put(last, BlockPosHelper.saveBlockPos(posOnHeight));
+        }
+    }
+
+    public static boolean justJumped(Entity entity, CompoundTag persistentData) {
+        return persistentData.contains(cd) && (entity.tickCount - persistentData.getInt(cd) < 30);
+    }
+
+    public static boolean setHeightIfFalling(Level level, Entity entity, ICFEHandler icfeHandler, BlockPos onPos, CompoundTag persistentData) {
+        float fallDistance = entity.fallDistance;
+        if (fallDistance > 3 && !entity.isShiftKeyDown()
+                && icfeHandler.getCFE() >= 1) {
+
+            BlockState blockStateBelow1 = level.getBlockState(onPos.below());
+            BlockState blockStateBelow3 = level.getBlockState(onPos.below(3));
+
+            if (blockStateBelow1.is(BlockTags.REPLACEABLE)
+                    && !blockStateBelow3.isAir()) {
+                persistentData.putInt(height, onPos.getY() - 1);
+                return true;
+            }
+        }
+        return false;
+    }
+
+    @Override
+    public void inventoryTick(ItemStack pStack, Level pLevel, Entity entity, int pSlotId, boolean pIsSelected) {
+        super.inventoryTick(pStack, pLevel, entity, pSlotId, pIsSelected);
+        ICFEHandler icfeHandler = pStack.getCapability(TCCapabilities.CFE).orElse(DummyCFEHandler.instance);
+        switch (type) {
+            case HELMET -> this.helmetInventoryTick(pStack, pLevel, entity, icfeHandler);
+            case CHESTPLATE -> {
+                // made via onLivingHurt
+            }
+            case LEGGINGS -> this.leggingsInventoryTick(pStack, pLevel, entity, icfeHandler);
+            case BOOTS -> {
+                // made via onBlockChanged and onLivingJump
+            }
+
+            default -> {
+            }
+
+        }
+    }
+
+    @Override
+    public void appendHoverText(ItemStack pStack, @Nullable Level pLevel, List<Component> pTooltipComponents, TooltipFlag pIsAdvanced) {
+        LocalPlayer player = Minecraft.getInstance().player;
+        if (player != null && ((PlayerKnowledgeAccessor) player).isCreationAcknowledged()) {
+            pTooltipComponents.add(
+                    TooltipHelper.defaultTextWithArg("block.terracompositio.cfe",
+                            pStack.getCapability(TCCapabilities.CFE).orElse(DummyCFEHandler.instance).getCFE())
+            );
+        }
+        super.appendHoverText(pStack, pLevel, pTooltipComponents, pIsAdvanced);
+    }
+
+    private void helmetInventoryTick(ItemStack ignoredPStack, Level ignoredPLevel, Entity pEntity, ICFEHandler ignoredIcfeHandler) {
+        if (pEntity.tickCount % 20 != 0) return;
+        ICFEHandler playerHandler = pEntity.getCapability(TCCapabilities.CFE).orElse(DummyCFEHandler.instance);
+
+        if (playerHandler.getFreeSpace() > 0) {
+            TerraCompositioAPI.instance().getCFENetworkInstance().fireCFENetworkEvent((CFENetworkMember) pEntity, NetworkAction.UPDATE);
+        }
+    }
+
+    private void leggingsInventoryTick(ItemStack itemStack, Level ignoredPLevel, Entity entity, ICFEHandler thisHandler) {
+        for (ItemStack stack : entity.getArmorSlots()) {
+            if (stack.equals(itemStack)) {
+                ICFEHandler playerHandler = entity.getCapability(TCCapabilities.CFE).orElse(DummyCFEHandler.instance).getMainHandler();
+                int taken = thisHandler.addCFE(TCCommonConfigs.CFE_PER_BURST_TRANSFER_LIMIT.get(), true);
+                int added = playerHandler.takeCFE(taken, false);
+                thisHandler.addCFE(added, false);
+                continue;
+            }
+            ICFEHandler icfeHandler = stack.getCapability(TCCapabilities.CFE).orElse(DummyCFEHandler.instance);
+            int taken = thisHandler.takeCFE(TCCommonConfigs.CFE_PER_BURST_TRANSFER_LIMIT.get(), true);
+            int added = icfeHandler.addCFE(taken, false);
+            thisHandler.takeCFE(added, false);
         }
     }
 
@@ -333,7 +364,13 @@ public class TechnetiumArmorItem extends TCArmorItem {
     public @Nullable String getArmorTexture(ItemStack stack, Entity entity, EquipmentSlot slot, String type) {
         return switch (slot) {
             case HEAD -> TerraCompositio.MOD_ID + ":textures/models/armor/technetium_crown.png";
-            case CHEST -> TerraCompositio.MOD_ID + ":textures/models/armor/technetium_chestplate.png";
+            case CHEST -> {
+                if (stack.getCapability(TCCapabilities.CFE).orElse(DummyCFEHandler.instance).getCFE() <= 0)
+                    yield TerraCompositio.MOD_ID + ":textures/models/armor/technetium_chestplate/armor_layer_no_shield.png";
+                int textureIndex = (int) (Util.getMillis() / 300) % 16;
+                yield TerraCompositio.MOD_ID + ":textures/models/armor/technetium_chestplate/armor_layer_"
+                        + textureIndex + ".png";
+            }
             case FEET -> TerraCompositio.MOD_ID + ":textures/models/armor/technetium_boots.png";
             case LEGS -> TerraCompositio.MOD_ID + ":textures/models/armor/technetium_leggings.png";
             default -> null;
@@ -346,7 +383,7 @@ public class TechnetiumArmorItem extends TCArmorItem {
             @Override
             public HumanoidModel<?> getHumanoidArmorModel(LivingEntity living, ItemStack stack, EquipmentSlot slot, HumanoidModel<?> defaultModel) {
                 if (stack.is(TCItems.TECHNETIUM_CROWN.get())) return TechnetiumCrownModel.bakedInstance;
-                if (stack.is(TCItems.TECHNETIUM_CHESTPLATE.get())) return TechnetiumCloakModel.bakedInstance;
+                if (stack.is(TCItems.TECHNETIUM_CHESTPLATE.get())) return TechnetiumChestplateModel.bakedInstance;
                 if (stack.is(TCItems.TECHNETIUM_BOOTS.get())) return TechnetiumBootsModel.Humanoid.bakedInstance;
                 return defaultModel;
             }

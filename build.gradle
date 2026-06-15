@@ -50,22 +50,7 @@ repositories {
     }
     maven { url = "https://maven.createmod.net" }
     maven { url = "https://raw.githubusercontent.com/Fuzss/modresources/main/maven/" }
-    maven {
-        url "https://maven.pkg.github.com/moremcmeta/*/"
 
-        // moremcmeta_maven_user is your GitHub username
-        // moremcmeta_maven_pass is your GitHub token (see "Authenticate to GitHub Packages")
-        // **NEVER** commit tokens to your git repository!
-        // Locally, store these in your user Gradle properties:
-        // https://docs.gradle.org/current/userguide/directory_layout.html#dir:gradle_user_home
-        // With GitHub Actions, use secrets and environment variables:
-        // https://docs.github.com/en/actions/security-guides/encrypted-secrets
-        credentials {
-            username System.getenv("MOREMCMETA_MAVEN_USER") ?: project.moremcmeta_maven_user
-            password System.getenv("MOREMCMETA_MAVEN_PASS") ?: project.moremcmeta_maven_pass
-        }
-
-    }
     maven {
         name = "Illusive Soulworks maven"
         url = "https://maven.theillusivec4.top/"
@@ -165,7 +150,6 @@ minecraft {
 
         server {
             property 'forge.enabledGameTestNamespaces', mod_id
-            //args '--nogui'
             jvmArgs += "-Dfml.earlyprogresswindow=false"
         }
 
@@ -180,7 +164,7 @@ minecraft {
             // example of overriding the workingDirectory set in configureEach above
             workingDirectory project.file('run-data')
 
-            // Specify the modid for data generation, where to output the resulting resource, and where to look for existing resources.
+            // Specify the mod_id for data generation, where to output the resulting resource, and where to look for existing resources.
             args '--mod', mod_id, '--all', '--output', file('src/generated/resources/'), '--existing', file('src/main/resources/')
         }
     }
@@ -195,25 +179,14 @@ sourceSets.main.resources { srcDir 'src/generated/resources' }
 
 
 dependencies {
-    // Specify the version of Minecraft to use.
-    // Any artifact can be supplied so long as it has a "userdev" classifier artifact and is a compatible patcher artifact.
-    // The "userdev" classifier will be requested and setup by ForgeGradle.
-    // If the group id is "net.minecraft" and the artifact id is one of ["client", "server", "joined"],
-    // then special handling is done to allow a setup of a vanilla dependency without the use of an external repository.
+
     minecraft "net.minecraftforge:forge:${minecraft_version}-${forge_version}"
 
-    // Example mod dependency with JEI - using fg.deobf() ensures the dependency is remapped to your development mappings
-    // The JEI API is declared for compile time use, while the full JEI artifact is used at runtime
-    // compileOnly fg.deobf("mezz.jei:jei-${mc_version}-common-api:${jei_version}")
-    // compileOnly fg.deobf("mezz.jei:jei-${mc_version}-forge-api:${jei_version}")
-    // runtimeOnly fg.deobf("mezz.jei:jei-${mc_version}-forge:${jei_version}")
+
     implementation 'org.spongepowered:mixin:0.8.5'
     annotationProcessor 'org.spongepowered:mixin:0.8.5:processor'
 
-    // Example mod dependency using a mod jar from ./libs with a flat dir repository
-    // This maps to ./libs/coolmod-${mc_version}-${coolmod_version}.jar
-    // The group id is ignored when searching -- in this case, it is "blank"
-    // implementation fg.deobf("blank:coolmod-${mc_version}:${coolmod_version}")
+
     compileOnly 'org.projectlombok:lombok:1.18.34'
     annotationProcessor 'org.projectlombok:lombok:1.18.34'
 
@@ -260,15 +233,6 @@ dependencies {
     compileOnly(annotationProcessor("io.github.llamalad7:mixinextras-common:0.4.1"))
     implementation("io.github.llamalad7:mixinextras-forge:0.4.1")
     implementation fg.deobf("com.github.glitchfiend:TerraBlender-forge:${minecraft_version}-${terrablender_version}")
-
-
-
-    implementation fg.deobf("io.github.moremcmeta:moremcmeta-forge:1.20.1-4.5.2")
-    runtimeOnly fg.deobf("io.github.moremcmeta:json-parser-plugin-forge:1.20.1-1.1.0")
-    runtimeOnly fg.deobf("io.github.moremcmeta:properties-parser-plugin-forge:1.20.1-1.1.2")
-    runtimeOnly fg.deobf("io.github.moremcmeta:animation-plugin-forge:1.20.1-1.0.0")
-    runtimeOnly fg.deobf("io.github.moremcmeta:texture-plugin-forge:1.20.1-1.0.0")
-    runtimeOnly fg.deobf("io.github.moremcmeta:gui-plugin-forge:1.20.1-1.0.0")
 }
 
 mixin {
@@ -316,7 +280,7 @@ tasks.named('jar', Jar).configure {
     finalizedBy 'reobfJar'
 }
 
-// However if you are in a multi-project build, dev time needs unobfed jar files, so you can delay the obfuscation until publishing by doing:
+// However if you are in a multi-project build, dev time needs unobfuscated jar files, so you can delay the obfuscation until publishing by doing:
 // tasks.named('publish').configure {
 //     dependsOn 'reobfJar'
 // }

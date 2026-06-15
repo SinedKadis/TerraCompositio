@@ -151,10 +151,10 @@ public class TCItems {
 
     //Apples
     public static final RegistryObject<Item> APPLE_OF_KNOWLEDGE = ITEMS.register("apple_of_knowledge",
-            () -> new Item(new Item.Properties()
+            () -> new KnowledgeAppleItem(new Item.Properties()
                     .food((TCFoods.CREATION_KNOWLEDGE))));
     public static final RegistryObject<Item> APPLE_OF_IGNORANCE = ITEMS.register("apple_of_ignorance",
-            () -> new Item(new Item.Properties()
+            () -> new KnowledgeAppleItem(new Item.Properties()
                     .food((TCFoods.IGNORANCE))));
 
 

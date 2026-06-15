@@ -11,6 +11,7 @@ import net.minecraftforge.network.NetworkEvent;
 import net.sinedkadis.terracompositio.api.TCCapabilities;
 import net.sinedkadis.terracompositio.api.dummies.DummyCFEHandler;
 import net.sinedkadis.terracompositio.registries.TCBlocks;
+import net.sinedkadis.terracompositio.util.helpers.ParticleHelper;
 import net.sinedkadis.terracompositio.util.helpers.WorldHelper;
 
 import java.util.function.Supplier;
@@ -54,6 +55,7 @@ public record C2SBoardSync(int x, short y, int z, boolean place, int cfeToTake, 
                             3);
                         player.getItemBySlot(EquipmentSlot.FEET).getCapability(TCCapabilities.CFE).orElse(DummyCFEHandler.instance)
                                 .takeCFE(msg.cfeToTake, false);
+                        ParticleHelper.spawnParticlesIn(level, pPos);
                     }
                 }
             }

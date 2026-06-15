@@ -3,45 +3,57 @@ package net.sinedkadis.terracompositio.cfe;
 import lombok.Getter;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.world.entity.player.Player;
+import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
+import net.minecraftforge.common.util.LazyOptional;
+import net.sinedkadis.terracompositio.api.TCCapabilities;
 import net.sinedkadis.terracompositio.api.dummies.DummyCFEHandler;
 import net.sinedkadis.terracompositio.api.networks.cfe.CFENetworkMember;
 import net.sinedkadis.terracompositio.api.networks.cfe.ICFEHandler;
 
 import javax.annotation.ParametersAreNonnullByDefault;
-import java.util.ArrayList;
-import java.util.List;
 import java.util.function.Function;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class CFEHandlerProxy implements ICFEHandler {
+public class CFEHandlerPlayerArmor implements ICFEHandler {
     @Getter
-    private final List<ICFEHandler> handlerList = new ArrayList<>() {
-        @Override
-        public boolean add(ICFEHandler icfeHandler) {
-            if (icfeHandler instanceof DummyCFEHandler) return false;
-            return super.add(icfeHandler);
-        }
-    };
+    private final ICFEHandler handler;
+    @Getter
+    private final Iterable<ItemStack> handlerList;
     private int queued = 0;
+
+    public CFEHandlerPlayerArmor(ICFEHandler icfeHandler) {
+        this.handler = icfeHandler;
+        handlerList = ((Player) icfeHandler.getAttachedMember().getEntity()).getArmorSlots();
+    }
 
     @Override
     public String toString() {
         StringBuilder stringBuilder = new StringBuilder();
         stringBuilder
-                .append("CFEHandlerProxy{");
+                .append("CFEPlayerProxy{").append(handler).append("\n").append("\n");
+
         handlerList.forEach(icfeHandler ->
-                stringBuilder.append("\n").append(icfeHandler.toString()).append("\n"));
-        stringBuilder.append(",\n\n\n queued=").append(queued)
+        {
+            LazyOptional<ICFEHandler> capability = icfeHandler.getCapability(TCCapabilities.CFE);
+            if (capability.isPresent()) {
+                stringBuilder.append("\n")
+                        .append(capability.orElse(DummyCFEHandler.instance))
+                        .append("\n");
+            }
+        });
+        stringBuilder.append(",\n\n\n Shared Queued=").append(queued)
                 .append("\n\n}");
         return stringBuilder.toString();
     }
 
     @Override
     public int getCFE() {
-        int toReturn = 0;
-        for (ICFEHandler icfeHandler : handlerList) {
+        int toReturn = handler.getCFE();
+        for (ItemStack itemStack : handlerList) {
+            ICFEHandler icfeHandler = itemStack.getCapability(TCCapabilities.CFE).orElse(DummyCFEHandler.instance);
             toReturn += icfeHandler.getCFE();
         }
         return toReturn;
@@ -49,13 +61,14 @@ public class CFEHandlerProxy implements ICFEHandler {
 
     @Override
     public void setCFE(int cfe) {
-        handlerList.get(0).setCFE(cfe);
+        handler.setCFE(cfe);
     }
 
     @Override
     public int getMaxCFE() {
-        int toReturn = 0;
-        for (ICFEHandler icfeHandler : handlerList) {
+        int toReturn = handler.getMaxCFE();
+        for (ItemStack itemStack : handlerList) {
+            ICFEHandler icfeHandler = itemStack.getCapability(TCCapabilities.CFE).orElse(DummyCFEHandler.instance);
             toReturn += icfeHandler.getMaxCFE();
         }
         return toReturn;
@@ -63,15 +76,16 @@ public class CFEHandlerProxy implements ICFEHandler {
 
     @Override
     public ICFEHandler setMaxCFE(int max) {
-        handlerList.get(0).setMaxCFE(max);
+        handler.setMaxCFE(max);
         return this;
     }
 
     @Override
     public int addCFE(int cfe, boolean simulate) {
         int allAdded = 0;
-        int toAdd = cfe;
-        for (ICFEHandler icfeHandler : handlerList) {
+        int toAdd = cfe - handler.addCFE(cfe, false);
+        for (ItemStack itemStack : handlerList) {
+            ICFEHandler icfeHandler = itemStack.getCapability(TCCapabilities.CFE).orElse(DummyCFEHandler.instance);
             int added = icfeHandler.addCFE(toAdd, simulate);
             allAdded += added;
             toAdd -= added;
@@ -82,8 +96,9 @@ public class CFEHandlerProxy implements ICFEHandler {
     @Override
     public int takeCFE(int cfe, boolean simulate) {
         int allTaken = 0;
-        int toTake = cfe;
-        for (ICFEHandler icfeHandler : handlerList) {
+        int toTake = cfe - handler.takeCFE(cfe, false);
+        for (ItemStack itemStack : handlerList) {
+            ICFEHandler icfeHandler = itemStack.getCapability(TCCapabilities.CFE).orElse(DummyCFEHandler.instance);
             int taken = icfeHandler.takeCFE(toTake, simulate);
             allTaken += taken;
             toTake -= taken;
@@ -98,12 +113,12 @@ public class CFEHandlerProxy implements ICFEHandler {
 
     @Override
     public void writeToNBT(CompoundTag pTag) {
-        handlerList.forEach(icfeHandler -> icfeHandler.writeToNBT(pTag));
+        handler.writeToNBT(pTag);
     }
 
     @Override
     public void readFromNBT(CompoundTag pTag) {
-        handlerList.forEach(icfeHandler -> icfeHandler.readFromNBT(pTag));
+        handler.readFromNBT(pTag);
     }
 
     @Override
@@ -123,8 +138,9 @@ public class CFEHandlerProxy implements ICFEHandler {
 
     @Override
     public boolean isEmpty() {
-        boolean toReturn = true;
-        for (ICFEHandler icfeHandler : handlerList) {
+        boolean toReturn = handler.isEmpty();
+        for (ItemStack itemStack : handlerList) {
+            ICFEHandler icfeHandler = itemStack.getCapability(TCCapabilities.CFE).orElse(DummyCFEHandler.instance);
             toReturn &= icfeHandler.isEmpty();
         }
         return toReturn;
@@ -132,8 +148,9 @@ public class CFEHandlerProxy implements ICFEHandler {
 
     @Override
     public int getFreeSpace() {
-        int toReturn = 0;
-        for (ICFEHandler icfeHandler : handlerList) {
+        int toReturn = handler.getFreeSpace();
+        for (ItemStack itemStack : handlerList) {
+            ICFEHandler icfeHandler = itemStack.getCapability(TCCapabilities.CFE).orElse(DummyCFEHandler.instance);
             toReturn += icfeHandler.getFreeSpace();
         }
         return toReturn - queued;
@@ -141,32 +158,41 @@ public class CFEHandlerProxy implements ICFEHandler {
 
     @Override
     public void clear() {
-        handlerList.forEach(ICFEHandler::clear);
+        handler.clear();
+        for (ItemStack itemStack : handlerList) {
+            ICFEHandler icfeHandler = itemStack.getCapability(TCCapabilities.CFE).orElse(DummyCFEHandler.instance);
+            icfeHandler.clear();
+        }
         queued = 0;
     }
 
     @Override
     public CFENetworkMember getAttachedMember() {
-        return handlerList.get(0).getAttachedMember();
+        return handler.getAttachedMember();
+    }
+
+    @Override
+    public ICFEHandler getMainHandler() {
+        return handler;
     }
 
     @Override
     public Function<Vec3, Vec3> getOffset() {
-        return handlerList.get(0).getOffset();
+        return handler.getOffset();
     }
 
     @Override
     public ICFEHandler setOffset(Function<Vec3, Vec3> offset) {
-        return handlerList.get(0).setOffset(offset);
+        return handler.setOffset(offset);
     }
 
     @Override
     public int getIndex() {
-        return handlerList.get(0).getIndex();
+        return handler.getIndex();
     }
 
     @Override
     public ICFEHandler setIndex(int index) {
-        return handlerList.get(0).setIndex(index);
+        return handler.setIndex(index);
     }
 }

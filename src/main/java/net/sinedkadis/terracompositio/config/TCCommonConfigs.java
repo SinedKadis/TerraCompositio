@@ -11,9 +11,8 @@ public class TCCommonConfigs {
     public static final ForgeConfigSpec.ConfigValue<Integer> PLATFORM_ALIVE_PER_PLAYER;
     public static final ForgeConfigSpec.ConfigValue<Boolean> DEBUG;
 
-
     static {
-        BUILDER.push("Configs for Terracompositio Mod");
+        BUILDER.push("Balance");
 
         PLATFORM_ALIVE_PER_PLAYER = BUILDER.comment("How many cfe boards from cfe charges can be")
                 .define("Max boards per player", 3);
@@ -21,11 +20,14 @@ public class TCCommonConfigs {
                 .define("CFE/burst transfer limit", 20);
         TICKS_BETWEEN_BURSTS = BUILDER.comment("How many ticks should pass before cfe source shot a new burst")
                 .define("Ticks for burst", 20);
-        DEBUG = BUILDER.comment("Enables extra info in knowledge tooltip")
-                .define("Debug mode", false);
+
 
 
         BUILDER.pop();
+
+        DEBUG = BUILDER.comment("Enables extra info in knowledge tooltip and more")
+                .define("Debug mode", false);
+
         SPEC = BUILDER.build();
     }
 }

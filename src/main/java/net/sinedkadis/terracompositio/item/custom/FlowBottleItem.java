@@ -1,9 +1,12 @@
 package net.sinedkadis.terracompositio.item.custom;
 
 import net.minecraft.advancements.CriteriaTriggers;
+import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.stats.Stats;
+import net.minecraft.util.Mth;
+import net.minecraft.util.RandomSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.InteractionResultHolder;
@@ -17,9 +20,12 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.gameevent.GameEvent;
+import net.minecraft.world.phys.Vec3;
+import net.minecraftforge.event.entity.living.LivingEvent;
+import net.sinedkadis.terracompositio.particle.CFEParticleData;
+import net.sinedkadis.terracompositio.registries.TCArmorMaterials;
 import net.sinedkadis.terracompositio.registries.TCBlocks;
 import net.sinedkadis.terracompositio.registries.TCEffects;
-import net.sinedkadis.terracompositio.registries.TCArmorMaterials;
 import net.sinedkadis.terracompositio.registries.TCItems;
 import org.jetbrains.annotations.NotNull;
 
@@ -152,6 +158,26 @@ public class FlowBottleItem extends Item {
     @ParametersAreNonnullByDefault
     public @NotNull InteractionResultHolder<ItemStack> use(Level pLevel, Player pPlayer, InteractionHand pHand) {
         return ItemUtils.startUsingInstantly(pLevel, pPlayer, pHand);
+    }
+
+    public static void onClientLivingTickEvent(LivingEvent.LivingTickEvent event, ClientLevel clientLevel) {
+        LivingEntity livingEntity = event.getEntity();
+        RandomSource random = clientLevel.getRandom();
+        Vec3 pos = livingEntity.position().add(
+                0,
+                Mth.lerp(random.nextFloat(), 0, livingEntity.getBbHeight()),
+                0
+        );
+        if (livingEntity.hasEffect(TCEffects.FLOW_SATURATION.get())) {
+
+            clientLevel.addParticle(new CFEParticleData(1 / 20f),
+                    pos.x,
+                    pos.y,
+                    pos.z,
+                    random.nextFloat(),
+                    random.nextFloat(),
+                    random.nextFloat());
+        }
     }
 
     private boolean hasFlowCedarArmorOn(Player player) {

@@ -1,12 +1,18 @@
 package net.sinedkadis.terracompositio.mixin;
 
+import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
+import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerPlayer;
+import net.minecraft.world.entity.EntityType;
+import net.minecraft.world.entity.LivingEntity;
 import net.minecraft.world.entity.MoverType;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
+import net.minecraftforge.common.capabilities.Capability;
+import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.network.PacketDistributor;
 import net.sinedkadis.terracompositio.api.TCCapabilities;
 import net.sinedkadis.terracompositio.api.dummies.DummyCFEHandler;
@@ -18,30 +24,43 @@ import net.sinedkadis.terracompositio.network.TCPackets;
 import net.sinedkadis.terracompositio.network.packets.S2CAddPlayerKnowledge;
 import net.sinedkadis.terracompositio.network.packets.S2CPlayerCfeContainerSync;
 import net.sinedkadis.terracompositio.util.accessors.PlayerKnowledgeAccessor;
+import org.jetbrains.annotations.Nullable;
 import org.spongepowered.asm.mixin.Mixin;
+import org.spongepowered.asm.mixin.Shadow;
 import org.spongepowered.asm.mixin.Unique;
 import org.spongepowered.asm.mixin.injection.At;
 import org.spongepowered.asm.mixin.injection.Inject;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 import org.spongepowered.asm.mixin.injection.callback.CallbackInfoReturnable;
 
+import javax.annotation.ParametersAreNonnullByDefault;
+
 @SuppressWarnings("AddedMixinMembersNamePattern")
 @Mixin(Player.class)
-public class PlayerMixin implements CFENetworkMemberEntity, PlayerKnowledgeAccessor {
+@ParametersAreNonnullByDefault
+@MethodsReturnNonnullByDefault
+public abstract class PlayerMixin extends LivingEntity implements CFENetworkMemberEntity, PlayerKnowledgeAccessor {
+    protected PlayerMixin(EntityType<? extends LivingEntity> pEntityType, Level pLevel) {
+        super(pEntityType, pLevel);
+    }
+
     @Unique
     boolean creationKnowledge = false;
 
     @Unique
     boolean scheduleUpdate = false;
 
+    @Shadow
+    public abstract <T> LazyOptional<T> getCapability(Capability<T> capability, @Nullable Direction facing);
+
     @Override
     public Level getLevel() {
-        return ((Player)(Object)this).level();
+        return this.level();
     }
 
     @Override
     public BlockPos getPos() {
-        return ((Player)(Object)this).blockPosition();
+        return this.blockPosition();
     }
 
     @Override
@@ -69,7 +88,7 @@ public class PlayerMixin implements CFENetworkMemberEntity, PlayerKnowledgeAcces
 
     @Override
     public ICFEHandler getMainHandler() {
-        return ((Player)(Object)this).getCapability(TCCapabilities.CFE).orElse(DummyCFEHandler.instance);
+        return this.getCapability(TCCapabilities.CFE).orElse(DummyCFEHandler.instance);
     }
 
     @Unique
@@ -102,7 +121,7 @@ public class PlayerMixin implements CFENetworkMemberEntity, PlayerKnowledgeAcces
     )
     private void technetium$edgeSafeTail(Vec3 movement, MoverType mover, CallbackInfoReturnable<Vec3> cir) {
         if (technetium$fakeSneak) {
-            ((Player) (Object) this).setShiftKeyDown(false);
+            this.setShiftKeyDown(false);
             technetium$fakeSneak = false;
         }
     }

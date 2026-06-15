@@ -14,6 +14,8 @@ import net.minecraft.server.level.ServerLevel;
 import net.minecraft.sounds.SoundEvent;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.world.DifficultyInstance;
+import net.minecraft.world.InteractionHand;
+import net.minecraft.world.InteractionResult;
 import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.*;
 import net.minecraft.world.entity.ai.attributes.AttributeSupplier;
@@ -32,6 +34,7 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.util.LazyOptional;
+import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.items.ItemStackHandler;
 import net.sinedkadis.terracompositio.api.IHaveKnowledge;
 import net.sinedkadis.terracompositio.api.TCCapabilities;
@@ -166,6 +169,32 @@ public class FlowCedarEntEntity extends AbstractGolem implements CFENetworkMembe
                     }
                 });
             });
+        }
+    }
+
+    public static void onEntityInteractEvent(PlayerInteractEvent.EntityInteractSpecific event) {
+        if (event.getTarget() instanceof FlowCedarEntEntity entity) {
+            ItemStack pStack = event.getEntity().getItemInHand(InteractionHand.MAIN_HAND);
+            ItemStack head = entity.getItemBySlot(EquipmentSlot.HEAD);
+            if (pStack.is(TCItems.TECHNETIUM_CROWN.get())) {
+                if (head.isEmpty()) {
+                    entity.setItemSlot(EquipmentSlot.HEAD, pStack.copy());
+                    pStack.shrink(1);
+                    entity.setDropChance(EquipmentSlot.HEAD, 2.0F);
+                    entity.setPersistenceRequired();
+                    event.setCancellationResult(InteractionResult.SUCCESS);
+                    event.setCanceled(true);
+                    return;
+                }
+            }
+            if (pStack.isEmpty()) {
+                if (!head.isEmpty()) {
+                    event.getEntity().setItemInHand(InteractionHand.MAIN_HAND, head.copy());
+                    head.shrink(1);
+                    event.setCancellationResult(InteractionResult.SUCCESS);
+                    event.setCanceled(true);
+                }
+            }
         }
     }
 

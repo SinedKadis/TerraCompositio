@@ -10,7 +10,6 @@
     "AbstractFurnaceBlockEntityMixin",
     "BlockStateBaseMixin",
     "ItemEntityMixin",
-    "LivingEntityMixin",
     "PlayerMixin",
     "RedStoneWireBlockMixin",
     "accessors.BundleItemAccessor",
@@ -18,7 +17,8 @@
   ],
   "client": [
     "HumanoidArmorLayerMixin",
-    "LocalPlayerMixin"
+    "LocalPlayerMixin",
+    "accessors.GuiGraphicsAccessor"
   ],
   "server": [],
   "injectors": {
