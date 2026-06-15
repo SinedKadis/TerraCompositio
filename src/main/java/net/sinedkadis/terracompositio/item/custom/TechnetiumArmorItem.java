@@ -1,6 +1,7 @@
 package net.sinedkadis.terracompositio.item.custom;
 
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.Util;
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
@@ -313,7 +314,11 @@ public class TechnetiumArmorItem extends TCArmorItem {
     public @Nullable String getArmorTexture(ItemStack stack, Entity entity, EquipmentSlot slot, String type) {
         return switch (slot) {
             case HEAD -> TerraCompositio.MOD_ID + ":textures/models/armor/technetium_crown.png";
-            case CHEST -> TerraCompositio.MOD_ID + ":textures/models/armor/technetium_chestplate.png";
+            case CHEST -> {
+                int textureIndex = (int) (Util.getMillis() / 300) % 16;
+                yield TerraCompositio.MOD_ID + ":textures/models/armor/technetium_chestplate/armor_layer_"
+                        + textureIndex + ".png";
+            }
             case FEET -> TerraCompositio.MOD_ID + ":textures/models/armor/technetium_boots.png";
             case LEGS -> TerraCompositio.MOD_ID + ":textures/models/armor/technetium_leggings.png";
             default -> null;
