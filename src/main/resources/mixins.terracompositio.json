@@ -10,7 +10,6 @@
     "AbstractFurnaceBlockEntityMixin",
     "BlockStateBaseMixin",
     "ItemEntityMixin",
-    "LivingEntityMixin",
     "PlayerMixin",
     "RedStoneWireBlockMixin",
     "accessors.BundleItemAccessor",

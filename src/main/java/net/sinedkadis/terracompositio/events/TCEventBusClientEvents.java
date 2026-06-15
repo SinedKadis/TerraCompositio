@@ -43,7 +43,7 @@ import net.sinedkadis.terracompositio.item.custom.ShieldedBundleItem;
 import net.sinedkadis.terracompositio.item.custom.TechnetiumArmorItem;
 import net.sinedkadis.terracompositio.item.custom.WrenchAxeItem;
 import net.sinedkadis.terracompositio.item.models.TechnetiumBootsModel;
-import net.sinedkadis.terracompositio.item.models.TechnetiumCloakModel;
+import net.sinedkadis.terracompositio.item.models.TechnetiumChestplateModel;
 import net.sinedkadis.terracompositio.item.models.TechnetiumCrownModel;
 import net.sinedkadis.terracompositio.particle.custom.*;
 import net.sinedkadis.terracompositio.registries.*;
@@ -58,9 +58,7 @@ public class TCEventBusClientEvents {
     @SubscribeEvent
     public static void onClientSetup(FMLClientSetupEvent event)
     {
-        // Some client setup code
-        //LOGGER.info("HELLO FROM CLIENT SETUP");
-        //LOGGER.info("MINECRAFT NAME >> {}", Minecraft.getInstance().getUser().getName());
+
         Sheets.addWoodType(TCWoodTypes.FLOW_CEDAR);
 
         EntityRenderers.register(TCEntities.MOD_BOAT.get(), pContext -> new TCBoatRenderer(pContext, false));
@@ -177,7 +175,7 @@ public class TCEventBusClientEvents {
         event.registerLayerDefinition(TCModelLayers.CFE_CUBE_LAYER, CFECubeModel::createBodyLayer);
 
         event.registerLayerDefinition(TCModelLayers.TECHNETIUM_CROWN_LAYER, TechnetiumCrownModel::createBodyLayer);
-        event.registerLayerDefinition(TCModelLayers.TECHNETIUM_CLOAK_LAYER, TechnetiumCloakModel::createBodyLayer);
+        event.registerLayerDefinition(TCModelLayers.TECHNETIUM_CHESTPLATE_LAYER, TechnetiumChestplateModel::createBodyLayer);
         event.registerLayerDefinition(TCModelLayers.TECHNETIUM_BOOTS_LAYER, TechnetiumBootsModel::createBodyLayer);
     }
 

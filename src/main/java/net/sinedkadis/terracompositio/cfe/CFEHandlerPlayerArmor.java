@@ -51,7 +51,7 @@ public class CFEHandlerPlayerArmor implements ICFEHandler {
 
     @Override
     public int getCFE() {
-        int toReturn = 0;
+        int toReturn = handler.getCFE();
         for (ItemStack itemStack : handlerList) {
             ICFEHandler icfeHandler = itemStack.getCapability(TCCapabilities.CFE).orElse(DummyCFEHandler.instance);
             toReturn += icfeHandler.getCFE();
@@ -66,7 +66,7 @@ public class CFEHandlerPlayerArmor implements ICFEHandler {
 
     @Override
     public int getMaxCFE() {
-        int toReturn = 0;
+        int toReturn = handler.getMaxCFE();
         for (ItemStack itemStack : handlerList) {
             ICFEHandler icfeHandler = itemStack.getCapability(TCCapabilities.CFE).orElse(DummyCFEHandler.instance);
             toReturn += icfeHandler.getMaxCFE();
@@ -138,7 +138,7 @@ public class CFEHandlerPlayerArmor implements ICFEHandler {
 
     @Override
     public boolean isEmpty() {
-        boolean toReturn = true;
+        boolean toReturn = handler.isEmpty();
         for (ItemStack itemStack : handlerList) {
             ICFEHandler icfeHandler = itemStack.getCapability(TCCapabilities.CFE).orElse(DummyCFEHandler.instance);
             toReturn &= icfeHandler.isEmpty();
@@ -148,7 +148,7 @@ public class CFEHandlerPlayerArmor implements ICFEHandler {
 
     @Override
     public int getFreeSpace() {
-        int toReturn = 0;
+        int toReturn = handler.getFreeSpace();
         for (ItemStack itemStack : handlerList) {
             ICFEHandler icfeHandler = itemStack.getCapability(TCCapabilities.CFE).orElse(DummyCFEHandler.instance);
             toReturn += icfeHandler.getFreeSpace();
@@ -169,6 +169,11 @@ public class CFEHandlerPlayerArmor implements ICFEHandler {
     @Override
     public CFENetworkMember getAttachedMember() {
         return handler.getAttachedMember();
+    }
+
+    @Override
+    public ICFEHandler getMainHandler() {
+        return handler;
     }
 
     @Override

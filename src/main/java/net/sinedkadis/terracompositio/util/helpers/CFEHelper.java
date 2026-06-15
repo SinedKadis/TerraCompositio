@@ -221,21 +221,16 @@ public class CFEHelper {
 
 
     public static class CFESpawnQueue {
-        private static final List<Pair<Level, Entity>> pendingSpawns = new ArrayList<>();
-        private static final Object lock = new Object();
+        private static final ConcurrentLinkedQueue<Pair<Level, Entity>> pending = new ConcurrentLinkedQueue<>();
 
-        public static void scheduleSpawn(Level level, Entity entity) {
-            synchronized (lock) {
-                pendingSpawns.add(Pair.of(level, entity));
-            }
+        public static void schedule(Level level, Entity entity) {
+            pending.add(Pair.of(level, entity));
         }
 
-        public static void flushSpawns() {
-            synchronized (lock) {
-                for (Pair<Level, Entity> pair : pendingSpawns) {
-                    pair.getFirst().addFreshEntity(pair.getSecond());
-                }
-                pendingSpawns.clear();
+        public static void flush() {
+            Pair<Level, Entity> entry;
+            while ((entry = pending.poll()) != null) {
+                entry.getFirst().addFreshEntity(entry.getSecond());
             }
         }
     }

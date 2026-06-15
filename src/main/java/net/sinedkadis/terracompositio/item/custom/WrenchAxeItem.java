@@ -1,8 +1,13 @@
 package net.sinedkadis.terracompositio.item.custom;
 
 
+import com.mojang.blaze3d.vertex.PoseStack;
+import com.mojang.math.Axis;
 import net.minecraft.ChatFormatting;
 import net.minecraft.Util;
+import net.minecraft.client.Minecraft;
+import net.minecraft.client.renderer.ItemInHandRenderer;
+import net.minecraft.client.renderer.MultiBufferSource;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
@@ -38,9 +43,11 @@ import net.minecraft.world.level.storage.loot.parameters.LootContextParams;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
+import net.minecraftforge.client.event.RenderHandEvent;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.util.FakePlayer;
+import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -674,6 +681,69 @@ public class WrenchAxeItem extends AxeItem {
 
     private static <T extends Comparable<T>> String getNameHelper(BlockState pState, Property<T> pProperty) {
         return pProperty.getName(pState.getValue(pProperty));
+    }
+
+    public static void onRenderHandEvent(RenderHandEvent event) {
+        Player player = Minecraft.getInstance().player;
+        if (player == null) return;
+
+        ItemStack mainHandStack = player.getMainHandItem();
+        ItemStack offHandStack = player.getOffhandItem();
+
+        if (mainHandStack.getItem() instanceof WrenchAxeItem && offHandStack.getItem() instanceof AxeItem && player.getUseItem().is(TCItems.WRENCH_AXE.get())) {
+            event.setCanceled(true);
+            renderAxes(event.getPoseStack(), event.getMultiBufferSource(), event.getPackedLight(), event.getHand());
+        }
+    }
+
+    private static void renderAxes(PoseStack poseStack, MultiBufferSource bufferSource, int packedLight, InteractionHand hand) {
+        Minecraft minecraft = Minecraft.getInstance();
+        Player player = minecraft.player;
+        if (player == null) return;
+
+        ItemStack stack = player.getItemInHand(hand);
+        if (stack.isEmpty()) return;
+        int duration = Math.min(player.getTicksUsingItem(), 60);
+
+        ItemInHandRenderer itemInHandRenderer = minecraft.getEntityRenderDispatcher().getItemInHandRenderer();
+        if (hand == InteractionHand.MAIN_HAND) {
+            poseStack.pushPose();
+            poseStack.translate(0.35F, -0.1F, -0.3F);
+            poseStack.mulPose(Axis.ZP.rotationDegrees(180));
+            poseStack.mulPose(Axis.XN.rotationDegrees(90 + duration * 1.5F));
+
+
+            itemInHandRenderer.renderItem(player, stack, ItemDisplayContext.FIRST_PERSON_RIGHT_HAND,
+                    true, poseStack, bufferSource, packedLight);
+            poseStack.popPose();
+        } else {
+            poseStack.pushPose();
+            poseStack.translate(-0.35F, -0.1F, -0.3F);
+            poseStack.mulPose(Axis.ZP.rotationDegrees(180));
+            poseStack.mulPose(Axis.XN.rotationDegrees(90 + duration * 1.5F));
+
+            itemInHandRenderer.renderItem(player, stack, ItemDisplayContext.FIRST_PERSON_LEFT_HAND,
+                    false, poseStack, bufferSource, packedLight);
+            poseStack.popPose();
+        }
+    }
+
+    public static void onClientLevelTickEndEvent(TickEvent.PlayerTickEvent event) {
+        Player player = event.player;
+        Level level = player.level();
+
+        if (!player.getMainHandItem().is(TCItems.WRENCH_AXE.get())) return;
+
+        HitResult hit = Minecraft.getInstance().hitResult;
+        if (!(hit instanceof BlockHitResult blockHit)) return;
+
+        BlockPos pos = blockHit.getBlockPos();
+        if (pos.distSqr(player.blockPosition()) > 25) return;
+
+        BlockEntity be = level.getBlockEntity(pos);
+        if (be instanceof PathPointerBlockEntity pointer) {
+            pointer.highlightNodes();
+        }
     }
 
     public enum WrenchMode {

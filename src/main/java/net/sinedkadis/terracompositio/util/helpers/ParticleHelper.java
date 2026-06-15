@@ -18,6 +18,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class ParticleHelper {
+
     public static void sendFluidParticles(ServerLevel level, BlockPos target, BlockPos source,
                                           int particleAmount, FluidStack fluidStack) {
         if (fluidStack.isEmpty() || particleAmount <= 0 || level == null) return;
@@ -47,14 +48,15 @@ public class ParticleHelper {
     public static void spawnParticlesIn(Level pLevel, BlockPos targetPos) {
         if (pLevel instanceof ServerLevel level) {
             float speed = 1 / 20f;
+            RandomSource random = pLevel.getRandom();
             level.sendParticles(new CFEParticleData(speed),
-                    targetPos.getX() + pLevel.getRandom().nextFloat(),
-                    targetPos.getY() + pLevel.getRandom().nextFloat(),
-                    targetPos.getZ() + pLevel.getRandom().nextFloat(),
+                    targetPos.getX() + random.nextFloat(),
+                    targetPos.getY() + random.nextFloat(),
+                    targetPos.getZ() + random.nextFloat(),
                     0,
-                    targetPos.getX(),
-                    targetPos.getY(),
-                    targetPos.getZ(),
+                    random.nextFloat(),
+                    random.nextFloat(),
+                    random.nextFloat(),
                     1);
         }
     }

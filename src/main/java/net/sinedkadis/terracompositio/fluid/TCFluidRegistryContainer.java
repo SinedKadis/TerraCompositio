@@ -50,7 +50,6 @@ import net.sinedkadis.terracompositio.block.custom.FlowCauldronBlock;
 import net.sinedkadis.terracompositio.registries.TCBlocks;
 import net.sinedkadis.terracompositio.registries.TCFluids;
 import net.sinedkadis.terracompositio.registries.TCItems;
-import org.apache.commons.lang3.function.TriFunction;
 import org.jetbrains.annotations.Nullable;
 import org.joml.Vector3f;
 
@@ -128,7 +127,7 @@ public class TCFluidRegistryContainer implements IForgeBucketPickup{
                     if (context.getLevel().getBlockState(pPos)== Blocks.CAULDRON.defaultBlockState()){
                         context.getLevel().setBlock(pPos, TCBlocks.FLOW_CAULDRON.get().defaultBlockState().setValue(FlowCauldronBlock.LEVEL,3),1);
                         player.setItemInHand(context.getHand(),new ItemStack(Items.BUCKET));
-                        player.playSound(SoundEvents.BUCKET_EMPTY); //TODO: fix sound when clicked with empty bucket on flow
+                        player.playSound(SoundEvents.BUCKET_EMPTY);
                         return InteractionResult.SUCCESS;
                     }
                 }
@@ -203,12 +202,6 @@ public class TCFluidRegistryContainer implements IForgeBucketPickup{
         this.properties.bucket(this.bucket);
     }
 
-    public TCFluidRegistryContainer(String name, FluidType.Properties typeProperties,
-                                    Supplier<IClientFluidTypeExtensions> clientExtensions, BlockBehaviour.Properties blockProperties,
-                                    Item.Properties itemProperties) {
-        this(name, typeProperties, clientExtensions, null, blockProperties, itemProperties);
-    }
-
     public static IClientFluidTypeExtensions createExtension(ClientExtensions extensions) {
         return new IClientFluidTypeExtensions() {
             @Override
@@ -234,7 +227,10 @@ public class TCFluidRegistryContainer implements IForgeBucketPickup{
 
             @Override
             public int getTintColor(FluidState state, BlockAndTintGetter getter, BlockPos pos) {
-                return extensions.tintFunction == null ? 0xFFFFFFFF : extensions.tintFunction.apply(state, getter, pos);
+//                if (extensions.tintFunction != null) {
+//                    return extensions.tintFunction.apply(state, getter, pos);
+//                }
+                return 0xFFFFFFFF;
             }
 
             @Override
@@ -263,14 +259,14 @@ public class TCFluidRegistryContainer implements IForgeBucketPickup{
 
     public static class AdditionalProperties {
         private int levelDecreasePerBlock = 1;
-        private float explosionResistance = 1;
+        private final float explosionResistance = 1;
         private int slopeFindDistance = 4;
         private int tickRate = 5;
 
-        public AdditionalProperties explosionResistance(float resistance) {
-            this.explosionResistance = resistance;
-            return this;
-        }
+//        public AdditionalProperties explosionResistance(float resistance) {
+//            this.explosionResistance = resistance;
+//            return this;
+//        }
 
         public AdditionalProperties levelDecreasePerBlock(int decrease) {
             this.levelDecreasePerBlock = decrease;
@@ -294,7 +290,7 @@ public class TCFluidRegistryContainer implements IForgeBucketPickup{
         private ResourceLocation overlay;
         private ResourceLocation renderOverlay;
         private Vector3f fogColor;
-        private TriFunction<FluidState, BlockAndTintGetter, BlockPos, Integer> tintFunction;
+        //private TriFunction<FluidState, BlockAndTintGetter, BlockPos, Integer> tintFunction;
 
         private final String modid;
 
@@ -305,13 +301,12 @@ public class TCFluidRegistryContainer implements IForgeBucketPickup{
             overlay(fluidName);
         }
 
-        public ClientExtensions flowing(String name) {
-            return flowing(name, "block");
+        public void flowing(String name) {
+            flowing(name, "block");
         }
 
-        public ClientExtensions flowing(String name, String folder) {
+        public void flowing(String name, String folder) {
             this.flowing = ResourceLocation.tryBuild(this.modid, folder + "/" + name + "_flowing");
-            return this;
         }
 
         public ClientExtensions fogColor(float red, float green, float blue) {
@@ -328,29 +323,28 @@ public class TCFluidRegistryContainer implements IForgeBucketPickup{
             return renderOverlay(Objects.requireNonNull(ResourceLocation.tryBuild(this.modid, "textures/" + folder + "/" + name + "_overlay.png")));
         }
 
-        public ClientExtensions renderOverlay(ResourceLocation path) {
+        public ClientExtensions renderOverlay(@Nullable ResourceLocation path) {
             this.renderOverlay = path;
             return this;
         }
 
-        public ClientExtensions still(String name) {
-            return still(name, "block");
+        public void still(String name) {
+            still(name, "block");
         }
 
-        public ClientExtensions still(String name, String folder) {
+        public void still(String name, String folder) {
             this.still = ResourceLocation.tryBuild(this.modid, folder + "/" + name + "_still");
-            return this;
         }
 
-        public ClientExtensions tint(int tint) {
-            this.tintFunction = ($0, $1, $2) -> tint;
-            return this;
-        }
-
-        public ClientExtensions tint(TriFunction<FluidState, BlockAndTintGetter, BlockPos, Integer> tinter) {
-            this.tintFunction = tinter;
-            return this;
-        }
+//        public ClientExtensions tint(int tint) {
+//            this.tintFunction = ($0, $1, $2) -> tint;
+//            return this;
+//        }
+//
+//        public ClientExtensions tint(TriFunction<FluidState, BlockAndTintGetter, BlockPos, Integer> tinter) {
+//            this.tintFunction = tinter;
+//            return this;
+//        }
 
     }
 }

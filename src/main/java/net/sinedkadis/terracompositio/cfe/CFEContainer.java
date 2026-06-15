@@ -106,7 +106,7 @@ public class CFEContainer implements ICFEHandler, INBTSerializable<CompoundTag> 
         if (!simulate) {
             CFEBurstProjectileEntity entity = CFEBurstProjectileEntity.sendBurst(this, target, added, speed);
             if (entity != null) {
-                CFEHelper.CFESpawnQueue.scheduleSpawn(getLevel(), entity);
+                CFEHelper.CFESpawnQueue.schedule(getLevel(), entity);
                 target.getMainHandler().addToQueue(added);
             }
         }
