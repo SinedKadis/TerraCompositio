@@ -257,6 +257,8 @@ public class CFEBurstProjectileEntity extends ThrowableProjectile {
         if (isRemoved()) {
             return;
         }
+        super.remove(pReason);
+
         BlockEntity blockEntity = level().getBlockEntity(getTarget());
         int cfe = getCFE();
         if (blockEntity instanceof CFENetworkMemberBE memberBE) {
@@ -270,7 +272,6 @@ public class CFEBurstProjectileEntity extends ThrowableProjectile {
             if (owner instanceof CFENetworkMemberEntity || owner instanceof Player) {
                 target = owner;
             } else {
-                super.remove(pReason);
                 return;
             }
             assert target instanceof CFENetworkMemberEntity;
@@ -279,10 +280,6 @@ public class CFEBurstProjectileEntity extends ThrowableProjectile {
             cfeNetworkMemberEntity.getMainHandler().subFromQueue(cfe);
 
         }
-        if (isRemoved()) {
-            return;
-        }
-        super.remove(pReason);
     }
 
     @Override

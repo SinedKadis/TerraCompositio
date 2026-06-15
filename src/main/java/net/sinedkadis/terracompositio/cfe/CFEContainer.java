@@ -22,6 +22,7 @@ import net.sinedkadis.terracompositio.api.networks.cfe.ICFEHandler;
 import net.sinedkadis.terracompositio.cfe.burst.CFEBurstProjectileEntity;
 import net.sinedkadis.terracompositio.network.TCPackets;
 import net.sinedkadis.terracompositio.network.packets.S2CPlayerCfeContainerSync;
+import net.sinedkadis.terracompositio.util.helpers.CFEHelper;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.function.Function;
@@ -38,7 +39,7 @@ public class CFEContainer implements ICFEHandler, INBTSerializable<CompoundTag> 
     protected int index = 0;
     @Getter
     protected int CFE = 0;
-    protected int maxCFE = 100;
+    protected int maxCFE = 64;
     @Getter
     protected Function<Vec3, Vec3> offset = t -> t;
     protected int queued = 0;
@@ -105,7 +106,7 @@ public class CFEContainer implements ICFEHandler, INBTSerializable<CompoundTag> 
         if (!simulate) {
             CFEBurstProjectileEntity entity = CFEBurstProjectileEntity.sendBurst(this, target, added, speed);
             if (entity != null) {
-                getLevel().addFreshEntity(entity);
+                CFEHelper.CFESpawnQueue.scheduleSpawn(getLevel(), entity);
                 target.getMainHandler().addToQueue(added);
             }
         }

@@ -35,7 +35,7 @@ public class PlayerCFEProvider implements net.minecraftforge.common.capabilities
     private ICFEHandler createPlayerCFEContainer() {
         if (this.handler == null) {
             this.handler = new CFEHandlerPlayerArmor(new CFEContainer((CFENetworkMemberEntity) player)
-                    .setMaxCFE(10)
+                    .setMaxCFE(0) // I haven't thought of a use for this yet
                     .setOffset(vec3 -> vec3.add(0, 1, 0)));
         }
 

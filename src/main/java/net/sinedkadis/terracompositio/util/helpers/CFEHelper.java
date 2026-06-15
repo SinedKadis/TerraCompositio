@@ -218,4 +218,25 @@ public class CFEHelper {
         entity.setSyncedCFE(cfe1 + cfe);
         return cfe;
     }
+
+
+    public static class CFESpawnQueue {
+        private static final List<Pair<Level, Entity>> pendingSpawns = new ArrayList<>();
+        private static final Object lock = new Object();
+
+        public static void scheduleSpawn(Level level, Entity entity) {
+            synchronized (lock) {
+                pendingSpawns.add(Pair.of(level, entity));
+            }
+        }
+
+        public static void flushSpawns() {
+            synchronized (lock) {
+                for (Pair<Level, Entity> pair : pendingSpawns) {
+                    pair.getFirst().addFreshEntity(pair.getSecond());
+                }
+                pendingSpawns.clear();
+            }
+        }
+    }
 }

@@ -29,8 +29,10 @@ import net.sinedkadis.terracompositio.util.helpers.CFEHelper;
 public class ForgeEventBusEvents {
     @SubscribeEvent
     public static void onTickLevelTick(TickEvent.LevelTickEvent event) {
+        if (event.phase != TickEvent.Phase.END) return;
         long gameTime = event.level.getGameTime();
         CFEHelper.transferManager().applyTransfers(gameTime);
+        CFEHelper.CFESpawnQueue.flushSpawns();
     }
 
     @SubscribeEvent
