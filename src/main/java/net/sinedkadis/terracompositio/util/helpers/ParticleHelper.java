@@ -63,18 +63,7 @@ public class ParticleHelper {
 
     public static void spawnParticlesIn(Level pLevel, BlockPos targetPos, int count) {
         for (int i = 0; i < count; i++) {
-            if (pLevel instanceof ServerLevel level) {
-                float speed = 1 / 20f;
-                level.sendParticles(new CFEParticleData(speed),
-                        targetPos.getX() + pLevel.getRandom().nextFloat(),
-                        targetPos.getY() + pLevel.getRandom().nextFloat(),
-                        targetPos.getZ() + pLevel.getRandom().nextFloat(),
-                        0,
-                        targetPos.getX(),
-                        targetPos.getY(),
-                        targetPos.getZ(),
-                        1);
-            }
+            spawnParticlesIn(pLevel, targetPos);
         }
     }
 

@@ -17,6 +17,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockSetType;
 import net.minecraft.world.level.block.state.properties.DoubleBlockHalf;
 import net.minecraft.world.level.material.Fluids;
+import net.minecraftforge.common.util.ForgeSoundType;
 import net.minecraftforge.eventbus.api.IEventBus;
 import net.minecraftforge.registries.DeferredRegister;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -262,7 +263,13 @@ public class TCBlocks {
     public static final RegistryObject<Block> FLOW_CEDAR_ENT_STATUE = registerBlock("flow_cedar_ent_statue",
             () -> new EntStatueBlock(BlockBehaviour.Properties.copy(Blocks.OAK_PLANKS)));
     public static final RegistryObject<Block> TECHNETIUM_BOARD = registerBlock("technetium_board",
-            () -> new TechnetiumBoardBlock(BlockBehaviour.Properties.copy(Blocks.GLASS).noLootTable().noParticlesOnBreak().noOcclusion()));
+            () -> new TechnetiumBoardBlock(BlockBehaviour.Properties.copy(Blocks.GLASS).sound(new ForgeSoundType(1.0F,
+                    1.0F,
+                    () -> SoundEvents.AMETHYST_BLOCK_STEP,
+                    () -> SoundEvents.AMETHYST_BLOCK_STEP,
+                    () -> SoundEvents.AMETHYST_BLOCK_PLACE,
+                    () -> SoundEvents.AMETHYST_BLOCK_HIT,
+                    () -> SoundEvents.AMETHYST_BLOCK_FALL)).noLootTable().noOcclusion()));
     public static final RegistryObject<Block> AIR_SATURATOR = registerBlock("air_saturator",
             () -> new AirSaturatorBlock(BlockBehaviour.Properties.copy(Blocks.OAK_PLANKS).strength(3f)));
 
