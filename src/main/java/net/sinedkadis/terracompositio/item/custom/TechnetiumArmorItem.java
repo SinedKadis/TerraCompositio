@@ -315,6 +315,8 @@ public class TechnetiumArmorItem extends TCArmorItem {
         return switch (slot) {
             case HEAD -> TerraCompositio.MOD_ID + ":textures/models/armor/technetium_crown.png";
             case CHEST -> {
+                if (stack.getCapability(TCCapabilities.CFE).orElse(DummyCFEHandler.instance).getCFE() <= 0)
+                    yield TerraCompositio.MOD_ID + ":textures/models/armor/technetium_chestplate/armor_layer_no_shield.png";
                 int textureIndex = (int) (Util.getMillis() / 300) % 16;
                 yield TerraCompositio.MOD_ID + ":textures/models/armor/technetium_chestplate/armor_layer_"
                         + textureIndex + ".png";

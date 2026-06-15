@@ -22,6 +22,7 @@ public final class CFEBarRenderer implements IItemDecorator {
     public static final CFEBarRenderer INSTANCE = new CFEBarRenderer();
     private static final int BAR_W = 12;
 
+    private static final int colorShadow = FastColor.ARGB32.color(255, 0, 0, 0);
     private static final int colorBarLeftEnergy = 0xFF037efc;
     private static final int colorBarRightEnergy = 0xFF025BB8;
     private static final int colorBarLeftDepleted = FastColor.ARGB32.color(255, 122, 0, 0);
@@ -43,13 +44,27 @@ public final class CFEBarRenderer implements IItemDecorator {
         fillHorizontalGradient(graphics, RenderType.gui(), x, y, x + level, y + 1, left, right, 190);
     }
 
-    public static void renderBarsTool(GuiGraphics graphics, ICFEHandler handler, ItemStack ignoredStack, int xPosition,
+    private static void renderShadow(GuiGraphics graphics, int xPosition, int yPosition) {
+        int x = xPosition + 2;
+        int y = yPosition + 13;
+        graphics.fill(RenderType.gui(), x, y, x + 13, y + (2), 190, colorShadow);
+    }
+
+    public static void renderBarsTool(GuiGraphics graphics, ICFEHandler handler, ItemStack stack, int xPosition,
                                       int yPosition) {
 
-        boolean renderedDurability = true;
 
-        renderElectricBar(graphics, handler.getCFE(), handler.getMaxCFE(), xPosition, yPosition,
-                renderedDurability);
+        int cfe = handler.getCFE();
+
+        boolean damaged = stack.isDamaged();
+        if (!damaged && cfe > 0) {
+            renderShadow(graphics, xPosition, yPosition);
+        }
+
+
+        renderElectricBar(graphics, cfe, handler.getMaxCFE(), xPosition, yPosition,
+                damaged);
+
 
     }
 
