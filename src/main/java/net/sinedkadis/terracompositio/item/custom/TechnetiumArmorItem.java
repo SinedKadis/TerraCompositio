@@ -255,8 +255,10 @@ public class TechnetiumArmorItem extends TCArmorItem {
     public void appendHoverText(ItemStack pStack, @Nullable Level pLevel, List<Component> pTooltipComponents, TooltipFlag pIsAdvanced) {
         LocalPlayer player = Minecraft.getInstance().player;
         if (player != null && ((PlayerKnowledgeAccessor) player).isCreationAcknowledged()) {
-            TooltipHelper.defaultTextWithArg("block.terracompositio.cfe",
-                    pStack.getCapability(TCCapabilities.CFE).orElse(DummyCFEHandler.instance).getCFE());
+            pTooltipComponents.add(
+                    TooltipHelper.defaultTextWithArg("block.terracompositio.cfe",
+                            pStack.getCapability(TCCapabilities.CFE).orElse(DummyCFEHandler.instance).getCFE())
+            );
         }
         super.appendHoverText(pStack, pLevel, pTooltipComponents, pIsAdvanced);
     }
