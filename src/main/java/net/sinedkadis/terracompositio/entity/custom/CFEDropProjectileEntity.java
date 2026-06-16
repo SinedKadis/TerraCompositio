@@ -16,6 +16,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.phys.BlockHitResult;
+import net.sinedkadis.terracompositio.registries.TCBlockStateProperties;
 import net.sinedkadis.terracompositio.registries.TCBlocks;
 import net.sinedkadis.terracompositio.registries.TCEntities;
 import net.sinedkadis.terracompositio.registries.TCItems;
@@ -61,6 +62,7 @@ public class CFEDropProjectileEntity extends ThrowableProjectile implements Item
         BlockPos blockPos = pResult.getBlockPos();
         if (!level().isClientSide() && level().getBlockState(blockPos).is(BlockTags.REPLACEABLE)) {
             level().setBlockAndUpdate(blockPos, TCBlocks.TECHNETIUM_BOARD.get().defaultBlockState()
+                    .setValue(TCBlockStateProperties.PERMANENT, true)
                     .setValue(BlockStateProperties.WATERLOGGED,false));
             Entity owner = getOwner();
             if (owner != null) {

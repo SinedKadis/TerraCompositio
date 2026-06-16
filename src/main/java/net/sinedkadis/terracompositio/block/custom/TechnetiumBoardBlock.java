@@ -3,14 +3,11 @@ package net.sinedkadis.terracompositio.block.custom;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.server.level.ServerLevel;
-import net.minecraft.util.RandomSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.level.BlockGetter;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LevelAccessor;
 import net.minecraft.world.level.block.Block;
-import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.SimpleWaterloggedBlock;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
@@ -18,31 +15,28 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.level.material.FluidState;
 import net.minecraft.world.level.material.Fluids;
-import net.minecraft.world.phys.AABB;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.EntityCollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import net.sinedkadis.terracompositio.registries.TCBlocks;
+import net.sinedkadis.terracompositio.registries.TCBlockStateProperties;
 
 import javax.annotation.ParametersAreNonnullByDefault;
-import java.util.List;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class TechnetiumBoardBlock extends Block implements SimpleWaterloggedBlock {
     public static final BooleanProperty WATERLOGGED = BlockStateProperties.WATERLOGGED;
-    public static final BooleanProperty WAS_USED = BooleanProperty.create("was_used");
     private final VoxelShape SHAPE = Block.box(0, 12, 0, 16, 16, 16);
 
 
     public TechnetiumBoardBlock(Properties pProperties) {
         super(pProperties);
-        registerDefaultState(defaultBlockState().setValue(WATERLOGGED,false).setValue(WAS_USED,false));
+        registerDefaultState(defaultBlockState().setValue(WATERLOGGED, false).setValue(TCBlockStateProperties.PERMANENT, false));
     }
 
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> pBuilder) {
-        pBuilder.add(WATERLOGGED,WAS_USED);
+        pBuilder.add(WATERLOGGED, TCBlockStateProperties.PERMANENT);
     }
 
 
@@ -67,7 +61,7 @@ public class TechnetiumBoardBlock extends Block implements SimpleWaterloggedBloc
             entity = entityCollisionContext.getEntity();
         }
 
-        if (context.isAbove(Shapes.block(), pos, true) || !(entity != null && entity.isShiftKeyDown())) {
+        if (context.isAbove(Shapes.block(), pos, true) || !(entity != null && !entity.isShiftKeyDown())) {
             return SHAPE;
         }
         return Shapes.empty();

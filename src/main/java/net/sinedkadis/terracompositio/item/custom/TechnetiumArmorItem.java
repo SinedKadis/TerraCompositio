@@ -48,6 +48,7 @@ import net.sinedkadis.terracompositio.item.models.TechnetiumCrownModel;
 import net.sinedkadis.terracompositio.network.TCPackets;
 import net.sinedkadis.terracompositio.network.packets.C2SBoardSync;
 import net.sinedkadis.terracompositio.registries.TCArmorMaterials;
+import net.sinedkadis.terracompositio.registries.TCBlockStateProperties;
 import net.sinedkadis.terracompositio.registries.TCBlocks;
 import net.sinedkadis.terracompositio.registries.TCItems;
 import net.sinedkadis.terracompositio.util.accessors.PlayerKnowledgeAccessor;
@@ -158,7 +159,7 @@ public class TechnetiumArmorItem extends TCArmorItem {
 
         boolean fallSaveActivated = setHeightIfFalling(level, player, icfeHandler, onPos, persistentData);
 
-        boolean standingOnBoard = standingState.is(TCBlocks.TECHNETIUM_BOARD.get());
+        boolean standingOnBoard = standingState.is(TCBlocks.TECHNETIUM_BOARD.get()) && !standingState.getValue(TCBlockStateProperties.PERMANENT);
 
         boolean jumped = justJumped(player, persistentData);
 
@@ -198,7 +199,7 @@ public class TechnetiumArmorItem extends TCArmorItem {
             persistentData.remove(last);
         }
 
-        if (allowBoardPlace) {
+        if (allowBoardPlace && !livingEntity.isShiftKeyDown()) {
             FluidState fluidState = blockStateOnHeight.getFluidState();
             boolean waterlogged = (blockStateOnHeight.hasProperty(WATERLOGGED) && blockStateOnHeight.getValue(WATERLOGGED))
                     || fluidState.is(Fluids.WATER);
@@ -321,7 +322,7 @@ public class TechnetiumArmorItem extends TCArmorItem {
 
         if (!blockStateOn.is(TCBlocks.TECHNETIUM_BOARD.get())) {
             calculateVelocityAndSetBoard(onPos, livingEntity, level, persistentData);
-        } else {
+        } else if (!blockStateOn.getValue(TCBlockStateProperties.PERMANENT)) {
             changeHeightByView(livingEntity, persistentData, level);
         }
         persistentData.putInt(cd, livingEntity.tickCount);
