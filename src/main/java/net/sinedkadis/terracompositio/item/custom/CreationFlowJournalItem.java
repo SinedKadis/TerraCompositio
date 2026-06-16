@@ -98,13 +98,11 @@ public class CreationFlowJournalItem extends Item {
     @Override
     public void inventoryTick(ItemStack pStack, Level pLevel, Entity pEntity, int pSlotId, boolean pIsSelected) {
         super.inventoryTick(pStack, pLevel, pEntity, pSlotId, pIsSelected);
-        CompoundTag tag = pStack.getOrCreateTag();
-        if (tag.contains("updateOnHold") && tag.getBoolean("updateOnHold") && pIsSelected) {
-            tag.putBoolean("updateOnHold", false);
+        CompoundTag tag = pEntity.getPersistentData();
+        int day = getDay(pStack);
+        if (!(tag.getInt("last_hold_days") == day) && pIsSelected) {
+            tag.putInt("last_hold_days", day);
             TCPatchouliCompat.reloadBookContents(pStack, pLevel);
-        }
-        if (!pIsSelected) {
-            tag.putBoolean("updateOnHold", true);
         }
     }
 }
