@@ -134,60 +134,95 @@ public class TCRecipeProvider extends RecipeProvider implements IConditionBuilde
     }
 
     private static void buildTechnetiumOreProcessing(@NotNull Consumer<FinishedRecipe> pWriter) {
+        int base1 = 128;
+        int consumeMultiplier = 5;
+        int generationMultiplier = 4;
+
+        int base2 = base1 * consumeMultiplier;
+        int base3 = base2 * consumeMultiplier;
+
         MatterInfusionRecipeBuilder.create(
                 TCItems.RAW_TECHNETIUM.get(),4,
                         TCItems.LOW_ENRICHED_TECHNETIUM.get(),1,
-                        Items.COAL,100,200,30)
+                        Items.COAL, base1, 200, 30)
                 .save(pWriter);
+
         MatterInfusionRecipeBuilder.create(
                         TCItems.LOW_ENRICHED_TECHNETIUM.get(),4,
                         TCItems.MEDIUM_ENRICHED_TECHNETIUM.get(),1,
-                        Items.REDSTONE,1000,1000,30)
+                        Items.REDSTONE, base2, 1000, 30)
                 .save(pWriter);
+
         MatterInfusionRecipeBuilder.create(
                         TCItems.MEDIUM_ENRICHED_TECHNETIUM.get(),4,
                         TCItems.HIGH_ENRICHED_TECHNETIUM.get(),1,
-                        Items.DIAMOND,10000,2000,30)
+                        Items.DIAMOND, base3, 2000, 30)
                 .save(pWriter);
+
+        TechnetiumFiringRecipeBuilder.create(
+                        TCItems.LOW_ENRICHED_TECHNETIUM.get(),
+                        base1 * generationMultiplier
+                )
+                .save(pWriter, Objects.requireNonNull(ForgeRegistries.ITEMS.getKey(TCItems.LOW_ENRICHED_TECHNETIUM.get())).withPrefix("firing/"));
+        TechnetiumFiringRecipeBuilder.create(
+                        TCItems.MEDIUM_ENRICHED_TECHNETIUM.get(),
+                        base2 * generationMultiplier)
+                .save(pWriter, Objects.requireNonNull(ForgeRegistries.ITEMS.getKey(TCItems.MEDIUM_ENRICHED_TECHNETIUM.get())).withPrefix("firing/"));
+        TechnetiumFiringRecipeBuilder.create(
+                        TCItems.HIGH_ENRICHED_TECHNETIUM.get(),
+                        base3 * generationMultiplier)
+                .save(pWriter, Objects.requireNonNull(ForgeRegistries.ITEMS.getKey(TCItems.HIGH_ENRICHED_TECHNETIUM.get())).withPrefix("firing/"));
+
 
         oreSmelting(pWriter,
                 List.of(TCItems.RAW_TECHNETIUM.get(),
                         TCBlocks.TECHNETIUM_ORE.get(),
                         TCBlocks.TECHNETIUM_DEEPSLATE_ORE.get(),
-                        TCItems.LOW_ENRICHED_TECHNETIUM.get(),
-                        TCItems.MEDIUM_ENRICHED_TECHNETIUM.get(),
-                        TCItems.HIGH_ENRICHED_TECHNETIUM.get()),
+                        TCItems.LOW_ENRICHED_TECHNETIUM.get()),
                 RecipeCategory.MISC,
                 TCItems.TECHNETIUM_INGOT.get(),
                 0.25f,
                 200,
                 "technetium");
+        oreSmelting(pWriter,
+                List.of(TCItems.MEDIUM_ENRICHED_TECHNETIUM.get()),
+                RecipeCategory.MISC,
+                TCItems.LOW_ENRICHED_TECHNETIUM.get(),
+                0.25f,
+                200,
+                "technetium");
+        oreSmelting(pWriter,
+                List.of(TCItems.HIGH_ENRICHED_TECHNETIUM.get()),
+                RecipeCategory.MISC,
+                TCItems.MEDIUM_ENRICHED_TECHNETIUM.get(),
+                0.25f,
+                200,
+                "technetium");
+
         oreBlasting(pWriter,
                 List.of(TCItems.RAW_TECHNETIUM.get(),
                         TCBlocks.TECHNETIUM_ORE.get(),
                         TCBlocks.TECHNETIUM_DEEPSLATE_ORE.get(),
-                        TCItems.LOW_ENRICHED_TECHNETIUM.get(),
-                        TCItems.MEDIUM_ENRICHED_TECHNETIUM.get(),
-                        TCItems.HIGH_ENRICHED_TECHNETIUM.get()),
+                        TCItems.LOW_ENRICHED_TECHNETIUM.get()),
                 RecipeCategory.MISC,
                 TCItems.TECHNETIUM_INGOT.get(),
                 0.25f,
                 100,
                 "technetium");
-
-        TechnetiumFiringRecipeBuilder.create(
+        oreBlasting(pWriter,
+                List.of(TCItems.MEDIUM_ENRICHED_TECHNETIUM.get()),
+                RecipeCategory.MISC,
                 TCItems.LOW_ENRICHED_TECHNETIUM.get(),
-                200
-                )
-                .save(pWriter, Objects.requireNonNull(ForgeRegistries.ITEMS.getKey(TCItems.LOW_ENRICHED_TECHNETIUM.get())).withPrefix("firing/"));
-        TechnetiumFiringRecipeBuilder.create(
-                        TCItems.MEDIUM_ENRICHED_TECHNETIUM.get(),
-                        2000)
-                .save(pWriter, Objects.requireNonNull(ForgeRegistries.ITEMS.getKey(TCItems.MEDIUM_ENRICHED_TECHNETIUM.get())).withPrefix("firing/"));
-        TechnetiumFiringRecipeBuilder.create(
-                        TCItems.HIGH_ENRICHED_TECHNETIUM.get(),
-                        20000)
-                .save(pWriter, Objects.requireNonNull(ForgeRegistries.ITEMS.getKey(TCItems.HIGH_ENRICHED_TECHNETIUM.get())).withPrefix("firing/"));
+                0.25f,
+                100,
+                "technetium");
+        oreBlasting(pWriter,
+                List.of(TCItems.HIGH_ENRICHED_TECHNETIUM.get()),
+                RecipeCategory.MISC,
+                TCItems.MEDIUM_ENRICHED_TECHNETIUM.get(),
+                0.25f,
+                100,
+                "technetium");
     }
 
     private static void buildCFJ(@NotNull Consumer<FinishedRecipe> pWriter) {

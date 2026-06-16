@@ -1,7 +1,7 @@
 {
   "type": "terracompositio:matter_infusion",
   "catalyst": "minecraft:coal",
-  "cfe": 100,
+  "cfe": 128,
   "input": {
     "count": 4,
     "item": "terracompositio:technetium_raw_ore"

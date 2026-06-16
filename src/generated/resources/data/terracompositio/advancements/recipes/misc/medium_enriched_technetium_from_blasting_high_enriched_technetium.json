@@ -15,7 +15,7 @@
     },
     "has_the_recipe": {
       "conditions": {
-        "recipe": "terracompositio:technetium_ingot_from_smelting_high_enriched_technetium"
+        "recipe": "terracompositio:medium_enriched_technetium_from_blasting_high_enriched_technetium"
       },
       "trigger": "minecraft:recipe_unlocked"
     }
@@ -28,7 +28,7 @@
   ],
   "rewards": {
     "recipes": [
-      "terracompositio:technetium_ingot_from_smelting_high_enriched_technetium"
+      "terracompositio:medium_enriched_technetium_from_blasting_high_enriched_technetium"
     ]
   },
   "sends_telemetry_event": false
