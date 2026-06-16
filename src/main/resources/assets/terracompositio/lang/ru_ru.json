@@ -9,7 +9,7 @@
   "book.terracompositio.creation_flow_journal.category.day_1.name": "День первый",
   "book.terracompositio.creation_flow_journal.category.day_1.description": "Если вы это читаете, значит вы нашли способ раздобыть копию моего журнала, через один из портов, что я создал. Я не буду сразу раскрывать все добытые мою знания, так что положите эту книгу в порт на следующий день, и я дам вам больше интересной информации",
   "book.terracompositio.creation_flow_journal.entry.cedar_book_port.name": "Об книге",
-  "book.terracompositio.creation_flow_journal.entry.cedar_book_port.page1": "  В кедровом лесу можно найти необычные стволы, с вырезьбленной книгой на них. Данные \"порты\" - моя личная разработка. Я даже сделал так, что б они самопроизвольно вырастали в новых деревьях. Через них я могу добавлять новые главы в вашу книгу раз в день, а так же делать из сажанцев дуба сажанцы кедра.<br><br> Почему бы и нет",
+  "book.terracompositio.creation_flow_journal.entry.cedar_book_port.page1": "  В кедровом лесу можно найти необычные стволы, с вырезьбленной книгой на них. Данные \"порты\" - моя личная разработка. Я даже сделал так, что б они самопроизвольно вырастали в новых деревьях. Через них я могу добавлять новые главы в вашу книгу раз в день, а так же делать из сажанцев дуба сажанцы кедра",
   "book.terracompositio.creation_flow_journal.entry.cedar_book_port.page2": " ",
 
   "book.terracompositio.creation_flow_journal.entry.flow_infusion.name": "Наполненность потоком",
@@ -74,7 +74,11 @@
   "book.terracompositio.creation_flow_journal.entry.cfe_mechanic.page1": "  Каждое магическое устройство, что использует ЭПС, способно хранить небольшое количество энергии внутри себя (обычно 100). Для того, что б передать энергию от одного устройства к другому, необходимо расположить их рядом. Для каждого устройства есть свой радиус передачи, при котором оно способно передать или принять энергию",
   "book.terracompositio.creation_flow_journal.entry.cfe_mechanic.page2": "Передача энергии происходит только от источника (например - десорбер) до потребителя ",
   "book.terracompositio.creation_flow_journal.category.day_4.name": "Четвертый день",
-  "book.terracompositio.creation_flow_journal.category.day_4.description": "Продвинутые материалы и их применение",
+  "book.terracompositio.creation_flow_journal.category.day_4.description": "Продвинутые устройство и их применение",
+
+
+
+
   "book.terracompositio.creation_flow_journal.entry.technetium_ore.name": "Руда Технеция",
   "book.terracompositio.creation_flow_journal.entry.technetium_ore.page1": "  В глубинах пещер можно отыскать одну необычно опасную синюю руду. Это - Нестабильный Технеций. От него исходит огромная аура созидания, которая будет истощать того, кто ее держит. По этому, без необходимого обмундирования ее лучше избегать!",
   "book.terracompositio.creation_flow_journal.entry.shielded_bundle.name": "Экранированный мешочек",
@@ -82,7 +86,7 @@
 
 
   "book.terracompositio.creation_flow_journal.entry.matter_infuser.name": "Наполнитель материи",
-  "book.terracompositio.creation_flow_journal.entry.matter_infuser.page1": "  Руда технеция содержит в себе много ЭПС, однако если просто руду переплавить, энергия улетучивается. Для того что бы ее добыть, необходимо раскрыть потенциал, с помощью наполнения руды разными каталитическими материалами. ",
+  "book.terracompositio.creation_flow_journal.entry.matter_infuser.page1": "  Руда технеция содержит в себе много ЭПС, однако если просто руду переплавить, энергия улетучивается. Для того что бы ее добыть, необходимо раскрыть потенциал, с помощью наполнения руды разными каталитическими материалами",
   "book.terracompositio.creation_flow_journal.entry.matter_infuser.page2": "  Для этого есть Наполнитель материи - многоблочная структура, занимающая от 2х2 до 2х9 блоков по горизонтали.",
   "book.terracompositio.creation_flow_journal.entry.matter_infuser.page3": "  После размещения блоков, необходимо нацепить на бревна Шины входа/выхода, а так же соединить модули друг с другом и с шинами с помощью стержней из наполненного железа",
 
@@ -119,8 +123,14 @@
   "book.terracompositio.creation_flow_journal.entry.path_pointers.infuser": "Наполняет существо с надетой короной энергией, будто оно потребитель, а Наполнитель - источник",
   "book.terracompositio.creation_flow_journal.entry.path_pointers.extractor": "Извлекает энергию из хранилища, где Энт держит не съеденную энергию",
   "book.terracompositio.creation_flow_journal.entry.path_pointers.storing": "Если на Энта надеть корону, Наполнитель будет передавать ему энергию",
-  "book.terracompositio.creation_flow_journal.entry.path_pointers.apple": "   Можно подключить Экстрактор, чтоб доставать и использовать оттуда энергию. <br><br>   Если съедено Яблоко Знания, то с ключём в руке будет видно точку входа/выхода из сети указателей пути, а так же к чему подключены Отправитель и Получатель"
-
-
+  "book.terracompositio.creation_flow_journal.entry.path_pointers.apple": "   Можно подключить Экстрактор, чтоб доставать и использовать оттуда энергию. <br><br>   Если съедено Яблоко Знания, то с ключём в руке будет видно точку входа/выхода из сети указателей пути, а так же к чему подключены Отправитель и Получатель",
+  "book.terracompositio.creation_flow_journal.entry.enriched_technetium.name": "Обогащенный Технеций",
+  "book.terracompositio.creation_flow_journal.entry.enriched_technetium.page1": "  Используя Наполнитель материи, можно провести очистку технеция, что позволит добыть невероятное количество ЭПС. Для первого этапа положите в порт наполнителя уголь, и положите в ячейку наполнителя 4 руды. Остальные этапы обработки аналогичны, только вместо угля редстоун и алмаз",
+  "book.terracompositio.creation_flow_journal.entry.enriched_technetium.page2": "  Для того, что б получить из него ЭПС, переплавьте обогащенный материал. Но помните, чем более он обогащен, тем более токсичен",
+  "book.terracompositio.creation_flow_journal.category.day_5.name": "Пятый день",
+  "book.terracompositio.creation_flow_journal.category.day_5.description": "Технеций и его применение",
+  "book.terracompositio.creation_flow_journal.entry.fluid_applier.name": "Применитель Жидкостей",
+  "book.terracompositio.creation_flow_journal.entry.fluid_applier.page1": "  Крутое устройство. Можно использовать как ведро, вмещает в себя 8 ведер жидкости. Может разливать жидкости одну об другую, вместо того, что б разливать их в один блок",
+  "book.terracompositio.creation_flow_journal.entry.fluid_applier.page2": "  Если в нем жидкий поток, способен наполнять им блоки древесины и оживлять засохших Энтов"
 
 }

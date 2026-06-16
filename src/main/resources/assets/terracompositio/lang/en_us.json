@@ -182,8 +182,7 @@
   "item.terracompositio.technetium_boots.height": "Set Boot Height",
   "item.terracompositio.technetium_boots.raise": "Raise Boot Height",
   "item.terracompositio.technetium_boots.reduce": "Reduce Boot Height",
-
-  "block.terracompositio.flow_cedar_ent_statue": "Flow Cedar Ent Statue",
+  "block.terracompositio.flow_cedar_ent_statue": "Dried Flow Cedar Ent",
   "item.terracompositio.fluid_applier": "Fluid Applier",
   "block.terracompositio.cfe_board": "CFE Board",
   "block.terracompositio.air_saturator": "Air Saturator",
@@ -337,6 +336,13 @@
   "book.terracompositio.creation_flow_journal.entry.path_pointers.infuser": "test",
   "book.terracompositio.creation_flow_journal.entry.path_pointers.extractor": "text",
   "book.terracompositio.creation_flow_journal.entry.path_pointers.storing": "text",
-  "book.terracompositio.creation_flow_journal.entry.path_pointers.apple": "text"
-
+  "book.terracompositio.creation_flow_journal.entry.path_pointers.apple": "text",
+  "book.terracompositio.creation_flow_journal.entry.enriched_technetium.name": "text",
+  "book.terracompositio.creation_flow_journal.entry.enriched_technetium.page1": "text",
+  "book.terracompositio.creation_flow_journal.entry.enriched_technetium.page2": "text",
+  "book.terracompositio.creation_flow_journal.category.day_5.name": "Fifth day",
+  "book.terracompositio.creation_flow_journal.category.day_5.description": "yes",
+  "book.terracompositio.creation_flow_journal.entry.fluid_applier.name": "text",
+  "book.terracompositio.creation_flow_journal.entry.fluid_applier.page1": "text",
+  "book.terracompositio.creation_flow_journal.entry.fluid_applier.page2": "text"
 }

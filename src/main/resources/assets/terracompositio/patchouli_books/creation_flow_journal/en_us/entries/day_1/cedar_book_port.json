@@ -4,7 +4,12 @@
   "icon": "terracompositio:textures/item/creation_flow_journal/day_5/2d.png",
   "flag": "terracompositio:day_1",
   "pages": [
-    "book.terracompositio.creation_flow_journal.entry.cedar_book_port.page1",
+    {
+      "type": "patchouli:spotlight",
+      "item": "terracompositio:creation_flow_journal{day:1},terracompositio:creation_flow_journal{day:2},terracompositio:creation_flow_journal{day:3},terracompositio:creation_flow_journal{day:4},terracompositio:creation_flow_journal{day:5}",
+      "link_recipe": true,
+      "text": "book.terracompositio.creation_flow_journal.entry.cedar_book_port.page1"
+    },
     {
       "type": "patchouli:image",
       "images": [

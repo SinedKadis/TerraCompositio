@@ -4,7 +4,14 @@
   "icon": "terracompositio:flow_infuser",
   "flag": "terracompositio:day_3",
   "pages": [
-    "book.terracompositio.creation_flow_journal.entry.flow_infuser.page1",
+    {
+      "type": "patchouli:spotlight",
+      "item": {
+        "item": "terracompositio:flow_infuser"
+      },
+      "link_recipe": true,
+      "text": "book.terracompositio.creation_flow_journal.entry.flow_infuser.page1"
+    },
     {
       "type": "patchouli:crafting",
       "recipe": "terracompositio:flow_infuser_kit",

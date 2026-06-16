@@ -1,6 +1,7 @@
 package net.sinedkadis.terracompositio.registries;
 
 import net.minecraft.core.registries.Registries;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
@@ -33,7 +34,7 @@ public class TCCreativeModeTabs {
                             pOutput.accept(TCFluids.BIRCH_JUICE_FLUID.bucket.get());
                             pOutput.accept(TCBlocks.WEDGE.get());
                             pOutput.accept(TCItems.SHIELDED_BUNDLE.get());
-                            pOutput.accept(TCItems.FLUID_APPLIER.get());
+                            addFluidAppliers(pOutput);
                             pOutput.accept(TCItems.CFE_BALL.get());
                             pOutput.accept(TCItems.INFUSED_FERTILIZER.get());
 
@@ -155,6 +156,15 @@ public class TCCreativeModeTabs {
 
                         })
                         .build());
+    }
+
+    private static void addFluidAppliers(CreativeModeTab.Output pOutput) {
+        pOutput.accept(TCItems.FLUID_APPLIER.get());
+        ItemStack itemStack = new ItemStack(TCItems.FLUID_APPLIER.get());
+        CompoundTag tag = itemStack.getOrCreateTag();
+        tag.putInt("Amount", 8000);
+        tag.putString("FluidName", "terracompositio:flow_source");
+        pOutput.accept(itemStack);
     }
 
     private static void addBooks(CreativeModeTab.Output pOutput) {

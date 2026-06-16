@@ -1,0 +1,16 @@
+{
+  "name": "book.terracompositio.creation_flow_journal.entry.fluid_applier.name",
+  "category": "terracompositio:day_5",
+  "icon": "terracompositio:fluid_applier",
+  "flag": "terracompositio:day_5",
+  "pages": [
+    {
+      "title": "book.terracompositio.creation_flow_journal.entry.fluid_applier.name",
+      "type": "patchouli:spotlight",
+      "item": "terracompositio:fluid_applier",
+      "link_recipe": true,
+      "text": "book.terracompositio.creation_flow_journal.entry.fluid_applier.page1"
+    },
+    "book.terracompositio.creation_flow_journal.entry.fluid_applier.page2"
+  ]
+}
