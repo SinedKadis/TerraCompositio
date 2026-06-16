@@ -88,7 +88,7 @@ public class CFEBallProjectileEntity extends ThrowableItemProjectile {
 
         Entity owner = getOwner();
         int visitedBlocks = getVisitedBlocks();
-        if (visitedBlocks > (owner != null ? 7 : 10)) {
+        if (visitedBlocks > (owner != null ? 7 : 10) || tickCount > 100) {
             this.discard();
         }
     }

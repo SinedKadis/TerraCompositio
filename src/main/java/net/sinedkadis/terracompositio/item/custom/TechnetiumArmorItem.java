@@ -159,7 +159,7 @@ public class TechnetiumArmorItem extends TCArmorItem {
 
         boolean fallSaveActivated = setHeightIfFalling(level, player, icfeHandler, onPos, persistentData);
 
-        boolean standingOnBoard = standingState.is(TCBlocks.TECHNETIUM_BOARD.get()) && !standingState.getValue(TCBlockStateProperties.PERMANENT);
+        boolean standingOnBoard = standingState.is(TCBlocks.CFE_BOARD.get()) && !standingState.getValue(TCBlockStateProperties.PERMANENT);
 
         boolean jumped = justJumped(player, persistentData);
 
@@ -190,8 +190,8 @@ public class TechnetiumArmorItem extends TCArmorItem {
         BlockState blockStateOnHeight = level.getBlockState(posOnHeight);
 
         boolean allowBoardPlace = blockStateOnHeight.is(BlockTags.REPLACEABLE)
-                && !blockStateOnHeight.is(TCBlocks.TECHNETIUM_BOARD.get())
-                && (standingState.is(TCBlocks.TECHNETIUM_BOARD.get()) || fallSaveActivated || jumped);
+                && !blockStateOnHeight.is(TCBlocks.CFE_BOARD.get())
+                && (standingState.is(TCBlocks.CFE_BOARD.get()) || fallSaveActivated || jumped);
 
         if (destroyPos != null && (allowBoardPlace || !posOnHeight.equals(destroyPos))) {
             level.destroyBlock(destroyPos, true);
@@ -204,7 +204,7 @@ public class TechnetiumArmorItem extends TCArmorItem {
             boolean waterlogged = (blockStateOnHeight.hasProperty(WATERLOGGED) && blockStateOnHeight.getValue(WATERLOGGED))
                     || fluidState.is(Fluids.WATER);
 
-            BlockState boardState = TCBlocks.TECHNETIUM_BOARD.get().defaultBlockState().setValue(WATERLOGGED, waterlogged);
+            BlockState boardState = TCBlocks.CFE_BOARD.get().defaultBlockState().setValue(WATERLOGGED, waterlogged);
 
             takeCFEAndSetBoard(icfeHandler, level, posOnHeight, boardState);
             persistentData.put(last, BlockPosHelper.saveBlockPos(posOnHeight));
@@ -320,7 +320,7 @@ public class TechnetiumArmorItem extends TCArmorItem {
         ICFEHandler icfeHandler = stack.getCapability(TCCapabilities.CFE).orElse(DummyCFEHandler.instance);
         if (icfeHandler.getCFE() < 1) return;
 
-        if (!blockStateOn.is(TCBlocks.TECHNETIUM_BOARD.get())) {
+        if (!blockStateOn.is(TCBlocks.CFE_BOARD.get())) {
             calculateVelocityAndSetBoard(onPos, livingEntity, level, persistentData);
         } else if (!blockStateOn.getValue(TCBlockStateProperties.PERMANENT)) {
             changeHeightByView(livingEntity, persistentData, level);

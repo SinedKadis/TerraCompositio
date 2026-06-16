@@ -262,8 +262,8 @@ public class TCBlocks {
     //Misc
     public static final RegistryObject<Block> FLOW_CEDAR_ENT_STATUE = registerBlock("flow_cedar_ent_statue",
             () -> new EntStatueBlock(BlockBehaviour.Properties.copy(Blocks.OAK_PLANKS)));
-    public static final RegistryObject<Block> TECHNETIUM_BOARD = registerBlock("technetium_board",
-            () -> new TechnetiumBoardBlock(BlockBehaviour.Properties.copy(Blocks.GLASS).sound(new ForgeSoundType(1.0F,
+    public static final RegistryObject<Block> CFE_BOARD = registerBlock("cfe_board",
+            () -> new CFEBoardBlock(BlockBehaviour.Properties.copy(Blocks.GLASS).sound(new ForgeSoundType(1.0F,
                     1.0F,
                     () -> SoundEvents.AMETHYST_BLOCK_STEP,
                     () -> SoundEvents.AMETHYST_BLOCK_STEP,

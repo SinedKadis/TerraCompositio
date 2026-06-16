@@ -185,8 +185,7 @@
 
   "block.terracompositio.flow_cedar_ent_statue": "Flow Cedar Ent Statue",
   "item.terracompositio.fluid_applier": "Fluid Applier",
-
-  "block.terracompositio.technetium_board": "Technetium Board",
+  "block.terracompositio.cfe_board": "CFE Board",
   "block.terracompositio.air_saturator": "Air Saturator",
   "block.terracompositio.cedar_gearbox": "Cedar Gearbox",
 

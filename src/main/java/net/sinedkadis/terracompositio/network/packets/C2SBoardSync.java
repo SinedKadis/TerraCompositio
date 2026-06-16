@@ -49,7 +49,7 @@ public record C2SBoardSync(int x, short y, int z, boolean place, int cfeToTake, 
                     WorldHelper.destroyBlockNoUpdate(level, pPos, player);
                     if (msg.place()) {
                         level.setBlock(pPos,
-                            TCBlocks.TECHNETIUM_BOARD.get().defaultBlockState()
+                                TCBlocks.CFE_BOARD.get().defaultBlockState()
                                     .setValue(BlockStateProperties.WATERLOGGED,
                                             msg.waterlogged),
                             3);

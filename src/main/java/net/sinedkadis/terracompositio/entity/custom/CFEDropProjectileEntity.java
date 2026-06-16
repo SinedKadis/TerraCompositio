@@ -13,6 +13,7 @@ import net.minecraft.world.entity.projectile.ItemSupplier;
 import net.minecraft.world.entity.projectile.ThrowableProjectile;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.phys.BlockHitResult;
@@ -59,19 +60,27 @@ public class CFEDropProjectileEntity extends ThrowableProjectile implements Item
 
     @Override
     protected void onHitBlock(BlockHitResult pResult) {
-        BlockPos blockPos = pResult.getBlockPos();
-        if (!level().isClientSide() && level().getBlockState(blockPos).is(BlockTags.REPLACEABLE)) {
-            level().setBlockAndUpdate(blockPos, TCBlocks.TECHNETIUM_BOARD.get().defaultBlockState()
-                    .setValue(TCBlockStateProperties.PERMANENT, true)
-                    .setValue(BlockStateProperties.WATERLOGGED,false));
-            Entity owner = getOwner();
-            if (owner != null) {
-                CompoundTag persistentData = owner.getPersistentData();
-                int ballsThrew = persistentData.getInt("balls_threw");
-                ListTag list = persistentData.getList("platform_on_throw_" + (ballsThrew % PLATFORM_ALIVE_PER_PLAYER.get()), Tag.TAG_COMPOUND);
-                list.add(BlockPosHelper.saveBlockPos(blockPos));
-                persistentData.put("platform_on_throw_" + (ballsThrew % PLATFORM_ALIVE_PER_PLAYER.get()), list);
+        if (!level().isClientSide()) {
+            BlockPos blockPos = pResult.getBlockPos();
+            if (!level().getBlockState(blockPos).is(BlockTags.REPLACEABLE)) {
+                blockPos = blockPos.above();
+            }
+            BlockState blockState = level().getBlockState(blockPos);
+            if (blockState.is(BlockTags.REPLACEABLE)) {
+                level().setBlockAndUpdate(blockPos, TCBlocks.CFE_BOARD.get().defaultBlockState()
+                        .setValue(TCBlockStateProperties.PERMANENT, true)
+                        .setValue(BlockStateProperties.WATERLOGGED,
+                                blockState.hasProperty(BlockStateProperties.WATERLOGGED)
+                                        && blockState.getValue(BlockStateProperties.WATERLOGGED)));
+                Entity owner = getOwner();
+                if (owner != null) {
+                    CompoundTag persistentData = owner.getPersistentData();
+                    int ballsThrew = persistentData.getInt("balls_threw");
+                    ListTag list = persistentData.getList("platform_on_throw_" + (ballsThrew % PLATFORM_ALIVE_PER_PLAYER.get()), Tag.TAG_COMPOUND);
+                    list.add(BlockPosHelper.saveBlockPos(blockPos));
+                    persistentData.put("platform_on_throw_" + (ballsThrew % PLATFORM_ALIVE_PER_PLAYER.get()), list);
 
+                }
             }
         }
         this.discard();

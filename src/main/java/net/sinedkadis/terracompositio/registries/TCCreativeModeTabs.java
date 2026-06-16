@@ -95,6 +95,8 @@ public class TCCreativeModeTabs {
                             pOutput.accept(TCBlocks.TECHNETIUM_ORE.get());
                             pOutput.accept(TCBlocks.TECHNETIUM_DEEPSLATE_ORE.get());
 
+                            pOutput.accept(TCBlocks.CFE_BOARD.get());
+
                             //  armor
                             pOutput.accept(TCItems.TECHNETIUM_CROWN.get());
                             pOutput.accept(TCItems.TECHNETIUM_CHESTPLATE.get());

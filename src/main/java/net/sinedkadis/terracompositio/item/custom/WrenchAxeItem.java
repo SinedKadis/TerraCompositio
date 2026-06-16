@@ -276,6 +276,7 @@ public class WrenchAxeItem extends AxeItem {
                 .RightClickBlock(pPlayer, InteractionHand.MAIN_HAND, pPos, blockHitResult));
         pPlayer.setItemInHand(InteractionHand.MAIN_HAND,wasInHand);
         if (canceled) {
+            pPlayer.getItemInHand(InteractionHand.MAIN_HAND).hurtAndBreak(1, pPlayer, player1 -> player1.broadcastBreakEvent(InteractionHand.MAIN_HAND));
             return;
         }
         if ((pState.hasBlockEntity()
@@ -305,7 +306,7 @@ public class WrenchAxeItem extends AxeItem {
                 });
             }
             pLevel.destroyBlock(pPos,false,pPlayer);
-            itemInHand.hurtAndBreak(1, pPlayer, player1 -> player1.broadcastBreakEvent(InteractionHand.MAIN_HAND));
+            pPlayer.getItemInHand(InteractionHand.MAIN_HAND).hurtAndBreak(1, pPlayer, player1 -> player1.broadcastBreakEvent(InteractionHand.MAIN_HAND));
         }
     }
 

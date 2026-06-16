@@ -18,7 +18,7 @@ import net.sinedkadis.terracompositio.api.TCCapabilities;
 import net.sinedkadis.terracompositio.api.dummies.DummyCFEHandler;
 import net.sinedkadis.terracompositio.api.networks.cfe.CFENetworkMemberEntity;
 import net.sinedkadis.terracompositio.api.networks.cfe.ICFEHandler;
-import net.sinedkadis.terracompositio.block.custom.TechnetiumBoardBlock;
+import net.sinedkadis.terracompositio.block.custom.CFEBoardBlock;
 import net.sinedkadis.terracompositio.config.TCInnerConfig;
 import net.sinedkadis.terracompositio.network.TCPackets;
 import net.sinedkadis.terracompositio.network.packets.S2CAddPlayerKnowledge;
@@ -104,7 +104,7 @@ public abstract class PlayerMixin extends LivingEntity implements CFENetworkMemb
         Player self = (Player) (Object) this;
         boolean found = false;
         for (BlockPos pos : BlockPos.betweenClosed(self.blockPosition().offset(-1, -1, -1), self.blockPosition().offset(1, -1, 1))) {
-            if ((self.level().getBlockState(pos).getBlock() instanceof TechnetiumBoardBlock)) {
+            if ((self.level().getBlockState(pos).getBlock() instanceof CFEBoardBlock)) {
                 found = true;
                 break;
             }

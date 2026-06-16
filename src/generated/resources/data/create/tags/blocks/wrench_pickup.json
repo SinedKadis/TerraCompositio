@@ -1,5 +1,6 @@
 {
   "values": [
+    "terracompositio:cfe_board",
     "terracompositio:cedar_gearbox"
   ]
 }
