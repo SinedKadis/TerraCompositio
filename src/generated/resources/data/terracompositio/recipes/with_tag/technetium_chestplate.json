@@ -1,0 +1,21 @@
+{
+  "type": "terracompositio:tag_transfer_shaped",
+  "category": "equipment",
+  "key": {
+    "C": {
+      "item": "terracompositio:flow_cedar_chestplate"
+    },
+    "T": {
+      "item": "terracompositio:technetium_ingot"
+    }
+  },
+  "pattern": [
+    "TCT",
+    "TTT",
+    "TTT"
+  ],
+  "result": {
+    "item": "terracompositio:technetium_chestplate"
+  },
+  "show_notification": true
+}

@@ -94,9 +94,10 @@ public class TCItemModelProvider extends ItemModelProvider {
 
         simpleItem(TCItems.CFE_BALL);
         simpleItem(TCItems.INFUSED_FERTILIZER);
-        simpleItem(TCItems.TECHNETIUM_CHESTPLATE);
-        simpleItem(TCItems.TECHNETIUM_LEGGINGS);
-        simpleItem(TCItems.TECHNETIUM_BOOTS);
+
+        trimmedArmorItem(TCItems.TECHNETIUM_CHESTPLATE);
+        trimmedArmorItem(TCItems.TECHNETIUM_LEGGINGS);
+        trimmedArmorItem(TCItems.TECHNETIUM_BOOTS);
 
         simpleItem(TCItems.APPLE_OF_KNOWLEDGE);
         simpleItem(TCItems.APPLE_OF_IGNORANCE);

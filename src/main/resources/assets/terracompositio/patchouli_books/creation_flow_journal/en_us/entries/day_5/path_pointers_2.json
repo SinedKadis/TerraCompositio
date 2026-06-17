@@ -1,0 +1,31 @@
+{
+  "name": "book.terracompositio.creation_flow_journal.entry.path_pointers.name_2",
+  "category": "terracompositio:day_5",
+  "icon": "terracompositio:pp_emitter",
+  "flag": "terracompositio:day_5",
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": "terracompositio:pp_infuser,terracompositio:pp_extractor",
+      "link_recipe": true,
+      "text": "book.terracompositio.creation_flow_journal.entry.path_pointers.desc_2"
+    },
+    {
+      "type": "patchouli:crafting",
+      "recipe": "terracompositio:pp_infuser",
+      "text": "book.terracompositio.creation_flow_journal.entry.path_pointers.infuser"
+    },
+    {
+      "type": "patchouli:crafting",
+      "recipe": "terracompositio:pp_extractor",
+      "text": "book.terracompositio.creation_flow_journal.entry.path_pointers.extractor"
+    },
+    {
+      "type": "patchouli:image",
+      "images": [
+        "terracompositio:textures/illustrations/pp_storing_image.png"
+      ],
+      "text": "book.terracompositio.creation_flow_journal.entry.path_pointers.storing"
+    }
+  ]
+}

@@ -1,10 +1,15 @@
 package net.sinedkadis.terracompositio.item.custom;
 
+import com.mojang.blaze3d.vertex.VertexConsumer;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.Util;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.HumanoidModel;
 import net.minecraft.client.player.LocalPlayer;
+import net.minecraft.client.renderer.MultiBufferSource;
+import net.minecraft.client.renderer.Sheets;
+import net.minecraft.client.renderer.texture.TextureAtlas;
+import net.minecraft.client.renderer.texture.TextureAtlasSprite;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -15,10 +20,12 @@ import net.minecraft.world.damagesource.DamageSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EquipmentSlot;
 import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.entity.MoverType;
 import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.item.ArmorItem;
+import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.TooltipFlag;
+import net.minecraft.world.item.armortrim.ArmorTrim;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
@@ -33,6 +40,8 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.network.PacketDistributor;
 import net.sinedkadis.terracompositio.TerraCompositio;
+import net.sinedkadis.terracompositio.api.ICFEStorageExtension;
+import net.sinedkadis.terracompositio.api.IHaveExtensibleCFEStorage;
 import net.sinedkadis.terracompositio.api.TCCapabilities;
 import net.sinedkadis.terracompositio.api.TerraCompositioAPI;
 import net.sinedkadis.terracompositio.api.dummies.DummyCFEHandler;
@@ -51,6 +60,7 @@ import net.sinedkadis.terracompositio.registries.TCArmorMaterials;
 import net.sinedkadis.terracompositio.registries.TCBlockStateProperties;
 import net.sinedkadis.terracompositio.registries.TCBlocks;
 import net.sinedkadis.terracompositio.registries.TCItems;
+import net.sinedkadis.terracompositio.util.OffsetVConsumer;
 import net.sinedkadis.terracompositio.util.accessors.PlayerKnowledgeAccessor;
 import net.sinedkadis.terracompositio.util.helpers.BlockPosHelper;
 import net.sinedkadis.terracompositio.util.helpers.ParticleHelper;
@@ -59,6 +69,7 @@ import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.List;
+import java.util.Optional;
 import java.util.function.Consumer;
 
 import static net.minecraft.world.level.block.state.properties.BlockStateProperties.WATERLOGGED;
@@ -66,7 +77,7 @@ import static net.minecraft.world.level.block.state.properties.BlockStatePropert
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 @Mod.EventBusSubscriber(modid = TerraCompositio.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
-public class TechnetiumArmorItem extends TCArmorItem {
+public class TechnetiumArmorItem extends TCArmorItem implements IHaveExtensibleCFEStorage {
 
     private static final String last = "last";
     private static final String height = "Height";
@@ -252,16 +263,21 @@ public class TechnetiumArmorItem extends TCArmorItem {
         }
     }
 
-    @Override
-    public void appendHoverText(ItemStack pStack, @Nullable Level pLevel, List<Component> pTooltipComponents, TooltipFlag pIsAdvanced) {
-        LocalPlayer player = Minecraft.getInstance().player;
-        if (player != null && ((PlayerKnowledgeAccessor) player).isCreationAcknowledged()) {
-            pTooltipComponents.add(
-                    TooltipHelper.defaultTextWithArg("block.terracompositio.cfe",
-                            pStack.getCapability(TCCapabilities.CFE).orElse(DummyCFEHandler.instance).getCFE())
-            );
-        }
-        super.appendHoverText(pStack, pLevel, pTooltipComponents, pIsAdvanced);
+    public static void onDoubleJump(LocalPlayer localPlayer) {
+        ItemStack itemBySlot = localPlayer.getItemBySlot(EquipmentSlot.FEET);
+        if (!itemBySlot.is(TCItems.TECHNETIUM_BOOTS.get())) return;
+
+        ICFEHandler icfeHandler = itemBySlot.getCapability(TCCapabilities.CFE).orElse(DummyCFEHandler.instance);
+        if (!(icfeHandler.takeCFE(1, false) > 0)) return;
+
+        CompoundTag persistentData = localPlayer.getPersistentData();
+
+        persistentData.putInt(cd, localPlayer.tickCount);
+        persistentData.putInt(height, localPlayer.getBlockY() + 4);
+        localPlayer.level().playSound(localPlayer, localPlayer.blockPosition(), SoundEvents.CHICKEN_EGG, SoundSource.PLAYERS);
+        localPlayer.move(MoverType.SELF, new Vec3(0, 5, 0));
+
+
     }
 
     private void helmetInventoryTick(ItemStack ignoredPStack, Level ignoredPLevel, Entity pEntity, ICFEHandler ignoredIcfeHandler) {
@@ -328,6 +344,19 @@ public class TechnetiumArmorItem extends TCArmorItem {
         persistentData.putInt(cd, livingEntity.tickCount);
     }
 
+    public static @Nullable VertexConsumer getTrimVertexConsumer(TextureAtlas armorTrimAtlas, MultiBufferSource pBuffer, LivingEntity pLivingEntity, ItemStack itemstack, boolean normal) {
+        Optional<ArmorTrim> trim = ArmorTrim.getTrim(pLivingEntity.level().registryAccess(), itemstack);
+
+        if (trim.isEmpty()) return null;
+
+        TextureAtlasSprite sprite = armorTrimAtlas.getSprite(trim.get().outerTexture(TCArmorMaterials.TECHNETIUM));
+
+        VertexConsumer base = sprite.wrap(pBuffer.getBuffer(Sheets.armorTrimsSheet()));
+
+        float vOffset = normal ? 0 : 0.04f;
+        return new OffsetVConsumer(base, vOffset);
+    }
+
     private static void changeHeightByView(LivingEntity livingEntity,
                                            CompoundTag persistentData,
                                            Level level) {
@@ -392,9 +421,57 @@ public class TechnetiumArmorItem extends TCArmorItem {
     }
 
     @Override
+    public void appendHoverText(ItemStack pStack, @Nullable Level pLevel, List<Component> pTooltipComponents, TooltipFlag pIsAdvanced) {
+        LocalPlayer player = Minecraft.getInstance().player;
+        if (player != null && ((PlayerKnowledgeAccessor) player).isCreationAcknowledged()) {
+            pTooltipComponents.add(
+                    TooltipHelper.defaultTextWithArg("block.terracompositio.cfe",
+                            pStack.getCapability(TCCapabilities.CFE).orElse(DummyCFEHandler.instance).getCFE())
+            );
+            ICFEStorageExtension currentExtension = this.getCurrentExtension(pStack);
+            if (currentExtension.maxStorage() > 0) {
+                Component description = currentExtension.self().getItem().getDescription();
+                pTooltipComponents.add(
+                        TooltipHelper.defaultTextWithArg("block.terracompositio.storage_extension", description, TooltipHelper.Units.NO_UNITS)
+                );
+            }
+            if (TCCommonConfigs.DEBUG.get()) {
+                pTooltipComponents.add(
+                        TooltipHelper.defaultTextWithArg("block.terracompositio.max_cfe",
+                                pStack.getCapability(TCCapabilities.CFE).orElse(DummyCFEHandler.instance).getMaxCFE())
+                );
+            }
+        }
+        super.appendHoverText(pStack, pLevel, pTooltipComponents, pIsAdvanced);
+    }
+
+    @Override
     public @Nullable ICapabilityProvider initCapabilities(ItemStack stack, @Nullable CompoundTag nbt) {
-        Type type = ((ArmorItem) stack.getItem()).getType();
-        if (type.equals(Type.HELMET)) return null;
-        return (ICapabilityProvider) new CFEItemWrapper(stack).setMaxCFE(100);
+        return new CFEItemWrapper(stack);
+    }
+
+    @Override
+    public ICFEStorageExtension getCurrentExtension(ItemStack stack) {
+        if (stack.getCapability(TCCapabilities.CFE).orElse(DummyCFEHandler.instance).getMaxCFE() == 8)
+            return () -> 0;
+        Item item = ItemStack.of(stack.getOrCreateTag().getCompound("StorageExtension")).getItem();
+        return item instanceof ICFEStorageExtension icfese ? icfese : () -> 0;
+    }
+
+    @Override
+    public void setExtension(ItemStack stack, ICFEStorageExtension extensionItem) {
+        if (extensionItem.maxStorage() <= 0) return;
+        stack.getOrCreateTag().put("StorageExtension", ((Item) extensionItem).getDefaultInstance().serializeNBT());
+        stack.getCapability(TCCapabilities.CFE).orElse(DummyCFEHandler.instance).setMaxCFE(extensionItem.maxStorage());
+    }
+
+    @Override
+    public boolean hasCraftingRemainingItem(ItemStack stack) {
+        return true;
+    }
+
+    @Override
+    public ItemStack getCraftingRemainingItem(ItemStack itemStack) {
+        return this.getCurrentExtension(itemStack).self();
     }
 }

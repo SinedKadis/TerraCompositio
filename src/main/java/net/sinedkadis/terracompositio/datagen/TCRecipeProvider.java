@@ -1,6 +1,7 @@
 package net.sinedkadis.terracompositio.datagen;
 
 
+import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.recipes.*;
 import net.minecraft.nbt.CompoundTag;
@@ -9,6 +10,7 @@ import net.minecraft.tags.ItemTags;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.AbstractCookingRecipe;
+import net.minecraft.world.item.crafting.CraftingRecipe;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.level.ItemLike;
@@ -21,15 +23,21 @@ import net.sinedkadis.terracompositio.datagen.builders.FlowInfusionRecipeBuilder
 import net.sinedkadis.terracompositio.datagen.builders.FlowSaturationRecipeBuilder;
 import net.sinedkadis.terracompositio.datagen.builders.MatterInfusionRecipeBuilder;
 import net.sinedkadis.terracompositio.datagen.builders.TechnetiumFiringRecipeBuilder;
+import net.sinedkadis.terracompositio.recipe.ArmorStorageUpgradeRecipe;
+import net.sinedkadis.terracompositio.recipe.NoOpRecipeSerializer;
+import net.sinedkadis.terracompositio.recipe.TagTransferShapedRecipe;
+import net.sinedkadis.terracompositio.recipe.WrapperResult;
 import net.sinedkadis.terracompositio.registries.TCBlocks;
 import net.sinedkadis.terracompositio.registries.TCItems;
 import net.sinedkadis.terracompositio.registries.TCTags;
 import org.jetbrains.annotations.NotNull;
 
-
+import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
+
+import static net.minecraft.data.recipes.RecipeBuilder.getDefaultRecipeId;
 
 public class TCRecipeProvider extends RecipeProvider implements IConditionBuilder {
 
@@ -40,11 +48,13 @@ public class TCRecipeProvider extends RecipeProvider implements IConditionBuilde
     @Override
     protected void buildRecipes(@NotNull Consumer<FinishedRecipe> pWriter) {
 
+        specialCraftingRecipe(pWriter, ArmorStorageUpgradeRecipe.SERIALIZER);
 
         buildCedarBlocks(pWriter);
         buildMatterInfuserBlocks(pWriter);
         buildCopperMaterials(pWriter);
         buildTechnetiumMaterials(pWriter);
+        buildTechnetiumArmor(pWriter);
         buildCedarArmor(pWriter);
         buildInfusedIronMaterials(pWriter);
         buildGoldMaterials(pWriter);
@@ -62,6 +72,80 @@ public class TCRecipeProvider extends RecipeProvider implements IConditionBuilde
         buildCompat(pWriter);
 
 
+    }
+
+    private void buildTechnetiumArmor(@NotNull Consumer<FinishedRecipe> pWriter) {
+        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, TCItems.TECHNETIUM_CROWN.get())
+                .pattern("T T")
+                .pattern("TTT")
+                .define('T', TCItems.TECHNETIUM_INGOT.get())
+                .unlockedBy(getHasName(TCItems.TECHNETIUM_INGOT.get()), has(TCItems.TECHNETIUM_INGOT.get()))
+                .save(pWriter);
+        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, TCItems.TECHNETIUM_CROWN.get())
+                .pattern("T T")
+                .pattern("TTT")
+                .pattern(" C ")
+                .define('T', TCItems.TECHNETIUM_INGOT.get())
+                .define('C', TCItems.FLOW_CEDAR_HELMET.get())
+                .unlockedBy(getHasName(TCItems.TECHNETIUM_INGOT.get()), has(TCItems.TECHNETIUM_INGOT.get()))
+                .save(WrapperResult.ofType(TagTransferShapedRecipe.SERIALIZER, pWriter),
+                        TerraCompositio.modLoc("with_tag/" + getDefaultRecipeId(TCItems.TECHNETIUM_CROWN.get()).getPath()));
+
+
+        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, TCItems.TECHNETIUM_CHESTPLATE.get())
+                .pattern("T T")
+                .pattern("TTT")
+                .pattern("TTT")
+                .define('T', TCItems.TECHNETIUM_INGOT.get())
+                .unlockedBy(getHasName(TCItems.TECHNETIUM_INGOT.get()), has(TCItems.TECHNETIUM_INGOT.get()))
+                .save(pWriter);
+        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, TCItems.TECHNETIUM_CHESTPLATE.get())
+                .pattern("TCT")
+                .pattern("TTT")
+                .pattern("TTT")
+                .define('T', TCItems.TECHNETIUM_INGOT.get())
+                .define('C', TCItems.FLOW_CEDAR_CHESTPLATE.get())
+                .unlockedBy(getHasName(TCItems.TECHNETIUM_INGOT.get()), has(TCItems.TECHNETIUM_INGOT.get()))
+                .save(WrapperResult.ofType(TagTransferShapedRecipe.SERIALIZER, pWriter),
+                        TerraCompositio.modLoc("with_tag/" + getDefaultRecipeId(TCItems.TECHNETIUM_CHESTPLATE.get()).getPath()));
+
+
+        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, TCItems.TECHNETIUM_LEGGINGS.get())
+                .pattern("TTT")
+                .pattern("T T")
+                .pattern("T T")
+                .define('T', TCItems.TECHNETIUM_INGOT.get())
+                .unlockedBy(getHasName(TCItems.TECHNETIUM_INGOT.get()), has(TCItems.TECHNETIUM_INGOT.get()))
+                .save(pWriter);
+        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, TCItems.TECHNETIUM_LEGGINGS.get())
+                .pattern("TTT")
+                .pattern("TCT")
+                .pattern("T T")
+                .define('T', TCItems.TECHNETIUM_INGOT.get())
+                .define('C', TCItems.FLOW_CEDAR_LEGGINGS.get())
+                .unlockedBy(getHasName(TCItems.TECHNETIUM_INGOT.get()), has(TCItems.TECHNETIUM_INGOT.get()))
+                .save(WrapperResult.ofType(TagTransferShapedRecipe.SERIALIZER, pWriter),
+                        TerraCompositio.modLoc("with_tag/" + getDefaultRecipeId(TCItems.TECHNETIUM_LEGGINGS.get()).getPath()));
+
+
+        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, TCItems.TECHNETIUM_BOOTS.get())
+                .pattern("T T")
+                .pattern("T T")
+                .pattern("F F")
+                .define('F', Items.FEATHER)
+                .define('T', TCItems.TECHNETIUM_INGOT.get())
+                .unlockedBy(getHasName(TCItems.TECHNETIUM_INGOT.get()), has(TCItems.TECHNETIUM_INGOT.get()))
+                .save(pWriter);
+        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, TCItems.TECHNETIUM_BOOTS.get())
+                .pattern("T T")
+                .pattern("TCT")
+                .pattern("F F")
+                .define('F', Items.FEATHER)
+                .define('T', TCItems.TECHNETIUM_INGOT.get())
+                .define('C', TCItems.FLOW_CEDAR_LEGGINGS.get())
+                .unlockedBy(getHasName(TCItems.TECHNETIUM_INGOT.get()), has(TCItems.TECHNETIUM_INGOT.get()))
+                .save(WrapperResult.ofType(TagTransferShapedRecipe.SERIALIZER, pWriter),
+                        TerraCompositio.modLoc("with_tag/" + getDefaultRecipeId(TCItems.TECHNETIUM_BOOTS.get()).getPath()));
     }
 
     private void buildApples(@NotNull Consumer<FinishedRecipe> pWriter) {
@@ -703,5 +787,13 @@ public class TCRecipeProvider extends RecipeProvider implements IConditionBuilde
                     .group(pGroup).unlockedBy(getHasName(itemlike), has(itemlike))
                     .save(pFinishedRecipeConsumer,  TerraCompositio.MOD_ID + ":" + getItemName(pResult) + pRecipeName + "_" + getItemName(itemlike));
         }
+    }
+
+    @ParametersAreNonnullByDefault
+    @MethodsReturnNonnullByDefault
+    protected void specialCraftingRecipe(Consumer<FinishedRecipe> consumer, NoOpRecipeSerializer<? extends CraftingRecipe> serializer) {
+        ResourceLocation name = ForgeRegistries.RECIPE_SERIALIZERS.getKey(serializer);
+        assert name != null;
+        SpecialRecipeBuilder.special(serializer).save(consumer, TerraCompositio.modLoc("dynamic/" + name.getPath()).toString());
     }
 }

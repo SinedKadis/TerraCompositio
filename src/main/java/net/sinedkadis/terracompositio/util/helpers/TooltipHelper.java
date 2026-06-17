@@ -10,10 +10,13 @@ public class TooltipHelper {
     }
 
     public static MutableComponent defaultTextWithArg(String translationKey, Object arg, Units measurement) {
+
+        MutableComponent mutableComponent = Component.literal(String.valueOf(arg))
+                .append(Component.translatable(measurement.toString()));
+        if (arg instanceof MutableComponent component)
+            mutableComponent = component;
         return Component.translatable(translationKey,
-                        Component.literal(String.valueOf(arg))
-                                .append(Component.translatable(measurement.toString()))
-                                .withStyle(ChatFormatting.AQUA))
+                        mutableComponent.withStyle(ChatFormatting.AQUA))
                 .withStyle(ChatFormatting.GRAY);
     }
 
@@ -21,6 +24,7 @@ public class TooltipHelper {
         BLOCKS("block.terracompositio.blocks"),
         UNITS("block.terracompositio.units"),
         MILIBUCKETS("block.terracompositio.milibuckets"),
+        NO_UNITS(""),
         CFE_SECOND("block.terracompositio.cfe_second");
 
         private final String translationKey;

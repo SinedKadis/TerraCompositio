@@ -32,6 +32,7 @@ import org.jetbrains.annotations.NotNull;
 import javax.annotation.ParametersAreNonnullByDefault;
 
 import static net.minecraft.world.level.block.LayeredCauldronBlock.LEVEL;
+import static net.sinedkadis.terracompositio.item.custom.CedarArmorItem.setOldDamage;
 
 public class FlowBottleItem extends Item {
 
@@ -59,40 +60,36 @@ public class FlowBottleItem extends Item {
             float chestplateDamagePercentage = (float) getDamage(player.getInventory().getArmor(2)) / player.getInventory().getArmor(2).getMaxDamage();
             float helmetDamagePercentage = (float) getDamage(player.getInventory().getArmor(3)) / player.getInventory().getArmor(3).getMaxDamage();
 
-            float[] tags = new float[]{
-                    bootsDamagePercentage,
-                    leggingsDamagePercentage,
-                    chestplateDamagePercentage,
-                    helmetDamagePercentage,
-            };
 
-            ItemStack boots = new ItemStack(((FlowArmorItem) TCItems.FLOWING_FLOW_CEDAR_BOOTS.get())
-                    .setOldDamage(tags));
+            ItemStack boots = TCItems.FLOWING_FLOW_CEDAR_BOOTS.get().getDefaultInstance();
             boots.setTag(player.getInventory().getArmor(0).getTag());
+            setOldDamage(boots, bootsDamagePercentage);
             boots.setDamageValue((int) (bootsDamagePercentage * boots.getMaxDamage()));
 
-            ItemStack leggings = new ItemStack(((FlowArmorItem) TCItems.FLOWING_FLOW_CEDAR_LEGGINGS.get())
-                    .setOldDamage(tags));
+            ItemStack leggings = TCItems.FLOWING_FLOW_CEDAR_LEGGINGS.get().getDefaultInstance();
             leggings.setTag(player.getInventory().getArmor(1).getTag());
+            setOldDamage(leggings, bootsDamagePercentage);
             leggings.setDamageValue((int) (leggingsDamagePercentage * leggings.getMaxDamage()));
 
-            ItemStack chestplate = new ItemStack(((FlowArmorItem) TCItems.FLOWING_FLOW_CEDAR_CHESTPLATE.get())
-                    .setOldDamage(tags));
+            ItemStack chestplate = TCItems.FLOWING_FLOW_CEDAR_CHESTPLATE.get().getDefaultInstance();
             chestplate.setTag(player.getInventory().getArmor(2).getTag());
+            setOldDamage(chestplate, chestplateDamagePercentage);
             chestplate.setDamageValue((int) (chestplateDamagePercentage * chestplate.getMaxDamage()));
 
-            ItemStack helmet = new ItemStack(((FlowArmorItem) TCItems.FLOWING_FLOW_CEDAR_HELMET.get())
-                    .setOldDamage(tags));
+            ItemStack helmet = TCItems.FLOWING_FLOW_CEDAR_HELMET.get().getDefaultInstance();
             helmet.setTag(player.getInventory().getArmor(3).getTag());
+            setOldDamage(helmet, helmetDamagePercentage);
             helmet.setDamageValue((int) (helmetDamagePercentage * helmet.getMaxDamage()));
 
             player.setItemSlot(EquipmentSlot.FEET,boots);
             player.setItemSlot(EquipmentSlot.LEGS,leggings);
             player.setItemSlot(EquipmentSlot.CHEST,chestplate);
             player.setItemSlot(EquipmentSlot.HEAD,helmet);
-        }else {
+        } else {
+            pEntityLiving.gameEvent(GameEvent.DRINK);
             pEntityLiving.addEffect(new MobEffectInstance(TCEffects.FLOW_SATURATION.get(),200));
         }
+
         if (player != null) {
             player.awardStat(Stats.ITEM_USED.get(this));
             if (!player.getAbilities().instabuild) {
@@ -109,8 +106,6 @@ public class FlowBottleItem extends Item {
                 player.getInventory().add(new ItemStack(Items.GLASS_BOTTLE));
             }
         }
-
-        pEntityLiving.gameEvent(GameEvent.DRINK);
         return pStack;
     }
 

@@ -63,7 +63,10 @@ public class TCItemTagGenerator extends ItemTagsProvider {
                         TCItems.FLOWING_FLOW_CEDAR_HELMET.get(),
                         TCItems.FLOWING_FLOW_CEDAR_CHESTPLATE.get(),
                         TCItems.FLOWING_FLOW_CEDAR_LEGGINGS.get(),
-                        TCItems.FLOWING_FLOW_CEDAR_BOOTS.get());
+                        TCItems.FLOWING_FLOW_CEDAR_BOOTS.get(),
+                        TCItems.TECHNETIUM_CHESTPLATE.get(),
+                        TCItems.TECHNETIUM_LEGGINGS.get(),
+                        TCItems.TECHNETIUM_BOOTS.get());
         this.tag(ItemTags.BOATS)
                 .add(TCItems.FLOW_CEDAR_BOAT.get());
         this.tag(ItemTags.CHEST_BOATS)

@@ -1,0 +1,18 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "T": {
+      "item": "terracompositio:technetium_ingot"
+    }
+  },
+  "pattern": [
+    "TTT",
+    "T T",
+    "T T"
+  ],
+  "result": {
+    "item": "terracompositio:technetium_leggings"
+  },
+  "show_notification": true
+}

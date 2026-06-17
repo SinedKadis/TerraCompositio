@@ -11,11 +11,13 @@ import net.minecraft.world.level.Level;
 import net.sinedkadis.terracompositio.registries.TCArmorMaterials;
 import net.sinedkadis.terracompositio.registries.TCItems;
 import org.jetbrains.annotations.NotNull;
+import org.jetbrains.annotations.UnknownNullability;
 
 import java.util.function.Consumer;
 
-public class FlowArmorItem extends TCArmorItem {
-    private float[] damage = new float[4];
+public class CedarArmorItem extends TCArmorItem {
+
+    private static final String oldDamagePercent = "oldDamagePercent";
 
     @Override
     public @NotNull Type getType() {
@@ -24,14 +26,14 @@ public class FlowArmorItem extends TCArmorItem {
 
     private final Type type;
 
-    public FlowArmorItem(ArmorMaterial pMaterial, Type pType, Properties pProperties) {
+    public CedarArmorItem(ArmorMaterial pMaterial, Type pType, Properties pProperties) {
         super(pMaterial, pType, pProperties);
         this.type = pType;
     }
 
-    public FlowArmorItem setOldDamage(float[] damage){
-        this.damage = damage;
-        return this;
+    public static ItemStack setOldDamage(@UnknownNullability ItemStack item, float damage) {
+        item.getOrCreateTag().putFloat(oldDamagePercent, damage);
+        return item;
     }
 
     @Override
@@ -62,25 +64,25 @@ public class FlowArmorItem extends TCArmorItem {
                 if (boots.getItem() == TCItems.FLOWING_FLOW_CEDAR_BOOTS.get()) {
                     ItemStack stack = new ItemStack(TCItems.FLOW_CEDAR_BOOTS.get());
                     stack.setTag(pPlayer.getItemBySlot(EquipmentSlot.FEET).getTag());
-                    stack.setDamageValue((int) (damage[0] * stack.getMaxDamage()));
+                    stack.setDamageValue((int) (stack.getOrCreateTag().getFloat(oldDamagePercent) * stack.getMaxDamage()));
                     pPlayer.setItemSlot(EquipmentSlot.FEET, stack);
                 }
                 if (leggings.getItem() == TCItems.FLOWING_FLOW_CEDAR_LEGGINGS.get()) {
                     ItemStack stack = new ItemStack(TCItems.FLOW_CEDAR_LEGGINGS.get());
                     stack.setTag(pPlayer.getItemBySlot(EquipmentSlot.LEGS).getTag());
-                    stack.setDamageValue((int) (damage[1] * stack.getMaxDamage()));
+                    stack.setDamageValue((int) (stack.getOrCreateTag().getFloat(oldDamagePercent) * stack.getMaxDamage()));
                     pPlayer.setItemSlot(EquipmentSlot.LEGS, stack);
                 }
                 if (chestplate.getItem() == TCItems.FLOWING_FLOW_CEDAR_CHESTPLATE.get()) {
                     ItemStack stack = new ItemStack(TCItems.FLOW_CEDAR_CHESTPLATE.get());
                     stack.setTag(pPlayer.getItemBySlot(EquipmentSlot.CHEST).getTag());
-                    stack.setDamageValue((int) (damage[2] * stack.getMaxDamage()));
+                    stack.setDamageValue((int) (stack.getOrCreateTag().getFloat(oldDamagePercent) * stack.getMaxDamage()));
                     pPlayer.setItemSlot(EquipmentSlot.CHEST, stack);
                 }
                 if (helmet.getItem() == TCItems.FLOWING_FLOW_CEDAR_HELMET.get()) {
                     ItemStack stack = new ItemStack(TCItems.FLOW_CEDAR_HELMET.get());
                     stack.setTag(pPlayer.getItemBySlot(EquipmentSlot.HEAD).getTag());
-                    stack.setDamageValue((int) (damage[3] * stack.getMaxDamage()));
+                    stack.setDamageValue((int) (stack.getOrCreateTag().getFloat(oldDamagePercent) * stack.getMaxDamage()));
                     pPlayer.setItemSlot(EquipmentSlot.HEAD, stack);
                 }
             }
@@ -91,7 +93,7 @@ public class FlowArmorItem extends TCArmorItem {
         if (this.type.getSlot() == EquipmentSlot.FEET){
             ItemStack stack = new ItemStack(TCItems.FLOW_CEDAR_BOOTS.get());
             stack.setTag(pPlayer.getInventory().getItem(slotID).getTag());
-            stack.setDamageValue((int) (damage[0] * stack.getMaxDamage()));
+            stack.setDamageValue((int) (stack.getOrCreateTag().getFloat(oldDamagePercent) * stack.getMaxDamage()));
             if (inArmorSlot){
                 pPlayer.getInventory().armor.set(slotID,stack);
             }else {
@@ -101,7 +103,7 @@ public class FlowArmorItem extends TCArmorItem {
         if (this.type.getSlot() == EquipmentSlot.LEGS){
             ItemStack stack = new ItemStack(TCItems.FLOW_CEDAR_LEGGINGS.get());
             stack.setTag(pPlayer.getInventory().getItem(slotID).getTag());
-            stack.setDamageValue((int) (damage[1] * stack.getMaxDamage()));
+            stack.setDamageValue((int) (stack.getOrCreateTag().getFloat(oldDamagePercent) * stack.getMaxDamage()));
             if (inArmorSlot){
                 pPlayer.getInventory().armor.set(slotID,stack);
             }else {
@@ -111,7 +113,7 @@ public class FlowArmorItem extends TCArmorItem {
         if (this.type.getSlot() == EquipmentSlot.CHEST){
             ItemStack stack = new ItemStack(TCItems.FLOW_CEDAR_CHESTPLATE.get());
             stack.setTag(pPlayer.getInventory().getItem(slotID).getTag());
-            stack.setDamageValue((int) (damage[2] * stack.getMaxDamage()));
+            stack.setDamageValue((int) (stack.getOrCreateTag().getFloat(oldDamagePercent) * stack.getMaxDamage()));
             if (inArmorSlot){
                 pPlayer.getInventory().armor.set(slotID,stack);
             }else {
@@ -121,7 +123,7 @@ public class FlowArmorItem extends TCArmorItem {
         if (this.type.getSlot() == EquipmentSlot.HEAD){
             ItemStack stack = new ItemStack(TCItems.FLOW_CEDAR_HELMET.get());
             stack.setTag(pPlayer.getInventory().getItem(slotID).getTag());
-            stack.setDamageValue((int) (damage[3] * stack.getMaxDamage()));
+            stack.setDamageValue((int) (stack.getOrCreateTag().getFloat(oldDamagePercent) * stack.getMaxDamage()));
             if (inArmorSlot){
                 pPlayer.getInventory().armor.set(slotID,stack);
             }else {

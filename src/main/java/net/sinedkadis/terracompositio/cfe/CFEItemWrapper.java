@@ -7,6 +7,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
+import net.minecraft.util.Mth;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
@@ -109,14 +110,15 @@ public class CFEItemWrapper implements ICFEHandler, ICapabilityProvider {
     @Override
     public int getMaxCFE() {
         CompoundTag tag = container.getOrCreateTag();
-        return tag.getInt("MAX_CFE");
+        int maxCfe = tag.getInt("MAX_CFE");
+        return maxCfe == 0 ? 8 : maxCfe;
     }
 
     @Override
     public ICFEHandler setMaxCFE(int max) {
         CompoundTag tag = container.getOrCreateTag();
-        if (!tag.contains("MAX_CFE"))
-            tag.putInt("MAX_CFE",max);
+        tag.putInt("MAX_CFE", max);
+        tag.putInt("CFE", Mth.clamp(tag.getInt("CFE"), 0, max));
         return this;
     }
 

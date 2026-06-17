@@ -103,6 +103,7 @@
 
   "block.terracompositio.consume": "Consuming: %s",
   "block.terracompositio.generate": "Generating: %s",
+  "block.terracompositio.storage_extension": "Extension: %s",
 
   "block.terracompositio.blocks": " blocks",
   "block.terracompositio.units": " units",
@@ -337,6 +338,12 @@
   "book.terracompositio.creation_flow_journal.entry.path_pointers.extractor": "text",
   "book.terracompositio.creation_flow_journal.entry.path_pointers.storing": "text",
   "book.terracompositio.creation_flow_journal.entry.path_pointers.apple": "text",
+  "book.terracompositio.creation_flow_journal.entry.path_pointers.desc_2": "text",
+  "book.terracompositio.creation_flow_journal.entry.path_pointers.name_2": "text",
+
+
+
+
   "book.terracompositio.creation_flow_journal.entry.enriched_technetium.name": "text",
   "book.terracompositio.creation_flow_journal.entry.enriched_technetium.page1": "text",
   "book.terracompositio.creation_flow_journal.entry.enriched_technetium.page2": "text",
@@ -344,5 +351,12 @@
   "book.terracompositio.creation_flow_journal.category.day_5.description": "yes",
   "book.terracompositio.creation_flow_journal.entry.fluid_applier.name": "text",
   "book.terracompositio.creation_flow_journal.entry.fluid_applier.page1": "text",
-  "book.terracompositio.creation_flow_journal.entry.fluid_applier.page2": "text"
+  "book.terracompositio.creation_flow_journal.entry.fluid_applier.page2": "text",
+  "book.terracompositio.creation_flow_journal.entry.technetium_armor.name": "test",
+  "book.terracompositio.creation_flow_journal.entry.technetium_armor.desc": "test",
+  "book.terracompositio.creation_flow_journal.entry.technetium_armor.crown": "test",
+  "book.terracompositio.creation_flow_journal.entry.technetium_armor.chestplate": "text",
+  "book.terracompositio.creation_flow_journal.entry.technetium_armor.leggings": "test",
+  "book.terracompositio.creation_flow_journal.entry.technetium_armor.boots": "text",
+  "book.terracompositio.creation_flow_journal.entry.technetium_armor.boots_usage": "text"
 }
