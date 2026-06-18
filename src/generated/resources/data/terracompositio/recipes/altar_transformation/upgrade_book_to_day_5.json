@@ -1,0 +1,16 @@
+{
+  "type": "terracompositio:altar_transformation",
+  "ingredients": [
+    {
+      "item": "terracompositio:creation_flow_journal"
+    },
+    {
+      "item": "terracompositio:technetium_ingot"
+    }
+  ],
+  "output": {
+    "count": 1,
+    "item": "terracompositio:creation_flow_journal",
+    "nbt": "{day:5}"
+  }
+}

@@ -3,7 +3,7 @@
   "category": "equipment",
   "key": {
     "C": {
-      "item": "terracompositio:flow_cedar_helmet"
+      "tag": "forge:armors/helmets"
     },
     "T": {
       "item": "terracompositio:technetium_ingot"

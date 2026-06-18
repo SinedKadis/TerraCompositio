@@ -3,7 +3,7 @@
   "category": "equipment",
   "key": {
     "C": {
-      "item": "terracompositio:flow_cedar_chestplate"
+      "tag": "forge:armors/chestplates"
     },
     "T": {
       "item": "terracompositio:technetium_ingot"

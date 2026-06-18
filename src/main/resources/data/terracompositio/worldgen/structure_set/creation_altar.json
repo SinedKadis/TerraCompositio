@@ -1,0 +1,15 @@
+{
+  "structures": [
+    {
+      "structure": "terracompositio:creation_altar",
+      "weight": 1
+    }
+  ],
+  "placement": {
+    //must be unique for structure sets
+    "salt": 1642136474,
+    "spacing": 20,
+    "separation": 8,
+    "type": "minecraft:random_spread"
+  }
+}

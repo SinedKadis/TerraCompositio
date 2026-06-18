@@ -1,7 +1,6 @@
 {
-  "type": "terracompositio:flow_saturation",
-  "input": {
-    "count": 1,
+  "type": "terracompositio:altar_transformation",
+  "ingredients": {
     "item": "minecraft:book"
   },
   "output": {

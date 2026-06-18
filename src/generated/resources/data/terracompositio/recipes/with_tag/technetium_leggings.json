@@ -3,7 +3,7 @@
   "category": "equipment",
   "key": {
     "C": {
-      "item": "terracompositio:flow_cedar_leggings"
+      "tag": "forge:armors/leggings"
     },
     "T": {
       "item": "terracompositio:technetium_ingot"
