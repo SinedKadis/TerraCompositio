@@ -175,7 +175,7 @@ public class ItemHandlerBehaviour implements IBEItemBehaviour, WorldlyContainer,
                     return InteractionResult.SUCCESS;
                 }
             }
-            if ((!hasEmptySlots || i == itemHandler.getSlots() - 1) && !slot.isEmpty() && allowExtract(i, slot, pHit.getDirection(), true)) {
+            if ((!hasEmptySlots || !hasItemInHand || i == itemHandler.getSlots() - 1) && !slot.isEmpty() && allowExtract(i, slot, pHit.getDirection(), true)) {
                 ItemStack extracted = itemHandler.extractItem(i, 64, false);
                 PlayerHelper.addOrDropToPlayer(pPlayer, extracted);
                 level.playSound(pPlayer, blockPos, SoundEvents.ITEM_FRAME_REMOVE_ITEM, SoundSource.BLOCKS);

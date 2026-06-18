@@ -48,7 +48,7 @@ public class AltarTransformationRecipe implements Recipe<SimpleContainer> {
         ItemStack containerItem2 = pContainer.getItem(1);
         if (containerItem1.equals(containerItem2)) return false;
         boolean first = inputs.get(0).test(containerItem1) || inputs.get(0).test(containerItem2);
-        boolean second = true;
+        boolean second = containerItem1.isEmpty() || containerItem2.isEmpty();
         if (inputs.size() == 2) {
             second = inputs.get(1).test(containerItem1) || inputs.get(1).test(containerItem2);
         }

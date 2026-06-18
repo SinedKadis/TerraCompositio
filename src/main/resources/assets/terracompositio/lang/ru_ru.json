@@ -7,9 +7,9 @@
   "book.terracompositio.creation_flow_journal.landing_text": "Записи о наблюдении за потоком созидания, автор John Pork",
 
   "book.terracompositio.creation_flow_journal.category.day_1.name": "День первый",
-  "book.terracompositio.creation_flow_journal.category.day_1.description": "Если вы это читаете, значит вы нашли способ раздобыть копию моего журнала, через один из портов, что я создал. Я не буду сразу раскрывать все добытые мою знания, так что положите эту книгу в порт на следующий день, и я дам вам больше интересной информации",
-  "book.terracompositio.creation_flow_journal.entry.cedar_book_port.name": "Об книге",
-  "book.terracompositio.creation_flow_journal.entry.cedar_book_port.page1": "  В кедровом лесу можно найти необычные стволы, с вырезьбленной книгой на них. Данные \"порты\" - моя личная разработка. Я даже сделал так, что б они самопроизвольно вырастали в новых деревьях. Через них я могу добавлять новые главы в вашу книгу раз в день, а так же делать из сажанцев дуба сажанцы кедра",
+  "book.terracompositio.creation_flow_journal.category.day_1.description": "  Закладка первая: Вступление. Для получения 2 закладки преподнесите саженец кедра",
+  "book.terracompositio.creation_flow_journal.entry.cedar_book_port.name": "Алтарь созидания",
+  "book.terracompositio.creation_flow_journal.entry.cedar_book_port.page1": "  Необычного вида алтарь, стоящий одиноко в кедровом лесу. Преподнося ему подходящие предметы вместе с этой книгой, творец может вознаградить знанием",
   "book.terracompositio.creation_flow_journal.entry.cedar_book_port.page2": " ",
 
   "book.terracompositio.creation_flow_journal.entry.flow_infusion.name": "Наполненность потоком",
@@ -19,7 +19,7 @@
   "book.terracompositio.creation_flow_journal.entry.cedar_armor.page1": "Кедр, на удивление, неплохой материал для брони. Благодаря своим магическим свойствам, хорошо сидит, хоть и характеристики оставляют желать лучшего.",
 
   "book.terracompositio.creation_flow_journal.category.day_2.name": "День второй",
-  "book.terracompositio.creation_flow_journal.category.day_2.description": "Подробнее про добычу и использование потока",
+  "book.terracompositio.creation_flow_journal.category.day_2.description": "  Закладка вторая: Подробнее про добычу и использование потока. Для следующей закладки преподнесите бутылочку жидкого потока",
 
   "book.terracompositio.creation_flow_journal.entry.wedge.name": "Клин",
   "book.terracompositio.creation_flow_journal.entry.wedge.page1": " Первое, что пришло мне в голову, это использовать клин, прям как при добыче березового сока. Вбиваешь клин в дерево, ставишь под него котел, и наслаждаешься результатом",

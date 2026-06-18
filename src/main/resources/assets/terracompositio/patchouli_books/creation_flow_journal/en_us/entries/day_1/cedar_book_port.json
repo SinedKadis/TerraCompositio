@@ -1,21 +1,19 @@
 {
   "name": "book.terracompositio.creation_flow_journal.entry.cedar_book_port.name",
   "category": "terracompositio:day_1",
-  "icon": "terracompositio:textures/item/creation_flow_journal/day_5/2d.png",
+  "icon": "terracompositio:flow_cedar_altar",
   "flag": "terracompositio:day_1",
   "pages": [
     {
       "type": "patchouli:spotlight",
-      "item": "terracompositio:creation_flow_journal{day:1},terracompositio:creation_flow_journal{day:2},terracompositio:creation_flow_journal{day:3},terracompositio:creation_flow_journal{day:4},terracompositio:creation_flow_journal{day:5}",
+      "title": "book.terracompositio.creation_flow_journal.entry.cedar_book_port.name",
+      "item": "terracompositio:creation_flow_journal{day:1},terracompositio:creation_flow_journal{day:2},terracompositio:creation_flow_journal{day:3},terracompositio:creation_flow_journal{day:4},terracompositio:creation_flow_journal{day:5},terracompositio:flow_cedar_altar",
       "link_recipe": true,
       "text": "book.terracompositio.creation_flow_journal.entry.cedar_book_port.page1"
     },
     {
-      "type": "patchouli:image",
-      "images": [
-        "terracompositio:textures/illustrations/flow_port_image.png"
-      ],
-      "text": "book.terracompositio.creation_flow_journal.entry.cedar_book_port.page2"
+      "type": "patchouli:multiblock",
+      "multiblock_id": "terracompositio:multiblocks/creation_altar"
     }
   ]
 }

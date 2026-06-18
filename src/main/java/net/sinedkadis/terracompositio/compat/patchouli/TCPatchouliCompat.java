@@ -14,6 +14,8 @@ public class TCPatchouliCompat {
 
     public static void registerMultiblocks() {
         PatchouliAPI.get().registerMultiblock(TerraCompositio.modLoc("multiblocks/matter_infuser"),TCMultiblocks.MATTER_INFUSER_MB.get());
+        PatchouliAPI.get().registerMultiblock(TerraCompositio.modLoc("multiblocks/creation_altar"), TCMultiblocks.CREATION_ALTAR_MB.get());
+
     }
 
     public static void reloadBookContents(Object book, Level level) {
