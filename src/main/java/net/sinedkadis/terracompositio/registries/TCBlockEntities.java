@@ -20,10 +20,10 @@ public class TCBlockEntities {
     public static final DeferredRegister<BlockEntityType<?>> BLOCK_ENTITIES =
             DeferredRegister.create(ForgeRegistries.BLOCK_ENTITY_TYPES, TerraCompositio.MOD_ID);
 
-    public static final RegistryObject<BlockEntityType<FlowCedarPortBlockEntity>> FLOW_PORT_BE=
-            BLOCK_ENTITIES.register("flow_port_be", () ->
-                    BlockEntityType.Builder.of(FlowCedarPortBlockEntity::new,
-                            FLOW_CEDAR_PORT.get()).build(null));
+    public static final RegistryObject<BlockEntityType<FlowCedarAltarBlockEntity>> FLOW_ALTAR_BE =
+            BLOCK_ENTITIES.register("flow_altar_be", () ->
+                    BlockEntityType.Builder.of(FlowCedarAltarBlockEntity::new,
+                            FLOW_CEDAR_ALTAR.get()).build(null));
     public static final RegistryObject<BlockEntityType<CreativeCFESourceBlockEntity>> CREATIVE_CFE_SOURCE_BE =
             BLOCK_ENTITIES.register("creative_cfe_source_be", () ->
                     BlockEntityType.Builder.of(CreativeCFESourceBlockEntity::new,

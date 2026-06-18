@@ -3,7 +3,6 @@ package net.sinedkadis.terracompositio.compat.jei;
 import mezz.jei.api.IModPlugin;
 import mezz.jei.api.JeiPlugin;
 import mezz.jei.api.recipe.RecipeType;
-import mezz.jei.api.registration.IGuiHandlerRegistration;
 import mezz.jei.api.registration.IRecipeCatalystRegistration;
 import mezz.jei.api.registration.IRecipeCategoryRegistration;
 import mezz.jei.api.registration.IRecipeRegistration;
@@ -19,13 +18,12 @@ import net.sinedkadis.terracompositio.compat.jei.categories.FlowInfusionCategory
 import net.sinedkadis.terracompositio.compat.jei.categories.FlowPortCategory;
 import net.sinedkadis.terracompositio.compat.jei.categories.MatterInfusionCategory;
 import net.sinedkadis.terracompositio.compat.jei.categories.TechnetiumFiringCategory;
+import net.sinedkadis.terracompositio.recipe.AltarTransformationRecipe;
+import net.sinedkadis.terracompositio.recipe.FlowInfusionRecipe;
 import net.sinedkadis.terracompositio.recipe.MatterInfusionRecipe;
 import net.sinedkadis.terracompositio.recipe.TechnetiumFiringRecipe;
 import net.sinedkadis.terracompositio.registries.TCBlocks;
-import net.sinedkadis.terracompositio.recipe.FlowInfusionRecipe;
-import net.sinedkadis.terracompositio.recipe.FlowSaturationRecipe;
 import net.sinedkadis.terracompositio.registries.TCItems;
-import net.sinedkadis.terracompositio.screen.FlowBlockPortScreen;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
@@ -52,22 +50,15 @@ public class JEITerraCompositioPlugin implements IModPlugin {
         assert Minecraft.getInstance().level != null;
         RecipeManager recipeManager = Minecraft.getInstance().level.getRecipeManager();
 
-        List<FlowSaturationRecipe> flowSaturationRecipes = recipeManager.getAllRecipesFor(FlowSaturationRecipe.Type.INSTANCE);
+        List<AltarTransformationRecipe> altarTransformationRecipes = recipeManager.getAllRecipesFor(AltarTransformationRecipe.Type.INSTANCE);
         List<FlowInfusionRecipe> flowInfusionRecipes = recipeManager.getAllRecipesFor(FlowInfusionRecipe.Type.INSTANCE);
         List<MatterInfusionRecipe> matterInfusionRecipes = recipeManager.getAllRecipesFor(MatterInfusionRecipe.Type.INSTANCE);
         List<TechnetiumFiringRecipe> technetiumFiringRecipes = recipeManager.getAllRecipesFor(TechnetiumFiringRecipe.Type.INSTANCE);
 
-        registration.addRecipes(FlowPortCategory.FLOW_SATURATION_RECIPE_RECIPE_TYPE,flowSaturationRecipes);
+        registration.addRecipes(FlowPortCategory.FLOW_SATURATION_RECIPE_RECIPE_TYPE, altarTransformationRecipes);
         registration.addRecipes(FlowInfusionCategory.FLOW_INFUSION_RECIPE_RECIPE_TYPE,flowInfusionRecipes);
         registration.addRecipes(MatterInfusionCategory.MATTER_INFUSION_RECIPE_RECIPE_TYPE,matterInfusionRecipes);
         registration.addRecipes(TechnetiumFiringCategory.TECHNETIUM_FIRING_RECIPE_RECIPE_TYPE,technetiumFiringRecipes);
-
-    }
-
-    @Override
-    public void registerGuiHandlers(IGuiHandlerRegistration registration) {
-        registration.addRecipeClickArea(FlowBlockPortScreen.class,60,30,20,30,
-                FlowPortCategory.FLOW_SATURATION_RECIPE_RECIPE_TYPE);
 
     }
 

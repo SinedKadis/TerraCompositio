@@ -106,7 +106,7 @@ public class TCCreativeModeTabs {
 
 
                             //be
-                            pOutput.accept(TCBlocks.FLOW_CEDAR_PORT.get());
+                            pOutput.accept(TCBlocks.FLOW_CEDAR_ALTAR.get());
                             pOutput.accept(TCItems.FLOW_INFUSER_KIT.get());
                             pOutput.accept(TCBlocks.FLOW_INFUSER.get());
                             pOutput.accept(TCBlocks.AIR_SATURATOR.get());

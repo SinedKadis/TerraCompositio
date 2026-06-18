@@ -7,13 +7,10 @@ import net.minecraft.core.Direction;
 import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.LevelSimulatedReader;
 import net.minecraft.world.level.block.state.BlockState;
-import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.levelgen.feature.configurations.TreeConfiguration;
 import net.minecraft.world.level.levelgen.feature.foliageplacers.FoliagePlacer;
 import net.minecraft.world.level.levelgen.feature.trunkplacers.TrunkPlacer;
 import net.minecraft.world.level.levelgen.feature.trunkplacers.TrunkPlacerType;
-import net.sinedkadis.terracompositio.registries.TCBlockStateProperties;
-import net.sinedkadis.terracompositio.registries.TCBlocks;
 import net.sinedkadis.terracompositio.worldgen.tree.TCTrunkPlacers;
 import org.jetbrains.annotations.NotNull;
 
@@ -50,17 +47,6 @@ public class FlowCedarTrunkPlacer extends TrunkPlacer {
         // Основной ствол
         for (int i = 0; i < pFreeTreeHeight; i++) {
             placeLog(pLevel, pBlockSetter, pRandom, pPos.above(i), pConfig);
-        }
-
-        // Добавляем портал FLOW_PORT на высоте 2-3 блоков
-        int portHeight = 2 + pRandom.nextInt(2); // 2 или 3
-        if (portHeight < pFreeTreeHeight && pRandom.nextFloat() < 0.02f) {
-            BlockPos portPos = pPos.above(portHeight);
-            Direction facing = Direction.Plane.HORIZONTAL.getRandomDirection(pRandom);
-            pBlockSetter.accept(portPos, TCBlocks.FLOW_CEDAR_PORT.get()
-                    .defaultBlockState()
-                    .setValue(BlockStateProperties.HORIZONTAL_FACING, facing)
-                    .setValue(TCBlockStateProperties.INFUSED,true));
         }
 
         // Точка для листвы на вершине

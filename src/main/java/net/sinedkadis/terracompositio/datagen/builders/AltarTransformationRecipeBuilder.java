@@ -1,8 +1,7 @@
 package net.sinedkadis.terracompositio.datagen.builders;
 
-import com.google.gson.JsonArray;
-import com.google.gson.JsonElement;
 import com.google.gson.JsonObject;
+import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.advancements.CriterionTriggerInstance;
 import net.minecraft.data.recipes.FinishedRecipe;
 import net.minecraft.data.recipes.RecipeBuilder;
@@ -12,52 +11,55 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraftforge.registries.ForgeRegistries;
-import net.sinedkadis.terracompositio.recipe.FlowInfusionRecipe;
-import org.jetbrains.annotations.NotNull;
+import net.sinedkadis.terracompositio.TerraCompositio;
+import net.sinedkadis.terracompositio.recipe.AltarTransformationRecipe;
 import org.jetbrains.annotations.Nullable;
 
+import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.Objects;
 import java.util.function.Consumer;
 
-public class FlowInfusionRecipeBuilder implements RecipeBuilder {
+@ParametersAreNonnullByDefault
+@MethodsReturnNonnullByDefault
+public class AltarTransformationRecipeBuilder implements RecipeBuilder {
 
     private final ItemStack output;
     private final Ingredient input;
-    private final int cfe;
-    private final int time;
 
-    private FlowInfusionRecipeBuilder(ItemStack output, Ingredient input, int cfe, int time) {
+    private AltarTransformationRecipeBuilder(Ingredient input, ItemStack output) {
         this.output = output;
         this.input = input;
-        this.cfe = cfe;
-        this.time = time;
     }
 
-    public static FlowInfusionRecipeBuilder create(ItemStack output, Ingredient input, int cfe, int time) {
-        return new FlowInfusionRecipeBuilder(output, input, cfe, time);
+    public static AltarTransformationRecipeBuilder create(Ingredient input, ItemStack output) {
+        return new AltarTransformationRecipeBuilder(input, output);
     }
 
 
     @Override
-    public @NotNull RecipeBuilder unlockedBy(@NotNull String s, @NotNull CriterionTriggerInstance criterionTriggerInstance) {
+    public RecipeBuilder unlockedBy(String s, CriterionTriggerInstance criterionTriggerInstance) {
         return this;
     }
 
     @Override
-    public @NotNull RecipeBuilder group(@Nullable String s) {
+    public RecipeBuilder group(@Nullable String s) {
         return this;
     }
 
     @Override
-    public @NotNull Item getResult() {
+    public Item getResult() {
         return this.output.getItem();
     }
 
+    @Override
+    public void save(Consumer<FinishedRecipe> consumer, ResourceLocation pRecipeId) {
+        consumer.accept(new Result(output, input, pRecipeId));
+    }
 
 
     @Override
-    public void save(@NotNull Consumer<FinishedRecipe> consumer, @NotNull ResourceLocation resourceLocation) {
-        consumer.accept(new Result(output,input,cfe,time, resourceLocation));
+    public void save(Consumer<FinishedRecipe> consumer, String resourceLocation) {
+        this.save(consumer, TerraCompositio.modLoc(AltarTransformationRecipe.Type.ID + "/" + resourceLocation));
     }
 
     public static class Result implements FinishedRecipe {
@@ -65,40 +67,27 @@ public class FlowInfusionRecipeBuilder implements RecipeBuilder {
         private final ItemStack output;
         private final Ingredient input;
 
-        private final int cfe;
-        private final int time;
         private final ResourceLocation id;
 
-
-        public Result(ItemStack output, Ingredient input, int cfe, int time, ResourceLocation id) {
+        public Result(ItemStack output, Ingredient input, ResourceLocation id) {
             this.output = output;
             this.input = input;
-            this.cfe = cfe;
-            this.time = time;
 
             this.id = id;
+
         }
 
         @Override
-        public @NotNull JsonObject serializeRecipe() {
+        public JsonObject serializeRecipe() {
             JsonObject jsonObject = new JsonObject();
-            jsonObject.addProperty("type", FlowInfusionRecipe.Serializer.ID.toString());
+            jsonObject.addProperty("type", AltarTransformationRecipe.Serializer.ID.toString());
             this.serializeRecipeData(jsonObject);
             return jsonObject;
         }
 
         @Override
-        public void serializeRecipeData(@NotNull JsonObject jsonObject) {
-
-
-            JsonElement json = input.toJson();
-            if (json.isJsonObject()) {
-                var inputArr = new JsonArray();
-                inputArr.add(json);
-                jsonObject.add("ingredients", inputArr);
-            } else {
-                jsonObject.add("ingredients", json);
-            }
+        public void serializeRecipeData(JsonObject jsonObject) {
+            jsonObject.add("ingredients", input.toJson());
 
             JsonObject outputObj = new JsonObject();
             outputObj.addProperty("item", Objects.requireNonNull(ForgeRegistries.ITEMS.getKey(output.getItem())).toString());
@@ -110,19 +99,17 @@ public class FlowInfusionRecipeBuilder implements RecipeBuilder {
             }
 
             jsonObject.add("output", outputObj);
-            jsonObject.addProperty("cfe",cfe);
-            jsonObject.addProperty("time",time);
         }
 
 
         @Override
-        public @NotNull ResourceLocation getId() {
+        public ResourceLocation getId() {
             return this.id;
         }
 
         @Override
-        public @NotNull RecipeSerializer<?> getType() {
-            return FlowInfusionRecipe.Serializer.INSTANCE;
+        public RecipeSerializer<?> getType() {
+            return AltarTransformationRecipe.Serializer.INSTANCE;
         }
 
         @Nullable

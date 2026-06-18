@@ -38,7 +38,7 @@ public class TCBlockLootTables extends BlockLootSubProvider {
         this.dropSelf(TCBlocks.FLOW_CEDAR_PLANKS.get());
         this.dropSelf(TCBlocks.STRIPPED_FLOW_CEDAR_LOG.get());
         this.dropSelf(TCBlocks.STRIPPED_FLOW_CEDAR_WOOD.get());
-        this.dropOther(TCBlocks.FLOW_CEDAR_PORT.get(), TCBlocks.FLOW_CEDAR_LOG.get());
+        this.dropOther(TCBlocks.FLOW_CEDAR_ALTAR.get(), TCBlocks.FLOW_CEDAR_LOG.get());
         this.dropSelf(TCBlocks.CREATIVE_CFE_SOURCE.get());
         this.dropSelf(TCBlocks.CFE_TRASH_CAN.get());
 
@@ -80,7 +80,7 @@ public class TCBlockLootTables extends BlockLootSubProvider {
         this.add(ModBlocks.END_STONE_SAPPHIRE_ORE.get(),
                 block -> createCopperLikeOreDrops(ModBlocks.END_STONE_SAPPHIRE_ORE.get(), ModItems.RAW_SAPPHIRE.get()));
         */
-        this.dropOther(TCBlocks.FLOW_CEDAR_PORT.get(), TCBlocks.FLOW_CEDAR_PORT.get());
+        this.dropOther(TCBlocks.FLOW_CEDAR_ALTAR.get(), TCBlocks.FLOW_CEDAR_ALTAR.get());
         this.dropOther(TCBlocks.FLOW_CAULDRON.get(), Blocks.CAULDRON);
         this.dropOther(TCBlocks.BIRCH_JUICE_CAULDRON.get(), Blocks.CAULDRON);
 

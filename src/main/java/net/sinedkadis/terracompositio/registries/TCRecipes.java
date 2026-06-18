@@ -12,10 +12,10 @@ public class TCRecipes {
             DeferredRegister.create(ForgeRegistries.RECIPE_SERIALIZERS, TerraCompositio.MOD_ID);
 
     static {
-        SERIALIZERS.register("flow_saturation", () -> FlowSaturationRecipe.Serializer.INSTANCE);
-        SERIALIZERS.register("flow_infusion", () -> FlowInfusionRecipe.Serializer.INSTANCE);
-        SERIALIZERS.register("matter_infusion", () -> MatterInfusionRecipe.Serializer.INSTANCE);
-        SERIALIZERS.register("technetium_firing", () -> TechnetiumFiringRecipe.Serializer.INSTANCE);
+        SERIALIZERS.register(AltarTransformationRecipe.Type.ID, () -> AltarTransformationRecipe.Serializer.INSTANCE);
+        SERIALIZERS.register(FlowInfusionRecipe.Type.ID, () -> FlowInfusionRecipe.Serializer.INSTANCE);
+        SERIALIZERS.register(MatterInfusionRecipe.Type.ID, () -> MatterInfusionRecipe.Serializer.INSTANCE);
+        SERIALIZERS.register(TechnetiumFiringRecipe.Type.ID, () -> TechnetiumFiringRecipe.Serializer.INSTANCE);
         SERIALIZERS.register("tag_transfer_shaped", () -> TagTransferShapedRecipe.SERIALIZER);
         SERIALIZERS.register("armor_storage_upgrade", () -> ArmorStorageUpgradeRecipe.SERIALIZER);
 

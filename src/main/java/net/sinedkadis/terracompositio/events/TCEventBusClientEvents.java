@@ -1,7 +1,6 @@
 package net.sinedkadis.terracompositio.events;
 
 import net.minecraft.client.Minecraft;
-import net.minecraft.client.gui.screens.MenuScreens;
 import net.minecraft.client.model.BoatModel;
 import net.minecraft.client.model.ChestBoatModel;
 import net.minecraft.client.renderer.ItemBlockRenderTypes;
@@ -47,8 +46,6 @@ import net.sinedkadis.terracompositio.item.models.TechnetiumChestplateModel;
 import net.sinedkadis.terracompositio.item.models.TechnetiumCrownModel;
 import net.sinedkadis.terracompositio.particle.custom.*;
 import net.sinedkadis.terracompositio.registries.*;
-import net.sinedkadis.terracompositio.screen.FlowBlockPortScreen;
-import net.sinedkadis.terracompositio.screen.TCMenuTypes;
 
 import java.util.Map;
 import java.util.Optional;
@@ -71,7 +68,6 @@ public class TCEventBusClientEvents {
         EntityRenderers.register(TCEntities.CFE_CLOUD.get(), CFECloudRenderer::new);
 
 
-        MenuScreens.register(TCMenuTypes.FLOW_PORT_MENU.get(), FlowBlockPortScreen::new);
         ItemBlockRenderTypes.setRenderLayer(TCFluids.BIRCH_JUICE_FLUID.source.get(), RenderType.translucent());
         ItemBlockRenderTypes.setRenderLayer(TCFluids.BIRCH_JUICE_FLUID.flowing.get(), RenderType.translucent());
         ItemBlockRenderTypes.setRenderLayer(TCFluids.FLOW_FLUID.source.get(), RenderType.translucent());
@@ -181,7 +177,7 @@ public class TCEventBusClientEvents {
 
     @SubscribeEvent
     public static void registerBER(EntityRenderersEvent.RegisterRenderers event) {
-        event.registerBlockEntityRenderer(TCBlockEntities.FLOW_PORT_BE.get(), FlowPortBlockEntityRenderer::new);
+        event.registerBlockEntityRenderer(TCBlockEntities.FLOW_ALTAR_BE.get(), FlowCedarAltarBlockEntityRenderer::new);
         event.registerBlockEntityRenderer(TCBlockEntities.FLOW_CEDAR_CASING_BE.get(), FlowCedarCasingBlockEntityRenderer::new);
         event.registerBlockEntityRenderer(TCBlockEntities.FLOW_INFUSER_BE.get(), FlowInfuserBlockEntityRenderer::new);
         event.registerBlockEntityRenderer(TCBlockEntities.MOD_SIGN.get(), SignRenderer::new);

@@ -43,8 +43,8 @@ public class TCBlocks {
     //Cedar blocks
     public static final RegistryObject<Block> FLOW_CEDAR_LOG = registerBlock("flow_cedar_log",
             () -> new FlowCedarLikeBlock(BlockBehaviour.Properties.copy(Blocks.OAK_LOG).strength(3f), TCBlocks.STRIPPED_FLOW_CEDAR_LOG));
-    public static final RegistryObject<Block> FLOW_CEDAR_PORT = registerBlock("flow_cedar_port",
-            () -> new FlowCedarPortBlock(BlockBehaviour.Properties.copy(Blocks.OAK_WOOD).strength(3f), TCBlocks.STRIPPED_FLOW_CEDAR_LOG));
+    public static final RegistryObject<Block> FLOW_CEDAR_ALTAR = registerBlock("flow_cedar_altar",
+            () -> new FlowCedarAltarBlock(BlockBehaviour.Properties.copy(Blocks.OAK_WOOD).strength(3f)));
     public static final RegistryObject<Block> FLOW_CEDAR_WOOD = registerBlock("flow_cedar_wood",
             () -> new FlowCedarLikeBlock(BlockBehaviour.Properties.copy(Blocks.OAK_WOOD).strength(3f), TCBlocks.STRIPPED_FLOW_CEDAR_WOOD));
     public static final RegistryObject<Block> STRIPPED_FLOW_CEDAR_LOG = registerBlock("stripped_flow_cedar_log",

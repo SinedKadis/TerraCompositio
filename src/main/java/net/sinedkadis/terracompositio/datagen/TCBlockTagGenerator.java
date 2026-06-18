@@ -48,7 +48,7 @@ public class TCBlockTagGenerator extends BlockTagsProvider {
         this.tag(BlockTags.MINEABLE_WITH_AXE)
                 .add(TCBlocks.FLOW_CEDAR_LOG.get(),
                         TCBlocks.FLOW_CEDAR_LEAVES.get(),
-                        TCBlocks.FLOW_CEDAR_PORT.get(),
+                        TCBlocks.FLOW_CEDAR_ALTAR.get(),
                         TCBlocks.FLOW_INFUSER.get(),
                         TCBlocks.FLOW_CEDAR_WOOD.get(),
                         TCBlocks.FLOW_CEDAR_PLANKS.get(),
@@ -82,7 +82,6 @@ public class TCBlockTagGenerator extends BlockTagsProvider {
         this.tag(BlockTags.LOGS_THAT_BURN)
                 .add(TCBlocks.FLOW_CEDAR_LOG.get(),
                         TCBlocks.FLOW_CEDAR_WOOD.get(),
-                        TCBlocks.FLOW_CEDAR_PORT.get(),
                         TCBlocks.STRIPPED_FLOW_CEDAR_LOG.get(),
                         TCBlocks.STRIPPED_FLOW_CEDAR_WOOD.get(),
                         TCBlocks.FLOW_INFUSER.get(),
@@ -110,8 +109,7 @@ public class TCBlockTagGenerator extends BlockTagsProvider {
                 .add(TCBlocks.FLOW_CEDAR_FENCE_GATE.get());
         this.tag(TCTags.Blocks.FLOW_CEDAR_LOGS)
                 .add(TCBlocks.FLOW_CEDAR_LOG.get(),
-                        TCBlocks.FLOW_CEDAR_WOOD.get(),
-                        TCBlocks.FLOW_CEDAR_PORT.get());
+                        TCBlocks.FLOW_CEDAR_WOOD.get());
         //this.tag(BlockTags.NEEDS_DIAMOND_TOOL)
         //        .add(ModBlocks.RAW_SAPPHIRE_BLOCK.get());
 

@@ -92,7 +92,7 @@ public class MatterInfusionRecipe implements Recipe<SimpleContainer> {
     }
     public static class Type implements RecipeType<MatterInfusionRecipe>{
         public static final Type INSTANCE = new Type();
-        //public static final String ID = "matter_infusion";
+        public static final String ID = "matter_infusion";
     }
     public static class Serializer implements RecipeSerializer<MatterInfusionRecipe>{
         public static final Serializer INSTANCE = new Serializer();

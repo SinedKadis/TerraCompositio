@@ -80,7 +80,7 @@ public class FlowInfusionRecipe implements Recipe<SimpleContainer> {
     }
     public static class Type implements RecipeType<FlowInfusionRecipe>{
         public static final Type INSTANCE = new Type();
-        //public static final String ID = "flow_infusion";
+        public static final String ID = "flow_infusion";
     }
     public static class Serializer implements RecipeSerializer<FlowInfusionRecipe>{
         public static final Serializer INSTANCE = new Serializer();
