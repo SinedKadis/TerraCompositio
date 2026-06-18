@@ -1,8 +1,10 @@
 package net.sinedkadis.terracompositio.datagen.builders;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.advancements.CriterionTriggerInstance;
+import net.minecraft.core.NonNullList;
 import net.minecraft.data.recipes.FinishedRecipe;
 import net.minecraft.data.recipes.RecipeBuilder;
 import net.minecraft.resources.ResourceLocation;
@@ -24,15 +26,15 @@ import java.util.function.Consumer;
 public class AltarTransformationRecipeBuilder implements RecipeBuilder {
 
     private final ItemStack output;
-    private final Ingredient input;
+    private final NonNullList<Ingredient> input;
 
-    private AltarTransformationRecipeBuilder(Ingredient input, ItemStack output) {
+    private AltarTransformationRecipeBuilder(NonNullList<Ingredient> input, ItemStack output) {
         this.output = output;
         this.input = input;
     }
 
-    public static AltarTransformationRecipeBuilder create(Ingredient input, ItemStack output) {
-        return new AltarTransformationRecipeBuilder(input, output);
+    public static AltarTransformationRecipeBuilder create(ItemStack output, Ingredient... input) {
+        return new AltarTransformationRecipeBuilder(NonNullList.of(Ingredient.EMPTY, input), output);
     }
 
 
@@ -65,11 +67,11 @@ public class AltarTransformationRecipeBuilder implements RecipeBuilder {
     public static class Result implements FinishedRecipe {
 
         private final ItemStack output;
-        private final Ingredient input;
+        private final NonNullList<Ingredient> input;
 
         private final ResourceLocation id;
 
-        public Result(ItemStack output, Ingredient input, ResourceLocation id) {
+        public Result(ItemStack output, NonNullList<Ingredient> input, ResourceLocation id) {
             this.output = output;
             this.input = input;
 
@@ -87,7 +89,9 @@ public class AltarTransformationRecipeBuilder implements RecipeBuilder {
 
         @Override
         public void serializeRecipeData(JsonObject jsonObject) {
-            jsonObject.add("ingredients", input.toJson());
+            JsonArray ingredients = new JsonArray();
+            input.forEach(ingredient -> ingredients.add(ingredient.toJson()));
+            jsonObject.add("ingredients", ingredients);
 
             JsonObject outputObj = new JsonObject();
             outputObj.addProperty("item", Objects.requireNonNull(ForgeRegistries.ITEMS.getKey(output.getItem())).toString());

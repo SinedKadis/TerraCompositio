@@ -15,6 +15,7 @@ import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.level.ItemLike;
 import net.minecraftforge.common.Tags;
+import net.minecraftforge.common.crafting.StrictNBTIngredient;
 import net.minecraftforge.common.crafting.conditions.IConditionBuilder;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.registries.ForgeRegistries;
@@ -83,40 +84,40 @@ public class TCRecipeProvider extends RecipeProvider implements IConditionBuilde
 
 
         AltarTransformationRecipeBuilder.create(
-                        Ingredient.of(Items.BOOK),
-                        bookLevel1
+                        bookLevel1,
+                        Ingredient.of(Items.BOOK)
                 )
                 .save(pWriter, "upgrade_book_to_day_1");
         AltarTransformationRecipeBuilder.create(
-                        Ingredient.of(
-                                bookLevel1,
-                                TCBlocks.FLOW_CEDAR_SAPLING.get().asItem().getDefaultInstance()
+                        bookLevel2,
+                        StrictNBTIngredient.of(
+                                bookLevel1
                         ),
-                        bookLevel2
+                        Ingredient.of(TCBlocks.FLOW_CEDAR_SAPLING.get().asItem().getDefaultInstance())
                 )
                 .save(pWriter, "upgrade_book_to_day_2");
         AltarTransformationRecipeBuilder.create(
-                        Ingredient.of(
-                                bookLevel2,
-                                TCItems.FLOW_BOTTLE.get().getDefaultInstance()
+                        bookLevel3,
+                        StrictNBTIngredient.of(
+                                bookLevel2
                         ),
-                        bookLevel3
+                        Ingredient.of(TCItems.FLOW_BOTTLE.get().asItem().getDefaultInstance())
                 )
                 .save(pWriter, "upgrade_book_to_day_3");
         AltarTransformationRecipeBuilder.create(
-                        Ingredient.of(
-                                bookLevel3,
-                                TCItems.CFE_BALL.get().getDefaultInstance()
+                        bookLevel4,
+                        StrictNBTIngredient.of(
+                                bookLevel3
                         ),
-                        bookLevel4
+                        Ingredient.of(TCItems.CFE_BALL.get().asItem().getDefaultInstance())
                 )
                 .save(pWriter, "upgrade_book_to_day_4");
         AltarTransformationRecipeBuilder.create(
-                        Ingredient.of(
-                                bookLevel4,
-                                TCItems.TECHNETIUM_INGOT.get().getDefaultInstance()
+                        bookLevel5,
+                        StrictNBTIngredient.of(
+                                bookLevel4
                         ),
-                        bookLevel5
+                        Ingredient.of(TCItems.TECHNETIUM_INGOT.get().asItem().getDefaultInstance())
                 )
                 .save(pWriter, "upgrade_book_to_day_5");
     }

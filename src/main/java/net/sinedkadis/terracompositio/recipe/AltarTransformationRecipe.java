@@ -1,5 +1,6 @@
 package net.sinedkadis.terracompositio.recipe;
 
+import com.google.gson.JsonArray;
 import com.google.gson.JsonObject;
 import com.google.gson.JsonSyntaxException;
 import com.mojang.brigadier.exceptions.CommandSyntaxException;
@@ -28,11 +29,11 @@ import java.util.Objects;
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class AltarTransformationRecipe implements Recipe<SimpleContainer> {
-    private final Ingredient inputs;
+    private final NonNullList<Ingredient> inputs;
     private final ItemStack output;
     private final ResourceLocation id;
 
-    public AltarTransformationRecipe(Ingredient inputs, ItemStack output, ResourceLocation id) {
+    public AltarTransformationRecipe(NonNullList<Ingredient> inputs, ItemStack output, ResourceLocation id) {
         this.inputs = inputs;
         this.output = output;
         this.id = id;
@@ -46,15 +47,17 @@ public class AltarTransformationRecipe implements Recipe<SimpleContainer> {
         ItemStack containerItem1 = pContainer.getItem(0);
         ItemStack containerItem2 = pContainer.getItem(1);
         if (containerItem1.equals(containerItem2)) return false;
-        if (inputs.getItems().length == 1)
-            return inputs.test(containerItem1) || inputs.test(containerItem2);
-        else
-            return inputs.test(containerItem1) && inputs.test(containerItem2);
+        boolean first = inputs.get(0).test(containerItem1) || inputs.get(0).test(containerItem2);
+        boolean second = true;
+        if (inputs.size() == 2) {
+            second = inputs.get(1).test(containerItem1) || inputs.get(1).test(containerItem2);
+        }
+        return first && second;
     }
 
     @Override
     public NonNullList<Ingredient> getIngredients() {
-        return NonNullList.of(inputs);
+        return inputs;
     }
 
     @Override
@@ -98,7 +101,12 @@ public class AltarTransformationRecipe implements Recipe<SimpleContainer> {
         @Override
         public AltarTransformationRecipe fromJson(ResourceLocation pRecipeId, JsonObject pSerializedRecipe) {
 
-            Ingredient ingredients = Ingredient.fromJson(pSerializedRecipe.get("ingredients"));
+            JsonArray ingredients1 = pSerializedRecipe.getAsJsonArray("ingredients");
+
+            NonNullList<Ingredient> ingredients = NonNullList.create();
+
+            ingredients1.asList()
+                    .forEach(jsonElement -> ingredients.add(Ingredient.fromJson(jsonElement)));
 
             JsonObject outputObject = GsonHelper.getAsJsonObject(pSerializedRecipe, "output");
             ResourceLocation itemId = ResourceLocation.tryParse(GsonHelper.getAsString(outputObject, "item"));
@@ -117,18 +125,25 @@ public class AltarTransformationRecipe implements Recipe<SimpleContainer> {
             return new AltarTransformationRecipe(ingredients, output, pRecipeId);
         }
 
+        @Override
+        public void toNetwork(FriendlyByteBuf pBuffer, AltarTransformationRecipe pRecipe) {
+            pBuffer.writeVarInt(pRecipe.inputs.size());
+            for (Ingredient ingredient : pRecipe.inputs) {
+                ingredient.toNetwork(pBuffer);
+            }
+            pBuffer.writeItemStack(pRecipe.getResultItem(null), false);
+        }
 
         @Override
         public @Nullable AltarTransformationRecipe fromNetwork(ResourceLocation pRecipeId, FriendlyByteBuf pBuffer) {
-            Ingredient input = Ingredient.fromNetwork(pBuffer);
+            NonNullList<Ingredient> ingredients = NonNullList.create();
+            for (int i = 0; i < pBuffer.readVarInt(); i++) {
+                ingredients.add(Ingredient.fromNetwork(pBuffer));
+            }
             ItemStack output = pBuffer.readItem();
-            return new AltarTransformationRecipe(input, output, pRecipeId);
+            return new AltarTransformationRecipe(ingredients, output, pRecipeId);
         }
 
-        @Override
-        public void toNetwork(FriendlyByteBuf pBuffer, AltarTransformationRecipe pRecipe) {
-            pRecipe.inputs.toNetwork(pBuffer);
-            pBuffer.writeItemStack(pRecipe.getResultItem(null),false);
-        }
+
     }
 }

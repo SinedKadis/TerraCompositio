@@ -23,7 +23,6 @@ import net.sinedkadis.terracompositio.events.FluidNetworkEvent;
 import net.sinedkadis.terracompositio.fluid.FluidNetworkHandler;
 import net.sinedkadis.terracompositio.network.TCPackets;
 import net.sinedkadis.terracompositio.registries.*;
-import net.sinedkadis.terracompositio.screen.TCMenuTypes;
 import net.sinedkadis.terracompositio.worldgen.biome.TCTerrablender;
 import net.sinedkadis.terracompositio.worldgen.tree.TCFoliagePlacers;
 import net.sinedkadis.terracompositio.worldgen.tree.TCTrunkPlacers;
@@ -59,7 +58,6 @@ public class TerraCompositio
         TCEntities.register(modEventBus);
         TCBlockEntities.register(modEventBus);
         TCRecipes.register(modEventBus);
-        TCMenuTypes.register(modEventBus);
         TCTrunkPlacers.register(modEventBus);
         TCFoliagePlacers.register(modEventBus);
         TCTerrablender.registerBiomes();

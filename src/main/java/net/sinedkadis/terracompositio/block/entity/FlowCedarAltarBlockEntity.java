@@ -3,6 +3,8 @@ package net.sinedkadis.terracompositio.block.entity;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
@@ -15,6 +17,8 @@ import net.sinedkadis.terracompositio.block.IFluidApplicable;
 import net.sinedkadis.terracompositio.block.behaviours.ItemHandlerBehaviour;
 import net.sinedkadis.terracompositio.recipe.AltarTransformationRecipe;
 import net.sinedkadis.terracompositio.registries.TCBlockEntities;
+import net.sinedkadis.terracompositio.registries.TCBlocks;
+import net.sinedkadis.terracompositio.util.helpers.ParticleHelper;
 import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -48,10 +52,16 @@ public class FlowCedarAltarBlockEntity extends TCCraftingBlockEntity implements 
         });
     }
 
+    boolean wasCrafting = false;
     public void tick(Level pLevel, BlockPos pPos, BlockState pState) {
         super.tick(pLevel,pPos,pState);
-        if (this.getBlockState().getValue(INFUSED)) {
+        if (this.getBlockState().getValue(INFUSED)
+                && pLevel.getBlockState(pPos.below()).is(TCBlocks.FLOW_CEDAR_PEDESTAL.get())) {
             if (hasRecipe()) {
+                if (!wasCrafting) {
+                    pLevel.playSound(null, pPos, SoundEvents.ZOMBIE_VILLAGER_CURE, SoundSource.BLOCKS);
+                }
+                ParticleHelper.spawnParticlesIn(pLevel, pPos);
                 increaseCraftingProgress();
                 if (hasProgressFinished()) {
                     craftItem();
@@ -59,7 +69,9 @@ public class FlowCedarAltarBlockEntity extends TCCraftingBlockEntity implements 
                     setChanged(pLevel, pPos, pState);
                     pLevel.sendBlockUpdated(pPos, pState, pState, 3);
                 }
+                wasCrafting = true;
             } else {
+                wasCrafting = false;
                 resetProgress();
             }
         }

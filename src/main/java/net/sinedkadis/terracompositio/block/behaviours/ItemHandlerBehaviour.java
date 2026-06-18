@@ -50,7 +50,12 @@ public class ItemHandlerBehaviour implements IBEItemBehaviour, WorldlyContainer,
         @Override
         public ItemStack insertItem(int slot, ItemStack stack, boolean simulate) {
             if (!allowInsert(slot, stack, null, false) && !simulate) return stack;
-            return super.insertItem(slot, stack, simulate);
+            ItemStack itemStack = super.insertItem(slot, stack, simulate);
+            Level level = blockEntity.getLevel();
+            if (level != null && !simulate) {
+                level.sendBlockUpdated(blockEntity.getBlockPos(), blockEntity.getBlockState(), blockEntity.getBlockState(), 3);
+            }
+            return itemStack;
         }
 
         @Override
@@ -58,7 +63,12 @@ public class ItemHandlerBehaviour implements IBEItemBehaviour, WorldlyContainer,
             // 511 - hardcoded number to bypass restriction when extracting with crowbar
             if (!allowExtract(slot, getStackInSlot(slot), null, false) && !simulate && !(amount == 511))
                 return ItemStack.EMPTY;
-            return super.extractItem(slot, amount, simulate);
+            ItemStack itemStack = super.extractItem(slot, amount, simulate);
+            Level level = blockEntity.getLevel();
+            if (level != null && !simulate) {
+                level.sendBlockUpdated(blockEntity.getBlockPos(), blockEntity.getBlockState(), blockEntity.getBlockState(), 3);
+            }
+            return itemStack;
         }
     };
     protected LazyOptional<IItemHandler> lazyItemHandler = LazyOptional.empty();
@@ -165,7 +175,7 @@ public class ItemHandlerBehaviour implements IBEItemBehaviour, WorldlyContainer,
                     return InteractionResult.SUCCESS;
                 }
             }
-            if (!slot.isEmpty() && allowExtract(i, slot, pHit.getDirection(), true)) {
+            if ((!hasEmptySlots || i == itemHandler.getSlots() - 1) && !slot.isEmpty() && allowExtract(i, slot, pHit.getDirection(), true)) {
                 ItemStack extracted = itemHandler.extractItem(i, 64, false);
                 PlayerHelper.addOrDropToPlayer(pPlayer, extracted);
                 level.playSound(pPlayer, blockPos, SoundEvents.ITEM_FRAME_REMOVE_ITEM, SoundSource.BLOCKS);

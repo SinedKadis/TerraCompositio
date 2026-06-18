@@ -36,6 +36,12 @@ public class FlowCedarAltarBlockEntityRenderer implements BlockEntityRenderer<Fl
         IItemHandler iItemHandler = pBlockEntity.getCapability(ForgeCapabilities.ITEM_HANDLER).orElse(EmptyHandler.INSTANCE);
         ItemStack stack1 = iItemHandler.getStackInSlot(0);
         ItemStack stack2 = iItemHandler.getStackInSlot(1);
+        ItemStack stack3 = iItemHandler.getStackInSlot(2);
+        int renderCount = 0;
+        if (!stack1.isEmpty()) renderCount++;
+        if (!stack2.isEmpty()) renderCount++;
+        if (!stack3.isEmpty()) renderCount++;
+
 
         Level level = pBlockEntity.getLevel();
         if (level == null) return;
@@ -43,7 +49,7 @@ public class FlowCedarAltarBlockEntityRenderer implements BlockEntityRenderer<Fl
         if (!stack1.isEmpty()) {
             pPoseStack.pushPose();
             pPoseStack.translate(0.5f, 0.5f, 0.5f);
-            if (!stack2.isEmpty()) {
+            if (renderCount > 1) {
                 pPoseStack.translate(0.2f, 0, 0.2f);
             }
 
@@ -58,7 +64,7 @@ public class FlowCedarAltarBlockEntityRenderer implements BlockEntityRenderer<Fl
         if (!stack2.isEmpty()) {
             pPoseStack.pushPose();
             pPoseStack.translate(0.5f, 0.5f, 0.5f);
-            if (!stack1.isEmpty()) {
+            if (renderCount > 1) {
                 pPoseStack.translate(-0.2f, 0, -0.2f);
             }
 
@@ -66,6 +72,18 @@ public class FlowCedarAltarBlockEntityRenderer implements BlockEntityRenderer<Fl
 
             pPoseStack.mulPose(Axis.YP.rotation((level.getGameTime() + pPartialTick) / 100));
             itemRenderer.renderStatic(stack2, ItemDisplayContext.FIXED, getLightLevel(pBlockEntity.getLevel(), pBlockEntity.getBlockPos(), null),
+                    OverlayTexture.NO_OVERLAY, pPoseStack, pBuffer, pBlockEntity.getLevel(), 1);
+            pPoseStack.popPose();
+        }
+
+        if (!stack3.isEmpty()) {
+            pPoseStack.pushPose();
+            pPoseStack.translate(0.5f, 0.5f, 0.5f);
+
+            pPoseStack.scale(0.5f, 0.5f, 0.5f);
+
+            pPoseStack.mulPose(Axis.YP.rotation((level.getGameTime() + pPartialTick) / 100));
+            itemRenderer.renderStatic(stack3, ItemDisplayContext.FIXED, getLightLevel(pBlockEntity.getLevel(), pBlockEntity.getBlockPos(), null),
                     OverlayTexture.NO_OVERLAY, pPoseStack, pBuffer, pBlockEntity.getLevel(), 1);
             pPoseStack.popPose();
         }
