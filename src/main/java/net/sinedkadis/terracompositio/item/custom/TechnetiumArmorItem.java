@@ -151,6 +151,7 @@ public class TechnetiumArmorItem extends TCArmorItem implements IHaveExtensibleC
     public static void onBlockChanged(LivingEntity livingEntity) {
         if (!(livingEntity instanceof Player player))
             return;
+        if (player.getAbilities().mayfly) return;
 
         Level level = livingEntity.level();
         if (!level.isClientSide()) return;
@@ -264,6 +265,7 @@ public class TechnetiumArmorItem extends TCArmorItem implements IHaveExtensibleC
     }
 
     public static void onDoubleJump(LocalPlayer localPlayer) {
+        if (localPlayer.getAbilities().mayfly) return;
         ItemStack itemBySlot = localPlayer.getItemBySlot(EquipmentSlot.FEET);
         if (!itemBySlot.is(TCItems.TECHNETIUM_BOOTS.get())) return;
 
@@ -273,10 +275,9 @@ public class TechnetiumArmorItem extends TCArmorItem implements IHaveExtensibleC
         CompoundTag persistentData = localPlayer.getPersistentData();
 
         persistentData.putInt(cd, localPlayer.tickCount);
-        persistentData.putInt(height, localPlayer.getBlockY() + 4);
         localPlayer.level().playSound(localPlayer, localPlayer.blockPosition(), SoundEvents.CHICKEN_EGG, SoundSource.PLAYERS);
         localPlayer.move(MoverType.SELF, new Vec3(0, 5, 0));
-
+        persistentData.putInt(height, localPlayer.getBlockY() - 1);
 
     }
 
@@ -319,7 +320,8 @@ public class TechnetiumArmorItem extends TCArmorItem implements IHaveExtensibleC
     @SubscribeEvent
     public static void onLivingJump(LivingEvent.LivingJumpEvent event) {
         LivingEntity livingEntity = event.getEntity();
-        if (!(livingEntity instanceof Player)) return;
+        if (!(livingEntity instanceof Player player)) return;
+        if (player.getAbilities().mayfly) return;
 
         Level level = livingEntity.level();
         ItemStack stack = livingEntity.getItemBySlot(EquipmentSlot.FEET);
