@@ -78,27 +78,6 @@ public class FlowCedarLikeBlock extends RotatedPillarBlock implements IFluidAppl
 
     @Override
     public @Nullable BlockState getToolModifiedState(BlockState state, UseOnContext context, ToolAction toolAction, boolean simulate) {
-//        Map<BlockState,BlockState> stripPair = new HashMap<>();
-//
-//        stripPair.put(
-//                ModBlocks.FLOW_CEDAR_LOG.get().defaultBlockState(),
-//                ModBlocks.STRIPPED_FLOW_CEDAR_LOG.get().defaultBlockState());
-//        stripPair.put(
-//                ModBlocks.FLOW_CEDAR_WOOD.get().defaultBlockState(),
-//                ModBlocks.STRIPPED_FLOW_CEDAR_WOOD.get().defaultBlockState());
-//        stripPair.put(
-//                ModBlocks.FLOW_PORT.get().defaultBlockState(),
-//                ModBlocks.STRIPPED_FLOW_CEDAR_WOOD.get().defaultBlockState());
-//        stripPair.put(
-//                ModBlocks.FLOW_CEDAR_LOG.get().defaultBlockState().setValue(INFUSED,true),
-//                ModBlocks.STRIPPED_FLOW_CEDAR_LOG.get().defaultBlockState().setValue(INFUSED,true));
-//        stripPair.put(
-//                ModBlocks.FLOW_CEDAR_WOOD.get().defaultBlockState().setValue(INFUSED,true),
-//                ModBlocks.STRIPPED_FLOW_CEDAR_WOOD.get().defaultBlockState().setValue(INFUSED,true));
-//        stripPair.put(
-//                ModBlocks.FLOW_PORT.get().defaultBlockState().setValue(INFUSED,true),
-//                ModBlocks.STRIPPED_FLOW_CEDAR_WOOD.get().defaultBlockState().setValue(INFUSED,true));
-
         if(context.getItemInHand().getItem() instanceof AxeItem && stripPair != null){
             return stripPair.get().defaultBlockState()
                     .setValue(AXIS, state.getValue(AXIS))
@@ -139,8 +118,7 @@ public class FlowCedarLikeBlock extends RotatedPillarBlock implements IFluidAppl
         super.onRemove(pState, pLevel, pPos, pNewState, pIsMoving);
         if (pState.getBlock() != pNewState.getBlock() && WorldHelper.onRemoveHandlerBlacklist(pNewState,
                 Blocks.STRUCTURE_VOID,
-                TCBlocks.FLOW_CEDAR_CASING.get(),
-                TCBlocks.FLOW_CEDAR_PORT.get())) {
+                TCBlocks.FLOW_CEDAR_CASING.get())) {
             WorldHelper.flowLeak(pState, pLevel, pPos, false);
         }
     }

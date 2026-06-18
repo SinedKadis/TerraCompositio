@@ -3,6 +3,7 @@ package net.sinedkadis.terracompositio.block.entity;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.world.WorldlyContainer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
@@ -12,12 +13,14 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.items.IItemHandlerModifiable;
 import net.sinedkadis.terracompositio.api.TCCapabilities;
 import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBEItemBehaviour;
+import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBEItemWordlyContainerBehaviour;
 import net.sinedkadis.terracompositio.api.dummies.DummyBehaviour;
 import net.sinedkadis.terracompositio.api.dummies.DummyCFEHandler;
 import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.Optional;
+import java.util.Set;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -45,6 +48,18 @@ public abstract class TCCraftingBlockEntity extends TCBlockEntity implements Wor
         int floorPart = (int) Math.floor(partialCFE);
         partialCFE = partialCFE - floorPart;
         this.getCapability(TCCapabilities.CFE).orElse(DummyCFEHandler.instance).takeCFE(floorCFE+floorPart,false);
+    }
+
+    @Override
+    protected void saveAdditional(CompoundTag pTag) {
+        pTag.putInt("flow_port_progress", progress);
+        super.saveAdditional(pTag);
+    }
+
+    @Override
+    public void load(CompoundTag pTag) {
+        super.load(pTag);
+        progress = pTag.getInt("flow_port_progress");
     }
 
     protected void increaseCraftingProgress() {
@@ -87,10 +102,12 @@ public abstract class TCCraftingBlockEntity extends TCBlockEntity implements Wor
         return getBehaviour().getSlotsForFace(pSide);
     }
 
-    public IBEItemBehaviour getBehaviour() {
-        IBEItemBehaviour itemBehaviour = getItemBehaviour();
-        if (itemBehaviour == null) return DummyBehaviour.instance;
-        return itemBehaviour;
+    public IBEItemWordlyContainerBehaviour getBehaviour() {
+        Set<IBEItemBehaviour> itemBehaviour = getItemBehaviours();
+        return itemBehaviour.stream()
+                .filter(IBEItemWordlyContainerBehaviour.class::isInstance)
+                .map(IBEItemWordlyContainerBehaviour.class::cast)
+                .findAny().orElse(DummyBehaviour.instance);
     }
 
     @Override

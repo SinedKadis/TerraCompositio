@@ -8,11 +8,9 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
-import net.minecraftforge.items.IItemHandlerModifiable;
-import net.minecraftforge.items.wrapper.EmptyHandler;
 import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBEBehaviour;
 import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBECFEBehaviour;
-import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBEItemBehaviour;
+import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBEItemWordlyContainerBehaviour;
 import net.sinedkadis.terracompositio.api.networks.cfe.ICFEHandler;
 import org.jetbrains.annotations.Nullable;
 
@@ -20,7 +18,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
-public class DummyBehaviour implements IBEBehaviour, IBEItemBehaviour, IBECFEBehaviour {
+public class DummyBehaviour implements IBEBehaviour, IBEItemWordlyContainerBehaviour, IBECFEBehaviour {
     public static final DummyBehaviour instance = new DummyBehaviour();
 
     @Override
@@ -63,19 +61,30 @@ public class DummyBehaviour implements IBEBehaviour, IBEItemBehaviour, IBECFEBeh
         return null;
     }
 
+
     @Override
-    public IItemHandlerModifiable getItemHandler() {
-        return (IItemHandlerModifiable) EmptyHandler.INSTANCE;
+    public int getRange() {
+        return 0;
     }
 
     @Override
-    public boolean allowExtract(int pSlot, ItemStack pStack, @Nullable Direction pDirection, boolean manualExtraction) {
-        return false;
+    public int getPriority() {
+        return 0;
     }
 
     @Override
-    public boolean allowInsert(int pSlot, ItemStack pStack, @Nullable Direction pDirection, boolean manualInsertion) {
-        return false;
+    public ICFEHandler getMainHandler() {
+        return DummyCFEHandler.instance;
+    }
+
+    @Override
+    public void updateIfScheduled() {
+
+    }
+
+    @Override
+    public void scheduleMemberUpdate() {
+
     }
 
     @Override
@@ -135,31 +144,6 @@ public class DummyBehaviour implements IBEBehaviour, IBEItemBehaviour, IBECFEBeh
 
     @Override
     public void clearContent() {
-
-    }
-
-    @Override
-    public int getRange() {
-        return 0;
-    }
-
-    @Override
-    public int getPriority() {
-        return 0;
-    }
-
-    @Override
-    public ICFEHandler getMainHandler() {
-        return DummyCFEHandler.instance;
-    }
-
-    @Override
-    public void updateIfScheduled() {
-
-    }
-
-    @Override
-    public void scheduleMemberUpdate() {
 
     }
 }

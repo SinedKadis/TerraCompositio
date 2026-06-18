@@ -146,11 +146,11 @@ public class FlowInfuserBlockEntity extends TCCraftingBlockEntity {
         if (recipe.isPresent()) {
             ItemStack result = recipe.get().getResultItem(null);
             this.getCapability(ForgeCapabilities.ITEM_HANDLER).ifPresent(iItemHandler -> {
-                if (getItemBehaviour() instanceof ItemHandlerBehaviour itemHandlerBehaviour) {
-                    itemHandlerBehaviour.ignoreRestrictions = true;
-                    iItemHandler.extractItem(0, 1, false);
-                    iItemHandler.insertItem(1, result.copy(), false);
-                    itemHandlerBehaviour.ignoreRestrictions = false;
+                if (iItemHandler instanceof IItemHandlerModifiable modifiable) {
+                    ItemStack copy = modifiable.getStackInSlot(0).copy();
+                    copy.shrink(1);
+                    modifiable.setStackInSlot(0, copy);
+                    modifiable.setStackInSlot(1, result.copy());
                     if (level != null) {
                         BlockState blockState = getBlockState();
                         level.sendBlockUpdated(worldPosition, blockState, blockState, 3);

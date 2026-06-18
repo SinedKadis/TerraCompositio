@@ -23,10 +23,7 @@ import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBEItemBehaviour
 import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.ParametersAreNonnullByDefault;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
+import java.util.*;
 
 
 @ParametersAreNonnullByDefault
@@ -42,11 +39,12 @@ public abstract class TCBlockEntity extends BlockEntity implements IHaveKnowledg
 
     abstract void addBEBehaviours(List<IBEBehaviour> behaviourList);
 
-    public @Nullable IBEItemBehaviour getItemBehaviour() {
+    public Set<IBEItemBehaviour> getItemBehaviours() {
+        Set<IBEItemBehaviour> toReturn = new HashSet<>();
         for (IBEBehaviour ibeBehaviour : behaviours) {
-            if (ibeBehaviour instanceof IBEItemBehaviour ibeItemBehaviour) return ibeItemBehaviour;
+            if (ibeBehaviour instanceof IBEItemBehaviour ibeItemBehaviour) toReturn.add(ibeItemBehaviour);
         }
-        return null;
+        return toReturn;
     }
 
     public @Nullable IBECFEBehaviour getCFEBehaviour() {

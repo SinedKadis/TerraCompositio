@@ -21,10 +21,9 @@ import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.wrapper.EmptyHandler;
 import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBEBehaviour;
 import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBECFEBehaviour;
-import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBEItemBehaviour;
 import net.sinedkadis.terracompositio.api.networks.cfe.ICFEHandler;
 import net.sinedkadis.terracompositio.block.behaviours.CFEHandlerBehaviour;
-import net.sinedkadis.terracompositio.block.behaviours.ItemHandlerBehaviour;
+import net.sinedkadis.terracompositio.block.behaviours.ItemStateHolderBehaviour;
 import net.sinedkadis.terracompositio.block.custom.MatterInfuserBaseEntityBlock;
 import net.sinedkadis.terracompositio.config.TCInnerConfig;
 import net.sinedkadis.terracompositio.recipe.MatterInfusionRecipe;
@@ -36,7 +35,8 @@ import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.List;
 import java.util.Optional;
 
-import static net.sinedkadis.terracompositio.block.entity.FlowCedarCasingBlockEntity.*;
+import static net.sinedkadis.terracompositio.block.entity.FlowCedarCasingBlockEntity.DOWN_CONNECTION_SLOT;
+import static net.sinedkadis.terracompositio.block.entity.FlowCedarCasingBlockEntity.UP_CONNECTION_SLOT;
 import static net.sinedkadis.terracompositio.registries.TCBlockStateProperties.INFUSED;
 
 @ParametersAreNonnullByDefault
@@ -65,22 +65,19 @@ public class MatterInfuserUnitBlockEntity extends MatterInfuserBaseBlockEntity{
                 };
             }
         }.range(10).priority(TCInnerConfig.DEFAULT_CONSUMER_PRIORITY));
-        list.add(new ItemHandlerBehaviour(this) {
+        list.add(new ItemStateHolderBehaviour(this) {
+
             @Override
-            public boolean allowExtract(int pSlot, ItemStack pStack, @Nullable Direction pDirection, boolean manual) {
-                return false;
+            public int getLimitInSlot(int slot) {
+                return 2;
             }
 
             @Override
             public boolean allowInsert(int pSlot, ItemStack pStack, @Nullable Direction pDirection, boolean manual) {
                 boolean enough = pStack.getCount() >= 2;
                 boolean isRod = pStack.is(TCItems.INFUSED_IRON_ROD.get());
-                return manual && enough && isRod;
-            }
-
-            @Override
-            public int getLimitInSlot(int slot) {
-                return 2;
+                boolean slotIsEmpty = itemHandler.getStackInSlot(pSlot).isEmpty();
+                return manual && enough && isRod && slotIsEmpty;
             }
 
             @Override
@@ -95,7 +92,7 @@ public class MatterInfuserUnitBlockEntity extends MatterInfuserBaseBlockEntity{
                 }
                 return InteractionResult.PASS;
             }
-        }.setInvisibleInOverlay(0));
+        });
 
     }
 
@@ -163,17 +160,17 @@ public class MatterInfuserUnitBlockEntity extends MatterInfuserBaseBlockEntity{
             int takeCount = recipe.get().getIngredients().get(1).getItems()[0].getCount();
 
             IItemHandlerModifiable itemHandler = casingBE.getItemHandler();
-            IBEItemBehaviour itemBehaviour = casingBE.getItemBehaviour();
 
-            if (itemBehaviour instanceof ItemHandlerBehaviour itemHandlerBehaviour) {
-                itemHandlerBehaviour.ignoreRestrictions = true;
-                itemHandler.extractItem(INPUT_INVENTORY_SLOT, takeCount, false);
-                itemHandler.insertItem(OUTPUT_INVENTORY_SLOT, result, false);
-                itemHandlerBehaviour.ignoreRestrictions = false;
-            }
-
-            if (this.level.getRandom().nextInt(100) < catalystDecayRate){
-                portBE.extractItemStack(0,1);
+            ItemStack copy = itemHandler.getStackInSlot(0).copy();
+            copy.shrink(takeCount);
+            itemHandler.setStackInSlot(0, copy);
+            itemHandler.setStackInSlot(1, result.copy());
+            if (level != null) {
+                BlockState blockState = getBlockState();
+                level.sendBlockUpdated(worldPosition, blockState, blockState, 3);
+                if (this.level.getRandom().nextInt(100) < catalystDecayRate) {
+                    portBE.extractItemStackViaSetter(0, 1);
+                }
             }
             return result;
         }

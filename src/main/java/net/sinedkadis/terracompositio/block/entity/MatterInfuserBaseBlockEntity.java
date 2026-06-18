@@ -7,6 +7,7 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
+import net.minecraftforge.items.IItemHandlerModifiable;
 import net.sinedkadis.terracompositio.registries.TCBlocks;
 import net.sinedkadis.terracompositio.util.helpers.ItemHelper;
 import org.jetbrains.annotations.Nullable;
@@ -39,10 +40,13 @@ public abstract class MatterInfuserBaseBlockEntity extends TCCraftingBlockEntity
         return ItemStack.EMPTY;
     }
 
-    public void extractItemStack(int slot, int count) {
+    public void extractItemStackViaSetter(int slot, int count) {
         FlowCedarCasingBlockEntity blockEntity = this.getCasingBE();
         if (blockEntity != null){
-            blockEntity.getItemHandler().extractItem(slot, count, false);
+            IItemHandlerModifiable itemHandler = blockEntity.getItemHandler();
+            ItemStack copy = itemHandler.getStackInSlot(slot).copy();
+            copy.shrink(count);
+            itemHandler.setStackInSlot(slot, copy);
         }
     }
 
