@@ -108,6 +108,10 @@ public class FlowCedarCasingBlock extends TCBaseEntityBlock implements IFluidApp
         pBuilder.add(AXIS, INFUSED, WAXED, ATTACHED_DIR);
     }
 
+    @Override
+    public @org.jetbrains.annotations.Nullable BlockState getStateForPlacement(BlockPlaceContext pContext) {
+        return this.defaultBlockState().setValue(AXIS, pContext.getClickedFace().getAxis());
+    }
 
     @Override
     protected BlockEntityType<? extends TCBlockEntity> getBlockEntityType() {

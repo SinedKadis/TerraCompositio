@@ -19,6 +19,7 @@ import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.wrapper.EmptyHandler;
+import net.sinedkadis.terracompositio.api.TCCapabilities;
 import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBEBehaviour;
 import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBECFEBehaviour;
 import net.sinedkadis.terracompositio.api.networks.cfe.ICFEHandler;
@@ -128,7 +129,7 @@ public class MatterInfuserUnitBlockEntity extends MatterInfuserBaseBlockEntity{
         if (casingBE == null) {
             return false;
         }
-        IItemHandlerModifiable casingItemHandler = casingBE.getItemHandler();
+        IItemHandler casingItemHandler = casingBE.getCapability(TCCapabilities.ITEM_STATE_HOLDER).orElse(((IItemHandlerModifiable) EmptyHandler.INSTANCE));
         if (casingItemHandler.getStackInSlot(UP_CONNECTION_SLOT).isEmpty()
                 || casingItemHandler.getStackInSlot(DOWN_CONNECTION_SLOT).isEmpty())
             return false;

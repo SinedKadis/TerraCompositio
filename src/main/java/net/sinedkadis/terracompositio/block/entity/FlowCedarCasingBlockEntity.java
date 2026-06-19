@@ -66,12 +66,17 @@ public class FlowCedarCasingBlockEntity extends TCCraftingBlockEntity{
                 if (noInputBus()) return false;
                 boolean noDir = pDirection == null;
                 boolean isInputSlot = pSlot == INPUT_INVENTORY_SLOT;
-                boolean directionIsUp = !noDir && pDirection.equals(Direction.UP);
+                boolean directionIsUp = noDir || pDirection.equals(Direction.UP);
 
                 return isInputSlot && directionIsUp;
             }
         });
         list.add(new ItemStateHolderBehaviour(this, 4) {
+            @Override
+            public int getLimitInSlot(int slot) {
+                return 1;
+            }
+
             @Override
             public boolean allowInsert(int pSlot, ItemStack pStack, @Nullable Direction pDirection, boolean manualInsertion) {
                 Level level = FlowCedarCasingBlockEntity.this.level;
@@ -81,7 +86,7 @@ public class FlowCedarCasingBlockEntity extends TCCraftingBlockEntity{
                 boolean isMIConnected = attachedDir().getAxis().isHorizontal()
                         && blockRelative instanceof MatterInfuserBaseEntityBlock;
 
-                boolean isUpConnectionAllow = noInputBus() && isMIConnected && pSlot == UP_CONNECTION_SLOT;
+                boolean isUpConnectionAllow = !noInputBus() && isMIConnected && pSlot == UP_CONNECTION_SLOT;
 
                 boolean isMIUNIT = blockRelative instanceof MatterInfuserIOBlock;
                 boolean isDownConnectionAllow = !noOutputBus() && isMIConnected && isMIUNIT && pSlot == DOWN_CONNECTION_SLOT;
@@ -107,11 +112,11 @@ public class FlowCedarCasingBlockEntity extends TCCraftingBlockEntity{
     }
 
     public boolean noInputBus() {
-        return this.getCapability(TCCapabilities.ITEM_STATE_HOLDER).orElse(EmptyHandler.INSTANCE).getStackInSlot(INPUT_BUS_SLOT).isEmpty();
+        return this.getCapability(TCCapabilities.ITEM_STATE_HOLDER).orElse(((IItemHandlerModifiable) EmptyHandler.INSTANCE)).getStackInSlot(INPUT_BUS_SLOT).isEmpty();
     }
 
     public boolean noOutputBus() {
-        return this.getCapability(TCCapabilities.ITEM_STATE_HOLDER).orElse(EmptyHandler.INSTANCE).getStackInSlot(OUTPUT_BUS_SLOT).isEmpty();
+        return this.getCapability(TCCapabilities.ITEM_STATE_HOLDER).orElse(((IItemHandlerModifiable) EmptyHandler.INSTANCE)).getStackInSlot(OUTPUT_BUS_SLOT).isEmpty();
     }
 
     public Direction attachedDir() {
@@ -128,7 +133,7 @@ public class FlowCedarCasingBlockEntity extends TCCraftingBlockEntity{
     }
 
     private boolean hasOutputBusConnection() {
-        IItemHandlerModifiable iItemHandler = getItemHandler();
+        IItemHandler iItemHandler = this.getCapability(TCCapabilities.ITEM_STATE_HOLDER).orElse(((IItemHandlerModifiable) EmptyHandler.INSTANCE));
         return !iItemHandler.getStackInSlot(OUTPUT_BUS_SLOT).isEmpty()
                 && !iItemHandler.getStackInSlot(DOWN_CONNECTION_SLOT).isEmpty();
     }

@@ -49,7 +49,7 @@ public class ItemHandlerBehaviour implements IBEItemBehaviour, WorldlyContainer,
 
         @Override
         public ItemStack insertItem(int slot, ItemStack stack, boolean simulate) {
-            if (!allowInsert(slot, stack, null, false) && !simulate) return stack;
+            if (!allowInsert(slot, stack, null, true)) return stack;
             ItemStack itemStack = super.insertItem(slot, stack, simulate);
             Level level = blockEntity.getLevel();
             if (level != null && !simulate) {
@@ -61,7 +61,7 @@ public class ItemHandlerBehaviour implements IBEItemBehaviour, WorldlyContainer,
         @Override
         public ItemStack extractItem(int slot, int amount, boolean simulate) {
             // 511 - hardcoded number to bypass restriction when extracting with crowbar
-            if (!allowExtract(slot, getStackInSlot(slot), null, false) && !simulate && !(amount == 511))
+            if (!allowExtract(slot, getStackInSlot(slot), null, true) && !(amount == 511))
                 return ItemStack.EMPTY;
             ItemStack itemStack = super.extractItem(slot, amount, simulate);
             Level level = blockEntity.getLevel();

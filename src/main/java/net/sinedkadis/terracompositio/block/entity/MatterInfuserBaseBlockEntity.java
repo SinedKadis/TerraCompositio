@@ -8,6 +8,7 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraftforge.items.IItemHandlerModifiable;
+import net.sinedkadis.terracompositio.api.TCCapabilities;
 import net.sinedkadis.terracompositio.registries.TCBlocks;
 import net.sinedkadis.terracompositio.util.helpers.ItemHelper;
 import org.jetbrains.annotations.Nullable;
@@ -71,7 +72,7 @@ public abstract class MatterInfuserBaseBlockEntity extends TCCraftingBlockEntity
             blockEntity1 = level.getBlockEntity(blockPos2);
         }
         if (blockEntity1 instanceof MatterInfuserUnitBlockEntity) {
-            ItemHelper.dropContents(blockEntity1);
+            ItemHelper.dropContents(blockEntity1, TCCapabilities.ITEM_STATE_HOLDER);
         }
         BlockPos blockpos = worldPosition.relative(direction.getOpposite());
         BlockState blockState = level.getBlockState(blockpos);
@@ -79,7 +80,7 @@ public abstract class MatterInfuserBaseBlockEntity extends TCCraftingBlockEntity
             level.setBlockAndUpdate(blockpos, blockState.setValue(BlockStateProperties.FACING, Direction.DOWN));
             BlockEntity blockEntity = level.getBlockEntity(blockpos);
             if (blockEntity instanceof FlowCedarCasingBlockEntity) {
-                ItemHelper.dropContents(blockEntity,
+                ItemHelper.dropContents(blockEntity, TCCapabilities.ITEM_STATE_HOLDER,
                         FlowCedarCasingBlockEntity.UP_CONNECTION_SLOT,
                         FlowCedarCasingBlockEntity.DOWN_CONNECTION_SLOT);
             }

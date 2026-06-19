@@ -61,7 +61,7 @@ public class MatterInfuserPortBlock extends MatterInfuserBaseEntityBlock {
                 }
                 if (!itemInHand.isEmpty() && itemBehaviour.allowInsert(i, itemInHand, Direction.UP, true)
                         && hasSpace(itemHandler, i)
-                        && ItemStack.isSameItem(itemInHand, stackInSlot)) {
+                        && (ItemStack.isSameItem(itemInHand, stackInSlot) || stackInSlot.isEmpty())) {
 
 
                     int count = itemInHand.getCount() + stackInSlot.getCount();
@@ -72,6 +72,7 @@ public class MatterInfuserPortBlock extends MatterInfuserBaseEntityBlock {
                         storageCopy.setCount(64);
                         handCopy.setCount(left);
                     } else {
+                        if (stackInSlot.isEmpty()) storageCopy = handCopy;
                         storageCopy.setCount(count);
                         handCopy = ItemStack.EMPTY;
                     }

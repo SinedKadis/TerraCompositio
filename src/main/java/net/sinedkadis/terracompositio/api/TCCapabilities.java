@@ -6,13 +6,13 @@ import net.minecraftforge.common.capabilities.CapabilityToken;
 import net.minecraftforge.common.capabilities.RegisterCapabilitiesEvent;
 import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
-import net.minecraftforge.items.IItemHandler;
+import net.minecraftforge.items.IItemHandlerModifiable;
 import net.sinedkadis.terracompositio.api.networks.cfe.ICFEHandler;
 
 @Mod.EventBusSubscriber(modid = TerraCompositioAPI.MOD_ID,bus = Mod.EventBusSubscriber.Bus.MOD)
 public class TCCapabilities {
     public static final Capability<ICFEHandler> CFE = CapabilityManager.get(new CapabilityToken<>() {});
-    public static final Capability<IItemHandler> ITEM_STATE_HOLDER = CapabilityManager.get(new CapabilityToken<>() {
+    public static final Capability<IItemHandlerModifiable> ITEM_STATE_HOLDER = CapabilityManager.get(new CapabilityToken<>() {
     });
 
     @SubscribeEvent
