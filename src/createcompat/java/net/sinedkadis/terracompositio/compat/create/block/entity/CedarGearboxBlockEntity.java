@@ -1,7 +1,6 @@
 package net.sinedkadis.terracompositio.compat.create.block.entity;
 
 import com.simibubi.create.content.kinetics.base.GeneratingKineticBlockEntity;
-import net.minecraft.ChatFormatting;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
@@ -15,6 +14,7 @@ import net.sinedkadis.terracompositio.TerraCompositio;
 import net.sinedkadis.terracompositio.api.IHaveKnowledge;
 import net.sinedkadis.terracompositio.api.TCCapabilities;
 import net.sinedkadis.terracompositio.api.TerraCompositioAPI;
+import net.sinedkadis.terracompositio.api.helpers.TooltipHelper;
 import net.sinedkadis.terracompositio.api.networks.NetworkAction;
 import net.sinedkadis.terracompositio.api.networks.cfe.CFENetwork;
 import net.sinedkadis.terracompositio.api.networks.cfe.CFENetworkMemberBE;
@@ -188,93 +188,42 @@ public class CedarGearboxBlockEntity extends GeneratingKineticBlockEntity implem
 
     @Override
     public void collectKnowledgeData(CompoundTag data) {
-
-        data.putInt("val.cfe", cfeHandler.getCFE());
+        data.putInt(TooltipHelper.Keys.CFE.toData(), cfeHandler.getCFE());
 
         if (TCCommonConfigs.DEBUG.get()) {
-            data.putInt("val.max_cfe", cfeHandler.getMaxCFE());
-            data.putInt("val.queued", cfeHandler.getQueued());
-            data.putInt("val.priority", this.getPriority());
+            data.putInt(TooltipHelper.Keys.MAX_CFE.toData(), cfeHandler.getMaxCFE());
+            data.putInt(TooltipHelper.Keys.QUEUED.toData(), cfeHandler.getQueued());
         }
-
-        data.putInt("val.range", this.getRange());
-
-        if (priority == TCInnerConfig.DEFAULT_CONSUMER_PRIORITY) {
-            data.putBoolean("flag.type.consumer", true);
-        } else if (priority == TCInnerConfig.DEFAULT_SOURCE_PRIORITY) {
-            data.putBoolean("flag.type.source", true);
-        }
-
+        data.putInt(TooltipHelper.Keys.PRIORITY.toData(), this.getPriority());
+        data.putInt(TooltipHelper.Keys.RANGE.toData(), this.getRange());
     }
 
     @Override
     public void addTooltipLines(CompoundTag data, List<Component> tooltip, boolean isShifting) {
 
-        // Заголовок — всегда первым, не зависит от данных
-        tooltip.add(Component.translatable("block.terracompositio.cfe_header"));
+        TooltipHelper.addHeader(TooltipHelper.Headers.BLOCK, tooltip);
 
-        if (data.contains("val.cfe")) {
-            tooltip.add(
-                    Component.translatable("block.terracompositio.cfe",
-                                    Component.literal(String.valueOf(data.getInt("val.cfe")))
-                                            .append(Component.translatable("block.terracompositio.units"))
-                                            .withStyle(ChatFormatting.AQUA))
-                            .withStyle(ChatFormatting.GRAY));
-            if (isShifting)
-                tooltip.add(Component.translatable("block.terracompositio." + "consume",
-                        Component.literal(1 + "").append(Component.translatable("block.terracompositio.cfe_second"))
-                                .withStyle(ChatFormatting.AQUA)).withStyle(ChatFormatting.GRAY));
+        boolean added = false;
+        if (TCCommonConfigs.DEBUG.get()) {
+            added |= TooltipHelper.addIfExist(TooltipHelper.Keys.PRIORITY, tooltip, data);
         }
-        if (data.contains("val.max_cfe")) {
-            tooltip.add(
-                    Component.translatable("block.terracompositio.max_cfe",
-                                    Component.literal(String.valueOf(data.getInt("val.max_cfe")))
-                                            .append(Component.translatable("block.terracompositio.units"))
-                                            .withStyle(ChatFormatting.AQUA))
-                            .withStyle(ChatFormatting.GRAY));
+        if (isShifting)
+            added |= TooltipHelper.addIfExist(TooltipHelper.Keys.RANGE, TooltipHelper.Units.BLOCKS, tooltip, data);
 
-        }
-        if (data.contains("val.queued")) {
-            tooltip.add(
-                    Component.translatable("block.terracompositio.queued",
-                                    Component.literal(String.valueOf(data.getInt("val.queued")))
-                                            .append(Component.translatable("block.terracompositio.units"))
-                                            .withStyle(ChatFormatting.AQUA))
-                            .withStyle(ChatFormatting.GRAY));
+        if (!added) tooltip.remove(tooltip.size() - 1);
 
-        }
-        if (data.contains("val.priority")) {
-            tooltip.add(
-                    Component.translatable("block.terracompositio.priority",
-                                    Component.literal(String.valueOf(data.getInt("val.priority")))
-                                            .append(Component.translatable("block.terracompositio.units"))
-                                            .withStyle(ChatFormatting.AQUA))
-                            .withStyle(ChatFormatting.GRAY));
+        TooltipHelper.addHeader(TooltipHelper.Headers.CFE, tooltip);
 
-        }
-        if (data.contains("val.range")) {
-            tooltip.add(
-                    Component.translatable("block.terracompositio.range",
-                                    Component.literal(String.valueOf(data.getInt("val.range")))
-                                            .append(Component.translatable("block.terracompositio.units"))
-                                            .withStyle(ChatFormatting.AQUA))
-                            .withStyle(ChatFormatting.GRAY));
+        TooltipHelper.addIfExist(TooltipHelper.Keys.CFE, tooltip, data);
+        TooltipHelper.addIfExist(TooltipHelper.Keys.MAX_CFE, tooltip, data);
+        TooltipHelper.addIfExist(TooltipHelper.Keys.QUEUED, tooltip, data);
 
-        }
-
-        if (data.contains("flag.type.consumer") && data.getBoolean("flag.type.consumer")) {
-            tooltip.add(
-                    Component.translatable("block.terracompositio.type",
-                                    Component.translatable("block.terracompositio.consumer")
-                                            .withStyle(ChatFormatting.AQUA))
-                            .withStyle(ChatFormatting.GRAY));
-        }
-        if (data.contains("flag.type.source") && data.getBoolean("flag.type.source")) {
-            tooltip.add(
-                    Component.translatable("block.terracompositio.type",
-                                    Component.translatable("block.terracompositio.consumer")
-                                            .withStyle(ChatFormatting.AQUA))
-                            .withStyle(ChatFormatting.GRAY));
+        if (data.contains(TooltipHelper.Keys.PRIORITY.toData())) {
+            int priority = data.getInt(TooltipHelper.Keys.PRIORITY.toData());
+            if (priority == TCInnerConfig.DEFAULT_CONSUMER_PRIORITY)
+                TooltipHelper.add(TooltipHelper.Keys.TYPE, TooltipHelper.Units.CONSUMER, tooltip);
+            if (priority == TCInnerConfig.DEFAULT_SOURCE_PRIORITY)
+                TooltipHelper.add(TooltipHelper.Keys.TYPE, TooltipHelper.Units.SOURCE, tooltip);
         }
     }
 }

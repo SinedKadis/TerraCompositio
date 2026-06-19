@@ -191,8 +191,8 @@ public class CFEBurstProjectileEntity extends ThrowableProjectile {
                 return;
             }
             BlockPos target = getTarget();
-            if (blockPos.equals(target) && blockEntity instanceof CFENetworkMemberBE member) {
-                tryConsumeCFEHandler(member.getMainHandler(), this.getCFE());
+            if (blockPos.equals(target) && blockEntity != null) {
+                tryConsumeCFEHandler(blockEntity.getCapability(TCCapabilities.CFE).orElse(DummyCFEHandler.instance), this.getCFE());
             }
         }
         lastBP.set(blockPos);

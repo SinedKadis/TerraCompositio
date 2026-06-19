@@ -25,6 +25,7 @@ import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.ItemStackHandler;
 import net.sinedkadis.terracompositio.api.IHaveKnowledge;
 import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBEItemBehaviour;
+import net.sinedkadis.terracompositio.api.helpers.TooltipHelper;
 import net.sinedkadis.terracompositio.block.entity.TCBlockEntity;
 import net.sinedkadis.terracompositio.util.ItemComponent;
 import net.sinedkadis.terracompositio.util.helpers.ItemHelper;
@@ -275,7 +276,8 @@ public class ItemHandlerBehaviour implements IBEItemBehaviour, WorldlyContainer,
 
     @Override
     public void addTooltipLines(CompoundTag data, List<Component> tooltip, boolean isShifting) {
-        tooltip.add(Component.translatable("block.terracompositio.items_header"));
+        TooltipHelper.addHeader(TooltipHelper.Headers.ITEMS, tooltip);
+
         List<ItemStack> entries = ItemHelper.readItemList(data.getList("inventory", Tag.TAG_COMPOUND));
         boolean somethingAdded = false;
         for (ItemStack stack : entries) {

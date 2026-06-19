@@ -94,16 +94,14 @@ public class FlowCedarAltarBlockEntity extends TCCraftingBlockEntity implements 
         return outputTest;
     }
 
-    protected ItemStack craftItem() {
+    protected void craftItem() {
         Optional<AltarTransformationRecipe> recipe = getCurrentRecipe();
         if (recipe.isPresent()) {
             ItemStack result = recipe.get().getResultItem(null);
             this.getItemHandler().setStackInSlot(0, ItemStack.EMPTY);
             this.getItemHandler().setStackInSlot(1, ItemStack.EMPTY);
             this.getItemHandler().setStackInSlot(2, result);
-            return result;
         }
-        return ItemStack.EMPTY;
     }
 
     protected Optional<AltarTransformationRecipe> getCurrentRecipe() {

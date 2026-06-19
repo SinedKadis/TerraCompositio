@@ -16,6 +16,7 @@ import net.minecraftforge.fluids.FluidUtil;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.sinedkadis.terracompositio.api.TerraCompositioAPI;
 import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBEBehaviour;
+import net.sinedkadis.terracompositio.api.helpers.TooltipHelper;
 import net.sinedkadis.terracompositio.api.networks.NetworkAction;
 import net.sinedkadis.terracompositio.api.networks.fluid.FluidNetwork;
 import net.sinedkadis.terracompositio.api.networks.fluid.FluidNetworkMemberBE;
@@ -29,7 +30,6 @@ import net.sinedkadis.terracompositio.util.FluidComponent;
 import net.sinedkadis.terracompositio.util.helpers.BlockPosHelper;
 import net.sinedkadis.terracompositio.util.helpers.CFEHelper;
 import net.sinedkadis.terracompositio.util.helpers.ParticleHelper;
-import net.sinedkadis.terracompositio.util.helpers.TooltipHelper;
 import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -230,11 +230,11 @@ public class FlowCedarTankBlockEntity extends TCBlockEntity implements FluidNetw
         FluidStack fluidInTank = fluidHandler.getFluidInTank(0);
         CompoundTag compoundTag = new CompoundTag();
         fluidInTank.writeToNBT(compoundTag);
-        data.put("val.fluid", compoundTag);
-        data.putInt("val.range", getRange());
+        data.put(TooltipHelper.Keys.FLUID.toData(), compoundTag);
+        data.putInt(TooltipHelper.Keys.RANGE.toData(), getRange());
 
         if (TCCommonConfigs.DEBUG.get()) {
-            data.putInt("val.priority", getPriority());
+            data.putInt(TooltipHelper.Keys.PRIORITY.toData(), getPriority());
         }
 
         super.collectKnowledgeData(data);
@@ -245,17 +245,14 @@ public class FlowCedarTankBlockEntity extends TCBlockEntity implements FluidNetw
         tooltip.add(Component.translatable("block.terracompositio.block_header"));
 
         if (isShifting)
-            tooltip.add(TooltipHelper
-                    .defaultTextWithArg("block.terracompositio.range", data.getInt("val.range"), TooltipHelper.Units.BLOCKS));
+            TooltipHelper.addIfExist(TooltipHelper.Keys.RANGE, tooltip, data);
 
-        if (data.contains("val.priority"))
-            tooltip.add(TooltipHelper
-                    .defaultTextWithArg("block.terracompositio.priority", data.getInt("val.priority")));
+        TooltipHelper.addIfExist(TooltipHelper.Keys.PRIORITY, tooltip, data);
 
-        FluidStack fluidStack = FluidStack.loadFluidStackFromNBT(data.getCompound("val.fluid"));
+        FluidStack fluidStack = FluidStack.loadFluidStackFromNBT(data.getCompound(TooltipHelper.Keys.FLUID.toData()));
         if (!fluidStack.isEmpty()) {
 
-            tooltip.add(Component.translatable("block.terracompositio.fluids_header"));
+            TooltipHelper.addHeader(TooltipHelper.Headers.FLUIDS, tooltip);
 
             tooltip.add(FluidComponent.of(fluidStack));
         }

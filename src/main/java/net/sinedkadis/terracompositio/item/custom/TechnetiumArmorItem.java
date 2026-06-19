@@ -45,6 +45,7 @@ import net.sinedkadis.terracompositio.api.IHaveExtensibleCFEStorage;
 import net.sinedkadis.terracompositio.api.TCCapabilities;
 import net.sinedkadis.terracompositio.api.TerraCompositioAPI;
 import net.sinedkadis.terracompositio.api.dummies.DummyCFEHandler;
+import net.sinedkadis.terracompositio.api.helpers.TooltipHelper;
 import net.sinedkadis.terracompositio.api.networks.NetworkAction;
 import net.sinedkadis.terracompositio.api.networks.cfe.CFENetworkMember;
 import net.sinedkadis.terracompositio.api.networks.cfe.CFENetworkMemberEntity;
@@ -64,7 +65,6 @@ import net.sinedkadis.terracompositio.util.OffsetVConsumer;
 import net.sinedkadis.terracompositio.util.accessors.PlayerKnowledgeAccessor;
 import net.sinedkadis.terracompositio.util.helpers.BlockPosHelper;
 import net.sinedkadis.terracompositio.util.helpers.ParticleHelper;
-import net.sinedkadis.terracompositio.util.helpers.TooltipHelper;
 import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -427,19 +427,19 @@ public class TechnetiumArmorItem extends TCArmorItem implements IHaveExtensibleC
         LocalPlayer player = Minecraft.getInstance().player;
         if (player != null && ((PlayerKnowledgeAccessor) player).isCreationAcknowledged()) {
             pTooltipComponents.add(
-                    TooltipHelper.defaultTextWithArg("block.terracompositio.cfe",
+                    TooltipHelper.keyWithArg(TooltipHelper.Keys.CFE,
                             pStack.getCapability(TCCapabilities.CFE).orElse(DummyCFEHandler.instance).getCFE())
             );
             ICFEStorageExtension currentExtension = this.getCurrentExtension(pStack);
             if (currentExtension.maxStorage() > 0) {
                 Component description = currentExtension.self().getItem().getDescription();
                 pTooltipComponents.add(
-                        TooltipHelper.defaultTextWithArg("block.terracompositio.storage_extension", description, TooltipHelper.Units.NO_UNITS)
+                        TooltipHelper.keyWithArg(TooltipHelper.Keys.STORAGE_EXTENSION, description, TooltipHelper.Units.NO_UNITS)
                 );
             }
             if (TCCommonConfigs.DEBUG.get()) {
                 pTooltipComponents.add(
-                        TooltipHelper.defaultTextWithArg("block.terracompositio.max_cfe",
+                        TooltipHelper.keyWithArg(TooltipHelper.Keys.MAX_CFE,
                                 pStack.getCapability(TCCapabilities.CFE).orElse(DummyCFEHandler.instance).getMaxCFE())
                 );
             }

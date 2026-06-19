@@ -22,7 +22,6 @@ import net.sinedkadis.terracompositio.api.networks.cfe.ICFEHandler;
 import net.sinedkadis.terracompositio.cfe.burst.CFEBurstProjectileEntity;
 import net.sinedkadis.terracompositio.network.TCPackets;
 import net.sinedkadis.terracompositio.network.packets.S2CPlayerCfeContainerSync;
-import net.sinedkadis.terracompositio.util.helpers.CFEHelper;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.function.Function;
@@ -106,7 +105,7 @@ public class CFEContainer implements ICFEHandler, INBTSerializable<CompoundTag> 
         if (!simulate) {
             CFEBurstProjectileEntity entity = CFEBurstProjectileEntity.sendBurst(this, target, added, speed);
             if (entity != null) {
-                CFEHelper.CFESpawnQueue.schedule(getLevel(), entity);
+                getLevel().addFreshEntity(entity);
                 target.getMainHandler().addToQueue(added);
             }
         }

@@ -15,7 +15,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.wrapper.EmptyHandler;
@@ -140,7 +139,7 @@ public class MatterInfuserUnitBlockEntity extends MatterInfuserBaseBlockEntity{
             BlockEntity blockEntity = level.getBlockEntity(currentPos);
             if (blockEntity instanceof MatterInfuserPortBlockEntity) break;
             if (blockEntity instanceof MatterInfuserUnitBlockEntity unitBlockEntity) {
-                IItemHandler unitItemHandler = unitBlockEntity.getCapability(ForgeCapabilities.ITEM_HANDLER).orElse(EmptyHandler.INSTANCE);
+                IItemHandler unitItemHandler = unitBlockEntity.getCapability(TCCapabilities.ITEM_STATE_HOLDER).orElse(((IItemHandlerModifiable) EmptyHandler.INSTANCE));
                 if (unitItemHandler.getStackInSlot(0).isEmpty()) return false;
                 continue;
             }
@@ -149,7 +148,7 @@ public class MatterInfuserUnitBlockEntity extends MatterInfuserBaseBlockEntity{
         return true;
     }
 
-    protected ItemStack craftItem() {
+    protected void craftItem() {
         Optional<MatterInfusionRecipe> recipe = getCurrentRecipe();
         MatterInfuserPortBlockEntity portBE = this.getPortBE();
         FlowCedarCasingBlockEntity casingBE = this.getCasingBE();
@@ -165,7 +164,9 @@ public class MatterInfuserUnitBlockEntity extends MatterInfuserBaseBlockEntity{
             ItemStack copy = itemHandler.getStackInSlot(0).copy();
             copy.shrink(takeCount);
             itemHandler.setStackInSlot(0, copy);
-            itemHandler.setStackInSlot(1, result.copy());
+            ItemStack resultCopy = result.copy();
+            resultCopy.setCount(resultCopy.getCount() + itemHandler.getStackInSlot(1).getCount());
+            itemHandler.setStackInSlot(1, resultCopy);
             if (level != null) {
                 BlockState blockState = getBlockState();
                 level.sendBlockUpdated(worldPosition, blockState, blockState, 3);
@@ -173,9 +174,7 @@ public class MatterInfuserUnitBlockEntity extends MatterInfuserBaseBlockEntity{
                     portBE.extractItemStackViaSetter(0, 1);
                 }
             }
-            return result;
         }
-        return ItemStack.EMPTY;
     }
 
     public int ticksLeft(){

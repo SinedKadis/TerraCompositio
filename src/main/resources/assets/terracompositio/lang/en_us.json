@@ -96,9 +96,8 @@
   "block.terracompositio.extracted_cfe": "Extracted CFE: %s",
   "block.terracompositio.cfe_header": "Creation Flow Energy info: ",
   "block.terracompositio.type": "Type: %s",
-
-  "block.terracompositio.consumer": "Consumer",
-  "block.terracompositio.source": "Source",
+  "block.terracompositio.consumer": " Consumer",
+  "block.terracompositio.source": " Source",
 
   "block.terracompositio.consume": "Consuming: %s",
   "block.terracompositio.generate": "Generating: %s",
@@ -112,6 +111,10 @@
   "block.terracompositio.entity_header": "Entity Info: ",
   "block.terracompositio.items_header": "Items Info: ",
   "block.terracompositio.fluids_header": "Fluids Info: ",
+  "block.terracompositio.crafting_header": "Crafting Info: ",
+  "block.terracompositio.time_remaining": "Remaining: %s",
+  "block.terracompositio.seconds": " seconds",
+
 
   "entity.terracompositio.ent_hold_header": "Holds: ",
   "entity.terracompositio.ent_inner_header": "In Stomach: ",

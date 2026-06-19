@@ -4,6 +4,7 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.WorldlyContainer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
@@ -11,20 +12,24 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.items.IItemHandlerModifiable;
+import net.sinedkadis.terracompositio.api.IHaveKnowledge;
 import net.sinedkadis.terracompositio.api.TCCapabilities;
 import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBEItemBehaviour;
 import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBEItemWordlyContainerBehaviour;
 import net.sinedkadis.terracompositio.api.dummies.DummyBehaviour;
 import net.sinedkadis.terracompositio.api.dummies.DummyCFEHandler;
+import net.sinedkadis.terracompositio.api.helpers.TooltipHelper;
+import net.sinedkadis.terracompositio.config.TCCommonConfigs;
 import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public abstract class TCCraftingBlockEntity extends TCBlockEntity implements WorldlyContainer {
+public abstract class TCCraftingBlockEntity extends TCBlockEntity implements WorldlyContainer, IHaveKnowledge {
     protected int progress = 0;
     protected int maxProgress;
     protected float tickCFECost;
@@ -81,7 +86,8 @@ public abstract class TCCraftingBlockEntity extends TCBlockEntity implements Wor
                 getItemHandler().getSlotLimit(1));
     }
 
-    protected ItemStack craftItem(){return ItemStack.EMPTY;}
+    protected void craftItem() {
+    }
     protected Optional<?> getCurrentRecipe(){return Optional.empty();}
     protected boolean hasRecipe(){return false;}
 
@@ -158,5 +164,32 @@ public abstract class TCCraftingBlockEntity extends TCBlockEntity implements Wor
     @Override
     public void clearContent() {
         getBehaviour().clearContent();
+    }
+
+    @Override
+    public void collectKnowledgeData(CompoundTag data) {
+        super.collectKnowledgeData(data);
+        if (maxProgress == 0) return;
+
+        float remaining = (maxProgress - progress) / 20f;
+        data.putFloat(TooltipHelper.Keys.TIME_REMAINING.toData(), remaining);
+        if (TCCommonConfigs.DEBUG.get()) {
+            data.putInt(TooltipHelper.Keys.PROGRESS.toData(), progress);
+            data.putInt(TooltipHelper.Keys.MAX_PROGRESS.toData(), maxProgress);
+        }
+        data.putFloat(TooltipHelper.Keys.CONSUME.toData(), tickCFECost * 20f);
+
+    }
+
+    @Override
+    public void addTooltipLines(CompoundTag data, List<Component> tooltip, boolean isShifting) {//todo add fallback
+        boolean added = false;
+        TooltipHelper.addHeader(TooltipHelper.Headers.CRAFTING, tooltip);
+        added |= TooltipHelper.addIfExist(TooltipHelper.Keys.TIME_REMAINING, TooltipHelper.Units.SECONDS, tooltip, data);
+        added |= TooltipHelper.addIfExist(TooltipHelper.Keys.PROGRESS, TooltipHelper.Units.SECONDS, tooltip, data);
+        added |= TooltipHelper.addIfExist(TooltipHelper.Keys.MAX_PROGRESS, TooltipHelper.Units.SECONDS, tooltip, data);
+        added |= TooltipHelper.addIfExist(TooltipHelper.Keys.CONSUME, TooltipHelper.Units.CFE_SECOND, tooltip, data);
+        if (!added) tooltip.remove(tooltip.size() - 1);
+        super.addTooltipLines(data, tooltip, isShifting);
     }
 }

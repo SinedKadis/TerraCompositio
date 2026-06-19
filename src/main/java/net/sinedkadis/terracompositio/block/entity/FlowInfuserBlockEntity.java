@@ -141,7 +141,7 @@ public class FlowInfuserBlockEntity extends TCCraftingBlockEntity {
     }
 
 
-    protected ItemStack craftItem() {
+    protected void craftItem() {
         Optional<FlowInfusionRecipe> recipe = getCurrentRecipe();
         if (recipe.isPresent()) {
             ItemStack result = recipe.get().getResultItem(null);
@@ -157,9 +157,7 @@ public class FlowInfuserBlockEntity extends TCCraftingBlockEntity {
                     }
                 }
             });
-            return result;
         }
-        return ItemStack.EMPTY;
     }
 
 
