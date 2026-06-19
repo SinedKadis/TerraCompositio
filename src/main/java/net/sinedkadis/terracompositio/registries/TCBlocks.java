@@ -258,6 +258,30 @@ public class TCBlocks {
                     super.playerWillDestroy(pLevel, pPos, pState, pPlayer);
                 }
             });
+    public static final RegistryObject<Block> FLOATING_BUTTON = registerBlock("floating_button",
+            () -> new ButtonBlock(BlockBehaviour.Properties.copy(Blocks.OAK_BUTTON), BlockSetType.IRON, 20, false) {
+                @Override
+                public boolean canSurvive(BlockState pState, LevelReader pLevel, BlockPos pPos) {
+                    return true;
+                }
+
+                @Override
+                public boolean canConnectRedstone(BlockState state, BlockGetter level, BlockPos pos, @Nullable Direction direction) {
+                    return true;
+                }
+            });
+    public static final RegistryObject<Block> FLOATING_LEVER = registerBlock("floating_lever",
+            () -> new LeverBlock(BlockBehaviour.Properties.copy(Blocks.OAK_BUTTON)) {
+                @Override
+                public boolean canSurvive(BlockState pState, LevelReader pLevel, BlockPos pPos) {
+                    return true;
+                }
+
+                @Override
+                public boolean canConnectRedstone(BlockState state, BlockGetter level, BlockPos pos, @Nullable Direction direction) {
+                    return true;
+                }
+            });
 
     //Misc
     public static final RegistryObject<Block> FLOW_CEDAR_ENT_STATUE = registerBlock("flow_cedar_ent_statue",

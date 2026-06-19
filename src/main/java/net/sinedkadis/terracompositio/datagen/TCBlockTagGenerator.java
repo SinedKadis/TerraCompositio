@@ -44,7 +44,9 @@ public class TCBlockTagGenerator extends BlockTagsProvider {
                         TCBlocks.TECHNETIUM_BLOCK.get(),
                         TCBlocks.INFUSED_IRON_BLOCK.get(),
                         TCBlocks.INFUSED_IRON_DOOR.get(),
-                        TCBlocks.INFUSED_IRON_PRESSURE_PLATE.get());
+                        TCBlocks.INFUSED_IRON_PRESSURE_PLATE.get(),
+                        TCBlocks.FLOATING_BUTTON.get(),
+                        TCBlocks.FLOATING_LEVER.get());
         this.tag(BlockTags.MINEABLE_WITH_AXE)
                 .add(TCBlocks.FLOW_CEDAR_LOG.get(),
                         TCBlocks.FLOW_CEDAR_LEAVES.get(),

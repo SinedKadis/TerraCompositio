@@ -6,6 +6,7 @@
   "pages": [
     {
       "type": "patchouli:spotlight",
+      "title": "book.terracompositio.creation_flow_journal.entry.path_pointers.name_2",
       "item": "terracompositio:pp_infuser,terracompositio:pp_extractor",
       "link_recipe": true,
       "text": "book.terracompositio.creation_flow_journal.entry.path_pointers.desc_2"

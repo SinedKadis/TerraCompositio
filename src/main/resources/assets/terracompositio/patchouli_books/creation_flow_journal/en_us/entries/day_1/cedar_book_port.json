@@ -13,7 +13,8 @@
     },
     {
       "type": "patchouli:multiblock",
-      "multiblock_id": "terracompositio:multiblocks/creation_altar"
+      "multiblock_id": "terracompositio:multiblocks/creation_altar",
+      "enable_visualize": false
     }
   ]
 }

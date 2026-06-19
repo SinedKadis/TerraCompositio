@@ -18,6 +18,8 @@
     "terracompositio:infused_iron_block",
     "terracompositio:infused_iron_door",
     "terracompositio:infused_iron_pressure_plate",
+    "terracompositio:floating_button",
+    "terracompositio:floating_lever",
     "terracompositio:cedar_gearbox"
   ]
 }

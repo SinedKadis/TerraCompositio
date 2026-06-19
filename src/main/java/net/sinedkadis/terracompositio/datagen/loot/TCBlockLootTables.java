@@ -111,6 +111,8 @@ public class TCBlockLootTables extends BlockLootSubProvider {
         this.dropSelf(TCBlocks.FLOATING_TORCH_HOLDER.get());
         this.dropSelf(TCBlocks.INFUSED_IRON_PRESSURE_PLATE.get());
         this.dropSelf(TCBlocks.INFUSED_IRON_DOOR.get());
+        this.dropSelf(TCBlocks.FLOATING_BUTTON.get());
+        this.dropSelf(TCBlocks.FLOATING_LEVER.get());
 
         if (ModList.get().isLoaded("create")) {
             Set<Block> blocks = new HashSet<>();

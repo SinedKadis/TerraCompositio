@@ -1,0 +1,24 @@
+{
+  "type": "minecraft:crafting_shaped",
+  "category": "equipment",
+  "key": {
+    "i": {
+      "item": "terracompositio:infused_iron_ingot"
+    },
+    "n": {
+      "item": "terracompositio:infused_iron_nugget"
+    },
+    "p": {
+      "item": "terracompositio:flow_cedar_planks"
+    }
+  },
+  "pattern": [
+    "n",
+    "p",
+    "i"
+  ],
+  "result": {
+    "item": "terracompositio:floating_lever"
+  },
+  "show_notification": true
+}

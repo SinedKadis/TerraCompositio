@@ -142,6 +142,9 @@ public class TCCreativeModeTabs {
                             pOutput.accept(TCBlocks.FLOATING_TORCH_HOLDER.get());
                             pOutput.accept(TCBlocks.INFUSED_IRON_PRESSURE_PLATE.get());
                             pOutput.accept(TCBlocks.INFUSED_IRON_DOOR.get());
+                            pOutput.accept(TCBlocks.FLOATING_BUTTON.get());
+                            pOutput.accept(TCBlocks.FLOATING_LEVER.get());
+
 
 
 
