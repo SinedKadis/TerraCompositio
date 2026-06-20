@@ -11,14 +11,14 @@ import net.sinedkadis.terracompositio.block.entity.TCBlockEntity;
 import net.sinedkadis.terracompositio.registries.TCBlockEntities;
 import org.jetbrains.annotations.NotNull;
 
-public class MatterInfuserIOBlock extends MatterInfuserBaseEntityBlock {
+public class MatterInfuserUnitBlock extends MatterInfuserBaseEntityBlock {
 
     protected static final VoxelShape NORTH_AABB;
     protected static final VoxelShape SOUTH_AABB;
     protected static final VoxelShape WEST_AABB;
     protected static final VoxelShape EAST_AABB;
 
-    public MatterInfuserIOBlock(Properties pProperties) {
+    public MatterInfuserUnitBlock(Properties pProperties) {
         super(pProperties);
 
     }

@@ -20,7 +20,7 @@ import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBEBehaviour;
 import net.sinedkadis.terracompositio.block.behaviours.ItemHandlerBehaviour;
 import net.sinedkadis.terracompositio.block.behaviours.ItemStateHolderBehaviour;
 import net.sinedkadis.terracompositio.block.custom.MatterInfuserBaseEntityBlock;
-import net.sinedkadis.terracompositio.block.custom.MatterInfuserIOBlock;
+import net.sinedkadis.terracompositio.block.custom.MatterInfuserUnitBlock;
 import net.sinedkadis.terracompositio.registries.TCBlockEntities;
 import net.sinedkadis.terracompositio.registries.TCItems;
 import org.jetbrains.annotations.Nullable;
@@ -88,7 +88,7 @@ public class FlowCedarCasingBlockEntity extends TCCraftingBlockEntity{
 
                 boolean isUpConnectionAllow = !noInputBus() && isMIConnected && pSlot == UP_CONNECTION_SLOT;
 
-                boolean isMIUNIT = blockRelative instanceof MatterInfuserIOBlock;
+                boolean isMIUNIT = blockRelative instanceof MatterInfuserUnitBlock;
                 boolean isDownConnectionAllow = !noOutputBus() && isMIConnected && isMIUNIT && pSlot == DOWN_CONNECTION_SLOT;
                 boolean isBus = pSlot <= OUTPUT_BUS_SLOT;
 

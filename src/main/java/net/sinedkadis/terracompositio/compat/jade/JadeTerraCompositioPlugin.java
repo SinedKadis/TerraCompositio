@@ -37,7 +37,7 @@ public class JadeTerraCompositioPlugin implements IWailaPlugin {
 
         registration.registerBlockComponent(TCBlockEntityComponentProvider.INSTANCE, TCBaseEntityBlock.class);
 
-        registration.registerBlockComponent(MatterInfuserIOComponentProvider.INSTANCE, MatterInfuserIOBlock.class);
+        registration.registerBlockComponent(MatterInfuserIOComponentProvider.INSTANCE, MatterInfuserUnitBlock.class);
         registration.addConfig(MatterInfuserIOComponentProvider.INSTANCE.catalystConfigRL(),true);
         registration.addConfig(MatterInfuserIOComponentProvider.INSTANCE.cfeTickConfigRL(),true);
         registration.addConfig(MatterInfuserIOComponentProvider.INSTANCE.decayChanceConfigRL(),true);

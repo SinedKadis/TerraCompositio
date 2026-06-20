@@ -3,8 +3,6 @@ package net.sinedkadis.terracompositio.block.entity;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.sounds.SoundEvents;
-import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.SimpleContainer;
@@ -31,6 +29,7 @@ import net.sinedkadis.terracompositio.config.TCInnerConfig;
 import net.sinedkadis.terracompositio.recipe.MatterInfusionRecipe;
 import net.sinedkadis.terracompositio.registries.TCBlockEntities;
 import net.sinedkadis.terracompositio.registries.TCItems;
+import net.sinedkadis.terracompositio.util.helpers.ParticleHelper;
 import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -104,9 +103,11 @@ public class MatterInfuserUnitBlockEntity extends MatterInfuserBaseBlockEntity{
         if (timer <= 0) {
             timer = 20;
             isAssembled = assembleValid();
-        }
-        if (timer % 5 == 0) {
-            playSoundIfNeeded(pLevel, pPos);
+            if (progress>0)
+                ParticleHelper.spawnParticlesIn(pLevel,
+                        pPos.relative(pState.getValue(BlockStateProperties.HORIZONTAL_FACING).getOpposite()),
+                        ((int) Math.ceil(tickCFECost*20)));
+
         }
         timer--;
         if(hasRecipe() && enoughCFE() && isAssembled){
@@ -122,13 +123,6 @@ public class MatterInfuserUnitBlockEntity extends MatterInfuserBaseBlockEntity{
             }
         }else if(!hasRecipe()) {
             resetProgress();
-        }
-    }
-
-    @Override
-    protected void playSoundIfNeeded(Level level, BlockPos pos) {
-        if (progress > 0) {
-            level.playSound(null, pos, SoundEvents.AZALEA_STEP, SoundSource.BLOCKS);
         }
     }
 
