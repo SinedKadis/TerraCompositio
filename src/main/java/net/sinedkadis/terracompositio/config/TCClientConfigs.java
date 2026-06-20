@@ -14,6 +14,14 @@ public class TCClientConfigs {
     public static final ForgeConfigSpec.EnumValue<Direction> OVERLAY_FADE_DIR;
     public static final ForgeConfigSpec.EnumValue<Corner> OVERLAY_ANCHOR_CORNER;
 
+    public static final ForgeConfigSpec.ConfigValue<Boolean> APPLE_PP_ENDPOINTS;
+    public static final ForgeConfigSpec.ConfigValue<Boolean> APPLE_RANGE_CIRCLE;
+    public static final ForgeConfigSpec.ConfigValue<Boolean> APPLE_ITEM_TOOLTIP;
+    public static final ForgeConfigSpec.EnumValue<AppleMode> APPLE_SHOW_MODE;
+
+
+
+
     static {
         BUILDER.push("Particles");
 
@@ -21,6 +29,18 @@ public class TCClientConfigs {
                 .define("CFE Particle multiplier", 0.1d);
 
         BUILDER.pop();
+
+        BUILDER.push("Apple of Knowledge");
+
+        APPLE_SHOW_MODE = BUILDER.comment("Normal - some info always, some on shift\nAlways - all info without shift\nOn Shift - all info on shift")
+                .defineEnum("Apple Mode", AppleMode.NORMAL);
+        APPLE_PP_ENDPOINTS= BUILDER.comment("Show Particles of Path Pointers endpoints when holding wrench")
+                .define("Path Pointer Particles", true);
+        APPLE_ITEM_TOOLTIP= BUILDER.comment("Show item's CFE info in tooltip")
+                .define("Item Tooltip", true);
+        APPLE_RANGE_CIRCLE= BUILDER.comment("Show range circle while holding shift")
+                .define("Range circle", true);
+
 
         BUILDER.push("Knowledge Overlay");
 
@@ -34,10 +54,14 @@ public class TCClientConfigs {
                 .defineEnum("Anchor corner", Corner.RIGHT_UP);
 
         BUILDER.pop();
+        BUILDER.pop();
         SPEC = BUILDER.build();
     }
 
     public enum Corner {
         LEFT_UP, LEFT_DOWN, RIGHT_UP, RIGHT_DOWN
+    }
+    public enum AppleMode {
+        NORMAL,ALWAYS,SHIFT
     }
 }
