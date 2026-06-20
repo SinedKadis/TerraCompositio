@@ -9,6 +9,8 @@ import net.minecraft.core.particles.ParticleTypes;
 import net.minecraft.network.syncher.EntityDataAccessor;
 import net.minecraft.network.syncher.EntityDataSerializers;
 import net.minecraft.network.syncher.SynchedEntityData;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.EntityType;
 import net.minecraft.world.entity.EquipmentSlot;
@@ -243,7 +245,13 @@ public class CFEBurstProjectileEntity extends ThrowableProjectile {
 
 
         this.shoot(shootVec.x(),shootVec.y(),shootVec.z(),5 / 20f,0);
-
+        Level level = pathPointerBlockEntity.getLevel();
+        if (level == null) return;
+        level.playSound(null,
+                pathPointerBlockEntity.getBlockPos(),
+                SoundEvents.BAMBOO_WOOD_HIT,
+                SoundSource.BLOCKS,
+                0.1f,1);
     }
 
     private int tryConsumeCFEHandler(ICFEHandler icfeHandler, int cfe) {
