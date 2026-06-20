@@ -8,7 +8,7 @@ import net.minecraft.network.chat.MutableComponent;
 import java.util.List;
 
 public class TooltipHelper {
-    private static final String translationKeyHeader = "block.terracompositio.";
+    private static final String translationKeyHeader = "info.terracompositio.";
     private static final String dataHeader = "val.";
     private static final String headerEnding = "_header";
 
@@ -23,9 +23,6 @@ public class TooltipHelper {
         if (stringArg.endsWith("f")) toCrop++;
 
         int length = stringArg.length();
-
-        if (length > 1 && stringArg.charAt(length - 2) == '.')
-            toCrop++;
 
         if (length > 6) toCrop = length - 6;
         stringArg = stringArg.substring(0, length - toCrop);

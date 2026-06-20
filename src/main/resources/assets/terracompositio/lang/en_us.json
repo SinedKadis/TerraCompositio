@@ -87,38 +87,44 @@
   "block.terracompositio.matter_infuser.duration": "Duration: %s s.",
   "block.terracompositio.matter_infuser.decay_chance": "Catalyst decay chance: %s%%",
 
-  "block.terracompositio.cfe": "Stored CFE: %s",
-  "block.terracompositio.cfe_tick": "CFE/tick: %s",
-  "block.terracompositio.max_cfe": "Max CFE: %s",
-  "block.terracompositio.priority": "Priority: %s",
-  "block.terracompositio.range": "Range: %s",
-  "block.terracompositio.queued": "Queued: %s",
-  "block.terracompositio.extracted_cfe": "Extracted CFE: %s",
-  "block.terracompositio.cfe_header": "Creation Flow Energy info: ",
-  "block.terracompositio.type": "Type: %s",
-  "block.terracompositio.consumer": " Consumer",
-  "block.terracompositio.source": " Source",
-
-  "block.terracompositio.consume": "Consuming: %s",
-  "block.terracompositio.generate": "Generating: %s",
-  "block.terracompositio.storage_extension": "Extension: %s",
-
-  "block.terracompositio.blocks": " blocks",
-  "block.terracompositio.units": " units",
-  "block.terracompositio.milibuckets": " milibuckets",
-  "block.terracompositio.cfe_second": " cfe/second",
-  "block.terracompositio.block_header": "Block Info: ",
-  "block.terracompositio.entity_header": "Entity Info: ",
-  "block.terracompositio.items_header": "Items Info: ",
-  "block.terracompositio.fluids_header": "Fluids Info: ",
-  "block.terracompositio.crafting_header": "Crafting Info: ",
-  "block.terracompositio.time_remaining": "Remaining: %s",
-  "block.terracompositio.seconds": " seconds",
 
 
-  "entity.terracompositio.ent_hold_header": "Holds: ",
-  "entity.terracompositio.ent_inner_header": "In Stomach: ",
-  "entity.terracompositio.ent_common_header": "Common: ",
+
+  "info.terracompositio.cfe": "Stored CFE: %s",
+  "info.terracompositio.cfe_tick": "CFE/tick: %s",
+  "info.terracompositio.max_cfe": "Max CFE: %s",
+  "info.terracompositio.priority": "Priority: %s",
+  "info.terracompositio.range": "Range: %s",
+  "info.terracompositio.queued": "Queued: %s",
+  "info.terracompositio.extracted_cfe": "Extracted CFE: %s",
+  "info.terracompositio.cfe_header": "Creation Flow Energy info: ",
+  "info.terracompositio.type": "Type: %s",
+  "info.terracompositio.consumer": " Consumer",
+  "info.terracompositio.source": " Source",
+
+  "info.terracompositio.consume": "Consuming: %s",
+  "info.terracompositio.generate": "Generating: %s",
+  "info.terracompositio.storage_extension": "Extension: %s",
+
+  "info.terracompositio.blocks": " blocks",
+  "info.terracompositio.units": " units",
+  "info.terracompositio.milibuckets": " milibuckets",
+  "info.terracompositio.cfe_second": " cfe/second",
+  "info.terracompositio.block_header": "Block Info: ",
+  "info.terracompositio.entity_header": "Entity Info: ",
+  "info.terracompositio.items_header": "Items Info: ",
+  "info.terracompositio.fluids_header": "Fluids Info: ",
+  "info.terracompositio.crafting_header": "Crafting Info: ",
+  "info.terracompositio.time_remaining": "Remaining: %s",
+  "info.terracompositio.seconds": " seconds",
+
+
+  "info.terracompositio.ent_hold_header": "Holds: ",
+  "info.terracompositio.ent_inner_header": "In Stomach: ",
+  "info.terracompositio.ent_common_header": "Common: ",
+
+
+
   "item.terracompositio.creation_flow_journal.tooltip": "%s bookmarks",
 
   "block.terracompositio.item_io.input": "Input: ",
