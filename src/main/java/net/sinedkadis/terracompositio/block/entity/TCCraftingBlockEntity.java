@@ -9,6 +9,7 @@ import net.minecraft.world.WorldlyContainer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.item.ItemStack;
+import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.items.IItemHandlerModifiable;
@@ -84,6 +85,10 @@ public abstract class TCCraftingBlockEntity extends TCBlockEntity implements Wor
         return this.getItemHandler().getStackInSlot(getOutputSlotIndex()).getCount() + count
                 <= Math.min(this.getItemHandler().getStackInSlot(getOutputSlotIndex()).getMaxStackSize(),
                 getItemHandler().getSlotLimit(1));
+    }
+
+    protected void playSoundIfNeeded(Level level, BlockPos pos) {
+
     }
 
     protected void craftItem() {

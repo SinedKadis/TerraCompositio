@@ -3,6 +3,8 @@ package net.sinedkadis.terracompositio.block.entity;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
+import net.minecraft.sounds.SoundEvents;
+import net.minecraft.sounds.SoundSource;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
 import net.minecraft.world.SimpleContainer;
@@ -103,6 +105,9 @@ public class MatterInfuserUnitBlockEntity extends MatterInfuserBaseBlockEntity{
             timer = 20;
             isAssembled = assembleValid();
         }
+        if (timer % 5 == 0) {
+            playSoundIfNeeded(pLevel, pPos);
+        }
         timer--;
         if(hasRecipe() && enoughCFE() && isAssembled){
             increaseCraftingProgress();
@@ -117,6 +122,13 @@ public class MatterInfuserUnitBlockEntity extends MatterInfuserBaseBlockEntity{
             }
         }else if(!hasRecipe()) {
             resetProgress();
+        }
+    }
+
+    @Override
+    protected void playSoundIfNeeded(Level level, BlockPos pos) {
+        if (progress > 0) {
+            level.playSound(null, pos, SoundEvents.AZALEA_STEP, SoundSource.BLOCKS);
         }
     }
 
