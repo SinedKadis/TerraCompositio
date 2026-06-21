@@ -10,10 +10,6 @@ public interface FluidNetworkMemberBE extends AnyNetworkMember {
     //Cfe Handler reference
     IFluidHandler getMainHandler();
 
-    int getPriority();
-
-    int getRange();
-
     //Updates
     void updateIfScheduled();
 

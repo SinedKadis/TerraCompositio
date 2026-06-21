@@ -33,6 +33,7 @@ import net.sinedkadis.terracompositio.api.networks.cfe.CFENetwork;
 import net.sinedkadis.terracompositio.api.networks.cfe.CFENetworkMember;
 import net.sinedkadis.terracompositio.api.networks.cfe.ICFEHandler;
 import net.sinedkadis.terracompositio.block.custom.PathPointerBlock;
+import net.sinedkadis.terracompositio.config.TCClientConfigs;
 import net.sinedkadis.terracompositio.config.TCCommonConfigs;
 import net.sinedkadis.terracompositio.network.TCPackets;
 import net.sinedkadis.terracompositio.network.packets.S2CHighLightNodesSync;
@@ -216,7 +217,7 @@ public class PathPointerBlockEntity extends TCBlockEntity implements Nameable, C
 
         if (forwardBind) backwardBind = false;
 
-        if (!clickedPos.closerThan(storedPos, 7)) {
+        if (!clickedPos.closerThan(storedPos, clickedPPBE.getRange())) {
             throw new BindException("item.terracompositio.flow_rotating_axe.bind_fail_too_far");
         }
 
@@ -715,6 +716,8 @@ public class PathPointerBlockEntity extends TCBlockEntity implements Nameable, C
             PlayerKnowledgeAccessor player = (PlayerKnowledgeAccessor) Minecraft.getInstance().player;
             if (player == null || !player.isCreationAcknowledged()) return;
 
+            if (!TCClientConfigs.APPLE_PP_ENDPOINTS.get()) return;
+
             if (receiverPos != null) {
                 addParticle(level, receiverPos, ParticleTypes.FLAME);
             }
@@ -768,7 +771,7 @@ public class PathPointerBlockEntity extends TCBlockEntity implements Nameable, C
 
     @Override
     public int getRange() {
-        return 5;
+        return 7;
     }
 
     @Override

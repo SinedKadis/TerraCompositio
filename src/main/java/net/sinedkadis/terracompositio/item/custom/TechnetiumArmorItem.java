@@ -51,6 +51,7 @@ import net.sinedkadis.terracompositio.api.networks.cfe.CFENetworkMember;
 import net.sinedkadis.terracompositio.api.networks.cfe.CFENetworkMemberEntity;
 import net.sinedkadis.terracompositio.api.networks.cfe.ICFEHandler;
 import net.sinedkadis.terracompositio.cfe.CFEItemWrapper;
+import net.sinedkadis.terracompositio.config.TCClientConfigs;
 import net.sinedkadis.terracompositio.config.TCCommonConfigs;
 import net.sinedkadis.terracompositio.item.models.TechnetiumBootsModel;
 import net.sinedkadis.terracompositio.item.models.TechnetiumChestplateModel;
@@ -425,7 +426,9 @@ public class TechnetiumArmorItem extends TCArmorItem implements IHaveExtensibleC
     @Override
     public void appendHoverText(ItemStack pStack, @Nullable Level pLevel, List<Component> pTooltipComponents, TooltipFlag pIsAdvanced) {
         LocalPlayer player = Minecraft.getInstance().player;
-        if (player != null && ((PlayerKnowledgeAccessor) player).isCreationAcknowledged()) {
+        if (player != null
+                && ((PlayerKnowledgeAccessor) player).isCreationAcknowledged()
+                && TCClientConfigs.APPLE_ITEM_TOOLTIP.get()) {
             pTooltipComponents.add(
                     TooltipHelper.keyWithArg(TooltipHelper.Keys.CFE,
                             pStack.getCapability(TCCapabilities.CFE).orElse(DummyCFEHandler.instance).getCFE())

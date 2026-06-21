@@ -5,9 +5,6 @@ import net.sinedkadis.terracompositio.api.networks.AnyNetworkMember;
 
 
 public interface CFENetworkMember extends AnyNetworkMember {
-    //Filter values
-    int getRange();
-    int getPriority();
 
     //Particle offset
     Vec3 center = new Vec3(0.5d,0.5d,0.5d);

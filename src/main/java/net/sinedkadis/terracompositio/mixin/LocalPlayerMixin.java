@@ -7,6 +7,7 @@ import net.minecraft.client.multiplayer.ClientLevel;
 import net.minecraft.client.player.AbstractClientPlayer;
 import net.minecraft.client.player.Input;
 import net.minecraft.client.player.LocalPlayer;
+import net.sinedkadis.terracompositio.item.custom.KnowledgeAppleItem;
 import net.sinedkadis.terracompositio.item.custom.TechnetiumArmorItem;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Shadow;
@@ -63,5 +64,7 @@ public class LocalPlayerMixin extends AbstractClientPlayer {
             }
         }
         terraCompositio$wasDown = down;
+        KnowledgeAppleItem.rangeVisualisation();
     }
+
 }
