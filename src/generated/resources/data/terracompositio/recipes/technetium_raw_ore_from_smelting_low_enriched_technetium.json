@@ -1,11 +1,11 @@
 {
-  "type": "minecraft:blasting",
+  "type": "minecraft:smelting",
   "category": "misc",
-  "cookingtime": 100,
+  "cookingtime": 200,
   "experience": 0.25,
   "group": "technetium",
   "ingredient": {
     "item": "terracompositio:low_enriched_technetium"
   },
-  "result": "terracompositio:technetium_ingot"
+  "result": "terracompositio:technetium_raw_ore"
 }
