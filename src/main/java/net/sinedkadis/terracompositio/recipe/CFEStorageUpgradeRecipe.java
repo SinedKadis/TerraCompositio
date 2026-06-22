@@ -16,11 +16,11 @@ import javax.annotation.ParametersAreNonnullByDefault;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class ArmorStorageUpgradeRecipe extends CustomRecipe {
-    public static final NoOpRecipeSerializer<ArmorStorageUpgradeRecipe> SERIALIZER = new NoOpRecipeSerializer<>(ArmorStorageUpgradeRecipe::new);
+public class CFEStorageUpgradeRecipe extends CustomRecipe {
+    public static final NoOpRecipeSerializer<CFEStorageUpgradeRecipe> SERIALIZER = new NoOpRecipeSerializer<>(CFEStorageUpgradeRecipe::new);
 
 
-    public ArmorStorageUpgradeRecipe(ResourceLocation id) {
+    public CFEStorageUpgradeRecipe(ResourceLocation id) {
         super(id, CraftingBookCategory.MISC);
     }
 

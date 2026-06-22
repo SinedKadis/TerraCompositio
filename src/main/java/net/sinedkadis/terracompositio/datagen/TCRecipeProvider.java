@@ -24,7 +24,7 @@ import net.sinedkadis.terracompositio.datagen.builders.AltarTransformationRecipe
 import net.sinedkadis.terracompositio.datagen.builders.FlowInfusionRecipeBuilder;
 import net.sinedkadis.terracompositio.datagen.builders.MatterInfusionRecipeBuilder;
 import net.sinedkadis.terracompositio.datagen.builders.TechnetiumFiringRecipeBuilder;
-import net.sinedkadis.terracompositio.recipe.ArmorStorageUpgradeRecipe;
+import net.sinedkadis.terracompositio.recipe.CFEStorageUpgradeRecipe;
 import net.sinedkadis.terracompositio.recipe.NoOpRecipeSerializer;
 import net.sinedkadis.terracompositio.recipe.TagTransferShapedRecipe;
 import net.sinedkadis.terracompositio.recipe.WrapperResult;
@@ -49,7 +49,7 @@ public class TCRecipeProvider extends RecipeProvider implements IConditionBuilde
     @Override
     protected void buildRecipes(@NotNull Consumer<FinishedRecipe> pWriter) {
 
-        specialCraftingRecipe(pWriter, ArmorStorageUpgradeRecipe.SERIALIZER);
+        specialCraftingRecipe(pWriter, CFEStorageUpgradeRecipe.SERIALIZER);
 
         buildCedarBlocks(pWriter);
         buildMatterInfuserBlocks(pWriter);

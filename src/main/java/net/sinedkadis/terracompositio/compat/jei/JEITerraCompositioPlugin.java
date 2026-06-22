@@ -3,9 +3,7 @@ package net.sinedkadis.terracompositio.compat.jei;
 import mezz.jei.api.IModPlugin;
 import mezz.jei.api.JeiPlugin;
 import mezz.jei.api.recipe.RecipeType;
-import mezz.jei.api.registration.IRecipeCatalystRegistration;
-import mezz.jei.api.registration.IRecipeCategoryRegistration;
-import mezz.jei.api.registration.IRecipeRegistration;
+import mezz.jei.api.registration.*;
 import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
@@ -14,14 +12,9 @@ import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.AbstractFurnaceBlock;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.sinedkadis.terracompositio.TerraCompositio;
-import net.sinedkadis.terracompositio.compat.jei.categories.FlowCedarAltarCategory;
-import net.sinedkadis.terracompositio.compat.jei.categories.FlowInfusionCategory;
-import net.sinedkadis.terracompositio.compat.jei.categories.MatterInfusionCategory;
-import net.sinedkadis.terracompositio.compat.jei.categories.TechnetiumFiringCategory;
-import net.sinedkadis.terracompositio.recipe.AltarTransformationRecipe;
-import net.sinedkadis.terracompositio.recipe.FlowInfusionRecipe;
-import net.sinedkadis.terracompositio.recipe.MatterInfusionRecipe;
-import net.sinedkadis.terracompositio.recipe.TechnetiumFiringRecipe;
+import net.sinedkadis.terracompositio.compat.jei.categories.*;
+import net.sinedkadis.terracompositio.compat.jei.extensions.CFEStorageUpdateRecipeWrapper;
+import net.sinedkadis.terracompositio.recipe.*;
 import net.sinedkadis.terracompositio.registries.TCBlocks;
 import net.sinedkadis.terracompositio.registries.TCItems;
 import org.jetbrains.annotations.NotNull;
@@ -63,10 +56,12 @@ public class JEITerraCompositioPlugin implements IModPlugin {
     }
 
     @Override
+    public void registerVanillaCategoryExtensions(IVanillaCategoryExtensionRegistration registration) {
+        registration.getCraftingCategory().addCategoryExtension(CFEStorageUpgradeRecipe.class, CFEStorageUpdateRecipeWrapper::new);
+    }
+
+    @Override
     public void registerRecipeCatalysts(@NotNull IRecipeCatalystRegistration registration) {
-//        if (Minecraft.getInstance().level != null) {
-//            RecipeManager recipeManager = Minecraft.getInstance().level.getRecipeManager();
-//        }
         registration.addRecipeCatalyst(new ItemStack(TCBlocks.FLOW_INFUSER.get()),FlowInfusionCategory.FLOW_INFUSION_RECIPE_RECIPE_TYPE);
         addCatalysts(registration,MatterInfusionCategory.MATTER_INFUSION_RECIPE_RECIPE_TYPE,
                 TCBlocks.FLOW_CEDAR_CASING.get(),
@@ -91,5 +86,10 @@ public class JEITerraCompositioPlugin implements IModPlugin {
         for (ItemLike item : items){
             registration.addRecipeCatalyst(new ItemStack(item.asItem()),recipeType);
         }
+    }
+
+    @Override
+    public void registerItemSubtypes(ISubtypeRegistration registration) {
+        registration.useNbtForSubtypes(TCItems.CREATION_FLOW_JOURNAL.get(),TCItems.FLUID_APPLIER.get());
     }
 }
