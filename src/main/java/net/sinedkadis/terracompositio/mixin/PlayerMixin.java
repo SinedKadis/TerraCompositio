@@ -12,14 +12,14 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.network.PacketDistributor;
 import net.sinedkadis.terracompositio.api.TCCapabilities;
-import net.sinedkadis.terracompositio.api.dummies.DummyCFEHandler;
-import net.sinedkadis.terracompositio.api.networks.cfe.CFENetworkMemberEntity;
-import net.sinedkadis.terracompositio.api.networks.cfe.ICFEHandler;
-import net.sinedkadis.terracompositio.block.custom.CFEBoardBlock;
+import net.sinedkadis.terracompositio.api.dummies.DummyECFHandler;
+import net.sinedkadis.terracompositio.api.networks.cfe.ECFNetworkMemberEntity;
+import net.sinedkadis.terracompositio.api.networks.cfe.IECFHandler;
+import net.sinedkadis.terracompositio.block.custom.ECFBoardBlock;
 import net.sinedkadis.terracompositio.config.TCInnerConfig;
 import net.sinedkadis.terracompositio.network.TCPackets;
 import net.sinedkadis.terracompositio.network.packets.S2CAddPlayerKnowledge;
-import net.sinedkadis.terracompositio.network.packets.S2CPlayerCfeContainerSync;
+import net.sinedkadis.terracompositio.network.packets.S2CPlayerEcfContainerSync;
 import net.sinedkadis.terracompositio.util.accessors.PlayerKnowledgeAccessor;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
@@ -34,7 +34,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 @Mixin(Player.class)
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public abstract class PlayerMixin extends LivingEntity implements CFENetworkMemberEntity, PlayerKnowledgeAccessor {
+public abstract class PlayerMixin extends LivingEntity implements ECFNetworkMemberEntity, PlayerKnowledgeAccessor {
     protected PlayerMixin(EntityType<? extends LivingEntity> pEntityType, Level pLevel) {
         super(pEntityType, pLevel);
     }
@@ -79,8 +79,8 @@ public abstract class PlayerMixin extends LivingEntity implements CFENetworkMemb
     }
 
     @Override
-    public ICFEHandler getMainHandler() {
-        return this.getCapability(TCCapabilities.CFE).orElse(DummyCFEHandler.instance);
+    public IECFHandler getMainHandler() {
+        return this.getCapability(TCCapabilities.ECF).orElse(DummyECFHandler.instance);
     }
 
     @Unique
@@ -96,7 +96,7 @@ public abstract class PlayerMixin extends LivingEntity implements CFENetworkMemb
         Player self = (Player) (Object) this;
         boolean found = false;
         for (BlockPos pos : BlockPos.betweenClosed(self.blockPosition().offset(-1, -1, -1), self.blockPosition().offset(1, -1, 1))) {
-            if ((self.level().getBlockState(pos).getBlock() instanceof CFEBoardBlock)) {
+            if ((self.level().getBlockState(pos).getBlock() instanceof ECFBoardBlock)) {
                 found = true;
                 break;
             }
@@ -144,7 +144,7 @@ public abstract class PlayerMixin extends LivingEntity implements CFENetworkMemb
                     TCPackets.CHANNEL.send(PacketDistributor.PLAYER.with(() -> serverPlayer),
                         new S2CAddPlayerKnowledge());
                 TCPackets.CHANNEL.send(PacketDistributor.PLAYER.with(() -> serverPlayer),
-                        new S2CPlayerCfeContainerSync(((CFENetworkMemberEntity) serverPlayer).getMainHandler().getCFE()));
+                        new S2CPlayerEcfContainerSync(((ECFNetworkMemberEntity) serverPlayer).getMainHandler().getCFE()));
             }
     }
 

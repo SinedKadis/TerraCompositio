@@ -27,14 +27,13 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.network.PacketDistributor;
 import net.sinedkadis.terracompositio.api.TerraCompositioAPI;
 import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBEBehaviour;
-import net.sinedkadis.terracompositio.api.dummies.DummyCFEHandler;
+import net.sinedkadis.terracompositio.api.dummies.DummyECFHandler;
 import net.sinedkadis.terracompositio.api.networks.NetworkAction;
-import net.sinedkadis.terracompositio.api.networks.cfe.CFENetwork;
-import net.sinedkadis.terracompositio.api.networks.cfe.CFENetworkMember;
-import net.sinedkadis.terracompositio.api.networks.cfe.ICFEHandler;
+import net.sinedkadis.terracompositio.api.networks.cfe.ECFNetwork;
+import net.sinedkadis.terracompositio.api.networks.cfe.ECFNetworkMember;
+import net.sinedkadis.terracompositio.api.networks.cfe.IECFHandler;
 import net.sinedkadis.terracompositio.block.custom.PathPointerBlock;
 import net.sinedkadis.terracompositio.config.TCClientConfigs;
-import net.sinedkadis.terracompositio.config.TCCommonConfigs;
 import net.sinedkadis.terracompositio.network.TCPackets;
 import net.sinedkadis.terracompositio.network.packets.S2CHighLightNodesSync;
 import net.sinedkadis.terracompositio.registries.TCBlockEntities;
@@ -52,7 +51,7 @@ import java.util.stream.Collectors;
 @Getter
 @Slf4j
 @ParametersAreNonnullByDefault
-public class PathPointerBlockEntity extends TCBlockEntity implements Nameable, CFENetworkMember {
+public class PathPointerBlockEntity extends TCBlockEntity implements Nameable, ECFNetworkMember {
 
     public static final String RECEIVER_POS_TAG = "receiver_pos";
     public static final String OUTPUT_POS_TAG = "output_pos";
@@ -122,11 +121,11 @@ public class PathPointerBlockEntity extends TCBlockEntity implements Nameable, C
     @Override
     public void tick(Level pLevel, BlockPos pPos, BlockState pState) {
         super.tick(pLevel, pPos, pState);
-        CFENetwork cfeNetworkInstance = TerraCompositioAPI.INSTANCE.getCFENetworkInstance();
+        ECFNetwork ECFNetworkInstance = TerraCompositioAPI.INSTANCE.getECFNetworkInstance();
         if (!pLevel.isClientSide) {
-            boolean inCFENetwork = cfeNetworkInstance.isIn(pLevel, this);
+            boolean inCFENetwork = ECFNetworkInstance.isIn(pLevel, this);
             if (!inCFENetwork && !this.isRemoved()) {
-                cfeNetworkInstance.fireCFENetworkEvent(this, NetworkAction.ADD);
+                ECFNetworkInstance.fireCFENetworkEvent(this, NetworkAction.ADD);
             }
         }
         if (updateScheduled) {
@@ -153,7 +152,7 @@ public class PathPointerBlockEntity extends TCBlockEntity implements Nameable, C
 
     @Override
     public void setRemoved() {
-        TerraCompositioAPI.INSTANCE.getCFENetworkInstance().fireCFENetworkEvent(this, NetworkAction.REMOVE);
+        TerraCompositioAPI.INSTANCE.getECFNetworkInstance().fireCFENetworkEvent(this, NetworkAction.REMOVE);
         super.setRemoved();
     }
 
@@ -247,7 +246,7 @@ public class PathPointerBlockEntity extends TCBlockEntity implements Nameable, C
         fullUpdateBE(pPlayer, (ServerLevel) level, outputPPBE);
 
         inputs.forEach(inputPPBE ->
-                TerraCompositioAPI.instance().getCFENetworkInstance().updateInRange((Level) level, inputPPBE.getPos(), 5));
+                TerraCompositioAPI.instance().getECFNetworkInstance().updateInRange((Level) level, inputPPBE.getPos(), 5));
     }
 
     private static void tryBindInputsAndOutput(Set<PathPointerBlockEntity> inputs, @Nullable PathPointerBlockEntity outputPPBE) {
@@ -655,61 +654,6 @@ public class PathPointerBlockEntity extends TCBlockEntity implements Nameable, C
 
     }
 
-    @Override
-    public void onAppendServerData(CompoundTag compoundTag) {
-        super.onAppendServerData(compoundTag);
-
-        BlockPos receiverPos = getReceiverPos();
-        if (receiverPos != null)
-            compoundTag.put(RECEIVER_POS_TAG, BlockPosHelper.saveBlockPos(receiverPos));
-        BlockPos outputPos = getOutputPos();
-        if (outputPos != null)
-            compoundTag.put(OUTPUT_POS_TAG, BlockPosHelper.saveBlockPos(outputPos));
-
-        PathPointerBlockEntity.saveFromSetToTag(compoundTag, PathPointerBlockEntity.SENDER_POSES_TAG, getSenderPoses());
-        PathPointerBlockEntity.saveFromSetToTag(compoundTag, PathPointerBlockEntity.INPUT_POSES_TAG, getInputPoses());
-    }
-
-    @Override
-    public void onAppendTooltip(List<Component> iTooltip, CompoundTag serverData) {
-        super.onAppendTooltip(iTooltip, serverData);
-
-
-        if (serverData.contains(RECEIVER_POS_TAG) && TCCommonConfigs.DEBUG.get()) {
-            BlockPos pos = BlockPosHelper.loadBlockPos(serverData.getCompound(RECEIVER_POS_TAG));
-            if (pos != null) {
-                iTooltip.add(Component.literal("ReceiverPos: " + pos.getX() + " " + pos.getY() + " " + pos.getZ()));
-            }
-        }
-
-        if (TCCommonConfigs.DEBUG.get()) {
-            Set<BlockPos> senderPoses = new HashSet<>();
-            PathPointerBlockEntity.loadFromTagToSet(serverData, PathPointerBlockEntity.SENDER_POSES_TAG, senderPoses);
-            int i = 1;
-            for (BlockPos pos : senderPoses) {
-                iTooltip.add(Component.literal("SenderPos " + i + ": " + pos.getX() + " " + pos.getY() + " " + pos.getZ()));
-                i = i + 1;
-            }
-        }
-
-        if (TCCommonConfigs.DEBUG.get()) {
-            Set<BlockPos> inputPoses = new HashSet<>();
-            PathPointerBlockEntity.loadFromTagToSet(serverData, PathPointerBlockEntity.INPUT_POSES_TAG, inputPoses);
-            int i = 1;
-            for (BlockPos pos : inputPoses) {
-                iTooltip.add(Component.literal("InputPos " + i + ": " + pos.getX() + " " + pos.getY() + " " + pos.getZ()));
-                i = i + 1;
-            }
-        }
-
-        if (serverData.contains(OUTPUT_POS_TAG) && TCCommonConfigs.DEBUG.get()) {
-            BlockPos pos = BlockPosHelper.loadBlockPos(serverData.getCompound(OUTPUT_POS_TAG));
-            if (pos != null) {
-                iTooltip.add(Component.literal("OutputPos: " + pos.getX() + " " + pos.getY() + " " + pos.getZ()));
-            }
-        }
-    }
-
     public void highlightNodes() {
         if (level != null && level.isClientSide) {
 
@@ -780,8 +724,8 @@ public class PathPointerBlockEntity extends TCBlockEntity implements Nameable, C
     }
 
     @Override
-    public ICFEHandler getMainHandler() {
-        return DummyCFEHandler.instance;
+    public IECFHandler getMainHandler() {
+        return DummyECFHandler.instance;
     }
 
     @Override

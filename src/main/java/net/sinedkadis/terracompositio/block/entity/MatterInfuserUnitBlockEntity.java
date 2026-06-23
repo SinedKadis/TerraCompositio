@@ -20,9 +20,9 @@ import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.wrapper.EmptyHandler;
 import net.sinedkadis.terracompositio.api.TCCapabilities;
 import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBEBehaviour;
-import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBECFEBehaviour;
-import net.sinedkadis.terracompositio.api.networks.cfe.ICFEHandler;
-import net.sinedkadis.terracompositio.block.behaviours.CFEHandlerBehaviour;
+import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBEECFBehaviour;
+import net.sinedkadis.terracompositio.api.networks.cfe.IECFHandler;
+import net.sinedkadis.terracompositio.block.behaviours.ECFHandlerBehaviour;
 import net.sinedkadis.terracompositio.block.behaviours.ItemStateHolderBehaviour;
 import net.sinedkadis.terracompositio.block.custom.MatterInfuserBaseEntityBlock;
 import net.sinedkadis.terracompositio.config.TCInnerConfig;
@@ -54,7 +54,7 @@ public class MatterInfuserUnitBlockEntity extends MatterInfuserBaseBlockEntity{
 
     @Override
     public void addBEBehaviours(List<IBEBehaviour> list) {
-        list.add(new CFEHandlerBehaviour(this){
+        list.add(new ECFHandlerBehaviour(this){
             @Override
             public Vec3 particleTargetOffset() {
                 return switch (getBlockState().getValue(BlockStateProperties.HORIZONTAL_FACING)){
@@ -183,10 +183,6 @@ public class MatterInfuserUnitBlockEntity extends MatterInfuserBaseBlockEntity{
         }
     }
 
-    public int ticksLeft(){
-        return maxProgress-progress;
-    }
-
     protected boolean enoughCFE() {
         return this.getCfeContainer().getCFE() >= Math.ceil(tickCFECost);
     }
@@ -220,8 +216,8 @@ public class MatterInfuserUnitBlockEntity extends MatterInfuserBaseBlockEntity{
         throw new RuntimeException("Item handler not present: " + this);
     }
 
-    protected ICFEHandler getCfeContainer() {
-        IBECFEBehaviour cfeBehaviour = getCFEBehaviour();
+    protected IECFHandler getCfeContainer() {
+        IBEECFBehaviour cfeBehaviour = getCFEBehaviour();
         if (cfeBehaviour != null) {
             return cfeBehaviour.getMainHandler();
         }

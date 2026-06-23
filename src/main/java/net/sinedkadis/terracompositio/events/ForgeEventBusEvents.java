@@ -11,7 +11,7 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.sinedkadis.terracompositio.TerraCompositio;
 import net.sinedkadis.terracompositio.api.TCCapabilities;
-import net.sinedkadis.terracompositio.cfe.PlayerCFEProvider;
+import net.sinedkadis.terracompositio.ecf.PlayerECFProvider;
 import net.sinedkadis.terracompositio.entity.custom.FlowCedarEntEntity;
 import net.sinedkadis.terracompositio.item.custom.KnowledgeAppleItem;
 import net.sinedkadis.terracompositio.item.custom.TechnetiumArmorItem;
@@ -37,8 +37,8 @@ public class ForgeEventBusEvents {
     @SubscribeEvent
     public static void onAttachCapabilities(AttachCapabilitiesEvent<Entity> event) {
         if (event.getObject() instanceof Player player) {
-            if (!player.getCapability(TCCapabilities.CFE).isPresent()) {
-                event.addCapability(TerraCompositio.modLoc("cfe_stored"), new PlayerCFEProvider(player));
+            if (!player.getCapability(TCCapabilities.ECF).isPresent()) {
+                event.addCapability(TerraCompositio.modLoc("cfe_stored"), new PlayerECFProvider(player));
             }
         }
     }

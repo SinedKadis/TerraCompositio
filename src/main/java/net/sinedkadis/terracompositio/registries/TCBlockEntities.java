@@ -24,14 +24,14 @@ public class TCBlockEntities {
             BLOCK_ENTITIES.register("flow_altar_be", () ->
                     BlockEntityType.Builder.of(FlowCedarAltarBlockEntity::new,
                             FLOW_CEDAR_ALTAR.get()).build(null));
-    public static final RegistryObject<BlockEntityType<CreativeCFESourceBlockEntity>> CREATIVE_CFE_SOURCE_BE =
-            BLOCK_ENTITIES.register("creative_cfe_source_be", () ->
-                    BlockEntityType.Builder.of(CreativeCFESourceBlockEntity::new,
-                            CREATIVE_CFE_SOURCE.get()).build(null));
-    public static final RegistryObject<BlockEntityType<CFETrashCanBlockEntity>> CFE_TRASH_CAN_BE =
-            BLOCK_ENTITIES.register("cfe_trash_can_be", () ->
-                    BlockEntityType.Builder.of(CFETrashCanBlockEntity::new,
-                            CFE_TRASH_CAN.get()).build(null));
+    public static final RegistryObject<BlockEntityType<CreativeECFSourceBlockEntity>> CREATIVE_ECF_SOURCE_BE =
+            BLOCK_ENTITIES.register("creative_ecf_source_be", () ->
+                    BlockEntityType.Builder.of(CreativeECFSourceBlockEntity::new,
+                            CREATIVE_ECF_SOURCE.get()).build(null));
+    public static final RegistryObject<BlockEntityType<ECFTrashCanBlockEntity>> ECF_TRASH_CAN_BE =
+            BLOCK_ENTITIES.register("ecf_trash_can_be", () ->
+                    BlockEntityType.Builder.of(ECFTrashCanBlockEntity::new,
+                            ECF_TRASH_CAN.get()).build(null));
     public static final RegistryObject<BlockEntityType<FlowInfuserBlockEntity>> FLOW_INFUSER_BE =
             BLOCK_ENTITIES.register("flow_infuser_be", () ->
                     BlockEntityType.Builder.of(FlowInfuserBlockEntity::new,
@@ -51,13 +51,13 @@ public class TCBlockEntities {
 
 
 
-    public static final RegistryObject<BlockEntityType<ModSignBlockEntity>> MOD_SIGN=
-            BLOCK_ENTITIES.register("mod_sign", () ->
-                    BlockEntityType.Builder.of(ModSignBlockEntity::new,
+    public static final RegistryObject<BlockEntityType<TCSignBlockEntity>> MOD_SIGN=
+            BLOCK_ENTITIES.register("tc_sign", () ->
+                    BlockEntityType.Builder.of(TCSignBlockEntity::new,
                             FLOW_CEDAR_SIGN.get(), FLOW_CEDAR_WALL_SIGN.get()).build(null));
-    public static final RegistryObject<BlockEntityType<ModHangingSignBlockEntity>> MOD_HANGING_SIGN=
-            BLOCK_ENTITIES.register("mod_hanging_sign", () ->
-                    BlockEntityType.Builder.of(ModHangingSignBlockEntity::new,
+    public static final RegistryObject<BlockEntityType<TCHangingSignBlockEntity>> TC_HANGING_SIGN =
+            BLOCK_ENTITIES.register("tc_hanging_sign", () ->
+                    BlockEntityType.Builder.of(TCHangingSignBlockEntity::new,
                             FLOW_CEDAR_HANGING_SIGN.get(), FLOW_CEDAR_WALL_HANGING_SIGN.get()).build(null));
 
     public static final RegistryObject<BlockEntityType<ConstructionDesorberBlockEntity>> CONSTRUCTION_DESORBER_BE =

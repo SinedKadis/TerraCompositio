@@ -8,7 +8,7 @@ import net.minecraft.util.FastColor;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.client.IItemDecorator;
 import net.sinedkadis.terracompositio.api.TCCapabilities;
-import net.sinedkadis.terracompositio.api.networks.cfe.ICFEHandler;
+import net.sinedkadis.terracompositio.api.networks.cfe.IECFHandler;
 import net.sinedkadis.terracompositio.mixin.accessors.GuiGraphicsAccessor;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Matrix4f;
@@ -50,7 +50,7 @@ public final class CFEBarRenderer implements IItemDecorator {
         graphics.fill(RenderType.gui(), x, y, x + 13, y + (2), 190, colorShadow);
     }
 
-    public static void renderBarsTool(GuiGraphics graphics, ICFEHandler handler, ItemStack stack, int xPosition,
+    public static void renderBarsTool(GuiGraphics graphics, IECFHandler handler, ItemStack stack, int xPosition,
                                       int yPosition) {
 
 
@@ -101,7 +101,7 @@ public final class CFEBarRenderer implements IItemDecorator {
 
     @Override
     public boolean render(@NotNull GuiGraphics guiGraphics, @NotNull Font font, ItemStack stack, int x, int y) {
-        Optional<ICFEHandler> handler = stack.getCapability(TCCapabilities.CFE).resolve();
+        Optional<IECFHandler> handler = stack.getCapability(TCCapabilities.ECF).resolve();
         if (handler.isPresent()) {
             CFEBarRenderer.renderBarsTool(guiGraphics, handler.get(), stack, x, y);
             return true;

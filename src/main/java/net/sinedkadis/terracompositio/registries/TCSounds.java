@@ -15,11 +15,6 @@ import java.util.Objects;
 public class TCSounds {
     public static final DeferredRegister<SoundEvent> SOUND_EVENTS = DeferredRegister.create(ForgeRegistries.SOUND_EVENTS, TerraCompositio.MOD_ID);
 
-    public static final RegistryObject<SoundEvent> FLOW_LEAK = registerSoundEvents("flow_leak");
-
-    public static final ForgeSoundType FLOWING_FLOW_CEDAR_LIKE_BLOCK_SOUNDS = new ForgeSoundType(1f,1f,
-            () -> SoundEvents.BEACON_DEACTIVATE, () -> SoundEvents.WOOD_STEP,() -> SoundEvents.WOOD_PLACE,
-            () -> SoundEvents.WOOD_HIT,() -> SoundEvents.WOOD_FALL);
 
     private static RegistryObject<SoundEvent> registerSoundEvents(String name) {
         return SOUND_EVENTS.register(name, () -> SoundEvent.createVariableRangeEvent(Objects.requireNonNull(ResourceLocation.tryBuild(TerraCompositio.MOD_ID, name))));

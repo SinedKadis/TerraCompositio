@@ -24,7 +24,7 @@ import net.sinedkadis.terracompositio.datagen.builders.AltarTransformationRecipe
 import net.sinedkadis.terracompositio.datagen.builders.FlowInfusionRecipeBuilder;
 import net.sinedkadis.terracompositio.datagen.builders.MatterInfusionRecipeBuilder;
 import net.sinedkadis.terracompositio.datagen.builders.TechnetiumFiringRecipeBuilder;
-import net.sinedkadis.terracompositio.recipe.CFEStorageUpgradeRecipe;
+import net.sinedkadis.terracompositio.recipe.ECFStorageUpgradeRecipe;
 import net.sinedkadis.terracompositio.recipe.NoOpRecipeSerializer;
 import net.sinedkadis.terracompositio.recipe.TagTransferShapedRecipe;
 import net.sinedkadis.terracompositio.recipe.WrapperResult;
@@ -49,7 +49,7 @@ public class TCRecipeProvider extends RecipeProvider implements IConditionBuilde
     @Override
     protected void buildRecipes(@NotNull Consumer<FinishedRecipe> pWriter) {
 
-        specialCraftingRecipe(pWriter, CFEStorageUpgradeRecipe.SERIALIZER);
+        specialCraftingRecipe(pWriter, ECFStorageUpgradeRecipe.SERIALIZER);
 
         buildCedarBlocks(pWriter);
         buildMatterInfuserBlocks(pWriter);
@@ -109,7 +109,7 @@ public class TCRecipeProvider extends RecipeProvider implements IConditionBuilde
                         StrictNBTIngredient.of(
                                 bookLevel3
                         ),
-                        Ingredient.of(TCItems.CFE_BALL.get().asItem().getDefaultInstance())
+                        Ingredient.of(TCItems.ECF_CHARGE.get().asItem().getDefaultInstance())
                 )
                 .save(pWriter, "upgrade_book_to_day_4");
         AltarTransformationRecipeBuilder.create(
@@ -460,24 +460,24 @@ public class TCRecipeProvider extends RecipeProvider implements IConditionBuilde
                 .unlockedBy(getHasName(Items.STRING), has(Items.STRING))
                 .save(pWriter);
         FlowInfusionRecipeBuilder.create(
-                TCItems.CFE_BALL.get().getDefaultInstance(),
+                TCItems.ECF_CHARGE.get().getDefaultInstance(),
                 Ingredient.of(Items.SNOWBALL),
                 10,
                 20
         ).save(pWriter,TerraCompositio.modLoc("flow_infusion/cfe_charge"));
         TechnetiumFiringRecipeBuilder.create(
-                        TCItems.CFE_BALL.get(),
+                        TCItems.ECF_CHARGE.get(),
                         10)
                 .save(pWriter, TerraCompositio.modLoc("firing/cfe_ball"));
         oreSmelting(pWriter,
-                List.of(TCItems.CFE_BALL.get()),
+                List.of(TCItems.ECF_CHARGE.get()),
                 RecipeCategory.MISC,
                 Items.SNOWBALL,
                 0.0f,
                 40,
                 "technetium");
         cookSmelting(pWriter,
-                List.of(TCItems.CFE_BALL.get()),
+                List.of(TCItems.ECF_CHARGE.get()),
                 RecipeCategory.MISC,
                 Items.SNOWBALL,
                 0.0f,

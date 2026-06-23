@@ -9,7 +9,7 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraftforge.fml.LogicalSide;
 import net.minecraftforge.network.NetworkEvent;
 import net.sinedkadis.terracompositio.api.TCCapabilities;
-import net.sinedkadis.terracompositio.api.dummies.DummyCFEHandler;
+import net.sinedkadis.terracompositio.api.dummies.DummyECFHandler;
 import net.sinedkadis.terracompositio.registries.TCBlocks;
 import net.sinedkadis.terracompositio.util.helpers.ParticleHelper;
 import net.sinedkadis.terracompositio.util.helpers.WorldHelper;
@@ -49,11 +49,11 @@ public record C2SBoardSync(int x, short y, int z, boolean place, int cfeToTake, 
                     WorldHelper.destroyBlockNoUpdate(level, pPos, player);
                     if (msg.place()) {
                         level.setBlock(pPos,
-                                TCBlocks.CFE_BOARD.get().defaultBlockState()
+                                TCBlocks.ECF_BOARD.get().defaultBlockState()
                                     .setValue(BlockStateProperties.WATERLOGGED,
                                             msg.waterlogged),
                             3);
-                        player.getItemBySlot(EquipmentSlot.FEET).getCapability(TCCapabilities.CFE).orElse(DummyCFEHandler.instance)
+                        player.getItemBySlot(EquipmentSlot.FEET).getCapability(TCCapabilities.ECF).orElse(DummyECFHandler.instance)
                                 .takeCFE(msg.cfeToTake, false);
                         ParticleHelper.spawnParticlesIn(level, pPos);
                     }

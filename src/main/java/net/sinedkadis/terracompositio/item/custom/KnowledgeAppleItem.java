@@ -32,8 +32,8 @@ public class KnowledgeAppleItem extends Item {
         Player original = event.getOriginal();
         original.reviveCaps();
         Player newPlayer = event.getEntity();
-        original.getCapability(TCCapabilities.CFE).ifPresent(oldStore ->
-                newPlayer.getCapability(TCCapabilities.CFE).ifPresent(newStore -> {
+        original.getCapability(TCCapabilities.ECF).ifPresent(oldStore ->
+                newPlayer.getCapability(TCCapabilities.ECF).ifPresent(newStore -> {
                     CompoundTag tag = new CompoundTag();
                     oldStore.writeToNBT(tag);
                     newStore.readFromNBT(tag);

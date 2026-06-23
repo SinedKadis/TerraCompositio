@@ -12,13 +12,13 @@ import net.minecraftforge.fml.config.ModConfig;
 import net.minecraftforge.fml.event.lifecycle.FMLCommonSetupEvent;
 import net.minecraftforge.fml.javafmlmod.FMLJavaModLoadingContext;
 import net.sinedkadis.terracompositio.api.TerraCompositioAPI;
-import net.sinedkadis.terracompositio.cfe.CFENetworkHandler;
+import net.sinedkadis.terracompositio.ecf.ECFNetworkHandler;
 import net.sinedkadis.terracompositio.compat.patchouli.TCPatchouliCompat;
 import net.sinedkadis.terracompositio.compat.soft_compat.ISoftCompat;
 import net.sinedkadis.terracompositio.config.TCClientConfigs;
 import net.sinedkadis.terracompositio.config.TCCommonConfigs;
 import net.sinedkadis.terracompositio.config.TCServerConfigs;
-import net.sinedkadis.terracompositio.events.CFENetworkEvent;
+import net.sinedkadis.terracompositio.events.ECFNetworkEvent;
 import net.sinedkadis.terracompositio.events.FluidNetworkEvent;
 import net.sinedkadis.terracompositio.fluid.FluidNetworkHandler;
 import net.sinedkadis.terracompositio.network.TCPackets;
@@ -86,7 +86,7 @@ public class TerraCompositio
 
     private void commonSetup(final FMLCommonSetupEvent event) {
         IEventBus bus = MinecraftForge.EVENT_BUS;
-        bus.addListener((CFENetworkEvent e) -> CFENetworkHandler.INSTANCE.onNetworkEvent(e.getSource(),e.getAction()));
+        bus.addListener((ECFNetworkEvent e) -> ECFNetworkHandler.INSTANCE.onNetworkEvent(e.getSource(),e.getAction()));
         bus.addListener((FluidNetworkEvent e) -> FluidNetworkHandler.INSTANCE.onNetworkEvent(e.getSource(),e.getAction()));
         TCPackets.register();
         if (ModList.get().isLoaded("patchouli"))

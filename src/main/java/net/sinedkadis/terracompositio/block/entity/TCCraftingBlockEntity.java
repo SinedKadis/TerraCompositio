@@ -18,7 +18,7 @@ import net.sinedkadis.terracompositio.api.TCCapabilities;
 import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBEItemBehaviour;
 import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBEItemWordlyContainerBehaviour;
 import net.sinedkadis.terracompositio.api.dummies.DummyBehaviour;
-import net.sinedkadis.terracompositio.api.dummies.DummyCFEHandler;
+import net.sinedkadis.terracompositio.api.dummies.DummyECFHandler;
 import net.sinedkadis.terracompositio.api.helpers.TooltipHelper;
 import net.sinedkadis.terracompositio.config.TCCommonConfigs;
 import org.jetbrains.annotations.Nullable;
@@ -53,7 +53,7 @@ public abstract class TCCraftingBlockEntity extends TCBlockEntity implements Wor
         partialCFE += tickCFECost- floorCFE;
         int floorPart = (int) Math.floor(partialCFE);
         partialCFE = partialCFE - floorPart;
-        this.getCapability(TCCapabilities.CFE).orElse(DummyCFEHandler.instance).takeCFE(floorCFE+floorPart,false);
+        this.getCapability(TCCapabilities.ECF).orElse(DummyECFHandler.instance).takeCFE(floorCFE+floorPart,false);
     }
 
     @Override

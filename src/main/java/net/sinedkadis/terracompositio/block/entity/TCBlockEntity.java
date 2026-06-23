@@ -18,7 +18,7 @@ import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
 import net.sinedkadis.terracompositio.api.IHaveKnowledge;
 import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBEBehaviour;
-import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBECFEBehaviour;
+import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBEECFBehaviour;
 import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBEItemBehaviour;
 import org.jetbrains.annotations.Nullable;
 
@@ -47,9 +47,9 @@ public abstract class TCBlockEntity extends BlockEntity implements IHaveKnowledg
         return toReturn;
     }
 
-    public @Nullable IBECFEBehaviour getCFEBehaviour() {
+    public @Nullable IBEECFBehaviour getCFEBehaviour() {
         for (IBEBehaviour ibeBehaviour : behaviours) {
-            if (ibeBehaviour instanceof IBECFEBehaviour ibecfeBehaviour) return ibecfeBehaviour;
+            if (ibeBehaviour instanceof IBEECFBehaviour IBEECFBehaviour) return IBEECFBehaviour;
         }
         return null;
     }
@@ -97,14 +97,6 @@ public abstract class TCBlockEntity extends BlockEntity implements IHaveKnowledg
     public void load(CompoundTag pTag) {
         super.load(pTag);
         behaviours.forEach(iBehaviour -> iBehaviour.onLoad(pTag));
-    }
-
-    public void onAppendTooltip(List<Component> iTooltip, CompoundTag serverData) {
-        getBehaviours().forEach(ibeBehaviour -> ibeBehaviour.onAppendTooltip(iTooltip, serverData));
-    }
-
-    public void onAppendServerData(CompoundTag compoundTag){
-        getBehaviours().forEach(ibeBehaviour -> ibeBehaviour.onAppendServerData(compoundTag));
     }
 
     @Nullable

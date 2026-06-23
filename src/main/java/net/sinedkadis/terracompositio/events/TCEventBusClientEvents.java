@@ -29,13 +29,13 @@ import net.minecraftforge.fml.event.lifecycle.FMLClientSetupEvent;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.sinedkadis.terracompositio.TerraCompositio;
 import net.sinedkadis.terracompositio.block.entity.renderer.*;
-import net.sinedkadis.terracompositio.cfe.burst.CFEBurstRenderer;
-import net.sinedkadis.terracompositio.entity.client.CFECloudRenderer;
-import net.sinedkadis.terracompositio.entity.client.CFECubeModel;
+import net.sinedkadis.terracompositio.ecf.burst.ECFBurstRenderer;
+import net.sinedkadis.terracompositio.entity.client.ECFCloudRenderer;
+import net.sinedkadis.terracompositio.entity.client.ECFCubeModel;
 import net.sinedkadis.terracompositio.entity.client.FlowCedarEntModel;
 import net.sinedkadis.terracompositio.entity.client.FlowCedarEntRenderer;
 import net.sinedkadis.terracompositio.gui.CFEBarRenderer;
-import net.sinedkadis.terracompositio.gui.CfeHud;
+import net.sinedkadis.terracompositio.gui.ECFHud;
 import net.sinedkadis.terracompositio.gui.KnowledgeOverlay;
 import net.sinedkadis.terracompositio.item.custom.CreationFlowJournalItem;
 import net.sinedkadis.terracompositio.item.custom.ShieldedBundleItem;
@@ -58,14 +58,14 @@ public class TCEventBusClientEvents {
 
         Sheets.addWoodType(TCWoodTypes.FLOW_CEDAR);
 
-        EntityRenderers.register(TCEntities.MOD_BOAT.get(), pContext -> new TCBoatRenderer(pContext, false));
-        EntityRenderers.register(TCEntities.MOD_CHEST_BOAT.get(), pContext -> new TCBoatRenderer(pContext, true));
+        EntityRenderers.register(TCEntities.TC_BOAT.get(), pContext -> new TCBoatRenderer(pContext, false));
+        EntityRenderers.register(TCEntities.TC_CHEST_BOAT.get(), pContext -> new TCBoatRenderer(pContext, true));
 
         EntityRenderers.register(TCEntities.FLOW_CEDAR_ENT.get(), FlowCedarEntRenderer::new);
-        EntityRenderers.register(TCEntities.CFE_BURST_PROJECTILE.get(), CFEBurstRenderer::new);
-        EntityRenderers.register(TCEntities.CFE_BALL_PROJECTILE.get(), ThrownItemRenderer::new);
-        EntityRenderers.register(TCEntities.CFE_DROP_PROJECTILE.get(), ThrownItemRenderer::new);
-        EntityRenderers.register(TCEntities.CFE_CLOUD.get(), CFECloudRenderer::new);
+        EntityRenderers.register(TCEntities.ECF_BURST_PROJECTILE.get(), ECFBurstRenderer::new);
+        EntityRenderers.register(TCEntities.ECF_BALL_PROJECTILE.get(), ThrownItemRenderer::new);
+        EntityRenderers.register(TCEntities.ECF_DROP_PROJECTILE.get(), ThrownItemRenderer::new);
+        EntityRenderers.register(TCEntities.ECF_CLOUD.get(), ECFCloudRenderer::new);
 
 
         ItemBlockRenderTypes.setRenderLayer(TCFluids.BIRCH_JUICE_FLUID.source.get(), RenderType.translucent());
@@ -152,12 +152,12 @@ public class TCEventBusClientEvents {
 
     @SubscribeEvent
     public static void registerKeyMapping(RegisterKeyMappingsEvent event) {
-        TCKeyMappings.register(event);
+        //TCKeyMappings.register(event);
     }
 
     @SubscribeEvent
     public static void onRegisterGuiOverlays(RegisterGuiOverlaysEvent event) {
-        event.registerAbove(VanillaGuiOverlay.HOTBAR.id(), "cfe_hud", CfeHud::render);
+        event.registerAbove(VanillaGuiOverlay.HOTBAR.id(), "cfe_hud", ECFHud::render);
         event.registerAbove(VanillaGuiOverlay.HOTBAR.id(), "knowledge_hud", KnowledgeOverlay::render);
     }
 
@@ -168,7 +168,7 @@ public class TCEventBusClientEvents {
 
         event.registerLayerDefinition(TCModelLayers.FLOW_CEDAR_ENT_LAYER, FlowCedarEntModel::createBodyLayer);
         event.registerLayerDefinition(TCModelLayers.FLOW_CEDAR_ENT_STATUE_LAYER, FlowCedarEntStatueModel::createBodyLayer);
-        event.registerLayerDefinition(TCModelLayers.CFE_CUBE_LAYER, CFECubeModel::createBodyLayer);
+        event.registerLayerDefinition(TCModelLayers.ECF_CUBE_LAYER, ECFCubeModel::createBodyLayer);
 
         event.registerLayerDefinition(TCModelLayers.TECHNETIUM_CROWN_LAYER, TechnetiumCrownModel::createBodyLayer);
         event.registerLayerDefinition(TCModelLayers.TECHNETIUM_CHESTPLATE_LAYER, TechnetiumChestplateModel::createBodyLayer);
@@ -181,7 +181,7 @@ public class TCEventBusClientEvents {
         event.registerBlockEntityRenderer(TCBlockEntities.FLOW_CEDAR_CASING_BE.get(), FlowCedarCasingBlockEntityRenderer::new);
         event.registerBlockEntityRenderer(TCBlockEntities.FLOW_INFUSER_BE.get(), FlowInfuserBlockEntityRenderer::new);
         event.registerBlockEntityRenderer(TCBlockEntities.MOD_SIGN.get(), SignRenderer::new);
-        event.registerBlockEntityRenderer(TCBlockEntities.MOD_HANGING_SIGN.get(), HangingSignRenderer::new);
+        event.registerBlockEntityRenderer(TCBlockEntities.TC_HANGING_SIGN.get(), HangingSignRenderer::new);
         event.registerBlockEntityRenderer(TCBlockEntities.CONSTRUCTION_DESORBER_BE.get(), ConstructionDesorberBlockEntityRenderer::new);
         event.registerBlockEntityRenderer(TCBlockEntities.CULTIVATION_DESORBER_BE.get(), CultivationDesorberBlockEntityRenderer::new);
         event.registerBlockEntityRenderer(TCBlockEntities.TIME_PASSAGE_DESORBER_BE.get(), TimePassageDesorberBlockEntityRenderer::new);
@@ -203,7 +203,7 @@ public class TCEventBusClientEvents {
         Minecraft.getInstance().particleEngine.register(TCParticles.FLOW_PARTICLE.get(),
                 FlowParticle.Provider::new);
         Minecraft.getInstance().particleEngine.register(TCParticles.CFE_PARTICLE.get(),
-                CFEParticle.Provider::new);
+                ECFParticle.Provider::new);
         Minecraft.getInstance().particleEngine.register(TCParticles.BIRCH_JUICE_PARTICLE.get(),
                 BirchJuiceParticle.Provider::new);
         Minecraft.getInstance().particleEngine.register(TCParticles.FLOW_SPLASH_PARTICLE.get(),

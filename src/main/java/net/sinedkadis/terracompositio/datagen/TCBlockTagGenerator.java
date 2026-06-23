@@ -142,7 +142,7 @@ public class TCBlockTagGenerator extends BlockTagsProvider {
                         TCBlocks.FLOATING_REDSTONE.get());
 
         this.tag(TCTags.Blocks.CREATE_WRENCH_PICKUP)
-                .add(TCBlocks.CFE_BOARD.get());
+                .add(TCBlocks.ECF_BOARD.get());
 
         if (ModList.get().isLoaded("create")) {
             TerraCompositio.createCompat.getDataGen().addBlockTags(this, pProvider);

@@ -13,7 +13,7 @@ import net.minecraft.world.level.block.AbstractFurnaceBlock;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.sinedkadis.terracompositio.TerraCompositio;
 import net.sinedkadis.terracompositio.compat.jei.categories.*;
-import net.sinedkadis.terracompositio.compat.jei.extensions.CFEStorageUpdateRecipeWrapper;
+import net.sinedkadis.terracompositio.compat.jei.extensions.ECFStorageUpdateRecipeWrapper;
 import net.sinedkadis.terracompositio.recipe.*;
 import net.sinedkadis.terracompositio.registries.TCBlocks;
 import net.sinedkadis.terracompositio.registries.TCItems;
@@ -57,7 +57,7 @@ public class JEITerraCompositioPlugin implements IModPlugin {
 
     @Override
     public void registerVanillaCategoryExtensions(IVanillaCategoryExtensionRegistration registration) {
-        registration.getCraftingCategory().addCategoryExtension(CFEStorageUpgradeRecipe.class, CFEStorageUpdateRecipeWrapper::new);
+        registration.getCraftingCategory().addCategoryExtension(ECFStorageUpgradeRecipe.class, ECFStorageUpdateRecipeWrapper::new);
     }
 
     @Override

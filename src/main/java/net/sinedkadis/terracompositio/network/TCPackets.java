@@ -21,10 +21,10 @@ public class TCPackets {
     public static void register()  {
 
         CHANNEL.registerMessage(id++,
-                S2CPlayerCfeContainerSync.class,
-                S2CPlayerCfeContainerSync::encode,
-                S2CPlayerCfeContainerSync::decode,
-                S2CPlayerCfeContainerSync::handle,
+                S2CPlayerEcfContainerSync.class,
+                S2CPlayerEcfContainerSync::encode,
+                S2CPlayerEcfContainerSync::decode,
+                S2CPlayerEcfContainerSync::handle,
                 Optional.of(NetworkDirection.PLAY_TO_CLIENT)
         );
         CHANNEL.registerMessage(id++,

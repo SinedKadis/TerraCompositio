@@ -17,7 +17,7 @@ public class TCRecipes {
         SERIALIZERS.register(MatterInfusionRecipe.Type.ID, () -> MatterInfusionRecipe.Serializer.INSTANCE);
         SERIALIZERS.register(TechnetiumFiringRecipe.Type.ID, () -> TechnetiumFiringRecipe.Serializer.INSTANCE);
         SERIALIZERS.register("tag_transfer_shaped", () -> TagTransferShapedRecipe.SERIALIZER);
-        SERIALIZERS.register("armor_storage_upgrade", () -> CFEStorageUpgradeRecipe.SERIALIZER);
+        SERIALIZERS.register("armor_storage_upgrade", () -> ECFStorageUpgradeRecipe.SERIALIZER);
 
     }
 

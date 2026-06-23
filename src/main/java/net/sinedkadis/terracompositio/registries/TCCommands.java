@@ -17,11 +17,9 @@ import net.minecraftforge.network.PacketDistributor;
 import net.sinedkadis.terracompositio.TerraCompositio;
 import net.sinedkadis.terracompositio.api.TCCapabilities;
 import net.sinedkadis.terracompositio.api.TerraCompositioAPI;
-import net.sinedkadis.terracompositio.api.networks.cfe.CFENetworkMember;
-import net.sinedkadis.terracompositio.api.networks.cfe.CFENetworkMemberEntity;
-import net.sinedkadis.terracompositio.api.networks.cfe.ICFEHandler;
+import net.sinedkadis.terracompositio.api.networks.cfe.*;
 import net.sinedkadis.terracompositio.network.TCPackets;
-import net.sinedkadis.terracompositio.network.packets.S2CPlayerCfeContainerSync;
+import net.sinedkadis.terracompositio.network.packets.S2CPlayerEcfContainerSync;
 
 import java.util.Arrays;
 
@@ -36,25 +34,25 @@ public class TCCommands {
                 Commands.literal("terracompositio")
                         .requires(source -> source.hasPermission(2)) // op only
                         .then(
-                                Commands.literal("print-cfe-data")
+                                Commands.literal("print-ecf-data")
                                         .executes(TCCommands::printCFEData)
                         )
                         .then(
-                                Commands.argument("print-cfe-data", EntityArgument.entity()))
+                                Commands.argument("print-ecf-data", EntityArgument.entity()))
                                         .executes(ctx -> {
                                             Entity entity = EntityArgument
-                                                    .getEntity(ctx,"cfe network member entity");
+                                                    .getEntity(ctx,"ecf network member entity");
                                             return TCCommands.printCFEData(ctx,entity);
                                         })
                         .then(
-                                Commands.literal("clear-cfe-data")
+                                Commands.literal("clear-ecf-data")
                                         .executes(TCCommands::clearCFEData)
                         )
                         .then(
-                                Commands.argument("clear-cfe-data", EntityArgument.entity()))
+                                Commands.argument("clear-ecf-data", EntityArgument.entity()))
                         .executes(ctx -> {
                             Entity entity = EntityArgument
-                                    .getEntity(ctx,"cfe network member entity");
+                                    .getEntity(ctx,"ecf network member entity");
                             return TCCommands.clearCFEData(ctx,entity);
                         })
                         .then(
@@ -65,42 +63,42 @@ public class TCCommands {
     }
 
     private static int clearAllQueues(CommandContext<CommandSourceStack> ctx) {
-        TerraCompositioAPI.instance().getCFENetworkInstance().getAllCFENetworkMembers(ctx.getSource().getLevel()).stream()
-                .map(CFENetworkMember::getMainHandler)
-                .forEach(icfeHandler -> icfeHandler.setQueued(0));
+        TerraCompositioAPI.instance().getECFNetworkInstance().getAllCFENetworkMembers(ctx.getSource().getLevel()).stream()
+                .map(ECFNetworkMember::getMainHandler)
+                .forEach(iEcfHandler -> iEcfHandler.setQueued(0));
         return 0;
     }
 
     private static int clearCFEData(CommandContext<CommandSourceStack> ctx, Entity... entities) {
         CommandSourceStack source = ctx.getSource();
-        CFENetworkMemberEntity memberEntity;
+        ECFNetworkMemberEntity memberEntity;
         if (Arrays.stream(entities).toList().isEmpty()) {
             ServerPlayer player = source.getPlayer();
             if (player == null) {
                 source.sendFailure(Component.literal("No entities were provided"));
                 return 0;
             }
-            memberEntity = (CFENetworkMemberEntity) player;
+            memberEntity = (ECFNetworkMemberEntity) player;
         } else {
             Entity entity = entities[0];
-            if (entity instanceof CFENetworkMemberEntity memberEntity1)
+            if (entity instanceof ECFNetworkMemberEntity memberEntity1)
                 memberEntity = memberEntity1;
             else {
-                source.sendFailure(Component.literal("Entity has to be CFENetworkMemberEntity"));
+                source.sendFailure(Component.literal("Entity has to be ECFNetworkMemberEntity"));
                 return 0;
             }
         }
-        ICFEHandler mainHandler = memberEntity.getMainHandler();
+        IECFHandler mainHandler = memberEntity.getMainHandler();
         mainHandler.clear();
         if (memberEntity instanceof ServerPlayer serverPlayer) {
             TCPackets.CHANNEL.send(PacketDistributor.PLAYER.with(() -> serverPlayer),
-                    new S2CPlayerCfeContainerSync(mainHandler.getCFE()));
+                    new S2CPlayerEcfContainerSync(mainHandler.getCFE()));
         }
 
         NonNullSupplier<Exception> exception = Exception::new;
         memberEntity.getEntity().getArmorSlots().forEach(itemStack -> {
             try {
-                itemStack.getCapability(TCCapabilities.CFE).orElseThrow(exception).clear();
+                itemStack.getCapability(TCCapabilities.ECF).orElseThrow(exception).clear();
             } catch (Exception ignored) {
 
             }
@@ -114,27 +112,27 @@ public class TCCommands {
 
     private static int printCFEData(CommandContext<CommandSourceStack> ctx, Entity... entities) {
         CommandSourceStack source = ctx.getSource();
-        CFENetworkMemberEntity memberEntity;
+        ECFNetworkMemberEntity memberEntity;
         if (Arrays.stream(entities).toList().isEmpty()) {
             ServerPlayer player = source.getPlayer();
             if (player == null) {
                 source.sendFailure(Component.literal("No entities were provided"));
                 return 0;
             }
-            memberEntity = (CFENetworkMemberEntity) player;
+            memberEntity = (ECFNetworkMemberEntity) player;
         } else {
             Entity entity = entities[0];
-            if (entity instanceof CFENetworkMemberEntity memberEntity1)
+            if (entity instanceof ECFNetworkMemberEntity memberEntity1)
                 memberEntity = memberEntity1;
             else {
-                source.sendFailure(Component.literal("Entity has to be CFENetworkMemberEntity"));
+                source.sendFailure(Component.literal("Entity has to be ECFNetworkMemberEntity"));
                 return 0;
             }
         }
 
         StringBuilder message = new StringBuilder();
 
-        ICFEHandler mainHandler = memberEntity.getMainHandler();
+        IECFHandler mainHandler = memberEntity.getMainHandler();
         message.append(mainHandler.toString()).append("\n\n");
 
         source.sendSuccess(() ->

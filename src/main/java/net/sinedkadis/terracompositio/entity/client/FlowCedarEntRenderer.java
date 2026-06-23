@@ -10,7 +10,7 @@ import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.sinedkadis.terracompositio.TerraCompositio;
 import net.sinedkadis.terracompositio.api.TCCapabilities;
-import net.sinedkadis.terracompositio.api.networks.cfe.ICFEHandler;
+import net.sinedkadis.terracompositio.api.networks.cfe.IECFHandler;
 import net.sinedkadis.terracompositio.entity.custom.FlowCedarEntEntity;
 import net.sinedkadis.terracompositio.item.models.TechnetiumBootsModel;
 import net.sinedkadis.terracompositio.item.models.TechnetiumChestplateModel;
@@ -25,12 +25,12 @@ import java.util.Optional;
 public class FlowCedarEntRenderer extends MobRenderer<FlowCedarEntEntity,FlowCedarEntModel<FlowCedarEntEntity>> {
 
     private static final ResourceLocation ENT_TEXTURE = TerraCompositio.modLoc("textures/entity/flow_cedar_ent.png");
-    private static final ResourceLocation CUBE_TEXTURE = TerraCompositio.modLoc("textures/entity/cfe_cube.png");
-    private final CFECubeModel<FlowCedarEntEntity> cfeCubeModel;
+    private static final ResourceLocation CUBE_TEXTURE = TerraCompositio.modLoc("textures/entity/ecf_cube.png");
+    private final ECFCubeModel<FlowCedarEntEntity> ECFCubeModel;
 
     public FlowCedarEntRenderer(EntityRendererProvider.Context pContext) {
         super(pContext, new FlowCedarEntModel<>(pContext.bakeLayer(TCModelLayers.FLOW_CEDAR_ENT_LAYER)), 0.5f);
-        this.cfeCubeModel = new CFECubeModel<>(pContext.bakeLayer(TCModelLayers.CFE_CUBE_LAYER));
+        this.ECFCubeModel = new ECFCubeModel<>(pContext.bakeLayer(TCModelLayers.ECF_CUBE_LAYER));
 
         bakeHomeless(pContext);
     }
@@ -57,7 +57,7 @@ public class FlowCedarEntRenderer extends MobRenderer<FlowCedarEntEntity,FlowCed
 
 
         int energy = entity.getSyncedCFE();
-        Optional<ICFEHandler> icfeHandler = entity.getCapability(TCCapabilities.CFE).resolve();
+        Optional<IECFHandler> icfeHandler = entity.getCapability(TCCapabilities.ECF).resolve();
         if (energy > 0 && icfeHandler.isPresent()) {
             float alpha = 0.8f;
             alpha += Mth.map(energy,1000,10000,0,0.2f);
@@ -71,8 +71,8 @@ public class FlowCedarEntRenderer extends MobRenderer<FlowCedarEntEntity,FlowCed
             poseStack.scale(scale,scale,scale);
 
 
-            this.cfeCubeModel.setupAnim(entity, 0, 0, entity.tickCount + partialTicks, 0, 0);
-            this.cfeCubeModel.renderToBuffer(
+            this.ECFCubeModel.setupAnim(entity, 0, 0, entity.tickCount + partialTicks, 0, 0);
+            this.ECFCubeModel.renderToBuffer(
                     poseStack,
                     buffer.getBuffer(RenderType.entityTranslucent(CUBE_TEXTURE)),
                     packedLight,

@@ -39,8 +39,8 @@ public class TCBlockLootTables extends BlockLootSubProvider {
         this.dropSelf(TCBlocks.STRIPPED_FLOW_CEDAR_LOG.get());
         this.dropSelf(TCBlocks.STRIPPED_FLOW_CEDAR_WOOD.get());
         this.dropOther(TCBlocks.FLOW_CEDAR_ALTAR.get(), TCBlocks.FLOW_CEDAR_LOG.get());
-        this.dropSelf(TCBlocks.CREATIVE_CFE_SOURCE.get());
-        this.dropSelf(TCBlocks.CFE_TRASH_CAN.get());
+        this.dropSelf(TCBlocks.CREATIVE_ECF_SOURCE.get());
+        this.dropSelf(TCBlocks.ECF_TRASH_CAN.get());
 
         this.dropSelf(TCBlocks.FLOW_CEDAR_STAIRS.get());
         this.dropSelf(TCBlocks.FLOW_CEDAR_BUTTON.get());

@@ -9,11 +9,11 @@ import net.minecraft.world.level.pathfinder.Path;
 import net.minecraft.world.phys.Vec3;
 import net.sinedkadis.terracompositio.api.TCCapabilities;
 import net.sinedkadis.terracompositio.api.TerraCompositioAPI;
-import net.sinedkadis.terracompositio.api.networks.cfe.CFENetworkMember;
-import net.sinedkadis.terracompositio.api.networks.cfe.ICFEHandler;
+import net.sinedkadis.terracompositio.api.networks.cfe.ECFNetworkMember;
+import net.sinedkadis.terracompositio.api.networks.cfe.IECFHandler;
 import net.sinedkadis.terracompositio.entity.custom.FlowCedarEntEntity;
 import net.sinedkadis.terracompositio.registries.TCTags;
-import net.sinedkadis.terracompositio.util.helpers.CFEHelper;
+import net.sinedkadis.terracompositio.util.helpers.ECFHelper;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.EnumSet;
@@ -48,11 +48,11 @@ public class ReachSourceGoal extends Goal {
         if (searchCooldown-- > 0) return false;
         searchCooldown = SEARCH_INTERVAL;
 
-        Optional<ICFEHandler> cfeHandler = mob.getInnerCFEOptional().resolve();
+        Optional<IECFHandler> cfeHandler = mob.getInnerECFOptional().resolve();
         if (cfeHandler.isEmpty() || cfeHandler.get().getCFE() > 6) return false;
         if (mob.isExtracting() || mob.isHolding()) return false;
 
-        CFENetworkMember member = searchMember();
+        ECFNetworkMember member = searchMember();
         if (member != null) {
             if (member.getPos().closerThan(mob.blockPosition(), stopDistance)) return false;
             targetPosition = member.getPos().getCenter();
@@ -88,14 +88,14 @@ public class ReachSourceGoal extends Goal {
         return null;
     }
 
-    private @Nullable CFENetworkMember searchMember() {
+    private @Nullable ECFNetworkMember searchMember() {
         BlockPos mobPos = mob.blockPosition();
 
-        for (CFENetworkMember member : TerraCompositioAPI.instance()
-                .getCFENetworkInstance()
+        for (ECFNetworkMember member : TerraCompositioAPI.instance()
+                .getECFNetworkInstance()
                 .getAllCFENetworkMembers(level)) {
 
-            if (!CFEHelper.validMember(member)) continue;
+            if (!ECFHelper.validMember(member)) continue;
 
             BlockPos memberPos = member.getPos();
             if (!memberPos.closerThan(mobPos, searchLimit)) continue;
@@ -104,7 +104,7 @@ public class ReachSourceGoal extends Goal {
             if (member.getMainHandler().getCFE() <= 0) continue;
 
             if (member instanceof FlowCedarEntEntity ent) {
-                boolean hasEnough = ent.getCapability(TCCapabilities.CFE)
+                boolean hasEnough = ent.getCapability(TCCapabilities.ECF)
                         .filter(h -> h.getCFE() > 1000)
                         .isPresent();
                 if (!hasEnough) continue;

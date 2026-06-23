@@ -144,8 +144,8 @@ public class TCItems {
             () -> new CreationFlowJournalItem(new Item.Properties()));
     public static final RegistryObject<Item> FLUID_APPLIER = ITEMS.register("fluid_applier",
             () -> new FluidApplierItem(new Item.Properties()));
-    public static final RegistryObject<Item> CFE_BALL = ITEMS.register("cfe_ball",
-            () -> new CFEBallItem(new Item.Properties()));
+    public static final RegistryObject<Item> ECF_CHARGE = ITEMS.register("ecf_charge",
+            () -> new ECFBallItem(new Item.Properties()));
     public static final RegistryObject<Item> INFUSED_FERTILIZER = ITEMS.register("infused_fertilizer",
             () -> new InfusedFertilizerItem(new Item.Properties()));
 

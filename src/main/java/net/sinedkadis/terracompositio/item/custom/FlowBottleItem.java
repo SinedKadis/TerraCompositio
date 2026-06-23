@@ -22,7 +22,7 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.event.entity.living.LivingEvent;
-import net.sinedkadis.terracompositio.particle.CFEParticleData;
+import net.sinedkadis.terracompositio.particle.ECFParticleData;
 import net.sinedkadis.terracompositio.registries.TCArmorMaterials;
 import net.sinedkadis.terracompositio.registries.TCBlocks;
 import net.sinedkadis.terracompositio.registries.TCEffects;
@@ -165,7 +165,7 @@ public class FlowBottleItem extends Item {
         );
         if (livingEntity.hasEffect(TCEffects.FLOW_SATURATION.get())) {
 
-            clientLevel.addParticle(new CFEParticleData(1 / 20f),
+            clientLevel.addParticle(new ECFParticleData(1 / 20f),
                     pos.x,
                     pos.y,
                     pos.z,

@@ -90,7 +90,7 @@ public class TCBlocks {
     public static final RegistryObject<Block> FLOW_CEDAR_TRAPDOOR = registerBlock("flow_cedar_trapdoor",
             () -> new TrapDoorBlock(BlockBehaviour.Properties.copy(Blocks.OAK_PLANKS).noOcclusion(),BlockSetType.OAK));
     public static final RegistryObject<Block> FLOW_CEDAR_SIGN = BLOCKS.register("flow_cedar_sign",
-            () -> new ModStandingSignBlock(BlockBehaviour.Properties.copy(Blocks.OAK_SIGN), TCWoodTypes.FLOW_CEDAR));
+            () -> new TCStandingSignBlock(BlockBehaviour.Properties.copy(Blocks.OAK_SIGN), TCWoodTypes.FLOW_CEDAR));
     public static final RegistryObject<Block> FLOW_CEDAR_WALL_SIGN = BLOCKS.register("flow_cedar_wall_sign",
             () -> new TCWallSignBlock(BlockBehaviour.Properties.copy(Blocks.OAK_WALL_SIGN), TCWoodTypes.FLOW_CEDAR));
     public static final RegistryObject<Block> FLOW_CEDAR_HANGING_SIGN = BLOCKS.register("flow_cedar_hanging_sign",
@@ -115,10 +115,10 @@ public class TCBlocks {
 
 
     //Creative
-    public static final RegistryObject<Block> CREATIVE_CFE_SOURCE = registerBlock("creative_cfe_source",
-            () -> new CreativeCFESourceBlock(BlockBehaviour.Properties.copy(Blocks.IRON_BLOCK)));
-    public static final RegistryObject<Block> CFE_TRASH_CAN = registerBlock("cfe_trash_can",
-            () -> new CFETrashCanBlock(BlockBehaviour.Properties.copy(Blocks.IRON_BLOCK)));
+    public static final RegistryObject<Block> CREATIVE_ECF_SOURCE = registerBlock("creative_ecf_source",
+            () -> new CreativeECFSourceBlock(BlockBehaviour.Properties.copy(Blocks.IRON_BLOCK)));
+    public static final RegistryObject<Block> ECF_TRASH_CAN = registerBlock("ecf_trash_can",
+            () -> new ECFTrashCanBlock(BlockBehaviour.Properties.copy(Blocks.IRON_BLOCK)));
 
 
     //Technetium
@@ -286,8 +286,8 @@ public class TCBlocks {
     //Misc
     public static final RegistryObject<Block> FLOW_CEDAR_ENT_STATUE = registerBlock("flow_cedar_ent_statue",
             () -> new EntStatueBlock(BlockBehaviour.Properties.copy(Blocks.OAK_PLANKS)));
-    public static final RegistryObject<Block> CFE_BOARD = registerBlock("cfe_board",
-            () -> new CFEBoardBlock(BlockBehaviour.Properties.copy(Blocks.GLASS).sound(new ForgeSoundType(1.0F,
+    public static final RegistryObject<Block> ECF_BOARD = registerBlock("ecf_board",
+            () -> new ECFBoardBlock(BlockBehaviour.Properties.copy(Blocks.GLASS).sound(new ForgeSoundType(1.0F,
                     1.0F,
                     () -> SoundEvents.AMETHYST_BLOCK_STEP,
                     () -> SoundEvents.AMETHYST_BLOCK_STEP,

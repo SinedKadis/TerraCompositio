@@ -9,16 +9,16 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
 import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBEBehaviour;
-import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBECFEBehaviour;
+import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBEECFBehaviour;
 import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBEItemWordlyContainerBehaviour;
-import net.sinedkadis.terracompositio.api.networks.cfe.ICFEHandler;
+import net.sinedkadis.terracompositio.api.networks.cfe.IECFHandler;
 import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
-public class DummyBehaviour implements IBEBehaviour, IBEItemWordlyContainerBehaviour, IBECFEBehaviour {
+public class DummyBehaviour implements IBEBehaviour, IBEItemWordlyContainerBehaviour, IBEECFBehaviour {
     public static final DummyBehaviour instance = new DummyBehaviour();
 
     @Override
@@ -73,8 +73,8 @@ public class DummyBehaviour implements IBEBehaviour, IBEItemWordlyContainerBehav
     }
 
     @Override
-    public ICFEHandler getMainHandler() {
-        return DummyCFEHandler.instance;
+    public IECFHandler getMainHandler() {
+        return DummyECFHandler.instance;
     }
 
     @Override

@@ -17,8 +17,8 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.items.ItemStackHandler;
 import net.sinedkadis.terracompositio.TerraCompositio;
 import net.sinedkadis.terracompositio.api.TerraCompositioAPI;
-import net.sinedkadis.terracompositio.api.networks.cfe.CFENetwork;
-import net.sinedkadis.terracompositio.api.networks.cfe.CFENetworkMember;
+import net.sinedkadis.terracompositio.api.networks.cfe.ECFNetwork;
+import net.sinedkadis.terracompositio.api.networks.cfe.ECFNetworkMember;
 import net.sinedkadis.terracompositio.registries.TCBlockEntities;
 import net.sinedkadis.terracompositio.util.helpers.ParticleHelper;
 import org.jetbrains.annotations.NotNull;
@@ -63,11 +63,11 @@ public class ConstructionDesorberBlockEntity extends AbstractDesorberBlockEntity
         BlockPos pos = event.getPos();
         LevelAccessor level = event.getLevel();
 
-        CFENetwork network = TerraCompositioAPI.instance().getCFENetworkInstance();
-        Set<CFENetworkMember> members = network.getAllCFENetworkMembers((Level) level);
+        ECFNetwork network = TerraCompositioAPI.instance().getECFNetworkInstance();
+        Set<ECFNetworkMember> members = network.getAllCFENetworkMembers((Level) level);
         List<ConstructionDesorberBlockEntity> constructors = members.stream()
                 .filter(cfeSource -> Math.sqrt(cfeSource.getPos().distSqr(pos)) < cfeSource.getRange())
-                .map(CFENetworkMember::getPos)
+                .map(ECFNetworkMember::getPos)
                 .map(cfeSourceBlockPos -> {
                     if (level.getBlockEntity(cfeSourceBlockPos) instanceof ConstructionDesorberBlockEntity blockEntity)
                         return blockEntity;
@@ -107,10 +107,10 @@ public class ConstructionDesorberBlockEntity extends AbstractDesorberBlockEntity
     public static void onBreakEvent(BlockEvent.BreakEvent event){
         BlockPos pos = event.getPos();
         LevelAccessor level = event.getLevel();
-        CFENetwork network = TerraCompositioAPI.instance().getCFENetworkInstance();
-        Set<CFENetworkMember> sources = network.getAllCFENetworkMembers((Level) level);
+        ECFNetwork network = TerraCompositioAPI.instance().getECFNetworkInstance();
+        Set<ECFNetworkMember> sources = network.getAllCFENetworkMembers((Level) level);
         List<ConstructionDesorberBlockEntity> constructors = sources.stream()
-                .map(CFENetworkMember::getPos)
+                .map(ECFNetworkMember::getPos)
                 .filter(cfeSourceBlockPos -> Math.sqrt(cfeSourceBlockPos.distSqr(pos)) < 7)
                 .map(cfeSourceBlockPos -> {
                     if (level.getBlockEntity(cfeSourceBlockPos) instanceof ConstructionDesorberBlockEntity blockEntity)

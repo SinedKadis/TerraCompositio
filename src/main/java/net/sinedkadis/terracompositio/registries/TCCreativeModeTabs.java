@@ -19,8 +19,8 @@ public class TCCreativeModeTabs {
                         .title(Component.translatable("creativetab.terra_compositio"))
                         .displayItems((pParameters, pOutput) -> {
                             //Creative
-                            pOutput.accept(TCBlocks.CREATIVE_CFE_SOURCE.get());
-                            pOutput.accept(TCBlocks.CFE_TRASH_CAN.get());
+                            pOutput.accept(TCBlocks.CREATIVE_ECF_SOURCE.get());
+                            pOutput.accept(TCBlocks.ECF_TRASH_CAN.get());
 
 
                             //Useful
@@ -35,7 +35,7 @@ public class TCCreativeModeTabs {
                             pOutput.accept(TCBlocks.WEDGE.get());
                             pOutput.accept(TCItems.SHIELDED_BUNDLE.get());
                             addFluidAppliers(pOutput);
-                            pOutput.accept(TCItems.CFE_BALL.get());
+                            pOutput.accept(TCItems.ECF_CHARGE.get());
                             pOutput.accept(TCItems.INFUSED_FERTILIZER.get());
 
                             //Cedar blocks
@@ -96,7 +96,7 @@ public class TCCreativeModeTabs {
                             pOutput.accept(TCBlocks.TECHNETIUM_ORE.get());
                             pOutput.accept(TCBlocks.TECHNETIUM_DEEPSLATE_ORE.get());
 
-                            pOutput.accept(TCBlocks.CFE_BOARD.get());
+                            pOutput.accept(TCBlocks.ECF_BOARD.get());
 
                             //  armor
                             pOutput.accept(TCItems.TECHNETIUM_CROWN.get());

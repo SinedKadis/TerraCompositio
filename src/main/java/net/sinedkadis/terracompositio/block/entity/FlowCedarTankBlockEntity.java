@@ -28,7 +28,7 @@ import net.sinedkadis.terracompositio.registries.TCFluids;
 import net.sinedkadis.terracompositio.registries.TCTags;
 import net.sinedkadis.terracompositio.util.FluidComponent;
 import net.sinedkadis.terracompositio.util.helpers.BlockPosHelper;
-import net.sinedkadis.terracompositio.util.helpers.CFEHelper;
+import net.sinedkadis.terracompositio.util.helpers.ECFHelper;
 import net.sinedkadis.terracompositio.util.helpers.ParticleHelper;
 import org.jetbrains.annotations.Nullable;
 
@@ -211,7 +211,7 @@ public class FlowCedarTankBlockEntity extends TCBlockEntity implements FluidNetw
 
     @Override
     public void onFluidNetworkMemberUpdate(FluidNetworkMemberBE updated) {
-        if (updated.getPriority() > this.getPriority() && getMainHandler().getFluidInTank(0).getAmount() > 0 && CFEHelper.validMember(updated)) {
+        if (updated.getPriority() > this.getPriority() && getMainHandler().getFluidInTank(0).getAmount() > 0 && ECFHelper.validMember(updated)) {
             IFluidHandler mainHandler = updated.getMainHandler();
             if (mainHandler.getTankCapacity(0) - mainHandler.getFluidInTank(0).getAmount() > 0) {
                 scheduleMemberUpdate(updated);
@@ -242,7 +242,7 @@ public class FlowCedarTankBlockEntity extends TCBlockEntity implements FluidNetw
 
     @Override
     public void addTooltipLines(CompoundTag data, List<Component> tooltip, boolean isShifting) {
-        tooltip.add(Component.translatable("block.terracompositio.block_header"));
+        TooltipHelper.addHeader(TooltipHelper.Headers.BLOCK,tooltip);
 
         if (isShifting)
             TooltipHelper.addIfExist(TooltipHelper.Keys.RANGE, tooltip, data);
