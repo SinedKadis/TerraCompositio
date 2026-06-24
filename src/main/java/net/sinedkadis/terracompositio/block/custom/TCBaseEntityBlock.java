@@ -46,7 +46,7 @@ public abstract class TCBaseEntityBlock extends Block implements EntityBlock {
         return getBlockEntityType().create(pPos, pState);
     }
 
-    abstract protected BlockEntityType<? extends TCBlockEntity> getBlockEntityType();
+    public abstract BlockEntityType<? extends TCBlockEntity> getBlockEntityType();
 
     @Override
     public void onRemove(BlockState pState,  Level pLevel, BlockPos pPos, BlockState pNewState, boolean pIsMoving) {

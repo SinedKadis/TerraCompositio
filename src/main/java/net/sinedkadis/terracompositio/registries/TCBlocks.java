@@ -298,6 +298,12 @@ public class TCBlocks {
             () -> new AirSaturatorBlock(BlockBehaviour.Properties.copy(Blocks.OAK_PLANKS).strength(3f)));
 
 
+    //Formal Energy Provider
+    public static final RegistryObject<Block> FE_PROVIDER_CORE = registerBlock("formal_energy_provider_core",
+            () -> new FormalEnergyProviderCoreBlock(BlockBehaviour.Properties.copy(Blocks.NETHERITE_BLOCK)));
+    public static final RegistryObject<Block> FE_PROVIDER_PYLON = registerBlock("formal_energy_provider_pylon",
+            () -> new FormalEnergyProviderPylonBlock(BlockBehaviour.Properties.copy(Blocks.TINTED_GLASS)));
+
     public static <T extends Block>RegistryObject<T> registerBlock(String name, Supplier<T> block) {
         return registerBlock(name, block, () -> true);
     }

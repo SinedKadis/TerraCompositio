@@ -212,7 +212,8 @@ public class FlowCedarTankBlock extends TCBaseEntityBlock{
     }
 
     @Override
-    protected @NotNull BlockEntityType<? extends TCBlockEntity> getBlockEntityType() {
+    @NotNull
+    public BlockEntityType<? extends TCBlockEntity> getBlockEntityType() {
         return TCBlockEntities.FLOW_CEDAR_TANK_BE.get();
     }
 }

@@ -33,7 +33,7 @@ public class MatterInfuserPortBlock extends MatterInfuserBaseEntityBlock {
     }
 
     @Override
-    protected BlockEntityType<? extends TCBlockEntity> getBlockEntityType() {
+    public BlockEntityType<? extends TCBlockEntity> getBlockEntityType() {
         return TCBlockEntities.MATTER_INFUSER_PORT_BE.get();
     }
 

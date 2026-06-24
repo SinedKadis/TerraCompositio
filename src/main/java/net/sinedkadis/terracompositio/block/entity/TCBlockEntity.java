@@ -20,6 +20,7 @@ import net.sinedkadis.terracompositio.api.IHaveKnowledge;
 import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBEBehaviour;
 import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBEECFBehaviour;
 import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBEItemBehaviour;
+import net.sinedkadis.terracompositio.block.custom.TCBaseEntityBlock;
 import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -32,6 +33,10 @@ public abstract class TCBlockEntity extends BlockEntity implements IHaveKnowledg
     @Getter
     protected List<IBEBehaviour> behaviours = new ArrayList<>();
 
+    public TCBlockEntity(BlockPos pos, BlockState state) {
+        super(((TCBaseEntityBlock) state.getBlock()).getBlockEntityType(), pos, state);
+        addBEBehaviours(behaviours);
+    }
     public TCBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
         addBEBehaviours(behaviours);

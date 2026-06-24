@@ -146,6 +146,9 @@ public class TCCreativeModeTabs {
                             pOutput.accept(TCBlocks.FLOATING_LEVER.get());
 
 
+                            //FE providers
+                            pOutput.accept(TCBlocks.FE_PROVIDER_CORE.get());
+                            pOutput.accept(TCBlocks.FE_PROVIDER_PYLON.get());
 
 
                             //misc

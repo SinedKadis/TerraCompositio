@@ -114,7 +114,7 @@ public class FlowCedarCasingBlock extends TCBaseEntityBlock implements IFluidApp
     }
 
     @Override
-    protected BlockEntityType<? extends TCBlockEntity> getBlockEntityType() {
+    public BlockEntityType<? extends TCBlockEntity> getBlockEntityType() {
         return TCBlockEntities.FLOW_CEDAR_CASING_BE.get();
     }
 

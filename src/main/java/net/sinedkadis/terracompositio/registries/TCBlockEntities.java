@@ -93,6 +93,11 @@ public class TCBlockEntities {
     public static final RegistryObject<BlockEntityType<AirSaturatorBlockEntity>> AIR_SATURATOR_BE =
             registerBE("air_saturator_be",AirSaturatorBlockEntity::new, AIR_SATURATOR);
 
+    public static final RegistryObject<BlockEntityType<FormalEnergyProviderCoreBlockEntity>> FE_PROVIDER_CORE_BE =
+            registerBE("formal_energy_provider_core_be",FormalEnergyProviderCoreBlockEntity::new, FE_PROVIDER_CORE);
+    public static final RegistryObject<BlockEntityType<FormalEnergyProviderPylonBlockEntity>> FE_PROVIDER_PYLON_BE =
+            registerBE("formal_energy_provider_pylon_be",FormalEnergyProviderPylonBlockEntity::new, FE_PROVIDER_PYLON);
+
 
     public static <T extends BlockEntity> RegistryObject<BlockEntityType<T>> registerBE(String name, BlockEntityType.BlockEntitySupplier<T> blockEntity, RegistryObject<Block>... blocks) {
         return registerBE(name, blockEntity,  () -> true, blocks);

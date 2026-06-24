@@ -52,7 +52,8 @@ public class TimePassageDesorberBlock extends AbstractDesorberBlock{
     }
 
     @Override
-    protected @NotNull BlockEntityType<? extends TCBlockEntity> getBlockEntityType() {
+    @NotNull
+    public BlockEntityType<? extends TCBlockEntity> getBlockEntityType() {
         return TCBlockEntities.TIME_PASSAGE_DESORBER_BE.get();
     }
 

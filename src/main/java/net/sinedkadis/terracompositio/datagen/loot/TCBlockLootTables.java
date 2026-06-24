@@ -114,6 +114,9 @@ public class TCBlockLootTables extends BlockLootSubProvider {
         this.dropSelf(TCBlocks.FLOATING_BUTTON.get());
         this.dropSelf(TCBlocks.FLOATING_LEVER.get());
 
+        this.dropSelf(TCBlocks.FE_PROVIDER_CORE.get());
+        this.dropSelf(TCBlocks.FE_PROVIDER_PYLON.get());
+
         if (ModList.get().isLoaded("create")) {
             Set<Block> blocks = new HashSet<>();
             TerraCompositio.createCompat.getDataGen().dropSelf(blocks);

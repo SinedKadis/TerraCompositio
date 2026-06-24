@@ -1,19 +1,22 @@
 package net.sinedkadis.terracompositio.block.custom;
 
+import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.sinedkadis.terracompositio.block.entity.TCBlockEntity;
 import net.sinedkadis.terracompositio.registries.TCBlockEntities;
-import org.jetbrains.annotations.NotNull;
 
-public class ECFTrashCanBlock extends TCBaseEntityBlock {
-    public ECFTrashCanBlock(Properties pProperties) {
+import javax.annotation.ParametersAreNonnullByDefault;
+
+
+@ParametersAreNonnullByDefault
+@MethodsReturnNonnullByDefault
+public class FormalEnergyProviderCoreBlock extends TCBaseEntityBlock{
+    public FormalEnergyProviderCoreBlock(Properties pProperties) {
         super(pProperties);
     }
 
     @Override
-    @NotNull
     public BlockEntityType<? extends TCBlockEntity> getBlockEntityType() {
-        return TCBlockEntities.ECF_TRASH_CAN_BE.get();
+        return TCBlockEntities.FE_PROVIDER_CORE_BE.get();
     }
-
 }

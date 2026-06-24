@@ -24,7 +24,8 @@ public class MatterInfuserUnitBlock extends MatterInfuserBaseEntityBlock {
     }
 
     @Override
-    protected @NotNull BlockEntityType<? extends TCBlockEntity> getBlockEntityType() {
+    @NotNull
+    public BlockEntityType<? extends TCBlockEntity> getBlockEntityType() {
         return TCBlockEntities.MATTER_INFUSER_IO_BE.get();
     }
 
