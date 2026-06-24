@@ -43,24 +43,41 @@ public class MatterInfuserPortBlock extends MatterInfuserBaseEntityBlock {
         BlockPos casingPos = pPos.relative(pState.getValue(FACING).getOpposite());
         FlowCedarCasingBlockEntity casingBE = (FlowCedarCasingBlockEntity) pLevel.getBlockEntity(casingPos);
         if (casingBE != null) {
-            ItemHandlerBehaviour itemBehaviour = ((ItemHandlerBehaviour) casingBE.getItemBehaviour());
+            ItemHandlerBehaviour itemBehaviour = casingBE.getItemBehaviours().stream()
+                    .filter(ItemHandlerBehaviour.class::isInstance)
+                    .map(ItemHandlerBehaviour.class::cast)
+                    .findAny().orElse(null);
             if (itemBehaviour != null) {
                 IItemHandlerModifiable itemHandler = itemBehaviour.getItemHandler();
                 int i = FlowCedarCasingBlockEntity.INPUT_INVENTORY_SLOT;
-                var slot = itemHandler.getStackInSlot(i);
-                if (!slot.isEmpty()) {
-                    itemBehaviour.ignoreRestrictions = true;
-                    ItemStack extracted = itemHandler.extractItem(i, 64, false);
-                    itemBehaviour.ignoreRestrictions = false;
-                    PlayerHelper.addOrDropToPlayer(pPlayer, extracted, true);
+                ItemStack stackInSlot = itemHandler.getStackInSlot(i);
+                if (!stackInSlot.isEmpty()) {
+
+                    itemHandler.setStackInSlot(i, ItemStack.EMPTY);
+
+                    PlayerHelper.addOrDropToPlayer(pPlayer, stackInSlot, true);
                     pLevel.playSound(pPlayer, pPos, SoundEvents.ITEM_FRAME_REMOVE_ITEM, SoundSource.BLOCKS);
                     return InteractionResult.SUCCESS;
                 }
-                if (!itemInHand.isEmpty() && itemBehaviour.allowInsert(i, itemInHand, Direction.UP, true) && hasSpace(itemHandler, i)) {
-                    itemBehaviour.ignoreRestrictions = true;
-                    ItemStack left = itemHandler.insertItem(i, itemInHand.copy(), false);
-                    itemBehaviour.ignoreRestrictions = false;
-                    pPlayer.setItemInHand(pHand, left);
+                if (!itemInHand.isEmpty() && itemBehaviour.allowInsert(i, itemInHand, Direction.UP, true)
+                        && hasSpace(itemHandler, i)
+                        && (ItemStack.isSameItem(itemInHand, stackInSlot) || stackInSlot.isEmpty())) {
+
+
+                    int count = itemInHand.getCount() + stackInSlot.getCount();
+                    int left = count - 64;
+                    ItemStack handCopy = itemInHand.copy();
+                    ItemStack storageCopy = stackInSlot.copy();
+                    if (left > 0) {
+                        storageCopy.setCount(64);
+                        handCopy.setCount(left);
+                    } else {
+                        if (stackInSlot.isEmpty()) storageCopy = handCopy;
+                        storageCopy.setCount(count);
+                        handCopy = ItemStack.EMPTY;
+                    }
+                    itemHandler.setStackInSlot(i, storageCopy);
+                    pPlayer.setItemInHand(pHand, handCopy);
                     pLevel.playSound(pPlayer, pPos, SoundEvents.ITEM_FRAME_ADD_ITEM, SoundSource.BLOCKS);
                     return InteractionResult.SUCCESS;
                 }

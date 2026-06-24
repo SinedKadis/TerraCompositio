@@ -1,0 +1,30 @@
+{
+  "name": "book.terracompositio.creation_flow_journal.entry.technetium_armor.name",
+  "category": "terracompositio:day_5",
+  "icon": "terracompositio:technetium_crown",
+  "flag": "terracompositio:day_5",
+  "pages": [
+    "book.terracompositio.creation_flow_journal.entry.technetium_armor.desc",
+    {
+      "type": "patchouli:crafting",
+      "recipe": "terracompositio:technetium_crown",
+      "text": "book.terracompositio.creation_flow_journal.entry.technetium_armor.crown"
+    },
+    {
+      "type": "patchouli:crafting",
+      "recipe": "terracompositio:technetium_chestplate",
+      "text": "book.terracompositio.creation_flow_journal.entry.technetium_armor.chestplate"
+    },
+    {
+      "type": "patchouli:crafting",
+      "recipe": "terracompositio:technetium_leggings",
+      "text": "book.terracompositio.creation_flow_journal.entry.technetium_armor.leggings"
+    },
+    {
+      "type": "patchouli:crafting",
+      "recipe": "terracompositio:technetium_boots",
+      "text": "book.terracompositio.creation_flow_journal.entry.technetium_armor.boots"
+    },
+    "book.terracompositio.creation_flow_journal.entry.technetium_armor.boots_usage"
+  ]
+}

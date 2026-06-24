@@ -15,7 +15,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.Optional;
 
-import static net.sinedkadis.terracompositio.util.helpers.CFEHelper.placeCFECloud;
+import static net.sinedkadis.terracompositio.util.helpers.ECFHelper.placeCFECloud;
 
 @Mixin(AbstractFurnaceBlockEntity.class)
 public class AbstractFurnaceBlockEntityMixin {

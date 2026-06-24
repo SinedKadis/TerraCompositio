@@ -6,7 +6,7 @@ import net.minecraft.world.level.block.CeilingHangingSignBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.WoodType;
-import net.sinedkadis.terracompositio.block.entity.ModHangingSignBlockEntity;
+import net.sinedkadis.terracompositio.block.entity.TCHangingSignBlockEntity;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 
@@ -19,6 +19,6 @@ public class TCHangingSignBlock extends CeilingHangingSignBlock {
 
     @Override
     public BlockEntity newBlockEntity(BlockPos pPos, BlockState pState) {
-        return new ModHangingSignBlockEntity(pPos, pState);
+        return new TCHangingSignBlockEntity(pPos, pState);
     }
 }

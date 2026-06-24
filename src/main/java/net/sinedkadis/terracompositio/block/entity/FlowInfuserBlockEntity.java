@@ -3,8 +3,6 @@ package net.sinedkadis.terracompositio.block.entity;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
-import net.minecraft.nbt.CompoundTag;
-import net.minecraft.network.chat.Component;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.item.ItemStack;
@@ -14,12 +12,11 @@ import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.wrapper.EmptyHandler;
 import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBEBehaviour;
-import net.sinedkadis.terracompositio.api.networks.cfe.ICFEHandler;
-import net.sinedkadis.terracompositio.block.behaviours.CFEHandlerBehaviour;
+import net.sinedkadis.terracompositio.api.networks.cfe.IECFHandler;
+import net.sinedkadis.terracompositio.block.behaviours.ECFHandlerBehaviour;
 import net.sinedkadis.terracompositio.block.behaviours.ItemHandlerBehaviour;
-import net.sinedkadis.terracompositio.config.TCCommonConfigs;
 import net.sinedkadis.terracompositio.config.TCInnerConfig;
-import net.sinedkadis.terracompositio.particle.CFEParticleData;
+import net.sinedkadis.terracompositio.particle.ECFParticleData;
 import net.sinedkadis.terracompositio.recipe.FlowInfusionRecipe;
 import net.sinedkadis.terracompositio.registries.TCBlockEntities;
 import org.jetbrains.annotations.Nullable;
@@ -38,22 +35,8 @@ public class FlowInfuserBlockEntity extends TCCraftingBlockEntity {
 
     @Override
     public void addBEBehaviours(List<IBEBehaviour> list) {
-        list.add(new CFEHandlerBehaviour(this){
-
-            @Override
-            public void onAppendServerData(CompoundTag compoundTag) {
-                super.onAppendServerData(compoundTag);
-                compoundTag.putFloat("cfe_tick",tickCFECost);
-            }
-
-            @Override
-            public void onAppendTooltip(List<Component> iTooltip, CompoundTag serverData) {
-                super.onAppendTooltip(iTooltip, serverData);
-                if (serverData.contains("cfe_tick") && TCCommonConfigs.DEBUG.get()) {
-                    iTooltip.add(Component.translatable("block.terracompositio." + "cfe_tick", serverData.getFloat("cfe_tick")));
-                }
-            }
-        }.priority(TCInnerConfig.DEFAULT_CONSUMER_PRIORITY));
+        list.add(new ECFHandlerBehaviour(this)
+                .priority(TCInnerConfig.DEFAULT_CONSUMER_PRIORITY));
         list.add(new ItemHandlerBehaviour(this, 2) {
             @Override
             public boolean allowInsert(int pSlot, ItemStack pStack, @Nullable Direction pDirection, boolean manual) {
@@ -125,15 +108,15 @@ public class FlowInfuserBlockEntity extends TCCraftingBlockEntity {
         return (IItemHandlerModifiable) getCapability(ForgeCapabilities.ITEM_HANDLER).orElse(EmptyHandler.INSTANCE);
     }
 
-    protected ICFEHandler cfeContainer() {
-        return ((CFEHandlerBehaviour) behaviours.get(0)).getMainHandler();
+    protected IECFHandler cfeContainer() {
+        return ((ECFHandlerBehaviour) behaviours.get(0)).getMainHandler();
     }
 
 
     private void spawnParticles() {
         if (level instanceof ServerLevel serverLevel) {
             BlockPos blockPos = getBlockPos();
-            serverLevel.sendParticles(new CFEParticleData(1 / 20f),
+            serverLevel.sendParticles(new ECFParticleData(1 / 20f),
                     blockPos.getX() + 0.5D,
                     blockPos.getY() + 0.5D,
                     blockPos.getZ() + 0.5D, 1, 0, -0.1D, 0, 0.1D);
@@ -141,25 +124,23 @@ public class FlowInfuserBlockEntity extends TCCraftingBlockEntity {
     }
 
 
-    protected ItemStack craftItem() {
+    protected void craftItem() {
         Optional<FlowInfusionRecipe> recipe = getCurrentRecipe();
         if (recipe.isPresent()) {
             ItemStack result = recipe.get().getResultItem(null);
             this.getCapability(ForgeCapabilities.ITEM_HANDLER).ifPresent(iItemHandler -> {
-                if (getItemBehaviour() instanceof ItemHandlerBehaviour itemHandlerBehaviour) {
-                    itemHandlerBehaviour.ignoreRestrictions = true;
-                    iItemHandler.extractItem(0, 1, false);
-                    iItemHandler.insertItem(1, result.copy(), false);
-                    itemHandlerBehaviour.ignoreRestrictions = false;
+                if (iItemHandler instanceof IItemHandlerModifiable modifiable) {
+                    ItemStack copy = modifiable.getStackInSlot(0).copy();
+                    copy.shrink(1);
+                    modifiable.setStackInSlot(0, copy);
+                    modifiable.setStackInSlot(1, result.copy());
                     if (level != null) {
                         BlockState blockState = getBlockState();
                         level.sendBlockUpdated(worldPosition, blockState, blockState, 3);
                     }
                 }
             });
-            return result;
         }
-        return ItemStack.EMPTY;
     }
 
 

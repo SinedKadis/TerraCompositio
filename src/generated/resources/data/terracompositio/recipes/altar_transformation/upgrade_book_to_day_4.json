@@ -1,0 +1,19 @@
+{
+  "type": "terracompositio:altar_transformation",
+  "ingredients": [
+    {
+      "type": "forge:nbt",
+      "count": 1,
+      "item": "terracompositio:creation_flow_journal",
+      "nbt": "{day:3}"
+    },
+    {
+      "item": "terracompositio:ecf_charge"
+    }
+  ],
+  "output": {
+    "count": 1,
+    "item": "terracompositio:creation_flow_journal",
+    "nbt": "{day:4}"
+  }
+}

@@ -4,7 +4,6 @@ import com.mojang.blaze3d.platform.Lighting;
 import com.mojang.blaze3d.systems.RenderSystem;
 import com.mojang.blaze3d.vertex.PoseStack;
 import com.mojang.math.Axis;
-import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
 import net.minecraft.client.gui.Font;
 import net.minecraft.client.gui.GuiGraphics;
@@ -23,9 +22,6 @@ import net.minecraft.network.chat.MutableComponent;
 import net.minecraft.util.FormattedCharSequence;
 import net.minecraft.util.Mth;
 import net.minecraft.world.entity.Entity;
-import net.minecraft.world.entity.EntityType;
-import net.minecraft.world.entity.player.Player;
-import net.minecraft.world.entity.projectile.Projectile;
 import net.minecraft.world.inventory.InventoryMenu;
 import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
@@ -44,13 +40,10 @@ import net.sinedkadis.terracompositio.registries.TCItems;
 import net.sinedkadis.terracompositio.util.FluidComponent;
 import net.sinedkadis.terracompositio.util.ItemComponent;
 import net.sinedkadis.terracompositio.util.accessors.PlayerKnowledgeAccessor;
-import org.jetbrains.annotations.Nullable;
-import snownee.jade.util.CommonProxy;
+import net.sinedkadis.terracompositio.util.helpers.PlayerHelper;
 
 import java.util.ArrayList;
 import java.util.List;
-import java.util.Optional;
-import java.util.function.Predicate;
 
 public class KnowledgeOverlay {
 
@@ -97,10 +90,14 @@ public class KnowledgeOverlay {
         }
         boolean isShifting = player.isShiftKeyDown();
 
+        TCClientConfigs.AppleMode appleMode = TCClientConfigs.APPLE_SHOW_MODE.get();
+        if (appleMode.equals(TCClientConfigs.AppleMode.ALWAYS)) isShifting = true;
+        if (appleMode.equals(TCClientConfigs.AppleMode.SHIFT) && !isShifting) return;
+
         List<Component> tooltip = new ArrayList<>();
         HitResult hit = mc.hitResult;
 
-        EntityHitResult entityResult = getEntityHitResult(mc, player, level);
+        EntityHitResult entityResult = PlayerHelper.getEntityHitResult(mc, player, level);
 
         boolean isEntity = false;
         Entity entity = null;
@@ -155,30 +152,6 @@ public class KnowledgeOverlay {
 
         renderOverlay(mc, graphics, partialTicks, width, height, tooltip);
 
-    }
-
-    private static @Nullable EntityHitResult getEntityHitResult(Minecraft mc, LocalPlayer player, Level level) {
-        EntityHitResult entityResult;
-        Camera camera = mc.gameRenderer.getMainCamera();
-        Vec3 cameraPosition = camera.getPosition();
-        Vec3 traceEnd;
-        float playerReach = (float) player.getEntityReach();
-        if (mc.hitResult == null) {
-            Vec3 lookVector = new Vec3(camera.getLookVector().mul(playerReach));
-            traceEnd = cameraPosition.add(lookVector);
-        } else if (mc.hitResult.getType() != HitResult.Type.BLOCK) {
-            traceEnd = mc.hitResult.getLocation();
-            traceEnd = cameraPosition.add(traceEnd.subtract(cameraPosition).normalize().scale(playerReach * 1.001));
-        } else {
-            traceEnd = mc.hitResult.getLocation();
-            traceEnd = cameraPosition.add(traceEnd.subtract(cameraPosition));
-        }
-        AABB bound = new AABB(cameraPosition, traceEnd);
-        Predicate<Entity> predicate = (e) -> canBeTarget(e, player);
-
-
-        entityResult = getEntityHitResult(level, player, cameraPosition, traceEnd, bound, predicate);
-        return entityResult;
     }
 
     /**
@@ -392,60 +365,4 @@ public class KnowledgeOverlay {
         poseStack.popPose();
     }
 
-    public static @Nullable EntityHitResult getEntityHitResult(Level worldIn, Entity projectile, Vec3 startVec, Vec3 endVec, AABB boundingBox, Predicate<Entity> filter) {
-        double d0 = Double.MAX_VALUE;
-        Entity entity = null;
-
-        for (Entity entity1 : worldIn.getEntities(projectile, boundingBox, filter)) {
-            AABB axisalignedbb = entity1.getBoundingBox();
-            if (axisalignedbb.getSize() < 0.3) {
-                axisalignedbb = axisalignedbb.inflate(0.3);
-            }
-
-            if (axisalignedbb.contains(startVec)) {
-                entity = entity1;
-                break;
-            }
-
-            Optional<Vec3> optional = axisalignedbb.clip(startVec, endVec);
-            if (optional.isPresent()) {
-                double d1 = startVec.distanceToSqr(optional.get());
-                if (d1 < d0) {
-                    entity = entity1;
-                    d0 = d1;
-                }
-            }
-        }
-
-        return entity == null ? null : new EntityHitResult(entity);
-    }
-
-    private static boolean canBeTarget(Entity target, Entity viewEntity) {
-        if (target.isRemoved()) {
-            return false;
-        } else if (target.isSpectator()) {
-            return false;
-        } else if (target == viewEntity.getVehicle()) {
-            return false;
-        } else {
-            if (target instanceof Projectile projectile) {
-                if (projectile.tickCount <= 10) {
-                    return false;
-                }
-            }
-
-            if (CommonProxy.isMultipartEntity(target) && !target.isPickable()) {
-                return false;
-            } else {
-                if (viewEntity instanceof Player player) {
-                    if (target.isInvisibleTo(player)) {
-                        return false;
-                    }
-
-                    Minecraft mc = Minecraft.getInstance();
-                    return mc.gameMode == null || !mc.gameMode.isDestroying() || target.getType() != EntityType.ITEM;
-                } else return !target.isInvisible();
-            }
-        }
-    }
 }

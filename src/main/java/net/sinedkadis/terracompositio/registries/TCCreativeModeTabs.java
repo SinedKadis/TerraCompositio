@@ -1,6 +1,7 @@
 package net.sinedkadis.terracompositio.registries;
 
 import net.minecraft.core.registries.Registries;
+import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.item.CreativeModeTab;
 import net.minecraft.world.item.ItemStack;
@@ -18,8 +19,8 @@ public class TCCreativeModeTabs {
                         .title(Component.translatable("creativetab.terra_compositio"))
                         .displayItems((pParameters, pOutput) -> {
                             //Creative
-                            pOutput.accept(TCBlocks.CREATIVE_CFE_SOURCE.get());
-                            pOutput.accept(TCBlocks.CFE_TRASH_CAN.get());
+                            pOutput.accept(TCBlocks.CREATIVE_ECF_SOURCE.get());
+                            pOutput.accept(TCBlocks.ECF_TRASH_CAN.get());
 
 
                             //Useful
@@ -33,8 +34,8 @@ public class TCCreativeModeTabs {
                             pOutput.accept(TCFluids.BIRCH_JUICE_FLUID.bucket.get());
                             pOutput.accept(TCBlocks.WEDGE.get());
                             pOutput.accept(TCItems.SHIELDED_BUNDLE.get());
-                            pOutput.accept(TCItems.FLUID_APPLIER.get());
-                            pOutput.accept(TCItems.CFE_BALL.get());
+                            addFluidAppliers(pOutput);
+                            pOutput.accept(TCItems.ECF_CHARGE.get());
                             pOutput.accept(TCItems.INFUSED_FERTILIZER.get());
 
                             //Cedar blocks
@@ -95,6 +96,8 @@ public class TCCreativeModeTabs {
                             pOutput.accept(TCBlocks.TECHNETIUM_ORE.get());
                             pOutput.accept(TCBlocks.TECHNETIUM_DEEPSLATE_ORE.get());
 
+                            pOutput.accept(TCBlocks.ECF_BOARD.get());
+
                             //  armor
                             pOutput.accept(TCItems.TECHNETIUM_CROWN.get());
                             pOutput.accept(TCItems.TECHNETIUM_CHESTPLATE.get());
@@ -103,7 +106,7 @@ public class TCCreativeModeTabs {
 
 
                             //be
-                            pOutput.accept(TCBlocks.FLOW_CEDAR_PORT.get());
+                            pOutput.accept(TCBlocks.FLOW_CEDAR_ALTAR.get());
                             pOutput.accept(TCItems.FLOW_INFUSER_KIT.get());
                             pOutput.accept(TCBlocks.FLOW_INFUSER.get());
                             pOutput.accept(TCBlocks.AIR_SATURATOR.get());
@@ -139,6 +142,9 @@ public class TCCreativeModeTabs {
                             pOutput.accept(TCBlocks.FLOATING_TORCH_HOLDER.get());
                             pOutput.accept(TCBlocks.INFUSED_IRON_PRESSURE_PLATE.get());
                             pOutput.accept(TCBlocks.INFUSED_IRON_DOOR.get());
+                            pOutput.accept(TCBlocks.FLOATING_BUTTON.get());
+                            pOutput.accept(TCBlocks.FLOATING_LEVER.get());
+
 
 
 
@@ -153,6 +159,15 @@ public class TCCreativeModeTabs {
 
                         })
                         .build());
+    }
+
+    private static void addFluidAppliers(CreativeModeTab.Output pOutput) {
+        pOutput.accept(TCItems.FLUID_APPLIER.get());
+        ItemStack itemStack = new ItemStack(TCItems.FLUID_APPLIER.get());
+        CompoundTag tag = itemStack.getOrCreateTag();
+        tag.putInt("Amount", 8000);
+        tag.putString("FluidName", "terracompositio:flow_source");
+        pOutput.accept(itemStack);
     }
 
     private static void addBooks(CreativeModeTab.Output pOutput) {

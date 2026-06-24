@@ -20,14 +20,14 @@ import org.jetbrains.annotations.NotNull;
 import java.util.function.IntFunction;
 
 public class TCBoatEntity extends Boat {
-    private static final EntityDataAccessor<Integer> DATA_ID_TYPE = SynchedEntityData.defineId(Boat.class, EntityDataSerializers.INT);
+    private static final EntityDataAccessor<Integer> DATA_ID_TYPE = SynchedEntityData.defineId(TCBoatEntity.class, EntityDataSerializers.INT);
 
     public TCBoatEntity(EntityType<? extends Boat> pEntityType, Level pLevel) {
         super(pEntityType, pLevel);
     }
 
     public TCBoatEntity(Level level, double pX, double pY, double pZ) {
-        this(TCEntities.MOD_BOAT.get(), level);
+        this(TCEntities.TC_BOAT.get(), level);
         this.setPos(pX, pY, pZ);
         this.xo = pX;
         this.yo = pY;
@@ -70,6 +70,7 @@ public class TCBoatEntity extends Boat {
 
         private final String name;
         private final Block planks;
+        @SuppressWarnings("deprecation")
         public static final StringRepresentable.EnumCodec<TCBoatEntity.Type> CODEC = StringRepresentable.fromEnum(TCBoatEntity.Type::values);
         private static final IntFunction<Type> BY_ID = ByIdMap.continuous(Enum::ordinal, values(), ByIdMap.OutOfBoundsStrategy.ZERO);
 

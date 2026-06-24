@@ -1,7 +1,6 @@
 package net.sinedkadis.terracompositio.entity.custom;
 
 import lombok.Getter;
-import net.minecraft.ChatFormatting;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -39,26 +38,23 @@ import net.minecraftforge.items.ItemStackHandler;
 import net.sinedkadis.terracompositio.api.IHaveKnowledge;
 import net.sinedkadis.terracompositio.api.TCCapabilities;
 import net.sinedkadis.terracompositio.api.TerraCompositioAPI;
-import net.sinedkadis.terracompositio.api.dummies.DummyCFEHandler;
+import net.sinedkadis.terracompositio.api.dummies.DummyECFHandler;
+import net.sinedkadis.terracompositio.api.helpers.TooltipHelper;
 import net.sinedkadis.terracompositio.api.networks.NetworkAction;
-import net.sinedkadis.terracompositio.api.networks.cfe.CFENetwork;
-import net.sinedkadis.terracompositio.api.networks.cfe.CFENetworkMember;
-import net.sinedkadis.terracompositio.api.networks.cfe.CFENetworkMemberEntity;
-import net.sinedkadis.terracompositio.api.networks.cfe.ICFEHandler;
+import net.sinedkadis.terracompositio.api.networks.cfe.*;
 import net.sinedkadis.terracompositio.block.entity.EntStatueBlockEntity;
-import net.sinedkadis.terracompositio.cfe.CFEContainer;
-import net.sinedkadis.terracompositio.cfe.PPCFEMemberProxy;
+import net.sinedkadis.terracompositio.ecf.ECFContainer;
+import net.sinedkadis.terracompositio.ecf.PPECFMemberProxy;
 import net.sinedkadis.terracompositio.config.TCClientConfigs;
 import net.sinedkadis.terracompositio.config.TCCommonConfigs;
 import net.sinedkadis.terracompositio.config.TCInnerConfig;
-import net.sinedkadis.terracompositio.entity.goals.CFEExtractGoal;
-import net.sinedkadis.terracompositio.entity.goals.CFEHoldGoal;
+import net.sinedkadis.terracompositio.entity.goals.ECFExtractGoal;
+import net.sinedkadis.terracompositio.entity.goals.ECFHoldGoal;
 import net.sinedkadis.terracompositio.entity.goals.ReachSourceGoal;
 import net.sinedkadis.terracompositio.registries.TCBlocks;
 import net.sinedkadis.terracompositio.registries.TCItems;
-import net.sinedkadis.terracompositio.util.helpers.CFEHelper;
+import net.sinedkadis.terracompositio.util.helpers.ECFHelper;
 import net.sinedkadis.terracompositio.util.helpers.ParticleHelper;
-import net.sinedkadis.terracompositio.util.helpers.TooltipHelper;
 import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -71,7 +67,7 @@ import java.util.Set;
 
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
-public class FlowCedarEntEntity extends AbstractGolem implements CFENetworkMemberEntity, IHaveKnowledge {
+public class FlowCedarEntEntity extends AbstractGolem implements ECFNetworkMemberEntity, IHaveKnowledge {
     private static final EntityDataAccessor<Boolean> EXTRACTING =
             SynchedEntityData.defineId(FlowCedarEntEntity.class, EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<Boolean> HOLDING =
@@ -79,25 +75,25 @@ public class FlowCedarEntEntity extends AbstractGolem implements CFENetworkMembe
     private static final EntityDataAccessor<Integer> CFE_DATA =
             SynchedEntityData.defineId(FlowCedarEntEntity.class, EntityDataSerializers.INT);
 
-    protected LazyOptional<ICFEHandler> lazyCFEOptional = LazyOptional.of(() -> new CFEContainer(this)
+    protected LazyOptional<IECFHandler> lazyCFEOptional = LazyOptional.of(() -> new ECFContainer(this)
             .setMaxCFE(10000)
             .setOffset(vec3 -> vec3.add(0,this.getBbHeight() + (0.1f + (this.getSyncedCFE() / 10000d)) * 10 * 0.2f,0))
             .setIndex(0));
     @Getter
-    protected LazyOptional<ICFEHandler> innerCFEOptional = LazyOptional.of(() -> new CFEContainer(this)
+    protected LazyOptional<IECFHandler> innerECFOptional = LazyOptional.of(() -> new ECFContainer(this)
             .setMaxCFE(100)
             .setOffset(vec3 -> vec3.add(0,1,0))
             .setIndex(1));
 
     @Getter
-    public final List<LazyOptional<ICFEHandler>> cfeHandlers = List.of(lazyCFEOptional,innerCFEOptional);
+    public final List<LazyOptional<IECFHandler>> cfeHandlers = List.of(lazyCFEOptional, innerECFOptional);
     public final AnimationState idleAnimationState = new AnimationState();
     public final AnimationState extractionAnimationState = new AnimationState();
     public final AnimationState extractionCompleteAnimationState = new AnimationState();
     public final AnimationState cfeHoldState = new AnimationState();
 
     protected int scheduledMembersUpdate = -1;
-    protected Set<PPCFEMemberProxy> scheduledMembers = new HashSet<>();
+    protected Set<PPECFMemberProxy> scheduledMembers = new HashSet<>();
 
     boolean scheduledUpdate = false;
 
@@ -112,7 +108,7 @@ public class FlowCedarEntEntity extends AbstractGolem implements CFENetworkMembe
 
     @Override
     public <T> LazyOptional<T> getCapability(Capability<T> capability, @Nullable Direction facing) {
-        if (capability == TCCapabilities.CFE)
+        if (capability == TCCapabilities.ECF)
             return lazyCFEOptional.cast();
         return super.getCapability(capability, facing);
     }
@@ -128,10 +124,10 @@ public class FlowCedarEntEntity extends AbstractGolem implements CFENetworkMembe
             setupAnimationStates();
         } else {
             // Серверная логика
-            CFENetwork cfeNetworkInstance = TerraCompositioAPI.instance().getCFENetworkInstance();
-            boolean inNetwork = cfeNetworkInstance.isIn(this.level(), this);
+            ECFNetwork ECFNetworkInstance = TerraCompositioAPI.instance().getECFNetworkInstance();
+            boolean inNetwork = ECFNetworkInstance.isIn(this.level(), this);
             if (!inNetwork && !this.isRemoved()) {
-                cfeNetworkInstance.fireCFENetworkEvent(this, NetworkAction.ADD);
+                ECFNetworkInstance.fireCFENetworkEvent(this, NetworkAction.ADD);
             }
 
             lazyCFEOptional.ifPresent(icfeHandler -> {
@@ -144,7 +140,7 @@ public class FlowCedarEntEntity extends AbstractGolem implements CFENetworkMembe
                     lastSyncedEnergy = currentEnergy;
                 }
 
-                innerCFEOptional.ifPresent(icfeHandler1 -> {
+                innerECFOptional.ifPresent(icfeHandler1 -> {
                     if (tickCount % 20 == 0) {
                         int cfe = TCCommonConfigs.CFE_PER_BURST_TRANSFER_LIMIT.get();
                         int taken = icfeHandler.takeCFE(cfe, false);
@@ -216,7 +212,7 @@ public class FlowCedarEntEntity extends AbstractGolem implements CFENetworkMembe
     @SuppressWarnings("deprecation")
     @Override
     public @Nullable SpawnGroupData finalizeSpawn(ServerLevelAccessor pLevel, DifficultyInstance pDifficulty, MobSpawnType pReason, @Nullable SpawnGroupData pSpawnData, @Nullable CompoundTag pDataTag) {
-        this.innerCFEOptional.ifPresent(icfeHandler -> icfeHandler.setCFE(level().getRandom().nextInt(6,36)));
+        this.innerECFOptional.ifPresent(icfeHandler -> icfeHandler.setCFE(level().getRandom().nextInt(6,36)));
         return super.finalizeSpawn(pLevel, pDifficulty, pReason, pSpawnData, pDataTag);
     }
 
@@ -257,14 +253,14 @@ public class FlowCedarEntEntity extends AbstractGolem implements CFENetworkMembe
     @Override
     public void remove(RemovalReason pReason) {
         super.remove(pReason);
-        TerraCompositioAPI.INSTANCE.getCFENetworkInstance().fireCFENetworkEvent(this, NetworkAction.REMOVE);
+        TerraCompositioAPI.INSTANCE.getECFNetworkInstance().fireCFENetworkEvent(this, NetworkAction.REMOVE);
     }
 
     @Override
     public void invalidateCaps() {
         super.invalidateCaps();
         lazyCFEOptional.invalidate();
-        innerCFEOptional.invalidate();
+        innerECFOptional.invalidate();
     }
 
     boolean wasHeld = false;
@@ -295,12 +291,12 @@ public class FlowCedarEntEntity extends AbstractGolem implements CFENetworkMembe
     @Override
     protected void registerGoals() {
         this.goalSelector.addGoal(0, new FloatGoal(this));
-        this.goalSelector.addGoal(0, new CFEHoldGoal(this));
+        this.goalSelector.addGoal(0, new ECFHoldGoal(this));
 //        this.goalSelector.addGoal(1, new BreedGoal(this, 1.15D));
 //        this.goalSelector.addGoal(2, new TemptGoal(this, 1.2D, Ingredient.of(Items.COOKED_BEEF), false));
 
         this.goalSelector.addGoal(3, new ReachSourceGoal(this, 1.2D, 32, 3));
-        this.goalSelector.addGoal(3, new CFEExtractGoal(this, 4));
+        this.goalSelector.addGoal(3, new ECFExtractGoal(this, 4));
         this.goalSelector.addGoal(4, new WaterAvoidingRandomStrollGoal(this, 1.0D));
         this.goalSelector.addGoal(5, new LookAtPlayerGoal(this, Player.class, 3f));
         this.goalSelector.addGoal(6, new RandomLookAroundGoal(this));
@@ -356,7 +352,7 @@ public class FlowCedarEntEntity extends AbstractGolem implements CFENetworkMembe
 
     @Override
     public Vec3 particleTargetOffset() {
-        Optional<ICFEHandler> icfeHandler = lazyCFEOptional.resolve();
+        Optional<IECFHandler> icfeHandler = lazyCFEOptional.resolve();
         float scale = 3;
         if (icfeHandler.isPresent() && icfeHandler.get().getCFE() > 0) {
             scale = (0.1f + (getSyncedCFE() / (float) icfeHandler.get().getMaxCFE())) * 10;
@@ -365,22 +361,22 @@ public class FlowCedarEntEntity extends AbstractGolem implements CFENetworkMembe
     }
 
     @Override
-    public ICFEHandler getMainHandler() {
-        return lazyCFEOptional.orElse(DummyCFEHandler.instance);
+    public IECFHandler getMainHandler() {
+        return lazyCFEOptional.orElse(DummyECFHandler.instance);
     }
 
     @Override
     public void addAdditionalSaveData(CompoundTag pCompound) {
         super.addAdditionalSaveData(pCompound);
         lazyCFEOptional.ifPresent(cap -> cap.writeToNBT(pCompound));
-        innerCFEOptional.ifPresent(cap -> cap.writeToNBT(pCompound));
+        innerECFOptional.ifPresent(cap -> cap.writeToNBT(pCompound));
     }
 
     @Override
     public void readAdditionalSaveData(CompoundTag pCompound) {
         super.readAdditionalSaveData(pCompound);
         lazyCFEOptional.ifPresent(cap -> cap.readFromNBT(pCompound));
-        innerCFEOptional.ifPresent(cap -> cap.readFromNBT(pCompound));
+        innerECFOptional.ifPresent(cap -> cap.readFromNBT(pCompound));
     }
 
 
@@ -395,17 +391,17 @@ public class FlowCedarEntEntity extends AbstractGolem implements CFENetworkMembe
 
     }
 
-    public void sendViaPP(PPCFEMemberProxy current) {
-        if (getMainHandler().getCFE() > 0 && CFEHelper.validMember(current)) {
+    public void sendViaPP(PPECFMemberProxy current) {
+        if (getMainHandler().getCFE() > 0 && ECFHelper.validMember(current)) {
             if (current.getMainHandler().getFreeSpace() > TCCommonConfigs.CFE_PER_BURST_TRANSFER_LIMIT.get())
                 scheduleMemberUpdate(current);
-            CFEHelper.newTransfer().targetAndSource(current, this).speed(5 / 20f).build();
+            ECFHelper.newTransfer().targetAndSource(current, this).speed(5 / 20f).build();
         } else onCFENetworkMemberUpdate();
     }
 
     @Override
-    public void scheduleMemberUpdate(CFENetworkMember updated) {
-        if (updated instanceof PPCFEMemberProxy proxy) {
+    public void scheduleMemberUpdate(ECFNetworkMember updated) {
+        if (updated instanceof PPECFMemberProxy proxy) {
             this.scheduledMembers.add(proxy);
             if (scheduledMembersUpdate < 0) scheduledMembersUpdate = TCCommonConfigs.TICKS_BETWEEN_BURSTS.get();
         }
@@ -424,7 +420,7 @@ public class FlowCedarEntEntity extends AbstractGolem implements CFENetworkMembe
         }
         if (scheduledMembersUpdate == 0) {
             scheduledMembersUpdate = -1;
-            Set<PPCFEMemberProxy> scheduledMembers1 = Set.copyOf(this.scheduledMembers);
+            Set<PPECFMemberProxy> scheduledMembers1 = Set.copyOf(this.scheduledMembers);
             this.scheduledMembers.clear();
             scheduledMembers1.forEach(this::sendViaPP);
         } else if (scheduledMembersUpdate > 0)
@@ -441,7 +437,7 @@ public class FlowCedarEntEntity extends AbstractGolem implements CFENetworkMembe
                 data.putInt("val.queued", cfeHandler.getQueued());
             }
         });
-        innerCFEOptional.ifPresent(cfeHandler -> {
+        innerECFOptional.ifPresent(cfeHandler -> {
             data.putInt("val.cfe2", cfeHandler.getCFE());
             if (TCCommonConfigs.DEBUG.get()) {
                 data.putInt("val.max_cfe2", cfeHandler.getMaxCFE());
@@ -468,98 +464,34 @@ public class FlowCedarEntEntity extends AbstractGolem implements CFENetworkMembe
     @Override
     public void addTooltipLines(CompoundTag data, List<Component> tooltip, boolean isShifting) {
 
-        tooltip.add(Component.translatable("block.terracompositio.cfe_header"));
 
-        tooltip.add(Component.translatable("entity.terracompositio.ent_hold_header"));
+        TooltipHelper.addHeader(TooltipHelper.Headers.ECF, tooltip);
+        TooltipHelper.addHeader(TooltipHelper.Headers.ENT_HOLD, tooltip);
 
-        if (data.contains("val.cfe")) {
-            tooltip.add(
-                    Component.translatable("block.terracompositio.cfe",
-                                    Component.literal(String.valueOf(data.getInt("val.cfe")))
-                                            .append(Component.translatable("block.terracompositio.units"))
-                                            .withStyle(ChatFormatting.AQUA))
-                            .withStyle(ChatFormatting.GRAY));
-        }
-        if (data.contains("val.max_cfe")) {
-            tooltip.add(
-                    Component.translatable("block.terracompositio.max_cfe",
-                                    Component.literal(String.valueOf(data.getInt("val.max_cfe")))
-                                            .append(Component.translatable("block.terracompositio.units"))
-                                            .withStyle(ChatFormatting.AQUA))
-                            .withStyle(ChatFormatting.GRAY));
-        }
-        if (data.contains("val.queued")) {
-            tooltip.add(
-                    Component.translatable("block.terracompositio.queued",
-                                    Component.literal(String.valueOf(data.getInt("val.queued")))
-                                            .append(Component.translatable("block.terracompositio.units"))
-                                            .withStyle(ChatFormatting.AQUA))
-                            .withStyle(ChatFormatting.GRAY));
-        }
 
-        tooltip.add(Component.translatable("entity.terracompositio.ent_inner_header"));
+        TooltipHelper.addIfExist(TooltipHelper.Keys.ECF, tooltip, data);
+        TooltipHelper.addIfExist(TooltipHelper.Keys.MAX_ECF, tooltip, data);
+        TooltipHelper.addIfExist(TooltipHelper.Keys.QUEUED, tooltip, data);
 
-        if (data.contains("val.cfe2")) {
-            tooltip.add(
-                    Component.translatable("block.terracompositio.cfe",
-                                    Component.literal(String.valueOf(data.getInt("val.cfe2")))
-                                            .append(Component.translatable("block.terracompositio.units"))
-                                            .withStyle(ChatFormatting.AQUA))
-                            .withStyle(ChatFormatting.GRAY));
-        }
+
+        TooltipHelper.addHeader(TooltipHelper.Headers.ENT_INNER, tooltip);
+
+
+        TooltipHelper.addIfExist(TooltipHelper.Keys.ECF, tooltip, data, 2);
         if (isShifting) {
-            tooltip.add(TooltipHelper.defaultTextWithArg("block.terracompositio.consume", 0.1, TooltipHelper.Units.CFE_SECOND));
+            tooltip.add(TooltipHelper.keyWithArg(TooltipHelper.Keys.CONSUME, 0.1, TooltipHelper.Units.CFE_SECOND));
         }
-        if (data.contains("val.max_cfe2")) {
-            tooltip.add(
-                    Component.translatable("block.terracompositio.max_cfe",
-                                    Component.literal(String.valueOf(data.getInt("val.max_cfe2")))
-                                            .append(Component.translatable("block.terracompositio.units"))
-                                            .withStyle(ChatFormatting.AQUA))
-                            .withStyle(ChatFormatting.GRAY));
-        }
-        if (data.contains("val.queued2")) {
-            tooltip.add(
-                    Component.translatable("block.terracompositio.queued",
-                                    Component.literal(String.valueOf(data.getInt("val.queued2")))
-                                            .append(Component.translatable("block.terracompositio.units"))
-                                            .withStyle(ChatFormatting.AQUA))
-                            .withStyle(ChatFormatting.GRAY));
-        }
+        TooltipHelper.addIfExist(TooltipHelper.Keys.MAX_ECF, tooltip, data, 2);
+        TooltipHelper.addIfExist(TooltipHelper.Keys.QUEUED, tooltip, data, 2);
 
-        tooltip.add(Component.translatable("entity.terracompositio.ent_common_header"));
+
+        TooltipHelper.addHeader(TooltipHelper.Headers.ENT_COMMON, tooltip);
+
         boolean shown = false;
-        if (data.contains("val.priority")) {
-            shown = tooltip.add(
-                    Component.translatable("block.terracompositio.priority",
-                                    Component.literal(String.valueOf(data.getInt("val.priority")))
-                                            .append(Component.translatable("block.terracompositio.units"))
-                                            .withStyle(ChatFormatting.AQUA))
-                            .withStyle(ChatFormatting.GRAY));
-        }
-        if (data.contains("val.range")) {
-            if (isShifting)
-                shown = tooltip.add(
-                        Component.translatable("block.terracompositio.range",
-                                        Component.literal(String.valueOf(data.getInt("val.range")))
-                                                .append(Component.translatable("block.terracompositio.blocks"))
-                                                .withStyle(ChatFormatting.AQUA))
-                                .withStyle(ChatFormatting.GRAY));
-        }
+
+        shown |= TooltipHelper.addIfExist(TooltipHelper.Keys.PRIORITY, tooltip, data);
+        shown |= TooltipHelper.addIfExist(TooltipHelper.Keys.RANGE, tooltip, data);
+
         if (!shown) tooltip.remove(tooltip.size() - 1);
-//        if (data.contains("flag.type.consumer") && data.getBoolean("flag.type.consumer")) {
-//            tooltip.add(
-//                    Component.translatable("block.terracompositio.type",
-//                                    Component.translatable("block.terracompositio.consumer")
-//                                            .withStyle(ChatFormatting.AQUA))
-//                            .withStyle(ChatFormatting.GRAY));
-//        }
-//        if (data.contains("flag.type.source") && data.getBoolean("flag.type.source")) {
-//            tooltip.add(
-//                    Component.translatable("block.terracompositio.type",
-//                                    Component.translatable("block.terracompositio.source")
-//                                            .withStyle(ChatFormatting.AQUA))
-//                            .withStyle(ChatFormatting.GRAY));
-//        }
     }
 }

@@ -1,6 +1,0 @@
-{
-  "parent": "minecraft:block/cube_all",
-  "textures": {
-    "all": "terracompositio:block/cfe_trash_can"
-  }
-}

@@ -8,13 +8,13 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBEBehaviour;
-import net.sinedkadis.terracompositio.api.networks.cfe.ICFEHandler;
+import net.sinedkadis.terracompositio.api.networks.cfe.IECFHandler;
 import net.sinedkadis.terracompositio.block.IFluidApplicable;
-import net.sinedkadis.terracompositio.block.behaviours.CFEHandlerBehaviour;
+import net.sinedkadis.terracompositio.block.behaviours.ECFHandlerBehaviour;
 import net.sinedkadis.terracompositio.config.TCInnerConfig;
 import net.sinedkadis.terracompositio.registries.TCBlockEntities;
 import net.sinedkadis.terracompositio.registries.TCBlockStateProperties;
-import net.sinedkadis.terracompositio.util.helpers.CFEHelper;
+import net.sinedkadis.terracompositio.util.helpers.ECFHelper;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.List;
@@ -31,7 +31,7 @@ public class AirSaturatorBlockEntity extends TCBlockEntity implements IFluidAppl
 
     @Override
     public void addBEBehaviours(List<IBEBehaviour> list) {
-        list.add(new CFEHandlerBehaviour(this)
+        list.add(new ECFHandlerBehaviour(this)
                 .maxCFE(100)
                 .priority(TCInnerConfig.DEFAULT_CONSUMER_PRIORITY)
                 .range(5));
@@ -50,13 +50,13 @@ public class AirSaturatorBlockEntity extends TCBlockEntity implements IFluidAppl
             BlockPos toPlace = pPos.relative(pState.getValue(BlockStateProperties.FACING));
             if (!pLevel.getBlockState(toPlace).isAir()) return;
             if (pState.getValue(TCBlockStateProperties.INFUSED)) {
-                CFEHelper.placeCFECloud(pLevel, toPlace, cfe);
+                ECFHelper.placeCFECloud(pLevel, toPlace, cfe);
                 cfeContainer().takeCFE(cfe,false);
                 scheduleMemberUpdate();
                 pLevel.playSound(null,toPlace, SoundEvents.WOOL_PLACE, SoundSource.BLOCKS,0.5f,1f);
             } else if (timer <= 0){
                 int toSaturate = cfeContainer().takeCFE(10,true);
-                CFEHelper.placeCFECloud(pLevel, toPlace, toSaturate);
+                ECFHelper.placeCFECloud(pLevel, toPlace, toSaturate);
                 cfeContainer().takeCFE(toSaturate,false);
                 scheduleMemberUpdate();
                 timer = 20;
@@ -66,12 +66,12 @@ public class AirSaturatorBlockEntity extends TCBlockEntity implements IFluidAppl
         wasActivated = isActivated;
     }
 
-    private ICFEHandler cfeContainer() {
-        return ((CFEHandlerBehaviour) behaviours.get(0)).getMainHandler();
+    private IECFHandler cfeContainer() {
+        return ((ECFHandlerBehaviour) behaviours.get(0)).getMainHandler();
     }
 
     private void scheduleMemberUpdate() {
-        ((CFEHandlerBehaviour) behaviours.get(0)).scheduleMemberUpdate();
+        ((ECFHandlerBehaviour) behaviours.get(0)).scheduleMemberUpdate();
     }
 
 }

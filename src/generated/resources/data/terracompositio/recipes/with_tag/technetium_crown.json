@@ -1,0 +1,21 @@
+{
+  "type": "terracompositio:tag_transfer_shaped",
+  "category": "equipment",
+  "key": {
+    "C": {
+      "tag": "forge:armors/helmets"
+    },
+    "T": {
+      "item": "terracompositio:technetium_ingot"
+    }
+  },
+  "pattern": [
+    "T T",
+    "TTT",
+    " C "
+  ],
+  "result": {
+    "item": "terracompositio:technetium_crown"
+  },
+  "show_notification": true
+}

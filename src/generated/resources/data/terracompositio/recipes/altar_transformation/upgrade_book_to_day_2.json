@@ -1,0 +1,19 @@
+{
+  "type": "terracompositio:altar_transformation",
+  "ingredients": [
+    {
+      "type": "forge:nbt",
+      "count": 1,
+      "item": "terracompositio:creation_flow_journal",
+      "nbt": "{day:1}"
+    },
+    {
+      "item": "terracompositio:flow_cedar_sapling"
+    }
+  ],
+  "output": {
+    "count": 1,
+    "item": "terracompositio:creation_flow_journal",
+    "nbt": "{day:2}"
+  }
+}

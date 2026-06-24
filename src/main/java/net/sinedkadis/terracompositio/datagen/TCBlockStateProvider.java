@@ -29,8 +29,8 @@ public class TCBlockStateProvider extends BlockStateProvider {
         flowLogBlockWithItem(TCBlocks.FLOW_CEDAR_LOG);
 
         blockWithItem(TCBlocks.FLOW_CEDAR_LEAVES);
-        blockWithItem(TCBlocks.CREATIVE_CFE_SOURCE);
-        blockWithItem(TCBlocks.CFE_TRASH_CAN);
+        blockWithItem(TCBlocks.CREATIVE_ECF_SOURCE);
+        blockWithItem(TCBlocks.ECF_TRASH_CAN);
         flowWoodBlockWithItem(TCBlocks.FLOW_CEDAR_WOOD,
                 TCBlocks.FLOW_CEDAR_LOG);
         blockWithItem(TCBlocks.FLOW_CEDAR_PLANKS);

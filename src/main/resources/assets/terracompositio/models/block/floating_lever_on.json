@@ -1,0 +1,8 @@
+{
+  "parent": "minecraft:block/lever_on",
+  "textures": {
+    "particle": "terracompositio:block/infused_iron_block",
+    "base": "terracompositio:block/floating_lever_base",
+    "lever": "terracompositio:block/floating_lever"
+  }
+}

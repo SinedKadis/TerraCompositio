@@ -31,13 +31,13 @@ public class TCItems {
     public static final RegistryObject<Item> FLOW_CEDAR_BOOTS = ITEMS.register("flow_cedar_boots",
             () -> new TCArmorItem(TCArmorMaterials.FLOW_CEDAR, ArmorItem.Type.BOOTS,new Item.Properties()));
     public static final RegistryObject<Item> FLOWING_FLOW_CEDAR_HELMET = ITEMS.register("flowing_flow_cedar_helmet",
-            () -> new FlowArmorItem(TCArmorMaterials.FLOWING_FLOW_CEDAR, ArmorItem.Type.HELMET,new Item.Properties()));
+            () -> new CedarArmorItem(TCArmorMaterials.FLOWING_FLOW_CEDAR, ArmorItem.Type.HELMET, new Item.Properties()));
     public static final RegistryObject<Item> FLOWING_FLOW_CEDAR_CHESTPLATE = ITEMS.register("flowing_flow_cedar_chestplate",
-            () -> new FlowArmorItem(TCArmorMaterials.FLOWING_FLOW_CEDAR, ArmorItem.Type.CHESTPLATE,new Item.Properties()));
+            () -> new CedarArmorItem(TCArmorMaterials.FLOWING_FLOW_CEDAR, ArmorItem.Type.CHESTPLATE, new Item.Properties()));
     public static final RegistryObject<Item> FLOWING_FLOW_CEDAR_LEGGINGS = ITEMS.register("flowing_flow_cedar_leggings",
-            () -> new FlowArmorItem(TCArmorMaterials.FLOWING_FLOW_CEDAR, ArmorItem.Type.LEGGINGS,new Item.Properties()));
+            () -> new CedarArmorItem(TCArmorMaterials.FLOWING_FLOW_CEDAR, ArmorItem.Type.LEGGINGS, new Item.Properties()));
     public static final RegistryObject<Item> FLOWING_FLOW_CEDAR_BOOTS = ITEMS.register("flowing_flow_cedar_boots",
-            () -> new FlowArmorItem(TCArmorMaterials.FLOWING_FLOW_CEDAR, ArmorItem.Type.BOOTS,new Item.Properties()));
+            () -> new CedarArmorItem(TCArmorMaterials.FLOWING_FLOW_CEDAR, ArmorItem.Type.BOOTS, new Item.Properties()));
 
 
     //Flow infused iron materials
@@ -51,13 +51,13 @@ public class TCItems {
 
     //Technetium
     public static final RegistryObject<Item> RAW_TECHNETIUM = ITEMS.register("technetium_raw_ore",
-            () -> new UnstableTechnetiumItem(new Item.Properties(),0));
+            () -> new UnstableTechnetiumItem(new Item.Properties(), 0, () -> 0));
     public static final RegistryObject<Item> LOW_ENRICHED_TECHNETIUM = ITEMS.register("low_enriched_technetium",
-            () -> new UnstableTechnetiumItem(new Item.Properties(),1));
+            () -> new UnstableTechnetiumItem(new Item.Properties(), 1, () -> 128));
     public static final RegistryObject<Item> MEDIUM_ENRICHED_TECHNETIUM = ITEMS.register("medium_enriched_technetium",
-            () -> new UnstableTechnetiumItem(new Item.Properties(),2));
+            () -> new UnstableTechnetiumItem(new Item.Properties(), 2, () -> 640));
     public static final RegistryObject<Item> HIGH_ENRICHED_TECHNETIUM = ITEMS.register("high_enriched_technetium",
-            () -> new UnstableTechnetiumItem(new Item.Properties(),3));
+            () -> new UnstableTechnetiumItem(new Item.Properties(), 3, () -> 3200));
     public static final RegistryObject<Item> TECHNETIUM_INGOT = ITEMS.register("technetium_ingot",
             () -> new Item(new Item.Properties()));
     public static final RegistryObject<Item> TECHNETIUM_NUGGET = ITEMS.register("technetium_nugget",
@@ -144,8 +144,8 @@ public class TCItems {
             () -> new CreationFlowJournalItem(new Item.Properties()));
     public static final RegistryObject<Item> FLUID_APPLIER = ITEMS.register("fluid_applier",
             () -> new FluidApplierItem(new Item.Properties()));
-    public static final RegistryObject<Item> CFE_BALL = ITEMS.register("cfe_ball",
-            () -> new CFEBallItem(new Item.Properties()));
+    public static final RegistryObject<Item> ECF_CHARGE = ITEMS.register("ecf_charge",
+            () -> new ECFBallItem(new Item.Properties()));
     public static final RegistryObject<Item> INFUSED_FERTILIZER = ITEMS.register("infused_fertilizer",
             () -> new InfusedFertilizerItem(new Item.Properties()));
 

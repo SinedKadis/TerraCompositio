@@ -8,7 +8,7 @@ import net.sinedkadis.terracompositio.api.networks.NetworkAction;
 import net.sinedkadis.terracompositio.api.networks.fluid.FluidNetwork;
 import net.sinedkadis.terracompositio.api.networks.fluid.FluidNetworkMemberBE;
 import net.sinedkadis.terracompositio.events.FluidNetworkEvent;
-import net.sinedkadis.terracompositio.util.helpers.CFEHelper;
+import net.sinedkadis.terracompositio.util.helpers.ECFHelper;
 
 import java.util.*;
 
@@ -76,7 +76,7 @@ public class FluidNetworkHandler implements FluidNetwork {
         }
 
 
-        toReturn.removeIf(m -> !CFEHelper.validMember(m));
+        toReturn.removeIf(m -> !ECFHelper.validMember(m));
         return toReturn;
     }
 

@@ -9,7 +9,6 @@ import net.minecraft.nbt.Tag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.sounds.SoundEvents;
 import net.minecraft.sounds.SoundSource;
-import net.minecraft.util.Mth;
 import net.minecraft.world.Container;
 import net.minecraft.world.InteractionHand;
 import net.minecraft.world.InteractionResult;
@@ -26,6 +25,7 @@ import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.ItemStackHandler;
 import net.sinedkadis.terracompositio.api.IHaveKnowledge;
 import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBEItemBehaviour;
+import net.sinedkadis.terracompositio.api.helpers.TooltipHelper;
 import net.sinedkadis.terracompositio.block.entity.TCBlockEntity;
 import net.sinedkadis.terracompositio.util.ItemComponent;
 import net.sinedkadis.terracompositio.util.helpers.ItemHelper;
@@ -34,7 +34,6 @@ import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.List;
 
 @Data
@@ -42,8 +41,6 @@ import java.util.List;
 @ParametersAreNonnullByDefault
 public class ItemHandlerBehaviour implements IBEItemBehaviour, WorldlyContainer, IHaveKnowledge {
     private final TCBlockEntity blockEntity;
-    public boolean ignoreRestrictions = false;
-    private final boolean[] slotsToShowInOverlay;
 
     protected ItemStackHandler itemHandler = new ItemStackHandler() {
         @Override
@@ -53,14 +50,26 @@ public class ItemHandlerBehaviour implements IBEItemBehaviour, WorldlyContainer,
 
         @Override
         public ItemStack insertItem(int slot, ItemStack stack, boolean simulate) {
-            if (!allowInsert(slot, stack, null, false) && !ignoreRestrictions) return stack;
-            return super.insertItem(slot, stack, simulate);
+            if (!allowInsert(slot, stack, null, true)) return stack;
+            ItemStack itemStack = super.insertItem(slot, stack, simulate);
+            Level level = blockEntity.getLevel();
+            if (level != null && !simulate) {
+                level.sendBlockUpdated(blockEntity.getBlockPos(), blockEntity.getBlockState(), blockEntity.getBlockState(), 3);
+            }
+            return itemStack;
         }
 
         @Override
         public ItemStack extractItem(int slot, int amount, boolean simulate) {
-            if (!allowExtract(slot, getStackInSlot(slot), null, false) && !ignoreRestrictions) return ItemStack.EMPTY;
-            return super.extractItem(slot, amount, simulate);
+            // 511 - hardcoded number to bypass restriction when extracting with crowbar
+            if (!allowExtract(slot, getStackInSlot(slot), null, true) && !(amount == 511))
+                return ItemStack.EMPTY;
+            ItemStack itemStack = super.extractItem(slot, amount, simulate);
+            Level level = blockEntity.getLevel();
+            if (level != null && !simulate) {
+                level.sendBlockUpdated(blockEntity.getBlockPos(), blockEntity.getBlockState(), blockEntity.getBlockState(), 3);
+            }
+            return itemStack;
         }
     };
     protected LazyOptional<IItemHandler> lazyItemHandler = LazyOptional.empty();
@@ -68,22 +77,11 @@ public class ItemHandlerBehaviour implements IBEItemBehaviour, WorldlyContainer,
     //One slot
     public ItemHandlerBehaviour(TCBlockEntity blockEntity) {
         this.blockEntity = blockEntity;
-        slotsToShowInOverlay = new boolean[]{true};
     }
 
     public ItemHandlerBehaviour(TCBlockEntity blockEntity, int slotCount) {
         this.blockEntity = blockEntity;
         itemHandler.setSize(slotCount);
-        slotsToShowInOverlay = new boolean[slotCount];
-        Arrays.fill(slotsToShowInOverlay, true);
-    }
-
-    public ItemHandlerBehaviour setInvisibleInOverlay(int... slots) {
-        for (Integer slot : slots) {
-            if (Mth.clamp(slot, 0, slotsToShowInOverlay.length - 1) == slot)
-                slotsToShowInOverlay[slot] = false;
-        }
-        return this;
     }
 
     public int getLimitInSlot(int slot) {
@@ -154,28 +152,38 @@ public class ItemHandlerBehaviour implements IBEItemBehaviour, WorldlyContainer,
         ItemStack itemInHand = pPlayer.getItemInHand(pHand);
 
         ItemStackHandler itemHandler = getItemHandler();
-
+        boolean[] isEmptySlot = new boolean[itemHandler.getSlots()];
+        boolean hasEmptySlots = false;
         for (int i = 0; i < itemHandler.getSlots(); i++) {
+            if (itemHandler.getStackInSlot(i).isEmpty()
+                    && allowInsert(i, itemInHand, pHit.getDirection(), true)
+                    && hasSpace(itemHandler, i)) {
+                hasEmptySlots = true;
+                isEmptySlot[i] = true;
+            }
+        }
+
+        for (int i = itemHandler.getSlots() - 1; i >= 0; i--) {
             ItemStack slot = itemHandler.getStackInSlot(i);
 
-            if (!slot.isEmpty() && allowExtract(i, slot, pHit.getDirection(), true)) {
-                ignoreRestrictions = true;
+            boolean hasItemInHand = !itemInHand.isEmpty();
+            if (hasItemInHand && hasEmptySlots) {
+                if (isEmptySlot[i]) {
+                    ItemStack left = itemHandler.insertItem(i, itemInHand.copy(), false);
+                    pPlayer.setItemInHand(pHand, left);
+                    level.playSound(pPlayer, blockPos, SoundEvents.ITEM_FRAME_ADD_ITEM, SoundSource.BLOCKS);
+                    blockEntity.setChanged();
+                    return InteractionResult.SUCCESS;
+                }
+            }
+            if ((!hasEmptySlots || !hasItemInHand || i == itemHandler.getSlots() - 1) && !slot.isEmpty() && allowExtract(i, slot, pHit.getDirection(), true)) {
                 ItemStack extracted = itemHandler.extractItem(i, 64, false);
-                ignoreRestrictions = false;
                 PlayerHelper.addOrDropToPlayer(pPlayer, extracted);
                 level.playSound(pPlayer, blockPos, SoundEvents.ITEM_FRAME_REMOVE_ITEM, SoundSource.BLOCKS);
                 blockEntity.setChanged();
                 return InteractionResult.SUCCESS;
             }
-            if (!itemInHand.isEmpty() && allowInsert(i, itemInHand, pHit.getDirection(), true) && hasSpace(itemHandler, i)) {
-                ignoreRestrictions = true;
-                ItemStack left = itemHandler.insertItem(i, itemInHand.copy(), false);
-                ignoreRestrictions = false;
-                pPlayer.setItemInHand(pHand, left);
-                level.playSound(pPlayer, blockPos, SoundEvents.ITEM_FRAME_ADD_ITEM, SoundSource.BLOCKS);
-                blockEntity.setChanged();
-                return InteractionResult.SUCCESS;
-            }
+
         }
 
 
@@ -268,12 +276,11 @@ public class ItemHandlerBehaviour implements IBEItemBehaviour, WorldlyContainer,
 
     @Override
     public void addTooltipLines(CompoundTag data, List<Component> tooltip, boolean isShifting) {
-        tooltip.add(Component.translatable("block.terracompositio.items_header"));
+        TooltipHelper.addHeader(TooltipHelper.Headers.ITEMS, tooltip);
+
         List<ItemStack> entries = ItemHelper.readItemList(data.getList("inventory", Tag.TAG_COMPOUND));
         boolean somethingAdded = false;
-        for (int slot = 0; slot < slotsToShowInOverlay.length; slot++) {
-            if (!slotsToShowInOverlay[slot]) continue;
-            ItemStack stack = entries.get(slot);
+        for (ItemStack stack : entries) {
             if (stack.isEmpty()) continue;
             somethingAdded = true;
             tooltip.add(ItemComponent.of(stack));

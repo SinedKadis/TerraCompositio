@@ -1,7 +1,7 @@
 {
   "type": "terracompositio:matter_infusion",
   "catalyst": "minecraft:redstone",
-  "cfe": 1000,
+  "cfe": 640,
   "input": {
     "count": 4,
     "item": "terracompositio:low_enriched_technetium"

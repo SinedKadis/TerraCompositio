@@ -16,9 +16,9 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.phys.Vec3;
-import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemStackHandler;
+import net.sinedkadis.terracompositio.api.TCCapabilities;
 import net.sinedkadis.terracompositio.block.custom.FlowCedarCasingBlock;
 import net.sinedkadis.terracompositio.block.entity.FlowCedarCasingBlockEntity;
 import net.sinedkadis.terracompositio.registries.TCItems;
@@ -45,7 +45,7 @@ public class FlowCedarCasingBlockEntityRenderer implements BlockEntityRenderer<F
         Level level = pBlockEntity.getLevel();
 
         @SuppressWarnings("DataFlowIssue")
-        IItemHandler iItemHandler = pBlockEntity.getCapability(ForgeCapabilities.ITEM_HANDLER).orElse(null);
+        IItemHandler iItemHandler = pBlockEntity.getCapability(TCCapabilities.ITEM_STATE_HOLDER).orElse(null);
         if (!(iItemHandler instanceof ItemStackHandler itemStackHandler)) return;
         if (level == null) return;
         renderItemInPort(pBlockEntity, pPoseStack, pBuffer, level, blockState, itemRenderer, renderStack);
@@ -78,12 +78,12 @@ public class FlowCedarCasingBlockEntityRenderer implements BlockEntityRenderer<F
                 pPoseStack.translate(0.5f, 0.0f, 0.5f);
                 Vec3i normal = facing.getNormal();
                 //Move to edges
-                float k = -0.05f;
+                float k = -0.1f;
                 pPoseStack.translate(normal.getX() * k, 0, normal.getZ() * k);
                 Vec3 vec3 = Vec3.atLowerCornerOf(normal);
                 Vec3 rotatedVec3 = vec3.yRot((float) ((Math.PI) / 2f));
                 //Move lil right
-                pPoseStack.translate(rotatedVec3.x() * 0.1f, 0, normal.getZ() * rotatedVec3.z() * 0.1f);
+                pPoseStack.translate(rotatedVec3.x() * 0.1f, 0, rotatedVec3.z() * 0.1f);
 
                 pPoseStack.mulPose(Axis.ZP.rotationDegrees(180));
                 pPoseStack.mulPose(Axis.YP.rotationDegrees(facing.toYRot() + 90));
@@ -104,7 +104,7 @@ public class FlowCedarCasingBlockEntityRenderer implements BlockEntityRenderer<F
                 Vec3i normal = facing.getNormal();
                 Vec3 vec3 = Vec3.atLowerCornerOf(normal);
                 //To MI cords
-                pPoseStack.translate(normal.getX(), 0, normal.getZ());
+                pPoseStack.translate(normal.getX(), -0.02f, normal.getZ());
                 // To face
                 pPoseStack.translate(vec3.scale(-1).x() * 0.5f, 0, vec3.scale(-1).z() * 0.5f);
 
@@ -112,7 +112,7 @@ public class FlowCedarCasingBlockEntityRenderer implements BlockEntityRenderer<F
                 // To right
                 pPoseStack.translate(rotatedVec3.x() * 0.1f, 0, rotatedVec3.z() * 0.1f);
 
-                pPoseStack.mulPose(Axis.YP.rotationDegrees(facing.toYRot()));
+                pPoseStack.mulPose(Axis.YP.rotationDegrees(facing.toYRot() + 180));
                 pPoseStack.mulPose(Axis.ZP.rotationDegrees(135));
 
                 itemRenderer.renderStatic(TCItems.HALF_ROD.get().getDefaultInstance(), ItemDisplayContext.FIXED, WorldHelper.getLightLevel(level, pBlockEntity.getBlockPos(), facing),
@@ -143,12 +143,12 @@ public class FlowCedarCasingBlockEntityRenderer implements BlockEntityRenderer<F
                 pPoseStack.translate(0.5f, 1.0f, 0.5f);
                 Vec3i normal = facing.getNormal();
                 //Move to edges
-                float move1 = -0.05f;
+                float move1 = -0.1f;
                 pPoseStack.translate(normal.getX() * move1, 0, normal.getZ() * move1);
                 Vec3 vec3 = Vec3.atLowerCornerOf(normal);
                 Vec3 rotatedVec3 = vec3.yRot((float) ((3 * Math.PI) / 2f)).normalize();
                 //Move lil left
-                pPoseStack.translate(rotatedVec3.x() * 0.1f, 0, normal.getZ() * rotatedVec3.z() * 0.1f);
+                pPoseStack.translate(rotatedVec3.x() * 0.1f, 0, rotatedVec3.z() * 0.1f);
 
                 pPoseStack.mulPose(Axis.ZP.rotationDegrees(180));
                 pPoseStack.mulPose(Axis.YP.rotationDegrees(facing.toYRot() + 90));
@@ -169,7 +169,7 @@ public class FlowCedarCasingBlockEntityRenderer implements BlockEntityRenderer<F
                 Vec3i normal = facing.getNormal();
                 Vec3 vec3 = Vec3.atLowerCornerOf(normal);
                 //To MI cords
-                pPoseStack.translate(normal.getX(), 0, normal.getZ());
+                pPoseStack.translate(normal.getX(), -0.02f, normal.getZ());
                 // To face
                 pPoseStack.translate(vec3.scale(-1).x() * 0.5f, 0, vec3.scale(-1).z() * 0.5f);
 
@@ -177,7 +177,7 @@ public class FlowCedarCasingBlockEntityRenderer implements BlockEntityRenderer<F
                 // To left
                 pPoseStack.translate(rotatedVec3.x() * 0.1f, 0, rotatedVec3.z() * 0.1f);
 
-                pPoseStack.mulPose(Axis.YP.rotationDegrees(facing.toYRot() + 180));
+                pPoseStack.mulPose(Axis.YP.rotationDegrees(facing.toYRot()));
                 pPoseStack.mulPose(Axis.ZP.rotationDegrees(-45));
 
                 itemRenderer.renderStatic(TCItems.HALF_ROD.get().getDefaultInstance(), ItemDisplayContext.FIXED, WorldHelper.getLightLevel(level, pBlockEntity.getBlockPos(), facing),

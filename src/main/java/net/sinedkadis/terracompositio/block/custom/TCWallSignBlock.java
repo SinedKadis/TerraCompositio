@@ -6,7 +6,7 @@ import net.minecraft.world.level.block.WallSignBlock;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.WoodType;
-import net.sinedkadis.terracompositio.block.entity.ModSignBlockEntity;
+import net.sinedkadis.terracompositio.block.entity.TCSignBlockEntity;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 
@@ -19,6 +19,6 @@ public class TCWallSignBlock extends WallSignBlock {
 
     @Override
     public BlockEntity newBlockEntity(BlockPos pPos, BlockState pState) {
-        return new ModSignBlockEntity(pPos, pState);
+        return new TCSignBlockEntity(pPos, pState);
     }
 }

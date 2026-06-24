@@ -13,7 +13,6 @@ import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.sinedkadis.terracompositio.recipe.FlowInfusionRecipe;
-import net.sinedkadis.terracompositio.recipe.FlowSaturationRecipe;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -83,7 +82,6 @@ public class FlowInfusionRecipeBuilder implements RecipeBuilder {
         @Override
         public @NotNull JsonObject serializeRecipe() {
             JsonObject jsonObject = new JsonObject();
-            assert FlowSaturationRecipe.Serializer.ID != null;
             jsonObject.addProperty("type", FlowInfusionRecipe.Serializer.ID.toString());
             this.serializeRecipeData(jsonObject);
             return jsonObject;

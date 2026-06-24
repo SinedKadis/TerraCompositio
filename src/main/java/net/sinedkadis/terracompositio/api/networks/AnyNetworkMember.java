@@ -10,4 +10,9 @@ public interface AnyNetworkMember {
     Level getLevel();
 
     BlockPos getPos();
+
+    //Filter values
+    int getRange();
+
+    int getPriority();
 }

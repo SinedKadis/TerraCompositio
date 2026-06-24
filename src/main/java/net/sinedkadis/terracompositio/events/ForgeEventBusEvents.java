@@ -3,7 +3,6 @@ package net.sinedkadis.terracompositio.events;
 import net.minecraft.world.entity.Entity;
 import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.event.AttachCapabilitiesEvent;
-import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.living.LivingAttackEvent;
 import net.minecraftforge.event.entity.living.LivingEvent;
 import net.minecraftforge.event.entity.player.PlayerEvent;
@@ -12,33 +11,18 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.sinedkadis.terracompositio.TerraCompositio;
 import net.sinedkadis.terracompositio.api.TCCapabilities;
-import net.sinedkadis.terracompositio.cfe.PlayerCFEProvider;
+import net.sinedkadis.terracompositio.ecf.PlayerECFProvider;
 import net.sinedkadis.terracompositio.entity.custom.FlowCedarEntEntity;
 import net.sinedkadis.terracompositio.item.custom.KnowledgeAppleItem;
 import net.sinedkadis.terracompositio.item.custom.TechnetiumArmorItem;
 import net.sinedkadis.terracompositio.registries.TCFluids;
-import net.sinedkadis.terracompositio.util.helpers.CFEHelper;
 
 @Mod.EventBusSubscriber(modid = TerraCompositio.MOD_ID, bus = Mod.EventBusSubscriber.Bus.FORGE)
 public class ForgeEventBusEvents {
     @SubscribeEvent
-    public static void onLevelTickEnd(TickEvent.LevelTickEvent event) {
-        if (event.phase != TickEvent.Phase.END) return;
-        long gameTime = event.level.getGameTime();
-        CFEHelper.transferManager().applyTransfers(gameTime);
-    }
-
-    @SubscribeEvent
-    public static void onServerTick(TickEvent.ServerTickEvent event) {
-        if (event.phase != TickEvent.Phase.END) return;
-        CFEHelper.CFESpawnQueue.flush();
-    }
-
-    @SubscribeEvent
     public static void onLivingHurt(LivingAttackEvent event) {
         TechnetiumArmorItem.onLivingHurtEvent(event);
     }
-
 
     @SubscribeEvent
     public static void onLivingTick(LivingEvent.LivingTickEvent event) {
@@ -53,8 +37,8 @@ public class ForgeEventBusEvents {
     @SubscribeEvent
     public static void onAttachCapabilities(AttachCapabilitiesEvent<Entity> event) {
         if (event.getObject() instanceof Player player) {
-            if (!player.getCapability(TCCapabilities.CFE).isPresent()) {
-                event.addCapability(TerraCompositio.modLoc("cfe_stored"), new PlayerCFEProvider(player));
+            if (!player.getCapability(TCCapabilities.ECF).isPresent()) {
+                event.addCapability(TerraCompositio.modLoc("cfe_stored"), new PlayerECFProvider(player));
             }
         }
     }

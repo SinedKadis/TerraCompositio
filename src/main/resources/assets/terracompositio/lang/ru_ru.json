@@ -5,25 +5,25 @@
 
   "book.terracompositio.creation_flow_journal.name": "Creation Flow Journal",
   "book.terracompositio.creation_flow_journal.landing_text": "Записи о наблюдении за потоком созидания, автор John Pork",
-
-  "book.terracompositio.creation_flow_journal.category.day_1.name": "День первый",
-  "book.terracompositio.creation_flow_journal.category.day_1.description": "Если вы это читаете, значит вы нашли способ раздобыть копию моего журнала, через один из портов, что я создал. Я не буду сразу раскрывать все добытые мою знания, так что положите эту книгу в порт на следующий день, и я дам вам больше интересной информации",
-  "book.terracompositio.creation_flow_journal.entry.cedar_book_port.name": "Об книге",
-  "book.terracompositio.creation_flow_journal.entry.cedar_book_port.page1": "  В кедровом лесу можно найти необычные стволы, с вырезьбленной книгой на них. Данные \"порты\" - моя личная разработка. Я даже сделал так, что б они самопроизвольно вырастали в новых деревьях. Через них я могу добавлять новые главы в вашу книгу раз в день, а так же делать из сажанцев дуба сажанцы кедра.<br><br> Почему бы и нет",
+  "book.terracompositio.creation_flow_journal.category.day_1.name": "Первая глава",
+  "book.terracompositio.creation_flow_journal.category.day_1.description": "  Закладка первая: Вступление. Для получения 2 закладки преподнесите саженец кедра",
+  "book.terracompositio.creation_flow_journal.entry.cedar_book_port.name": "Алтарь созидания",
+  "book.terracompositio.creation_flow_journal.entry.cedar_book_port.page1": "  Необычного вида алтарь, стоящий одиноко в кедровом лесу. Преподнося ему подходящие предметы вместе с этой книгой, творец может вознаградить знанием",
   "book.terracompositio.creation_flow_journal.entry.cedar_book_port.page2": " ",
 
   "book.terracompositio.creation_flow_journal.entry.flow_infusion.name": "Наполненность потоком",
-  "book.terracompositio.creation_flow_journal.entry.flow_infusion.page1": " Наблюдая за кедровыми деревьями, я заметил, как в них течет нечто синее и жидкое. Когда касаешься его, можно почувствовать прилив энергии, желание создавать. Это - Поток Созидания. Его нельзя добыть вместе с бревном, при попытке разрушить дерево, данный поток вытечет так же и из близжайших блоков",
-  "book.terracompositio.creation_flow_journal.entry.flow_infusion.page2": " Однако, даже без самого потока, из него получается хороший строй-материал",
+  "book.terracompositio.creation_flow_journal.entry.flow_infusion.page1": " Блоки по типу кедрового бревна содержат в себе некую синюю жидкость. Это - поток Созидания. Он плохо реагирует на разрушение бревен поблизости, испаряясь. Нужен для работы разных устройств",
+  "book.terracompositio.creation_flow_journal.entry.flow_infusion.page2": " Сам кедр, без потока внутри, годится как хороший материал для строительства",
   "book.terracompositio.creation_flow_journal.entry.cedar_armor.name": "Броня из кедра",
   "book.terracompositio.creation_flow_journal.entry.cedar_armor.page1": "Кедр, на удивление, неплохой материал для брони. Благодаря своим магическим свойствам, хорошо сидит, хоть и характеристики оставляют желать лучшего.",
 
-  "book.terracompositio.creation_flow_journal.category.day_2.name": "День второй",
-  "book.terracompositio.creation_flow_journal.category.day_2.description": "Подробнее про добычу и использование потока",
+
+  "book.terracompositio.creation_flow_journal.category.day_2.name": "Вторая глава",
+  "book.terracompositio.creation_flow_journal.category.day_2.description": "  Закладка вторая: Подробнее про добычу и использование потока. Для следующей закладки преподнесите бутылочку жидкого потока",
 
   "book.terracompositio.creation_flow_journal.entry.wedge.name": "Клин",
-  "book.terracompositio.creation_flow_journal.entry.wedge.page1": " Первое, что пришло мне в голову, это использовать клин, прям как при добыче березового сока. Вбиваешь клин в дерево, ставишь под него котел, и наслаждаешься результатом",
-  "book.terracompositio.creation_flow_journal.entry.wedge.page2": " Ресурс дерева хоть и истощается, но востанавливается со временем",
+  "book.terracompositio.creation_flow_journal.entry.wedge.page1": " Как и для добычи березового сока, для получения жидкого потока понадобится клин. Нужно воткнуть его в ствол, поставить под него котёл и наблюдать, как капли медленно стекают вниз",
+  "book.terracompositio.creation_flow_journal.entry.wedge.page2": " Ресурс дерева хоть и истощается, но восстанавливается со временем",
   "book.terracompositio.creation_flow_journal.entry.wedge.page3": " Для добычи березового сока клин тоже хорошо подходит, конечно же",
 
   "book.terracompositio.creation_flow_journal.entry.flow_fluid.name": "Жидкий поток",
@@ -44,9 +44,8 @@
   "book.terracompositio.creation_flow_journal.entry.desorbers.page3": " Извлекает ЭПС из жидкого потока, используя как катализатор созидание, получаемое при росте растений рядом",
   "book.terracompositio.creation_flow_journal.entry.desorbers.page4.title": "Десорбер течения времени",
   "book.terracompositio.creation_flow_journal.entry.desorbers.page4": " Извлекает ЭПС из жидкого потока, используя как катализатор созидание собранного времени. Прирост не стабильный, требует редстоун сигнал для преобразования собранного времени в ЭПС",
-
-  "book.terracompositio.creation_flow_journal.category.day_3.name": "День третий",
-  "book.terracompositio.creation_flow_journal.category.day_3.description": "Подробнее об использовании ЭПС",
+  "book.terracompositio.creation_flow_journal.category.day_3.name": "Третья глава",
+  "book.terracompositio.creation_flow_journal.category.day_3.description": "  Закладка третья: Подробнее об использовании ЭПС. Для следующей закладки преподнесите заряд ЭПС",
 
   "book.terracompositio.creation_flow_journal.entry.flow_infuser.name": "Наполнитель потоком",
   "book.terracompositio.creation_flow_journal.entry.flow_infuser.page1": " С помощью данного устройства можно создать интересный материал, обладающий свойствами как и жидкости, так и железа. Для этого нам понадобятся палки, медь, топор и прямые руки.",
@@ -65,16 +64,20 @@
   "book.terracompositio.creation_flow_journal.entry.infused_fertilizer.name": "Насыщенное удобрение",
   "book.terracompositio.creation_flow_journal.entry.infused_fertilizer.page1": "Изготовленное путем наполнения потоком любой семечки удобрение обладает невероятными способностями в ускорении роста растений. Для того что б его пробудить, необходимо бросить его в жидкий поток, и тогда в течении 5 секунд оно ускорит рост растений вокруг себя ",
   "book.terracompositio.creation_flow_journal.entry.infused_fertilizer.page2": "Неплохо синергирует с досорбером культивации",
-  "book.terracompositio.creation_flow_journal.entry.cfe_charge.name": "Заряд ЭПС",
-  "book.terracompositio.creation_flow_journal.entry.cfe_charge.page1": "Есть способ извлечь ЭПС чуть ли не в чистом виде, и законсервировать его в предмете, удобном для транспортировки. Положив снежёк в наполнетель потоком, он втянет в себя энергию и станет ЭПС зарядом.",
-  "book.terracompositio.creation_flow_journal.entry.cfe_charge.page2": "Если его бросить, то он превратится в удобные летающие платформы",
+  "book.terracompositio.creation_flow_journal.entry.ecf_charge.name": "Заряд ЭПС",
+  "book.terracompositio.creation_flow_journal.entry.ecf_charge.page1": "Есть способ извлечь ЭПС чуть ли не в чистом виде, и законсервировать его в предмете, удобном для транспортировки. Положив снежёк в наполнетель потоком, он втянет в себя энергию и станет ЭПС зарядом.",
+  "book.terracompositio.creation_flow_journal.entry.ecf_charge.page2": "Если его бросить, то он превратится в удобные летающие платформы",
   "book.terracompositio.creation_flow_journal.entry.cedar_gearbox.name": "Кедровая коробка передач",
-  "book.terracompositio.creation_flow_journal.entry.cedar_gearbox.page1": "Одно из применений ЭПС есть превращение её в кинетическую энергию. Для этого можно сматерить кедровую коробку передач. Она вырабатывает 2048ен и потребляет 1 ЭПС/с. Если его наполнить потоком, он начнет вырабатывать 4096ен при том же потреблении",
-  "book.terracompositio.creation_flow_journal.entry.cfe_mechanic.name": "Механика ЭПС",
-  "book.terracompositio.creation_flow_journal.entry.cfe_mechanic.page1": "  Каждое магическое устройство, что использует ЭПС, способно хранить небольшое количество энергии внутри себя (обычно 100). Для того, что б передать энергию от одного устройства к другому, необходимо расположить их рядом. Для каждого устройства есть свой радиус передачи, при котором оно способно передать или принять энергию",
-  "book.terracompositio.creation_flow_journal.entry.cfe_mechanic.page2": "Передача энергии происходит только от источника (например - десорбер) до потребителя ",
-  "book.terracompositio.creation_flow_journal.category.day_4.name": "Четвертый день",
-  "book.terracompositio.creation_flow_journal.category.day_4.description": "Продвинутые материалы и их применение",
+  "book.terracompositio.creation_flow_journal.entry.cedar_gearbox.page1": "Одно из применений ЭПС есть превращение её в кинетическую энергию. Для этого можно смастерить кедровую коробку передач. Она вырабатывает 2048ен и потребляет 1 ЭПС/с. Если его наполнить потоком, он начнет вырабатывать 4096ен при том же потреблении",
+  "book.terracompositio.creation_flow_journal.entry.ecf_mechanic.name": "Механика ЭПС",
+  "book.terracompositio.creation_flow_journal.entry.ecf_mechanic.page1": "  Каждое магическое устройство, что использует ЭПС, способно хранить небольшое количество энергии внутри себя (обычно 64). Для того, что б передать энергию от одного устройства к другому, необходимо расположить их не далеко друг от друга. Для каждого устройства есть свой радиус передачи, при котором оно способно передать или принять энергию",
+  "book.terracompositio.creation_flow_journal.entry.ecf_mechanic.page2": "Передача энергии происходит только от источника (например - десорбер) до потребителя ",
+  "book.terracompositio.creation_flow_journal.category.day_4.name": "Четвертая глава",
+  "book.terracompositio.creation_flow_journal.category.day_4.description": "Закладка четвертая: Продвинутые устройства и их применение. Для следующей закладки преподнесите слиток стабильного технеция",
+
+
+
+
   "book.terracompositio.creation_flow_journal.entry.technetium_ore.name": "Руда Технеция",
   "book.terracompositio.creation_flow_journal.entry.technetium_ore.page1": "  В глубинах пещер можно отыскать одну необычно опасную синюю руду. Это - Нестабильный Технеций. От него исходит огромная аура созидания, которая будет истощать того, кто ее держит. По этому, без необходимого обмундирования ее лучше избегать!",
   "book.terracompositio.creation_flow_journal.entry.shielded_bundle.name": "Экранированный мешочек",
@@ -82,7 +85,7 @@
 
 
   "book.terracompositio.creation_flow_journal.entry.matter_infuser.name": "Наполнитель материи",
-  "book.terracompositio.creation_flow_journal.entry.matter_infuser.page1": "  Руда технеция содержит в себе много ЭПС, однако если просто руду переплавить, энергия улетучивается. Для того что бы ее добыть, необходимо раскрыть потенциал, с помощью наполнения руды разными каталитическими материалами. ",
+  "book.terracompositio.creation_flow_journal.entry.matter_infuser.page1": "  Руда технеция содержит в себе много ЭПС, однако если просто руду переплавить, энергия улетучивается. Для того что бы ее добыть, необходимо раскрыть потенциал, с помощью наполнения руды разными каталитическими материалами",
   "book.terracompositio.creation_flow_journal.entry.matter_infuser.page2": "  Для этого есть Наполнитель материи - многоблочная структура, занимающая от 2х2 до 2х9 блоков по горизонтали.",
   "book.terracompositio.creation_flow_journal.entry.matter_infuser.page3": "  После размещения блоков, необходимо нацепить на бревна Шины входа/выхода, а так же соединить модули друг с другом и с шинами с помощью стержней из наполненного железа",
 
@@ -102,15 +105,15 @@
   "book.terracompositio.creation_flow_journal.entry.air_saturator.page1": "  Есть еще способ получения облака ЭПС, а именно с помощью обогатителя воздуха. Подав на него редстоун сигнал, он начнет распылять в воздух ЭПС. Если наполнить кору устройства жидким потоком, обогатитель будет распылять ЭПС быстрее",
 
 
-  "book.terracompositio.creation_flow_journal.entry.cfe_cloud.name": "Облако ЭПС",
-  "book.terracompositio.creation_flow_journal.entry.cfe_cloud.page1": " Облако ЭПС - обогащенный воздух, что получается при обжиге зарядов ЭПС или обогащенной руды технеция в печи. Облако постепенно рассасывается в окружение, а также в окружающие устройства. ",
+  "book.terracompositio.creation_flow_journal.entry.ecf_cloud.name": "Облако ЭПС",
+  "book.terracompositio.creation_flow_journal.entry.ecf_cloud.page1": " Облако ЭПС - обогащенный воздух, что получается при обжиге зарядов ЭПС или обогащенной руды технеция в печи. Облако постепенно рассасывается в окружение, а также в окружающие устройства. ",
 
 
   "book.terracompositio.creation_flow_journal.entry.cedar_ent.name": "Кедровые Энты",
-  "book.terracompositio.creation_flow_journal.entry.cedar_ent.page1": "В кедровом лесу можно найти помимо красивой флоры, еще и местную уникальную фауну - Кедровых Энтов. Они состоят из кедра, имеют 3 ноги, 2 руки и голод. Они питаются Энергией Потока Созидания вырабатывая её напрямую из жидкого потока, что содержится в бревнах кедра, или разных устройств, содержащих ЭПС.",
-  "book.terracompositio.creation_flow_journal.entry.cedar_ent.page2": "Если он долго не будет кушать, то погибнет от голода, превратившись в статую. Оживить их обратно можно поставив под капающий потоком клин",
+  "book.terracompositio.creation_flow_journal.entry.cedar_ent.page1": "  В кедровом лесу можно найти местную уникальную фауну - Кедровых Энтов. Они состоят из кедра, имеют 3 ноги, 2 руки и голод. Питаются ЭПС, вырабатывая её напрямую из жидкого потока, что содержится в бревнах кедра, или добывая из разных устройств, содержащих ЭПС. Если он долго не будет кушать, то погибнет от голода, превратившись в статую",
+  "book.terracompositio.creation_flow_journal.entry.cedar_ent.page2": "  Оживить их обратно можно поставив под капающий потоком клин",
   "book.terracompositio.creation_flow_journal.entry.path_pointers.name": "Указатели Пути",
-  "book.terracompositio.creation_flow_journal.entry.path_pointers.desc": "  Для быстрой передачи ЭПС на расстояние а также для его эффективного хранения есть Указатели пути. Это устройство собирается из двух деталей в один блок, и от выбранных деталей зависит его функционал. Есть 6 видов:<br> - Сборщик       - Излучатель<br> - Отправитель   - Получатель<br> - Наполнитель   - Экстрактор",
+  "book.terracompositio.creation_flow_journal.entry.path_pointers.desc": "  Для быстрой передачи ЭПС на расстояние а также для его эффективного хранения есть Указатели пути. Это устройство собирается из двух деталей в один блок, и от выбранных деталей зависит его функционал. Есть 4 вида:<br><br> - Сборщик       - Излучатель<br> - Отправитель   - Получатель",
   "book.terracompositio.creation_flow_journal.entry.path_pointers.collector": "Притягивает энергию из ближайших источников, как потребитель",
   "book.terracompositio.creation_flow_journal.entry.path_pointers.emitter": "Отдает энергию ближайшим потребителям, как источник",
   "book.terracompositio.creation_flow_journal.entry.path_pointers.sender": "Перенаправляет энергию к подключенному Получателю",
@@ -119,8 +122,29 @@
   "book.terracompositio.creation_flow_journal.entry.path_pointers.infuser": "Наполняет существо с надетой короной энергией, будто оно потребитель, а Наполнитель - источник",
   "book.terracompositio.creation_flow_journal.entry.path_pointers.extractor": "Извлекает энергию из хранилища, где Энт держит не съеденную энергию",
   "book.terracompositio.creation_flow_journal.entry.path_pointers.storing": "Если на Энта надеть корону, Наполнитель будет передавать ему энергию",
-  "book.terracompositio.creation_flow_journal.entry.path_pointers.apple": "   Можно подключить Экстрактор, чтоб доставать и использовать оттуда энергию. <br><br>   Если съедено Яблоко Знания, то с ключём в руке будет видно точку входа/выхода из сети указателей пути, а так же к чему подключены Отправитель и Получатель"
+  "book.terracompositio.creation_flow_journal.entry.path_pointers.apple": "  Если съедено Яблоко Знания, то с ключём в руке будет видно точку входа/выхода из сети указателей пути, а так же к чему подключены Отправитель и Получатель",
+  "book.terracompositio.creation_flow_journal.entry.path_pointers.name_2": "Указатели Пути 2",
+  "book.terracompositio.creation_flow_journal.entry.path_pointers.desc_2": " С помощью указателей пути можно хранить много энергии почти без потерь. С этим нам помогут еще 2 вида: <br><br> - Наполнитель   - Экстрактор <br>  Также нам понадобится живой Энт и Корона из Технеция",
+
+  "book.terracompositio.creation_flow_journal.entry.enriched_technetium.name": "Обогащенный Технеций",
+  "book.terracompositio.creation_flow_journal.entry.enriched_technetium.page1": "  Используя Наполнитель материи, можно провести очистку технеция, что позволит добыть невероятное количество ЭПС. Для первого этапа положите в порт наполнителя уголь, и положите в ячейку наполнителя 4 руды. Остальные этапы обработки аналогичны, только вместо угля редстоун и алмаз",
+  "book.terracompositio.creation_flow_journal.entry.enriched_technetium.page2": "  Для того, что б получить из него ЭПС, переплавьте обогащенный материал. Но помните, чем более он обогащен, тем более токсичен",
+  "book.terracompositio.creation_flow_journal.category.day_5.name": "Пятая глава",
+  "book.terracompositio.creation_flow_journal.category.day_5.description": "Закладка пятая: Технеций и его применение. Последняя закладка",
 
 
+  "book.terracompositio.creation_flow_journal.entry.fluid_applier.name": "Применитель Жидкостей",
+  "book.terracompositio.creation_flow_journal.entry.fluid_applier.page1": "  Крутое устройство. Можно использовать как ведро, вмещает в себя 8 ведер жидкости. Может разливать жидкости одну об другую, вместо того, что б разливать их в один блок",
+  "book.terracompositio.creation_flow_journal.entry.fluid_applier.page2": "  Если в нем жидкий поток, способен наполнять им блоки древесины и оживлять засохших Энтов",
+  "book.terracompositio.creation_flow_journal.entry.technetium_armor.name": "Броня из Технеция",
+  "book.terracompositio.creation_flow_journal.entry.technetium_armor.desc": "  Невероятный материал, из которого можно сделать хорошую броню. Изначально каждый элемент хранит может хранить до 8 ЭПС, но соединив его в верстаке с кусочком обогащенного технеция, его вместимость станет равной стоимости получения: от 128 до 3200 соответственно",
+  "book.terracompositio.creation_flow_journal.entry.technetium_armor.crown": "Корона является целью для ближайших наполнителей указателей пути. Позволяет заряжать броню",
+  "book.terracompositio.creation_flow_journal.entry.technetium_armor.chestplate": "Нагрудник отбивает входящие атаки за счет ЭПС",
+  "book.terracompositio.creation_flow_journal.entry.technetium_armor.leggings": "Поножи удобно использовать для хранения ЭПС, передает хранящуюся энергию другим элементам брони",
+  "book.terracompositio.creation_flow_journal.entry.technetium_armor.boots": "Ботинки из технеция позволяют ходить по воздуху, благодаря платформам, что появляются под ногами. На них можно стоять, а так же сквозь них можно свободно двигаться. Становятся твердыми со всех сторон при приседании",
+  "book.terracompositio.creation_flow_journal.entry.technetium_armor.boots_usage": "  Каждая поставленная платформа стоит 1 ЭПС, а так же она гасит урон от падения и с нее нельзя соскользнуть.  Для использования, прыгните с уступа, предварительно убедившись, что в ботинках есть ЭПС. Если смотреть достаточно высоко, при прыжке уровень платформ поднимется, а если достаточно низко - опустится. Для того, что б быстро спуститься, сойдите с платформы присев, а что б быстро подняться, 2 раза прыгнете. Спасает при падении с большой высоты",
+  "book.terracompositio.creation_flow_journal.entry.floating_redstone.name": "Левитирующий редстоун",
+  "book.terracompositio.creation_flow_journal.entry.floating_redstone.page1": "  Благодаря свойствам наполненного железа к левитации, а так же его редстоун проводимость, можно создать редстоун компоненты, которым не нужна опора что б работать",
+  "book.terracompositio.creation_flow_journal.entry.floating_redstone.page2": "  В держатель можно вставить любой факел, не обязательно из редстоуна"
 
 }

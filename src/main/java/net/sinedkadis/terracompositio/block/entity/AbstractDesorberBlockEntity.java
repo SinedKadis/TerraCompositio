@@ -19,8 +19,9 @@ import net.minecraftforge.fluids.FluidUtil;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.fluids.capability.templates.FluidTank;
 import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBEBehaviour;
-import net.sinedkadis.terracompositio.api.networks.cfe.ICFEHandler;
-import net.sinedkadis.terracompositio.block.behaviours.CFEHandlerBehaviour;
+import net.sinedkadis.terracompositio.api.helpers.TooltipHelper;
+import net.sinedkadis.terracompositio.api.networks.cfe.IECFHandler;
+import net.sinedkadis.terracompositio.block.behaviours.ECFHandlerBehaviour;
 import net.sinedkadis.terracompositio.config.TCInnerConfig;
 import net.sinedkadis.terracompositio.registries.TCBlockStateProperties;
 import net.sinedkadis.terracompositio.registries.TCFluids;
@@ -48,7 +49,7 @@ public abstract class AbstractDesorberBlockEntity extends TCBlockEntity {
 
     @Override
     public void addBEBehaviours(List<IBEBehaviour> list) {
-        list.add(new CFEHandlerBehaviour(this)
+        list.add(new ECFHandlerBehaviour(this)
                 .maxCFE(1000)
                 .range(5)
                 .priority(TCInnerConfig.DEFAULT_SOURCE_PRIORITY));
@@ -115,8 +116,8 @@ public abstract class AbstractDesorberBlockEntity extends TCBlockEntity {
         lazyFluidHandler.invalidate();
     }
 
-    protected ICFEHandler cfeContainer() {
-        return ((CFEHandlerBehaviour) behaviours.get(0)).getMainHandler();
+    protected IECFHandler cfeContainer() {
+        return ((ECFHandlerBehaviour) behaviours.get(0)).getMainHandler();
     }
 
     @Override
@@ -126,7 +127,7 @@ public abstract class AbstractDesorberBlockEntity extends TCBlockEntity {
         FluidStack fluidInTank = fluidHandler.getFluidInTank(0);
         CompoundTag compoundTag = new CompoundTag();
         fluidInTank.writeToNBT(compoundTag);
-        data.put("val.fluid", compoundTag);
+        data.put(TooltipHelper.Keys.FLUID.toData(), compoundTag);
 
     }
 
@@ -134,10 +135,9 @@ public abstract class AbstractDesorberBlockEntity extends TCBlockEntity {
     public void addTooltipLines(CompoundTag data, List<Component> tooltip, boolean isShifting) {
         super.addTooltipLines(data, tooltip, isShifting);
 
-        FluidStack fluidStack = FluidStack.loadFluidStackFromNBT(data.getCompound("val.fluid"));
+        FluidStack fluidStack = FluidStack.loadFluidStackFromNBT(data.getCompound(TooltipHelper.Keys.FLUID.toData()));
         if (!fluidStack.isEmpty()) {
-
-            tooltip.add(Component.translatable("block.terracompositio.fluids_header"));
+            TooltipHelper.addHeader(TooltipHelper.Headers.FLUIDS, tooltip);
 
             tooltip.add(FluidComponent.of(fluidStack));
         }

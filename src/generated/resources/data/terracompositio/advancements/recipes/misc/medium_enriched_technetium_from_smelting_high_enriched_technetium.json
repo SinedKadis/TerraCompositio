@@ -1,0 +1,35 @@
+{
+  "parent": "minecraft:recipes/root",
+  "criteria": {
+    "has_high_enriched_technetium": {
+      "conditions": {
+        "items": [
+          {
+            "items": [
+              "terracompositio:high_enriched_technetium"
+            ]
+          }
+        ]
+      },
+      "trigger": "minecraft:inventory_changed"
+    },
+    "has_the_recipe": {
+      "conditions": {
+        "recipe": "terracompositio:medium_enriched_technetium_from_smelting_high_enriched_technetium"
+      },
+      "trigger": "minecraft:recipe_unlocked"
+    }
+  },
+  "requirements": [
+    [
+      "has_high_enriched_technetium",
+      "has_the_recipe"
+    ]
+  ],
+  "rewards": {
+    "recipes": [
+      "terracompositio:medium_enriched_technetium_from_smelting_high_enriched_technetium"
+    ]
+  },
+  "sends_telemetry_event": false
+}

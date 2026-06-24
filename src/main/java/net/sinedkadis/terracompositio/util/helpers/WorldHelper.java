@@ -22,7 +22,7 @@ import net.minecraft.world.level.block.state.properties.Property;
 import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.level.material.FluidState;
 import net.sinedkadis.terracompositio.block.custom.FlowCedarLikeBlock;
-import net.sinedkadis.terracompositio.particle.CFEParticleData;
+import net.sinedkadis.terracompositio.particle.ECFParticleData;
 import net.sinedkadis.terracompositio.registries.TCBlockStateProperties;
 import net.sinedkadis.terracompositio.registries.TCGameRules;
 import org.jetbrains.annotations.NotNull;
@@ -56,7 +56,7 @@ public class WorldHelper {
 
     public static @NotNull InteractionResult handleInWorldBlockCraft(BlockState oldState, BlockState newState, Level pLevel, BlockPos pPos, ItemStack item, int count) {
         float speed = 1 / 20f;
-        return handleInWorldBlockCraft(oldState, newState, pLevel, pPos, item, count, new CFEParticleData(speed), SoundEvents.COPPER_PLACE);
+        return handleInWorldBlockCraft(oldState, newState, pLevel, pPos, item, count, new ECFParticleData(speed), SoundEvents.COPPER_PLACE);
     }
 
     public static BlockState copyBlockStates(BlockState oldState, BlockState newState) {

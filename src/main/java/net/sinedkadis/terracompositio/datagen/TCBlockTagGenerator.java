@@ -44,11 +44,13 @@ public class TCBlockTagGenerator extends BlockTagsProvider {
                         TCBlocks.TECHNETIUM_BLOCK.get(),
                         TCBlocks.INFUSED_IRON_BLOCK.get(),
                         TCBlocks.INFUSED_IRON_DOOR.get(),
-                        TCBlocks.INFUSED_IRON_PRESSURE_PLATE.get());
+                        TCBlocks.INFUSED_IRON_PRESSURE_PLATE.get(),
+                        TCBlocks.FLOATING_BUTTON.get(),
+                        TCBlocks.FLOATING_LEVER.get());
         this.tag(BlockTags.MINEABLE_WITH_AXE)
                 .add(TCBlocks.FLOW_CEDAR_LOG.get(),
                         TCBlocks.FLOW_CEDAR_LEAVES.get(),
-                        TCBlocks.FLOW_CEDAR_PORT.get(),
+                        TCBlocks.FLOW_CEDAR_ALTAR.get(),
                         TCBlocks.FLOW_INFUSER.get(),
                         TCBlocks.FLOW_CEDAR_WOOD.get(),
                         TCBlocks.FLOW_CEDAR_PLANKS.get(),
@@ -82,7 +84,6 @@ public class TCBlockTagGenerator extends BlockTagsProvider {
         this.tag(BlockTags.LOGS_THAT_BURN)
                 .add(TCBlocks.FLOW_CEDAR_LOG.get(),
                         TCBlocks.FLOW_CEDAR_WOOD.get(),
-                        TCBlocks.FLOW_CEDAR_PORT.get(),
                         TCBlocks.STRIPPED_FLOW_CEDAR_LOG.get(),
                         TCBlocks.STRIPPED_FLOW_CEDAR_WOOD.get(),
                         TCBlocks.FLOW_INFUSER.get(),
@@ -110,8 +111,7 @@ public class TCBlockTagGenerator extends BlockTagsProvider {
                 .add(TCBlocks.FLOW_CEDAR_FENCE_GATE.get());
         this.tag(TCTags.Blocks.FLOW_CEDAR_LOGS)
                 .add(TCBlocks.FLOW_CEDAR_LOG.get(),
-                        TCBlocks.FLOW_CEDAR_WOOD.get(),
-                        TCBlocks.FLOW_CEDAR_PORT.get());
+                        TCBlocks.FLOW_CEDAR_WOOD.get());
         //this.tag(BlockTags.NEEDS_DIAMOND_TOOL)
         //        .add(ModBlocks.RAW_SAPPHIRE_BLOCK.get());
 
@@ -141,8 +141,8 @@ public class TCBlockTagGenerator extends BlockTagsProvider {
                 .add(Blocks.REDSTONE_WIRE,
                         TCBlocks.FLOATING_REDSTONE.get());
 
-//        this.tag(TCTags.Blocks.CREATE_WRENCH_PICKUP)
-//                .add(Blocks.PISTON);
+        this.tag(TCTags.Blocks.CREATE_WRENCH_PICKUP)
+                .add(TCBlocks.ECF_BOARD.get());
 
         if (ModList.get().isLoaded("create")) {
             TerraCompositio.createCompat.getDataGen().addBlockTags(this, pProvider);

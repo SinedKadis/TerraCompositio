@@ -8,7 +8,9 @@ import net.minecraft.world.SimpleContainer;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
+import net.minecraftforge.items.IItemHandler;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -73,7 +75,11 @@ public class ItemHelper {
     }
 
     public static void dropContents(BlockEntity blockEntity, int... slots) {
-        blockEntity.getCapability(ForgeCapabilities.ITEM_HANDLER).ifPresent(itemHandler -> {
+        dropContents(blockEntity, ForgeCapabilities.ITEM_HANDLER, slots);
+    }
+
+    public static <T extends IItemHandler> void dropContents(BlockEntity blockEntity, Capability<T> cap, int... slots) {
+        blockEntity.getCapability(cap).ifPresent(itemHandler -> {
             SimpleContainer inventory = new SimpleContainer(itemHandler.getSlots());
             if (slots.length == 0) {
                 for (int i = 0; i < itemHandler.getSlots(); i++) {

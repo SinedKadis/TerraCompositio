@@ -18,6 +18,8 @@ import org.jetbrains.annotations.Nullable;
 
 import java.util.concurrent.CompletableFuture;
 
+import static net.sinedkadis.terracompositio.registries.TCItems.*;
+
 public class TCItemTagGenerator extends ItemTagsProvider {
     public TCItemTagGenerator(PackOutput p_275343_, CompletableFuture<HolderLookup.Provider> p_275729_,
                               CompletableFuture<TagLookup<Block>> p_275322_, @Nullable ExistingFileHelper existingFileHelper) {
@@ -29,7 +31,6 @@ public class TCItemTagGenerator extends ItemTagsProvider {
         this.tag(ItemTags.LOGS_THAT_BURN)
                 .add(TCBlocks.FLOW_CEDAR_LOG.get().asItem(),
                         TCBlocks.FLOW_CEDAR_WOOD.get().asItem(),
-                        TCBlocks.FLOW_CEDAR_PORT.get().asItem(),
                         TCBlocks.STRIPPED_FLOW_CEDAR_LOG.get().asItem(),
                         TCBlocks.STRIPPED_FLOW_CEDAR_WOOD.get().asItem(),
                         TCBlocks.FLOW_CEDAR_CASING.get().asItem(),
@@ -56,14 +57,17 @@ public class TCItemTagGenerator extends ItemTagsProvider {
                 .add(TCBlocks.FLOW_CEDAR_LOG.get().asItem(),
                         TCBlocks.FLOW_CEDAR_WOOD.get().asItem());
         this.tag(ItemTags.TRIMMABLE_ARMOR)
-                .add(TCItems.FLOW_CEDAR_HELMET.get(),
+                .add(FLOW_CEDAR_HELMET.get(),
                         TCItems.FLOW_CEDAR_CHESTPLATE.get(),
                         TCItems.FLOW_CEDAR_LEGGINGS.get(),
                         TCItems.FLOW_CEDAR_BOOTS.get(),
                         TCItems.FLOWING_FLOW_CEDAR_HELMET.get(),
                         TCItems.FLOWING_FLOW_CEDAR_CHESTPLATE.get(),
                         TCItems.FLOWING_FLOW_CEDAR_LEGGINGS.get(),
-                        TCItems.FLOWING_FLOW_CEDAR_BOOTS.get());
+                        TCItems.FLOWING_FLOW_CEDAR_BOOTS.get(),
+                        TCItems.TECHNETIUM_CHESTPLATE.get(),
+                        TCItems.TECHNETIUM_LEGGINGS.get(),
+                        TCItems.TECHNETIUM_BOOTS.get());
         this.tag(ItemTags.BOATS)
                 .add(TCItems.FLOW_CEDAR_BOAT.get());
         this.tag(ItemTags.CHEST_BOATS)
@@ -99,6 +103,15 @@ public class TCItemTagGenerator extends ItemTagsProvider {
                 .add(TCItems.GOLD_ROD.get());
         this.tag(TCTags.Items.CHAIN_RIDEABLE)
                 .add(TCItems.WRENCH_AXE.get());
+
+        this.tag(Tags.Items.ARMORS_HELMETS)
+                .add(FLOW_CEDAR_HELMET.get(), TECHNETIUM_CROWN.get());
+        this.tag(Tags.Items.ARMORS_CHESTPLATES)
+                .add(FLOW_CEDAR_CHESTPLATE.get(), TECHNETIUM_CHESTPLATE.get());
+        this.tag(Tags.Items.ARMORS_LEGGINGS)
+                .add(FLOW_CEDAR_LEGGINGS.get(), TECHNETIUM_LEGGINGS.get());
+        this.tag(Tags.Items.ARMORS_BOOTS)
+                .add(FLOW_CEDAR_BOOTS.get(), TECHNETIUM_BOOTS.get());
 
         if (ModList.get().isLoaded("create")) {
             TerraCompositio.createCompat.getDataGen().addItemTags(this, pProvider);

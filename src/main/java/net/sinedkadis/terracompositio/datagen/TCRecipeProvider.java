@@ -1,6 +1,7 @@
 package net.sinedkadis.terracompositio.datagen;
 
 
+import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.data.PackOutput;
 import net.minecraft.data.recipes.*;
 import net.minecraft.nbt.CompoundTag;
@@ -9,27 +10,35 @@ import net.minecraft.tags.ItemTags;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.item.Items;
 import net.minecraft.world.item.crafting.AbstractCookingRecipe;
+import net.minecraft.world.item.crafting.CraftingRecipe;
 import net.minecraft.world.item.crafting.Ingredient;
 import net.minecraft.world.item.crafting.RecipeSerializer;
 import net.minecraft.world.level.ItemLike;
-import net.minecraft.world.level.block.Blocks;
+import net.minecraftforge.common.Tags;
+import net.minecraftforge.common.crafting.StrictNBTIngredient;
 import net.minecraftforge.common.crafting.conditions.IConditionBuilder;
 import net.minecraftforge.fml.ModList;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.sinedkadis.terracompositio.TerraCompositio;
+import net.sinedkadis.terracompositio.datagen.builders.AltarTransformationRecipeBuilder;
 import net.sinedkadis.terracompositio.datagen.builders.FlowInfusionRecipeBuilder;
-import net.sinedkadis.terracompositio.datagen.builders.FlowSaturationRecipeBuilder;
 import net.sinedkadis.terracompositio.datagen.builders.MatterInfusionRecipeBuilder;
 import net.sinedkadis.terracompositio.datagen.builders.TechnetiumFiringRecipeBuilder;
+import net.sinedkadis.terracompositio.recipe.ECFStorageUpgradeRecipe;
+import net.sinedkadis.terracompositio.recipe.NoOpRecipeSerializer;
+import net.sinedkadis.terracompositio.recipe.TagTransferShapedRecipe;
+import net.sinedkadis.terracompositio.recipe.WrapperResult;
 import net.sinedkadis.terracompositio.registries.TCBlocks;
 import net.sinedkadis.terracompositio.registries.TCItems;
 import net.sinedkadis.terracompositio.registries.TCTags;
 import org.jetbrains.annotations.NotNull;
 
-
+import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.List;
 import java.util.Objects;
 import java.util.function.Consumer;
+
+import static net.minecraft.data.recipes.RecipeBuilder.getDefaultRecipeId;
 
 public class TCRecipeProvider extends RecipeProvider implements IConditionBuilder {
 
@@ -40,11 +49,13 @@ public class TCRecipeProvider extends RecipeProvider implements IConditionBuilde
     @Override
     protected void buildRecipes(@NotNull Consumer<FinishedRecipe> pWriter) {
 
+        specialCraftingRecipe(pWriter, ECFStorageUpgradeRecipe.SERIALIZER);
 
         buildCedarBlocks(pWriter);
         buildMatterInfuserBlocks(pWriter);
         buildCopperMaterials(pWriter);
         buildTechnetiumMaterials(pWriter);
+        buildTechnetiumArmor(pWriter);
         buildCedarArmor(pWriter);
         buildInfusedIronMaterials(pWriter);
         buildGoldMaterials(pWriter);
@@ -62,6 +73,53 @@ public class TCRecipeProvider extends RecipeProvider implements IConditionBuilde
         buildCompat(pWriter);
 
 
+    }
+
+    private static void buildCFJ(@NotNull Consumer<FinishedRecipe> pWriter) {
+        ItemStack bookLevel1 = createCFJBook(1);
+        ItemStack bookLevel2 = createCFJBook(2);
+        ItemStack bookLevel3 = createCFJBook(3);
+        ItemStack bookLevel4 = createCFJBook(4);
+        ItemStack bookLevel5 = createCFJBook(5);
+
+
+        AltarTransformationRecipeBuilder.create(
+                        bookLevel1,
+                        Ingredient.of(Items.BOOK)
+                )
+                .save(pWriter, "upgrade_book_to_day_1");
+        AltarTransformationRecipeBuilder.create(
+                        bookLevel2,
+                        StrictNBTIngredient.of(
+                                bookLevel1
+                        ),
+                        Ingredient.of(TCBlocks.FLOW_CEDAR_SAPLING.get().asItem().getDefaultInstance())
+                )
+                .save(pWriter, "upgrade_book_to_day_2");
+        AltarTransformationRecipeBuilder.create(
+                        bookLevel3,
+                        StrictNBTIngredient.of(
+                                bookLevel2
+                        ),
+                        Ingredient.of(TCItems.FLOW_BOTTLE.get().asItem().getDefaultInstance())
+                )
+                .save(pWriter, "upgrade_book_to_day_3");
+        AltarTransformationRecipeBuilder.create(
+                        bookLevel4,
+                        StrictNBTIngredient.of(
+                                bookLevel3
+                        ),
+                        Ingredient.of(TCItems.ECF_CHARGE.get().asItem().getDefaultInstance())
+                )
+                .save(pWriter, "upgrade_book_to_day_4");
+        AltarTransformationRecipeBuilder.create(
+                        bookLevel5,
+                        StrictNBTIngredient.of(
+                                bookLevel4
+                        ),
+                        Ingredient.of(TCItems.TECHNETIUM_INGOT.get().asItem().getDefaultInstance())
+                )
+                .save(pWriter, "upgrade_book_to_day_5");
     }
 
     private void buildApples(@NotNull Consumer<FinishedRecipe> pWriter) {
@@ -85,149 +143,237 @@ public class TCRecipeProvider extends RecipeProvider implements IConditionBuilde
         }
     }
 
-    private void buildFloatingRedstone(@NotNull Consumer<FinishedRecipe> pWriter) {
-        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, TCBlocks.FLOATING_REDSTONE.get())
-                .pattern("R")
-                .pattern("N")
-                .define('R', Items.REDSTONE)
-                .define('N', TCItems.INFUSED_IRON_NUGGET.get())
-                .unlockedBy(getHasName(TCItems.INFUSED_IRON_INGOT.get()), has(TCItems.INFUSED_IRON_INGOT.get()))
+    private static void buildCedarBlocks(@NotNull Consumer<FinishedRecipe> pWriter) {
+        ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, TCBlocks.FLOW_CEDAR_STAIRS.get())
+                .pattern("S  ")
+                .pattern("SS ")
+                .pattern("SSS")
+                .define('S', TCBlocks.FLOW_CEDAR_PLANKS.get())
+                .unlockedBy(getHasName(TCBlocks.FLOW_CEDAR_PLANKS.get()), has(TCBlocks.FLOW_CEDAR_PLANKS.get()))
                 .save(pWriter);
-        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, TCBlocks.FLOATING_TORCH_HOLDER.get())
-                .pattern("P")
-                .pattern("I")
-                .define('P', Items.FLOWER_POT)
-                .define('I', TCItems.INFUSED_IRON_INGOT.get())
-                .unlockedBy(getHasName(TCItems.INFUSED_IRON_INGOT.get()), has(TCItems.INFUSED_IRON_INGOT.get()))
+        ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, TCBlocks.FLOW_CEDAR_SLAB.get(),2)
+                .pattern("SSS")
+                .define('S', TCBlocks.FLOW_CEDAR_PLANKS.get())
+                .unlockedBy(getHasName(TCBlocks.FLOW_CEDAR_PLANKS.get()), has(TCBlocks.FLOW_CEDAR_PLANKS.get()))
                 .save(pWriter);
-        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, TCBlocks.FLOATING_REPEATER.get())
-                .pattern("TRT")
-                .pattern("SIS")
-                .define('T', Items.REDSTONE_TORCH)
-                .define('R', Items.REDSTONE)
-                .define('S', Items.STONE)
-                .define('I',TCItems.INFUSED_IRON_INGOT.get())
-                .unlockedBy(getHasName(TCItems.INFUSED_IRON_INGOT.get()), has(TCItems.INFUSED_IRON_INGOT.get()))
+        ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, TCBlocks.FLOW_CEDAR_PRESSURE_PLATE.get())
+                .pattern("SS")
+                .define('S', TCBlocks.FLOW_CEDAR_PLANKS.get())
+                .unlockedBy(getHasName(TCBlocks.FLOW_CEDAR_PLANKS.get()), has(TCBlocks.FLOW_CEDAR_PLANKS.get()))
                 .save(pWriter);
-        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, TCBlocks.FLOATING_COMPARATOR.get())
-                .pattern(" T ")
-                .pattern("TQT")
-                .pattern("SIS")
-                .define('T', Items.REDSTONE_TORCH)
-                .define('Q', Items.QUARTZ)
-                .define('S', Items.STONE)
-                .define('I',TCItems.INFUSED_IRON_INGOT.get())
-                .unlockedBy(getHasName(TCItems.INFUSED_IRON_INGOT.get()), has(TCItems.INFUSED_IRON_INGOT.get()))
+        ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, TCBlocks.FLOW_CEDAR_FENCE.get())
+                .pattern("SFS")
+                .pattern("SFS")
+                .define('S', TCBlocks.FLOW_CEDAR_PLANKS.get())
+                .define('F', Items.STICK)
+                .unlockedBy(getHasName(TCBlocks.FLOW_CEDAR_PLANKS.get()), has(TCBlocks.FLOW_CEDAR_PLANKS.get()))
                 .save(pWriter);
-        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, TCBlocks.INFUSED_IRON_PRESSURE_PLATE.get())
-                .pattern("II")
-                .define('I',TCItems.INFUSED_IRON_INGOT.get())
-                .unlockedBy(getHasName(TCItems.INFUSED_IRON_INGOT.get()), has(TCItems.INFUSED_IRON_INGOT.get()))
+        ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, TCBlocks.FLOW_CEDAR_FENCE_GATE.get())
+                .pattern("FSF")
+                .pattern("FSF")
+                .define('S', TCBlocks.FLOW_CEDAR_PLANKS.get())
+                .define('F', Items.STICK)
+                .unlockedBy(getHasName(TCBlocks.FLOW_CEDAR_PLANKS.get()), has(TCBlocks.FLOW_CEDAR_PLANKS.get()))
                 .save(pWriter);
-        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, TCBlocks.INFUSED_IRON_DOOR.get())
-                .pattern("II")
-                .pattern("II")
-                .pattern("II")
-                .define('I',TCItems.INFUSED_IRON_INGOT.get())
-                .unlockedBy(getHasName(TCItems.INFUSED_IRON_INGOT.get()), has(TCItems.INFUSED_IRON_INGOT.get()))
+        ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, TCBlocks.FLOW_CEDAR_DOOR.get(),3)
+                .pattern("SS")
+                .pattern("SS")
+                .pattern("SS")
+                .define('S', TCBlocks.FLOW_CEDAR_PLANKS.get())
+                .unlockedBy(getHasName(TCBlocks.FLOW_CEDAR_PLANKS.get()), has(TCBlocks.FLOW_CEDAR_PLANKS.get()))
+                .save(pWriter);
+        ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, TCBlocks.FLOW_CEDAR_TRAPDOOR.get(),2)
+                .pattern("SSS")
+                .pattern("SSS")
+                .define('S', TCBlocks.FLOW_CEDAR_PLANKS.get())
+                .unlockedBy(getHasName(TCBlocks.FLOW_CEDAR_PLANKS.get()), has(TCBlocks.FLOW_CEDAR_PLANKS.get()))
+                .save(pWriter);
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.BUILDING_BLOCKS, TCBlocks.FLOW_CEDAR_PLANKS.get(), 4)
+                .requires(TCTags.Items.FLOW_CEDAR_LOGS)
+                .unlockedBy(getHasName(TCBlocks.FLOW_CEDAR_LOG.get()), has(TCBlocks.FLOW_CEDAR_LOG.get()))
+                .save(pWriter);
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.BUILDING_BLOCKS, TCBlocks.FLOW_CEDAR_BUTTON.get(), 1)
+                .requires(TCBlocks.FLOW_CEDAR_PLANKS.get())
+                .unlockedBy(getHasName(TCBlocks.FLOW_CEDAR_PLANKS.get()), has(TCBlocks.FLOW_CEDAR_PLANKS.get()))
                 .save(pWriter);
     }
 
     private static void buildTechnetiumOreProcessing(@NotNull Consumer<FinishedRecipe> pWriter) {
+        int base1 = 128;
+        int consumeMultiplier = 5;
+        int generationMultiplier = 4;
+
+        int base2 = base1 * consumeMultiplier;
+        int base3 = base2 * consumeMultiplier;
+
         MatterInfusionRecipeBuilder.create(
                 TCItems.RAW_TECHNETIUM.get(),4,
                         TCItems.LOW_ENRICHED_TECHNETIUM.get(),1,
-                        Items.COAL,100,200,30)
+                        Items.COAL, base1, 200, 30)
                 .save(pWriter);
+
         MatterInfusionRecipeBuilder.create(
                         TCItems.LOW_ENRICHED_TECHNETIUM.get(),4,
                         TCItems.MEDIUM_ENRICHED_TECHNETIUM.get(),1,
-                        Items.REDSTONE,1000,1000,30)
+                        Items.REDSTONE, base2, 1000, 30)
                 .save(pWriter);
+
         MatterInfusionRecipeBuilder.create(
                         TCItems.MEDIUM_ENRICHED_TECHNETIUM.get(),4,
                         TCItems.HIGH_ENRICHED_TECHNETIUM.get(),1,
-                        Items.DIAMOND,10000,2000,30)
+                        Items.DIAMOND, base3, 2000, 30)
                 .save(pWriter);
+
+        TechnetiumFiringRecipeBuilder.create(
+                        TCItems.LOW_ENRICHED_TECHNETIUM.get(),
+                        base1 * generationMultiplier
+                )
+                .save(pWriter, Objects.requireNonNull(ForgeRegistries.ITEMS.getKey(TCItems.LOW_ENRICHED_TECHNETIUM.get())).withPrefix("firing/"));
+        TechnetiumFiringRecipeBuilder.create(
+                        TCItems.MEDIUM_ENRICHED_TECHNETIUM.get(),
+                        base2 * generationMultiplier)
+                .save(pWriter, Objects.requireNonNull(ForgeRegistries.ITEMS.getKey(TCItems.MEDIUM_ENRICHED_TECHNETIUM.get())).withPrefix("firing/"));
+        TechnetiumFiringRecipeBuilder.create(
+                        TCItems.HIGH_ENRICHED_TECHNETIUM.get(),
+                        base3 * generationMultiplier)
+                .save(pWriter, Objects.requireNonNull(ForgeRegistries.ITEMS.getKey(TCItems.HIGH_ENRICHED_TECHNETIUM.get())).withPrefix("firing/"));
+
 
         oreSmelting(pWriter,
                 List.of(TCItems.RAW_TECHNETIUM.get(),
                         TCBlocks.TECHNETIUM_ORE.get(),
-                        TCBlocks.TECHNETIUM_DEEPSLATE_ORE.get(),
-                        TCItems.LOW_ENRICHED_TECHNETIUM.get(),
-                        TCItems.MEDIUM_ENRICHED_TECHNETIUM.get(),
-                        TCItems.HIGH_ENRICHED_TECHNETIUM.get()),
+                        TCBlocks.TECHNETIUM_DEEPSLATE_ORE.get()),
                 RecipeCategory.MISC,
                 TCItems.TECHNETIUM_INGOT.get(),
                 0.25f,
                 200,
                 "technetium");
+        oreSmelting(pWriter,
+                List.of(TCItems.LOW_ENRICHED_TECHNETIUM.get()),
+                RecipeCategory.MISC,
+                TCItems.RAW_TECHNETIUM.get(),
+                0.25f,
+                200,
+                "technetium");
+        oreSmelting(pWriter,
+                List.of(TCItems.MEDIUM_ENRICHED_TECHNETIUM.get()),
+                RecipeCategory.MISC,
+                TCItems.LOW_ENRICHED_TECHNETIUM.get(),
+                0.25f,
+                200,
+                "technetium");
+        oreSmelting(pWriter,
+                List.of(TCItems.HIGH_ENRICHED_TECHNETIUM.get()),
+                RecipeCategory.MISC,
+                TCItems.MEDIUM_ENRICHED_TECHNETIUM.get(),
+                0.25f,
+                200,
+                "technetium");
+
         oreBlasting(pWriter,
                 List.of(TCItems.RAW_TECHNETIUM.get(),
                         TCBlocks.TECHNETIUM_ORE.get(),
-                        TCBlocks.TECHNETIUM_DEEPSLATE_ORE.get(),
-                        TCItems.LOW_ENRICHED_TECHNETIUM.get(),
-                        TCItems.MEDIUM_ENRICHED_TECHNETIUM.get(),
-                        TCItems.HIGH_ENRICHED_TECHNETIUM.get()),
+                        TCBlocks.TECHNETIUM_DEEPSLATE_ORE.get()),
                 RecipeCategory.MISC,
                 TCItems.TECHNETIUM_INGOT.get(),
                 0.25f,
                 100,
                 "technetium");
-
-        TechnetiumFiringRecipeBuilder.create(
+        oreBlasting(pWriter,
+                List.of(TCItems.LOW_ENRICHED_TECHNETIUM.get()),
+                RecipeCategory.MISC,
+                TCItems.RAW_TECHNETIUM.get(),
+                0.25f,
+                100,
+                "technetium");
+        oreBlasting(pWriter,
+                List.of(TCItems.MEDIUM_ENRICHED_TECHNETIUM.get()),
+                RecipeCategory.MISC,
                 TCItems.LOW_ENRICHED_TECHNETIUM.get(),
-                200
-                )
-                .save(pWriter, Objects.requireNonNull(ForgeRegistries.ITEMS.getKey(TCItems.LOW_ENRICHED_TECHNETIUM.get())).withPrefix("firing/"));
-        TechnetiumFiringRecipeBuilder.create(
-                        TCItems.MEDIUM_ENRICHED_TECHNETIUM.get(),
-                        2000)
-                .save(pWriter, Objects.requireNonNull(ForgeRegistries.ITEMS.getKey(TCItems.MEDIUM_ENRICHED_TECHNETIUM.get())).withPrefix("firing/"));
-        TechnetiumFiringRecipeBuilder.create(
-                        TCItems.HIGH_ENRICHED_TECHNETIUM.get(),
-                        20000)
-                .save(pWriter, Objects.requireNonNull(ForgeRegistries.ITEMS.getKey(TCItems.HIGH_ENRICHED_TECHNETIUM.get())).withPrefix("firing/"));
+                0.25f,
+                100,
+                "technetium");
+        oreBlasting(pWriter,
+                List.of(TCItems.HIGH_ENRICHED_TECHNETIUM.get()),
+                RecipeCategory.MISC,
+                TCItems.MEDIUM_ENRICHED_TECHNETIUM.get(),
+                0.25f,
+                100,
+                "technetium");
     }
 
-    private static void buildCFJ(@NotNull Consumer<FinishedRecipe> pWriter) {
-        ItemStack bookLevel1 = createCFJBook(1);
-        ItemStack bookLevel2 = createCFJBook(2);
-        ItemStack bookLevel3 = createCFJBook(3);
-        ItemStack bookLevel4 = createCFJBook(4);
-        ItemStack bookLevel5 = createCFJBook(5);
+    private void buildTechnetiumArmor(@NotNull Consumer<FinishedRecipe> pWriter) {
+        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, TCItems.TECHNETIUM_CROWN.get())
+                .pattern("T T")
+                .pattern("TTT")
+                .define('T', TCItems.TECHNETIUM_INGOT.get())
+                .unlockedBy(getHasName(TCItems.TECHNETIUM_INGOT.get()), has(TCItems.TECHNETIUM_INGOT.get()))
+                .save(pWriter);
+        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, TCItems.TECHNETIUM_CROWN.get())
+                .pattern("T T")
+                .pattern("TTT")
+                .pattern(" C ")
+                .define('T', TCItems.TECHNETIUM_INGOT.get())
+                .define('C', Tags.Items.ARMORS_HELMETS)
+                .unlockedBy(getHasName(TCItems.TECHNETIUM_INGOT.get()), has(TCItems.TECHNETIUM_INGOT.get()))
+                .save(WrapperResult.ofType(TagTransferShapedRecipe.SERIALIZER, pWriter),
+                        TerraCompositio.modLoc("with_tag/" + getDefaultRecipeId(TCItems.TECHNETIUM_CROWN.get()).getPath()));
 
 
-        FlowSaturationRecipeBuilder.create(
-                        Items.BOOK.getDefaultInstance(),
-                        bookLevel1
-                )
-                .unlockedBy(getHasName(Items.BOOK), has(Items.BOOK))
-                .save(pWriter, TerraCompositio.modLoc("flow_saturation/upgrade_book_to_day_1"));
-        FlowSaturationRecipeBuilder.create(
-                        bookLevel1,
-                        bookLevel2
-                )
-                .unlockedBy(getHasName(bookLevel1.getItem()), has(bookLevel1.getItem()))
-                .save(pWriter, TerraCompositio.modLoc("flow_saturation/upgrade_book_to_day_2"));
-        FlowSaturationRecipeBuilder.create(
-                        bookLevel2,
-                        bookLevel3
-                )
-                .unlockedBy(getHasName(bookLevel2.getItem()), has(bookLevel2.getItem()))
-                .save(pWriter, TerraCompositio.modLoc("flow_saturation/upgrade_book_to_day_3"));
-        FlowSaturationRecipeBuilder.create(
-                        bookLevel3,
-                        bookLevel4
-                )
-                .unlockedBy(getHasName(bookLevel3.getItem()), has(bookLevel3.getItem()))
-                .save(pWriter, TerraCompositio.modLoc("flow_saturation/upgrade_book_to_day_4"));
-        FlowSaturationRecipeBuilder.create(
-                        bookLevel4,
-                        bookLevel5
-                )
-                .unlockedBy(getHasName(bookLevel4.getItem()), has(bookLevel4.getItem()))
-                .save(pWriter, TerraCompositio.modLoc("flow_saturation/upgrade_book_to_day_5"));
+        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, TCItems.TECHNETIUM_CHESTPLATE.get())
+                .pattern("T T")
+                .pattern("TTT")
+                .pattern("TTT")
+                .define('T', TCItems.TECHNETIUM_INGOT.get())
+                .unlockedBy(getHasName(TCItems.TECHNETIUM_INGOT.get()), has(TCItems.TECHNETIUM_INGOT.get()))
+                .save(pWriter);
+        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, TCItems.TECHNETIUM_CHESTPLATE.get())
+                .pattern("TCT")
+                .pattern("TTT")
+                .pattern("TTT")
+                .define('T', TCItems.TECHNETIUM_INGOT.get())
+                .define('C', Tags.Items.ARMORS_CHESTPLATES)
+                .unlockedBy(getHasName(TCItems.TECHNETIUM_INGOT.get()), has(TCItems.TECHNETIUM_INGOT.get()))
+                .save(WrapperResult.ofType(TagTransferShapedRecipe.SERIALIZER, pWriter),
+                        TerraCompositio.modLoc("with_tag/" + getDefaultRecipeId(TCItems.TECHNETIUM_CHESTPLATE.get()).getPath()));
+
+
+        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, TCItems.TECHNETIUM_LEGGINGS.get())
+                .pattern("TTT")
+                .pattern("T T")
+                .pattern("T T")
+                .define('T', TCItems.TECHNETIUM_INGOT.get())
+                .unlockedBy(getHasName(TCItems.TECHNETIUM_INGOT.get()), has(TCItems.TECHNETIUM_INGOT.get()))
+                .save(pWriter);
+        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, TCItems.TECHNETIUM_LEGGINGS.get())
+                .pattern("TTT")
+                .pattern("TCT")
+                .pattern("T T")
+                .define('T', TCItems.TECHNETIUM_INGOT.get())
+                .define('C', Tags.Items.ARMORS_LEGGINGS)
+                .unlockedBy(getHasName(TCItems.TECHNETIUM_INGOT.get()), has(TCItems.TECHNETIUM_INGOT.get()))
+                .save(WrapperResult.ofType(TagTransferShapedRecipe.SERIALIZER, pWriter),
+                        TerraCompositio.modLoc("with_tag/" + getDefaultRecipeId(TCItems.TECHNETIUM_LEGGINGS.get()).getPath()));
+
+
+        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, TCItems.TECHNETIUM_BOOTS.get())
+                .pattern("T T")
+                .pattern("T T")
+                .pattern("F F")
+                .define('F', Items.FEATHER)
+                .define('T', TCItems.TECHNETIUM_INGOT.get())
+                .unlockedBy(getHasName(TCItems.TECHNETIUM_INGOT.get()), has(TCItems.TECHNETIUM_INGOT.get()))
+                .save(pWriter);
+        ShapedRecipeBuilder.shaped(RecipeCategory.COMBAT, TCItems.TECHNETIUM_BOOTS.get())
+                .pattern("T T")
+                .pattern("TCT")
+                .pattern("F F")
+                .define('F', Items.FEATHER)
+                .define('T', TCItems.TECHNETIUM_INGOT.get())
+                .define('C', Tags.Items.ARMORS_BOOTS)
+                .unlockedBy(getHasName(TCItems.TECHNETIUM_INGOT.get()), has(TCItems.TECHNETIUM_INGOT.get()))
+                .save(WrapperResult.ofType(TagTransferShapedRecipe.SERIALIZER, pWriter),
+                        TerraCompositio.modLoc("with_tag/" + getDefaultRecipeId(TCItems.TECHNETIUM_BOOTS.get()).getPath()));
     }
 
     private static void buildPathPointers(@NotNull Consumer<FinishedRecipe> pWriter) {
@@ -313,31 +459,25 @@ public class TCRecipeProvider extends RecipeProvider implements IConditionBuilde
                 .define('L',Items.LEATHER)
                 .unlockedBy(getHasName(Items.STRING), has(Items.STRING))
                 .save(pWriter);
-        FlowSaturationRecipeBuilder.create(
-                        Blocks.OAK_SAPLING.asItem().getDefaultInstance(),
-                        TCBlocks.FLOW_CEDAR_SAPLING.get().asItem().getDefaultInstance()
-                )
-                .unlockedBy(getHasName(Blocks.OAK_SAPLING), has(Blocks.OAK_SAPLING))
-                .save(pWriter, TerraCompositio.modLoc("flow_saturation/cedar_sapling"));
         FlowInfusionRecipeBuilder.create(
-                TCItems.CFE_BALL.get().getDefaultInstance(),
+                TCItems.ECF_CHARGE.get().getDefaultInstance(),
                 Ingredient.of(Items.SNOWBALL),
                 10,
                 20
         ).save(pWriter,TerraCompositio.modLoc("flow_infusion/cfe_charge"));
         TechnetiumFiringRecipeBuilder.create(
-                        TCItems.CFE_BALL.get(),
+                        TCItems.ECF_CHARGE.get(),
                         10)
                 .save(pWriter, TerraCompositio.modLoc("firing/cfe_ball"));
         oreSmelting(pWriter,
-                List.of(TCItems.CFE_BALL.get()),
+                List.of(TCItems.ECF_CHARGE.get()),
                 RecipeCategory.MISC,
                 Items.SNOWBALL,
                 0.0f,
                 40,
                 "technetium");
         cookSmelting(pWriter,
-                List.of(TCItems.CFE_BALL.get()),
+                List.of(TCItems.ECF_CHARGE.get()),
                 RecipeCategory.MISC,
                 Items.SNOWBALL,
                 0.0f,
@@ -586,58 +726,65 @@ public class TCRecipeProvider extends RecipeProvider implements IConditionBuilde
                 .save(pWriter);
     }
 
-    private static void buildCedarBlocks(@NotNull Consumer<FinishedRecipe> pWriter) {
-        ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, TCBlocks.FLOW_CEDAR_STAIRS.get())
-                .pattern("S  ")
-                .pattern("SS ")
-                .pattern("SSS")
-                .define('S', TCBlocks.FLOW_CEDAR_PLANKS.get())
-                .unlockedBy(getHasName(TCBlocks.FLOW_CEDAR_PLANKS.get()), has(TCBlocks.FLOW_CEDAR_PLANKS.get()))
+    private void buildFloatingRedstone(@NotNull Consumer<FinishedRecipe> pWriter) {
+        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, TCBlocks.FLOATING_REDSTONE.get())
+                .pattern("R")
+                .pattern("N")
+                .define('R', Items.REDSTONE)
+                .define('N', TCItems.INFUSED_IRON_NUGGET.get())
+                .unlockedBy(getHasName(TCItems.INFUSED_IRON_INGOT.get()), has(TCItems.INFUSED_IRON_INGOT.get()))
                 .save(pWriter);
-        ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, TCBlocks.FLOW_CEDAR_SLAB.get(),2)
-                .pattern("SSS")
-                .define('S', TCBlocks.FLOW_CEDAR_PLANKS.get())
-                .unlockedBy(getHasName(TCBlocks.FLOW_CEDAR_PLANKS.get()), has(TCBlocks.FLOW_CEDAR_PLANKS.get()))
+        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, TCBlocks.FLOATING_TORCH_HOLDER.get())
+                .pattern("P")
+                .pattern("I")
+                .define('P', Items.FLOWER_POT)
+                .define('I', TCItems.INFUSED_IRON_INGOT.get())
+                .unlockedBy(getHasName(TCItems.INFUSED_IRON_INGOT.get()), has(TCItems.INFUSED_IRON_INGOT.get()))
                 .save(pWriter);
-        ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, TCBlocks.FLOW_CEDAR_PRESSURE_PLATE.get())
-                .pattern("SS")
-                .define('S', TCBlocks.FLOW_CEDAR_PLANKS.get())
-                .unlockedBy(getHasName(TCBlocks.FLOW_CEDAR_PLANKS.get()), has(TCBlocks.FLOW_CEDAR_PLANKS.get()))
+        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, TCBlocks.FLOATING_REPEATER.get())
+                .pattern("TRT")
+                .pattern("SIS")
+                .define('T', Items.REDSTONE_TORCH)
+                .define('R', Items.REDSTONE)
+                .define('S', Items.STONE)
+                .define('I',TCItems.INFUSED_IRON_INGOT.get())
+                .unlockedBy(getHasName(TCItems.INFUSED_IRON_INGOT.get()), has(TCItems.INFUSED_IRON_INGOT.get()))
                 .save(pWriter);
-        ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, TCBlocks.FLOW_CEDAR_FENCE.get())
-                .pattern("SFS")
-                .pattern("SFS")
-                .define('S', TCBlocks.FLOW_CEDAR_PLANKS.get())
-                .define('F', Items.STICK)
-                .unlockedBy(getHasName(TCBlocks.FLOW_CEDAR_PLANKS.get()), has(TCBlocks.FLOW_CEDAR_PLANKS.get()))
+        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, TCBlocks.FLOATING_COMPARATOR.get())
+                .pattern(" T ")
+                .pattern("TQT")
+                .pattern("SIS")
+                .define('T', Items.REDSTONE_TORCH)
+                .define('Q', Items.QUARTZ)
+                .define('S', Items.STONE)
+                .define('I',TCItems.INFUSED_IRON_INGOT.get())
+                .unlockedBy(getHasName(TCItems.INFUSED_IRON_INGOT.get()), has(TCItems.INFUSED_IRON_INGOT.get()))
                 .save(pWriter);
-        ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, TCBlocks.FLOW_CEDAR_FENCE_GATE.get())
-                .pattern("FSF")
-                .pattern("FSF")
-                .define('S', TCBlocks.FLOW_CEDAR_PLANKS.get())
-                .define('F', Items.STICK)
-                .unlockedBy(getHasName(TCBlocks.FLOW_CEDAR_PLANKS.get()), has(TCBlocks.FLOW_CEDAR_PLANKS.get()))
+        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, TCBlocks.INFUSED_IRON_PRESSURE_PLATE.get())
+                .pattern("II")
+                .define('I',TCItems.INFUSED_IRON_INGOT.get())
+                .unlockedBy(getHasName(TCItems.INFUSED_IRON_INGOT.get()), has(TCItems.INFUSED_IRON_INGOT.get()))
                 .save(pWriter);
-        ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, TCBlocks.FLOW_CEDAR_DOOR.get(),3)
-                .pattern("SS")
-                .pattern("SS")
-                .pattern("SS")
-                .define('S', TCBlocks.FLOW_CEDAR_PLANKS.get())
-                .unlockedBy(getHasName(TCBlocks.FLOW_CEDAR_PLANKS.get()), has(TCBlocks.FLOW_CEDAR_PLANKS.get()))
+        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, TCBlocks.INFUSED_IRON_DOOR.get())
+                .pattern("II")
+                .pattern("II")
+                .pattern("II")
+                .define('I',TCItems.INFUSED_IRON_INGOT.get())
+                .unlockedBy(getHasName(TCItems.INFUSED_IRON_INGOT.get()), has(TCItems.INFUSED_IRON_INGOT.get()))
                 .save(pWriter);
-        ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, TCBlocks.FLOW_CEDAR_TRAPDOOR.get(),2)
-                .pattern("SSS")
-                .pattern("SSS")
-                .define('S', TCBlocks.FLOW_CEDAR_PLANKS.get())
-                .unlockedBy(getHasName(TCBlocks.FLOW_CEDAR_PLANKS.get()), has(TCBlocks.FLOW_CEDAR_PLANKS.get()))
+        ShapelessRecipeBuilder.shapeless(RecipeCategory.BUILDING_BLOCKS, TCBlocks.FLOATING_BUTTON.get(), 1)
+                .requires(TCItems.INFUSED_IRON_INGOT.get())
+                .requires(ItemTags.STONE_BUTTONS)
+                .unlockedBy(getHasName(TCItems.INFUSED_IRON_INGOT.get()), has(TCItems.INFUSED_IRON_INGOT.get()))
                 .save(pWriter);
-        ShapelessRecipeBuilder.shapeless(RecipeCategory.BUILDING_BLOCKS, TCBlocks.FLOW_CEDAR_PLANKS.get(), 4)
-                .requires(TCTags.Items.FLOW_CEDAR_LOGS)
-                .unlockedBy(getHasName(TCBlocks.FLOW_CEDAR_LOG.get()), has(TCBlocks.FLOW_CEDAR_LOG.get()))
-                .save(pWriter);
-        ShapelessRecipeBuilder.shapeless(RecipeCategory.BUILDING_BLOCKS, TCBlocks.FLOW_CEDAR_BUTTON.get(), 4)
-                .requires(TCBlocks.FLOW_CEDAR_PLANKS.get())
-                .unlockedBy(getHasName(TCBlocks.FLOW_CEDAR_PLANKS.get()), has(TCBlocks.FLOW_CEDAR_PLANKS.get()))
+        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, TCBlocks.FLOATING_LEVER.get())
+                .pattern("n")
+                .pattern("p")
+                .pattern("i")
+                .define('i', TCItems.INFUSED_IRON_INGOT.get())
+                .define('n', TCItems.INFUSED_IRON_NUGGET.get())
+                .define('p', TCBlocks.FLOW_CEDAR_PLANKS.get())
+                .unlockedBy(getHasName(TCItems.INFUSED_IRON_INGOT.get()), has(TCItems.INFUSED_IRON_INGOT.get()))
                 .save(pWriter);
     }
 
@@ -668,5 +815,13 @@ public class TCRecipeProvider extends RecipeProvider implements IConditionBuilde
                     .group(pGroup).unlockedBy(getHasName(itemlike), has(itemlike))
                     .save(pFinishedRecipeConsumer,  TerraCompositio.MOD_ID + ":" + getItemName(pResult) + pRecipeName + "_" + getItemName(itemlike));
         }
+    }
+
+    @ParametersAreNonnullByDefault
+    @MethodsReturnNonnullByDefault
+    protected void specialCraftingRecipe(Consumer<FinishedRecipe> consumer, NoOpRecipeSerializer<? extends CraftingRecipe> serializer) {
+        ResourceLocation name = ForgeRegistries.RECIPE_SERIALIZERS.getKey(serializer);
+        assert name != null;
+        SpecialRecipeBuilder.special(serializer).save(consumer, TerraCompositio.modLoc("dynamic/" + name.getPath()).toString());
     }
 }

@@ -1,0 +1,21 @@
+{
+  "type": "terracompositio:tag_transfer_shaped",
+  "category": "equipment",
+  "key": {
+    "C": {
+      "tag": "forge:armors/leggings"
+    },
+    "T": {
+      "item": "terracompositio:technetium_ingot"
+    }
+  },
+  "pattern": [
+    "TTT",
+    "TCT",
+    "T T"
+  ],
+  "result": {
+    "item": "terracompositio:technetium_leggings"
+  },
+  "show_notification": true
+}

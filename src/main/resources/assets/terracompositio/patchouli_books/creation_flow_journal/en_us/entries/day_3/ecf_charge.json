@@ -1,0 +1,23 @@
+{
+  "name": "book.terracompositio.creation_flow_journal.entry.ecf_charge.name",
+  "category": "terracompositio:day_3",
+  "icon": "terracompositio:ecf_charge",
+  "flag": "terracompositio:day_3",
+  "pages": [
+    {
+      "type": "patchouli:spotlight",
+      "item": {
+        "item": "terracompositio:ecf_charge"
+      },
+      "link_recipe": true,
+      "text": "book.terracompositio.creation_flow_journal.entry.ecf_charge.page1"
+    },
+    {
+      "type": "patchouli:image",
+      "images": [
+        "terracompositio:textures/illustrations/ecf_charge_image.png"
+      ],
+      "text": "book.terracompositio.creation_flow_journal.entry.ecf_charge.page2"
+    }
+  ]
+}

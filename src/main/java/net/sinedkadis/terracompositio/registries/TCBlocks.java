@@ -43,8 +43,8 @@ public class TCBlocks {
     //Cedar blocks
     public static final RegistryObject<Block> FLOW_CEDAR_LOG = registerBlock("flow_cedar_log",
             () -> new FlowCedarLikeBlock(BlockBehaviour.Properties.copy(Blocks.OAK_LOG).strength(3f), TCBlocks.STRIPPED_FLOW_CEDAR_LOG));
-    public static final RegistryObject<Block> FLOW_CEDAR_PORT = registerBlock("flow_cedar_port",
-            () -> new FlowCedarPortBlock(BlockBehaviour.Properties.copy(Blocks.OAK_WOOD).strength(3f), TCBlocks.STRIPPED_FLOW_CEDAR_LOG));
+    public static final RegistryObject<Block> FLOW_CEDAR_ALTAR = registerBlock("flow_cedar_altar",
+            () -> new FlowCedarAltarBlock(BlockBehaviour.Properties.copy(Blocks.OAK_WOOD).strength(3f)));
     public static final RegistryObject<Block> FLOW_CEDAR_WOOD = registerBlock("flow_cedar_wood",
             () -> new FlowCedarLikeBlock(BlockBehaviour.Properties.copy(Blocks.OAK_WOOD).strength(3f), TCBlocks.STRIPPED_FLOW_CEDAR_WOOD));
     public static final RegistryObject<Block> STRIPPED_FLOW_CEDAR_LOG = registerBlock("stripped_flow_cedar_log",
@@ -90,7 +90,7 @@ public class TCBlocks {
     public static final RegistryObject<Block> FLOW_CEDAR_TRAPDOOR = registerBlock("flow_cedar_trapdoor",
             () -> new TrapDoorBlock(BlockBehaviour.Properties.copy(Blocks.OAK_PLANKS).noOcclusion(),BlockSetType.OAK));
     public static final RegistryObject<Block> FLOW_CEDAR_SIGN = BLOCKS.register("flow_cedar_sign",
-            () -> new ModStandingSignBlock(BlockBehaviour.Properties.copy(Blocks.OAK_SIGN), TCWoodTypes.FLOW_CEDAR));
+            () -> new TCStandingSignBlock(BlockBehaviour.Properties.copy(Blocks.OAK_SIGN), TCWoodTypes.FLOW_CEDAR));
     public static final RegistryObject<Block> FLOW_CEDAR_WALL_SIGN = BLOCKS.register("flow_cedar_wall_sign",
             () -> new TCWallSignBlock(BlockBehaviour.Properties.copy(Blocks.OAK_WALL_SIGN), TCWoodTypes.FLOW_CEDAR));
     public static final RegistryObject<Block> FLOW_CEDAR_HANGING_SIGN = BLOCKS.register("flow_cedar_hanging_sign",
@@ -115,10 +115,10 @@ public class TCBlocks {
 
 
     //Creative
-    public static final RegistryObject<Block> CREATIVE_CFE_SOURCE = registerBlock("creative_cfe_source",
-            () -> new CreativeCFESourceBlock(BlockBehaviour.Properties.copy(Blocks.IRON_BLOCK)));
-    public static final RegistryObject<Block> CFE_TRASH_CAN = registerBlock("cfe_trash_can",
-            () -> new CFETrashCanBlock(BlockBehaviour.Properties.copy(Blocks.IRON_BLOCK)));
+    public static final RegistryObject<Block> CREATIVE_ECF_SOURCE = registerBlock("creative_ecf_source",
+            () -> new CreativeECFSourceBlock(BlockBehaviour.Properties.copy(Blocks.IRON_BLOCK)));
+    public static final RegistryObject<Block> ECF_TRASH_CAN = registerBlock("ecf_trash_can",
+            () -> new ECFTrashCanBlock(BlockBehaviour.Properties.copy(Blocks.IRON_BLOCK)));
 
 
     //Technetium
@@ -143,7 +143,7 @@ public class TCBlocks {
     public static final RegistryObject<Block> MATTER_INFUSER_PORT = registerBlock("matter_infuser_port",
             () -> new MatterInfuserPortBlock(BlockBehaviour.Properties.copy(Blocks.TRIPWIRE_HOOK).sound(SoundType.COPPER).strength(3f)));
     public static final RegistryObject<Block> MATTER_INFUSER_UNIT = registerBlock("matter_infuser_unit",
-            () -> new MatterInfuserIOBlock(BlockBehaviour.Properties.copy(Blocks.TRIPWIRE_HOOK).sound(SoundType.COPPER).strength(3f)));
+            () -> new MatterInfuserUnitBlock(BlockBehaviour.Properties.copy(Blocks.TRIPWIRE_HOOK).sound(SoundType.COPPER).strength(3f)));
 
 
     //Desorbers
@@ -258,12 +258,36 @@ public class TCBlocks {
                     super.playerWillDestroy(pLevel, pPos, pState, pPlayer);
                 }
             });
+    public static final RegistryObject<Block> FLOATING_BUTTON = registerBlock("floating_button",
+            () -> new ButtonBlock(BlockBehaviour.Properties.copy(Blocks.OAK_BUTTON), BlockSetType.IRON, 20, false) {
+                @Override
+                public boolean canSurvive(BlockState pState, LevelReader pLevel, BlockPos pPos) {
+                    return true;
+                }
+
+                @Override
+                public boolean canConnectRedstone(BlockState state, BlockGetter level, BlockPos pos, @Nullable Direction direction) {
+                    return true;
+                }
+            });
+    public static final RegistryObject<Block> FLOATING_LEVER = registerBlock("floating_lever",
+            () -> new LeverBlock(BlockBehaviour.Properties.copy(Blocks.OAK_BUTTON)) {
+                @Override
+                public boolean canSurvive(BlockState pState, LevelReader pLevel, BlockPos pPos) {
+                    return true;
+                }
+
+                @Override
+                public boolean canConnectRedstone(BlockState state, BlockGetter level, BlockPos pos, @Nullable Direction direction) {
+                    return true;
+                }
+            });
 
     //Misc
     public static final RegistryObject<Block> FLOW_CEDAR_ENT_STATUE = registerBlock("flow_cedar_ent_statue",
             () -> new EntStatueBlock(BlockBehaviour.Properties.copy(Blocks.OAK_PLANKS)));
-    public static final RegistryObject<Block> TECHNETIUM_BOARD = registerBlock("technetium_board",
-            () -> new TechnetiumBoardBlock(BlockBehaviour.Properties.copy(Blocks.GLASS).sound(new ForgeSoundType(1.0F,
+    public static final RegistryObject<Block> ECF_BOARD = registerBlock("ecf_board",
+            () -> new ECFBoardBlock(BlockBehaviour.Properties.copy(Blocks.GLASS).sound(new ForgeSoundType(1.0F,
                     1.0F,
                     () -> SoundEvents.AMETHYST_BLOCK_STEP,
                     () -> SoundEvents.AMETHYST_BLOCK_STEP,

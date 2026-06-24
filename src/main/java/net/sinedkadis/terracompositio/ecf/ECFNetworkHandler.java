@@ -1,0 +1,244 @@
+package net.sinedkadis.terracompositio.ecf;
+
+import net.minecraft.core.BlockPos;
+import net.minecraft.world.entity.EquipmentSlot;
+import net.minecraft.world.entity.LivingEntity;
+import net.minecraft.world.level.Level;
+import net.minecraft.world.level.block.entity.BlockEntity;
+import net.minecraft.world.phys.AABB;
+import net.minecraftforge.common.MinecraftForge;
+import net.sinedkadis.terracompositio.api.TerraCompositioAPI;
+import net.sinedkadis.terracompositio.api.networks.NetworkAction;
+import net.sinedkadis.terracompositio.api.networks.cfe.*;
+import net.sinedkadis.terracompositio.block.entity.PathPointerBlockEntity;
+import net.sinedkadis.terracompositio.entity.custom.FlowCedarEntEntity;
+import net.sinedkadis.terracompositio.events.ECFNetworkEvent;
+import net.sinedkadis.terracompositio.registries.TCItems;
+import net.sinedkadis.terracompositio.util.helpers.ECFHelper;
+import org.jetbrains.annotations.Nullable;
+
+import java.util.*;
+
+public class ECFNetworkHandler implements ECFNetwork {
+    public static final ECFNetworkHandler INSTANCE = new ECFNetworkHandler();
+
+    private final Map<Level, Set<ECFNetworkMember>> cfeSources = new WeakHashMap<>();
+
+    private static @Nullable BlockPos getClosestInput(ECFNetworkMember requesterMember, PathPointerBlockEntity proxyBE) {
+        BlockPos requesterPos = requesterMember.getPos();
+        BlockPos closestInput = null;
+        double closestDist = Double.MAX_VALUE;
+        if (proxyBE != null) {
+            for (BlockPos inputPos : proxyBE.getInputPoses()) {
+                double dist = requesterPos.distSqr(inputPos);
+                if (dist < closestDist) {
+                    closestDist = dist;
+                    closestInput = inputPos;
+                }
+            }
+        }
+        return closestInput;
+    }
+
+    @Override
+    public void updateInRange(Level level, BlockPos origin, int range) {
+        Set<ECFNetworkMember> members = cfeSources.get(level);
+        if (members == null) return;
+        for (ECFNetworkMember member : members) {
+            if (member.getPos().closerThan(origin, range)) {
+                member.scheduleMemberUpdate();
+            }
+        }
+    }
+
+    @Override
+    public Set<ECFNetworkMember> getAllCFENetworkMembers(Level level) {
+        return cfeSources.getOrDefault(level, Set.of());
+    }
+
+    public void networkMemberUpdated(ECFNetworkMember updated) {
+        Level level = updated.getLevel();
+        Set<ECFNetworkMember> members = cfeSources.get(level);
+        if (members == null) return;
+
+        Queue<ECFNetworkMember> queue = new ArrayDeque<>();
+        // Защита от зацикливания: храним entity, а не member (прокси могут отличаться)
+        Set<Object> visitedEntities = new HashSet<>();
+        Set<PathPointerBlockEntity> updatedEmitters = new HashSet<>();
+
+        queue.add(updated);
+        visitedEntities.add(updated.getEntity());
+
+        while (!queue.isEmpty()) {
+            ECFNetworkMember current = queue.poll();
+            if (current instanceof PPECFMemberProxy memberProxy) {
+                PathPointerBlockEntity ppBE = memberProxy.proxy();
+                if (ppBE != null && ppBE.parts.contains(PathPointerBlockEntity.PPPart.EXTRACTOR)) {
+                    TerraCompositioAPI.instance().getECFNetworkInstance().getAllCFENetworkMembers(level).stream()
+                            .filter(FlowCedarEntEntity.class::isInstance)
+                            .map(FlowCedarEntEntity.class::cast)
+                            .filter(entEntity -> entEntity.position().closerThan(ppBE.getBlockPos().getCenter(), 3))
+                            .forEach(entEntity -> entEntity.scheduleMemberUpdate(memberProxy));
+                }
+            }
+            for (ECFNetworkMember member : members) {
+                if (!current.getPos().closerThan(member.getPos(), Math.min(current.getRange(), member.getRange())))
+                    continue;
+                Object currentEntity = current.getEntity();
+                if (currentEntity == null || currentEntity.equals(member.getEntity())) continue;
+                if (current.getPriority() <= member.getPriority()) continue;
+
+                // PathPointer EMITTER — добавляем входы в очередь
+                if (member.getEntity() instanceof PathPointerBlockEntity ppBE
+                        && (ppBE.parts.contains(PathPointerBlockEntity.PPPart.EMITTER)
+                        || (ppBE.parts.contains(PathPointerBlockEntity.PPPart.INFUSER) && updated instanceof ECFNetworkMemberEntity))
+                        && updatedEmitters.add(ppBE)) { // add() возвращает false если уже есть
+                    for (BlockPos inputPos : ppBE.getInputPoses()) {
+                        BlockEntity be = level.getBlockEntity(inputPos);
+                        if (be instanceof PathPointerBlockEntity inputEntity
+                                && visitedEntities.add(inputEntity)) { // защита от петли
+                            queue.add(new PPECFMemberProxy(updated, inputEntity));
+                        }
+                    }
+                }
+
+                member.scheduleMemberUpdate(current);
+            }
+        }
+    }
+
+    @Override
+    public Set<ECFNetworkMember> getAvailableNetworkTargets(ECFNetworkMember requesterMember) {
+        Level level = requesterMember.getLevel();
+        Set<ECFNetworkMember> members = cfeSources.get(level);
+        if (members == null) return Set.of();
+
+        Set<ECFNetworkMember> toReturn = new HashSet<>();
+        Queue<ECFNetworkMember> queue = new ArrayDeque<>();
+        // Защита от зацикливания по entity-идентичности
+        Set<Object> visitedEntities = new HashSet<>();
+
+        queue.add(requesterMember);
+        visitedEntities.add(requesterMember.getEntity());
+
+        while (!queue.isEmpty()) {
+            ECFNetworkMember current = queue.poll();
+
+            List<PathPointerBlockEntity.PPPart> parts = null;
+            PathPointerBlockEntity collector = null;
+
+            if (current instanceof PPECFMemberProxy proxy) {
+                PathPointerBlockEntity proxyBE = proxy.proxy();
+                if (proxyBE != null) {
+                    parts = proxyBE.parts;
+                }
+
+                // Ищем ближайший collector среди входов
+                BlockPos closestInput = getClosestInput(requesterMember, proxyBE);
+
+                if (closestInput != null
+                        && level.getBlockEntity(closestInput) instanceof PathPointerBlockEntity collectorBE) {
+                    collector = collectorBE;
+                }
+
+                // INFUSER: добавляем живые сущности с короной рядом с proxyBE
+                if (parts != null && collector != null && parts.contains(PathPointerBlockEntity.PPPart.INFUSER)) {
+                    PathPointerBlockEntity finalCollector = collector;
+                    level.getEntitiesOfClass(
+                            LivingEntity.class,
+                            new AABB(proxyBE.getPos()).inflate(3),
+                            e -> e.getItemBySlot(EquipmentSlot.HEAD).is(TCItems.TECHNETIUM_CROWN.get())
+                    ).forEach(entity -> {
+                        if (entity instanceof ECFNetworkMemberEntity memberEntity
+                                && visitedEntities.add(entity)) { // защита: не добавляем уже посещённых
+                            toReturn.add(new PPECFMemberProxy(memberEntity, finalCollector));
+                        }
+                    });
+                }
+            }
+
+            // Фильтруем членов сети в радиусе с нужным приоритетом
+            for (ECFNetworkMember member : members) {
+                if (!member.getPos().closerThan(current.getPos(), current.getRange())) continue;
+                if (member.getPriority() <= current.getPriority()) continue;
+                if (member.getEntity().equals(current.getEntity())) continue;
+
+                // Если текущий — EMITTER прокси, перенаправляем позицию к collector
+                ECFNetworkMember mapped = (parts != null && collector != null
+                        && parts.contains(PathPointerBlockEntity.PPPart.EMITTER))
+                        ? new PPECFMemberProxy(member, collector)
+                        : member;
+
+                toReturn.add(mapped);
+
+                // COLLECTOR: идём дальше по цепочке PathPointer
+                if (member.getEntity() instanceof PathPointerBlockEntity ppBE
+                        && ppBE.parts.contains(PathPointerBlockEntity.PPPart.COLLECTOR)) {
+                    BlockPos outputPos = ppBE.getOutputPos();
+                    if (outputPos != null
+                            && level.getBlockEntity(outputPos) instanceof PathPointerBlockEntity outputEntity
+                            && visitedEntities.add(outputEntity)) { // защита от петли A→B→A
+                        queue.add(new PPECFMemberProxy(requesterMember, outputEntity));
+                    }
+                }
+            }
+        }
+
+        // validMember фильтр — в конце, один раз
+        toReturn.removeIf(m -> !ECFHelper.validMember(m));
+        return toReturn;
+    }
+
+    @Override
+    public boolean isIn(Level level, IECFHandler cfeHandler) {
+        Set<ECFNetworkMember> members = cfeSources.get(level);
+        if (members == null) return false;
+        for (ECFNetworkMember member : members) {
+            if (member.getMainHandler().equals(cfeHandler)) return true;
+        }
+        return false;
+    }
+
+    @Override
+    public boolean isIn(Level level, ECFNetworkMember networkMember) {
+        Set<ECFNetworkMember> members = cfeSources.get(level);
+        if (members == null) return false;
+        return members.contains(networkMember);
+    }
+
+    private void remove(Level level, ECFNetworkMember thing) {
+        Set<ECFNetworkMember> set = cfeSources.get(level);
+        if (set == null) return;
+        networkMemberUpdated(thing);
+        set.remove(thing);
+        if (set.isEmpty()) cfeSources.remove(level);
+    }
+
+    private void add(Level level, ECFNetworkMember thing) {
+        Set<ECFNetworkMember> ECFNetworkMembers = cfeSources.computeIfAbsent(level, k -> new HashSet<>());
+
+        Optional<ECFNetworkMember> any = ECFNetworkMembers.stream()
+                .filter(ECFNetworkMemberBE.class::isInstance)
+                .filter(cfeNetworkMember -> cfeNetworkMember.getPos().equals(thing.getPos()))
+                .findAny();
+
+        if (any.isPresent()) return;
+
+        ECFNetworkMembers.add(thing);
+
+        networkMemberUpdated(thing);
+    }
+
+    public void onNetworkEvent(ECFNetworkMember source, NetworkAction action) {
+        switch (action) {
+            case ADD    -> add(source.getLevel(), source);
+            case REMOVE -> remove(source.getLevel(), source);
+            case UPDATE -> networkMemberUpdated(source);
+            default     -> throw new RuntimeException("Unsupported Network action: " + action);
+        }
+    }
+    @Override
+    public void fireCFENetworkEvent(ECFNetworkMember source, NetworkAction action) {
+        MinecraftForge.EVENT_BUS.post(new ECFNetworkEvent(source,action));
+    }
+}

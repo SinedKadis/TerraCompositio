@@ -51,13 +51,10 @@ import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.registries.ForgeRegistries;
-import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBEItemBehaviour;
-import net.sinedkadis.terracompositio.block.behaviours.ItemHandlerBehaviour;
 import net.sinedkadis.terracompositio.block.custom.PathPointerBlock;
 import net.sinedkadis.terracompositio.block.entity.FlowCedarCasingBlockEntity;
 import net.sinedkadis.terracompositio.block.entity.MatterInfuserBaseBlockEntity;
 import net.sinedkadis.terracompositio.block.entity.PathPointerBlockEntity;
-import net.sinedkadis.terracompositio.block.entity.TCBlockEntity;
 import net.sinedkadis.terracompositio.registries.TCBlocks;
 import net.sinedkadis.terracompositio.registries.TCItems;
 import net.sinedkadis.terracompositio.registries.TCTags;
@@ -276,6 +273,7 @@ public class WrenchAxeItem extends AxeItem {
                 .RightClickBlock(pPlayer, InteractionHand.MAIN_HAND, pPos, blockHitResult));
         pPlayer.setItemInHand(InteractionHand.MAIN_HAND,wasInHand);
         if (canceled) {
+            pPlayer.getItemInHand(InteractionHand.MAIN_HAND).hurtAndBreak(1, pPlayer, player1 -> player1.broadcastBreakEvent(InteractionHand.MAIN_HAND));
             return;
         }
         if ((pState.hasBlockEntity()
@@ -305,7 +303,7 @@ public class WrenchAxeItem extends AxeItem {
                 });
             }
             pLevel.destroyBlock(pPos,false,pPlayer);
-            itemInHand.hurtAndBreak(1, pPlayer, player1 -> player1.broadcastBreakEvent(InteractionHand.MAIN_HAND));
+            pPlayer.getItemInHand(InteractionHand.MAIN_HAND).hurtAndBreak(1, pPlayer, player1 -> player1.broadcastBreakEvent(InteractionHand.MAIN_HAND));
         }
     }
 
@@ -319,25 +317,15 @@ public class WrenchAxeItem extends AxeItem {
                 boolean isCasing = blockEntity instanceof FlowCedarCasingBlockEntity;
                 boolean isMI = blockEntity instanceof MatterInfuserBaseBlockEntity;
                 for (int slot = 0; slot < iItemHandler.getSlots(); slot++) {
-                    if (isCasing && !FlowCedarCasingBlockEntity.isInventorySlot(slot)) continue;
+                    if (isCasing) continue;
                     if (isMI) continue;
-                    ItemHandlerBehaviour itemHandlerBehaviour = null;
-                    if (blockEntity instanceof TCBlockEntity tcBlockEntity) {
-                        IBEItemBehaviour itemBehaviour = tcBlockEntity.getItemBehaviour();
-                        if (itemBehaviour instanceof ItemHandlerBehaviour) {
-                            itemHandlerBehaviour = (ItemHandlerBehaviour) itemBehaviour;
-                            itemHandlerBehaviour.ignoreRestrictions = true;
-                        }
-                    }
-                    ItemStack itemStack = iItemHandler.extractItem(slot, 512, false);
+
+                    ItemStack itemStack = iItemHandler.extractItem(slot, 511, false); //511 - hardcoded
                     if (itemStack.isEmpty()) continue;
                     if (!player.addItem(itemStack)) {
                         player.drop(itemStack, true);
                     }
                     flag = true;
-                    if (itemHandlerBehaviour != null) {
-                        itemHandlerBehaviour.ignoreRestrictions = false;
-                    }
                 }
                 if (flag) {
                     level.playSound(null, pos, SoundEvents.ITEM_FRAME_REMOVE_ITEM, SoundSource.BLOCKS);
@@ -491,7 +479,7 @@ public class WrenchAxeItem extends AxeItem {
     }
 
     private BlockState rotateBlockState(BlockState state, Direction pushDirection) {
-        if (state.is(TCBlocks.FLOW_CEDAR_PORT.get()))
+        if (state.is(TCBlocks.FLOW_CEDAR_ALTAR.get()))
             state = TCBlocks.FLOW_CEDAR_LOG.get().defaultBlockState().setValue(INFUSED,state.getValue(INFUSED));
 
         if (!state.hasProperty(AXIS))

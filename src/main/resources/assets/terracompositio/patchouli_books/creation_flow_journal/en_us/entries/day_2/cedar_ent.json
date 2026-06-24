@@ -5,6 +5,10 @@
   "flag": "terracompositio:day_2",
   "pages": [
     "book.terracompositio.creation_flow_journal.entry.cedar_ent.page1",
-    "book.terracompositio.creation_flow_journal.entry.cedar_ent.page2"
+    {
+      "type": "patchouli:entity",
+      "entity": "terracompositio:flow_cedar_ent_entity",
+      "text": "book.terracompositio.creation_flow_journal.entry.cedar_ent.page2"
+    }
   ]
 }

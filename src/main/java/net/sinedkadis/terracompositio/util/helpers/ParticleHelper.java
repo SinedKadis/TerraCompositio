@@ -9,7 +9,7 @@ import net.minecraft.util.RandomSource;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.fluids.FluidStack;
-import net.sinedkadis.terracompositio.particle.CFEParticleData;
+import net.sinedkadis.terracompositio.particle.ECFParticleData;
 import net.sinedkadis.terracompositio.particle.FluidParticleData;
 import net.sinedkadis.terracompositio.registries.TCParticles;
 import org.jetbrains.annotations.NotNull;
@@ -49,7 +49,7 @@ public class ParticleHelper {
         if (pLevel instanceof ServerLevel level) {
             float speed = 1 / 20f;
             RandomSource random = pLevel.getRandom();
-            level.sendParticles(new CFEParticleData(speed),
+            level.sendParticles(new ECFParticleData(speed),
                     targetPos.getX() + random.nextFloat(),
                     targetPos.getY() + random.nextFloat(),
                     targetPos.getZ() + random.nextFloat(),
@@ -94,7 +94,7 @@ public class ParticleHelper {
             offsetY = vec3.y + source.y;
             offsetZ = vec3.z + source.z;
 
-            level.sendParticles(new CFEParticleData(speed),
+            level.sendParticles(new ECFParticleData(speed),
                     offsetX, offsetY, offsetZ,
                     0, // count
                     target.x - offsetX + vec3.x, // xd (направление к цели)

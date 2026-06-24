@@ -36,14 +36,6 @@ public class CreationFlowJournalItem extends Item {
         super(properties);
     }
 
-    @Override
-    public void onCraftedBy(ItemStack pStack, Level pLevel, Player pPlayer) {
-        CompoundTag tag = pStack.getOrCreateTag();
-        long time = pLevel.getLevelData().getGameTime();
-        tag.putLong("tick_crafted",time);
-        super.onCraftedBy(pStack, pLevel, pPlayer);
-    }
-
     public static int getDay(ItemStack stack){
         CompoundTag tag = stack.getTag();
         if (tag != null && stack.hasTag() && tag.contains("day")) {
@@ -98,13 +90,11 @@ public class CreationFlowJournalItem extends Item {
     @Override
     public void inventoryTick(ItemStack pStack, Level pLevel, Entity pEntity, int pSlotId, boolean pIsSelected) {
         super.inventoryTick(pStack, pLevel, pEntity, pSlotId, pIsSelected);
-        CompoundTag tag = pStack.getOrCreateTag();
-        if (tag.contains("updateOnHold") && tag.getBoolean("updateOnHold") && pIsSelected) {
-            tag.putBoolean("updateOnHold", false);
+        CompoundTag tag = pEntity.getPersistentData();
+        int day = getDay(pStack);
+        if (!(tag.getInt("last_hold_days") == day) && pIsSelected) {
+            tag.putInt("last_hold_days", day);
             TCPatchouliCompat.reloadBookContents(pStack, pLevel);
-        }
-        if (!pIsSelected) {
-            tag.putBoolean("updateOnHold", true);
         }
     }
 }

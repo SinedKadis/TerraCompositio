@@ -6,7 +6,7 @@
   "pages": [
     {
       "type": "patchouli:spotlight",
-      "item": "terracompositio:pp_emitter,terracompositio:pp_collector,terracompositio:pp_sender,terracompositio:pp_receiver,terracompositio:pp_infuser,terracompositio:pp_extractor",
+      "item": "terracompositio:pp_emitter,terracompositio:pp_collector,terracompositio:pp_sender,terracompositio:pp_receiver",
       "link_recipe": true,
       "text": "book.terracompositio.creation_flow_journal.entry.path_pointers.desc"
     },
@@ -31,28 +31,11 @@
       "text": "book.terracompositio.creation_flow_journal.entry.path_pointers.receiver"
     },
     {
-      "type": "patchouli:crafting",
-      "recipe": "terracompositio:pp_infuser",
-      "text": "book.terracompositio.creation_flow_journal.entry.path_pointers.infuser"
-    },
-    {
-      "type": "patchouli:crafting",
-      "recipe": "terracompositio:pp_extractor",
-      "text": "book.terracompositio.creation_flow_journal.entry.path_pointers.extractor"
-    },
-    {
       "type": "patchouli:image",
       "images": [
         "terracompositio:textures/illustrations/pp_binding_image.png"
       ],
       "text": "book.terracompositio.creation_flow_journal.entry.path_pointers.binding"
-    },
-    {
-      "type": "patchouli:image",
-      "images": [
-        "terracompositio:textures/illustrations/pp_storing_image.png"
-      ],
-      "text": "book.terracompositio.creation_flow_journal.entry.path_pointers.storing"
     },
     "book.terracompositio.creation_flow_journal.entry.path_pointers.apple"
   ]

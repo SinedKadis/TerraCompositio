@@ -1,0 +1,33 @@
+{
+  "name": "book.terracompositio.creation_flow_journal.entry.floating_redstone.name",
+  "category": "terracompositio:day_3",
+  "icon": "terracompositio:floating_redstone",
+  "flag": "terracompositio:day_3",
+  "pages": [
+    {
+      "type": "patchouli:crafting",
+      "recipe": "terracompositio:floating_redstone",
+      "text": "book.terracompositio.creation_flow_journal.entry.floating_redstone.page1"
+    },
+    {
+      "type": "patchouli:crafting",
+      "recipe": "terracompositio:floating_comparator",
+      "recipe2": "terracompositio:floating_repeater"
+    },
+    {
+      "type": "patchouli:crafting",
+      "recipe": "terracompositio:infused_iron_pressure_plate",
+      "recipe2": "terracompositio:infused_iron_door"
+    },
+    {
+      "type": "patchouli:crafting",
+      "recipe": "terracompositio:floating_button",
+      "recipe2": "terracompositio:floating_lever"
+    },
+    {
+      "type": "patchouli:crafting",
+      "recipe": "terracompositio:floating_torch_holder",
+      "text": "book.terracompositio.creation_flow_journal.entry.floating_redstone.page2"
+    }
+  ]
+}

@@ -3,10 +3,7 @@ package net.sinedkadis.terracompositio.compat.jei;
 import mezz.jei.api.IModPlugin;
 import mezz.jei.api.JeiPlugin;
 import mezz.jei.api.recipe.RecipeType;
-import mezz.jei.api.registration.IGuiHandlerRegistration;
-import mezz.jei.api.registration.IRecipeCatalystRegistration;
-import mezz.jei.api.registration.IRecipeCategoryRegistration;
-import mezz.jei.api.registration.IRecipeRegistration;
+import mezz.jei.api.registration.*;
 import net.minecraft.client.Minecraft;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.world.item.ItemStack;
@@ -15,17 +12,11 @@ import net.minecraft.world.level.ItemLike;
 import net.minecraft.world.level.block.AbstractFurnaceBlock;
 import net.minecraftforge.registries.ForgeRegistries;
 import net.sinedkadis.terracompositio.TerraCompositio;
-import net.sinedkadis.terracompositio.compat.jei.categories.FlowInfusionCategory;
-import net.sinedkadis.terracompositio.compat.jei.categories.FlowPortCategory;
-import net.sinedkadis.terracompositio.compat.jei.categories.MatterInfusionCategory;
-import net.sinedkadis.terracompositio.compat.jei.categories.TechnetiumFiringCategory;
-import net.sinedkadis.terracompositio.recipe.MatterInfusionRecipe;
-import net.sinedkadis.terracompositio.recipe.TechnetiumFiringRecipe;
+import net.sinedkadis.terracompositio.compat.jei.categories.*;
+import net.sinedkadis.terracompositio.compat.jei.extensions.ECFStorageUpdateRecipeWrapper;
+import net.sinedkadis.terracompositio.recipe.*;
 import net.sinedkadis.terracompositio.registries.TCBlocks;
-import net.sinedkadis.terracompositio.recipe.FlowInfusionRecipe;
-import net.sinedkadis.terracompositio.recipe.FlowSaturationRecipe;
 import net.sinedkadis.terracompositio.registries.TCItems;
-import net.sinedkadis.terracompositio.screen.FlowBlockPortScreen;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Arrays;
@@ -41,7 +32,7 @@ public class JEITerraCompositioPlugin implements IModPlugin {
 
     @Override
     public void registerCategories(IRecipeCategoryRegistration registration) {
-        registration.addRecipeCategories(new FlowPortCategory(registration.getJeiHelpers().getGuiHelper()));
+        registration.addRecipeCategories(new FlowCedarAltarCategory(registration.getJeiHelpers().getGuiHelper()));
         registration.addRecipeCategories(new FlowInfusionCategory(registration.getJeiHelpers().getGuiHelper()));
         registration.addRecipeCategories(new MatterInfusionCategory(registration.getJeiHelpers().getGuiHelper()));
         registration.addRecipeCategories(new TechnetiumFiringCategory(registration.getJeiHelpers().getGuiHelper()));
@@ -52,12 +43,12 @@ public class JEITerraCompositioPlugin implements IModPlugin {
         assert Minecraft.getInstance().level != null;
         RecipeManager recipeManager = Minecraft.getInstance().level.getRecipeManager();
 
-        List<FlowSaturationRecipe> flowSaturationRecipes = recipeManager.getAllRecipesFor(FlowSaturationRecipe.Type.INSTANCE);
+        List<AltarTransformationRecipe> altarTransformationRecipes = recipeManager.getAllRecipesFor(AltarTransformationRecipe.Type.INSTANCE);
         List<FlowInfusionRecipe> flowInfusionRecipes = recipeManager.getAllRecipesFor(FlowInfusionRecipe.Type.INSTANCE);
         List<MatterInfusionRecipe> matterInfusionRecipes = recipeManager.getAllRecipesFor(MatterInfusionRecipe.Type.INSTANCE);
         List<TechnetiumFiringRecipe> technetiumFiringRecipes = recipeManager.getAllRecipesFor(TechnetiumFiringRecipe.Type.INSTANCE);
 
-        registration.addRecipes(FlowPortCategory.FLOW_SATURATION_RECIPE_RECIPE_TYPE,flowSaturationRecipes);
+        registration.addRecipes(FlowCedarAltarCategory.FLOW_CEDAR_ALTAR_RECIPE_RECIPE_TYPE, altarTransformationRecipes);
         registration.addRecipes(FlowInfusionCategory.FLOW_INFUSION_RECIPE_RECIPE_TYPE,flowInfusionRecipes);
         registration.addRecipes(MatterInfusionCategory.MATTER_INFUSION_RECIPE_RECIPE_TYPE,matterInfusionRecipes);
         registration.addRecipes(TechnetiumFiringCategory.TECHNETIUM_FIRING_RECIPE_RECIPE_TYPE,technetiumFiringRecipes);
@@ -65,17 +56,12 @@ public class JEITerraCompositioPlugin implements IModPlugin {
     }
 
     @Override
-    public void registerGuiHandlers(IGuiHandlerRegistration registration) {
-        registration.addRecipeClickArea(FlowBlockPortScreen.class,60,30,20,30,
-                FlowPortCategory.FLOW_SATURATION_RECIPE_RECIPE_TYPE);
-
+    public void registerVanillaCategoryExtensions(IVanillaCategoryExtensionRegistration registration) {
+        registration.getCraftingCategory().addCategoryExtension(ECFStorageUpgradeRecipe.class, ECFStorageUpdateRecipeWrapper::new);
     }
 
     @Override
     public void registerRecipeCatalysts(@NotNull IRecipeCatalystRegistration registration) {
-//        if (Minecraft.getInstance().level != null) {
-//            RecipeManager recipeManager = Minecraft.getInstance().level.getRecipeManager();
-//        }
         registration.addRecipeCatalyst(new ItemStack(TCBlocks.FLOW_INFUSER.get()),FlowInfusionCategory.FLOW_INFUSION_RECIPE_RECIPE_TYPE);
         addCatalysts(registration,MatterInfusionCategory.MATTER_INFUSION_RECIPE_RECIPE_TYPE,
                 TCBlocks.FLOW_CEDAR_CASING.get(),
@@ -87,6 +73,9 @@ public class JEITerraCompositioPlugin implements IModPlugin {
                 .filter(block -> block instanceof AbstractFurnaceBlock)
                 .map(block -> ((ItemLike) block.asItem()))
                 .toList());
+        addCatalysts(registration, FlowCedarAltarCategory.FLOW_CEDAR_ALTAR_RECIPE_RECIPE_TYPE,
+                TCBlocks.FLOW_CEDAR_ALTAR.get(),
+                TCBlocks.FLOW_CEDAR_PEDESTAL.get());
 
     }
 
@@ -97,5 +86,10 @@ public class JEITerraCompositioPlugin implements IModPlugin {
         for (ItemLike item : items){
             registration.addRecipeCatalyst(new ItemStack(item.asItem()),recipeType);
         }
+    }
+
+    @Override
+    public void registerItemSubtypes(ISubtypeRegistration registration) {
+        registration.useNbtForSubtypes(TCItems.CREATION_FLOW_JOURNAL.get(),TCItems.FLUID_APPLIER.get());
     }
 }
