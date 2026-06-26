@@ -46,7 +46,8 @@ public class KnowledgeAppleItem extends Item {
     public static void rangeVisualisation() {
         Minecraft mc = Minecraft.getInstance();
         LocalPlayer player = mc.player;
-        if (player == null || !player.isShiftKeyDown()) return;
+        if (!(player instanceof PlayerKnowledgeAccessor accessor) || !player.isShiftKeyDown()) return;
+        if (!accessor.isCreationAcknowledged()) return;
 
         ClientLevel level = mc.level;
         if (level == null) return;

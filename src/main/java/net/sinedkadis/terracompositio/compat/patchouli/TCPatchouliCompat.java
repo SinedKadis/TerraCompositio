@@ -2,7 +2,6 @@ package net.sinedkadis.terracompositio.compat.patchouli;
 
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.minecraftforge.fml.ModList;
 import net.sinedkadis.terracompositio.TerraCompositio;
 import net.sinedkadis.terracompositio.item.custom.CreationFlowJournalItem;
 import vazkii.patchouli.api.PatchouliAPI;
@@ -19,7 +18,7 @@ public class TCPatchouliCompat {
     }
 
     public static void reloadBookContents(Object book, Level level) {
-        if (!ModList.get().isLoaded("patchouli")) return;
+        if (!CreationFlowJournalItem.patchouliLoaded.get()) return;
 
 
         if (book instanceof ItemStack itemStack) {

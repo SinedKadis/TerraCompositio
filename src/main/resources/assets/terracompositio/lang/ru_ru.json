@@ -174,8 +174,8 @@
   "item.terracompositio.apple_of_knowledge": "Яблоко Знания",
   "item.terracompositio.apple_of_ignorance": "Яблоко Забытия",
   "key.terracompositio.categories.main": "Terra Compositio",
-  "create.recipe.item_with_wrench_application": "Ручное создание с Инструментом",
-
+  "create.recipe.item_with_wrench_application": "Ручная сборка с Инструментом",
+  "item.terracompositio.creation_flow_journal.no_pathchouli": "Установите Patchouli для лучшего игрового опыта",
 
 
   "book.terracompositio.creation_flow_journal.name": "Creation Flow Journal",
