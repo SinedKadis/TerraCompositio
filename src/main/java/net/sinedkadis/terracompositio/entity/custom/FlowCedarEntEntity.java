@@ -36,28 +36,28 @@ import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.items.ItemStackHandler;
 import net.sinedkadis.terracompositio.api.IHaveKnowledge;
-import net.sinedkadis.terracompositio.api.TCCapabilities;
 import net.sinedkadis.terracompositio.api.TerraCompositioAPI;
 import net.sinedkadis.terracompositio.api.dummies.DummyECFHandler;
+import net.sinedkadis.terracompositio.api.helpers.ECFHelper;
 import net.sinedkadis.terracompositio.api.helpers.TooltipHelper;
 import net.sinedkadis.terracompositio.api.networks.NetworkAction;
 import net.sinedkadis.terracompositio.api.networks.ecf.ECFNetwork;
 import net.sinedkadis.terracompositio.api.networks.ecf.ECFNetworkMember;
 import net.sinedkadis.terracompositio.api.networks.ecf.ECFNetworkMemberEntity;
 import net.sinedkadis.terracompositio.api.networks.ecf.IECFHandler;
+import net.sinedkadis.terracompositio.api.registries.TCCapabilities;
 import net.sinedkadis.terracompositio.block.entity.EntStatueBlockEntity;
 import net.sinedkadis.terracompositio.config.TCClientConfigs;
 import net.sinedkadis.terracompositio.config.TCCommonConfigs;
 import net.sinedkadis.terracompositio.config.TCInnerConfig;
-import net.sinedkadis.terracompositio.ecf.ECFContainer;
+import net.sinedkadis.terracompositio.ecf.DefaultECFHandler;
 import net.sinedkadis.terracompositio.ecf.PPECFMemberProxy;
 import net.sinedkadis.terracompositio.entity.goals.ECFExtractGoal;
 import net.sinedkadis.terracompositio.entity.goals.ECFHoldGoal;
 import net.sinedkadis.terracompositio.entity.goals.ReachSourceGoal;
 import net.sinedkadis.terracompositio.registries.TCBlocks;
 import net.sinedkadis.terracompositio.registries.TCItems;
-import net.sinedkadis.terracompositio.util.helpers.ECFHelper;
-import net.sinedkadis.terracompositio.util.helpers.ParticleHelper;
+import net.sinedkadis.terracompositio.util.helpers.ParticleHelperInternal;
 import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -78,12 +78,12 @@ public class FlowCedarEntEntity extends AbstractGolem implements ECFNetworkMembe
     private static final EntityDataAccessor<Integer> ECF_DATA =
             SynchedEntityData.defineId(FlowCedarEntEntity.class, EntityDataSerializers.INT);
     public final AnimationState ecfHoldState = new AnimationState();
-    protected LazyOptional<IECFHandler> lazyCFEOptional = LazyOptional.of(() -> new ECFContainer(this)
+    protected LazyOptional<IECFHandler> lazyCFEOptional = LazyOptional.of(() -> new DefaultECFHandler(this)
             .setMaxECF(10000)
             .setOffset(vec3 -> vec3.add(0, this.getBbHeight() + (0.1f + (this.getSyncedECF() / 10000d)) * 10 * 0.2f, 0))
             .setIndex(0));
     @Getter
-    protected LazyOptional<IECFHandler> innerECFOptional = LazyOptional.of(() -> new ECFContainer(this)
+    protected LazyOptional<IECFHandler> innerECFOptional = LazyOptional.of(() -> new DefaultECFHandler(this)
             .setMaxECF(100)
             .setOffset(vec3 -> vec3.add(0,1,0))
             .setIndex(1));
@@ -152,7 +152,7 @@ public class FlowCedarEntEntity extends AbstractGolem implements ECFNetworkMembe
                         );
                         if (taken > 0) {
                             if (getLevel() instanceof ServerLevel serverLevel)
-                                ParticleHelper.sendECFParticles(
+                                ParticleHelperInternal.sendECFParticles(
                                         serverLevel,
                                         icfeHandler1.getOffset().apply(position()),
                                         icfeHandler.getOffset().apply(position()),
@@ -386,7 +386,7 @@ public class FlowCedarEntEntity extends AbstractGolem implements ECFNetworkMembe
         lazyCFEOptional.ifPresent(icfeHandler -> {
             if (!this.level().isClientSide()){
                 float scale = (0.1f + (icfeHandler.getECF() / (float) icfeHandler.getMaxECF())) * 10;
-                ParticleHelper.spawnParticlesIn(this.level(), BlockPos.containing(this.position().add(0, this.getBbHeight() + scale * 0.2f, 0)), icfeHandler.getECF() / 10);
+                ParticleHelperInternal.spawnParticlesIn(this.level(), BlockPos.containing(this.position().add(0, this.getBbHeight() + scale * 0.2f, 0)), icfeHandler.getECF() / 10);
                 icfeHandler.setECF(0);
             }
         });

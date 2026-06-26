@@ -23,7 +23,7 @@ import net.sinedkadis.terracompositio.api.networks.ecf.ECFNetwork;
 import net.sinedkadis.terracompositio.api.networks.ecf.ECFNetworkMember;
 import net.sinedkadis.terracompositio.registries.TCBlockEntities;
 
-import net.sinedkadis.terracompositio.util.helpers.ParticleHelper;
+import net.sinedkadis.terracompositio.util.helpers.ParticleHelperInternal;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collections;
@@ -95,7 +95,7 @@ public class CultivationDesorberBlockEntity extends AbstractDesorberBlockEntity 
                 ECFToAdd -= added;
                 if (!level.isClientSide())
                     level.playSound(null,pos, SoundEvents.AZALEA_LEAVES_STEP, SoundSource.BLOCKS);
-                ParticleHelper.sendECFParticles((ServerLevel) level,
+                ParticleHelperInternal.sendECFParticles((ServerLevel) level,
                         blockEntity.ecfContainer().getOffset().apply(blockEntity.getBlockPos().getCenter()),
                         pos.getCenter(),
                         added);

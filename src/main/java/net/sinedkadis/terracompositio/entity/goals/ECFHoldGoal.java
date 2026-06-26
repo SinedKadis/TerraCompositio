@@ -1,8 +1,8 @@
 package net.sinedkadis.terracompositio.entity.goals;
 
 import net.minecraft.world.entity.ai.goal.Goal;
-import net.sinedkadis.terracompositio.api.TCCapabilities;
 import net.sinedkadis.terracompositio.api.networks.ecf.IECFHandler;
+import net.sinedkadis.terracompositio.api.registries.TCCapabilities;
 import net.sinedkadis.terracompositio.entity.custom.FlowCedarEntEntity;
 
 import java.util.EnumSet;

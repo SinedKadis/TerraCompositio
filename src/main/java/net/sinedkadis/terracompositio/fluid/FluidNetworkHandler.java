@@ -4,11 +4,11 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.common.MinecraftForge;
 import net.minecraftforge.fluids.capability.IFluidHandler;
+import net.sinedkadis.terracompositio.api.helpers.ECFHelper;
 import net.sinedkadis.terracompositio.api.networks.NetworkAction;
 import net.sinedkadis.terracompositio.api.networks.fluid.FluidNetwork;
 import net.sinedkadis.terracompositio.api.networks.fluid.FluidNetworkMemberBE;
 import net.sinedkadis.terracompositio.events.FluidNetworkEvent;
-import net.sinedkadis.terracompositio.util.helpers.ECFHelper;
 
 import java.util.*;
 

@@ -11,8 +11,8 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.wrapper.EmptyHandler;
-import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBEBehaviour;
 import net.sinedkadis.terracompositio.registries.TCBlockEntities;
+import net.sinedkadis.terracompositio.util.behaviors.blockentity.IBEBehaviour;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.List;

@@ -6,11 +6,15 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
+import net.sinedkadis.terracompositio.api.networks.ecf.ECFNetwork;
 import net.sinedkadis.terracompositio.api.networks.ecf.ECFNetworkMember;
 import net.sinedkadis.terracompositio.api.networks.ecf.IECFHandler;
 
 import java.util.function.Function;
 
+/**
+ * The placeholder, returned by {@link ECFNetwork#createDefaultECFHandler(ECFNetworkMember)}, if Terracompositio is not present
+ */
 @SuppressWarnings("DataFlowIssue")
 @MethodsReturnNonnullByDefault
 public class DummyECFHandler implements IECFHandler {
@@ -33,7 +37,7 @@ public class DummyECFHandler implements IECFHandler {
     }
 
     @Override
-    public void setECF(int cfe) {
+    public void setECF(int ecf) {
 
     }
 
@@ -43,7 +47,7 @@ public class DummyECFHandler implements IECFHandler {
     }
 
     @Override
-    public int sendECF(ECFNetworkMember target, int cfe, float speed, boolean simulate) {
+    public int sendECF(ECFNetworkMember target, int cfe, float speed) {
         return 0;
     }
 

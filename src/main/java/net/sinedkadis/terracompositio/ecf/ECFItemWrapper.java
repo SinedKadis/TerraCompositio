@@ -14,9 +14,9 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.LazyOptional;
-import net.sinedkadis.terracompositio.api.TCCapabilities;
 import net.sinedkadis.terracompositio.api.networks.ecf.ECFNetworkMember;
 import net.sinedkadis.terracompositio.api.networks.ecf.IECFHandler;
+import net.sinedkadis.terracompositio.api.registries.TCCapabilities;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -77,9 +77,9 @@ public class ECFItemWrapper implements IECFHandler, ICapabilityProvider {
     }
 
     @Override
-    public void setECF(int cfe) {
+    public void setECF(int ecf) {
         CompoundTag tag = container.getOrCreateTag();
-        tag.putInt("CFE", cfe);
+        tag.putInt("CFE", ecf);
     }
 
     @Override
@@ -93,7 +93,7 @@ public class ECFItemWrapper implements IECFHandler, ICapabilityProvider {
     }
 
     @Override
-    public int sendECF(ECFNetworkMember target, int cfe, float speed, boolean simulate) {
+    public int sendECF(ECFNetworkMember target, int cfe, float speed) {
         return 0;
     }
 

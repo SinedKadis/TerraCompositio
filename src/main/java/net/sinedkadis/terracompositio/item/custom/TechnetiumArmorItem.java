@@ -42,14 +42,16 @@ import net.minecraftforge.network.PacketDistributor;
 import net.sinedkadis.terracompositio.TerraCompositio;
 import net.sinedkadis.terracompositio.api.IECFStorageExtensionItem;
 import net.sinedkadis.terracompositio.api.IHaveExtensibleECFStorageItem;
-import net.sinedkadis.terracompositio.api.TCCapabilities;
 import net.sinedkadis.terracompositio.api.TerraCompositioAPI;
 import net.sinedkadis.terracompositio.api.dummies.DummyECFHandler;
+import net.sinedkadis.terracompositio.api.helpers.BlockPosHelper;
 import net.sinedkadis.terracompositio.api.helpers.TooltipHelper;
 import net.sinedkadis.terracompositio.api.networks.NetworkAction;
 import net.sinedkadis.terracompositio.api.networks.ecf.ECFNetworkMember;
 import net.sinedkadis.terracompositio.api.networks.ecf.ECFNetworkMemberEntity;
 import net.sinedkadis.terracompositio.api.networks.ecf.IECFHandler;
+import net.sinedkadis.terracompositio.api.registries.TCBlockStateProperties;
+import net.sinedkadis.terracompositio.api.registries.TCCapabilities;
 import net.sinedkadis.terracompositio.config.TCClientConfigs;
 import net.sinedkadis.terracompositio.config.TCCommonConfigs;
 import net.sinedkadis.terracompositio.ecf.ECFItemWrapper;
@@ -59,13 +61,11 @@ import net.sinedkadis.terracompositio.item.models.TechnetiumCrownModel;
 import net.sinedkadis.terracompositio.network.TCPackets;
 import net.sinedkadis.terracompositio.network.packets.C2SBoardSync;
 import net.sinedkadis.terracompositio.registries.TCArmorMaterials;
-import net.sinedkadis.terracompositio.registries.TCBlockStateProperties;
 import net.sinedkadis.terracompositio.registries.TCBlocks;
 import net.sinedkadis.terracompositio.registries.TCItems;
 import net.sinedkadis.terracompositio.util.OffsetVConsumer;
 import net.sinedkadis.terracompositio.util.accessors.PlayerKnowledgeAccessor;
-import net.sinedkadis.terracompositio.util.helpers.BlockPosHelper;
-import net.sinedkadis.terracompositio.util.helpers.ParticleHelper;
+import net.sinedkadis.terracompositio.util.helpers.ParticleHelperInternal;
 import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -128,7 +128,7 @@ public class TechnetiumArmorItem extends TCArmorItem implements IHaveExtensibleE
                         SoundEvents.SHIELD_BLOCK,
                         SoundSource.PLAYERS);
 
-                ParticleHelper.spawnParticlesIn(level, pPos.above());
+                ParticleHelperInternal.spawnParticlesIn(level, pPos.above());
                 event.setCanceled(true);
             }
         }

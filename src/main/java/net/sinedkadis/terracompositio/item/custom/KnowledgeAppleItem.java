@@ -14,12 +14,12 @@ import net.minecraft.world.phys.EntityHitResult;
 import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.event.entity.player.PlayerEvent;
-import net.sinedkadis.terracompositio.api.TCCapabilities;
+import net.sinedkadis.terracompositio.api.helpers.PlayerHelper;
 import net.sinedkadis.terracompositio.api.networks.AnyNetworkMember;
+import net.sinedkadis.terracompositio.api.registries.TCCapabilities;
 import net.sinedkadis.terracompositio.block.entity.TCBlockEntity;
 import net.sinedkadis.terracompositio.config.TCClientConfigs;
 import net.sinedkadis.terracompositio.util.accessors.PlayerKnowledgeAccessor;
-import net.sinedkadis.terracompositio.util.helpers.PlayerHelper;
 
 import java.util.Optional;
 

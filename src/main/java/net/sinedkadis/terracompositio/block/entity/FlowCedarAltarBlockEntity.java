@@ -12,20 +12,20 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.wrapper.EmptyHandler;
-import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBEBehaviour;
 import net.sinedkadis.terracompositio.block.IFluidApplicable;
 import net.sinedkadis.terracompositio.block.behaviours.ItemHandlerBehaviour;
 import net.sinedkadis.terracompositio.recipe.AltarTransformationRecipe;
 import net.sinedkadis.terracompositio.registries.TCBlockEntities;
 import net.sinedkadis.terracompositio.registries.TCBlocks;
-import net.sinedkadis.terracompositio.util.helpers.ParticleHelper;
+import net.sinedkadis.terracompositio.util.behaviors.blockentity.IBEBehaviour;
+import net.sinedkadis.terracompositio.util.helpers.ParticleHelperInternal;
 import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.List;
 import java.util.Optional;
 
-import static net.sinedkadis.terracompositio.registries.TCBlockStateProperties.INFUSED;
+import static net.sinedkadis.terracompositio.api.registries.TCBlockStateProperties.INFUSED;
 
 @SuppressWarnings("DataFlowIssue")
 @MethodsReturnNonnullByDefault
@@ -61,7 +61,7 @@ public class FlowCedarAltarBlockEntity extends TCCraftingBlockEntity implements 
                 if (!wasCrafting) {
                     pLevel.playSound(null, pPos, SoundEvents.ZOMBIE_VILLAGER_CURE, SoundSource.BLOCKS);
                 }
-                ParticleHelper.spawnParticlesIn(pLevel, pPos);
+                ParticleHelperInternal.spawnParticlesIn(pLevel, pPos);
                 increaseCraftingProgress();
                 if (hasProgressFinished()) {
                     craftItem();

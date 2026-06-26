@@ -17,7 +17,7 @@ import net.minecraftforge.items.wrapper.EmptyHandler;
 import net.sinedkadis.terracompositio.block.entity.FlowCedarAltarBlockEntity;
 import org.jetbrains.annotations.NotNull;
 
-import static net.sinedkadis.terracompositio.util.helpers.WorldHelper.getLightLevel;
+import static net.sinedkadis.terracompositio.api.helpers.WorldHelper.getLightLevel;
 
 public class FlowCedarAltarBlockEntityRenderer implements BlockEntityRenderer<FlowCedarAltarBlockEntity> {
     public FlowCedarAltarBlockEntityRenderer(BlockEntityRendererProvider.Context context) {

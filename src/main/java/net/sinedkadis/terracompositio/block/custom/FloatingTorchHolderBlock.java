@@ -30,15 +30,15 @@ import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.shapes.CollisionContext;
 import net.minecraft.world.phys.shapes.Shapes;
 import net.minecraft.world.phys.shapes.VoxelShape;
-import net.sinedkadis.terracompositio.util.HoldTorch;
-import net.sinedkadis.terracompositio.util.helpers.PlayerHelper;
+import net.sinedkadis.terracompositio.api.HoldTorch;
+import net.sinedkadis.terracompositio.api.helpers.PlayerHelper;
 import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 
 import java.util.Map;
 
-import static net.sinedkadis.terracompositio.registries.TCBlockStateProperties.HOLD_TORCH;
+import static net.sinedkadis.terracompositio.api.registries.TCBlockStateProperties.HOLD_TORCH;
 
 @SuppressWarnings("deprecation")
 @ParametersAreNonnullByDefault

@@ -41,7 +41,7 @@ import java.util.function.BiPredicate;
 import java.util.function.Predicate;
 
 import static net.minecraft.world.level.block.LayeredCauldronBlock.LEVEL;
-import static net.sinedkadis.terracompositio.registries.TCBlockStateProperties.INFUSED;
+import static net.sinedkadis.terracompositio.api.registries.TCBlockStateProperties.INFUSED;
 
 @SuppressWarnings("deprecation")
 public class WedgeBlock extends Block {

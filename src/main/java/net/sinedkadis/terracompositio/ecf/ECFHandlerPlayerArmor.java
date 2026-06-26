@@ -7,10 +7,10 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.util.LazyOptional;
-import net.sinedkadis.terracompositio.api.TCCapabilities;
 import net.sinedkadis.terracompositio.api.dummies.DummyECFHandler;
 import net.sinedkadis.terracompositio.api.networks.ecf.ECFNetworkMember;
 import net.sinedkadis.terracompositio.api.networks.ecf.IECFHandler;
+import net.sinedkadis.terracompositio.api.registries.TCCapabilities;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.function.Function;
@@ -60,8 +60,8 @@ public class ECFHandlerPlayerArmor implements IECFHandler {
     }
 
     @Override
-    public void setECF(int cfe) {
-        handler.setECF(cfe);
+    public void setECF(int ecf) {
+        handler.setECF(ecf);
     }
 
     @Override
@@ -107,7 +107,7 @@ public class ECFHandlerPlayerArmor implements IECFHandler {
     }
 
     @Override
-    public int sendECF(ECFNetworkMember target, int cfe, float speed, boolean simulate) {
+    public int sendECF(ECFNetworkMember target, int cfe, float speed) {
         throw new UnsupportedOperationException();
     }
 

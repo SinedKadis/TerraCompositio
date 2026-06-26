@@ -3,15 +3,18 @@ package net.sinedkadis.terracompositio.api.dummies;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.fluids.capability.IFluidHandler;
+import net.sinedkadis.terracompositio.api.TerraCompositioAPI;
 import net.sinedkadis.terracompositio.api.networks.NetworkAction;
 import net.sinedkadis.terracompositio.api.networks.ecf.ECFNetwork;
 import net.sinedkadis.terracompositio.api.networks.ecf.ECFNetworkMember;
-import net.sinedkadis.terracompositio.api.networks.ecf.IECFHandler;
 import net.sinedkadis.terracompositio.api.networks.fluid.FluidNetwork;
 import net.sinedkadis.terracompositio.api.networks.fluid.FluidNetworkMemberBE;
 
 import java.util.Set;
 
+/**
+ * The placeholder, returned by {@link TerraCompositioAPI#getECFNetworkInstance()} and {@link TerraCompositioAPI#getFluidNetworkInstance()}, if Terracompositio is not present
+ */
 public class DummyNetwork implements ECFNetwork, FluidNetwork {
     public static final DummyNetwork instance = new DummyNetwork();
 
@@ -27,13 +30,13 @@ public class DummyNetwork implements ECFNetwork, FluidNetwork {
     }
 
     @Override
-    public void fireECFNetworkEvent(ECFNetworkMember source, NetworkAction action) {
-
+    public int getECFTransferLimit() {
+        return 20;
     }
 
     @Override
-    public boolean isIn(Level pLevel, IECFHandler ecfHandler) {
-        return true;
+    public void fireECFNetworkEvent(ECFNetworkMember source, NetworkAction action) {
+
     }
 
     @Override

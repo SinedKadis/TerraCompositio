@@ -12,7 +12,7 @@ import net.minecraft.client.resources.model.BakedModel;
 import net.minecraft.world.level.block.state.BlockState;
 import net.sinedkadis.terracompositio.block.entity.PathPointerBlockEntity;
 import net.sinedkadis.terracompositio.registries.TCBlocks;
-import net.sinedkadis.terracompositio.util.helpers.VecHelper;
+import org.joml.Quaternionf;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.Map;
@@ -52,6 +52,10 @@ public class PathPointerBlockEntityRenderer implements BlockEntityRenderer<PathP
         }
     }
 
+    public static float toRadians(float degrees) {
+        return (float) (degrees / 180F * Math.PI);
+    }
+
     private void renderModel(PoseStack poseStack, MultiBufferSource bufferSource, BlockState state,
                              BakedModel model, int packedLight, int packedOverlay,
                               float rotationY, float rotationX, float rotationZ, float partialTicks) {
@@ -63,10 +67,11 @@ public class PathPointerBlockEntityRenderer implements BlockEntityRenderer<PathP
         poseStack.translate(0.5, 0.5, 0.5);
 
         poseStack.translate(0, Math.sin(time / 20f) * 0.05f, 0);
-        //poseStack.mulPose(VecHelper.rotateY(-rotationY + 90F)); // yaw
-        poseStack.mulPose(VecHelper.rotateY(rotationY)); // yaw
-        poseStack.mulPose(VecHelper.rotateX(-rotationX));       // pitch
-        poseStack.mulPose(VecHelper.rotateZ(-rotationZ));       // roll
+
+
+        poseStack.mulPose(new Quaternionf().rotateY(toRadians(rotationY))); // yaw
+        poseStack.mulPose(new Quaternionf().rotateX(toRadians(-rotationX)));       // pitch
+        poseStack.mulPose(new Quaternionf().rotateZ(toRadians(-rotationZ)));       // roll
 
 
         poseStack.translate(-0.5, -0.5, -0.5);

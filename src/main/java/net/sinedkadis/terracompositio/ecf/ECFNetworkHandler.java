@@ -8,13 +8,15 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.phys.AABB;
 import net.minecraftforge.common.MinecraftForge;
 import net.sinedkadis.terracompositio.api.TerraCompositioAPI;
+import net.sinedkadis.terracompositio.api.helpers.ECFHelper;
 import net.sinedkadis.terracompositio.api.networks.NetworkAction;
 import net.sinedkadis.terracompositio.api.networks.ecf.*;
 import net.sinedkadis.terracompositio.block.entity.PathPointerBlockEntity;
+import net.sinedkadis.terracompositio.config.TCCommonConfigs;
 import net.sinedkadis.terracompositio.entity.custom.FlowCedarEntEntity;
 import net.sinedkadis.terracompositio.events.ECFNetworkEvent;
 import net.sinedkadis.terracompositio.registries.TCItems;
-import net.sinedkadis.terracompositio.util.helpers.ECFHelper;
+import net.sinedkadis.terracompositio.util.helpers.ECFHelperInternal;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
@@ -54,6 +56,11 @@ public class ECFNetworkHandler implements ECFNetwork {
     @Override
     public Set<ECFNetworkMember> getAllECFNetworkMembers(Level level) {
         return ecfSources.getOrDefault(level, Set.of());
+    }
+
+    @Override
+    public int getECFTransferLimit() {
+        return TCCommonConfigs.ECF_PER_BURST_TRANSFER_LIMIT.get();
     }
 
     public void networkMemberUpdated(ECFNetworkMember updated) {
@@ -184,25 +191,18 @@ public class ECFNetworkHandler implements ECFNetwork {
             }
         }
 
-        // validMember фильтр — в конце, один раз
-        toReturn.removeIf(m -> !ECFHelper.validMember(m));
-        return toReturn;
-    }
 
-    @Override
-    public boolean isIn(Level level, IECFHandler cfeHandler) {
-        Set<ECFNetworkMember> members = ecfSources.get(level);
-        if (members == null) return false;
-        for (ECFNetworkMember member : members) {
-            if (member.getMainHandler().equals(cfeHandler)) return true;
-        }
-        return false;
+        toReturn.removeIf(m -> !ECFHelper.validMember(m) && !ECFHelperInternal.validPPProxy(m));
+        return toReturn;
     }
 
     @Override
     public boolean isIn(Level level, ECFNetworkMember networkMember) {
         Set<ECFNetworkMember> members = ecfSources.get(level);
         if (members == null) return false;
+        for (ECFNetworkMember member : members) {
+            if (member.getMainHandler().equals(networkMember.getMainHandler())) return true;
+        }
         return members.contains(networkMember);
     }
 
@@ -240,5 +240,10 @@ public class ECFNetworkHandler implements ECFNetwork {
     @Override
     public void fireECFNetworkEvent(ECFNetworkMember source, NetworkAction action) {
         MinecraftForge.EVENT_BUS.post(new ECFNetworkEvent(source,action));
+    }
+
+    @Override
+    public IECFHandler createDefaultECFHandler(ECFNetworkMember attachedMember) {
+        return new DefaultECFHandler(attachedMember);
     }
 }

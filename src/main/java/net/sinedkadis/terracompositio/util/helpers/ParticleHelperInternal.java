@@ -17,7 +17,7 @@ import org.jetbrains.annotations.NotNull;
 import java.util.ArrayList;
 import java.util.List;
 
-public class ParticleHelper {
+public class ParticleHelperInternal {
 
     public static void sendFluidParticles(ServerLevel level, BlockPos target, BlockPos source,
                                           int particleAmount, FluidStack fluidStack) {

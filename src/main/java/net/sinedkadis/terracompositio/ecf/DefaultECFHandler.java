@@ -4,6 +4,7 @@ package net.sinedkadis.terracompositio.ecf;
 import lombok.Getter;
 import lombok.Setter;
 import net.minecraft.MethodsReturnNonnullByDefault;
+import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerPlayer;
 import net.minecraft.util.Mth;
@@ -19,6 +20,7 @@ import net.sinedkadis.terracompositio.api.networks.ecf.ECFNetworkMember;
 import net.sinedkadis.terracompositio.api.networks.ecf.ECFNetworkMemberBE;
 import net.sinedkadis.terracompositio.api.networks.ecf.ECFNetworkMemberEntity;
 import net.sinedkadis.terracompositio.api.networks.ecf.IECFHandler;
+import net.sinedkadis.terracompositio.block.entity.PathPointerBlockEntity;
 import net.sinedkadis.terracompositio.ecf.burst.ECFBurstProjectileEntity;
 import net.sinedkadis.terracompositio.network.TCPackets;
 import net.sinedkadis.terracompositio.network.packets.S2CPlayerEcfContainerSync;
@@ -26,10 +28,12 @@ import net.sinedkadis.terracompositio.network.packets.S2CPlayerEcfContainerSync;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.function.Function;
 
+import static net.sinedkadis.terracompositio.block.entity.PathPointerBlockEntity.setYawAndPitchFromRot;
+
 @Setter
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class ECFContainer implements IECFHandler, INBTSerializable<CompoundTag> {
+public class DefaultECFHandler implements IECFHandler, INBTSerializable<CompoundTag> {
     @Getter
     protected ECFNetworkMember attachedMember;
     @Getter
@@ -60,7 +64,7 @@ public class ECFContainer implements IECFHandler, INBTSerializable<CompoundTag> 
         queued = 0;
     }
 
-    public ECFContainer(ECFNetworkMember attachedMember) {
+    public DefaultECFHandler(ECFNetworkMember attachedMember) {
         this.attachedMember = attachedMember;
         if (attachedMember instanceof ECFNetworkMemberEntity) isEntity = true;
     }
@@ -90,20 +94,29 @@ public class ECFContainer implements IECFHandler, INBTSerializable<CompoundTag> 
     }
 
     @Override
-    public int sendECF(ECFNetworkMember target, int cfe, float speed, boolean simulate) {
+    public int sendECF(ECFNetworkMember target, int cfe, float speed) {
         int freeSpace = target.getMainHandler().getFreeSpace();
         int available = this.getECF();
         int added = Mth.clamp(cfe, 0, Math.min(available, freeSpace));
         if (added < 1)
             return 0;
 
-        if (!simulate) {
-            ECFBurstProjectileEntity entity = ECFBurstProjectileEntity.sendBurst(this, target, added, speed);
-            if (entity != null) {
-                getLevel().addFreshEntity(entity);
-                target.getMainHandler().addToQueue(added);
+        if (target instanceof PPECFMemberProxy proxy && proxy.target() instanceof ECFNetworkMemberEntity) {
+            BlockPos pos = proxy.proxy().getOutputPos();
+            PathPointerBlockEntity ppBE = ((PathPointerBlockEntity) target.getLevel().getBlockEntity(pos));
+            if (ppBE != null) {
+                if (ppBE.parts.contains(PathPointerBlockEntity.PPPart.INFUSER)) {
+                    setYawAndPitchFromRot(pos.getCenter().vectorTo(proxy.target().getPos().getCenter()), ppBE);
+                }
             }
         }
+
+        ECFBurstProjectileEntity entity = ECFBurstProjectileEntity.sendBurst(this, target, added, speed);
+        if (entity != null) {
+            getLevel().addFreshEntity(entity);
+            target.getMainHandler().addToQueue(added);
+        }
+
         return added;
     }
 
@@ -188,7 +201,7 @@ public class ECFContainer implements IECFHandler, INBTSerializable<CompoundTag> 
         return Math.max(this.maxECF, this.ECF);
     }
 
-    public ECFContainer setMaxECF(int max) {
+    public DefaultECFHandler setMaxECF(int max) {
         this.maxECF = max;
         return this;
     }

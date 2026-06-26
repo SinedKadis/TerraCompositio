@@ -5,23 +5,23 @@ import net.sinedkadis.terracompositio.api.networks.ecf.ECFNetworkMember;
 import net.sinedkadis.terracompositio.ecf.burst.ECFBurstProjectileEntity;
 import org.jetbrains.annotations.NotNull;
 
-public class LimitlessECFContainer extends ECFContainer {
-    public LimitlessECFContainer(ECFNetworkMember entity) {
+public class LimitlessDefaultECFHandler extends DefaultECFHandler {
+    public LimitlessDefaultECFHandler(ECFNetworkMember entity) {
         super(entity);
     }
 
     @Override
-    public int sendECF(@NotNull ECFNetworkMember target, int cfe, float speed, boolean simulate) {
+    public int sendECF(@NotNull ECFNetworkMember target, int cfe, float speed) {
         int freeSpace = target.getMainHandler().getFreeSpace();
         int added = Mth.clamp(cfe, 0, freeSpace);
         if (added < 1)
             return 0;
-        if (!simulate) {
-            ECFBurstProjectileEntity entity = ECFBurstProjectileEntity.sendBurst(this, target, added, speed);
-            if (entity != null) {
-                target.getMainHandler().addToQueue(added);
-            }
+
+        ECFBurstProjectileEntity entity = ECFBurstProjectileEntity.sendBurst(this, target, added, speed);
+        if (entity != null) {
+            target.getMainHandler().addToQueue(added);
         }
+
         return added;
     }
 

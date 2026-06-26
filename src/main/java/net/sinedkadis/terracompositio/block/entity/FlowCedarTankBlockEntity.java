@@ -15,7 +15,7 @@ import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidUtil;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.sinedkadis.terracompositio.api.TerraCompositioAPI;
-import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBEBehaviour;
+import net.sinedkadis.terracompositio.api.helpers.ECFHelper;
 import net.sinedkadis.terracompositio.api.helpers.TooltipHelper;
 import net.sinedkadis.terracompositio.api.networks.NetworkAction;
 import net.sinedkadis.terracompositio.api.networks.fluid.FluidNetwork;
@@ -27,9 +27,8 @@ import net.sinedkadis.terracompositio.registries.TCBlocks;
 import net.sinedkadis.terracompositio.registries.TCFluids;
 import net.sinedkadis.terracompositio.registries.TCTags;
 import net.sinedkadis.terracompositio.util.FluidComponent;
-import net.sinedkadis.terracompositio.util.helpers.BlockPosHelper;
-import net.sinedkadis.terracompositio.util.helpers.ECFHelper;
-import net.sinedkadis.terracompositio.util.helpers.ParticleHelper;
+import net.sinedkadis.terracompositio.util.behaviors.blockentity.IBEBehaviour;
+import net.sinedkadis.terracompositio.util.helpers.ParticleHelperInternal;
 import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -38,7 +37,7 @@ import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 
-import static net.sinedkadis.terracompositio.registries.TCBlockStateProperties.INFUSED;
+import static net.sinedkadis.terracompositio.api.registries.TCBlockStateProperties.INFUSED;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -109,7 +108,8 @@ public class FlowCedarTankBlockEntity extends TCBlockEntity implements FluidNetw
             tickCounter = 20;
             FluidStack fluidStack = new FluidStack(TCFluids.FLOW_FLUID.source.get(), 1000);
             if (fluidHandler.fill(fluidStack, IFluidHandler.FluidAction.SIMULATE)>=1000){
-                List<BlockPos> list = new ArrayList<>(BlockPosHelper.getNearBlocks(pos, 10).stream()
+                List<BlockPos> list = new ArrayList<>(
+                        BlockPos.betweenClosedStream(pos.offset(-getRange(), -getRange(), -getRange()), pos.offset(getRange(), getRange(), getRange()))
                         .filter(pos1 -> level.getBlockState(pos1).is(TCTags.Blocks.FLOW_CEDAR_LOGS))
                         .filter(pos2 -> level.getBlockState(pos2).getValue(INFUSED))
                         .toList());
@@ -118,7 +118,7 @@ public class FlowCedarTankBlockEntity extends TCBlockEntity implements FluidNetw
                     BlockPos blockPos = list.get(index);
                     level.setBlockAndUpdate(blockPos, level.getBlockState(blockPos).setValue(INFUSED, false));
                     fluidHandler.fill(fluidStack, IFluidHandler.FluidAction.EXECUTE);
-                    ParticleHelper.sendFluidParticles((ServerLevel) level, pos, blockPos, 100, fluidStack);
+                    ParticleHelperInternal.sendFluidParticles((ServerLevel) level, pos, blockPos, 100, fluidStack);
                 }
             }
         }
@@ -202,7 +202,7 @@ public class FlowCedarTankBlockEntity extends TCBlockEntity implements FluidNetw
                 FluidStack transferred = FluidUtil.tryFluidTransfer(mainHandler, fluidHandler, 1000, true);
                 int amount = transferred.getAmount();
                 if (amount > 0) {
-                    ParticleHelper
+                    ParticleHelperInternal
                             .sendFluidParticles((ServerLevel) level, target.getPos(), this.getBlockPos(), amount / 10, transferred);
                 }
             });
@@ -219,7 +219,7 @@ public class FlowCedarTankBlockEntity extends TCBlockEntity implements FluidNetw
             FluidStack transferred = FluidUtil.tryFluidTransfer(mainHandler, fluidHandler, 1000, true);
             int amount = transferred.getAmount();
             if (amount > 0) {
-                ParticleHelper
+                ParticleHelperInternal
                         .sendFluidParticles((ServerLevel) level, updated.getPos(), this.getBlockPos(), amount / 10, transferred);
             }
         } else onFluidNetworkMemberUpdate();

@@ -1,4 +1,4 @@
-package net.sinedkadis.terracompositio.util.helpers;
+package net.sinedkadis.terracompositio.api.helpers;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -14,7 +14,19 @@ import org.jetbrains.annotations.Nullable;
 import java.util.*;
 import java.util.function.Predicate;
 
+/**
+ * The Class with cool methods, that my mod use, related to {@link BlockPos}.
+ */
 public class BlockPosHelper {
+    /**
+     * Get block poses of blocks, that match tag. Each iteration searches blocks is 3x3x3 cube with already found block in center
+     *
+     * @param level     the Minecraft World
+     * @param pPos      the Starting position of search
+     * @param block     the Tag, that used to filter searched blocks
+     * @param iteration the Iteration. Each one like "runs" that method for already found block pos
+     * @return the List of BlockPoses
+     */
     public static @NotNull List<BlockPos> getNearBlocks(@Nullable Level level, BlockPos pPos, @Nullable TagKey<Block> block, int iteration) {
         List<BlockPos> result = new ArrayList<>();
         if (iteration <= 0) {
@@ -53,6 +65,15 @@ public class BlockPosHelper {
         return result;
     }
 
+    /**
+     * Get block poses of blocks, that match predicate. Each iteration searches blocks that touching already found block.
+     *
+     * @param level     the Minecraft World
+     * @param pPos      the Starting position of search
+     * @param predicate the Predicate, that used to filter searched blocks
+     * @param iteration the Iteration. Each one like "runs" that method for already found block pos
+     * @return the List of BlockPoses
+     */
     public static @NotNull List<BlockPos> getTouchingBlocks(@Nullable Level level, BlockPos pPos, @Nullable Predicate<BlockState> predicate, int iteration) {
         List<BlockPos> result = new ArrayList<>();
         if (iteration <= 0) {
@@ -87,6 +108,15 @@ public class BlockPosHelper {
         return result;
     }
 
+    /**
+     * Get block poses of blocks, that match tag. Each iteration searches blocks that touching already found block.
+     *
+     * @param level     the Minecraft World
+     * @param pPos      the Starting position of search
+     * @param block     the Tag, that used to filter searched blocks
+     * @param iteration the Iteration. Each one like "runs" that method for already found block pos
+     * @return the List of BlockPoses
+     */
     public static @NotNull List<BlockPos> getTouchingBlocks(@Nullable Level level, BlockPos pPos, @Nullable TagKey<Block> block, int iteration) {
         List<BlockPos> result = new ArrayList<>();
         if (iteration <= 0) {
@@ -121,34 +151,12 @@ public class BlockPosHelper {
         return result;
     }
 
-    public static @NotNull List<BlockPos> getNearBlocks(@Nullable Level level, BlockPos pos, @Nullable TagKey<Block> block) {
-        if (level != null && !level.isClientSide)
-            return getNearBlocks(level, pos, block, 1);
-        return getNearBlocks(null, pos, null, 1);
-    }
-
-    public static @NotNull List<BlockPos> getTouchingBlocks(@Nullable Level level, BlockPos pos, @Nullable TagKey<Block> block) {
-        if (level != null && !level.isClientSide)
-            return getTouchingBlocks(level, pos, block, 1);
-        return getTouchingBlocks(null, pos, (TagKey<Block>) null, 2);
-    }
-
-    public static @NotNull List<BlockPos> getNearBlocks(BlockPos pos, int iteration) {
-        return getNearBlocks(null, pos, null, iteration);
-    }
-
-    public static @NotNull List<BlockPos> getTouchingBlocks(BlockPos pos, int iteration) {
-        return getTouchingBlocks(null, pos, (TagKey<Block>) null, iteration);
-    }
-
-    public static @NotNull List<BlockPos> getNearBlocks(BlockPos pos) {
-        return getNearBlocks(null, pos, null);
-    }
-
-    public static @NotNull List<BlockPos> getTouchingBlocks(BlockPos pos) {
-        return getTouchingBlocks(null, pos, null);
-    }
-
+    /**
+     * Saves block pos to compound tag.
+     *
+     * @param blockPos the blockPos
+     * @return saved blockPos or empty tag if blockPos is null
+     */
     public static CompoundTag saveBlockPos(BlockPos blockPos) {
         CompoundTag tag = new CompoundTag();
         if (blockPos == null) return tag;
@@ -163,6 +171,12 @@ public class BlockPosHelper {
         return tag;
     }
 
+    /**
+     * Load block pos from tag.
+     *
+     * @param tag the tag
+     * @return the blockPos or null if tag is not instance of {@link CompoundTag} or empty
+     */
     public static @Nullable BlockPos loadBlockPos(Tag tag) {
         CompoundTag compoundTag;
         if (tag instanceof CompoundTag) {

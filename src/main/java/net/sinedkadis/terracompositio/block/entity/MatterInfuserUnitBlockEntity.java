@@ -18,10 +18,8 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.wrapper.EmptyHandler;
-import net.sinedkadis.terracompositio.api.TCCapabilities;
-import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBEBehaviour;
-import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBEECFBehaviour;
 import net.sinedkadis.terracompositio.api.networks.ecf.IECFHandler;
+import net.sinedkadis.terracompositio.api.registries.TCCapabilities;
 import net.sinedkadis.terracompositio.block.behaviours.ECFHandlerBehaviour;
 import net.sinedkadis.terracompositio.block.behaviours.ItemStateHolderBehaviour;
 import net.sinedkadis.terracompositio.block.custom.MatterInfuserBaseEntityBlock;
@@ -29,16 +27,18 @@ import net.sinedkadis.terracompositio.config.TCInnerConfig;
 import net.sinedkadis.terracompositio.recipe.MatterInfusionRecipe;
 import net.sinedkadis.terracompositio.registries.TCBlockEntities;
 import net.sinedkadis.terracompositio.registries.TCItems;
-import net.sinedkadis.terracompositio.util.helpers.ParticleHelper;
+import net.sinedkadis.terracompositio.util.behaviors.blockentity.IBEBehaviour;
+import net.sinedkadis.terracompositio.util.behaviors.blockentity.IBEECFBehaviour;
+import net.sinedkadis.terracompositio.util.helpers.ParticleHelperInternal;
 import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.List;
 import java.util.Optional;
 
+import static net.sinedkadis.terracompositio.api.registries.TCBlockStateProperties.INFUSED;
 import static net.sinedkadis.terracompositio.block.entity.FlowCedarCasingBlockEntity.DOWN_CONNECTION_SLOT;
 import static net.sinedkadis.terracompositio.block.entity.FlowCedarCasingBlockEntity.UP_CONNECTION_SLOT;
-import static net.sinedkadis.terracompositio.registries.TCBlockStateProperties.INFUSED;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -104,7 +104,7 @@ public class MatterInfuserUnitBlockEntity extends MatterInfuserBaseBlockEntity{
             timer = 20;
             isAssembled = assembleValid();
             if (progress>0)
-                ParticleHelper.spawnParticlesIn(pLevel,
+                ParticleHelperInternal.spawnParticlesIn(pLevel,
                         pPos.relative(pState.getValue(BlockStateProperties.HORIZONTAL_FACING).getOpposite()),
                         ((int) Math.ceil(tickECFCost * 20)));
 

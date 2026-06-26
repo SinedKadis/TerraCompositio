@@ -1,4 +1,4 @@
-package net.sinedkadis.terracompositio.api.behaviors.blockentity;
+package net.sinedkadis.terracompositio.util.behaviors.blockentity;
 
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;

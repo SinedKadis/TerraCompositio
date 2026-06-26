@@ -12,7 +12,7 @@ import net.minecraftforge.common.util.LazyOptional;
 import net.minecraftforge.fml.DistExecutor;
 import net.sinedkadis.terracompositio.TerraCompositio;
 import net.sinedkadis.terracompositio.api.IHaveKnowledge;
-import net.sinedkadis.terracompositio.api.TCCapabilities;
+import net.sinedkadis.terracompositio.api.registries.TCCapabilities;
 import net.sinedkadis.terracompositio.api.TerraCompositioAPI;
 import net.sinedkadis.terracompositio.api.helpers.TooltipHelper;
 import net.sinedkadis.terracompositio.api.networks.NetworkAction;
@@ -22,8 +22,8 @@ import net.sinedkadis.terracompositio.api.networks.ecf.IECFHandler;
 import net.sinedkadis.terracompositio.compat.create.TCCreateCompat;
 import net.sinedkadis.terracompositio.config.TCCommonConfigs;
 import net.sinedkadis.terracompositio.config.TCInnerConfig;
-import net.sinedkadis.terracompositio.ecf.ECFContainer;
-import net.sinedkadis.terracompositio.registries.TCBlockStateProperties;
+import net.sinedkadis.terracompositio.ecf.DefaultECFHandler;
+import net.sinedkadis.terracompositio.api.registries.TCBlockStateProperties;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;
@@ -34,7 +34,7 @@ public class CedarGearboxBlockEntity extends GeneratingKineticBlockEntity implem
     protected int range;
     protected int priority;
     protected boolean scheduledUpdate = false;
-    protected IECFHandler ecfHandler = new ECFContainer(this) {
+    protected IECFHandler ecfHandler = new DefaultECFHandler(this) {
         @Override
         protected void sendCFEUpdate() {
             super.sendCFEUpdate();

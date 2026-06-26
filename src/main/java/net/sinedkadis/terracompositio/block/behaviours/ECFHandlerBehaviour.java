@@ -5,27 +5,26 @@ import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
-import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
 import net.sinedkadis.terracompositio.api.IHaveKnowledge;
-import net.sinedkadis.terracompositio.api.TCCapabilities;
 import net.sinedkadis.terracompositio.api.TerraCompositioAPI;
-import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBEECFBehaviour;
+import net.sinedkadis.terracompositio.api.helpers.ECFHelper;
 import net.sinedkadis.terracompositio.api.helpers.TooltipHelper;
 import net.sinedkadis.terracompositio.api.networks.NetworkAction;
 import net.sinedkadis.terracompositio.api.networks.ecf.ECFNetwork;
 import net.sinedkadis.terracompositio.api.networks.ecf.ECFNetworkMember;
 import net.sinedkadis.terracompositio.api.networks.ecf.ECFNetworkMemberEntity;
 import net.sinedkadis.terracompositio.api.networks.ecf.IECFHandler;
+import net.sinedkadis.terracompositio.api.registries.TCCapabilities;
 import net.sinedkadis.terracompositio.block.entity.TCBlockEntity;
 import net.sinedkadis.terracompositio.config.TCCommonConfigs;
 import net.sinedkadis.terracompositio.config.TCInnerConfig;
-import net.sinedkadis.terracompositio.ecf.ECFContainer;
 import net.sinedkadis.terracompositio.ecf.PPECFMemberProxy;
-import net.sinedkadis.terracompositio.util.helpers.ECFHelper;
+import net.sinedkadis.terracompositio.util.behaviors.blockentity.IBEECFBehaviour;
+import net.sinedkadis.terracompositio.util.helpers.ECFHelperInternal;
 import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -43,7 +42,7 @@ public class ECFHandlerBehaviour implements IBEECFBehaviour, IHaveKnowledge {
 
     protected int range;
     protected int priority;
-    protected IECFHandler ecfHandler = new ECFContainer(this);
+    protected IECFHandler ecfHandler = TerraCompositioAPI.instance().getECFNetworkInstance().createDefaultECFHandler(this);
     protected LazyOptional<IECFHandler> lazyCFEOptional = LazyOptional.empty();
 
     protected boolean scheduledUpdate = false;
@@ -107,30 +106,26 @@ public class ECFHandlerBehaviour implements IBEECFBehaviour, IHaveKnowledge {
             targets.forEach(target -> {
                 if (target.getMainHandler().getFreeSpace() > TCCommonConfigs.ECF_PER_BURST_TRANSFER_LIMIT.get())
                     scheduleMemberUpdate(target);
-                ECFHelper.ECFTransferBuilder ECFTransferBuilder = ECFHelper.newTransfer().targetAndSource(target, this);
-                if (target.getEntity() instanceof Player) {
-                    ECFTransferBuilder.instant();
-                }
-                ECFTransferBuilder.build();
+                ECFHelper.newTransfer().targetAndSource(target, this).build();
             });
         }
     }
 
     @Override
     public void onECFNetworkMemberUpdate(ECFNetworkMember updated) {
-        if (getMainHandler().getECF() > 0 && ECFHelper.validMember(updated)) {
+        if (getMainHandler().getECF() > 0 && isValidMember(updated)) {
             if (updated.getMainHandler().getFreeSpace() > TCCommonConfigs.ECF_PER_BURST_TRANSFER_LIMIT.get()) {
                 if (updated instanceof PPECFMemberProxy proxy && proxy.target() instanceof ECFNetworkMemberEntity) {
                     if (updated.getPos().closerThan(proxy.proxy().getOutputPos(),getRange()))
                         scheduleMemberUpdate(updated);
                 } else scheduleMemberUpdate(updated);
             }
-            ECFHelper.ECFTransferBuilder ECFTransferBuilder = ECFHelper.newTransfer().targetAndSource(updated, this);
-            if (updated.getEntity() instanceof Player) {
-                ECFTransferBuilder.instant();
-            }
-            ECFTransferBuilder.build();
+            ECFHelper.newTransfer().targetAndSource(updated, this).build();
         } else onECFNetworkMemberUpdate();
+    }
+
+    public boolean isValidMember(ECFNetworkMember updated) {
+        return ECFHelper.validMember(updated) || ECFHelperInternal.validPPProxy(updated);
     }
 
     @Override

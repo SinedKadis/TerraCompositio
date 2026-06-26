@@ -23,7 +23,7 @@ import net.sinedkadis.terracompositio.worldgen.tree.custom.FlowCedarTrunkPlacer;
 import java.util.List;
 import java.util.Objects;
 
-import static net.sinedkadis.terracompositio.registries.TCBlockStateProperties.INFUSED;
+import static net.sinedkadis.terracompositio.api.registries.TCBlockStateProperties.INFUSED;
 
 public class TCConfiguredFeatures {
     public static final ResourceKey<ConfiguredFeature<?, ?>> OVERWORLD_FLOW_CONTAINING_ORE_KEY = registerKey("flow_containing_ore");

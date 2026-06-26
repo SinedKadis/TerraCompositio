@@ -14,7 +14,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.Optional;
 
-import static net.sinedkadis.terracompositio.util.helpers.ECFHelper.placeECFCloud;
+import static net.sinedkadis.terracompositio.entity.custom.ECFCloudEntity.placeECFCloud;
 
 @Mixin(AbstractFurnaceBlockEntity.class)
 public abstract class AbstractFurnaceBlockEntityMixin implements Container {

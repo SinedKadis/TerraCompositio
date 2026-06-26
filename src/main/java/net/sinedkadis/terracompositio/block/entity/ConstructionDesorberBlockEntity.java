@@ -20,7 +20,7 @@ import net.sinedkadis.terracompositio.api.TerraCompositioAPI;
 import net.sinedkadis.terracompositio.api.networks.ecf.ECFNetwork;
 import net.sinedkadis.terracompositio.api.networks.ecf.ECFNetworkMember;
 import net.sinedkadis.terracompositio.registries.TCBlockEntities;
-import net.sinedkadis.terracompositio.util.helpers.ParticleHelper;
+import net.sinedkadis.terracompositio.util.helpers.ParticleHelperInternal;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collections;
@@ -93,7 +93,7 @@ public class ConstructionDesorberBlockEntity extends AbstractDesorberBlockEntity
                     if (!level.isClientSide()) {
                         BlockPos blockEntityBlockPos = blockEntity.getBlockPos();
                         level.playSound(null, blockEntityBlockPos, SoundEvents.BEACON_ACTIVATE, SoundSource.BLOCKS, 0.1f, 1f);
-                        ParticleHelper.sendECFParticles((ServerLevel) level,
+                        ParticleHelperInternal.sendECFParticles((ServerLevel) level,
                                 blockEntity.ecfContainer().getOffset().apply(blockEntityBlockPos.getCenter()),
                                 pos.getCenter(),
                                 added);

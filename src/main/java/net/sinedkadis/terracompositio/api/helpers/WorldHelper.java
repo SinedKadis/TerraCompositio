@@ -1,4 +1,4 @@
-package net.sinedkadis.terracompositio.util.helpers;
+package net.sinedkadis.terracompositio.api.helpers;
 
 import net.minecraft.client.renderer.LightTexture;
 import net.minecraft.core.BlockPos;
@@ -13,6 +13,7 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.LightLayer;
+import net.minecraft.world.level.block.BaseFireBlock;
 import net.minecraft.world.level.block.Block;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.RotatedPillarBlock;
@@ -21,16 +22,16 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.Property;
 import net.minecraft.world.level.gameevent.GameEvent;
 import net.minecraft.world.level.material.FluidState;
-import net.sinedkadis.terracompositio.block.custom.FlowCedarLikeBlock;
+import net.sinedkadis.terracompositio.api.registries.TCBlockStateProperties;
 import net.sinedkadis.terracompositio.particle.ECFParticleData;
-import net.sinedkadis.terracompositio.registries.TCBlockStateProperties;
 import net.sinedkadis.terracompositio.registries.TCGameRules;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.Arrays;
 
-import static net.sinedkadis.terracompositio.registries.TCBlockStateProperties.INFUSED;
+import static net.minecraft.world.level.block.Block.dropResources;
+import static net.sinedkadis.terracompositio.api.registries.TCBlockStateProperties.INFUSED;
 
 public class WorldHelper {
     public static @NotNull InteractionResult handleInWorldBlockCraft(BlockState oldState, BlockState newState, Level pLevel, BlockPos pPos, ItemStack item, int count, ParticleOptions type, SoundEvent event) {
@@ -86,8 +87,8 @@ public class WorldHelper {
                 .orElse(true);
     }
 
-    public static void flowLeak(BlockState pState, Level pLevel, BlockPos pPos, boolean chained) {
-        if ((!pState.hasProperty(FlowCedarLikeBlock.INFUSED) || pState.getValue(FlowCedarLikeBlock.INFUSED))
+    public static void flowLeak(BlockState pState, Level pLevel, BlockPos pPos) {
+        if ((!pState.hasProperty(TCBlockStateProperties.INFUSED) || pState.getValue(TCBlockStateProperties.INFUSED))
                 && !pLevel.getGameRules().getBoolean(TCGameRules.DISABLE_FLOW_LEAKING)
                 && (!pState.hasProperty(TCBlockStateProperties.WAXED) || !pState.getValue(TCBlockStateProperties.WAXED))) {
 
@@ -100,15 +101,11 @@ public class WorldHelper {
                 f_pos = pPos.relative(Direction.Axis.Y, 1);
                 b_pos = pPos.relative(Direction.Axis.Y, -1);
             }
-            BlockPosHelper.getNearBlocks(f_pos, chained ? 4 : 2).stream()
-                    .filter(pos -> pos != pPos)
-                    .filter(pos -> pLevel.getBlockState(pos).hasProperty(FlowCedarLikeBlock.INFUSED))
-                    .forEach(pos -> pLevel.setBlockAndUpdate(pos, pLevel.getBlockState(pos).setValue(FlowCedarLikeBlock.INFUSED, false)));
-            BlockPosHelper.getNearBlocks(b_pos, chained ? 4 : 2).stream()
-                    .filter(pos -> pos != pPos)
-                    .filter(pos -> pLevel.getBlockState(pos).hasProperty(FlowCedarLikeBlock.INFUSED))
-                    .forEach(pos -> pLevel.setBlockAndUpdate(pos, pLevel.getBlockState(pos).setValue(FlowCedarLikeBlock.INFUSED, false)));
 
+            BlockPos.betweenClosedStream(b_pos.offset(-1, -1, -1), f_pos.offset(1, 1, 1))
+                    .filter(pos -> pos != pPos)
+                    .filter(pos -> pLevel.getBlockState(pos).hasProperty(TCBlockStateProperties.INFUSED))
+                    .forEach(pos -> pLevel.setBlockAndUpdate(pos, pLevel.getBlockState(pos).setValue(TCBlockStateProperties.INFUSED, false)));
         }
     }
 
@@ -141,5 +138,21 @@ public class WorldHelper {
             level.gameEvent(GameEvent.BLOCK_DESTROY, pPos, GameEvent.Context.of(player, blockstate));
         }
 
+    }
+
+    public static void destroyBlockSilent(Level level, BlockPos pos, Player player) {
+        BlockState blockstate = level.getBlockState(pos);
+
+        if (blockstate.isAir()) return;
+
+        FluidState fluidstate = level.getFluidState(pos);
+        if (!(blockstate.getBlock() instanceof BaseFireBlock)) {
+            level.levelEvent(2001, pos, Block.getId(blockstate));
+        }
+
+        BlockEntity blockentity = blockstate.hasBlockEntity() ? level.getBlockEntity(pos) : null;
+        dropResources(blockstate, level, pos, blockentity, player, ItemStack.EMPTY);
+
+        level.setBlock(pos, fluidstate.createLegacyBlock(), 3, 512);
     }
 }

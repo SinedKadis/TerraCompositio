@@ -1,4 +1,4 @@
-package net.sinedkadis.terracompositio.util.helpers;
+package net.sinedkadis.terracompositio.api.helpers;
 
 import net.minecraft.client.Camera;
 import net.minecraft.client.Minecraft;
@@ -21,11 +21,27 @@ import org.jetbrains.annotations.Nullable;
 import java.util.Optional;
 import java.util.function.Predicate;
 
+/**
+ * The Class with cool methods, that my mod use, related to {@link Player}.
+ */
 public class PlayerHelper {
+    /**
+     * Tries to add itemStack to player inventory, if fails - drops it. Do not add anything if in Creative mode
+     *
+     * @param pPlayer the player
+     * @param toAdd   the itemStack to add
+     */
     public static void addOrDropToPlayer(@NotNull Player pPlayer, ItemStack toAdd) {
         addOrDropToPlayer(pPlayer, toAdd, false);
     }
 
+    /**
+     * Tries to add itemStack to player inventory, if fails - drops it.
+     *
+     * @param pPlayer       the player
+     * @param toAdd         the itemStack to add
+     * @param addInCreative to add if in Creative Mode. If false, add only if not in Creative mode
+     */
     public static void addOrDropToPlayer(@NotNull Player pPlayer, ItemStack toAdd, boolean addInCreative) {
         if (addInCreative || !pPlayer.isCreative()) {
             if (!pPlayer.addItem(toAdd)) {
@@ -34,11 +50,25 @@ public class PlayerHelper {
         }
     }
 
+    /**
+     * Displays message in the center of the screen, that fades away after some time
+     *
+     * @param pPlayer           the player
+     * @param pMessageComponent the message component
+     */
     public static void message(Player pPlayer, Component pMessageComponent) {
         if (pPlayer instanceof ServerPlayer player)
             player.sendSystemMessage(pMessageComponent, true);
     }
 
+    /**
+     * Custom getter of entity hit result. I do not remember why I need it, but here it is
+     *
+     * @param mc     the minecraft instance
+     * @param player the player
+     * @param level  the level
+     * @return the entity hit result
+     */
     public static @Nullable EntityHitResult getEntityHitResult(Minecraft mc, LocalPlayer player, Level level) {
         EntityHitResult entityResult;
         Camera camera = mc.gameRenderer.getMainCamera();
@@ -63,6 +93,17 @@ public class PlayerHelper {
         return entityResult;
     }
 
+    /**
+     * I already so bored writing this, but that even not a half of API :(.
+     *
+     * @param worldIn     the world in
+     * @param projectile  the projectile
+     * @param startVec    the start vec
+     * @param endVec      the end vec
+     * @param boundingBox the bounding box
+     * @param filter      the filter
+     * @return the entity hit result
+     */
     public static @Nullable EntityHitResult getEntityHitResult(Level worldIn, Entity projectile, Vec3 startVec, Vec3 endVec, AABB boundingBox, Predicate<Entity> filter) {
         double d0 = Double.MAX_VALUE;
         Entity entity = null;
