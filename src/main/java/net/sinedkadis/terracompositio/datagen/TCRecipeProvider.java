@@ -467,8 +467,8 @@ public class TCRecipeProvider extends RecipeProvider implements IConditionBuilde
         ).save(pWriter,TerraCompositio.modLoc("flow_infusion/cfe_charge"));
         TechnetiumFiringRecipeBuilder.create(
                         TCItems.ECF_CHARGE.get(),
-                        10)
-                .save(pWriter, TerraCompositio.modLoc("firing/cfe_ball"));
+                        8)
+                .save(pWriter, TerraCompositio.modLoc("firing/cfe_charge"));
         oreSmelting(pWriter,
                 List.of(TCItems.ECF_CHARGE.get()),
                 RecipeCategory.MISC,

@@ -1,5 +1,5 @@
 {
   "type": "terracompositio:technetium_firing",
-  "cfe": 10,
+  "cfe": 8,
   "furnace_input": "terracompositio:ecf_charge"
 }

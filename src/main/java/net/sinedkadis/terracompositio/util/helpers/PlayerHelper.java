@@ -17,7 +17,6 @@ import net.minecraft.world.phys.HitResult;
 import net.minecraft.world.phys.Vec3;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
-import snownee.jade.util.CommonProxy;
 
 import java.util.Optional;
 import java.util.function.Predicate;
@@ -106,7 +105,7 @@ public class PlayerHelper {
                 }
             }
 
-            if (CommonProxy.isMultipartEntity(target) && !target.isPickable()) {
+            if (target.isMultipartEntity() && !target.isPickable()) {
                 return false;
             } else {
                 if (viewEntity instanceof Player player) {
