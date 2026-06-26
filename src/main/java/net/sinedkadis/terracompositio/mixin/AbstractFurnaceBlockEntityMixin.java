@@ -1,9 +1,8 @@
 package net.sinedkadis.terracompositio.mixin;
 
-import com.llamalad7.mixinextras.sugar.Local;
 import net.minecraft.core.BlockPos;
+import net.minecraft.world.Container;
 import net.minecraft.world.SimpleContainer;
-import net.minecraft.world.item.crafting.Recipe;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.AbstractFurnaceBlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
@@ -18,7 +17,8 @@ import java.util.Optional;
 import static net.sinedkadis.terracompositio.util.helpers.ECFHelper.placeCFECloud;
 
 @Mixin(AbstractFurnaceBlockEntity.class)
-public class AbstractFurnaceBlockEntityMixin {
+public abstract class AbstractFurnaceBlockEntityMixin implements Container {
+
     @Inject(
             method = "serverTick",
             at = @At(
@@ -32,16 +32,18 @@ public class AbstractFurnaceBlockEntityMixin {
             BlockPos pPos,
             BlockState pState,
             AbstractFurnaceBlockEntity pBlockEntity,
-            CallbackInfo ci,
-            @Local Recipe<?> recipe
+            CallbackInfo ci
     ) {
-        if (recipe != null) {
-            Optional<TechnetiumFiringRecipe> firingRecipe = pLevel.getRecipeManager().getRecipeFor(TechnetiumFiringRecipe.Type.INSTANCE,
-                    new SimpleContainer(pBlockEntity.getItem(0)),pLevel);
-            if (firingRecipe.isPresent()) {
-                int cfe = firingRecipe.get().getCfe();
-                placeCFECloud(pLevel, pPos, cfe);
-            }
+        Optional<TechnetiumFiringRecipe> firingRecipe = pLevel.getRecipeManager()
+                .getRecipeFor(
+                        TechnetiumFiringRecipe.Type.INSTANCE,
+                        new SimpleContainer(pBlockEntity.getItem(0)),
+                        pLevel
+                );
+
+        if (firingRecipe.isPresent()) {
+            int cfe = firingRecipe.get().getCfe();
+            placeCFECloud(pLevel, pPos, cfe);
         }
     }
 }
