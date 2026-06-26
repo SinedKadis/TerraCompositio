@@ -8,7 +8,7 @@ import net.minecraft.util.FastColor;
 import net.minecraft.world.item.ItemStack;
 import net.minecraftforge.client.IItemDecorator;
 import net.sinedkadis.terracompositio.api.TCCapabilities;
-import net.sinedkadis.terracompositio.api.networks.cfe.IECFHandler;
+import net.sinedkadis.terracompositio.api.networks.ecf.IECFHandler;
 import net.sinedkadis.terracompositio.mixin.accessors.GuiGraphicsAccessor;
 import org.jetbrains.annotations.NotNull;
 import org.joml.Matrix4f;
@@ -17,9 +17,9 @@ import java.util.Optional;
 
 import static net.minecraft.util.FastColor.ARGB32.*;
 
-public final class CFEBarRenderer implements IItemDecorator {
+public final class ECFBarRenderer implements IItemDecorator {
 
-    public static final CFEBarRenderer INSTANCE = new CFEBarRenderer();
+    public static final ECFBarRenderer INSTANCE = new ECFBarRenderer();
     private static final int BAR_W = 12;
 
     private static final int colorShadow = FastColor.ARGB32.color(255, 0, 0, 0);
@@ -28,7 +28,7 @@ public final class CFEBarRenderer implements IItemDecorator {
     private static final int colorBarLeftDepleted = FastColor.ARGB32.color(255, 122, 0, 0);
     private static final int colorBarRightDepleted = FastColor.ARGB32.color(255, 255, 27, 27);
 
-    private CFEBarRenderer() {
+    private ECFBarRenderer() {
     }
 
     public static void render(GuiGraphics graphics, int level, int xPosition, int yPosition, int offset,
@@ -54,7 +54,7 @@ public final class CFEBarRenderer implements IItemDecorator {
                                       int yPosition) {
 
 
-        int cfe = handler.getCFE();
+        int cfe = handler.getECF();
 
         boolean damaged = stack.isDamaged();
         if (!damaged && cfe > 0) {
@@ -62,7 +62,7 @@ public final class CFEBarRenderer implements IItemDecorator {
         }
 
 
-        renderElectricBar(graphics, cfe, handler.getMaxCFE(), xPosition, yPosition,
+        renderElectricBar(graphics, cfe, handler.getMaxECF(), xPosition, yPosition,
                 damaged);
 
 
@@ -103,7 +103,7 @@ public final class CFEBarRenderer implements IItemDecorator {
     public boolean render(@NotNull GuiGraphics guiGraphics, @NotNull Font font, ItemStack stack, int x, int y) {
         Optional<IECFHandler> handler = stack.getCapability(TCCapabilities.ECF).resolve();
         if (handler.isPresent()) {
-            CFEBarRenderer.renderBarsTool(guiGraphics, handler.get(), stack, x, y);
+            ECFBarRenderer.renderBarsTool(guiGraphics, handler.get(), stack, x, y);
             return true;
         }
         return true;

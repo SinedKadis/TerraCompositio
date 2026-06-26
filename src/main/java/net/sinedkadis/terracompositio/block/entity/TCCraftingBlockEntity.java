@@ -33,7 +33,7 @@ import java.util.Set;
 public abstract class TCCraftingBlockEntity extends TCBlockEntity implements WorldlyContainer, IHaveKnowledge {
     protected int progress = 0;
     protected int maxProgress;
-    protected float tickCFECost;
+    protected float tickECFCost;
 
     public TCCraftingBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
@@ -47,13 +47,14 @@ public abstract class TCCraftingBlockEntity extends TCBlockEntity implements Wor
         return progress>=maxProgress;
     }
 
-    private float partialCFE = 0;
-    protected void consumeCFE() {
-        int floorCFE = (int) Math.floor(tickCFECost);
-        partialCFE += tickCFECost- floorCFE;
-        int floorPart = (int) Math.floor(partialCFE);
-        partialCFE = partialCFE - floorPart;
-        this.getCapability(TCCapabilities.ECF).orElse(DummyECFHandler.instance).takeCFE(floorCFE+floorPart,false);
+    private float partialECF = 0;
+
+    protected void consumeECF() {
+        int floorECF = (int) Math.floor(tickECFCost);
+        partialECF += tickECFCost - floorECF;
+        int floorPart = (int) Math.floor(partialECF);
+        partialECF = partialECF - floorPart;
+        this.getCapability(TCCapabilities.ECF).orElse(DummyECFHandler.instance).takeECF(floorECF + floorPart, false);
     }
 
     @Override
@@ -182,7 +183,7 @@ public abstract class TCCraftingBlockEntity extends TCBlockEntity implements Wor
             data.putInt(TooltipHelper.Keys.PROGRESS.toData(), progress);
             data.putInt(TooltipHelper.Keys.MAX_PROGRESS.toData(), maxProgress);
         }
-        data.putFloat(TooltipHelper.Keys.CONSUME.toData(), tickCFECost * 20f);
+        data.putFloat(TooltipHelper.Keys.CONSUME.toData(), tickECFCost * 20f);
 
     }
 
@@ -193,7 +194,7 @@ public abstract class TCCraftingBlockEntity extends TCBlockEntity implements Wor
         added |= TooltipHelper.addIfExist(TooltipHelper.Keys.TIME_REMAINING, TooltipHelper.Units.SECONDS, tooltip, data);
         added |= TooltipHelper.addIfExist(TooltipHelper.Keys.PROGRESS, TooltipHelper.Units.SECONDS, tooltip, data);
         added |= TooltipHelper.addIfExist(TooltipHelper.Keys.MAX_PROGRESS, TooltipHelper.Units.SECONDS, tooltip, data);
-        added |= TooltipHelper.addIfExist(TooltipHelper.Keys.CONSUME, TooltipHelper.Units.CFE_SECOND, tooltip, data);
+        added |= TooltipHelper.addIfExist(TooltipHelper.Keys.CONSUME, TooltipHelper.Units.ECF_SECOND, tooltip, data);
         if (!added) tooltip.remove(tooltip.size() - 1);
         super.addTooltipLines(data, tooltip, isShifting);
     }

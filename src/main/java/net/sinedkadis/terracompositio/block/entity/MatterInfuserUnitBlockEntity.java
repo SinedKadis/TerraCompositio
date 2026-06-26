@@ -21,7 +21,7 @@ import net.minecraftforge.items.wrapper.EmptyHandler;
 import net.sinedkadis.terracompositio.api.TCCapabilities;
 import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBEBehaviour;
 import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBEECFBehaviour;
-import net.sinedkadis.terracompositio.api.networks.cfe.IECFHandler;
+import net.sinedkadis.terracompositio.api.networks.ecf.IECFHandler;
 import net.sinedkadis.terracompositio.block.behaviours.ECFHandlerBehaviour;
 import net.sinedkadis.terracompositio.block.behaviours.ItemStateHolderBehaviour;
 import net.sinedkadis.terracompositio.block.custom.MatterInfuserBaseEntityBlock;
@@ -106,13 +106,13 @@ public class MatterInfuserUnitBlockEntity extends MatterInfuserBaseBlockEntity{
             if (progress>0)
                 ParticleHelper.spawnParticlesIn(pLevel,
                         pPos.relative(pState.getValue(BlockStateProperties.HORIZONTAL_FACING).getOpposite()),
-                        ((int) Math.ceil(tickCFECost*20)));
+                        ((int) Math.ceil(tickECFCost * 20)));
 
         }
         timer--;
-        if(hasRecipe() && enoughCFE() && isAssembled){
+        if (hasRecipe() && enoughECF() && isAssembled) {
             increaseCraftingProgress();
-            consumeCFE();
+            consumeECF();
             setChanged(pLevel, pPos, pState);
 //            if (!pLevel.isClientSide){
 //                ((ServerLevel) pLevel).sendParticles(ModParticles.FLOW_STILL_PARTICLE.get(),pPos.getX()+0.5D,pPos.getY()+0.5D,pPos.getZ()+0.5D,3,0,-0.1D,0,0.1D);
@@ -183,8 +183,8 @@ public class MatterInfuserUnitBlockEntity extends MatterInfuserBaseBlockEntity{
         }
     }
 
-    protected boolean enoughCFE() {
-        return this.getCfeContainer().getCFE() >= Math.ceil(tickCFECost);
+    protected boolean enoughECF() {
+        return this.getEcfContainer().getECF() >= Math.ceil(tickECFCost);
     }
 
     protected boolean hasRecipe() {
@@ -202,7 +202,7 @@ public class MatterInfuserUnitBlockEntity extends MatterInfuserBaseBlockEntity{
         }
         if (outputTest && infusedTest) {
             maxProgress = matterInfusionRecipe.getTicks();
-            tickCFECost = matterInfusionRecipe.getCFETick();
+            tickECFCost = matterInfusionRecipe.getECFTick();
             catalystDecayRate = matterInfusionRecipe.getCatalystDecayRate();
         }
         return outputTest && infusedTest;
@@ -216,8 +216,8 @@ public class MatterInfuserUnitBlockEntity extends MatterInfuserBaseBlockEntity{
         throw new RuntimeException("Item handler not present: " + this);
     }
 
-    protected IECFHandler getCfeContainer() {
-        IBEECFBehaviour cfeBehaviour = getCFEBehaviour();
+    protected IECFHandler getEcfContainer() {
+        IBEECFBehaviour cfeBehaviour = getECFBehaviour();
         if (cfeBehaviour != null) {
             return cfeBehaviour.getMainHandler();
         }

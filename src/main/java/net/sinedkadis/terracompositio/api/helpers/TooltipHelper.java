@@ -140,7 +140,7 @@ public class TooltipHelper {
         BLOCKS,
         UNITS,
         MILIBUCKETS,
-        CFE_SECOND,
+        ECF_SECOND,
         SECONDS,
         CONSUMER,
         NO_UNITS,

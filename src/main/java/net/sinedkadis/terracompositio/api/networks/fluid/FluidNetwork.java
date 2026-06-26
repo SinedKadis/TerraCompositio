@@ -12,8 +12,9 @@ public interface FluidNetwork {
     void fireFluidNetworkEvent(FluidNetworkMemberBE source, NetworkAction action);
 
     //Existence checks
-    boolean isIn(Level pLevel, IFluidHandler cfeHandler);
-    boolean isIn(Level pLevel, FluidNetworkMemberBE cfeHandler);
+    boolean isIn(Level pLevel, IFluidHandler ecfHandler);
+
+    boolean isIn(Level pLevel, FluidNetworkMemberBE fluidHandler);
 
     void updateInRange(Level level, BlockPos origin, int range);
 

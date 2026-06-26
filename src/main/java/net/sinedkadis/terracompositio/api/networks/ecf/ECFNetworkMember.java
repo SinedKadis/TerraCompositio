@@ -1,4 +1,4 @@
-package net.sinedkadis.terracompositio.api.networks.cfe;
+package net.sinedkadis.terracompositio.api.networks.ecf;
 
 import net.minecraft.world.phys.Vec3;
 import net.sinedkadis.terracompositio.api.networks.AnyNetworkMember;
@@ -20,14 +20,17 @@ public interface ECFNetworkMember extends AnyNetworkMember {
 
     //Causeless updates
     void scheduleMemberUpdate();
-    default void onCFENetworkMemberUpdate(){}
+
+    default void onECFNetworkMemberUpdate() {
+    }
 
     //Update because of "updated"
     default void scheduleMemberUpdate(ECFNetworkMember updated){
         scheduleMemberUpdate();
     }
-    default void onCFENetworkMemberUpdate(ECFNetworkMember updated){
-        onCFENetworkMemberUpdate();
+
+    default void onECFNetworkMemberUpdate(ECFNetworkMember updated) {
+        onECFNetworkMemberUpdate();
     }
 
 

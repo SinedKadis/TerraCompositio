@@ -32,7 +32,7 @@ public class ECFBurstRenderer extends EntityRenderer<ECFBurstProjectileEntity> {
     public void render(ECFBurstProjectileEntity pEntity, float pEntityYaw, float pPartialTicks, PoseStack pPoseStack, MultiBufferSource pBuffer, int pPackedLight) {
         int tickCount = pEntity.tickCount;
         if (tickCount >= 1 || !(this.entityRenderDispatcher.camera.getEntity().distanceToSqr(pEntity) < MIN_CAMERA_DISTANCE_SQUARED)) {
-            int cfe = pEntity.getCFE();
+            int cfe = pEntity.getECF();
             int count = TCInnerConfig.RENDER_COUNT_FUNCTION.applyAsInt(cfe);
             Vector3f[] offsets1 = getOffsets(pEntity);
             if (offsets1 == null || offsets1.length < count) genOffsets(pEntity);
@@ -65,7 +65,7 @@ public class ECFBurstRenderer extends EntityRenderer<ECFBurstProjectileEntity> {
                 pPoseStack.mulPose(this.entityRenderDispatcher.cameraOrientation());
                 pPoseStack.mulPose(Axis.YP.rotationDegrees(180.0F));
 
-                ParticleHelper.drawCfeParticle(pPoseStack, pPackedLight, buffer);
+                ParticleHelper.drawEcfParticle(pPoseStack, pPackedLight, buffer);
 
                 pPoseStack.popPose();
             }
@@ -74,7 +74,7 @@ public class ECFBurstRenderer extends EntityRenderer<ECFBurstProjectileEntity> {
     }
 
     private void genOffsets(ECFBurstProjectileEntity entity) {
-        int cfe = entity.getCFE();
+        int cfe = entity.getECF();
         float count = TCInnerConfig.RENDER_COUNT_FUNCTION.applyAsInt(cfe);
         if (count > 100000) throw new RuntimeException("Particles amount is suspicious large: " + count);
         Vector3f[] offsets1 = getOffsets(entity);

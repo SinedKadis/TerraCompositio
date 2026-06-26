@@ -15,7 +15,10 @@ import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.network.PacketDistributor;
 import net.sinedkadis.terracompositio.api.TerraCompositioAPI;
 import net.sinedkadis.terracompositio.api.networks.NetworkAction;
-import net.sinedkadis.terracompositio.api.networks.cfe.*;
+import net.sinedkadis.terracompositio.api.networks.ecf.ECFNetworkMember;
+import net.sinedkadis.terracompositio.api.networks.ecf.ECFNetworkMemberBE;
+import net.sinedkadis.terracompositio.api.networks.ecf.ECFNetworkMemberEntity;
+import net.sinedkadis.terracompositio.api.networks.ecf.IECFHandler;
 import net.sinedkadis.terracompositio.ecf.burst.ECFBurstProjectileEntity;
 import net.sinedkadis.terracompositio.network.TCPackets;
 import net.sinedkadis.terracompositio.network.packets.S2CPlayerEcfContainerSync;
@@ -34,8 +37,8 @@ public class ECFContainer implements IECFHandler, INBTSerializable<CompoundTag> 
     @Getter
     protected int index = 0;
     @Getter
-    protected int CFE = 0;
-    protected int maxCFE = 64;
+    protected int ECF = 0;
+    protected int maxECF = 64;
     @Getter
     protected Function<Vec3, Vec3> offset = t -> t;
     protected int queued = 0;
@@ -44,8 +47,8 @@ public class ECFContainer implements IECFHandler, INBTSerializable<CompoundTag> 
     public String toString() {
         return "CFEContainer{" +
                 // "\n attachedMember=" + attachedMember +
-                ",\n CFE=" + CFE +
-                ",\n maxCFE=" + maxCFE +
+                ",\n CFE=" + ECF +
+                ",\n maxCFE=" + maxECF +
                 ",\n queued=" + queued +
                 ",\n index=" + index +
                 '}';
@@ -53,7 +56,7 @@ public class ECFContainer implements IECFHandler, INBTSerializable<CompoundTag> 
 
     @Override
     public void clear() {
-        CFE = 0;
+        ECF = 0;
         queued = 0;
     }
 
@@ -62,9 +65,17 @@ public class ECFContainer implements IECFHandler, INBTSerializable<CompoundTag> 
         if (attachedMember instanceof ECFNetworkMemberEntity) isEntity = true;
     }
 
-    public ECFContainer setMaxCFE(int max) {
-        this.maxCFE = max;
-        return this;
+    @Override
+    public int takeECF(int cfe, boolean simulate) {
+        int taken = Mth.clamp(cfe, 0, this.getECF());
+
+        if (!simulate) {
+            this.setECF(this.getECF() - taken);
+
+            sendCFEUpdate();
+            onContentsChanged();
+        }
+        return taken;
     }
 
     @Override
@@ -79,22 +90,9 @@ public class ECFContainer implements IECFHandler, INBTSerializable<CompoundTag> 
     }
 
     @Override
-    public int takeCFE(int cfe, boolean simulate) {
-        int taken = Mth.clamp(cfe, 0, getCFE());
-
-        if (!simulate) {
-            setCFE(getCFE() - taken);
-
-            sendCFEUpdate();
-            onContentsChanged();
-        }
-        return taken;
-    }
-
-    @Override
-    public int sendCFE(ECFNetworkMember target, int cfe, float speed, boolean simulate) {
+    public int sendECF(ECFNetworkMember target, int cfe, float speed, boolean simulate) {
         int freeSpace = target.getMainHandler().getFreeSpace();
-        int available = this.getCFE();
+        int available = this.getECF();
         int added = Mth.clamp(cfe, 0, Math.min(available, freeSpace));
         if (added < 1)
             return 0;
@@ -109,16 +107,29 @@ public class ECFContainer implements IECFHandler, INBTSerializable<CompoundTag> 
         return added;
     }
 
-    public int addCFE(int cfe, boolean simulate) {
-        int pMax = getMaxCFE() - getCFE();
+    public int addECF(int cfe, boolean simulate) {
+        int pMax = getMaxECF() - this.getECF();
         int added = Mth.clamp(cfe, 0, pMax);
         if (!simulate) {
-            setCFE(getCFE() + added);
+            this.setECF(this.getECF() + added);
 
             getAttachedMember().scheduleMemberUpdate();
             onContentsChanged();
         }
         return added;
+    }
+
+    protected void sendCFEUpdate() {
+        if (getAttachedMember() instanceof ECFNetworkMemberBE cfeNetworkMemberBE) {
+            TerraCompositioAPI.INSTANCE.getECFNetworkInstance().fireECFNetworkEvent(cfeNetworkMemberBE, NetworkAction.UPDATE);
+        }
+        if (isEntity) {
+            TerraCompositioAPI.INSTANCE.getECFNetworkInstance().fireECFNetworkEvent(getAttachedMember(), NetworkAction.UPDATE);
+            if (getAttachedMember() instanceof ServerPlayer serverPlayer) {
+                TCPackets.CHANNEL.send(PacketDistributor.PLAYER.with(() -> serverPlayer),
+                        new S2CPlayerEcfContainerSync(this.getECF()));
+            }
+        }
     }
 
 
@@ -133,17 +144,9 @@ public class ECFContainer implements IECFHandler, INBTSerializable<CompoundTag> 
         }
     }
 
-    protected void sendCFEUpdate() {
-        if (getAttachedMember() instanceof ECFNetworkMemberBE cfeNetworkMemberBE) {
-            TerraCompositioAPI.INSTANCE.getECFNetworkInstance().fireCFENetworkEvent(cfeNetworkMemberBE, NetworkAction.UPDATE);
-        }
-        if (isEntity) {
-            TerraCompositioAPI.INSTANCE.getECFNetworkInstance().fireCFENetworkEvent(getAttachedMember(), NetworkAction.UPDATE);
-            if (getAttachedMember() instanceof ServerPlayer serverPlayer) {
-                TCPackets.CHANNEL.send(PacketDistributor.PLAYER.with(() -> serverPlayer),
-                        new S2CPlayerEcfContainerSync(getCFE()));
-            }
-        }
+    @Override
+    public int getECFWithQueue() {
+        return this.getECF() + getQueued();
     }
 
     public void writeToNBT(CompoundTag pTag) {
@@ -160,33 +163,33 @@ public class ECFContainer implements IECFHandler, INBTSerializable<CompoundTag> 
         return queued;
     }
 
-    @Override
-    public int getCFEWithQueue() {
-        return getCFE() + getQueued();
-    }
-
     public boolean isEmpty() {
-        return !(this.getCFE() + getQueued() > 0);
+        return !(this.getECF() + getQueued() > 0);
     }
 
     @Override
     public int getFreeSpace() {
-        return getMaxCFE() - (getCFE() + getQueued());
+        return getMaxECF() - (this.getECF() + getQueued());
     }
 
     @Override
     public CompoundTag serializeNBT() {
         CompoundTag nbt = new CompoundTag();
-        nbt.putInt("CFE", getCFE());
+        nbt.putInt("CFE", this.getECF());
         return nbt;
     }
 
     @Override
     public void deserializeNBT(CompoundTag tag) {
-        setCFE(tag.getInt("CFE"));
+        this.setECF(tag.getInt("CFE"));
     }
 
-    public int getMaxCFE() {
-        return Math.max(this.maxCFE, this.CFE);
+    public int getMaxECF() {
+        return Math.max(this.maxECF, this.ECF);
+    }
+
+    public ECFContainer setMaxECF(int max) {
+        this.maxECF = max;
+        return this;
     }
 }

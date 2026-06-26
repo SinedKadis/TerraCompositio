@@ -35,7 +35,7 @@ public class TimePassageDesorberBlockEntity extends AbstractDesorberBlockEntity 
         if (timeReSetter <= 1) {
             timeReSetter = 20;
             if (pLevel.hasNeighborSignal(pPos)){
-                addingCFEProcess();
+                addingECFProcess();
             }else if (isEnoughFluid()) {
                 addingTimeProcess(pLevel);
             }
@@ -56,12 +56,12 @@ public class TimePassageDesorberBlockEntity extends AbstractDesorberBlockEntity 
         }
     }
 
-    private void addingCFEProcess() {
+    private void addingECFProcess() {
         timeCounter = 0;
         if (timeBuffer > 20) {
-            timeBuffer -= cfeContainer().addCFE(20, false);
+            timeBuffer -= ecfContainer().addECF(20, false);
         } else if (timeBuffer > 0){
-            timeBuffer -= cfeContainer().addCFE(timeBuffer,false);
+            timeBuffer -= ecfContainer().addECF(timeBuffer, false);
         }
     }
 

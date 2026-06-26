@@ -14,7 +14,7 @@ import org.spongepowered.asm.mixin.injection.callback.CallbackInfo;
 
 import java.util.Optional;
 
-import static net.sinedkadis.terracompositio.util.helpers.ECFHelper.placeCFECloud;
+import static net.sinedkadis.terracompositio.util.helpers.ECFHelper.placeECFCloud;
 
 @Mixin(AbstractFurnaceBlockEntity.class)
 public abstract class AbstractFurnaceBlockEntityMixin implements Container {
@@ -42,8 +42,8 @@ public abstract class AbstractFurnaceBlockEntityMixin implements Container {
                 );
 
         if (firingRecipe.isPresent()) {
-            int cfe = firingRecipe.get().getCfe();
-            placeCFECloud(pLevel, pPos, cfe);
+            int ecf = firingRecipe.get().getEcf();
+            placeECFCloud(pLevel, pPos, ecf);
         }
     }
 }

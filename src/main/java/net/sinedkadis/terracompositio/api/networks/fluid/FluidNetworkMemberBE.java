@@ -7,7 +7,7 @@ import net.sinedkadis.terracompositio.api.networks.AnyNetworkMember;
 
 
 public interface FluidNetworkMemberBE extends AnyNetworkMember {
-    //Cfe Handler reference
+    //Fluid Handler reference
     IFluidHandler getMainHandler();
 
     //Updates

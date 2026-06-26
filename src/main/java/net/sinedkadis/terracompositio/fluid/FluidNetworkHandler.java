@@ -44,8 +44,8 @@ public class FluidNetworkHandler implements FluidNetwork {
     }
 
     @Override
-    public boolean isIn(Level pLevel, FluidNetworkMemberBE fluidNetworkMemberBE) {
-        return fluidSources.getOrDefault(pLevel, Collections.emptySet()).stream().anyMatch(fluidSource -> fluidSource.equals(fluidNetworkMemberBE));
+    public boolean isIn(Level pLevel, FluidNetworkMemberBE fluidHandler) {
+        return fluidSources.getOrDefault(pLevel, Collections.emptySet()).stream().anyMatch(fluidSource -> fluidSource.equals(fluidHandler));
     }
 
     @Override

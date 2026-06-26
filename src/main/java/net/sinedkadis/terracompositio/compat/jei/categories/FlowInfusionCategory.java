@@ -71,20 +71,20 @@ public class FlowInfusionCategory implements IRecipeCategory<FlowInfusionRecipe>
     }
 
     @Override
-    public void setRecipe(IRecipeLayoutBuilder iRecipeLayoutBuilder, FlowInfusionRecipe flowSaturationRecipe, @NotNull IFocusGroup iFocusGroup) {
+    public void setRecipe(IRecipeLayoutBuilder iRecipeLayoutBuilder, FlowInfusionRecipe flowSaturationRecipe, IFocusGroup iFocusGroup) {
         iRecipeLayoutBuilder.addSlot(RecipeIngredientRole.INPUT,41,16).addIngredients(flowSaturationRecipe.getIngredients().get(0));
         iRecipeLayoutBuilder.addSlot(RecipeIngredientRole.OUTPUT,121,48).addItemStack(flowSaturationRecipe.getResultItem(null));
     }
 
     @Override
-    public void draw(FlowInfusionRecipe recipe, @NotNull IRecipeSlotsView recipeSlotsView, GuiGraphics guiGraphics, double mouseX, double mouseY) {
+    public void draw(FlowInfusionRecipe recipe, IRecipeSlotsView recipeSlotsView, GuiGraphics guiGraphics, double mouseX, double mouseY) {
         background.draw(guiGraphics);
         animatedArrow.draw(guiGraphics,47,35);
-        String cfe = "CFE: "+ recipe.getCfe();
-        String cfe_t = "CFE/t: "+ recipe.getCFETick();
+        String ecf = "ECF: " + recipe.getEcf();
+        String ecf_t = "ECF/t: " + recipe.getECFTick();
         String duration = "Duration: " + recipe.getTicks() / 20f + " s.";
-        guiGraphics.drawString(Minecraft.getInstance().font,cfe,5,50, Color.WHITE.getRGB());
-        guiGraphics.drawString(Minecraft.getInstance().font,cfe_t,5,60, Color.WHITE.getRGB());
+        guiGraphics.drawString(Minecraft.getInstance().font, ecf, 5, 50, Color.WHITE.getRGB());
+        guiGraphics.drawString(Minecraft.getInstance().font, ecf_t, 5, 60, Color.WHITE.getRGB());
         guiGraphics.drawString(Minecraft.getInstance().font,duration,5,70, Color.WHITE.getRGB());
     }
 

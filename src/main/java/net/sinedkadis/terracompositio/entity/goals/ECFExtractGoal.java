@@ -9,8 +9,8 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.event.ForgeEventFactory;
 import net.sinedkadis.terracompositio.api.TCCapabilities;
 import net.sinedkadis.terracompositio.api.TerraCompositioAPI;
-import net.sinedkadis.terracompositio.api.networks.cfe.ECFNetworkMember;
-import net.sinedkadis.terracompositio.api.networks.cfe.IECFHandler;
+import net.sinedkadis.terracompositio.api.networks.ecf.ECFNetworkMember;
+import net.sinedkadis.terracompositio.api.networks.ecf.IECFHandler;
 import net.sinedkadis.terracompositio.entity.custom.FlowCedarEntEntity;
 import net.sinedkadis.terracompositio.registries.TCBlockStateProperties;
 import net.sinedkadis.terracompositio.registries.TCTags;
@@ -55,8 +55,8 @@ public class ECFExtractGoal extends Goal {
         cachedHeld = mob.getCapability(TCCapabilities.ECF).resolve().orElse(null);
         cachedInner = mob.getInnerECFOptional().resolve().orElse(null);
 
-        if (cachedInner == null || cachedInner.getCFE() >= 6) return false;
-        if (!isCFEQueueEmpty()) return false;
+        if (cachedInner == null || cachedInner.getECF() >= 6) return false;
+        if (!isECFQueueEmpty()) return false;
 
         targetMember = searchMember();
         if (targetMember != null) return true;
@@ -86,16 +86,16 @@ public class ECFExtractGoal extends Goal {
 
         for (ECFNetworkMember member : TerraCompositioAPI.instance()
                 .getECFNetworkInstance()
-                .getAllCFENetworkMembers(level)) {
+                .getAllECFNetworkMembers(level)) {
 
             if (!ECFHelper.validMember(member)) continue;
             if (!member.getPos().closerThan(mobPos, extractRange)) continue;
             if (member.getEntity().equals(mob)) continue;
-            if (member.getMainHandler().getCFE() <= 0) continue;
+            if (member.getMainHandler().getECF() <= 0) continue;
 
             if (member instanceof FlowCedarEntEntity ent) {
                 boolean hasEnough = ent.getCapability(TCCapabilities.ECF)
-                        .filter(h -> h.getCFE() > 1000)
+                        .filter(h -> h.getECF() > 1000)
                         .isPresent();
                 if (!hasEnough) continue;
             }
@@ -125,10 +125,10 @@ public class ECFExtractGoal extends Goal {
 
     @Override
     public boolean canContinueToUse() {
-        return this.extractAnimationTick > 0 || !isCFEQueueEmpty();
+        return this.extractAnimationTick > 0 || !isECFQueueEmpty();
     }
 
-    private boolean isCFEQueueEmpty() {
+    private boolean isECFQueueEmpty() {
         IECFHandler held = cachedHeld != null
                 ? cachedHeld
                 : mob.getCapability(TCCapabilities.ECF).resolve().orElse(null);
@@ -137,7 +137,7 @@ public class ECFExtractGoal extends Goal {
                 : mob.getInnerECFOptional().resolve().orElse(null);
 
         if (held == null || inner == null) return true;
-        return held.getCFE() + held.getQueued() + inner.getQueued() <= 0;
+        return held.getECF() + held.getQueued() + inner.getQueued() <= 0;
     }
 
     @Override
@@ -170,7 +170,7 @@ public class ECFExtractGoal extends Goal {
             }
         }
 
-        if (this.extractAnimationTick < 20 && isCFEQueueEmpty()) {
+        if (this.extractAnimationTick < 20 && isECFQueueEmpty()) {
             this.mob.setExtracting(false);
         }
     }
@@ -182,7 +182,7 @@ public class ECFExtractGoal extends Goal {
                 && blockState.getValue(TCBlockStateProperties.INFUSED)) {
             level.setBlockAndUpdate(targetPosition,
                     blockState.setValue(TCBlockStateProperties.INFUSED, false));
-            cachedHeld.addCFE(100, false);
+            cachedHeld.addECF(100, false);
         }
     }
 }

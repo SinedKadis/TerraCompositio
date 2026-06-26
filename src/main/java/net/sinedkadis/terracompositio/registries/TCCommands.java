@@ -17,7 +17,9 @@ import net.minecraftforge.network.PacketDistributor;
 import net.sinedkadis.terracompositio.TerraCompositio;
 import net.sinedkadis.terracompositio.api.TCCapabilities;
 import net.sinedkadis.terracompositio.api.TerraCompositioAPI;
-import net.sinedkadis.terracompositio.api.networks.cfe.*;
+import net.sinedkadis.terracompositio.api.networks.ecf.ECFNetworkMember;
+import net.sinedkadis.terracompositio.api.networks.ecf.ECFNetworkMemberEntity;
+import net.sinedkadis.terracompositio.api.networks.ecf.IECFHandler;
 import net.sinedkadis.terracompositio.network.TCPackets;
 import net.sinedkadis.terracompositio.network.packets.S2CPlayerEcfContainerSync;
 
@@ -46,14 +48,14 @@ public class TCCommands {
                                         })
                         .then(
                                 Commands.literal("clear-ecf-data")
-                                        .executes(TCCommands::clearCFEData)
+                                        .executes(TCCommands::clearECFData)
                         )
                         .then(
                                 Commands.argument("clear-ecf-data", EntityArgument.entity()))
                         .executes(ctx -> {
                             Entity entity = EntityArgument
                                     .getEntity(ctx,"ecf network member entity");
-                            return TCCommands.clearCFEData(ctx,entity);
+                            return TCCommands.clearECFData(ctx, entity);
                         })
                         .then(
                                 Commands.literal("clear-all-queues")
@@ -63,13 +65,13 @@ public class TCCommands {
     }
 
     private static int clearAllQueues(CommandContext<CommandSourceStack> ctx) {
-        TerraCompositioAPI.instance().getECFNetworkInstance().getAllCFENetworkMembers(ctx.getSource().getLevel()).stream()
+        TerraCompositioAPI.instance().getECFNetworkInstance().getAllECFNetworkMembers(ctx.getSource().getLevel()).stream()
                 .map(ECFNetworkMember::getMainHandler)
                 .forEach(iEcfHandler -> iEcfHandler.setQueued(0));
         return 0;
     }
 
-    private static int clearCFEData(CommandContext<CommandSourceStack> ctx, Entity... entities) {
+    private static int clearECFData(CommandContext<CommandSourceStack> ctx, Entity... entities) {
         CommandSourceStack source = ctx.getSource();
         ECFNetworkMemberEntity memberEntity;
         if (Arrays.stream(entities).toList().isEmpty()) {
@@ -92,7 +94,7 @@ public class TCCommands {
         mainHandler.clear();
         if (memberEntity instanceof ServerPlayer serverPlayer) {
             TCPackets.CHANNEL.send(PacketDistributor.PLAYER.with(() -> serverPlayer),
-                    new S2CPlayerEcfContainerSync(mainHandler.getCFE()));
+                    new S2CPlayerEcfContainerSync(mainHandler.getECF()));
         }
 
         NonNullSupplier<Exception> exception = Exception::new;

@@ -1,7 +1,7 @@
 package net.sinedkadis.terracompositio.ecf;
 
 import net.minecraft.util.Mth;
-import net.sinedkadis.terracompositio.api.networks.cfe.ECFNetworkMember;
+import net.sinedkadis.terracompositio.api.networks.ecf.ECFNetworkMember;
 import net.sinedkadis.terracompositio.ecf.burst.ECFBurstProjectileEntity;
 import org.jetbrains.annotations.NotNull;
 
@@ -11,7 +11,7 @@ public class LimitlessECFContainer extends ECFContainer {
     }
 
     @Override
-    public int sendCFE(@NotNull ECFNetworkMember target, int cfe, float speed, boolean simulate) {
+    public int sendECF(@NotNull ECFNetworkMember target, int cfe, float speed, boolean simulate) {
         int freeSpace = target.getMainHandler().getFreeSpace();
         int added = Mth.clamp(cfe, 0, freeSpace);
         if (added < 1)
@@ -31,7 +31,7 @@ public class LimitlessECFContainer extends ECFContainer {
     }
 
     @Override
-    public int getMaxCFE() {
+    public int getMaxECF() {
         return Integer.MAX_VALUE;
     }
 }

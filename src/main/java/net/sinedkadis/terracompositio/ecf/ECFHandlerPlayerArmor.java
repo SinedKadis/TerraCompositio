@@ -9,8 +9,8 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.util.LazyOptional;
 import net.sinedkadis.terracompositio.api.TCCapabilities;
 import net.sinedkadis.terracompositio.api.dummies.DummyECFHandler;
-import net.sinedkadis.terracompositio.api.networks.cfe.ECFNetworkMember;
-import net.sinedkadis.terracompositio.api.networks.cfe.IECFHandler;
+import net.sinedkadis.terracompositio.api.networks.ecf.ECFNetworkMember;
+import net.sinedkadis.terracompositio.api.networks.ecf.IECFHandler;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.function.Function;
@@ -50,43 +50,43 @@ public class ECFHandlerPlayerArmor implements IECFHandler {
     }
 
     @Override
-    public int getCFE() {
-        int toReturn = handler.getCFE();
+    public int getECF() {
+        int toReturn = handler.getECF();
         for (ItemStack itemStack : handlerList) {
             IECFHandler IECFHandler = itemStack.getCapability(TCCapabilities.ECF).orElse(DummyECFHandler.instance);
-            toReturn += IECFHandler.getCFE();
+            toReturn += IECFHandler.getECF();
         }
         return toReturn;
     }
 
     @Override
-    public void setCFE(int cfe) {
-        handler.setCFE(cfe);
+    public void setECF(int cfe) {
+        handler.setECF(cfe);
     }
 
     @Override
-    public int getMaxCFE() {
-        int toReturn = handler.getMaxCFE();
+    public int getMaxECF() {
+        int toReturn = handler.getMaxECF();
         for (ItemStack itemStack : handlerList) {
             IECFHandler IECFHandler = itemStack.getCapability(TCCapabilities.ECF).orElse(DummyECFHandler.instance);
-            toReturn += IECFHandler.getMaxCFE();
+            toReturn += IECFHandler.getMaxECF();
         }
         return toReturn;
     }
 
     @Override
-    public IECFHandler setMaxCFE(int max) {
-        handler.setMaxCFE(max);
+    public IECFHandler setMaxECF(int max) {
+        handler.setMaxECF(max);
         return this;
     }
 
     @Override
-    public int addCFE(int cfe, boolean simulate) {
+    public int addECF(int cfe, boolean simulate) {
         int allAdded = 0;
-        int toAdd = cfe - handler.addCFE(cfe, false);
+        int toAdd = cfe - handler.addECF(cfe, false);
         for (ItemStack itemStack : handlerList) {
             IECFHandler IECFHandler = itemStack.getCapability(TCCapabilities.ECF).orElse(DummyECFHandler.instance);
-            int added = IECFHandler.addCFE(toAdd, simulate);
+            int added = IECFHandler.addECF(toAdd, simulate);
             allAdded += added;
             toAdd -= added;
         }
@@ -94,12 +94,12 @@ public class ECFHandlerPlayerArmor implements IECFHandler {
     }
 
     @Override
-    public int takeCFE(int cfe, boolean simulate) {
+    public int takeECF(int cfe, boolean simulate) {
         int allTaken = 0;
-        int toTake = cfe - handler.takeCFE(cfe, false);
+        int toTake = cfe - handler.takeECF(cfe, false);
         for (ItemStack itemStack : handlerList) {
             IECFHandler IECFHandler = itemStack.getCapability(TCCapabilities.ECF).orElse(DummyECFHandler.instance);
-            int taken = IECFHandler.takeCFE(toTake, simulate);
+            int taken = IECFHandler.takeECF(toTake, simulate);
             allTaken += taken;
             toTake -= taken;
         }
@@ -107,7 +107,7 @@ public class ECFHandlerPlayerArmor implements IECFHandler {
     }
 
     @Override
-    public int sendCFE(ECFNetworkMember target, int cfe, float speed, boolean simulate) {
+    public int sendECF(ECFNetworkMember target, int cfe, float speed, boolean simulate) {
         throw new UnsupportedOperationException();
     }
 
@@ -132,8 +132,8 @@ public class ECFHandlerPlayerArmor implements IECFHandler {
     }
 
     @Override
-    public int getCFEWithQueue() {
-        return getCFE() + queued;
+    public int getECFWithQueue() {
+        return getECF() + queued;
     }
 
     @Override

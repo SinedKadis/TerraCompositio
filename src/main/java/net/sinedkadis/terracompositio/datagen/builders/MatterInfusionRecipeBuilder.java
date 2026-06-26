@@ -24,16 +24,16 @@ public class MatterInfusionRecipeBuilder implements RecipeBuilder {
     private final ItemStack output;
     private final ItemStack input;
     private final Item catalyst;
-    private final int cfe;
+    private final int ecf;
     private final int time;
     private final int rate;
     private final Advancement.Builder advancement = Advancement.Builder.advancement();
 
-    private MatterInfusionRecipeBuilder(ItemStack input,ItemStack output, Item catalyst, int cfe, int time, int rate) {
+    private MatterInfusionRecipeBuilder(ItemStack input, ItemStack output, Item catalyst, int ecf, int time, int rate) {
         this.output = output;
         this.input = input;
         this.catalyst = catalyst;
-        this.cfe = cfe;
+        this.ecf = ecf;
         this.time = time;
         this.rate = rate;
     }
@@ -69,7 +69,7 @@ public class MatterInfusionRecipeBuilder implements RecipeBuilder {
     public void save(@NotNull Consumer<FinishedRecipe> consumer, @NotNull ResourceLocation resourceLocation) {
         if (hasCriteria())
             this.advancement.parent(Objects.requireNonNull(ResourceLocation.tryParse("recipes/root"))).addCriterion("has_the_recipe", RecipeUnlockedTrigger.unlocked(resourceLocation)).rewards(net.minecraft.advancements.AdvancementRewards.Builder.recipe(resourceLocation)).requirements(RequirementsStrategy.OR);
-        consumer.accept(new Result(output,input,catalyst,cfe,time,rate, resourceLocation, advancement));
+        consumer.accept(new Result(output, input, catalyst, ecf, time, rate, resourceLocation, advancement));
     }
 
     public static class Result implements FinishedRecipe {
@@ -77,17 +77,17 @@ public class MatterInfusionRecipeBuilder implements RecipeBuilder {
         private final ItemStack output;
         private final ItemStack input;
         private final Item catalyst;
-        private final int cfe;
+        private final int ecf;
         private final int time;
         private final int rate;
         private final ResourceLocation id;
         private final Advancement.Builder advancement;
 
-        public Result(ItemStack output, ItemStack input, Item catalyst, int cfe, int time, int rate, ResourceLocation id, Advancement.Builder advancement) {
+        public Result(ItemStack output, ItemStack input, Item catalyst, int ecf, int time, int rate, ResourceLocation id, Advancement.Builder advancement) {
             this.output = output;
             this.input = input;
             this.catalyst = catalyst;
-            this.cfe = cfe;
+            this.ecf = ecf;
             this.time = time;
             this.rate = rate;
             this.id = id;
@@ -117,7 +117,7 @@ public class MatterInfusionRecipeBuilder implements RecipeBuilder {
             outputObj.addProperty("item",Objects.requireNonNull(ForgeRegistries.ITEMS.getKey(output.getItem())).toString());
             jsonObject.add("output",outputObj);
 
-            jsonObject.addProperty("cfe",cfe);
+            jsonObject.addProperty("ecf", ecf);
             jsonObject.addProperty("time",time);
             jsonObject.addProperty("rate",rate);
         }

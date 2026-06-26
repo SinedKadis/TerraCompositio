@@ -8,9 +8,9 @@ import net.sinedkadis.terracompositio.network.ClientPacketHandlers;
 import java.util.function.Supplier;
 
 
-public record S2CPlayerEcfContainerSync(int cfe) {
+public record S2CPlayerEcfContainerSync(int ecf) {
     public static void encode(S2CPlayerEcfContainerSync msg, FriendlyByteBuf buf) {
-        buf.writeVarInt(msg.cfe);
+        buf.writeVarInt(msg.ecf);
     }
 
     public static S2CPlayerEcfContainerSync decode(FriendlyByteBuf buf) {
@@ -21,7 +21,7 @@ public record S2CPlayerEcfContainerSync(int cfe) {
     public static void handle(S2CPlayerEcfContainerSync msg, Supplier<NetworkEvent.Context> ctx) {
         ctx.get().enqueueWork(() -> {
             if (ctx.get().getDirection().getReceptionSide() == LogicalSide.CLIENT) {
-                ClientPacketHandlers.handlePlayerCfeSync(msg);
+                ClientPacketHandlers.handlePlayerEcfSync(msg);
             }
         });
         ctx.get().setPacketHandled(true);

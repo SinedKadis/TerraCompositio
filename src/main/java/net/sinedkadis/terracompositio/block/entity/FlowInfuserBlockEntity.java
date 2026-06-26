@@ -12,7 +12,7 @@ import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.wrapper.EmptyHandler;
 import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBEBehaviour;
-import net.sinedkadis.terracompositio.api.networks.cfe.IECFHandler;
+import net.sinedkadis.terracompositio.api.networks.ecf.IECFHandler;
 import net.sinedkadis.terracompositio.block.behaviours.ECFHandlerBehaviour;
 import net.sinedkadis.terracompositio.block.behaviours.ItemHandlerBehaviour;
 import net.sinedkadis.terracompositio.config.TCInnerConfig;
@@ -59,9 +59,9 @@ public class FlowInfuserBlockEntity extends TCCraftingBlockEntity {
     public void tick(Level pLevel, BlockPos pPos, BlockState pState) {
         super.tick(pLevel, pPos, pState);
         if (!pLevel.isClientSide) {
-            if (hasRecipe() && enoughCFE()) {
+            if (hasRecipe() && enoughECF()) {
                 increaseCraftingProgress();
-                consumeCFE();
+                consumeECF();
                 setChanged(pLevel, pPos, pState);
                 spawnParticles();
                 if (hasProgressFinished()) {
@@ -74,9 +74,9 @@ public class FlowInfuserBlockEntity extends TCCraftingBlockEntity {
         }
     }
 
-    public boolean enoughCFE() {
-        int cfe = cfeContainer().getCFE();
-        return cfe > tickCFECost;
+    public boolean enoughECF() {
+        int ecf = ecfContainer().getECF();
+        return ecf > tickECFCost;
     }
 
     public boolean hasRecipe() {
@@ -88,7 +88,7 @@ public class FlowInfuserBlockEntity extends TCCraftingBlockEntity {
         boolean outputTest = enoughSpaceInOutput(result.getCount()) && sameItemInOutput(result.getItem());
         if (outputTest){
             maxProgress = recipe.get().getTicks();
-            tickCFECost = recipe.get().getCFETick();
+            tickECFCost = recipe.get().getECFTick();
         }
         return outputTest;
     }
@@ -108,7 +108,7 @@ public class FlowInfuserBlockEntity extends TCCraftingBlockEntity {
         return (IItemHandlerModifiable) getCapability(ForgeCapabilities.ITEM_HANDLER).orElse(EmptyHandler.INSTANCE);
     }
 
-    protected IECFHandler cfeContainer() {
+    protected IECFHandler ecfContainer() {
         return ((ECFHandlerBehaviour) behaviours.get(0)).getMainHandler();
     }
 

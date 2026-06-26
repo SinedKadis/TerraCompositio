@@ -41,13 +41,16 @@ import net.sinedkadis.terracompositio.api.TerraCompositioAPI;
 import net.sinedkadis.terracompositio.api.dummies.DummyECFHandler;
 import net.sinedkadis.terracompositio.api.helpers.TooltipHelper;
 import net.sinedkadis.terracompositio.api.networks.NetworkAction;
-import net.sinedkadis.terracompositio.api.networks.cfe.*;
+import net.sinedkadis.terracompositio.api.networks.ecf.ECFNetwork;
+import net.sinedkadis.terracompositio.api.networks.ecf.ECFNetworkMember;
+import net.sinedkadis.terracompositio.api.networks.ecf.ECFNetworkMemberEntity;
+import net.sinedkadis.terracompositio.api.networks.ecf.IECFHandler;
 import net.sinedkadis.terracompositio.block.entity.EntStatueBlockEntity;
-import net.sinedkadis.terracompositio.ecf.ECFContainer;
-import net.sinedkadis.terracompositio.ecf.PPECFMemberProxy;
 import net.sinedkadis.terracompositio.config.TCClientConfigs;
 import net.sinedkadis.terracompositio.config.TCCommonConfigs;
 import net.sinedkadis.terracompositio.config.TCInnerConfig;
+import net.sinedkadis.terracompositio.ecf.ECFContainer;
+import net.sinedkadis.terracompositio.ecf.PPECFMemberProxy;
 import net.sinedkadis.terracompositio.entity.goals.ECFExtractGoal;
 import net.sinedkadis.terracompositio.entity.goals.ECFHoldGoal;
 import net.sinedkadis.terracompositio.entity.goals.ReachSourceGoal;
@@ -72,25 +75,23 @@ public class FlowCedarEntEntity extends AbstractGolem implements ECFNetworkMembe
             SynchedEntityData.defineId(FlowCedarEntEntity.class, EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<Boolean> HOLDING =
             SynchedEntityData.defineId(FlowCedarEntEntity.class, EntityDataSerializers.BOOLEAN);
-    private static final EntityDataAccessor<Integer> CFE_DATA =
+    private static final EntityDataAccessor<Integer> ECF_DATA =
             SynchedEntityData.defineId(FlowCedarEntEntity.class, EntityDataSerializers.INT);
-
+    public final AnimationState ecfHoldState = new AnimationState();
     protected LazyOptional<IECFHandler> lazyCFEOptional = LazyOptional.of(() -> new ECFContainer(this)
-            .setMaxCFE(10000)
-            .setOffset(vec3 -> vec3.add(0,this.getBbHeight() + (0.1f + (this.getSyncedCFE() / 10000d)) * 10 * 0.2f,0))
+            .setMaxECF(10000)
+            .setOffset(vec3 -> vec3.add(0, this.getBbHeight() + (0.1f + (this.getSyncedECF() / 10000d)) * 10 * 0.2f, 0))
             .setIndex(0));
     @Getter
     protected LazyOptional<IECFHandler> innerECFOptional = LazyOptional.of(() -> new ECFContainer(this)
-            .setMaxCFE(100)
+            .setMaxECF(100)
             .setOffset(vec3 -> vec3.add(0,1,0))
             .setIndex(1));
-
-    @Getter
-    public final List<LazyOptional<IECFHandler>> cfeHandlers = List.of(lazyCFEOptional, innerECFOptional);
     public final AnimationState idleAnimationState = new AnimationState();
     public final AnimationState extractionAnimationState = new AnimationState();
     public final AnimationState extractionCompleteAnimationState = new AnimationState();
-    public final AnimationState cfeHoldState = new AnimationState();
+    @Getter
+    public final List<LazyOptional<IECFHandler>> ecfHandlers = List.of(lazyCFEOptional, innerECFOptional);
 
     protected int scheduledMembersUpdate = -1;
     protected Set<PPECFMemberProxy> scheduledMembers = new HashSet<>();
@@ -114,6 +115,7 @@ public class FlowCedarEntEntity extends AbstractGolem implements ECFNetworkMembe
     }
 
     private int lastSyncedEnergy = -1;
+
     @Override
     public void tick() {
         super.tick();
@@ -127,39 +129,39 @@ public class FlowCedarEntEntity extends AbstractGolem implements ECFNetworkMembe
             ECFNetwork ECFNetworkInstance = TerraCompositioAPI.instance().getECFNetworkInstance();
             boolean inNetwork = ECFNetworkInstance.isIn(this.level(), this);
             if (!inNetwork && !this.isRemoved()) {
-                ECFNetworkInstance.fireCFENetworkEvent(this, NetworkAction.ADD);
+                ECFNetworkInstance.fireECFNetworkEvent(this, NetworkAction.ADD);
             }
 
             lazyCFEOptional.ifPresent(icfeHandler -> {
-                int currentEnergy = icfeHandler.getCFE();
+                int currentEnergy = icfeHandler.getECF();
 
-                if (currentEnergy > 10000) abortCFEConsume();
+                if (currentEnergy > 10000) abortECFConsume();
 
                 if (currentEnergy != lastSyncedEnergy) {
-                    setSyncedCFE(currentEnergy);
+                    setSyncedECF(currentEnergy);
                     lastSyncedEnergy = currentEnergy;
                 }
 
                 innerECFOptional.ifPresent(icfeHandler1 -> {
                     if (tickCount % 20 == 0) {
-                        int cfe = TCCommonConfigs.CFE_PER_BURST_TRANSFER_LIMIT.get();
-                        int taken = icfeHandler.takeCFE(cfe, false);
-                        icfeHandler1.addCFE(
+                        int cfe = TCCommonConfigs.ECF_PER_BURST_TRANSFER_LIMIT.get();
+                        int taken = icfeHandler.takeECF(cfe, false);
+                        icfeHandler1.addECF(
                                 taken,
                                 false
                         );
                         if (taken > 0) {
                             if (getLevel() instanceof ServerLevel serverLevel)
-                                ParticleHelper.sendCFEParticles(
+                                ParticleHelper.sendECFParticles(
                                         serverLevel,
                                         icfeHandler1.getOffset().apply(position()),
                                         icfeHandler.getOffset().apply(position()),
-                                        (int) Math.floor(cfe * TCClientConfigs.CFE_RENDER_MULTIPLIER.get()));
+                                        (int) Math.floor(cfe * TCClientConfigs.ECF_RENDER_MULTIPLIER.get()));
                         }
                     }
                     if (tickCount % 200 == 0) {
-                        icfeHandler1.takeCFE(1, false);
-                        if (icfeHandler1.getCFE() <= 0) {
+                        icfeHandler1.takeECF(1, false);
+                        if (icfeHandler1.getECF() <= 0) {
                             this.turnIntoStatue();
                         }
                     }
@@ -212,7 +214,7 @@ public class FlowCedarEntEntity extends AbstractGolem implements ECFNetworkMembe
     @SuppressWarnings("deprecation")
     @Override
     public @Nullable SpawnGroupData finalizeSpawn(ServerLevelAccessor pLevel, DifficultyInstance pDifficulty, MobSpawnType pReason, @Nullable SpawnGroupData pSpawnData, @Nullable CompoundTag pDataTag) {
-        this.innerECFOptional.ifPresent(icfeHandler -> icfeHandler.setCFE(level().getRandom().nextInt(6,36)));
+        this.innerECFOptional.ifPresent(icfeHandler -> icfeHandler.setECF(level().getRandom().nextInt(6, 36)));
         return super.finalizeSpawn(pLevel, pDifficulty, pReason, pSpawnData, pDataTag);
     }
 
@@ -221,7 +223,7 @@ public class FlowCedarEntEntity extends AbstractGolem implements ECFNetworkMembe
         super.defineSynchedData();
         this.entityData.define(EXTRACTING, false);
         this.entityData.define(HOLDING, false);
-        this.entityData.define(CFE_DATA, 0);
+        this.entityData.define(ECF_DATA, 0);
     }
 
     public void setExtracting(boolean extracting) {
@@ -240,20 +242,20 @@ public class FlowCedarEntEntity extends AbstractGolem implements ECFNetworkMembe
         return this.entityData.get(HOLDING);
     }
 
-    public int getSyncedCFE() {
-        return this.entityData.get(CFE_DATA);
+    public int getSyncedECF() {
+        return this.entityData.get(ECF_DATA);
     }
 
-    public void setSyncedCFE(int amount) {
+    public void setSyncedECF(int amount) {
         if (!this.level().isClientSide()) {
-            this.entityData.set(CFE_DATA, amount);
+            this.entityData.set(ECF_DATA, amount);
         }
     }
 
     @Override
     public void remove(RemovalReason pReason) {
         super.remove(pReason);
-        TerraCompositioAPI.INSTANCE.getECFNetworkInstance().fireCFENetworkEvent(this, NetworkAction.REMOVE);
+        TerraCompositioAPI.INSTANCE.getECFNetworkInstance().fireECFNetworkEvent(this, NetworkAction.REMOVE);
     }
 
     @Override
@@ -268,9 +270,9 @@ public class FlowCedarEntEntity extends AbstractGolem implements ECFNetworkMembe
         idleAnimationState.startIfStopped(this.tickCount);
 
         extractionAnimationState.animateWhen(this.isExtracting(),this.tickCount);
-        cfeHoldState.animateWhen(this.isHolding(),this.tickCount);
+        ecfHoldState.animateWhen(this.isHolding(), this.tickCount);
         if (!isHolding() && wasHeld){
-            cfeHoldState.stop();
+            ecfHoldState.stop();
             extractionCompleteAnimationState.start(this.tickCount);
         }
         wasHeld = isHolding();
@@ -354,8 +356,8 @@ public class FlowCedarEntEntity extends AbstractGolem implements ECFNetworkMembe
     public Vec3 particleTargetOffset() {
         Optional<IECFHandler> icfeHandler = lazyCFEOptional.resolve();
         float scale = 3;
-        if (icfeHandler.isPresent() && icfeHandler.get().getCFE() > 0) {
-            scale = (0.1f + (getSyncedCFE() / (float) icfeHandler.get().getMaxCFE())) * 10;
+        if (icfeHandler.isPresent() && icfeHandler.get().getECF() > 0) {
+            scale = (0.1f + (getSyncedECF() / (float) icfeHandler.get().getMaxECF())) * 10;
         }
         return new Vec3(0.5d,this.getBbHeight() + scale * 0.2f,0.5d);
     }
@@ -380,23 +382,23 @@ public class FlowCedarEntEntity extends AbstractGolem implements ECFNetworkMembe
     }
 
 
-    public void abortCFEConsume() {
+    public void abortECFConsume() {
         lazyCFEOptional.ifPresent(icfeHandler -> {
             if (!this.level().isClientSide()){
-                float scale = (0.1f + (icfeHandler.getCFE() / (float) icfeHandler.getMaxCFE())) * 10;
-                ParticleHelper.spawnParticlesIn(this.level(), BlockPos.containing(this.position().add(0, this.getBbHeight() + scale * 0.2f, 0)), icfeHandler.getCFE() / 10);
-                icfeHandler.setCFE(0);
+                float scale = (0.1f + (icfeHandler.getECF() / (float) icfeHandler.getMaxECF())) * 10;
+                ParticleHelper.spawnParticlesIn(this.level(), BlockPos.containing(this.position().add(0, this.getBbHeight() + scale * 0.2f, 0)), icfeHandler.getECF() / 10);
+                icfeHandler.setECF(0);
             }
         });
 
     }
 
     public void sendViaPP(PPECFMemberProxy current) {
-        if (getMainHandler().getCFE() > 0 && ECFHelper.validMember(current)) {
-            if (current.getMainHandler().getFreeSpace() > TCCommonConfigs.CFE_PER_BURST_TRANSFER_LIMIT.get())
+        if (getMainHandler().getECF() > 0 && ECFHelper.validMember(current)) {
+            if (current.getMainHandler().getFreeSpace() > TCCommonConfigs.ECF_PER_BURST_TRANSFER_LIMIT.get())
                 scheduleMemberUpdate(current);
             ECFHelper.newTransfer().targetAndSource(current, this).speed(5 / 20f).build();
-        } else onCFENetworkMemberUpdate();
+        } else onECFNetworkMemberUpdate();
     }
 
     @Override
@@ -416,7 +418,7 @@ public class FlowCedarEntEntity extends AbstractGolem implements ECFNetworkMembe
     public void updateIfScheduled() {
         if (scheduledUpdate) {
             scheduledUpdate = false;
-            onCFENetworkMemberUpdate();
+            onECFNetworkMemberUpdate();
         }
         if (scheduledMembersUpdate == 0) {
             scheduledMembersUpdate = -1;
@@ -431,16 +433,16 @@ public class FlowCedarEntEntity extends AbstractGolem implements ECFNetworkMembe
     public void collectKnowledgeData(CompoundTag data) {
 
         lazyCFEOptional.ifPresent(cfeHandler -> {
-            data.putInt("val.cfe", cfeHandler.getCFE());
+            data.putInt("val.ecf", cfeHandler.getECF());
             if (TCCommonConfigs.DEBUG.get()) {
-                data.putInt("val.max_cfe", cfeHandler.getMaxCFE());
+                data.putInt("val.max_cfe", cfeHandler.getMaxECF());
                 data.putInt("val.queued", cfeHandler.getQueued());
             }
         });
         innerECFOptional.ifPresent(cfeHandler -> {
-            data.putInt("val.cfe2", cfeHandler.getCFE());
+            data.putInt("val.cfe2", cfeHandler.getECF());
             if (TCCommonConfigs.DEBUG.get()) {
-                data.putInt("val.max_cfe2", cfeHandler.getMaxCFE());
+                data.putInt("val.max_cfe2", cfeHandler.getMaxECF());
                 data.putInt("val.queued2", cfeHandler.getQueued());
             }
         });
@@ -479,7 +481,7 @@ public class FlowCedarEntEntity extends AbstractGolem implements ECFNetworkMembe
 
         TooltipHelper.addIfExist(TooltipHelper.Keys.ECF, tooltip, data, 2);
         if (isShifting) {
-            tooltip.add(TooltipHelper.keyWithArg(TooltipHelper.Keys.CONSUME, 0.1, TooltipHelper.Units.CFE_SECOND));
+            tooltip.add(TooltipHelper.keyWithArg(TooltipHelper.Keys.CONSUME, 0.1, TooltipHelper.Units.ECF_SECOND));
         }
         TooltipHelper.addIfExist(TooltipHelper.Keys.MAX_ECF, tooltip, data, 2);
         TooltipHelper.addIfExist(TooltipHelper.Keys.QUEUED, tooltip, data, 2);

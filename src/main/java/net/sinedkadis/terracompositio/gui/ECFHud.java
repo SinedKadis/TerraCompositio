@@ -11,12 +11,12 @@ import net.minecraftforge.client.gui.overlay.ForgeGui;
 import net.sinedkadis.terracompositio.TerraCompositio;
 import net.sinedkadis.terracompositio.api.TCCapabilities;
 import net.sinedkadis.terracompositio.api.dummies.DummyECFHandler;
-import net.sinedkadis.terracompositio.api.networks.cfe.IECFHandler;
+import net.sinedkadis.terracompositio.api.networks.ecf.IECFHandler;
 import org.lwjgl.opengl.GL11;
 
 public class ECFHud {
-    public static final ResourceLocation CFE_HUD_RL = TerraCompositio.modLoc("textures/gui/ecf_hud.png");
-    public static final ResourceLocation CFE_HUD_SHADOW_RL = TerraCompositio.modLoc("textures/gui/cfe_hud_shadow.png");
+    public static final ResourceLocation ECF_HUD_RL = TerraCompositio.modLoc("textures/gui/ecf_hud.png");
+    public static final ResourceLocation ECF_HUD_SHADOW_RL = TerraCompositio.modLoc("textures/gui/ecf_hud_shadow.png");
 
     public static void render(ForgeGui ignoredGui,
                               GuiGraphics guiGraphics,
@@ -26,8 +26,8 @@ public class ECFHud {
         LocalPlayer player = Minecraft.getInstance().player;
         if (player == null) return;
         IECFHandler playerHandler = player.getCapability(TCCapabilities.ECF).orElse(DummyECFHandler.instance).getMainHandler();
-        int cfeTotal = playerHandler.getCFE();
-        int cfeMaxTotal = playerHandler.getMaxCFE();
+        int cfeTotal = playerHandler.getECF();
+        int cfeMaxTotal = playerHandler.getMaxECF();
 
         if (cfeMaxTotal <= 0) return;
 
@@ -44,14 +44,14 @@ public class ECFHud {
         int g = (color >> 8 & 0xFF);
         int b = color & 0xFF;
 
-        guiGraphics.blit(CFE_HUD_SHADOW_RL, x + 1, y, 0, 0, 0, 64, 40, 256, 256);
+        guiGraphics.blit(ECF_HUD_SHADOW_RL, x + 1, y, 0, 0, 0, 64, 40, 256, 256);
 
         RenderSystem.setShaderColor(r / 255F, g / 255F, b / 255F, 1 - (r / 255F));
 
         RenderSystem.enableBlend();
         RenderSystem.blendFunc(GL11.GL_SRC_ALPHA, GL11.GL_ONE_MINUS_SRC_ALPHA);
 
-        guiGraphics.blit(CFE_HUD_RL, x + 1, y, 0, 0, 0, width, 40, 256, 256);
+        guiGraphics.blit(ECF_HUD_RL, x + 1, y, 0, 0, 0, width, 40, 256, 256);
 
         RenderSystem.disableBlend();
         RenderSystem.setShaderColor(1, 1, 1, 1);

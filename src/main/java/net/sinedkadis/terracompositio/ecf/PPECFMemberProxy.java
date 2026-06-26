@@ -2,8 +2,8 @@ package net.sinedkadis.terracompositio.ecf;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
-import net.sinedkadis.terracompositio.api.networks.cfe.ECFNetworkMember;
-import net.sinedkadis.terracompositio.api.networks.cfe.IECFHandler;
+import net.sinedkadis.terracompositio.api.networks.ecf.ECFNetworkMember;
+import net.sinedkadis.terracompositio.api.networks.ecf.IECFHandler;
 import net.sinedkadis.terracompositio.block.entity.PathPointerBlockEntity;
 
 public record PPECFMemberProxy(ECFNetworkMember target, PathPointerBlockEntity proxy) implements ECFNetworkMember {
@@ -54,13 +54,13 @@ public record PPECFMemberProxy(ECFNetworkMember target, PathPointerBlockEntity p
     }
 
     @Override
-    public void onCFENetworkMemberUpdate() {
-        target.onCFENetworkMemberUpdate();
+    public void onECFNetworkMemberUpdate() {
+        target.onECFNetworkMemberUpdate();
     }
 
     @Override
-    public void onCFENetworkMemberUpdate(ECFNetworkMember updated) {
-        target.onCFENetworkMemberUpdate(updated);
+    public void onECFNetworkMemberUpdate(ECFNetworkMember updated) {
+        target.onECFNetworkMemberUpdate(updated);
     }
 
 }

@@ -47,7 +47,7 @@ public abstract class TCBlockEntity extends BlockEntity implements IHaveKnowledg
         return toReturn;
     }
 
-    public @Nullable IBEECFBehaviour getCFEBehaviour() {
+    public @Nullable IBEECFBehaviour getECFBehaviour() {
         for (IBEBehaviour ibeBehaviour : behaviours) {
             if (ibeBehaviour instanceof IBEECFBehaviour IBEECFBehaviour) return IBEECFBehaviour;
         }

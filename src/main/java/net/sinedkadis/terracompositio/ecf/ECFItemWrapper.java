@@ -15,8 +15,8 @@ import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
 import net.minecraftforge.common.util.LazyOptional;
 import net.sinedkadis.terracompositio.api.TCCapabilities;
-import net.sinedkadis.terracompositio.api.networks.cfe.ECFNetworkMember;
-import net.sinedkadis.terracompositio.api.networks.cfe.IECFHandler;
+import net.sinedkadis.terracompositio.api.networks.ecf.ECFNetworkMember;
+import net.sinedkadis.terracompositio.api.networks.ecf.IECFHandler;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -41,15 +41,15 @@ public class ECFItemWrapper implements IECFHandler, ICapabilityProvider {
     public String toString() {
         return "CFEItemWrapper{" +
                 "container=" + container +
-                ",\n CFE=" + getCFE() +
-                ",\n Max CFE=" + getMaxCFE() +
+                ",\n CFE=" + getECF() +
+                ",\n Max CFE=" + getMaxECF() +
                 ",\n queued=" + queued +
                 '}';
     }
 
     @Override
     public void clear() {
-        setCFE(0);
+        setECF(0);
         queued = 0;
     }
 
@@ -59,7 +59,7 @@ public class ECFItemWrapper implements IECFHandler, ICapabilityProvider {
     }
 
     @Override
-    public int getCFE() {
+    public int getECF() {
         CompoundTag tag = container.getOrCreateTag();
         return tag.getInt("CFE");
     }
@@ -77,45 +77,45 @@ public class ECFItemWrapper implements IECFHandler, ICapabilityProvider {
     }
 
     @Override
-    public int takeCFE(int cfe, boolean simulate) {
-        int cfe1 = this.getCFE();
+    public void setECF(int cfe) {
+        CompoundTag tag = container.getOrCreateTag();
+        tag.putInt("CFE", cfe);
+    }
+
+    @Override
+    public int takeECF(int cfe, boolean simulate) {
+        int cfe1 = this.getECF();
         int toTake = Math.min(cfe, cfe1);
         if (!simulate) {
-            this.setCFE(cfe1 -toTake);
+            this.setECF(cfe1 - toTake);
         }
         return toTake;
     }
 
     @Override
-    public int sendCFE(ECFNetworkMember target, int cfe, float speed, boolean simulate) {
+    public int sendECF(ECFNetworkMember target, int cfe, float speed, boolean simulate) {
         return 0;
     }
 
     @Override
-    public int addCFE(int cfe, boolean simulate) {
+    public int addECF(int cfe, boolean simulate) {
         int toAdd = Math.min(this.getFreeSpace(),cfe);
         if (!simulate) {
-            int cfe1 = this.getCFE();
-            this.setCFE(cfe1 +toAdd);
+            int cfe1 = this.getECF();
+            this.setECF(cfe1 + toAdd);
         }
         return toAdd;
     }
 
     @Override
-    public void setCFE(int cfe) {
-        CompoundTag tag = container.getOrCreateTag();
-        tag.putInt("CFE",cfe);
-    }
-
-    @Override
-    public int getMaxCFE() {
+    public int getMaxECF() {
         CompoundTag tag = container.getOrCreateTag();
         int maxCfe = tag.getInt("MAX_CFE");
         return maxCfe == 0 ? 8 : maxCfe;
     }
 
     @Override
-    public IECFHandler setMaxCFE(int max) {
+    public IECFHandler setMaxECF(int max) {
         CompoundTag tag = container.getOrCreateTag();
         tag.putInt("MAX_CFE", max);
         tag.putInt("CFE", Mth.clamp(tag.getInt("CFE"), 0, max));
@@ -133,18 +133,18 @@ public class ECFItemWrapper implements IECFHandler, ICapabilityProvider {
     }
 
     @Override
-    public int getCFEWithQueue() {
-        return getCFE()+getQueued();
+    public int getECFWithQueue() {
+        return getECF() + getQueued();
     }
 
     @Override
     public boolean isEmpty() {
-        return getCFEWithQueue() <= 0;
+        return getECFWithQueue() <= 0;
     }
 
     @Override
     public int getFreeSpace() {
-        return this.getMaxCFE()-this.getCFEWithQueue();
+        return this.getMaxECF() - this.getECFWithQueue();
     }
 
     @Override

@@ -16,13 +16,13 @@ import net.sinedkadis.terracompositio.api.TCCapabilities;
 import net.sinedkadis.terracompositio.api.TerraCompositioAPI;
 import net.sinedkadis.terracompositio.api.helpers.TooltipHelper;
 import net.sinedkadis.terracompositio.api.networks.NetworkAction;
-import net.sinedkadis.terracompositio.api.networks.cfe.ECFNetwork;
-import net.sinedkadis.terracompositio.api.networks.cfe.ECFNetworkMemberBE;
-import net.sinedkadis.terracompositio.api.networks.cfe.IECFHandler;
-import net.sinedkadis.terracompositio.ecf.ECFContainer;
+import net.sinedkadis.terracompositio.api.networks.ecf.ECFNetwork;
+import net.sinedkadis.terracompositio.api.networks.ecf.ECFNetworkMemberBE;
+import net.sinedkadis.terracompositio.api.networks.ecf.IECFHandler;
 import net.sinedkadis.terracompositio.compat.create.TCCreateCompat;
 import net.sinedkadis.terracompositio.config.TCCommonConfigs;
 import net.sinedkadis.terracompositio.config.TCInnerConfig;
+import net.sinedkadis.terracompositio.ecf.ECFContainer;
 import net.sinedkadis.terracompositio.registries.TCBlockStateProperties;
 import org.jetbrains.annotations.NotNull;
 
@@ -34,7 +34,7 @@ public class CedarGearboxBlockEntity extends GeneratingKineticBlockEntity implem
     protected int range;
     protected int priority;
     protected boolean scheduledUpdate = false;
-    protected IECFHandler cfeHandler = new ECFContainer(this){
+    protected IECFHandler ecfHandler = new ECFContainer(this) {
         @Override
         protected void sendCFEUpdate() {
             super.sendCFEUpdate();
@@ -54,7 +54,7 @@ public class CedarGearboxBlockEntity extends GeneratingKineticBlockEntity implem
     @Override
     public float getGeneratedSpeed() {
         if (isOverStressed()) return 0;
-        if (cfeHandler.getCFE() <= 0) return 0;
+        if (ecfHandler.getECF() <= 0) return 0;
         return getBlockState().getValue(TCBlockStateProperties.INFUSED) ? 16 : 8;
     }
 
@@ -69,10 +69,10 @@ public class CedarGearboxBlockEntity extends GeneratingKineticBlockEntity implem
         if (!pLevel.isClientSide && range != 0) {
             boolean inNetwork = ECFNetworkInstance.isIn(pLevel, this);
             if (!inNetwork && !isRemoved()) {
-                ECFNetworkInstance.fireCFENetworkEvent(this, NetworkAction.ADD);
+                ECFNetworkInstance.fireECFNetworkEvent(this, NetworkAction.ADD);
             }
         }
-        if (!isOverStressed() && cfeHandler.takeCFE(1, false) > 0) {
+        if (!isOverStressed() && ecfHandler.takeECF(1, false) > 0) {
             updateGeneratedRotation();
         } else {
             if (getSpeed() != 0)
@@ -88,7 +88,7 @@ public class CedarGearboxBlockEntity extends GeneratingKineticBlockEntity implem
     @Override
     public void onLoad() {
         super.onLoad();
-        lazyCFEOptional = LazyOptional.of(() -> cfeHandler);
+        lazyCFEOptional = LazyOptional.of(() -> ecfHandler);
         scheduleMemberUpdate();
         updateGeneratedRotation();
     }
@@ -104,7 +104,7 @@ public class CedarGearboxBlockEntity extends GeneratingKineticBlockEntity implem
     @Override
     public void remove() {
         super.remove();
-        TerraCompositioAPI.INSTANCE.getECFNetworkInstance().fireCFENetworkEvent(this, NetworkAction.REMOVE);
+        TerraCompositioAPI.INSTANCE.getECFNetworkInstance().fireECFNetworkEvent(this, NetworkAction.REMOVE);
     }
 
     @Override
@@ -116,47 +116,14 @@ public class CedarGearboxBlockEntity extends GeneratingKineticBlockEntity implem
     @Override
     protected void write(CompoundTag compound, boolean clientPacket) {
         super.write(compound, clientPacket);
-        cfeHandler.writeToNBT(compound);
+        ecfHandler.writeToNBT(compound);
     }
 
     @Override
     protected void read(CompoundTag compound, boolean clientPacket) {
         super.read(compound, clientPacket);
-        cfeHandler.readFromNBT(compound);
+        ecfHandler.readFromNBT(compound);
     }
-
-    public void onAppendServerData(CompoundTag compoundTag) {
-        compoundTag.putInt("cfe",getMainHandler().getCFE());
-        compoundTag.putInt("priority",getPriority());
-        compoundTag.putInt("limit", getRange());
-
-        compoundTag.putInt("max_cfe",getMainHandler().getMaxCFE());
-        compoundTag.putInt("queued",getMainHandler().getQueued());
-    }
-
-    public void onAppendTooltip(List<Component> iTooltip, CompoundTag serverData) {
-        if (serverData.contains("cfe")) {
-            iTooltip.add(Component.translatable("block.terracompositio." + "cfe", serverData.getInt("cfe")));
-        }
-        if (serverData.contains("max_cfe") && TCCommonConfigs.DEBUG.get()) {
-            iTooltip.add(Component.translatable("block.terracompositio." + "max_cfe", serverData.getInt("max_cfe")));
-        }
-        if (serverData.contains("queued") && TCCommonConfigs.DEBUG.get()) {
-            iTooltip.add(Component.translatable("block.terracompositio." + "queued", serverData.getInt("queued")));
-        }
-        if (serverData.contains("priority") && TCCommonConfigs.DEBUG.get()) {
-            iTooltip.add(Component.translatable("block.terracompositio." + "priority", serverData.getInt("priority")));
-        }
-        if (serverData.contains("limit") && TCCommonConfigs.DEBUG.get()) {
-            iTooltip.add(Component.translatable("block.terracompositio." + "limit", serverData.getInt("limit")));
-        }
-        if (serverData.contains("speed") && TCCommonConfigs.DEBUG.get()) {
-            iTooltip.add(Component.translatable("block.terracompositio." + "speed", serverData.getFloat("speed")));
-        }
-    }
-
-
-
 
     @Override
     public int getRange() {
@@ -170,14 +137,14 @@ public class CedarGearboxBlockEntity extends GeneratingKineticBlockEntity implem
 
     @Override
     public IECFHandler getMainHandler() {
-        return cfeHandler;
+        return ecfHandler;
     }
 
     @Override
     public void updateIfScheduled() {
         if (scheduledUpdate) {
             this.scheduledUpdate = false;
-            this.onCFENetworkMemberUpdate();
+            this.onECFNetworkMemberUpdate();
         }
     }
 
@@ -188,11 +155,11 @@ public class CedarGearboxBlockEntity extends GeneratingKineticBlockEntity implem
 
     @Override
     public void collectKnowledgeData(CompoundTag data) {
-        data.putInt(TooltipHelper.Keys.ECF.toData(), cfeHandler.getCFE());
+        data.putInt(TooltipHelper.Keys.ECF.toData(), ecfHandler.getECF());
 
         if (TCCommonConfigs.DEBUG.get()) {
-            data.putInt(TooltipHelper.Keys.MAX_ECF.toData(), cfeHandler.getMaxCFE());
-            data.putInt(TooltipHelper.Keys.QUEUED.toData(), cfeHandler.getQueued());
+            data.putInt(TooltipHelper.Keys.MAX_ECF.toData(), ecfHandler.getMaxECF());
+            data.putInt(TooltipHelper.Keys.QUEUED.toData(), ecfHandler.getQueued());
         }
         data.putInt(TooltipHelper.Keys.PRIORITY.toData(), this.getPriority());
         data.putInt(TooltipHelper.Keys.RANGE.toData(), this.getRange());

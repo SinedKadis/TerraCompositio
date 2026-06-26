@@ -19,11 +19,11 @@ import java.util.function.Consumer;
 public class TechnetiumFiringRecipeBuilder implements RecipeBuilder {
 
     private final Item ingredient;
-    private final int cfe;
+    private final int ecf;
     private TechnetiumFiringRecipeBuilder(Item ingredient,
-                                          int cfe) {
+                                          int ecf) {
         this.ingredient = ingredient;
-        this.cfe = cfe;
+        this.ecf = ecf;
 
     }
 
@@ -52,7 +52,7 @@ public class TechnetiumFiringRecipeBuilder implements RecipeBuilder {
     public void save(@NotNull Consumer<FinishedRecipe> consumer, @NotNull ResourceLocation pRecipeId) {
         consumer.accept(new Result(pRecipeId,
                 this.ingredient,
-                cfe
+                ecf
         ));
     }
 
@@ -60,19 +60,19 @@ public class TechnetiumFiringRecipeBuilder implements RecipeBuilder {
         @Getter
         private final ResourceLocation id;
         private final Item ingredient;
-        private final int cfe;
+        private final int ecf;
 
         public Result(ResourceLocation pId,
                       Item pIngredient,
-                      int cfe) {
+                      int ecf) {
             this.id = pId;
             this.ingredient = pIngredient;
-            this.cfe = cfe;
+            this.ecf = ecf;
         }
 
         public void serializeRecipeData(@NotNull JsonObject pJson) {
             pJson.addProperty("furnace_input", Objects.requireNonNull(ForgeRegistries.ITEMS.getKey(ingredient)).toString());
-            pJson.addProperty("cfe",cfe);
+            pJson.addProperty("ecf", ecf);
         }
 
         public @NotNull RecipeSerializer<?> getType() {

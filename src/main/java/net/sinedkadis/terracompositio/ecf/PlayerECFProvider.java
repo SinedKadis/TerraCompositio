@@ -7,8 +7,8 @@ import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.common.util.LazyOptional;
 import net.sinedkadis.terracompositio.api.TCCapabilities;
-import net.sinedkadis.terracompositio.api.networks.cfe.ECFNetworkMemberEntity;
-import net.sinedkadis.terracompositio.api.networks.cfe.IECFHandler;
+import net.sinedkadis.terracompositio.api.networks.ecf.ECFNetworkMemberEntity;
+import net.sinedkadis.terracompositio.api.networks.ecf.IECFHandler;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -21,7 +21,7 @@ public class PlayerECFProvider implements net.minecraftforge.common.capabilities
     }
 
     private final Player player;
-    private final LazyOptional<IECFHandler> optional = LazyOptional.of(this::createPlayerCFEContainer);
+    private final LazyOptional<IECFHandler> optional = LazyOptional.of(this::createPlayerECFContainer);
 
     @Override
     public @NotNull <T> LazyOptional<T> getCapability(@NotNull Capability<T> cap, @Nullable Direction side) {
@@ -32,10 +32,10 @@ public class PlayerECFProvider implements net.minecraftforge.common.capabilities
         return LazyOptional.empty();
     }
 
-    private IECFHandler createPlayerCFEContainer() {
+    private IECFHandler createPlayerECFContainer() {
         if (this.handler == null) {
             this.handler = new ECFHandlerPlayerArmor(new ECFContainer((ECFNetworkMemberEntity) player)
-                    .setMaxCFE(0) // I haven't thought of a use for this yet
+                    .setMaxECF(0) // I haven't thought of a use for this yet
                     .setOffset(vec3 -> vec3.add(0, 1, 0)));
         }
 
@@ -45,12 +45,12 @@ public class PlayerECFProvider implements net.minecraftforge.common.capabilities
     @Override
     public CompoundTag serializeNBT() {
         CompoundTag nbt = new CompoundTag();
-        createPlayerCFEContainer().writeToNBT(nbt);
+        createPlayerECFContainer().writeToNBT(nbt);
         return nbt;
     }
 
     @Override
     public void deserializeNBT(CompoundTag nbt) {
-        createPlayerCFEContainer().readFromNBT(nbt);
+        createPlayerECFContainer().readFromNBT(nbt);
     }
 }

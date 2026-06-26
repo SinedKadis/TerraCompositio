@@ -81,7 +81,7 @@ public class EntStatueBlockEntity extends TCBlockEntity implements FluidNetworkM
             FlowCedarEntEntity pEntity = TCEntities.FLOW_CEDAR_ENT.get().create(level);
             if (pEntity != null) {
                 level.addFreshEntity(pEntity);
-                pEntity.getInnerECFOptional().ifPresent(icfeHandler -> icfeHandler.setCFE(30));
+                pEntity.getInnerECFOptional().ifPresent(iecfHandler -> iecfHandler.setECF(30));
                 ItemStack crown = this.itemHandler().getStackInSlot(0);
                 if (crown.is(TCItems.TECHNETIUM_CROWN.get())) {
                     pEntity.setItemSlot(EquipmentSlot.HEAD,crown.copyAndClear());

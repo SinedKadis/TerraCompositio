@@ -9,8 +9,8 @@ import net.minecraft.world.level.pathfinder.Path;
 import net.minecraft.world.phys.Vec3;
 import net.sinedkadis.terracompositio.api.TCCapabilities;
 import net.sinedkadis.terracompositio.api.TerraCompositioAPI;
-import net.sinedkadis.terracompositio.api.networks.cfe.ECFNetworkMember;
-import net.sinedkadis.terracompositio.api.networks.cfe.IECFHandler;
+import net.sinedkadis.terracompositio.api.networks.ecf.ECFNetworkMember;
+import net.sinedkadis.terracompositio.api.networks.ecf.IECFHandler;
 import net.sinedkadis.terracompositio.entity.custom.FlowCedarEntEntity;
 import net.sinedkadis.terracompositio.registries.TCTags;
 import net.sinedkadis.terracompositio.util.helpers.ECFHelper;
@@ -49,7 +49,7 @@ public class ReachSourceGoal extends Goal {
         searchCooldown = SEARCH_INTERVAL;
 
         Optional<IECFHandler> cfeHandler = mob.getInnerECFOptional().resolve();
-        if (cfeHandler.isEmpty() || cfeHandler.get().getCFE() > 6) return false;
+        if (cfeHandler.isEmpty() || cfeHandler.get().getECF() > 6) return false;
         if (mob.isExtracting() || mob.isHolding()) return false;
 
         ECFNetworkMember member = searchMember();
@@ -93,7 +93,7 @@ public class ReachSourceGoal extends Goal {
 
         for (ECFNetworkMember member : TerraCompositioAPI.instance()
                 .getECFNetworkInstance()
-                .getAllCFENetworkMembers(level)) {
+                .getAllECFNetworkMembers(level)) {
 
             if (!ECFHelper.validMember(member)) continue;
 
@@ -101,11 +101,11 @@ public class ReachSourceGoal extends Goal {
             if (!memberPos.closerThan(mobPos, searchLimit)) continue;
             if (memberPos.closerThan(mobPos, stopDistance)) continue;
             if (member.getEntity().equals(mob)) continue;
-            if (member.getMainHandler().getCFE() <= 0) continue;
+            if (member.getMainHandler().getECF() <= 0) continue;
 
             if (member instanceof FlowCedarEntEntity ent) {
                 boolean hasEnough = ent.getCapability(TCCapabilities.ECF)
-                        .filter(h -> h.getCFE() > 1000)
+                        .filter(h -> h.getECF() > 1000)
                         .isPresent();
                 if (!hasEnough) continue;
             }

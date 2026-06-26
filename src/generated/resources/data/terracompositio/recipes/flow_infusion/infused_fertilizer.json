@@ -1,6 +1,6 @@
 {
   "type": "terracompositio:flow_infusion",
-  "cfe": 200,
+  "ecf": 200,
   "ingredients": [
     {
       "tag": "minecraft:villager_plantable_seeds"

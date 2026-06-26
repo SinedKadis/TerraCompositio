@@ -2,10 +2,10 @@ package net.sinedkadis.terracompositio.block.entity;
 
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.state.BlockState;
-import net.sinedkadis.terracompositio.block.behaviours.ECFHandlerBehaviour;
 import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBEBehaviour;
-import net.sinedkadis.terracompositio.ecf.ECFContainer;
+import net.sinedkadis.terracompositio.block.behaviours.ECFHandlerBehaviour;
 import net.sinedkadis.terracompositio.config.TCInnerConfig;
+import net.sinedkadis.terracompositio.ecf.ECFContainer;
 import net.sinedkadis.terracompositio.registries.TCBlockEntities;
 import org.jetbrains.annotations.NotNull;
 
@@ -21,9 +21,9 @@ public class CreativeECFSourceBlockEntity extends TCBlockEntity{
     @Override
     public void addBEBehaviours(@NotNull List<IBEBehaviour> list) {
         list.add(new ECFHandlerBehaviour(this)
-                .cfeHandler(cfeHandlerBehaviour -> new ECFContainer(cfeHandlerBehaviour) {
+                .ecfHandler(cfeHandlerBehaviour -> new ECFContainer(cfeHandlerBehaviour) {
                         @Override
-                        public int getCFE() {
+                        public int getECF() {
                             return Integer.MAX_VALUE;
                         }
                     })

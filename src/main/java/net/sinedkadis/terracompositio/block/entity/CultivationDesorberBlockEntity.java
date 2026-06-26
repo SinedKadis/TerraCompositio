@@ -19,8 +19,8 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.items.ItemStackHandler;
 import net.sinedkadis.terracompositio.TerraCompositio;
 import net.sinedkadis.terracompositio.api.TerraCompositioAPI;
-import net.sinedkadis.terracompositio.api.networks.cfe.ECFNetwork;
-import net.sinedkadis.terracompositio.api.networks.cfe.ECFNetworkMember;
+import net.sinedkadis.terracompositio.api.networks.ecf.ECFNetwork;
+import net.sinedkadis.terracompositio.api.networks.ecf.ECFNetworkMember;
 import net.sinedkadis.terracompositio.registries.TCBlockEntities;
 
 import net.sinedkadis.terracompositio.util.helpers.ParticleHelper;
@@ -69,12 +69,12 @@ public class CultivationDesorberBlockEntity extends AbstractDesorberBlockEntity 
         LevelAccessor level = event.getLevel();
         BlockState state = event.getState();
         ECFNetwork network = TerraCompositioAPI.instance().getECFNetworkInstance();
-        Set<ECFNetworkMember> sources = network.getAllCFENetworkMembers((Level) level);
+        Set<ECFNetworkMember> sources = network.getAllECFNetworkMembers((Level) level);
         List<CultivationDesorberBlockEntity> cultivators = sources.stream()
                 .map(ECFNetworkMember::getPos)
-                .filter(cfeSourceBlockPos -> Math.sqrt(cfeSourceBlockPos.distSqr(pos)) < 7)
-                .map(cfeSourceBlockPos -> {
-                    if (level.getBlockEntity(cfeSourceBlockPos) instanceof CultivationDesorberBlockEntity blockEntity)
+                .filter(ecfSourceBlockPose -> Math.sqrt(ecfSourceBlockPose.distSqr(pos)) < 7)
+                .map(ecfSourceBlockPose -> {
+                    if (level.getBlockEntity(ecfSourceBlockPose) instanceof CultivationDesorberBlockEntity blockEntity)
                         return blockEntity;
                     return null;
                 })
@@ -86,17 +86,17 @@ public class CultivationDesorberBlockEntity extends AbstractDesorberBlockEntity 
                             return collectedList;
                         }
                 ));
-        int CFEToAdd = 1;
+        int ECFToAdd = 1;
         for (CultivationDesorberBlockEntity blockEntity : cultivators){
             FluidTank fluidHandler1 = blockEntity.fluidHandler;
-            if (!fluidHandler1.isEmpty() && fluidHandler1.getFluidAmount() >= CFEToAdd) {
-                fluidHandler1.drain(CFEToAdd, IFluidHandler.FluidAction.EXECUTE);
-                int added = blockEntity.cfeContainer().addCFE(CFEToAdd, false);
-                CFEToAdd -= added;
+            if (!fluidHandler1.isEmpty() && fluidHandler1.getFluidAmount() >= ECFToAdd) {
+                fluidHandler1.drain(ECFToAdd, IFluidHandler.FluidAction.EXECUTE);
+                int added = blockEntity.ecfContainer().addECF(ECFToAdd, false);
+                ECFToAdd -= added;
                 if (!level.isClientSide())
                     level.playSound(null,pos, SoundEvents.AZALEA_LEAVES_STEP, SoundSource.BLOCKS);
-                ParticleHelper.sendCFEParticles((ServerLevel) level,
-                        blockEntity.cfeContainer().getOffset().apply(blockEntity.getBlockPos().getCenter()),
+                ParticleHelper.sendECFParticles((ServerLevel) level,
+                        blockEntity.ecfContainer().getOffset().apply(blockEntity.getBlockPos().getCenter()),
                         pos.getCenter(),
                         added);
                 //noinspection deprecation
@@ -104,7 +104,7 @@ public class CultivationDesorberBlockEntity extends AbstractDesorberBlockEntity 
                         .getDrops(state,new LootParams.Builder((ServerLevel) level)
                                 .withParameter(LootContextParams.ORIGIN,pos.getCenter())
                                 .withParameter(LootContextParams.TOOL,ItemStack.EMPTY)).get(0).getItem().asItem()));
-                if (CFEToAdd == 0) {
+                if (ECFToAdd == 0) {
                     break;
                 }
             }

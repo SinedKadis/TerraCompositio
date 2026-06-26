@@ -81,8 +81,8 @@ public class MatterInfusionCategory implements IRecipeCategory<MatterInfusionRec
     public void draw(MatterInfusionRecipe recipe, IRecipeSlotsView recipeSlotsView, GuiGraphics guiGraphics, double mouseX, double mouseY) {
         background.draw(guiGraphics);
         animatedArrow.draw(guiGraphics,40,16);
-        String cfe = "CFE: "+ recipe.getCfe();
-        String cfe_t = "CFE/t: "+ recipe.getCFETick();
+        String cfe = "CFE: " + recipe.getEcf();
+        String cfe_t = "CFE/t: " + recipe.getECFTick();
         Component duration = Component.translatable("block.terracompositio.matter_infuser.duration",(float)(recipe.getTicks()/20));
         Component decayChance = Component.translatable("block.terracompositio.matter_infuser.decay_chance",recipe.getCatalystDecayRate());
         guiGraphics.drawString(Minecraft.getInstance().font,cfe,5,110, Color.WHITE.getRGB());

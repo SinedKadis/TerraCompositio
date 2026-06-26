@@ -18,12 +18,12 @@ import java.util.Set;
 
 @OnlyIn(Dist.CLIENT)
 public class ClientPacketHandlers {
-    public static void handlePlayerCfeSync(S2CPlayerEcfContainerSync msg) {
+    public static void handlePlayerEcfSync(S2CPlayerEcfContainerSync msg) {
         Player player = Minecraft.getInstance().player;
         if (player != null) {
             player.getCapability(TCCapabilities.ECF)
                     .orElse(DummyECFHandler.instance)
-                    .setCFE(msg.cfe());
+                    .setECF(msg.ecf());
         }
     }
     public static void handleAddPlayerKnowledge() {

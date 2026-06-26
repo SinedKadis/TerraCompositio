@@ -38,7 +38,7 @@ public class ForgeEventBusEvents {
     public static void onAttachCapabilities(AttachCapabilitiesEvent<Entity> event) {
         if (event.getObject() instanceof Player player) {
             if (!player.getCapability(TCCapabilities.ECF).isPresent()) {
-                event.addCapability(TerraCompositio.modLoc("cfe_stored"), new PlayerECFProvider(player));
+                event.addCapability(TerraCompositio.modLoc("ecf_stored"), new PlayerECFProvider(player));
             }
         }
     }

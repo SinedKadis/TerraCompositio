@@ -1,6 +1,6 @@
 {
   "type": "terracompositio:flow_infusion",
-  "cfe": 10,
+  "ecf": 10,
   "ingredients": [
     {
       "item": "minecraft:snowball"

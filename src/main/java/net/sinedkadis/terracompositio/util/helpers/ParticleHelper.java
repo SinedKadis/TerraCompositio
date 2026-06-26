@@ -67,7 +67,7 @@ public class ParticleHelper {
         }
     }
 
-    public static void sendCFEParticles(ServerLevel level, Vec3 target, Vec3 source, int particleAmount, List<Vec3> offsets, float speed) {
+    public static void sendECFParticles(ServerLevel level, Vec3 target, Vec3 source, int particleAmount, List<Vec3> offsets, float speed) {
         if (particleAmount <= 0 || level == null) return;
         if (target == null) return;
 
@@ -104,8 +104,8 @@ public class ParticleHelper {
         }
     }
 
-    public static void sendCFEParticles(ServerLevel level, Vec3 target, Vec3 source, int particleAmount, List<Vec3> offsets) {
-        sendCFEParticles(level, target, source, particleAmount, offsets, 1 / 20f);
+    public static void sendECFParticles(ServerLevel level, Vec3 target, Vec3 source, int particleAmount, List<Vec3> offsets) {
+        sendECFParticles(level, target, source, particleAmount, offsets, 1 / 20f);
     }
 
     public static @NotNull Vec3 getSpreadParticleOffset(RandomSource random, int count) {
@@ -127,11 +127,11 @@ public class ParticleHelper {
         return new Vec3(x, y, z);
     }
 
-    public static void sendCFEParticles(ServerLevel level, Vec3 target, Vec3 source, int particleAmount) {
-        sendCFEParticles(level, target, source, particleAmount, null);
+    public static void sendECFParticles(ServerLevel level, Vec3 target, Vec3 source, int particleAmount) {
+        sendECFParticles(level, target, source, particleAmount, null);
     }
 
-    public static void drawCfeParticle(PoseStack pPoseStack, int pPackedLight, VertexConsumer buffer) {
+    public static void drawEcfParticle(PoseStack pPoseStack, int pPackedLight, VertexConsumer buffer) {
         PoseStack.Pose pose = pPoseStack.last();
         var matrix = pose.pose();
         var normal = pose.normal();

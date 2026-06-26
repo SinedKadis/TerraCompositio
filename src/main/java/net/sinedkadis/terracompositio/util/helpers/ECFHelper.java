@@ -6,13 +6,13 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.phys.AABB;
 import net.sinedkadis.terracompositio.api.networks.AnyNetworkMember;
-import net.sinedkadis.terracompositio.api.networks.cfe.ECFNetworkMember;
-import net.sinedkadis.terracompositio.api.networks.cfe.ECFNetworkMemberEntity;
-import net.sinedkadis.terracompositio.api.networks.cfe.IECFHandler;
+import net.sinedkadis.terracompositio.api.networks.ecf.ECFNetworkMember;
+import net.sinedkadis.terracompositio.api.networks.ecf.ECFNetworkMemberEntity;
+import net.sinedkadis.terracompositio.api.networks.ecf.IECFHandler;
 import net.sinedkadis.terracompositio.block.entity.ECFTrashCanBlockEntity;
 import net.sinedkadis.terracompositio.block.entity.PathPointerBlockEntity;
-import net.sinedkadis.terracompositio.ecf.PPECFMemberProxy;
 import net.sinedkadis.terracompositio.config.TCCommonConfigs;
+import net.sinedkadis.terracompositio.ecf.PPECFMemberProxy;
 import net.sinedkadis.terracompositio.entity.custom.ECFCloudEntity;
 
 import java.util.Objects;
@@ -38,7 +38,7 @@ public class ECFHelper {
         return false;
     }
 
-    public static void doCFETransfer(ECFNetworkMember target,
+    public static void doECFTransfer(ECFNetworkMember target,
                                      ECFNetworkMember source,
                                      int maxTransfer,
                                      float speed) {
@@ -46,9 +46,9 @@ public class ECFHelper {
         if (!validMember(source)) return;
         if (target.getEntity() instanceof ECFTrashCanBlockEntity) maxTransfer = Integer.MAX_VALUE;
         IECFHandler sourceMainHandler = source.getMainHandler();
-        int taken = sourceMainHandler.takeCFE(maxTransfer, true);
+        int taken = sourceMainHandler.takeECF(maxTransfer, true);
         IECFHandler targetMainHandler = target.getMainHandler();
-        int added = targetMainHandler.addCFE(taken, true);
+        int added = targetMainHandler.addECF(taken, true);
 
         if (added > 0) {
             if (target instanceof PPECFMemberProxy proxy && proxy.target() instanceof ECFNetworkMemberEntity) {
@@ -61,72 +61,71 @@ public class ECFHelper {
                 }
             }
             if (target.getPos().closerThan(source.getPos(), 2) && !(target instanceof Entity))
-                added = targetMainHandler.addCFE(added, false);
+                added = targetMainHandler.addECF(added, false);
             else {
-                added = sourceMainHandler.sendCFE(target, added, speed, false);
+                added = sourceMainHandler.sendECF(target, added, speed, false);
             }
 
-            sourceMainHandler.takeCFE(added, false);
+            sourceMainHandler.takeECF(added, false);
         }
 
     }
 
-    public static CFETransferBuilder newTransfer() {
-        return new CFETransferBuilder();
+    public static ECFTransferBuilder newTransfer() {
+        return new ECFTransferBuilder();
     }
 
-
-    public static class CFETransferBuilder {
-        ECFNetworkMember target = null;
-        ECFNetworkMember source = null;
-
-        int maxTransfer = TCCommonConfigs.CFE_PER_BURST_TRANSFER_LIMIT.get();
-        float speed = 1 / 20f;
-        boolean instant = false;
-
-
-        public CFETransferBuilder targetAndSource(ECFNetworkMember target, ECFNetworkMember source) {
-            this.target = target;
-            this.source = source;
-            return this;
-        }
-
-        public CFETransferBuilder maxTransfer(int maxTransfer) {
-            this.maxTransfer = maxTransfer;
-            return this;
-        }
-
-        public CFETransferBuilder speed(float speed) {
-            this.speed = speed;
-            return this;
-        }
-
-        public CFETransferBuilder instant() {
-            this.instant = true;
-            return this;
-        }
-
-        public void build() {
-            if (target != null && source != null) {
-                doCFETransfer(target, source, maxTransfer, speed);
-            }
-        }
-
-    }
-
-    public static int placeCFECloud(Level pLevel, BlockPos targetPos, int cfe) {
+    public static int placeECFCloud(Level pLevel, BlockPos targetPos, int cfe) {
         Optional<ECFCloudEntity> first = pLevel.getEntities(null, AABB.ofSize(targetPos.getCenter(), 1, 1, 1))
                 .stream()
                 .map(entity -> entity instanceof ECFCloudEntity cfeCloudEntity ? cfeCloudEntity : null)
                 .filter(Objects::nonNull)
                 .findFirst();
         ECFCloudEntity entity = first.orElseGet(() -> new ECFCloudEntity(pLevel));
-        int cfe1 = entity.getSyncedCFE();
+        int cfe1 = entity.getSyncedECF();
         if (cfe1 == 0) {
             pLevel.addFreshEntity(entity);
             entity.setPos(targetPos.getCenter());
         }
-        entity.setSyncedCFE(cfe1 + cfe);
+        entity.setSyncedECF(cfe1 + cfe);
         return cfe;
+    }
+
+    public static class ECFTransferBuilder {
+        ECFNetworkMember target = null;
+        ECFNetworkMember source = null;
+
+        int maxTransfer = TCCommonConfigs.ECF_PER_BURST_TRANSFER_LIMIT.get();
+        float speed = 1 / 20f;
+        boolean instant = false;
+
+
+        public ECFTransferBuilder targetAndSource(ECFNetworkMember target, ECFNetworkMember source) {
+            this.target = target;
+            this.source = source;
+            return this;
+        }
+
+        public ECFTransferBuilder maxTransfer(int maxTransfer) {
+            this.maxTransfer = maxTransfer;
+            return this;
+        }
+
+        public ECFTransferBuilder speed(float speed) {
+            this.speed = speed;
+            return this;
+        }
+
+        public ECFTransferBuilder instant() {
+            this.instant = true;
+            return this;
+        }
+
+        public void build() {
+            if (target != null && source != null) {
+                doECFTransfer(target, source, maxTransfer, speed);
+            }
+        }
+
     }
 }

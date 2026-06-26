@@ -20,7 +20,7 @@ import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.fluids.capability.templates.FluidTank;
 import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBEBehaviour;
 import net.sinedkadis.terracompositio.api.helpers.TooltipHelper;
-import net.sinedkadis.terracompositio.api.networks.cfe.IECFHandler;
+import net.sinedkadis.terracompositio.api.networks.ecf.IECFHandler;
 import net.sinedkadis.terracompositio.block.behaviours.ECFHandlerBehaviour;
 import net.sinedkadis.terracompositio.config.TCInnerConfig;
 import net.sinedkadis.terracompositio.registries.TCBlockStateProperties;
@@ -50,7 +50,7 @@ public abstract class AbstractDesorberBlockEntity extends TCBlockEntity {
     @Override
     public void addBEBehaviours(List<IBEBehaviour> list) {
         list.add(new ECFHandlerBehaviour(this)
-                .maxCFE(1000)
+                .maxECF(1000)
                 .range(5)
                 .priority(TCInnerConfig.DEFAULT_SOURCE_PRIORITY));
     }
@@ -116,7 +116,7 @@ public abstract class AbstractDesorberBlockEntity extends TCBlockEntity {
         lazyFluidHandler.invalidate();
     }
 
-    protected IECFHandler cfeContainer() {
+    protected IECFHandler ecfContainer() {
         return ((ECFHandlerBehaviour) behaviours.get(0)).getMainHandler();
     }
 

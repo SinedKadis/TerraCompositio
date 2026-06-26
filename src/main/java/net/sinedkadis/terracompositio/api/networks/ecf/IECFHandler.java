@@ -1,4 +1,4 @@
-package net.sinedkadis.terracompositio.api.networks.cfe;
+package net.sinedkadis.terracompositio.api.networks.ecf;
 
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
@@ -15,16 +15,19 @@ import java.util.function.Function;
 
 @MethodsReturnNonnullByDefault
 public interface IECFHandler extends BlockSource, ECFNetworkMember {
-    int getCFE();
-    void setCFE(int cfe);
+    int getECF();
 
-    int getMaxCFE();
-    IECFHandler setMaxCFE(int max);
+    void setECF(int cfe);
 
-    int addCFE(int cfe, boolean simulate);
-    int takeCFE(int cfe, boolean simulate);
+    int getMaxECF();
 
-    int sendCFE(ECFNetworkMember target, int cfe, float speed, boolean simulate);
+    IECFHandler setMaxECF(int max);
+
+    int addECF(int cfe, boolean simulate);
+
+    int takeECF(int cfe, boolean simulate);
+
+    int sendECF(ECFNetworkMember target, int cfe, float speed, boolean simulate);
 
     void writeToNBT(CompoundTag pTag);
     void readFromNBT(CompoundTag pTag);
@@ -39,7 +42,7 @@ public interface IECFHandler extends BlockSource, ECFNetworkMember {
         setQueued(Math.max(getQueued()-toSub,0));
     }
 
-    int getCFEWithQueue();
+    int getECFWithQueue();
 
     boolean isEmpty();
     int getFreeSpace();
