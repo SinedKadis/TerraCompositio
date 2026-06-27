@@ -17,6 +17,7 @@ import net.minecraft.world.level.block.state.BlockBehaviour;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraft.world.phys.Vec3;
+import net.sinedkadis.terracompositio.api.registries.TCBlockStateProperties;
 import net.sinedkadis.terracompositio.registries.TCBlocks;
 import net.sinedkadis.terracompositio.worldgen.tree.FlowCedarTreeGrower;
 
@@ -35,12 +36,20 @@ public class FlowCedarSaplingBlock extends SaplingBlock {
         ItemStack itemInHand = pPlayer.getItemInHand(pHand);
         if (itemInHand.is(Items.BONE_MEAL)){
             BlockState blockState = pLevel.getBlockState(pPos.above());
+            boolean success = false;
             if (blockState.is(TCBlocks.FLOW_CEDAR_TANK.get()) && blockState.getValue(FlowCedarTankBlock.STAGE).equals(3)) {
-                pLevel.setBlockAndUpdate(pPos, TCBlocks.FLOW_CEDAR_PEDESTAL.get().defaultBlockState());
+                success = true;
                 pLevel.setBlockAndUpdate(pPos.above(),blockState.setValue(FlowCedarTankBlock.STAGE,4));
+            }
+            if (blockState.is(TCBlocks.FLOW_CEDAR_ALTAR.get())) {
+                success = true;
+                pLevel.setBlockAndUpdate(pPos.above(), blockState.setValue(TCBlockStateProperties.INFUSED, true));
+            }
+            if (success) {
+                pLevel.setBlockAndUpdate(pPos, TCBlocks.FLOW_CEDAR_PEDESTAL.get().defaultBlockState());
                 itemInHand.shrink(1);
-                spawnFertilizeParticles(pLevel,pPos,10);
-                playFertilizeSound(pLevel,pPos);
+                spawnFertilizeParticles(pLevel, pPos, 10);
+                playFertilizeSound(pLevel, pPos);
                 return InteractionResult.SUCCESS;
             }
         }

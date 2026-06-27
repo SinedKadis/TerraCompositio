@@ -76,6 +76,13 @@ public class TCRecipeProvider extends RecipeProvider implements IConditionBuilde
     }
 
     private static void buildCFJ(@NotNull Consumer<FinishedRecipe> pWriter) {
+        ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, TCBlocks.FLOW_CEDAR_ALTAR.get())
+                .pattern("LLL")
+                .define('L', TCTags.Items.FLOW_CEDAR_LOGS)
+                .unlockedBy(getHasName(TCBlocks.FLOW_CEDAR_LOG.get()), has(TCBlocks.FLOW_CEDAR_LOG.get()))
+                .save(pWriter);
+
+
         ItemStack bookLevel1 = createCFJBook(1);
         ItemStack bookLevel2 = createCFJBook(2);
         ItemStack bookLevel3 = createCFJBook(3);
