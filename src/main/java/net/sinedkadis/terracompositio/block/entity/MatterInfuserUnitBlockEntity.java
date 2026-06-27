@@ -14,7 +14,6 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.phys.BlockHitResult;
-import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.wrapper.EmptyHandler;
@@ -54,18 +53,9 @@ public class MatterInfuserUnitBlockEntity extends MatterInfuserBaseBlockEntity{
 
     @Override
     public void addBEBehaviours(List<IBEBehaviour> list) {
-        list.add(new ECFHandlerBehaviour(this){
-            @Override
-            public Vec3 particleTargetOffset() {
-                return switch (getBlockState().getValue(BlockStateProperties.HORIZONTAL_FACING)){
-                    case SOUTH -> new Vec3(8.0 / 16, 8.0 / 16, 0.5 / 16);
-                    case NORTH -> new Vec3(8.0 / 16, 8.0 / 16, 15.5 / 16);
-                    case EAST -> new Vec3(0.5 / 16, 8.0 / 16, 8.0 / 16);
-                    case WEST -> new Vec3(15.5 / 16, 8.0 / 16, 8.0 / 16);
-                    default -> super.particleTargetOffset();
-                };
-            }
-        }.range(10).priority(TCInnerConfig.DEFAULT_CONSUMER_PRIORITY));
+        list.add(new ECFHandlerBehaviour(this)
+                .range(10)
+                .priority(TCInnerConfig.DEFAULT_CONSUMER_PRIORITY));
         list.add(new ItemStateHolderBehaviour(this) {
 
             @Override

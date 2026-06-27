@@ -1,6 +1,5 @@
 package net.sinedkadis.terracompositio.api.networks.ecf;
 
-import net.minecraft.world.phys.Vec3;
 import net.sinedkadis.terracompositio.api.networks.AnyNetworkMember;
 
 
@@ -8,22 +7,6 @@ import net.sinedkadis.terracompositio.api.networks.AnyNetworkMember;
  * The ECF Network Member. Holds data about ECF handler and capable to scheduled lazy updates.
  */
 public interface ECFNetworkMember extends AnyNetworkMember {
-
-    /**
-     * The center of block.
-     */
-    Vec3 center = new Vec3(0.5d,0.5d,0.5d);
-
-    /**
-     * Particle target offset to send ECF bursts. Deprecated (yes, just from first version), use {@link IECFHandler#getOffset()}
-     *
-     * @return the offset
-     */
-    @Deprecated
-    default Vec3 particleTargetOffset(){
-        return center;
-    }
-
     /**
      * Gets main handler of member.
      *

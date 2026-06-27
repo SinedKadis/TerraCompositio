@@ -29,7 +29,6 @@ import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.ServerLevelAccessor;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.common.util.LazyOptional;
@@ -63,7 +62,6 @@ import org.jetbrains.annotations.Nullable;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Optional;
 import java.util.Set;
 
 // /kill @e[type=terracompositio:flow_cedar_ent_entity]
@@ -79,12 +77,12 @@ public class FlowCedarEntEntity extends AbstractGolem implements ECFNetworkMembe
             SynchedEntityData.defineId(FlowCedarEntEntity.class, EntityDataSerializers.INT);
     public final AnimationState ecfHoldState = new AnimationState();
     protected LazyOptional<IECFHandler> lazyCFEOptional = LazyOptional.of(() -> new DefaultECFHandler(this)
-            .setMaxECF(10000)
+            .setMaxECF(64000)
             .setOffset(vec3 -> vec3.add(0, this.getBbHeight() + (0.1f + (this.getSyncedECF() / 10000d)) * 10 * 0.2f, 0))
             .setIndex(0));
     @Getter
     protected LazyOptional<IECFHandler> innerECFOptional = LazyOptional.of(() -> new DefaultECFHandler(this)
-            .setMaxECF(100)
+            .setMaxECF(32)
             .setOffset(vec3 -> vec3.add(0,1,0))
             .setIndex(1));
     public final AnimationState idleAnimationState = new AnimationState();
@@ -214,7 +212,12 @@ public class FlowCedarEntEntity extends AbstractGolem implements ECFNetworkMembe
     @SuppressWarnings("deprecation")
     @Override
     public @Nullable SpawnGroupData finalizeSpawn(ServerLevelAccessor pLevel, DifficultyInstance pDifficulty, MobSpawnType pReason, @Nullable SpawnGroupData pSpawnData, @Nullable CompoundTag pDataTag) {
-        this.innerECFOptional.ifPresent(icfeHandler -> icfeHandler.setECF(level().getRandom().nextInt(6, 36)));
+        int max;
+        if (pReason.equals(MobSpawnType.SPAWN_EGG))
+            max = 5;
+        else
+            max = level().getRandom().nextInt(6, 12);
+        this.innerECFOptional.ifPresent(icfeHandler -> icfeHandler.setECF(max));
         return super.finalizeSpawn(pLevel, pDifficulty, pReason, pSpawnData, pDataTag);
     }
 
@@ -353,16 +356,6 @@ public class FlowCedarEntEntity extends AbstractGolem implements ECFNetworkMembe
     }
 
     @Override
-    public Vec3 particleTargetOffset() {
-        Optional<IECFHandler> icfeHandler = lazyCFEOptional.resolve();
-        float scale = 3;
-        if (icfeHandler.isPresent() && icfeHandler.get().getECF() > 0) {
-            scale = (0.1f + (getSyncedECF() / (float) icfeHandler.get().getMaxECF())) * 10;
-        }
-        return new Vec3(0.5d,this.getBbHeight() + scale * 0.2f,0.5d);
-    }
-
-    @Override
     public IECFHandler getMainHandler() {
         return lazyCFEOptional.orElse(DummyECFHandler.instance);
     }
@@ -433,33 +426,27 @@ public class FlowCedarEntEntity extends AbstractGolem implements ECFNetworkMembe
     public void collectKnowledgeData(CompoundTag data) {
 
         lazyCFEOptional.ifPresent(cfeHandler -> {
-            data.putInt("val.ecf", cfeHandler.getECF());
+
+            data.putInt(TooltipHelper.Keys.ECF.toData(), cfeHandler.getECF());
             if (TCCommonConfigs.DEBUG.get()) {
-                data.putInt("val.max_cfe", cfeHandler.getMaxECF());
-                data.putInt("val.queued", cfeHandler.getQueued());
+                data.putInt(TooltipHelper.Keys.MAX_ECF.toData(), cfeHandler.getMaxECF());
+                data.putInt(TooltipHelper.Keys.QUEUED.toData(), cfeHandler.getQueued());
             }
         });
         innerECFOptional.ifPresent(cfeHandler -> {
-            data.putInt("val.cfe2", cfeHandler.getECF());
+            data.putInt(TooltipHelper.Keys.ECF.toData() + 2, cfeHandler.getECF());
             if (TCCommonConfigs.DEBUG.get()) {
-                data.putInt("val.max_cfe2", cfeHandler.getMaxECF());
-                data.putInt("val.queued2", cfeHandler.getQueued());
+                data.putInt(TooltipHelper.Keys.MAX_ECF.toData() + 2, cfeHandler.getMaxECF());
+                data.putInt(TooltipHelper.Keys.QUEUED.toData() + 2, cfeHandler.getQueued());
             }
         });
 
         int priority = this.getPriority();
 
         if (TCCommonConfigs.DEBUG.get()) {
-            data.putInt("val.priority", priority);
+            data.putInt(TooltipHelper.Keys.PRIORITY.toData(), priority);
         }
-
-        data.putInt("val.range", this.getRange());
-
-//        if (priority == TCInnerConfig.DEFAULT_CONSUMER_PRIORITY) {
-//            data.putBoolean("flag.type.consumer", true);
-//        } else if (priority == TCInnerConfig.DEFAULT_SOURCE_PRIORITY) {
-//            data.putBoolean("flag.type.source", true);
-//        }
+        data.putInt(TooltipHelper.Keys.RANGE.toData(), this.getRange());
 
     }
 

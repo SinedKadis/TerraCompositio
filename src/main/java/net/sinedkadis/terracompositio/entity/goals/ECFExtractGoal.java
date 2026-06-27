@@ -181,7 +181,7 @@ public class ECFExtractGoal extends Goal {
                 && blockState.getValue(TCBlockStateProperties.INFUSED)) {
             level.setBlockAndUpdate(targetPosition,
                     blockState.setValue(TCBlockStateProperties.INFUSED, false));
-            cachedHeld.addECF(100, false);
+            cachedHeld.addECF(32, false);
         }
     }
 }
