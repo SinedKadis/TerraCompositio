@@ -50,10 +50,12 @@ public abstract class AbstractDesorberBlockEntity extends TCBlockEntity {
     @Override
     public void addBEBehaviours(List<IBEBehaviour> list) {
         list.add(new ECFHandlerBehaviour(this)
-                .maxECF(1000)
+                .maxECF(getMaxCFE())
                 .range(5)
                 .priority(TCInnerConfig.DEFAULT_SOURCE_PRIORITY));
     }
+
+    abstract protected int getMaxCFE();
 
     //todo comparator compatibility
 

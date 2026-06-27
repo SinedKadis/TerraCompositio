@@ -68,7 +68,11 @@ public class ECFBurstProjectileEntity extends ThrowableProjectile {
 
 
     private ECFBurstProjectileEntity(IECFHandler pSource, Vec3 startOffset, ECFNetworkMember target, int cfe, float cfeTravelSpeed) {
-        this(pSource.x() + startOffset.x, pSource.y() + startOffset.y, pSource.z() + startOffset.z, pSource.getLevel());
+        this(pSource.getPos(), startOffset, target, cfe, cfeTravelSpeed);
+    }
+
+    private ECFBurstProjectileEntity(BlockPos pSource, Vec3 startOffset, ECFNetworkMember target, int cfe, float cfeTravelSpeed) {
+        this(pSource.getX() + startOffset.x + 0.5f, pSource.getY() + startOffset.y + 0.5f, pSource.getZ() + startOffset.z + 0.5f, target.getLevel());
 
         Vec3 offset;
         if (target instanceof PPECFMemberProxy) {
@@ -90,12 +94,12 @@ public class ECFBurstProjectileEntity extends ThrowableProjectile {
         float size = 0f;
         this.setBoundingBox(new AABB(size, size, size, size, size, size));
         Vec3 targetPos = target.getPos().getCenter().add(offset);
-        Vec3 startPos = pSource.getPos().getCenter().add(startOffset);
+        Vec3 startPos = pSource.getCenter().add(startOffset);
         Vec3 shootVec = targetPos.subtract(startPos);
         //pp proxy backdoor
         this.setTarget(target.getMainHandler().getAttachedMember().getPos());
         this.shoot(shootVec.x(), shootVec.y(), shootVec.z(), cfeTravelSpeed, 0);
-        lastBP.set(pSource.getPos());
+        lastBP.set(pSource);
     }
 
     public static @Nullable ECFBurstProjectileEntity sendBurst(IECFHandler pSource, ECFNetworkMember target, int cfe, float cfeTravelSpeed) {
@@ -103,6 +107,13 @@ public class ECFBurstProjectileEntity extends ThrowableProjectile {
             return null;
         }
         return new ECFBurstProjectileEntity(pSource, target, cfe, cfeTravelSpeed);
+    }
+
+    public static @Nullable ECFBurstProjectileEntity sendBurst(BlockPos pSource, ECFNetworkMember target, int cfe, float cfeTravelSpeed) {
+        if (cfe < 1) {
+            return null;
+        }
+        return new ECFBurstProjectileEntity(pSource, Vec3.ZERO, target, cfe, cfeTravelSpeed);
     }
 
     public static @Nullable ECFBurstProjectileEntity sendBurst(IECFHandler pSource, Vec3 offset, ECFNetworkMember target, int cfe, float cfeTravelSpeed) {

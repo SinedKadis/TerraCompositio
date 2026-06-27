@@ -41,6 +41,11 @@ public class CultivationDesorberBlockEntity extends AbstractDesorberBlockEntity 
         super(TCBlockEntities.CULTIVATION_DESORBER_BE.get(), pos, state);
     }
 
+    @Override
+    protected int getMaxCFE() {
+        return 32;
+    }
+
     public void setRenderStack(ItemStack itemStack) {
         this.renderStack.setStackInSlot(0,itemStack);
     }

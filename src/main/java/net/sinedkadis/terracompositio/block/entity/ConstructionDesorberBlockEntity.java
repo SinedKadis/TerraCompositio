@@ -19,6 +19,8 @@ import net.sinedkadis.terracompositio.TerraCompositio;
 import net.sinedkadis.terracompositio.api.TerraCompositioAPI;
 import net.sinedkadis.terracompositio.api.networks.ecf.ECFNetwork;
 import net.sinedkadis.terracompositio.api.networks.ecf.ECFNetworkMember;
+import net.sinedkadis.terracompositio.api.networks.ecf.IECFHandler;
+import net.sinedkadis.terracompositio.ecf.burst.ECFBurstProjectileEntity;
 import net.sinedkadis.terracompositio.registries.TCBlockEntities;
 import net.sinedkadis.terracompositio.util.helpers.ParticleHelperInternal;
 import org.jetbrains.annotations.NotNull;
@@ -36,26 +38,6 @@ public class ConstructionDesorberBlockEntity extends AbstractDesorberBlockEntity
 
     public ConstructionDesorberBlockEntity(BlockPos pos, BlockState state) {
         super(TCBlockEntities.CONSTRUCTION_DESORBER_BE.get(), pos, state);
-    }
-
-    @Override
-    protected void saveAdditional(@NotNull CompoundTag pTag) {
-        pTag.put("render", renderStack.serializeNBT());
-        super.saveAdditional(pTag);
-    }
-
-    @Override
-    public void load(@NotNull CompoundTag pTag) {
-        super.load(pTag);
-        renderStack.deserializeNBT(pTag.getCompound("render"));
-    }
-
-    public void setRenderStack(ItemStack itemStack) {
-        this.renderStack.setStackInSlot(0,itemStack);
-    }
-
-    public ItemStack getRenderStack() {
-        return this.renderStack.getStackInSlot(0);
     }
 
     @SubscribeEvent
@@ -86,23 +68,34 @@ public class ConstructionDesorberBlockEntity extends AbstractDesorberBlockEntity
             FluidTank fluidHandler1 = blockEntity.fluidHandler;
             if (!fluidHandler1.isEmpty() && fluidHandler1.getFluidAmount() >= ECFToAdd) {
                 fluidHandler1.drain(ECFToAdd, IFluidHandler.FluidAction.EXECUTE);
-                int added = blockEntity.ecfContainer().addECF(ECFToAdd, false);
+                IECFHandler iecfHandler = blockEntity.ecfContainer();
+                int added = iecfHandler.addECF(ECFToAdd, true);
                 ECFToAdd -= added;
                 blockEntity.setRenderStack(new ItemStack(event.getPlacedBlock().getBlock()));
+                BlockPos blockEntityBlockPos = blockEntity.getBlockPos();
+                ((Level) level).sendBlockUpdated(blockEntityBlockPos, blockEntity.getBlockState(), blockEntity.getBlockState(), 3);
                 if (ECFToAdd == 0) {
                     if (!level.isClientSide()) {
-                        BlockPos blockEntityBlockPos = blockEntity.getBlockPos();
                         level.playSound(null, blockEntityBlockPos, SoundEvents.BEACON_ACTIVATE, SoundSource.BLOCKS, 0.1f, 1f);
+                        level.addFreshEntity(
+                                Objects.requireNonNull(
+                                        ECFBurstProjectileEntity.sendBurst(pos, iecfHandler, added, 5 / 20f)
+                                )
+                        );
                         ParticleHelperInternal.sendECFParticles((ServerLevel) level,
                                 blockEntity.ecfContainer().getOffset().apply(blockEntityBlockPos.getCenter()),
                                 pos.getCenter(),
-                                added);
+                                added,
+                                null,
+                                5 / 20f);
+
                     }
                     break;
                 }
             }
         }
     }
+
     @SubscribeEvent
     public static void onBreakEvent(BlockEvent.BreakEvent event){
         BlockPos pos = event.getPos();
@@ -132,14 +125,42 @@ public class ConstructionDesorberBlockEntity extends AbstractDesorberBlockEntity
                 if (!fluidHandler1.isEmpty()) {
                     CFEToRemove -= fluidHandler1.drain(CFEToRemove*2, IFluidHandler.FluidAction.EXECUTE).getAmount()/2;
                     blockEntity.setRenderStack(new ItemStack(event.getState().getBlock()));
+                    BlockPos blockEntityBlockPos = blockEntity.getBlockPos();
+                    ((Level) level).sendBlockUpdated(blockEntityBlockPos, blockEntity.getBlockState(), blockEntity.getBlockState(), 3);
+                    ParticleHelperInternal.spawnParticlesIn((Level) level, blockEntityBlockPos, 10);
                     if (!level.isClientSide())
-                        level.playSound(null, blockEntity.getBlockPos(), SoundEvents.BEACON_DEACTIVATE, SoundSource.BLOCKS,0.1f,1f);
+                        level.playSound(null, blockEntityBlockPos, SoundEvents.BEACON_DEACTIVATE, SoundSource.BLOCKS, 0.1f, 1f);
                 }
                 if (CFEToRemove == 0) {
                     break;
                 }
             }
         }
+    }
+
+    @Override
+    public void load(@NotNull CompoundTag pTag) {
+        super.load(pTag);
+        renderStack.deserializeNBT(pTag.getCompound("render"));
+    }
+
+    public void setRenderStack(ItemStack itemStack) {
+        this.renderStack.setStackInSlot(0,itemStack);
+    }
+
+    public ItemStack getRenderStack() {
+        return this.renderStack.getStackInSlot(0);
+    }
+
+    @Override
+    protected int getMaxCFE() {
+        return 64;
+    }
+
+    @Override
+    protected void saveAdditional(@NotNull CompoundTag pTag) {
+        pTag.put("render", renderStack.serializeNBT());
+        super.saveAdditional(pTag);
     }
 
 }

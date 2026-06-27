@@ -29,6 +29,11 @@ public class TimePassageDesorberBlockEntity extends AbstractDesorberBlockEntity 
     }
 
     @Override
+    protected int getMaxCFE() {
+        return 240;
+    }
+
+    @Override
     public void tick(@NotNull Level pLevel, @NotNull BlockPos pPos, @NotNull BlockState pState) {
         super.tick(pLevel, pPos, pState);
         timeReSetter--;
