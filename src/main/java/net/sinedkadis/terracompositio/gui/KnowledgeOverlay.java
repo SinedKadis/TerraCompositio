@@ -108,18 +108,28 @@ public class KnowledgeOverlay {
 
         EntityHitResult entityResult = PlayerHelper.getEntityHitResult(mc, player, level);
 
-        boolean isEntity = false;
+
         Entity entity = null;
-        IHaveKnowledge entityKnowledge = null;
+        List<Component> entityTooltip = new ArrayList<>();
         if (entityResult != null) {
             entity = entityResult.getEntity();
             if ((entity instanceof IHaveKnowledge ihk)) {
-                isEntity = true;
-                entityKnowledge = ihk;
+                hoverTicks++;
+
+                if (hoverTicks == 1 || hoverTicks % REQUEST_INTERVAL == 0) {
+
+                    TCPackets.CHANNEL.sendToServer(new C2SRequestEntityKnowledgePacket(entity.getUUID()));
+                }
+
+                CompoundTag data = S2CKnowledgeDataPacket.ClientCache.get(entity.getUUID());
+                if (data != null) {
+                    ihk.addTooltipLines(data, entityTooltip, isShifting);
+                }
+
             }
         }
 
-        if (!isEntity && hit instanceof BlockHitResult result) {
+        if (entityTooltip.isEmpty() && hit instanceof BlockHitResult result) {
             BlockPos pos = result.getBlockPos();
 
             BlockEntity be = level.getBlockEntity(pos);
@@ -127,8 +137,8 @@ public class KnowledgeOverlay {
                 resetHover();
                 return;
             }
-
-            hoverTicks++;
+            if (!(entity instanceof IHaveKnowledge))
+                hoverTicks++;
 
             if (hoverTicks == 1 || hoverTicks % REQUEST_INTERVAL == 0) {
                 TCPackets.CHANNEL.sendToServer(new C2SRequestBlockKnowledgePacket(pos));
@@ -141,20 +151,8 @@ public class KnowledgeOverlay {
             }
 
             ihk.addTooltipLines(data, tooltip, isShifting);
-        } else if (isEntity) {
-            hoverTicks++;
-
-            if (hoverTicks == 1 || hoverTicks % REQUEST_INTERVAL == 0) {
-
-                TCPackets.CHANNEL.sendToServer(new C2SRequestEntityKnowledgePacket(entity.getUUID()));
-            }
-
-            CompoundTag data = S2CKnowledgeDataPacket.ClientCache.get(entity.getUUID());
-            if (data == null) {
-                return;
-            }
-
-            entityKnowledge.addTooltipLines(data, tooltip, isShifting);
+        } else {
+            tooltip.addAll(entityTooltip);
         }
 
         resolveHeaders(tooltip);

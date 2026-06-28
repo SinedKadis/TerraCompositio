@@ -118,6 +118,7 @@ public class ECFCloudEntity extends Entity implements ECFNetworkMemberEntity, IH
             entity.setPos(targetPos.getCenter());
         }
         entity.setSyncedECF(cfe1 + cfe);
+        entity.scheduleMemberUpdate();
         return cfe;
     }
 
@@ -325,7 +326,7 @@ public class ECFCloudEntity extends Entity implements ECFNetworkMemberEntity, IH
     public void addTooltipLines(CompoundTag data, List<Component> tooltip, boolean isShifting) {
 
         if (isShifting) {
-            TooltipHelper.addWithHeader(TooltipHelper.Headers.BLOCK, tooltip, t -> {
+            TooltipHelper.addWithHeader(TooltipHelper.Headers.ENTITY, tooltip, t -> {
                 if (TCCommonConfigs.DEBUG.get())
                     TooltipHelper.addIfExist(TooltipHelper.Keys.PRIORITY, t, data);
                 TooltipHelper.addIfExist(TooltipHelper.Keys.RANGE, t, data);

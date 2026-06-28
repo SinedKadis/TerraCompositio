@@ -35,7 +35,13 @@ public class ECFBurstRenderer extends EntityRenderer<ECFBurstProjectileEntity> {
             int cfe = pEntity.getECF();
             int count = TCInnerConfig.RENDER_COUNT_FUNCTION.applyAsInt(cfe);
             Vector3f[] offsets1 = getOffsets(pEntity);
-            if (offsets1 == null || offsets1.length < count) genOffsets(pEntity);
+            if (offsets1 == null || offsets1.length < count) {
+                try {
+                    genOffsets(pEntity);
+                } catch (RuntimeException e) {
+                    return;
+                }
+            }
             offsets1 = getOffsets(pEntity);
             assert offsets1 != null;
             var renderType = RenderType.entityTranslucentEmissive(getTextureLocation(pEntity));

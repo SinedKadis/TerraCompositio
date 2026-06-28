@@ -47,7 +47,7 @@ public class ECFBurstProjectileEntity extends ThrowableProjectile {
 
 
     private final BlockPos.MutableBlockPos lastBP = new BlockPos.MutableBlockPos();
-    private int timeToLive = 100;
+    private int timeToLive = 120;
 
     @Getter
     @Setter

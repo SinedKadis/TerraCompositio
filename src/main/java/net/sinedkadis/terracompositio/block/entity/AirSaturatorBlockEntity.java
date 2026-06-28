@@ -53,7 +53,9 @@ public class AirSaturatorBlockEntity extends TCBlockEntity implements IFluidAppl
                 ECFCloudEntity.placeECFCloud(pLevel, toPlace, ecf);
                 ecfContainer().takeECF(ecf, false);
                 scheduleMemberUpdate();
-                pLevel.playSound(null,toPlace, SoundEvents.WOOL_PLACE, SoundSource.BLOCKS,0.5f,1f);
+
+                if (level != null && level.getGameTime() % 20 == 0)
+                    pLevel.playSound(null, toPlace, SoundEvents.WOOL_PLACE, SoundSource.BLOCKS, 0.5f, 1f);
             } else if (timer <= 0){
                 int toSaturate = ecfContainer().takeECF(10, true);
                 ECFCloudEntity.placeECFCloud(pLevel, toPlace, toSaturate);
