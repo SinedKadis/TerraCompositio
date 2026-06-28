@@ -1,19 +1,25 @@
 package net.sinedkadis.terracompositio.block.entity;
 
 import lombok.Getter;
+import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
+import net.minecraft.network.chat.Component;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.fluids.capability.IFluidHandler;
+import net.sinedkadis.terracompositio.api.helpers.TooltipHelper;
 import net.sinedkadis.terracompositio.registries.TCBlockEntities;
 import net.sinedkadis.terracompositio.util.helpers.ParticleHelperInternal;
-import org.jetbrains.annotations.NotNull;
 
+import javax.annotation.ParametersAreNonnullByDefault;
+import java.util.List;
 import java.util.function.Function;
 
 
 @Getter
+@ParametersAreNonnullByDefault
+@MethodsReturnNonnullByDefault
 public class TimePassageDesorberBlockEntity extends AbstractDesorberBlockEntity {
     private int timeBuffer = 0;
     private int timeReSetter = 20;
@@ -34,7 +40,7 @@ public class TimePassageDesorberBlockEntity extends AbstractDesorberBlockEntity 
     }
 
     @Override
-    public void tick(@NotNull Level pLevel, @NotNull BlockPos pPos, @NotNull BlockState pState) {
+    public void tick(Level pLevel, BlockPos pPos, BlockState pState) {
         super.tick(pLevel, pPos, pState);
         timeReSetter--;
         if (timeReSetter <= 1) {
@@ -80,16 +86,33 @@ public class TimePassageDesorberBlockEntity extends AbstractDesorberBlockEntity 
     }
 
     @Override
-    protected void saveAdditional(@NotNull CompoundTag pTag) {
+    protected void saveAdditional(CompoundTag pTag) {
         pTag.putInt("buffer", timeBuffer);
         pTag.putInt("counter", timeCounter);
         super.saveAdditional(pTag);
     }
 
     @Override
-    public void load(@NotNull CompoundTag pTag) {
+    public void load(CompoundTag pTag) {
         super.load(pTag);
         timeBuffer = pTag.getInt("buffer");
         timeCounter = pTag.getInt("counter");
+    }
+
+    @Override
+    public void collectKnowledgeData(CompoundTag data) {
+        data.putInt(TooltipHelper.Keys.TIME_COLLECTED.toData(), timeBuffer);
+        data.putDouble(TooltipHelper.Keys.TIME_COLLECTION_CHANCE.toData(), function.apply(timeCounter) * 100);
+        super.collectKnowledgeData(data);
+    }
+
+    @Override
+    public void addTooltipLines(CompoundTag data, List<Component> tooltip, boolean isShifting) {
+        TooltipHelper.addWithHeader(TooltipHelper.Headers.BLOCK, tooltip, t -> {
+            TooltipHelper.addIfExist(TooltipHelper.Keys.TIME_COLLECTED, TooltipHelper.Units.SECONDS, t, data);
+            TooltipHelper.addIfExist(TooltipHelper.Keys.TIME_COLLECTION_CHANCE, TooltipHelper.Units.NO_UNITS, t, data);
+        });
+
+        super.addTooltipLines(data, tooltip, isShifting);
     }
 }

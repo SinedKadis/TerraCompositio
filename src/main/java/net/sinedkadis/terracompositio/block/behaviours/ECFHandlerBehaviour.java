@@ -217,30 +217,31 @@ public class ECFHandlerBehaviour implements IBEECFBehaviour, IHaveKnowledge {
     @Override
     public void addTooltipLines(CompoundTag data, List<Component> tooltip, boolean isShifting) {
 
-        TooltipHelper.addHeader(TooltipHelper.Headers.BLOCK, tooltip);
+        TooltipHelper.addWithHeader(TooltipHelper.Headers.BLOCK, tooltip, t -> {
+            if (TCCommonConfigs.DEBUG.get()) {
+                TooltipHelper.addIfExist(TooltipHelper.Keys.PRIORITY, t, data);
+            }
+            if (isShifting)
+                TooltipHelper.addIfExist(TooltipHelper.Keys.RANGE, TooltipHelper.Units.BLOCKS, t, data);
+            if (data.contains(TooltipHelper.Keys.PRIORITY.toData())) {
+                int priority = data.getInt(TooltipHelper.Keys.PRIORITY.toData());
+                if (priority == TCInnerConfig.DEFAULT_CONSUMER_PRIORITY)
+                    TooltipHelper.addWithNoArg(TooltipHelper.Keys.TYPE, TooltipHelper.Units.CONSUMER, t);
+                if (priority == TCInnerConfig.DEFAULT_SOURCE_PRIORITY)
+                    TooltipHelper.addWithNoArg(TooltipHelper.Keys.TYPE, TooltipHelper.Units.SOURCE, t);
+            }
+        });
 
-        boolean added = false;
-        if (TCCommonConfigs.DEBUG.get()) {
-            added = TooltipHelper.addIfExist(TooltipHelper.Keys.PRIORITY, tooltip, data);
-        }
-        if (isShifting)
-            added = TooltipHelper.addIfExist(TooltipHelper.Keys.RANGE, TooltipHelper.Units.BLOCKS, tooltip, data);
 
-        if (!added) tooltip.remove(tooltip.size() - 1);
+        TooltipHelper.addWithHeader(TooltipHelper.Headers.ECF, tooltip, t -> {
+            TooltipHelper.addIfExist(TooltipHelper.Keys.ECF, t, data);
+            TooltipHelper.addIfExist(TooltipHelper.Keys.MAX_ECF, t, data);
+            TooltipHelper.addIfExist(TooltipHelper.Keys.QUEUED, t, data);
+        });
 
-        TooltipHelper.addHeader(TooltipHelper.Headers.ECF, tooltip);
 
-        TooltipHelper.addIfExist(TooltipHelper.Keys.ECF, tooltip, data);
-        TooltipHelper.addIfExist(TooltipHelper.Keys.MAX_ECF, tooltip, data);
-        TooltipHelper.addIfExist(TooltipHelper.Keys.QUEUED, tooltip, data);
 
-        if (data.contains(TooltipHelper.Keys.PRIORITY.toData())) {
-            int priority = data.getInt(TooltipHelper.Keys.PRIORITY.toData());
-            if (priority == TCInnerConfig.DEFAULT_CONSUMER_PRIORITY)
-                TooltipHelper.add(TooltipHelper.Keys.TYPE, TooltipHelper.Units.CONSUMER, tooltip);
-            if (priority == TCInnerConfig.DEFAULT_SOURCE_PRIORITY)
-                TooltipHelper.add(TooltipHelper.Keys.TYPE, TooltipHelper.Units.SOURCE, tooltip);
-        }
+
     }
 
 }

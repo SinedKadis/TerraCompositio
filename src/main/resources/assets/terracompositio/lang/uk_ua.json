@@ -103,6 +103,8 @@
   "info.terracompositio.ent_hold_header": "Тримає: ",
   "info.terracompositio.ent_inner_header": "У шлунку: ",
   "info.terracompositio.ent_common_header": "Загальне: ",
+  "info.terracompositio.time_collected": "Часу зібрано: %s",
+  "info.terracompositio.time_collection_chance": "Вірогідність збору часу: %s%%",
   "item.terracompositio.creation_flow_journal.tooltip": "%s закладок",
   "block.terracompositio.item_io.input": "Вхід: ",
   "block.terracompositio.item_io.output": "Вихід: ",

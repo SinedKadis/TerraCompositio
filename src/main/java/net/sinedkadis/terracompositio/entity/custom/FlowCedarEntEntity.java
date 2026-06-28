@@ -453,34 +453,27 @@ public class FlowCedarEntEntity extends AbstractGolem implements ECFNetworkMembe
     @Override
     public void addTooltipLines(CompoundTag data, List<Component> tooltip, boolean isShifting) {
 
-
-        TooltipHelper.addHeader(TooltipHelper.Headers.ECF, tooltip);
-        TooltipHelper.addHeader(TooltipHelper.Headers.ENT_HOLD, tooltip);
-
-
-        TooltipHelper.addIfExist(TooltipHelper.Keys.ECF, tooltip, data);
-        TooltipHelper.addIfExist(TooltipHelper.Keys.MAX_ECF, tooltip, data);
-        TooltipHelper.addIfExist(TooltipHelper.Keys.QUEUED, tooltip, data);
+        TooltipHelper.addWithHeader(TooltipHelper.Headers.ECF, tooltip, t1 -> {
+            TooltipHelper.addWithHeader(TooltipHelper.Headers.ENT_HOLD, t1, t -> {
+                TooltipHelper.addIfExist(TooltipHelper.Keys.ECF, t, data);
+                TooltipHelper.addIfExist(TooltipHelper.Keys.MAX_ECF, t, data);
+                TooltipHelper.addIfExist(TooltipHelper.Keys.QUEUED, t, data);
+            });
 
 
-        TooltipHelper.addHeader(TooltipHelper.Headers.ENT_INNER, tooltip);
+            TooltipHelper.addWithHeader(TooltipHelper.Headers.ENT_INNER, t1, t -> {
+                TooltipHelper.addIfExist(TooltipHelper.Keys.ECF, t, data, 2);
+                if (isShifting) {
+                    t.add(TooltipHelper.keyWithArg(TooltipHelper.Keys.CONSUME, 0.1, TooltipHelper.Units.ECF_SECOND));
+                }
+                TooltipHelper.addIfExist(TooltipHelper.Keys.MAX_ECF, t, data, 2);
+                TooltipHelper.addIfExist(TooltipHelper.Keys.QUEUED, t, data, 2);
+            });
 
-
-        TooltipHelper.addIfExist(TooltipHelper.Keys.ECF, tooltip, data, 2);
-        if (isShifting) {
-            tooltip.add(TooltipHelper.keyWithArg(TooltipHelper.Keys.CONSUME, 0.1, TooltipHelper.Units.ECF_SECOND));
-        }
-        TooltipHelper.addIfExist(TooltipHelper.Keys.MAX_ECF, tooltip, data, 2);
-        TooltipHelper.addIfExist(TooltipHelper.Keys.QUEUED, tooltip, data, 2);
-
-
-        TooltipHelper.addHeader(TooltipHelper.Headers.ENT_COMMON, tooltip);
-
-        boolean shown = false;
-
-        shown |= TooltipHelper.addIfExist(TooltipHelper.Keys.PRIORITY, tooltip, data);
-        shown |= TooltipHelper.addIfExist(TooltipHelper.Keys.RANGE, tooltip, data);
-
-        if (!shown) tooltip.remove(tooltip.size() - 1);
+            TooltipHelper.addWithHeader(TooltipHelper.Headers.ENT_COMMON, t1, t -> {
+                TooltipHelper.addIfExist(TooltipHelper.Keys.PRIORITY, t, data);
+                TooltipHelper.addIfExist(TooltipHelper.Keys.RANGE, TooltipHelper.Units.BLOCKS, t, data);
+            });
+        });
     }
 }

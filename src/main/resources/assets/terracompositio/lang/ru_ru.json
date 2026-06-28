@@ -103,6 +103,8 @@
   "info.terracompositio.ent_hold_header": "Держит: ",
   "info.terracompositio.ent_inner_header": "В желудке: ",
   "info.terracompositio.ent_common_header": "Общее: ",
+  "info.terracompositio.time_collected": "Времени собрано: %s",
+  "info.terracompositio.time_collection_chance": "Вероятность сбора времени: %s%%",
   "item.terracompositio.creation_flow_journal.tooltip": "%s закладок",
   "block.terracompositio.item_io.input": "Вход: ",
   "block.terracompositio.item_io.output": "Выход: ",

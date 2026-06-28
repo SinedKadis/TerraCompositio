@@ -1,4 +1,4 @@
-package net.sinedkadis.terracompositio.util;
+package net.sinedkadis.terracompositio.api.components;
 
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.network.chat.Component;
@@ -10,10 +10,19 @@ import net.minecraft.world.item.ItemStack;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.List;
 
+/**
+ * The implementation of Component that holds {@link ItemStack}. Processed in Knowledge Overlay.
+ */
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
 public record ItemComponent(ItemStack itemStack) implements Component {
 
+    /**
+     * Factory method for {@link ItemComponent}
+     *
+     * @param itemStack the item stack
+     * @return the item component
+     */
     public static ItemComponent of(ItemStack itemStack) {
         return new ItemComponent(itemStack);
     }

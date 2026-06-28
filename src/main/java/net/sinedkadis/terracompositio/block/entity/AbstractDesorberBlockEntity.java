@@ -18,13 +18,13 @@ import net.minecraftforge.fluids.FluidStack;
 import net.minecraftforge.fluids.FluidUtil;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.fluids.capability.templates.FluidTank;
+import net.sinedkadis.terracompositio.api.components.FluidComponent;
 import net.sinedkadis.terracompositio.api.helpers.TooltipHelper;
 import net.sinedkadis.terracompositio.api.networks.ecf.IECFHandler;
 import net.sinedkadis.terracompositio.api.registries.TCBlockStateProperties;
 import net.sinedkadis.terracompositio.block.behaviours.ECFHandlerBehaviour;
 import net.sinedkadis.terracompositio.config.TCInnerConfig;
 import net.sinedkadis.terracompositio.registries.TCFluids;
-import net.sinedkadis.terracompositio.util.FluidComponent;
 import net.sinedkadis.terracompositio.util.behaviors.blockentity.IBEBehaviour;
 import org.jetbrains.annotations.Nullable;
 
@@ -139,9 +139,8 @@ public abstract class AbstractDesorberBlockEntity extends TCBlockEntity {
 
         FluidStack fluidStack = FluidStack.loadFluidStackFromNBT(data.getCompound(TooltipHelper.Keys.FLUID.toData()));
         if (!fluidStack.isEmpty()) {
-            TooltipHelper.addHeader(TooltipHelper.Headers.FLUIDS, tooltip);
-
-            tooltip.add(FluidComponent.of(fluidStack));
+            TooltipHelper.addWithHeader(TooltipHelper.Headers.FLUIDS, tooltip,
+                    t -> t.add(FluidComponent.of(fluidStack)));
         }
 
     }

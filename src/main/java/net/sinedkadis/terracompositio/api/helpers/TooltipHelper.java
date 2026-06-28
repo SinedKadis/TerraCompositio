@@ -4,14 +4,17 @@ import net.minecraft.ChatFormatting;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.network.chat.MutableComponent;
+import net.sinedkadis.terracompositio.api.TerraCompositioAPI;
+import net.sinedkadis.terracompositio.api.components.HeaderComponent;
 
 import java.util.List;
+import java.util.function.Consumer;
 
 /**
  * The class with methods, that helps with {@link Component}.
  */
 public class TooltipHelper {
-    private static final String translationKeyHeader = "info.terracompositio.";
+    private static final String translationKeyHeader = "info.";
     private static final String dataHeader = "val.";
     private static final String headerEnding = "_header";
 
@@ -46,7 +49,7 @@ public class TooltipHelper {
         stringArg = stringArg.substring(0, length - toCrop);
 
         MutableComponent mutableComponent = Component.literal(stringArg)
-                .append(Component.translatable(measurement.toString()));
+                .append(Component.translatable(measurement.toTranslation()));
         if (arg instanceof MutableComponent component)
             mutableComponent = component;
         return Component.translatable(translationKey,
@@ -57,11 +60,20 @@ public class TooltipHelper {
     /**
      * Adds header to {@link List} of {@link Component}.
      *
-     * @param header the header
-     * @param list   the list
+     * @param header              the header
+     * @param list                the list
+     * @param tooltipsUnderHeader the lines that will be added under the header
      */
-    public static void addHeader(ICustomHeader header, List<Component> list) {
-        list.add(Component.translatable(header.toString()));
+    public static void addWithHeader(ICustomHeader header, List<Component> list, Consumer<List<Component>> tooltipsUnderHeader) {
+        for (Component component : list) {
+            if (component instanceof HeaderComponent headerComponent && headerComponent.getHeader().equals(header)) {
+                headerComponent.getConsumerList().add(tooltipsUnderHeader);
+                return;
+            }
+        }
+        HeaderComponent headerComponent = HeaderComponent.create(header);
+        headerComponent.getConsumerList().add(tooltipsUnderHeader);
+        list.add(headerComponent);
     }
 
     /**
@@ -72,7 +84,7 @@ public class TooltipHelper {
      * @return the mutable component
      */
     public static MutableComponent keyWithArg(ICustomKey key, Object arg) {
-        return defaultTextWithArg(key.toString(), arg);
+        return defaultTextWithArg(key.toTranslation(), arg);
     }
 
     /**
@@ -84,7 +96,7 @@ public class TooltipHelper {
      * @return the mutable component
      */
     public static MutableComponent keyWithArg(ICustomKey key, Object arg, ICustomUnit unit) {
-        return defaultTextWithArg(key.toString(), arg, unit);
+        return defaultTextWithArg(key.toTranslation(), arg, unit);
     }
 
     /**
@@ -93,13 +105,11 @@ public class TooltipHelper {
      * @param key  the key
      * @param list the list
      * @param data the data
-     * @return is added
      */
-    public static boolean addIfExist(ICustomKey key, List<Component> list, CompoundTag data) {
+    public static void addIfExist(ICustomKey key, List<Component> list, CompoundTag data) {
         if (data.contains(key.toData())) {
-            return list.add(keyWithArg(key, data.get(key.toData())));
+            list.add(keyWithArg(key, data.get(key.toData())));
         }
-        return false;
     }
 
     /**
@@ -109,13 +119,11 @@ public class TooltipHelper {
      * @param units the units
      * @param list  the list
      * @param data  the data
-     * @return the boolean
      */
-    public static boolean addIfExist(ICustomKey key, Units units, List<Component> list, CompoundTag data) {
+    public static void addIfExist(ICustomKey key, Units units, List<Component> list, CompoundTag data) {
         if (data.contains(key.toData())) {
-            return list.add(keyWithArg(key, data.get(key.toData()), units));
+            list.add(keyWithArg(key, data.get(key.toData()), units));
         }
-        return false;
     }
 
     /**
@@ -125,13 +133,11 @@ public class TooltipHelper {
      * @param list  the list
      * @param data  the data
      * @param index the index, added to key in data
-     * @return the boolean
      */
-    public static boolean addIfExist(ICustomKey key, List<Component> list, CompoundTag data, int index) {
+    public static void addIfExist(ICustomKey key, List<Component> list, CompoundTag data, int index) {
         if (data.contains(key.toData(index))) {
-            return list.add(keyWithArg(key, data.get(key.toData(index))));
+            list.add(keyWithArg(key, data.get(key.toData(index))));
         }
-        return false;
     }
 
     /**
@@ -142,13 +148,11 @@ public class TooltipHelper {
      * @param list  the list
      * @param data  the data
      * @param index the index, added to key in data
-     * @return the boolean
      */
-    public static boolean addIfExist(ICustomKey key, ICustomUnit units, List<Component> list, CompoundTag data, int index) {
+    public static void addIfExist(ICustomKey key, ICustomUnit units, List<Component> list, CompoundTag data, int index) {
         if (data.contains(key.toData(index))) {
-            return list.add(keyWithArg(key, data.get(key.toData(index)), units));
+            list.add(keyWithArg(key, data.get(key.toData(index)), units));
         }
-        return false;
     }
 
     /**
@@ -177,21 +181,20 @@ public class TooltipHelper {
     }
 
     /**
-     * Add translation key without args and with given units, without checking it existence.
+     * Add translation key without args and with given units, without checking it existence. Data provided to check Headers.
+     * If any header is active, adds values right after it header
      *
      * @param key  the key
      * @param unit the unit
      * @param list the list
      * @return the boolean
      */
-    public static boolean add(ICustomKey key, ICustomUnit unit, List<Component> list) {
+    public static boolean addWithNoArg(ICustomKey key, ICustomUnit unit, List<Component> list) {
         return list.add(keyWithArg(key, "", unit));
     }
 
     /**
-     * The Headers. Auto generated using enum entry names and adding
-     * {@link net.sinedkadis.terracompositio.api.helpers.TooltipHelper#translationKeyHeader} at the start of string, and
-     * {@link TooltipHelper#headerEnding} to the end of string
+     * The Headers. Auto generated using enum entry names
      */
     public enum Headers implements ICustomHeader {
         BLOCK,
@@ -205,16 +208,13 @@ public class TooltipHelper {
         ENT_COMMON;
 
         @Override
-        public String toString() {
-            return translationKeyHeader + name().toLowerCase() + headerEnding;
+        public String getModID() {
+            return TerraCompositioAPI.MOD_ID;
         }
     }
 
     /**
-     * The Keys. Auto generated using enum entry names and adding
-     * {@link net.sinedkadis.terracompositio.api.helpers.TooltipHelper#translationKeyHeader} at the start of string to get a translation key,
-     * and
-     * {@link TooltipHelper#dataHeader} at the start of string to get a data key. Translation keys contains "%s" to make passing args possible
+     * The Keys. Auto generated using enum entry names
      */
     public enum Keys implements ICustomKey {
         CONSUME,
@@ -231,19 +231,13 @@ public class TooltipHelper {
         TYPE,
         FLUID,
         PROGRESS,
-        MAX_PROGRESS;
+        MAX_PROGRESS,
+        TIME_COLLECTED,
+        TIME_COLLECTION_CHANCE;
 
         @Override
-        public String toString() {
-            return translationKeyHeader + name().toLowerCase();
-        }
-
-        public String toData() {
-            return dataHeader + name().toLowerCase();
-        }
-
-        public String toData(int index) {
-            return dataHeader + name().toLowerCase() + index;
+        public String getModID() {
+            return TerraCompositioAPI.MOD_ID;
         }
     }
 
@@ -262,29 +256,81 @@ public class TooltipHelper {
         SOURCE;
 
         @Override
-        public String toString() {
+        public String toTranslation() {
             if (this.equals(NO_UNITS)) return "";
-            return translationKeyHeader + name().toLowerCase();
+            return ICustomUnit.super.toTranslation();
+        }
+
+        @Override
+        public String getModID() {
+            return TerraCompositioAPI.MOD_ID;
         }
     }
 
     /**
-     * Implement that to uze custom headers.
+     * Implement that to uze custom headers. Generated via adding
+     *  {@link net.sinedkadis.terracompositio.api.helpers.TooltipHelper#translationKeyHeader} at the start of string,
+     *  then provided MOD_ID, then provided name and with
+     *  {@link TooltipHelper#headerEnding} at the end of the string
      */
     public interface ICustomHeader {
 
+        /**
+         * Name of the header without "_header".
+         *
+         * @return the string
+         */
+        String name();
+
+        /**
+         * To translation string. Looks like "info.mod_id.name_header"
+         *
+         * @return the string
+         */
+        default String toTranslation() {
+            return translationKeyHeader + getModID() + "." + name().toLowerCase() + headerEnding;
+        }
+
+        /**
+         * Gets the MOD_ID used in translation key.
+         *
+         * @return the MOD_ID
+         */
+        String getModID();
     }
 
     /**
-     * Implement that to uze custom keys.
+     * Implement that to uze custom keys. Generated via adding
+     *   {@link net.sinedkadis.terracompositio.api.helpers.TooltipHelper#translationKeyHeader} at the start of string,
+     *   then provided MOD_ID, then provided name. For usage in compoundTag data adds {@link TooltipHelper#dataHeader} at the start.
+     *   Translation keys must contain "%s" to make passing args possible
      */
     public interface ICustomKey {
+
+        /**
+         * Name of the key.
+         *
+         * @return the string
+         */
+        String name();
+
+        /**
+         * To translation string. Looks like "info.mod_id.name"
+         *
+         * @return the string
+         */
+        default String toTranslation() {
+            return translationKeyHeader + getModID() + "." + name().toLowerCase();
+        }
+
         /**
          * Adds {@link TooltipHelper#dataHeader} at the start of string.
          *
          * @return the string
          */
-        String toData();
+        default String toData() {
+            return dataHeader + name().toLowerCase();
+        }
 
         /**
          * Adds {@link TooltipHelper#dataHeader} at the start of name and index to the end of string
@@ -292,13 +338,45 @@ public class TooltipHelper {
          * @param index the index
          * @return the string
          */
-        String toData(int index);
+        default String toData(int index) {
+            return dataHeader + name().toLowerCase() + index;
+        }
+
+        /**
+         * Gets the MOD_ID used in translation key.
+         *
+         * @return the MOD_ID
+         */
+        String getModID();
     }
 
     /**
-     * Implement that to use custom units.
+     * Implement that to use custom units. Generated via adding
+     *   {@link net.sinedkadis.terracompositio.api.helpers.TooltipHelper#translationKeyHeader} at the start of string,
+     *   then provided MOD_ID, then provided name
      */
     public interface ICustomUnit {
+        /**
+         * Name of the unit.
+         *
+         * @return the string
+         */
+        String name();
 
+        /**
+         * To translation string. Looks like "info.mod_id.name"
+         *
+         * @return the string
+         */
+        default String toTranslation() {
+            return translationKeyHeader + getModID() + "." + name().toLowerCase();
+        }
+
+        /**
+         * Gets the MOD_ID used in translation key.
+         *
+         * @return the MOD_ID
+         */
+        String getModID();
     }
 }

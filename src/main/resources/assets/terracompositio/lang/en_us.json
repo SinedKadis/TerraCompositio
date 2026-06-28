@@ -111,6 +111,10 @@
   "info.terracompositio.fluids_header": "Fluids Info: ",
   "info.terracompositio.crafting_header": "Crafting Info: ",
   "info.terracompositio.time_remaining": "Remaining: %s",
+  "info.terracompositio.time_collected": "Time Collected: %s",
+  "info.terracompositio.time_collection_chance": "Time collection chance: %s%%",
+
+
   "info.terracompositio.seconds": " seconds",
 
 

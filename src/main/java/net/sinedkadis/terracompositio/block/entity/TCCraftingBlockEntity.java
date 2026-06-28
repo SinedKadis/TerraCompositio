@@ -178,24 +178,29 @@ public abstract class TCCraftingBlockEntity extends TCBlockEntity implements Wor
         if (maxProgress == 0) return;
 
         float remaining = (maxProgress - progress) / 20f;
-        data.putFloat(TooltipHelper.Keys.TIME_REMAINING.toData(), remaining);
+        if (hasRecipe()) {
+            data.putFloat(TooltipHelper.Keys.TIME_REMAINING.toData(), remaining);
+            data.putFloat(TooltipHelper.Keys.CONSUME.toData(), tickECFCost * 20f);
+        }
+
         if (TCCommonConfigs.DEBUG.get()) {
             data.putInt(TooltipHelper.Keys.PROGRESS.toData(), progress);
             data.putInt(TooltipHelper.Keys.MAX_PROGRESS.toData(), maxProgress);
         }
-        data.putFloat(TooltipHelper.Keys.CONSUME.toData(), tickECFCost * 20f);
 
     }
 
     @Override
     public void addTooltipLines(CompoundTag data, List<Component> tooltip, boolean isShifting) {//todo add fallback
-        boolean added = false;
-        TooltipHelper.addHeader(TooltipHelper.Headers.CRAFTING, tooltip);
-        added |= TooltipHelper.addIfExist(TooltipHelper.Keys.TIME_REMAINING, TooltipHelper.Units.SECONDS, tooltip, data);
-        added |= TooltipHelper.addIfExist(TooltipHelper.Keys.PROGRESS, TooltipHelper.Units.SECONDS, tooltip, data);
-        added |= TooltipHelper.addIfExist(TooltipHelper.Keys.MAX_PROGRESS, TooltipHelper.Units.SECONDS, tooltip, data);
-        added |= TooltipHelper.addIfExist(TooltipHelper.Keys.CONSUME, TooltipHelper.Units.ECF_SECOND, tooltip, data);
-        if (!added) tooltip.remove(tooltip.size() - 1);
+
+        TooltipHelper.addWithHeader(TooltipHelper.Headers.CRAFTING, tooltip, t -> {
+            TooltipHelper.addIfExist(TooltipHelper.Keys.TIME_REMAINING, TooltipHelper.Units.SECONDS, t, data);
+            TooltipHelper.addIfExist(TooltipHelper.Keys.PROGRESS, TooltipHelper.Units.SECONDS, t, data);
+            TooltipHelper.addIfExist(TooltipHelper.Keys.MAX_PROGRESS, TooltipHelper.Units.SECONDS, t, data);
+            TooltipHelper.addIfExist(TooltipHelper.Keys.CONSUME, TooltipHelper.Units.ECF_SECOND, t, data);
+        });
+
+
         super.addTooltipLines(data, tooltip, isShifting);
     }
 }

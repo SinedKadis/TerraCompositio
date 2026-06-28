@@ -1,4 +1,4 @@
-package net.sinedkadis.terracompositio.util;
+package net.sinedkadis.terracompositio.api.components;
 
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.network.chat.Component;
@@ -10,10 +10,19 @@ import net.minecraftforge.fluids.FluidStack;
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.List;
 
+/**
+ * The implementation of Component that holds {@link FluidStack}. Processed in Knowledge Overlay.
+ */
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
 public record FluidComponent(FluidStack fluidStack) implements Component {
 
+    /**
+     * Factory method for {@link FluidComponent}
+     *
+     * @param fluidStack the fluid stack
+     * @return the fluid component
+     */
     public static FluidComponent of(FluidStack fluidStack) {
         return new FluidComponent(fluidStack);
     }
