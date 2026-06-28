@@ -15,7 +15,7 @@ import net.minecraftforge.api.distmarker.OnlyIn;
 import net.sinedkadis.terracompositio.TerraCompositio;
 import net.sinedkadis.terracompositio.config.TCInnerConfig;
 import net.sinedkadis.terracompositio.entity.custom.ECFCloudEntity;
-import net.sinedkadis.terracompositio.util.helpers.ParticleHelper;
+import net.sinedkadis.terracompositio.util.helpers.ParticleHelperInternal;
 import org.joml.Vector3f;
 
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -36,7 +36,7 @@ public class ECFCloudRenderer extends EntityRenderer<ECFCloudEntity> {
         super.render(pEntity, pEntityYaw, pPartialTick, pPoseStack, pBuffer, pPackedLight);
         var renderType = RenderType.entityCutout(getTextureLocation(pEntity));
         var buffer = pBuffer.getBuffer(renderType);
-        int cfe = pEntity.getSyncedCFE();
+        int cfe = pEntity.getSyncedECF();
         float k = (float) Math.log10(cfe);
         int count = TCInnerConfig.RENDER_COUNT_FUNCTION.applyAsInt(cfe);
         if (offsets == null || offsets.length < count) genOffsets(pEntity);
@@ -65,7 +65,7 @@ public class ECFCloudRenderer extends EntityRenderer<ECFCloudEntity> {
             pPoseStack.translate(oX*k, oY*k, oZ*k);
             pPoseStack.mulPose(entityRenderDispatcher.camera.rotation());
             pPoseStack.mulPose(Axis.YP.rotationDegrees(180.0F));
-            ParticleHelper.drawCfeParticle(pPoseStack, pPackedLight, buffer);
+            ParticleHelperInternal.drawEcfParticle(pPoseStack, pPackedLight, buffer);
             pPoseStack.popPose();
         }
         pPoseStack.popPose();
@@ -76,12 +76,12 @@ public class ECFCloudRenderer extends EntityRenderer<ECFCloudEntity> {
 
 
     private void genOffsets(ECFCloudEntity entity) {
-        int cfe = entity.getSyncedCFE();
+        int cfe = entity.getSyncedECF();
         float count = TCInnerConfig.RENDER_COUNT_FUNCTION.applyAsInt(cfe);
         if (offsets == null || offsets.length < count) {
             offsets = new Vector3f[(int) Math.ceil(count)];
             for (int i = 0; i < count; i++) {
-                offsets[i] = ParticleHelper.getSpreadParticleOffset(entity.level().random, (int) (count)).toVector3f();
+                offsets[i] = ParticleHelperInternal.getSpreadParticleOffset(entity.level().random, (int) (count)).toVector3f();
             }
         }
     }

@@ -24,20 +24,19 @@ import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraftforge.common.ToolAction;
+import net.sinedkadis.terracompositio.api.helpers.WorldHelper;
+import net.sinedkadis.terracompositio.api.registries.TCBlockStateProperties;
 import net.sinedkadis.terracompositio.block.IFluidApplicable;
 import net.sinedkadis.terracompositio.item.custom.WrenchAxeItem;
-import net.sinedkadis.terracompositio.registries.TCBlockStateProperties;
 import net.sinedkadis.terracompositio.registries.TCBlocks;
 import net.sinedkadis.terracompositio.registries.TCItems;
 import net.sinedkadis.terracompositio.registries.TCTags;
-import net.sinedkadis.terracompositio.util.helpers.WorldHelper;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.function.Supplier;
 
-import static net.sinedkadis.terracompositio.util.helpers.BlockPosHelper.getNearBlocks;
-import static net.sinedkadis.terracompositio.util.helpers.WorldHelper.handleInWorldBlockCraft;
+import static net.sinedkadis.terracompositio.api.helpers.WorldHelper.handleInWorldBlockCraft;
 
 
 @SuppressWarnings("deprecation")
@@ -119,7 +118,7 @@ public class FlowCedarLikeBlock extends RotatedPillarBlock implements IFluidAppl
         if (pState.getBlock() != pNewState.getBlock() && WorldHelper.onRemoveHandlerBlacklist(pNewState,
                 Blocks.STRUCTURE_VOID,
                 TCBlocks.FLOW_CEDAR_CASING.get())) {
-            WorldHelper.flowLeak(pState, pLevel, pPos, false);
+            WorldHelper.flowLeak(pState, pLevel, pPos);
         }
     }
 
@@ -127,7 +126,7 @@ public class FlowCedarLikeBlock extends RotatedPillarBlock implements IFluidAppl
     @Override
     public void tick(BlockState pState, @NotNull ServerLevel pLevel, @NotNull BlockPos pPos, @NotNull RandomSource pRandom) {
         if (pState.getValue(INFUSED)) {
-            for (BlockPos blockPos : getNearBlocks(pPos)) {
+            for (BlockPos blockPos : BlockPos.betweenClosed(pPos.offset(-1, -1, -1), pPos.offset(1, 1, 1))) {
                 if (blockPos.getX() != pPos.getX()
                         && blockPos.getY() != pPos.getY()
                         && blockPos.getZ() != pPos.getZ()) {

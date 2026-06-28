@@ -1,0 +1,14 @@
+{
+  "type": "terracompositio:flow_infusion",
+  "ecf": 10,
+  "ingredients": [
+    {
+      "item": "minecraft:snowball"
+    }
+  ],
+  "output": {
+    "count": 1,
+    "item": "terracompositio:ecf_charge"
+  },
+  "time": 20
+}

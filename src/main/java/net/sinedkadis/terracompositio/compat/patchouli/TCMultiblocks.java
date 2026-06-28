@@ -6,7 +6,7 @@ import net.minecraft.core.Direction;
 import net.minecraft.world.level.block.Blocks;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
-import net.sinedkadis.terracompositio.registries.TCBlockStateProperties;
+import net.sinedkadis.terracompositio.api.registries.TCBlockStateProperties;
 import net.sinedkadis.terracompositio.registries.TCBlocks;
 import vazkii.patchouli.api.IMultiblock;
 import vazkii.patchouli.api.PatchouliAPI;

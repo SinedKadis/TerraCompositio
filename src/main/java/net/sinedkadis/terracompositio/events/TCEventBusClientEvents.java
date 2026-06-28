@@ -1,6 +1,5 @@
 package net.sinedkadis.terracompositio.events;
 
-import net.minecraft.client.Minecraft;
 import net.minecraft.client.model.BoatModel;
 import net.minecraft.client.model.ChestBoatModel;
 import net.minecraft.client.renderer.ItemBlockRenderTypes;
@@ -34,7 +33,7 @@ import net.sinedkadis.terracompositio.entity.client.ECFCloudRenderer;
 import net.sinedkadis.terracompositio.entity.client.ECFCubeModel;
 import net.sinedkadis.terracompositio.entity.client.FlowCedarEntModel;
 import net.sinedkadis.terracompositio.entity.client.FlowCedarEntRenderer;
-import net.sinedkadis.terracompositio.gui.CFEBarRenderer;
+import net.sinedkadis.terracompositio.gui.ECFBarRenderer;
 import net.sinedkadis.terracompositio.gui.ECFHud;
 import net.sinedkadis.terracompositio.gui.KnowledgeOverlay;
 import net.sinedkadis.terracompositio.item.custom.CreationFlowJournalItem;
@@ -157,7 +156,7 @@ public class TCEventBusClientEvents {
 
     @SubscribeEvent
     public static void onRegisterGuiOverlays(RegisterGuiOverlaysEvent event) {
-        event.registerAbove(VanillaGuiOverlay.HOTBAR.id(), "cfe_hud", ECFHud::render);
+        event.registerAbove(VanillaGuiOverlay.HOTBAR.id(), "ecf_hud", ECFHud::render);
         event.registerAbove(VanillaGuiOverlay.HOTBAR.id(), "knowledge_hud", KnowledgeOverlay::render);
     }
 
@@ -197,28 +196,23 @@ public class TCEventBusClientEvents {
         }
     }
 
-    @SuppressWarnings("deprecation")
+
     @SubscribeEvent
     public static void registerParticleFactories(final RegisterParticleProvidersEvent event) {
-        Minecraft.getInstance().particleEngine.register(TCParticles.FLOW_PARTICLE.get(),
-                FlowParticle.Provider::new);
-        Minecraft.getInstance().particleEngine.register(TCParticles.CFE_PARTICLE.get(),
-                ECFParticle.Provider::new);
-        Minecraft.getInstance().particleEngine.register(TCParticles.BIRCH_JUICE_PARTICLE.get(),
-                BirchJuiceParticle.Provider::new);
-        Minecraft.getInstance().particleEngine.register(TCParticles.FLOW_SPLASH_PARTICLE.get(),
-                FlowSplashParticle.Provider::new);
-        Minecraft.getInstance().particleEngine.register(TCParticles.BIRCH_JUICE_SPLASH_PARTICLE.get(),
-                BirchJuiceSplashParticle.Provider::new);
-        Minecraft.getInstance().particleEngine.register(TCParticles.FLUID_FLOW.get(),
-                FluidFlowParticle.Provider::new);
+
+        event.registerSpriteSet(TCParticles.FLOW_PARTICLE.get(), FlowParticle.Provider::new);
+        event.registerSpriteSet(TCParticles.ECF_PARTICLE.get(), ECFParticle.Provider::new);
+        event.registerSpriteSet(TCParticles.BIRCH_JUICE_PARTICLE.get(), BirchJuiceParticle.Provider::new);
+        event.registerSpriteSet(TCParticles.FLOW_SPLASH_PARTICLE.get(), FlowSplashParticle.Provider::new);
+        event.registerSpriteSet(TCParticles.BIRCH_JUICE_SPLASH_PARTICLE.get(), BirchJuiceSplashParticle.Provider::new);
+        event.registerSpriteSet(TCParticles.FLUID_FLOW.get(), FluidFlowParticle.Provider::new);
     }
 
     @SubscribeEvent
     public static void onRegisterItemDecorations(RegisterItemDecorationsEvent event) {
         for (Item item : ForgeRegistries.ITEMS) {
             if (item instanceof TechnetiumArmorItem) {
-                event.register(item, CFEBarRenderer.INSTANCE);
+                event.register(item, ECFBarRenderer.INSTANCE);
             }
         }
     }

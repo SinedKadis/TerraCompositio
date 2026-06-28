@@ -11,10 +11,10 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.network.PacketDistributor;
-import net.sinedkadis.terracompositio.api.TCCapabilities;
 import net.sinedkadis.terracompositio.api.dummies.DummyECFHandler;
-import net.sinedkadis.terracompositio.api.networks.cfe.ECFNetworkMemberEntity;
-import net.sinedkadis.terracompositio.api.networks.cfe.IECFHandler;
+import net.sinedkadis.terracompositio.api.networks.ecf.ECFNetworkMemberEntity;
+import net.sinedkadis.terracompositio.api.networks.ecf.IECFHandler;
+import net.sinedkadis.terracompositio.api.registries.TCCapabilities;
 import net.sinedkadis.terracompositio.block.custom.ECFBoardBlock;
 import net.sinedkadis.terracompositio.config.TCInnerConfig;
 import net.sinedkadis.terracompositio.network.TCPackets;
@@ -59,7 +59,7 @@ public abstract class PlayerMixin extends LivingEntity implements ECFNetworkMemb
     public void updateIfScheduled() {
         if (scheduleUpdate){
             scheduleUpdate = false;
-            onCFENetworkMemberUpdate();
+            onECFNetworkMemberUpdate();
         }
     }
 
@@ -144,7 +144,7 @@ public abstract class PlayerMixin extends LivingEntity implements ECFNetworkMemb
                     TCPackets.CHANNEL.send(PacketDistributor.PLAYER.with(() -> serverPlayer),
                         new S2CAddPlayerKnowledge());
                 TCPackets.CHANNEL.send(PacketDistributor.PLAYER.with(() -> serverPlayer),
-                        new S2CPlayerEcfContainerSync(((ECFNetworkMemberEntity) serverPlayer).getMainHandler().getCFE()));
+                        new S2CPlayerEcfContainerSync(((ECFNetworkMemberEntity) serverPlayer).getMainHandler().getECF()));
             }
     }
 

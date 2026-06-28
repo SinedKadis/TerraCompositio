@@ -8,16 +8,16 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraftforge.fml.LogicalSide;
 import net.minecraftforge.network.NetworkEvent;
-import net.sinedkadis.terracompositio.api.TCCapabilities;
 import net.sinedkadis.terracompositio.api.dummies.DummyECFHandler;
+import net.sinedkadis.terracompositio.api.helpers.WorldHelper;
+import net.sinedkadis.terracompositio.api.registries.TCCapabilities;
 import net.sinedkadis.terracompositio.registries.TCBlocks;
-import net.sinedkadis.terracompositio.util.helpers.ParticleHelper;
-import net.sinedkadis.terracompositio.util.helpers.WorldHelper;
+import net.sinedkadis.terracompositio.util.helpers.ParticleHelperInternal;
 
 import java.util.function.Supplier;
 
 
-public record C2SBoardSync(int x, short y, int z, boolean place, int cfeToTake, boolean waterlogged) {
+public record C2SBoardSync(int x, short y, int z, boolean place, int ecfToTake, boolean waterlogged) {
     public C2SBoardSync(BlockPos target, boolean place) {
         this(target.getX(), (short) target.getY(), target.getZ(), place, 0, false);
     }
@@ -30,7 +30,7 @@ public record C2SBoardSync(int x, short y, int z, boolean place, int cfeToTake, 
         buf.writeShort(msg.y);
         buf.writeInt(msg.z);
         buf.writeBoolean(msg.place);
-        buf.writeVarInt(msg.cfeToTake);
+        buf.writeVarInt(msg.ecfToTake);
         buf.writeBoolean(msg.waterlogged);
     }
 
@@ -54,8 +54,8 @@ public record C2SBoardSync(int x, short y, int z, boolean place, int cfeToTake, 
                                             msg.waterlogged),
                             3);
                         player.getItemBySlot(EquipmentSlot.FEET).getCapability(TCCapabilities.ECF).orElse(DummyECFHandler.instance)
-                                .takeCFE(msg.cfeToTake, false);
-                        ParticleHelper.spawnParticlesIn(level, pPos);
+                                .takeECF(msg.ecfToTake, false);
+                        ParticleHelperInternal.spawnParticlesIn(level, pPos);
                     }
                 }
             }

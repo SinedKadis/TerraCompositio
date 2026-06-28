@@ -23,7 +23,7 @@ import java.util.Collections;
 import java.util.List;
 import java.util.OptionalInt;
 
-import static net.sinedkadis.terracompositio.registries.TCBlockStateProperties.INFUSED;
+import static net.sinedkadis.terracompositio.api.registries.TCBlockStateProperties.INFUSED;
 
 public class FlowCedarLeavesBlock extends LeavesBlock {
     public FlowCedarLeavesBlock(Properties pProperties) {
@@ -49,6 +49,7 @@ public class FlowCedarLeavesBlock extends LeavesBlock {
         pLevel.setBlock(pPos, updateDistance(pState, pLevel, pPos), 3);
     }
 
+    @SuppressWarnings("deprecation")
     @Override
     public @NotNull List<ItemStack> getDrops(@NotNull BlockState pState, LootParams.@NotNull Builder pParams) {
         LootParams lootContext = pParams.withParameter(LootContextParams.BLOCK_STATE, pState).create(LootContextParamSets.BLOCK);

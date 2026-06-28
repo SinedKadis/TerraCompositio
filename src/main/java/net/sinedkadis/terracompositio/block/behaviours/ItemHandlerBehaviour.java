@@ -24,12 +24,12 @@ import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.ItemStackHandler;
 import net.sinedkadis.terracompositio.api.IHaveKnowledge;
-import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBEItemBehaviour;
+import net.sinedkadis.terracompositio.api.components.ItemComponent;
+import net.sinedkadis.terracompositio.api.helpers.ItemHelper;
+import net.sinedkadis.terracompositio.api.helpers.PlayerHelper;
 import net.sinedkadis.terracompositio.api.helpers.TooltipHelper;
 import net.sinedkadis.terracompositio.block.entity.TCBlockEntity;
-import net.sinedkadis.terracompositio.util.ItemComponent;
-import net.sinedkadis.terracompositio.util.helpers.ItemHelper;
-import net.sinedkadis.terracompositio.util.helpers.PlayerHelper;
+import net.sinedkadis.terracompositio.util.behaviors.blockentity.IBEItemBehaviour;
 import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.ParametersAreNonnullByDefault;
@@ -276,15 +276,13 @@ public class ItemHandlerBehaviour implements IBEItemBehaviour, WorldlyContainer,
 
     @Override
     public void addTooltipLines(CompoundTag data, List<Component> tooltip, boolean isShifting) {
-        TooltipHelper.addHeader(TooltipHelper.Headers.ITEMS, tooltip);
+        TooltipHelper.addWithHeader(TooltipHelper.Headers.ITEMS, tooltip, t -> {
+            List<ItemStack> entries = ItemHelper.readItemList(data.getList("inventory", Tag.TAG_COMPOUND));
+            for (ItemStack stack : entries) {
+                if (stack.isEmpty()) continue;
+                t.add(ItemComponent.of(stack));
 
-        List<ItemStack> entries = ItemHelper.readItemList(data.getList("inventory", Tag.TAG_COMPOUND));
-        boolean somethingAdded = false;
-        for (ItemStack stack : entries) {
-            if (stack.isEmpty()) continue;
-            somethingAdded = true;
-            tooltip.add(ItemComponent.of(stack));
-        }
-        if (!somethingAdded) tooltip.remove(tooltip.size() - 1);
+            }
+        });
     }
 }

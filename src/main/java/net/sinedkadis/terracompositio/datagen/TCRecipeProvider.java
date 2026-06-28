@@ -76,6 +76,13 @@ public class TCRecipeProvider extends RecipeProvider implements IConditionBuilde
     }
 
     private static void buildCFJ(@NotNull Consumer<FinishedRecipe> pWriter) {
+        ShapedRecipeBuilder.shaped(RecipeCategory.BUILDING_BLOCKS, TCBlocks.FLOW_CEDAR_ALTAR.get())
+                .pattern("LLL")
+                .define('L', TCTags.Items.FLOW_CEDAR_LOGS)
+                .unlockedBy(getHasName(TCBlocks.FLOW_CEDAR_LOG.get()), has(TCBlocks.FLOW_CEDAR_LOG.get()))
+                .save(pWriter);
+
+
         ItemStack bookLevel1 = createCFJBook(1);
         ItemStack bookLevel2 = createCFJBook(2);
         ItemStack bookLevel3 = createCFJBook(3);
@@ -464,11 +471,11 @@ public class TCRecipeProvider extends RecipeProvider implements IConditionBuilde
                 Ingredient.of(Items.SNOWBALL),
                 10,
                 20
-        ).save(pWriter,TerraCompositio.modLoc("flow_infusion/cfe_charge"));
+        ).save(pWriter, TerraCompositio.modLoc("flow_infusion/ecf_charge"));
         TechnetiumFiringRecipeBuilder.create(
                         TCItems.ECF_CHARGE.get(),
-                        10)
-                .save(pWriter, TerraCompositio.modLoc("firing/cfe_ball"));
+                        8)
+                .save(pWriter, TerraCompositio.modLoc("firing/ecf_charge"));
         oreSmelting(pWriter,
                 List.of(TCItems.ECF_CHARGE.get()),
                 RecipeCategory.MISC,
@@ -518,7 +525,7 @@ public class TCRecipeProvider extends RecipeProvider implements IConditionBuilde
     }
 
     private static void buildGoldMaterials(@NotNull Consumer<FinishedRecipe> pWriter) {
-        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, TCItems.GOLD_ROD.get())
+        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, TCItems.GOLD_ROD.get(), 2)
                 .pattern("R")
                 .pattern("R")
                 .define('R', Items.GOLD_INGOT)
@@ -552,7 +559,7 @@ public class TCRecipeProvider extends RecipeProvider implements IConditionBuilde
                 .unlockedBy(getHasName(TCItems.INFUSED_IRON_INGOT.get()), has(TCItems.INFUSED_IRON_INGOT.get()))
                 .save(pWriter,Objects.requireNonNull(ResourceLocation.tryBuild(Objects.requireNonNull(key).getNamespace(),
                         Objects.requireNonNull(key).getPath() + "_from_block")));
-        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, TCItems.INFUSED_IRON_ROD.get())
+        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, TCItems.INFUSED_IRON_ROD.get(), 2)
                 .pattern("R")
                 .pattern("R")
                 .define('R', TCItems.INFUSED_IRON_INGOT.get())
@@ -622,7 +629,7 @@ public class TCRecipeProvider extends RecipeProvider implements IConditionBuilde
                 .unlockedBy(getHasName(TCItems.TECHNETIUM_INGOT.get()), has(TCItems.TECHNETIUM_INGOT.get()))
                 .save(pWriter,Objects.requireNonNull(ResourceLocation.tryBuild(Objects.requireNonNull(technetium).getNamespace(),
                         Objects.requireNonNull(technetium).getPath() + "_from_block")));
-        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, TCItems.TECHNETIUM_ROD.get())
+        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, TCItems.TECHNETIUM_ROD.get(), 2)
                 .pattern("R")
                 .pattern("R")
                 .define('R', TCItems.TECHNETIUM_INGOT.get())
@@ -639,7 +646,7 @@ public class TCRecipeProvider extends RecipeProvider implements IConditionBuilde
                 .requires(Items.COPPER_INGOT)
                 .unlockedBy(getHasName(Items.COPPER_INGOT), has(Items.COPPER_INGOT))
                 .save(pWriter);
-        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, TCItems.COPPER_ROD.get())
+        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, TCItems.COPPER_ROD.get(), 2)
                 .pattern("R")
                 .pattern("R")
                 .define('R', Items.COPPER_INGOT)

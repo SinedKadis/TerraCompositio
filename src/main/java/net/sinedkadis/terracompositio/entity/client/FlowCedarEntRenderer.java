@@ -9,8 +9,8 @@ import net.minecraft.client.renderer.entity.MobRenderer;
 import net.minecraft.resources.ResourceLocation;
 import net.minecraft.util.Mth;
 import net.sinedkadis.terracompositio.TerraCompositio;
-import net.sinedkadis.terracompositio.api.TCCapabilities;
-import net.sinedkadis.terracompositio.api.networks.cfe.IECFHandler;
+import net.sinedkadis.terracompositio.api.networks.ecf.IECFHandler;
+import net.sinedkadis.terracompositio.api.registries.TCCapabilities;
 import net.sinedkadis.terracompositio.entity.custom.FlowCedarEntEntity;
 import net.sinedkadis.terracompositio.item.models.TechnetiumBootsModel;
 import net.sinedkadis.terracompositio.item.models.TechnetiumChestplateModel;
@@ -53,17 +53,14 @@ public class FlowCedarEntRenderer extends MobRenderer<FlowCedarEntEntity,FlowCed
         super.render(entity, entityYaw, partialTicks, poseStack, buffer, packedLight);
 
 
-
-
-
-        int energy = entity.getSyncedCFE();
+        int energy = entity.getSyncedECF();
         Optional<IECFHandler> icfeHandler = entity.getCapability(TCCapabilities.ECF).resolve();
         if (energy > 0 && icfeHandler.isPresent()) {
             float alpha = 0.8f;
             alpha += Mth.map(energy,1000,10000,0,0.2f);
 
 
-            float scale = (0.1f + (energy / (float) icfeHandler.get().getMaxCFE())) * 10;
+            float scale = (0.1f + (energy / (float) icfeHandler.get().getMaxECF())) * 10;
             poseStack.pushPose();
 
             float yOffset = entity.getBbHeight() + scale * 0.2f;

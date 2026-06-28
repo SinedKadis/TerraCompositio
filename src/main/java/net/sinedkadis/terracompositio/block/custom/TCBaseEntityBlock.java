@@ -14,8 +14,8 @@ import net.minecraft.world.level.block.entity.BlockEntityTicker;
 import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.BlockHitResult;
+import net.sinedkadis.terracompositio.api.helpers.ItemHelper;
 import net.sinedkadis.terracompositio.block.entity.TCBlockEntity;
-import net.sinedkadis.terracompositio.util.helpers.ItemHelper;
 import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.ParametersAreNonnullByDefault;

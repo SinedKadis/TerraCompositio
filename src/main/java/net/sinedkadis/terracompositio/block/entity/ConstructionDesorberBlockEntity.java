@@ -17,10 +17,12 @@ import net.minecraftforge.fml.common.Mod;
 import net.minecraftforge.items.ItemStackHandler;
 import net.sinedkadis.terracompositio.TerraCompositio;
 import net.sinedkadis.terracompositio.api.TerraCompositioAPI;
-import net.sinedkadis.terracompositio.api.networks.cfe.ECFNetwork;
-import net.sinedkadis.terracompositio.api.networks.cfe.ECFNetworkMember;
+import net.sinedkadis.terracompositio.api.networks.ecf.ECFNetwork;
+import net.sinedkadis.terracompositio.api.networks.ecf.ECFNetworkMember;
+import net.sinedkadis.terracompositio.api.networks.ecf.IECFHandler;
+import net.sinedkadis.terracompositio.ecf.burst.ECFBurstProjectileEntity;
 import net.sinedkadis.terracompositio.registries.TCBlockEntities;
-import net.sinedkadis.terracompositio.util.helpers.ParticleHelper;
+import net.sinedkadis.terracompositio.util.helpers.ParticleHelperInternal;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.Collections;
@@ -38,38 +40,18 @@ public class ConstructionDesorberBlockEntity extends AbstractDesorberBlockEntity
         super(TCBlockEntities.CONSTRUCTION_DESORBER_BE.get(), pos, state);
     }
 
-    @Override
-    protected void saveAdditional(@NotNull CompoundTag pTag) {
-        pTag.put("render", renderStack.serializeNBT());
-        super.saveAdditional(pTag);
-    }
-
-    @Override
-    public void load(@NotNull CompoundTag pTag) {
-        super.load(pTag);
-        renderStack.deserializeNBT(pTag.getCompound("render"));
-    }
-
-    public void setRenderStack(ItemStack itemStack) {
-        this.renderStack.setStackInSlot(0,itemStack);
-    }
-
-    public ItemStack getRenderStack() {
-        return this.renderStack.getStackInSlot(0);
-    }
-
     @SubscribeEvent
     public static void onEntityPlaceEvent(BlockEvent.EntityPlaceEvent event){
         BlockPos pos = event.getPos();
         LevelAccessor level = event.getLevel();
 
         ECFNetwork network = TerraCompositioAPI.instance().getECFNetworkInstance();
-        Set<ECFNetworkMember> members = network.getAllCFENetworkMembers((Level) level);
+        Set<ECFNetworkMember> members = network.getAllECFNetworkMembers((Level) level);
         List<ConstructionDesorberBlockEntity> constructors = members.stream()
-                .filter(cfeSource -> Math.sqrt(cfeSource.getPos().distSqr(pos)) < cfeSource.getRange())
+                .filter(ecfSource -> Math.sqrt(ecfSource.getPos().distSqr(pos)) < ecfSource.getRange())
                 .map(ECFNetworkMember::getPos)
-                .map(cfeSourceBlockPos -> {
-                    if (level.getBlockEntity(cfeSourceBlockPos) instanceof ConstructionDesorberBlockEntity blockEntity)
+                .map(ecfSourceBlockPos -> {
+                    if (level.getBlockEntity(ecfSourceBlockPos) instanceof ConstructionDesorberBlockEntity blockEntity)
                         return blockEntity;
                     return null;
                 })
@@ -81,34 +63,45 @@ public class ConstructionDesorberBlockEntity extends AbstractDesorberBlockEntity
                             return collectedList;
                         }
                 ));
-        int CFEToAdd = 5;
+        int ECFToAdd = 5;
         for (ConstructionDesorberBlockEntity blockEntity : constructors){
             FluidTank fluidHandler1 = blockEntity.fluidHandler;
-            if (!fluidHandler1.isEmpty() && fluidHandler1.getFluidAmount() >= CFEToAdd) {
-                fluidHandler1.drain(CFEToAdd, IFluidHandler.FluidAction.EXECUTE);
-                int added = blockEntity.cfeContainer().addCFE(CFEToAdd,false);
-                CFEToAdd -= added;
+            if (!fluidHandler1.isEmpty() && fluidHandler1.getFluidAmount() >= ECFToAdd) {
+                fluidHandler1.drain(ECFToAdd, IFluidHandler.FluidAction.EXECUTE);
+                IECFHandler iecfHandler = blockEntity.ecfContainer();
+                int added = iecfHandler.addECF(ECFToAdd, true);
+                ECFToAdd -= added;
                 blockEntity.setRenderStack(new ItemStack(event.getPlacedBlock().getBlock()));
-                if (CFEToAdd == 0) {
+                BlockPos blockEntityBlockPos = blockEntity.getBlockPos();
+                ((Level) level).sendBlockUpdated(blockEntityBlockPos, blockEntity.getBlockState(), blockEntity.getBlockState(), 3);
+                if (ECFToAdd == 0) {
                     if (!level.isClientSide()) {
-                        BlockPos blockEntityBlockPos = blockEntity.getBlockPos();
                         level.playSound(null, blockEntityBlockPos, SoundEvents.BEACON_ACTIVATE, SoundSource.BLOCKS, 0.1f, 1f);
-                        ParticleHelper.sendCFEParticles((ServerLevel) level,
-                                blockEntity.cfeContainer().getOffset().apply(blockEntityBlockPos.getCenter()),
+                        level.addFreshEntity(
+                                Objects.requireNonNull(
+                                        ECFBurstProjectileEntity.sendBurst(pos, iecfHandler, added, 5 / 20f)
+                                )
+                        );
+                        ParticleHelperInternal.sendECFParticles((ServerLevel) level,
+                                blockEntity.ecfContainer().getOffset().apply(blockEntityBlockPos.getCenter()),
                                 pos.getCenter(),
-                                added);
+                                added,
+                                null,
+                                5 / 20f);
+
                     }
                     break;
                 }
             }
         }
     }
+
     @SubscribeEvent
     public static void onBreakEvent(BlockEvent.BreakEvent event){
         BlockPos pos = event.getPos();
         LevelAccessor level = event.getLevel();
         ECFNetwork network = TerraCompositioAPI.instance().getECFNetworkInstance();
-        Set<ECFNetworkMember> sources = network.getAllCFENetworkMembers((Level) level);
+        Set<ECFNetworkMember> sources = network.getAllECFNetworkMembers((Level) level);
         List<ConstructionDesorberBlockEntity> constructors = sources.stream()
                 .map(ECFNetworkMember::getPos)
                 .filter(cfeSourceBlockPos -> Math.sqrt(cfeSourceBlockPos.distSqr(pos)) < 7)
@@ -132,14 +125,42 @@ public class ConstructionDesorberBlockEntity extends AbstractDesorberBlockEntity
                 if (!fluidHandler1.isEmpty()) {
                     CFEToRemove -= fluidHandler1.drain(CFEToRemove*2, IFluidHandler.FluidAction.EXECUTE).getAmount()/2;
                     blockEntity.setRenderStack(new ItemStack(event.getState().getBlock()));
+                    BlockPos blockEntityBlockPos = blockEntity.getBlockPos();
+                    ((Level) level).sendBlockUpdated(blockEntityBlockPos, blockEntity.getBlockState(), blockEntity.getBlockState(), 3);
+                    ParticleHelperInternal.spawnParticlesIn((Level) level, blockEntityBlockPos, 10);
                     if (!level.isClientSide())
-                        level.playSound(null, blockEntity.getBlockPos(), SoundEvents.BEACON_DEACTIVATE, SoundSource.BLOCKS,0.1f,1f);
+                        level.playSound(null, blockEntityBlockPos, SoundEvents.BEACON_DEACTIVATE, SoundSource.BLOCKS, 0.1f, 1f);
                 }
                 if (CFEToRemove == 0) {
                     break;
                 }
             }
         }
+    }
+
+    @Override
+    public void load(@NotNull CompoundTag pTag) {
+        super.load(pTag);
+        renderStack.deserializeNBT(pTag.getCompound("render"));
+    }
+
+    public void setRenderStack(ItemStack itemStack) {
+        this.renderStack.setStackInSlot(0,itemStack);
+    }
+
+    public ItemStack getRenderStack() {
+        return this.renderStack.getStackInSlot(0);
+    }
+
+    @Override
+    protected int getMaxCFE() {
+        return 64;
+    }
+
+    @Override
+    protected void saveAdditional(@NotNull CompoundTag pTag) {
+        pTag.put("render", renderStack.serializeNBT());
+        super.saveAdditional(pTag);
     }
 
 }

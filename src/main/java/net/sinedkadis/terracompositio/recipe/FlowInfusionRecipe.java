@@ -21,14 +21,14 @@ public class FlowInfusionRecipe implements Recipe<SimpleContainer> {
     private final ItemStack output;
     private final ResourceLocation id;
     @Getter
-    private final int cfe;
+    private final int ecf;
     @Getter
     private final int ticks;
 
-    public FlowInfusionRecipe(NonNullList<Ingredient> inputItems, ItemStack output, ResourceLocation id, int cfe, int ticks) {
+    public FlowInfusionRecipe(NonNullList<Ingredient> inputItems, ItemStack output, ResourceLocation id, int ecf, int ticks) {
         this.inputItems = inputItems;
         this.output = output;
-        this.cfe = cfe;
+        this.ecf = ecf;
         this.ticks = ticks;
         this.id = id;
     }
@@ -61,8 +61,9 @@ public class FlowInfusionRecipe implements Recipe<SimpleContainer> {
     public @NotNull ItemStack getResultItem(@Nullable RegistryAccess pRegistryAccess) {
         return output.copy();
     }
-    public float getCFETick(){
-        return (float) cfe /ticks;
+
+    public float getECFTick() {
+        return (float) ecf / ticks;
     }
     @Override
     public @NotNull ResourceLocation getId() {
@@ -88,7 +89,7 @@ public class FlowInfusionRecipe implements Recipe<SimpleContainer> {
         @Override
         public @NotNull FlowInfusionRecipe fromJson(@NotNull ResourceLocation pRecipeId, @NotNull JsonObject pSerializedRecipe) {
             ItemStack output = ShapedRecipe.itemStackFromJson(GsonHelper.getAsJsonObject(pSerializedRecipe, "output"));
-            int cfe = GsonHelper.getAsInt(pSerializedRecipe,"cfe");
+            int cfe = GsonHelper.getAsInt(pSerializedRecipe, "ecf");
             int ticks = GsonHelper.getAsInt(pSerializedRecipe,"time");
             JsonArray ingredients = GsonHelper.getAsJsonArray(pSerializedRecipe,"ingredients");
             NonNullList<Ingredient> inputs = NonNullList.withSize(1,Ingredient.EMPTY);
@@ -118,7 +119,7 @@ public class FlowInfusionRecipe implements Recipe<SimpleContainer> {
                 ingredient.toNetwork(pBuffer);
             }
             pBuffer.writeItemStack(pRecipe.getResultItem(null),false);
-            pBuffer.writeInt(pRecipe.cfe);
+            pBuffer.writeInt(pRecipe.ecf);
             pBuffer.writeInt(pRecipe.ticks);
         }
     }

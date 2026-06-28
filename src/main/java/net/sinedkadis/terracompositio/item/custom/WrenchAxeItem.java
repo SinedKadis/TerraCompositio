@@ -51,6 +51,8 @@ import net.minecraftforge.event.TickEvent;
 import net.minecraftforge.event.entity.player.PlayerInteractEvent;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.registries.ForgeRegistries;
+import net.sinedkadis.terracompositio.api.helpers.PlayerHelper;
+import net.sinedkadis.terracompositio.api.helpers.WorldHelper;
 import net.sinedkadis.terracompositio.block.custom.PathPointerBlock;
 import net.sinedkadis.terracompositio.block.entity.FlowCedarCasingBlockEntity;
 import net.sinedkadis.terracompositio.block.entity.MatterInfuserBaseBlockEntity;
@@ -58,7 +60,6 @@ import net.sinedkadis.terracompositio.block.entity.PathPointerBlockEntity;
 import net.sinedkadis.terracompositio.registries.TCBlocks;
 import net.sinedkadis.terracompositio.registries.TCItems;
 import net.sinedkadis.terracompositio.registries.TCTags;
-import net.sinedkadis.terracompositio.util.helpers.PlayerHelper;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -67,9 +68,9 @@ import java.util.function.Predicate;
 
 import static net.minecraft.world.level.block.Block.dropResources;
 import static net.minecraft.world.level.block.state.properties.BlockStateProperties.*;
-import static net.sinedkadis.terracompositio.registries.TCBlockStateProperties.INFUSED;
-import static net.sinedkadis.terracompositio.util.helpers.BlockPosHelper.getNearBlocks;
-import static net.sinedkadis.terracompositio.util.helpers.BlockPosHelper.getTouchingBlocks;
+import static net.sinedkadis.terracompositio.api.helpers.BlockPosHelper.getNearBlocks;
+import static net.sinedkadis.terracompositio.api.helpers.BlockPosHelper.getTouchingBlocks;
+import static net.sinedkadis.terracompositio.api.registries.TCBlockStateProperties.INFUSED;
 
 public class WrenchAxeItem extends AxeItem {
     private static final TagKey<Block> LOGS_TAG = BlockTags.LOGS;
@@ -400,7 +401,7 @@ public class WrenchAxeItem extends AxeItem {
             allLeaves.forEach(blockPos -> {
                 BlockState state = level.getBlockState(blockPos);
                 if (state.is(BlockTags.LEAVES)) {
-                    level.destroyBlock(blockPos, true, player, 512);
+                    WorldHelper.destroyBlockSilent(level, blockPos, player);
                     level.sendBlockUpdated(blockPos, state, state, Block.UPDATE_ALL);
                 }
             });

@@ -25,7 +25,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 @ParametersAreNonnullByDefault
 public class ECFBallItem extends Item {
 
-    public static DispenseItemBehavior CFE_BALL_DISPENSER_BEHAVIOUR = (pSource, pStack) -> {
+    public static DispenseItemBehavior ECF_BALL_DISPENSER_BEHAVIOUR = (pSource, pStack) -> {
         ServerLevel level = pSource.getLevel();
         level.playSound(null, pSource.x(), pSource.y(), pSource.z(),
                 SoundEvents.SNOWBALL_THROW, SoundSource.NEUTRAL, 0.5F, 0.4F / (level.getRandom().nextFloat() * 0.4F + 0.8F));
@@ -47,7 +47,7 @@ public class ECFBallItem extends Item {
 
     public ECFBallItem(Properties pProperties) {
         super(pProperties);
-        DispenserBlock.registerBehavior(this,CFE_BALL_DISPENSER_BEHAVIOUR);
+        DispenserBlock.registerBehavior(this, ECF_BALL_DISPENSER_BEHAVIOUR);
     }
 
     public InteractionResultHolder<ItemStack> use(Level pLevel, Player pPlayer, InteractionHand pHand) {

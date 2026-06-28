@@ -15,8 +15,8 @@ import net.minecraftforge.eventbus.api.SubscribeEvent;
 import net.minecraftforge.fml.common.Mod;
 import net.sinedkadis.terracompositio.TerraCompositio;
 import net.sinedkadis.terracompositio.api.IECFStorageExtensionItem;
+import net.sinedkadis.terracompositio.api.helpers.ItemHelper;
 import net.sinedkadis.terracompositio.registries.TCTags;
-import net.sinedkadis.terracompositio.util.helpers.ItemHelper;
 import org.jetbrains.annotations.NotNull;
 
 import java.util.List;

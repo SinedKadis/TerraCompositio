@@ -86,7 +86,7 @@ public class TechnetiumFiringCategory implements IRecipeCategory<TechnetiumFirin
         this.animatedEmittedLeft.draw(guiGraphics,0,0);
         this.animatedEmittedRight.draw(guiGraphics,41,0);
         this.animatedFlame.draw(guiGraphics, 33, 33);
-        String cfe = "CFE: "+ recipe.getCfe();
+        String cfe = "CFE: " + recipe.getEcf();
         //guiGraphics.drawString(Minecraft.getInstance().font,"Generation",5,40, Color.WHITE.getRGB());
         guiGraphics.drawString(Minecraft.getInstance().font,cfe,5,50, Color.WHITE.getRGB());
 

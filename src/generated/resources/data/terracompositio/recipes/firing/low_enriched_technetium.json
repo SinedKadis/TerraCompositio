@@ -1,5 +1,5 @@
 {
   "type": "terracompositio:technetium_firing",
-  "cfe": 512,
+  "ecf": 512,
   "furnace_input": "terracompositio:low_enriched_technetium"
 }

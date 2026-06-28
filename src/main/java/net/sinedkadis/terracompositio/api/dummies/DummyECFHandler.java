@@ -6,18 +6,22 @@ import net.minecraft.nbt.CompoundTag;
 import net.minecraft.server.level.ServerLevel;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
-import net.sinedkadis.terracompositio.api.networks.cfe.ECFNetworkMember;
-import net.sinedkadis.terracompositio.api.networks.cfe.IECFHandler;
+import net.sinedkadis.terracompositio.api.networks.ecf.ECFNetwork;
+import net.sinedkadis.terracompositio.api.networks.ecf.ECFNetworkMember;
+import net.sinedkadis.terracompositio.api.networks.ecf.IECFHandler;
 
 import java.util.function.Function;
 
+/**
+ * The placeholder, returned by {@link ECFNetwork#createDefaultECFHandler(ECFNetworkMember)}, if Terracompositio is not present
+ */
 @SuppressWarnings("DataFlowIssue")
 @MethodsReturnNonnullByDefault
 public class DummyECFHandler implements IECFHandler {
     public static final DummyECFHandler instance = new DummyECFHandler();
 
     @Override
-    public int getCFE() {
+    public int getECF() {
         return 0;
     }
 
@@ -32,38 +36,35 @@ public class DummyECFHandler implements IECFHandler {
         return null;
     }
 
+    @Override
+    public void setECF(int ecf) {
+
+    }
 
     @Override
-    public int takeCFE(int cfe, boolean simulate) {
+    public int takeECF(int cfe, boolean simulate) {
         return 0;
     }
 
     @Override
-    public int sendCFE(ECFNetworkMember target, int cfe, float speed, boolean simulate) {
+    public int sendECF(ECFNetworkMember target, int cfe, float speed) {
         return 0;
     }
 
-
     @Override
-    public int addCFE(int cfe, boolean simulate) {
+    public int addECF(int cfe, boolean simulate) {
         return 0;
     }
 
-
     @Override
-    public void setCFE(int cfe) {
-
-    }
-
-    @Override
-    public int getMaxCFE() {
+    public int getMaxECF() {
         return 0;
     }
 
 
 
     @Override
-    public IECFHandler setMaxCFE(int max) {
+    public IECFHandler setMaxECF(int max) {
         return instance;
     }
 
@@ -90,7 +91,7 @@ public class DummyECFHandler implements IECFHandler {
     }
 
     @Override
-    public int getCFEWithQueue() {
+    public int getECFWithQueue() {
         return 0;
     }
 
