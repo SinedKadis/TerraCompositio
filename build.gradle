@@ -302,6 +302,10 @@ tasks.withType(JavaCompile).configureEach {
     options.compilerArgs << "-Xmaxerrs" << "1000" << "-Xmaxwarns" << "1000"
     options.incremental = true
 }
+tasks.withType(AbstractArchiveTask).configureEach {
+    archiveBaseName.set(mod_id)
+    archiveVersion.set("${minecraft_version}-${mod_version}")
+}
 
 jar {
     from sourceSets.createcompat.output
