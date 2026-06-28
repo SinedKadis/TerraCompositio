@@ -19,7 +19,7 @@ public class TCParticles {
 
     public static final RegistryObject<SimpleParticleType> FLOW_PARTICLE =
             PARTICLE_TYPES.register("flow_particle",() -> new SimpleParticleType(true));
-    public static final RegistryObject<ParticleType<ECFParticleData>> CFE_PARTICLE =
+    public static final RegistryObject<ParticleType<ECFParticleData>> ECF_PARTICLE =
             PARTICLE_TYPES.register("ecf_particle",() -> new ParticleType<>(false, ECFParticleData.DESERIALIZER) {
                 @Override
                 public @NotNull Codec<ECFParticleData> codec() {

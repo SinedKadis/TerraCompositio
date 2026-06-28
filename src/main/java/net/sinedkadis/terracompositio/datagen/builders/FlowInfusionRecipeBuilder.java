@@ -23,13 +23,13 @@ public class FlowInfusionRecipeBuilder implements RecipeBuilder {
 
     private final ItemStack output;
     private final Ingredient input;
-    private final int cfe;
+    private final int ecf;
     private final int time;
 
-    private FlowInfusionRecipeBuilder(ItemStack output, Ingredient input, int cfe, int time) {
+    private FlowInfusionRecipeBuilder(ItemStack output, Ingredient input, int ecf, int time) {
         this.output = output;
         this.input = input;
-        this.cfe = cfe;
+        this.ecf = ecf;
         this.time = time;
     }
 
@@ -57,7 +57,7 @@ public class FlowInfusionRecipeBuilder implements RecipeBuilder {
 
     @Override
     public void save(@NotNull Consumer<FinishedRecipe> consumer, @NotNull ResourceLocation resourceLocation) {
-        consumer.accept(new Result(output,input,cfe,time, resourceLocation));
+        consumer.accept(new Result(output, input, ecf, time, resourceLocation));
     }
 
     public static class Result implements FinishedRecipe {
@@ -65,15 +65,15 @@ public class FlowInfusionRecipeBuilder implements RecipeBuilder {
         private final ItemStack output;
         private final Ingredient input;
 
-        private final int cfe;
+        private final int ecf;
         private final int time;
         private final ResourceLocation id;
 
 
-        public Result(ItemStack output, Ingredient input, int cfe, int time, ResourceLocation id) {
+        public Result(ItemStack output, Ingredient input, int ecf, int time, ResourceLocation id) {
             this.output = output;
             this.input = input;
-            this.cfe = cfe;
+            this.ecf = ecf;
             this.time = time;
 
             this.id = id;
@@ -110,7 +110,7 @@ public class FlowInfusionRecipeBuilder implements RecipeBuilder {
             }
 
             jsonObject.add("output", outputObj);
-            jsonObject.addProperty("cfe",cfe);
+            jsonObject.addProperty("ecf", ecf);
             jsonObject.addProperty("time",time);
         }
 

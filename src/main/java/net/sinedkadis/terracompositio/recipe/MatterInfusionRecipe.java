@@ -26,16 +26,16 @@ public class MatterInfusionRecipe implements Recipe<SimpleContainer> {
     @Getter
     private final int catalystDecayRate;
     @Getter
-    private final int cfe;
+    private final int ecf;
     @Getter
     private final int ticks;
 
-    public MatterInfusionRecipe(Item catalyst, ItemStack input, ItemStack output, int catalystDecayRate, ResourceLocation pRecipeId, int cfe, int ticks) {
+    public MatterInfusionRecipe(Item catalyst, ItemStack input, ItemStack output, int catalystDecayRate, ResourceLocation pRecipeId, int ecf, int ticks) {
         this.catalyst = catalyst;
         this.input = input;
         this.output = output;
         this.catalystDecayRate = catalystDecayRate;
-        this.cfe = cfe;
+        this.ecf = ecf;
         this.ticks = ticks;
         this.id = pRecipeId;
     }
@@ -73,8 +73,9 @@ public class MatterInfusionRecipe implements Recipe<SimpleContainer> {
     public @NotNull ItemStack getResultItem(@Nullable RegistryAccess pRegistryAccess) {
         return output.copy();
     }
-    public float getCFETick(){
-        return (float) cfe /ticks;
+
+    public float getECFTick() {
+        return (float) ecf / ticks;
     }
     @Override
     public @NotNull ResourceLocation getId() {
@@ -104,7 +105,7 @@ public class MatterInfusionRecipe implements Recipe<SimpleContainer> {
             String catalystStr = GsonHelper.getAsString(pSerializedRecipe, "catalyst");
             Item catalyst = ForgeRegistries.ITEMS.getDelegateOrThrow(ResourceLocation.tryParse(catalystStr)).get();
             ItemStack input = ShapedRecipe.itemStackFromJson(GsonHelper.getAsJsonObject(pSerializedRecipe, "input"));
-            int cfe = GsonHelper.getAsInt(pSerializedRecipe,"cfe");
+            int cfe = GsonHelper.getAsInt(pSerializedRecipe, "ecf");
             int ticks = GsonHelper.getAsInt(pSerializedRecipe,"time");
             int catalystDecayRate = GsonHelper.getAsInt(pSerializedRecipe,"rate");
 
@@ -128,7 +129,7 @@ public class MatterInfusionRecipe implements Recipe<SimpleContainer> {
             pBuffer.writeItemStack(pRecipe.output,false);
             pBuffer.writeItemStack(new ItemStack(pRecipe.catalyst),true);
             pBuffer.writeItemStack(pRecipe.input,false);
-            pBuffer.writeInt(pRecipe.cfe);
+            pBuffer.writeInt(pRecipe.ecf);
             pBuffer.writeInt(pRecipe.ticks);
             pBuffer.writeInt(pRecipe.catalystDecayRate);
         }

@@ -8,9 +8,9 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraftforge.items.IItemHandlerModifiable;
-import net.sinedkadis.terracompositio.api.TCCapabilities;
+import net.sinedkadis.terracompositio.api.helpers.ItemHelper;
+import net.sinedkadis.terracompositio.api.registries.TCCapabilities;
 import net.sinedkadis.terracompositio.registries.TCBlocks;
-import net.sinedkadis.terracompositio.util.helpers.ItemHelper;
 import org.jetbrains.annotations.Nullable;
 
 import static net.minecraft.world.level.block.state.properties.BlockStateProperties.HORIZONTAL_FACING;
@@ -22,12 +22,6 @@ public abstract class MatterInfuserBaseBlockEntity extends TCCraftingBlockEntity
 
     public ItemStack getInputSlot() {
         ItemStack itemInSlot = this.getItemInSlot(FlowCedarCasingBlockEntity.INPUT_INVENTORY_SLOT);
-        if (itemInSlot != null)
-            return itemInSlot;
-        return ItemStack.EMPTY;
-    }
-    public ItemStack getSlotOutput() {
-        ItemStack itemInSlot = this.getItemInSlot(FlowCedarCasingBlockEntity.OUTPUT_INVENTORY_SLOT);
         if (itemInSlot != null)
             return itemInSlot;
         return ItemStack.EMPTY;

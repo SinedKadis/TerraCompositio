@@ -14,14 +14,11 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.phys.BlockHitResult;
-import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.IItemHandlerModifiable;
 import net.minecraftforge.items.wrapper.EmptyHandler;
-import net.sinedkadis.terracompositio.api.TCCapabilities;
-import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBEBehaviour;
-import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBEECFBehaviour;
-import net.sinedkadis.terracompositio.api.networks.cfe.IECFHandler;
+import net.sinedkadis.terracompositio.api.networks.ecf.IECFHandler;
+import net.sinedkadis.terracompositio.api.registries.TCCapabilities;
 import net.sinedkadis.terracompositio.block.behaviours.ECFHandlerBehaviour;
 import net.sinedkadis.terracompositio.block.behaviours.ItemStateHolderBehaviour;
 import net.sinedkadis.terracompositio.block.custom.MatterInfuserBaseEntityBlock;
@@ -29,16 +26,18 @@ import net.sinedkadis.terracompositio.config.TCInnerConfig;
 import net.sinedkadis.terracompositio.recipe.MatterInfusionRecipe;
 import net.sinedkadis.terracompositio.registries.TCBlockEntities;
 import net.sinedkadis.terracompositio.registries.TCItems;
-import net.sinedkadis.terracompositio.util.helpers.ParticleHelper;
+import net.sinedkadis.terracompositio.util.behaviors.blockentity.IBEBehaviour;
+import net.sinedkadis.terracompositio.util.behaviors.blockentity.IBEECFBehaviour;
+import net.sinedkadis.terracompositio.util.helpers.ParticleHelperInternal;
 import org.jetbrains.annotations.Nullable;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.List;
 import java.util.Optional;
 
+import static net.sinedkadis.terracompositio.api.registries.TCBlockStateProperties.INFUSED;
 import static net.sinedkadis.terracompositio.block.entity.FlowCedarCasingBlockEntity.DOWN_CONNECTION_SLOT;
 import static net.sinedkadis.terracompositio.block.entity.FlowCedarCasingBlockEntity.UP_CONNECTION_SLOT;
-import static net.sinedkadis.terracompositio.registries.TCBlockStateProperties.INFUSED;
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
@@ -54,18 +53,9 @@ public class MatterInfuserUnitBlockEntity extends MatterInfuserBaseBlockEntity{
 
     @Override
     public void addBEBehaviours(List<IBEBehaviour> list) {
-        list.add(new ECFHandlerBehaviour(this){
-            @Override
-            public Vec3 particleTargetOffset() {
-                return switch (getBlockState().getValue(BlockStateProperties.HORIZONTAL_FACING)){
-                    case SOUTH -> new Vec3(8.0 / 16, 8.0 / 16, 0.5 / 16);
-                    case NORTH -> new Vec3(8.0 / 16, 8.0 / 16, 15.5 / 16);
-                    case EAST -> new Vec3(0.5 / 16, 8.0 / 16, 8.0 / 16);
-                    case WEST -> new Vec3(15.5 / 16, 8.0 / 16, 8.0 / 16);
-                    default -> super.particleTargetOffset();
-                };
-            }
-        }.range(10).priority(TCInnerConfig.DEFAULT_CONSUMER_PRIORITY));
+        list.add(new ECFHandlerBehaviour(this)
+                .range(10)
+                .priority(TCInnerConfig.DEFAULT_CONSUMER_PRIORITY));
         list.add(new ItemStateHolderBehaviour(this) {
 
             @Override
@@ -78,7 +68,11 @@ public class MatterInfuserUnitBlockEntity extends MatterInfuserBaseBlockEntity{
                 boolean enough = pStack.getCount() >= 2;
                 boolean isRod = pStack.is(TCItems.INFUSED_IRON_ROD.get());
                 boolean slotIsEmpty = itemHandler.getStackInSlot(pSlot).isEmpty();
-                return manual && enough && isRod && slotIsEmpty;
+                Direction left = getBlockEntity().getBlockState().getValue(BlockStateProperties.HORIZONTAL_FACING).getClockWise();
+                if (level == null) return false;
+                BlockState leftState = level.getBlockState(getBlockPos().relative(left));
+                boolean leftIsMI = leftState.getBlock() instanceof MatterInfuserBaseEntityBlock;
+                return manual && enough && isRod && slotIsEmpty && leftIsMI;
             }
 
             @Override
@@ -104,15 +98,15 @@ public class MatterInfuserUnitBlockEntity extends MatterInfuserBaseBlockEntity{
             timer = 20;
             isAssembled = assembleValid();
             if (progress>0)
-                ParticleHelper.spawnParticlesIn(pLevel,
+                ParticleHelperInternal.spawnParticlesIn(pLevel,
                         pPos.relative(pState.getValue(BlockStateProperties.HORIZONTAL_FACING).getOpposite()),
-                        ((int) Math.ceil(tickCFECost*20)));
+                        ((int) Math.ceil(tickECFCost * 20)));
 
         }
         timer--;
-        if(hasRecipe() && enoughCFE() && isAssembled){
+        if (hasRecipe() && enoughECF() && isAssembled) {
             increaseCraftingProgress();
-            consumeCFE();
+            consumeECF();
             setChanged(pLevel, pPos, pState);
 //            if (!pLevel.isClientSide){
 //                ((ServerLevel) pLevel).sendParticles(ModParticles.FLOW_STILL_PARTICLE.get(),pPos.getX()+0.5D,pPos.getY()+0.5D,pPos.getZ()+0.5D,3,0,-0.1D,0,0.1D);
@@ -183,10 +177,6 @@ public class MatterInfuserUnitBlockEntity extends MatterInfuserBaseBlockEntity{
         }
     }
 
-    protected boolean enoughCFE() {
-        return this.getCfeContainer().getCFE() >= Math.ceil(tickCFECost);
-    }
-
     protected boolean hasRecipe() {
         Optional<MatterInfusionRecipe> recipe = getCurrentRecipe();
         if (recipe.isEmpty()){
@@ -202,7 +192,7 @@ public class MatterInfuserUnitBlockEntity extends MatterInfuserBaseBlockEntity{
         }
         if (outputTest && infusedTest) {
             maxProgress = matterInfusionRecipe.getTicks();
-            tickCFECost = matterInfusionRecipe.getCFETick();
+            tickECFCost = matterInfusionRecipe.getECFTick();
             catalystDecayRate = matterInfusionRecipe.getCatalystDecayRate();
         }
         return outputTest && infusedTest;
@@ -216,8 +206,8 @@ public class MatterInfuserUnitBlockEntity extends MatterInfuserBaseBlockEntity{
         throw new RuntimeException("Item handler not present: " + this);
     }
 
-    protected IECFHandler getCfeContainer() {
-        IBEECFBehaviour cfeBehaviour = getCFEBehaviour();
+    protected IECFHandler getEcfContainer() {
+        IBEECFBehaviour cfeBehaviour = getECFBehaviour();
         if (cfeBehaviour != null) {
             return cfeBehaviour.getMainHandler();
         }
@@ -235,6 +225,11 @@ public class MatterInfuserUnitBlockEntity extends MatterInfuserBaseBlockEntity{
             return this.level.getRecipeManager().getRecipeFor(MatterInfusionRecipe.Type.INSTANCE, inventory, level);
         }
         return Optional.empty();
+    }
+
+    @Override
+    protected int getECF() {
+        return getEcfContainer().getECF();
     }
 
     public ItemStack getCatalyst() {
@@ -258,11 +253,15 @@ public class MatterInfuserUnitBlockEntity extends MatterInfuserBaseBlockEntity{
 
     protected boolean sameItemInOutput(Item item) {
         ItemStack outputSlot = this.getItemInSlot(FlowCedarCasingBlockEntity.OUTPUT_INVENTORY_SLOT);
-        return outputSlot.isEmpty() || outputSlot.is(item);
+        boolean b = outputSlot.isEmpty() || outputSlot.is(item);
+        checkCraftException(b, CraftException.NO_SPACE);
+        return b;
     }
 
     protected boolean enoughSpaceInOutput(int count) {
         ItemStack outputSlot = this.getItemInSlot(FlowCedarCasingBlockEntity.OUTPUT_INVENTORY_SLOT);
-        return outputSlot.getCount() + count <= outputSlot.getMaxStackSize();
+        boolean b = outputSlot.getCount() + count <= outputSlot.getMaxStackSize();
+        checkCraftException(b, CraftException.NO_SPACE);
+        return b;
     }
 }

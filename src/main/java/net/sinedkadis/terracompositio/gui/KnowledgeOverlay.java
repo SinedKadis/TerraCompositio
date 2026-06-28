@@ -27,20 +27,24 @@ import net.minecraft.world.item.ItemDisplayContext;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.phys.*;
+import net.minecraft.world.phys.BlockHitResult;
+import net.minecraft.world.phys.EntityHitResult;
+import net.minecraft.world.phys.HitResult;
 import net.minecraftforge.client.gui.overlay.ForgeGui;
 import net.minecraftforge.fluids.FluidStack;
 import net.sinedkadis.terracompositio.api.IHaveKnowledge;
+import net.sinedkadis.terracompositio.api.components.EmptyComponent;
+import net.sinedkadis.terracompositio.api.components.FluidComponent;
+import net.sinedkadis.terracompositio.api.components.HeaderComponent;
+import net.sinedkadis.terracompositio.api.components.ItemComponent;
+import net.sinedkadis.terracompositio.api.helpers.PlayerHelper;
 import net.sinedkadis.terracompositio.config.TCClientConfigs;
 import net.sinedkadis.terracompositio.network.TCPackets;
 import net.sinedkadis.terracompositio.network.packets.C2SRequestBlockKnowledgePacket;
 import net.sinedkadis.terracompositio.network.packets.C2SRequestEntityKnowledgePacket;
 import net.sinedkadis.terracompositio.network.packets.S2CKnowledgeDataPacket;
 import net.sinedkadis.terracompositio.registries.TCItems;
-import net.sinedkadis.terracompositio.util.FluidComponent;
-import net.sinedkadis.terracompositio.util.ItemComponent;
 import net.sinedkadis.terracompositio.util.accessors.PlayerKnowledgeAccessor;
-import net.sinedkadis.terracompositio.util.helpers.PlayerHelper;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -61,11 +65,16 @@ public class KnowledgeOverlay {
             return 16 + 4 + 45 + font.width(ic.itemStack().getHoverName());
         } else if (line instanceof FluidComponent fc) {
             return 16 + 4 + 25 + font.width(fc.fluidStack().getFluid().getBucket().getDefaultInstance().getHoverName());
+        } else if (line instanceof EmptyComponent) {
+            return 0;
         }
         return font.width(line) + 15;
     }
 
     private static int lineHeight(FormattedText line) {
+        if (line instanceof EmptyComponent) {
+            return 0;
+        }
         return (line instanceof MutableComponent) ? 9 : 16;
     }
 
@@ -99,18 +108,28 @@ public class KnowledgeOverlay {
 
         EntityHitResult entityResult = PlayerHelper.getEntityHitResult(mc, player, level);
 
-        boolean isEntity = false;
+
         Entity entity = null;
-        IHaveKnowledge entityKnowledge = null;
+        List<Component> entityTooltip = new ArrayList<>();
         if (entityResult != null) {
             entity = entityResult.getEntity();
             if ((entity instanceof IHaveKnowledge ihk)) {
-                isEntity = true;
-                entityKnowledge = ihk;
+                hoverTicks++;
+
+                if (hoverTicks == 1 || hoverTicks % REQUEST_INTERVAL == 0) {
+
+                    TCPackets.CHANNEL.sendToServer(new C2SRequestEntityKnowledgePacket(entity.getUUID()));
+                }
+
+                CompoundTag data = S2CKnowledgeDataPacket.ClientCache.get(entity.getUUID());
+                if (data != null) {
+                    ihk.addTooltipLines(data, entityTooltip, isShifting);
+                }
+
             }
         }
 
-        if (!isEntity && hit instanceof BlockHitResult result) {
+        if (entityTooltip.isEmpty() && hit instanceof BlockHitResult result) {
             BlockPos pos = result.getBlockPos();
 
             BlockEntity be = level.getBlockEntity(pos);
@@ -118,8 +137,8 @@ public class KnowledgeOverlay {
                 resetHover();
                 return;
             }
-
-            hoverTicks++;
+            if (!(entity instanceof IHaveKnowledge))
+                hoverTicks++;
 
             if (hoverTicks == 1 || hoverTicks % REQUEST_INTERVAL == 0) {
                 TCPackets.CHANNEL.sendToServer(new C2SRequestBlockKnowledgePacket(pos));
@@ -132,26 +151,29 @@ public class KnowledgeOverlay {
             }
 
             ihk.addTooltipLines(data, tooltip, isShifting);
-        } else if (isEntity) {
-            hoverTicks++;
-
-            if (hoverTicks == 1 || hoverTicks % REQUEST_INTERVAL == 0) {
-
-                TCPackets.CHANNEL.sendToServer(new C2SRequestEntityKnowledgePacket(entity.getUUID()));
-            }
-
-            CompoundTag data = S2CKnowledgeDataPacket.ClientCache.get(entity.getUUID());
-            if (data == null) {
-                return;
-            }
-
-            entityKnowledge.addTooltipLines(data, tooltip, isShifting);
+        } else {
+            tooltip.addAll(entityTooltip);
         }
 
+        resolveHeaders(tooltip);
         if (tooltip.isEmpty()) return;
 
         renderOverlay(mc, graphics, partialTicks, width, height, tooltip);
 
+    }
+
+    private static void resolveHeaders(List<Component> tooltip) {
+        for (Component component : new ArrayList<>(tooltip)) {
+            if (component instanceof HeaderComponent headerComponent) {
+                List<Component> headerContents = new ArrayList<>();
+                headerComponent.getConsumerList().forEach(listConsumer -> listConsumer.accept(headerContents));
+                if (headerContents.isEmpty()) continue;
+                resolveHeaders(headerContents);
+                tooltip.add(Component.translatable(headerComponent.getHeader().toTranslation()));
+                tooltip.addAll(headerContents);
+            }
+        }
+        tooltip.removeIf(HeaderComponent.class::isInstance);
     }
 
     /**

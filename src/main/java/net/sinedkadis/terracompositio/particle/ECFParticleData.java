@@ -34,7 +34,7 @@ public record ECFParticleData(float speed) implements ParticleOptions {
 
     @Override
     public @NotNull ParticleType<?> getType() {
-        return TCParticles.CFE_PARTICLE.get();
+        return TCParticles.ECF_PARTICLE.get();
     }
 
     @Override

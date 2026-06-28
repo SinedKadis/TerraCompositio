@@ -19,9 +19,9 @@ import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemStackHandler;
+import net.sinedkadis.terracompositio.api.helpers.WorldHelper;
 import net.sinedkadis.terracompositio.block.entity.FlowCedarCasingBlockEntity;
 import net.sinedkadis.terracompositio.block.entity.MatterInfuserPortBlockEntity;
-import net.sinedkadis.terracompositio.util.helpers.WorldHelper;
 import org.jetbrains.annotations.NotNull;
 
 public class MatterInfuserPortBlockEntityRenderer implements BlockEntityRenderer<MatterInfuserPortBlockEntity> {

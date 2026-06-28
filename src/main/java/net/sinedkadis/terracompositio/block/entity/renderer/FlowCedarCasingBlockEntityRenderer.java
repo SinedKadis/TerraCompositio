@@ -18,11 +18,11 @@ import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.items.IItemHandler;
 import net.minecraftforge.items.ItemStackHandler;
-import net.sinedkadis.terracompositio.api.TCCapabilities;
+import net.sinedkadis.terracompositio.api.helpers.WorldHelper;
+import net.sinedkadis.terracompositio.api.registries.TCCapabilities;
 import net.sinedkadis.terracompositio.block.custom.FlowCedarCasingBlock;
 import net.sinedkadis.terracompositio.block.entity.FlowCedarCasingBlockEntity;
 import net.sinedkadis.terracompositio.registries.TCItems;
-import net.sinedkadis.terracompositio.util.helpers.WorldHelper;
 import org.jetbrains.annotations.NotNull;
 
 public class FlowCedarCasingBlockEntityRenderer implements BlockEntityRenderer<FlowCedarCasingBlockEntity> {
@@ -112,7 +112,7 @@ public class FlowCedarCasingBlockEntityRenderer implements BlockEntityRenderer<F
                 // To right
                 pPoseStack.translate(rotatedVec3.x() * 0.1f, 0, rotatedVec3.z() * 0.1f);
 
-                pPoseStack.mulPose(Axis.YP.rotationDegrees(facing.toYRot() + 180));
+                pPoseStack.mulPose(Axis.YN.rotationDegrees(facing.toYRot()));
                 pPoseStack.mulPose(Axis.ZP.rotationDegrees(135));
 
                 itemRenderer.renderStatic(TCItems.HALF_ROD.get().getDefaultInstance(), ItemDisplayContext.FIXED, WorldHelper.getLightLevel(level, pBlockEntity.getBlockPos(), facing),
@@ -177,7 +177,7 @@ public class FlowCedarCasingBlockEntityRenderer implements BlockEntityRenderer<F
                 // To left
                 pPoseStack.translate(rotatedVec3.x() * 0.1f, 0, rotatedVec3.z() * 0.1f);
 
-                pPoseStack.mulPose(Axis.YP.rotationDegrees(facing.toYRot()));
+                pPoseStack.mulPose(Axis.YN.rotationDegrees(facing.toYRot() + 180));
                 pPoseStack.mulPose(Axis.ZP.rotationDegrees(-45));
 
                 itemRenderer.renderStatic(TCItems.HALF_ROD.get().getDefaultInstance(), ItemDisplayContext.FIXED, WorldHelper.getLightLevel(level, pBlockEntity.getBlockPos(), facing),

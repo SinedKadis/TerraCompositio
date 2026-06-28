@@ -7,8 +7,8 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.api.distmarker.Dist;
 import net.minecraftforge.api.distmarker.OnlyIn;
-import net.sinedkadis.terracompositio.api.TCCapabilities;
 import net.sinedkadis.terracompositio.api.dummies.DummyECFHandler;
+import net.sinedkadis.terracompositio.api.registries.TCCapabilities;
 import net.sinedkadis.terracompositio.block.entity.PathPointerBlockEntity;
 import net.sinedkadis.terracompositio.network.packets.S2CHighLightNodesSync;
 import net.sinedkadis.terracompositio.network.packets.S2CPlayerEcfContainerSync;
@@ -18,12 +18,12 @@ import java.util.Set;
 
 @OnlyIn(Dist.CLIENT)
 public class ClientPacketHandlers {
-    public static void handlePlayerCfeSync(S2CPlayerEcfContainerSync msg) {
+    public static void handlePlayerEcfSync(S2CPlayerEcfContainerSync msg) {
         Player player = Minecraft.getInstance().player;
         if (player != null) {
             player.getCapability(TCCapabilities.ECF)
                     .orElse(DummyECFHandler.instance)
-                    .setCFE(msg.cfe());
+                    .setECF(msg.ecf());
         }
     }
     public static void handleAddPlayerKnowledge() {

@@ -1,6 +1,6 @@
 {
   "type": "terracompositio:flow_infusion",
-  "cfe": 100,
+  "ecf": 100,
   "ingredients": [
     {
       "item": "minecraft:golden_apple"

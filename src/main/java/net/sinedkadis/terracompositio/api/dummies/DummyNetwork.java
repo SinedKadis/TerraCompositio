@@ -3,15 +3,18 @@ package net.sinedkadis.terracompositio.api.dummies;
 import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
 import net.minecraftforge.fluids.capability.IFluidHandler;
+import net.sinedkadis.terracompositio.api.TerraCompositioAPI;
 import net.sinedkadis.terracompositio.api.networks.NetworkAction;
-import net.sinedkadis.terracompositio.api.networks.cfe.ECFNetwork;
-import net.sinedkadis.terracompositio.api.networks.cfe.ECFNetworkMember;
-import net.sinedkadis.terracompositio.api.networks.cfe.IECFHandler;
+import net.sinedkadis.terracompositio.api.networks.ecf.ECFNetwork;
+import net.sinedkadis.terracompositio.api.networks.ecf.ECFNetworkMember;
 import net.sinedkadis.terracompositio.api.networks.fluid.FluidNetwork;
 import net.sinedkadis.terracompositio.api.networks.fluid.FluidNetworkMemberBE;
 
 import java.util.Set;
 
+/**
+ * The placeholder, returned by {@link TerraCompositioAPI#getECFNetworkInstance()} and {@link TerraCompositioAPI#getFluidNetworkInstance()}, if Terracompositio is not present
+ */
 public class DummyNetwork implements ECFNetwork, FluidNetwork {
     public static final DummyNetwork instance = new DummyNetwork();
 
@@ -22,22 +25,22 @@ public class DummyNetwork implements ECFNetwork, FluidNetwork {
     }
 
     @Override
-    public Set<ECFNetworkMember> getAllCFENetworkMembers(Level level) {
+    public Set<ECFNetworkMember> getAllECFNetworkMembers(Level level) {
         return Set.of();
     }
 
     @Override
-    public void fireCFENetworkEvent(ECFNetworkMember source, NetworkAction action) {
+    public int getECFTransferLimit() {
+        return 20;
+    }
+
+    @Override
+    public void fireECFNetworkEvent(ECFNetworkMember source, NetworkAction action) {
 
     }
 
     @Override
-    public boolean isIn(Level pLevel, IECFHandler cfeHandler) {
-        return true;
-    }
-
-    @Override
-    public boolean isIn(Level pLevel, ECFNetworkMember cfeHandler) {
+    public boolean isIn(Level pLevel, ECFNetworkMember ecfHandler) {
         return true;
     }
 
@@ -47,12 +50,12 @@ public class DummyNetwork implements ECFNetwork, FluidNetwork {
     }
 
     @Override
-    public boolean isIn(Level pLevel, IFluidHandler cfeHandler) {
+    public boolean isIn(Level pLevel, IFluidHandler ecfHandler) {
         return false;
     }
 
     @Override
-    public boolean isIn(Level pLevel, FluidNetworkMemberBE cfeHandler) {
+    public boolean isIn(Level pLevel, FluidNetworkMemberBE ecfHandler) {
         return false;
     }
 

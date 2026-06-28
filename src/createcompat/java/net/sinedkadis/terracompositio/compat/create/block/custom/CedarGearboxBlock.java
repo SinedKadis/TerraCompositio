@@ -19,7 +19,7 @@ import net.sinedkadis.terracompositio.TerraCompositio;
 import net.sinedkadis.terracompositio.block.IFluidApplicable;
 import net.sinedkadis.terracompositio.compat.create.TCCreateCompat;
 import net.sinedkadis.terracompositio.compat.create.block.entity.CedarGearboxBlockEntity;
-import net.sinedkadis.terracompositio.registries.TCBlockStateProperties;
+import net.sinedkadis.terracompositio.api.registries.TCBlockStateProperties;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 

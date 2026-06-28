@@ -7,7 +7,7 @@ public class TCClientConfigs {
     public static final ForgeConfigSpec.Builder BUILDER = new ForgeConfigSpec.Builder();
     public static final ForgeConfigSpec SPEC;
 
-    public static final ForgeConfigSpec.ConfigValue<Double> CFE_RENDER_MULTIPLIER;
+    public static final ForgeConfigSpec.ConfigValue<Double> ECF_RENDER_MULTIPLIER;
 
     public static final ForgeConfigSpec.ConfigValue<Integer> OVERLAY_X_OFFSET;
     public static final ForgeConfigSpec.ConfigValue<Integer> OVERLAY_Y_OFFSET;
@@ -25,7 +25,7 @@ public class TCClientConfigs {
     static {
         BUILDER.push("Particles");
 
-        CFE_RENDER_MULTIPLIER = BUILDER.comment("How many cfe particles per CFE will be rendered")
+        ECF_RENDER_MULTIPLIER = BUILDER.comment("How many ecf particles per CFE will be rendered")
                 .define("CFE Particle multiplier", 0.1d);
 
         BUILDER.pop();
@@ -36,7 +36,7 @@ public class TCClientConfigs {
                 .defineEnum("Apple Mode", AppleMode.NORMAL);
         APPLE_PP_ENDPOINTS= BUILDER.comment("Show Particles of Path Pointers endpoints when holding wrench")
                 .define("Path Pointer Particles", true);
-        APPLE_ITEM_TOOLTIP= BUILDER.comment("Show item's CFE info in tooltip")
+        APPLE_ITEM_TOOLTIP = BUILDER.comment("Show item's ECF info in tooltip")
                 .define("Item Tooltip", true);
         APPLE_RANGE_CIRCLE= BUILDER.comment("Show range circle while holding shift")
                 .define("Range circle", true);

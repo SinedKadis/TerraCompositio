@@ -16,9 +16,9 @@ import net.minecraft.world.entity.projectile.ThrowableItemProjectile;
 import net.minecraft.world.item.Item;
 import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.Blocks;
+import net.sinedkadis.terracompositio.api.helpers.BlockPosHelper;
 import net.sinedkadis.terracompositio.registries.TCEntities;
 import net.sinedkadis.terracompositio.registries.TCItems;
-import net.sinedkadis.terracompositio.util.helpers.BlockPosHelper;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 

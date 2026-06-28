@@ -32,10 +32,10 @@ import net.minecraftforge.fluids.FluidUtil;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.minecraftforge.fluids.capability.IFluidHandlerItem;
 import net.minecraftforge.fluids.capability.templates.FluidTank;
+import net.sinedkadis.terracompositio.api.helpers.WorldHelper;
 import net.sinedkadis.terracompositio.block.entity.TCBlockEntity;
 import net.sinedkadis.terracompositio.item.custom.WrenchAxeItem;
 import net.sinedkadis.terracompositio.registries.*;
-import net.sinedkadis.terracompositio.util.helpers.WorldHelper;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -64,7 +64,7 @@ public class FlowCedarTankBlock extends TCBaseEntityBlock{
         Integer stage = state.getValue(STAGE);
         if (context.getItemInHand().getItem() instanceof AxeItem && (stage.equals(0) || stage.equals(1))) {
             if (stage.equals(0)){
-                WorldHelper.flowLeak(state, context.getLevel(), context.getClickedPos(), false);
+                WorldHelper.flowLeak(state, context.getLevel(), context.getClickedPos());
             }
             return state.setValue(STAGE, 2);
         }

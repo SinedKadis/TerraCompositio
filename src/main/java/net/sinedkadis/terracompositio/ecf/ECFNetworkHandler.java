@@ -8,13 +8,15 @@ import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.phys.AABB;
 import net.minecraftforge.common.MinecraftForge;
 import net.sinedkadis.terracompositio.api.TerraCompositioAPI;
+import net.sinedkadis.terracompositio.api.helpers.ECFHelper;
 import net.sinedkadis.terracompositio.api.networks.NetworkAction;
-import net.sinedkadis.terracompositio.api.networks.cfe.*;
+import net.sinedkadis.terracompositio.api.networks.ecf.*;
 import net.sinedkadis.terracompositio.block.entity.PathPointerBlockEntity;
+import net.sinedkadis.terracompositio.config.TCCommonConfigs;
 import net.sinedkadis.terracompositio.entity.custom.FlowCedarEntEntity;
 import net.sinedkadis.terracompositio.events.ECFNetworkEvent;
 import net.sinedkadis.terracompositio.registries.TCItems;
-import net.sinedkadis.terracompositio.util.helpers.ECFHelper;
+import net.sinedkadis.terracompositio.util.helpers.ECFHelperInternal;
 import org.jetbrains.annotations.Nullable;
 
 import java.util.*;
@@ -22,7 +24,7 @@ import java.util.*;
 public class ECFNetworkHandler implements ECFNetwork {
     public static final ECFNetworkHandler INSTANCE = new ECFNetworkHandler();
 
-    private final Map<Level, Set<ECFNetworkMember>> cfeSources = new WeakHashMap<>();
+    private final Map<Level, Set<ECFNetworkMember>> ecfSources = new WeakHashMap<>();
 
     private static @Nullable BlockPos getClosestInput(ECFNetworkMember requesterMember, PathPointerBlockEntity proxyBE) {
         BlockPos requesterPos = requesterMember.getPos();
@@ -42,7 +44,7 @@ public class ECFNetworkHandler implements ECFNetwork {
 
     @Override
     public void updateInRange(Level level, BlockPos origin, int range) {
-        Set<ECFNetworkMember> members = cfeSources.get(level);
+        Set<ECFNetworkMember> members = ecfSources.get(level);
         if (members == null) return;
         for (ECFNetworkMember member : members) {
             if (member.getPos().closerThan(origin, range)) {
@@ -52,13 +54,18 @@ public class ECFNetworkHandler implements ECFNetwork {
     }
 
     @Override
-    public Set<ECFNetworkMember> getAllCFENetworkMembers(Level level) {
-        return cfeSources.getOrDefault(level, Set.of());
+    public Set<ECFNetworkMember> getAllECFNetworkMembers(Level level) {
+        return ecfSources.getOrDefault(level, Set.of());
+    }
+
+    @Override
+    public int getECFTransferLimit() {
+        return TCCommonConfigs.ECF_PER_BURST_TRANSFER_LIMIT.get();
     }
 
     public void networkMemberUpdated(ECFNetworkMember updated) {
         Level level = updated.getLevel();
-        Set<ECFNetworkMember> members = cfeSources.get(level);
+        Set<ECFNetworkMember> members = ecfSources.get(level);
         if (members == null) return;
 
         Queue<ECFNetworkMember> queue = new ArrayDeque<>();
@@ -74,7 +81,7 @@ public class ECFNetworkHandler implements ECFNetwork {
             if (current instanceof PPECFMemberProxy memberProxy) {
                 PathPointerBlockEntity ppBE = memberProxy.proxy();
                 if (ppBE != null && ppBE.parts.contains(PathPointerBlockEntity.PPPart.EXTRACTOR)) {
-                    TerraCompositioAPI.instance().getECFNetworkInstance().getAllCFENetworkMembers(level).stream()
+                    TerraCompositioAPI.instance().getECFNetworkInstance().getAllECFNetworkMembers(level).stream()
                             .filter(FlowCedarEntEntity.class::isInstance)
                             .map(FlowCedarEntEntity.class::cast)
                             .filter(entEntity -> entEntity.position().closerThan(ppBE.getBlockPos().getCenter(), 3))
@@ -110,7 +117,7 @@ public class ECFNetworkHandler implements ECFNetwork {
     @Override
     public Set<ECFNetworkMember> getAvailableNetworkTargets(ECFNetworkMember requesterMember) {
         Level level = requesterMember.getLevel();
-        Set<ECFNetworkMember> members = cfeSources.get(level);
+        Set<ECFNetworkMember> members = ecfSources.get(level);
         if (members == null) return Set.of();
 
         Set<ECFNetworkMember> toReturn = new HashSet<>();
@@ -184,38 +191,31 @@ public class ECFNetworkHandler implements ECFNetwork {
             }
         }
 
-        // validMember фильтр — в конце, один раз
-        toReturn.removeIf(m -> !ECFHelper.validMember(m));
+
+        toReturn.removeIf(m -> !ECFHelper.validMember(m) && !ECFHelperInternal.validPPProxy(m));
         return toReturn;
     }
 
     @Override
-    public boolean isIn(Level level, IECFHandler cfeHandler) {
-        Set<ECFNetworkMember> members = cfeSources.get(level);
+    public boolean isIn(Level level, ECFNetworkMember networkMember) {
+        Set<ECFNetworkMember> members = ecfSources.get(level);
         if (members == null) return false;
         for (ECFNetworkMember member : members) {
-            if (member.getMainHandler().equals(cfeHandler)) return true;
+            if (member.getMainHandler().equals(networkMember.getMainHandler())) return true;
         }
-        return false;
-    }
-
-    @Override
-    public boolean isIn(Level level, ECFNetworkMember networkMember) {
-        Set<ECFNetworkMember> members = cfeSources.get(level);
-        if (members == null) return false;
         return members.contains(networkMember);
     }
 
     private void remove(Level level, ECFNetworkMember thing) {
-        Set<ECFNetworkMember> set = cfeSources.get(level);
+        Set<ECFNetworkMember> set = ecfSources.get(level);
         if (set == null) return;
         networkMemberUpdated(thing);
         set.remove(thing);
-        if (set.isEmpty()) cfeSources.remove(level);
+        if (set.isEmpty()) ecfSources.remove(level);
     }
 
     private void add(Level level, ECFNetworkMember thing) {
-        Set<ECFNetworkMember> ECFNetworkMembers = cfeSources.computeIfAbsent(level, k -> new HashSet<>());
+        Set<ECFNetworkMember> ECFNetworkMembers = ecfSources.computeIfAbsent(level, k -> new HashSet<>());
 
         Optional<ECFNetworkMember> any = ECFNetworkMembers.stream()
                 .filter(ECFNetworkMemberBE.class::isInstance)
@@ -238,7 +238,12 @@ public class ECFNetworkHandler implements ECFNetwork {
         }
     }
     @Override
-    public void fireCFENetworkEvent(ECFNetworkMember source, NetworkAction action) {
+    public void fireECFNetworkEvent(ECFNetworkMember source, NetworkAction action) {
         MinecraftForge.EVENT_BUS.post(new ECFNetworkEvent(source,action));
+    }
+
+    @Override
+    public IECFHandler createDefaultECFHandler(ECFNetworkMember attachedMember) {
+        return new DefaultECFHandler(attachedMember);
     }
 }

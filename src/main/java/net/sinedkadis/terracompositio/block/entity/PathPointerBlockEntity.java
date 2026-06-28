@@ -26,12 +26,13 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.network.PacketDistributor;
 import net.sinedkadis.terracompositio.api.TerraCompositioAPI;
-import net.sinedkadis.terracompositio.api.behaviors.blockentity.IBEBehaviour;
 import net.sinedkadis.terracompositio.api.dummies.DummyECFHandler;
+import net.sinedkadis.terracompositio.api.helpers.BlockPosHelper;
+import net.sinedkadis.terracompositio.api.helpers.PlayerHelper;
 import net.sinedkadis.terracompositio.api.networks.NetworkAction;
-import net.sinedkadis.terracompositio.api.networks.cfe.ECFNetwork;
-import net.sinedkadis.terracompositio.api.networks.cfe.ECFNetworkMember;
-import net.sinedkadis.terracompositio.api.networks.cfe.IECFHandler;
+import net.sinedkadis.terracompositio.api.networks.ecf.ECFNetwork;
+import net.sinedkadis.terracompositio.api.networks.ecf.ECFNetworkMember;
+import net.sinedkadis.terracompositio.api.networks.ecf.IECFHandler;
 import net.sinedkadis.terracompositio.block.custom.PathPointerBlock;
 import net.sinedkadis.terracompositio.config.TCClientConfigs;
 import net.sinedkadis.terracompositio.network.TCPackets;
@@ -39,8 +40,7 @@ import net.sinedkadis.terracompositio.network.packets.S2CHighLightNodesSync;
 import net.sinedkadis.terracompositio.registries.TCBlockEntities;
 import net.sinedkadis.terracompositio.util.BindException;
 import net.sinedkadis.terracompositio.util.accessors.PlayerKnowledgeAccessor;
-import net.sinedkadis.terracompositio.util.helpers.BlockPosHelper;
-import net.sinedkadis.terracompositio.util.helpers.PlayerHelper;
+import net.sinedkadis.terracompositio.util.behaviors.blockentity.IBEBehaviour;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -123,9 +123,9 @@ public class PathPointerBlockEntity extends TCBlockEntity implements Nameable, E
         super.tick(pLevel, pPos, pState);
         ECFNetwork ECFNetworkInstance = TerraCompositioAPI.INSTANCE.getECFNetworkInstance();
         if (!pLevel.isClientSide) {
-            boolean inCFENetwork = ECFNetworkInstance.isIn(pLevel, this);
-            if (!inCFENetwork && !this.isRemoved()) {
-                ECFNetworkInstance.fireCFENetworkEvent(this, NetworkAction.ADD);
+            boolean inECFNetwork = ECFNetworkInstance.isIn(pLevel, this);
+            if (!inECFNetwork && !this.isRemoved()) {
+                ECFNetworkInstance.fireECFNetworkEvent(this, NetworkAction.ADD);
             }
         }
         if (updateScheduled) {
@@ -152,7 +152,7 @@ public class PathPointerBlockEntity extends TCBlockEntity implements Nameable, E
 
     @Override
     public void setRemoved() {
-        TerraCompositioAPI.INSTANCE.getECFNetworkInstance().fireCFENetworkEvent(this, NetworkAction.REMOVE);
+        TerraCompositioAPI.INSTANCE.getECFNetworkInstance().fireECFNetworkEvent(this, NetworkAction.REMOVE);
         super.setRemoved();
     }
 

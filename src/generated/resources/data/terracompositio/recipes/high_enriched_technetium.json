@@ -1,7 +1,7 @@
 {
   "type": "terracompositio:matter_infusion",
   "catalyst": "minecraft:diamond",
-  "cfe": 3200,
+  "ecf": 3200,
   "input": {
     "count": 4,
     "item": "terracompositio:medium_enriched_technetium"
