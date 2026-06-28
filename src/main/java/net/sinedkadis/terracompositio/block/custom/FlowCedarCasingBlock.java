@@ -21,7 +21,6 @@ import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.level.block.state.StateDefinition;
 import net.minecraft.world.level.block.state.properties.BlockStateProperties;
 import net.minecraft.world.level.block.state.properties.BooleanProperty;
-import net.minecraft.world.level.block.state.properties.DirectionProperty;
 import net.minecraft.world.level.block.state.properties.EnumProperty;
 import net.minecraft.world.phys.BlockHitResult;
 import net.sinedkadis.terracompositio.api.registries.TCBlockStateProperties;
@@ -41,14 +40,12 @@ public class FlowCedarCasingBlock extends TCBaseEntityBlock implements IFluidApp
     public static final BooleanProperty INFUSED = TCBlockStateProperties.INFUSED;
     public static final EnumProperty<Direction.Axis> AXIS = BlockStateProperties.AXIS;
     protected static final BooleanProperty WAXED = TCBlockStateProperties.WAXED;
-    public static final DirectionProperty ATTACHED_DIR = BlockStateProperties.FACING;
 
     public FlowCedarCasingBlock(Properties pProperties) {
         super(pProperties);
         registerDefaultState(defaultBlockState()
                 .setValue(INFUSED, false)
-                .setValue(WAXED, false)
-                .setValue(ATTACHED_DIR, Direction.DOWN));
+                .setValue(WAXED, false));
     }
 
     @Override
@@ -105,7 +102,7 @@ public class FlowCedarCasingBlock extends TCBaseEntityBlock implements IFluidApp
 
     @Override
     protected void createBlockStateDefinition(StateDefinition.Builder<Block, BlockState> pBuilder) {
-        pBuilder.add(AXIS, INFUSED, WAXED, ATTACHED_DIR);
+        pBuilder.add(AXIS, INFUSED, WAXED);
     }
 
     @Override
@@ -121,10 +118,15 @@ public class FlowCedarCasingBlock extends TCBaseEntityBlock implements IFluidApp
     @Override
     public void onRemove(BlockState pState, Level pLevel, BlockPos pPos, BlockState pNewState, boolean pIsMoving) {
 
-        Direction attachedDir = pState.getValue(ATTACHED_DIR);
-        if (!pState.getBlock().equals(pNewState.getBlock())
-                && attachedDir.getAxis().isHorizontal()) {
-            pLevel.destroyBlock(pPos.relative(attachedDir), true);
+
+        if (!pState.getBlock().equals(pNewState.getBlock())) {
+            for (Direction direction : Direction.Plane.HORIZONTAL) {
+                BlockPos relativePos = pPos.relative(direction);
+                BlockState dirState = pLevel.getBlockState(relativePos);
+                if (!(dirState.getBlock() instanceof MatterInfuserBaseEntityBlock)) continue;
+                if (!dirState.getValue(BlockStateProperties.HORIZONTAL_FACING).equals(direction)) continue;
+                pLevel.destroyBlock(relativePos, true);
+            }
         }
 
         super.onRemove(pState, pLevel, pPos, pNewState, pIsMoving);

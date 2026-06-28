@@ -67,8 +67,11 @@ public class FlowCedarCasingBlockEntity extends TCCraftingBlockEntity{
                 boolean noDir = pDirection == null;
                 boolean isInputSlot = pSlot == INPUT_INVENTORY_SLOT;
                 boolean directionIsUp = noDir || pDirection.equals(Direction.UP);
+                boolean inHardCodedBlackList = pStack.is(TCItems.OUTPUT_BUS.get())
+                        || pStack.is(TCItems.INPUT_BUS.get())
+                        || pStack.is(TCItems.INFUSED_IRON_ROD.get());
 
-                return isInputSlot && directionIsUp;
+                return isInputSlot && directionIsUp && !inHardCodedBlackList;
             }
         });
         list.add(new ItemStateHolderBehaviour(this, 4) {
@@ -82,9 +85,20 @@ public class FlowCedarCasingBlockEntity extends TCCraftingBlockEntity{
                 Level level = FlowCedarCasingBlockEntity.this.level;
                 if (level == null) return false;
 
-                Block blockRelative = level.getBlockState(worldPosition.relative(attachedDir())).getBlock();
-                boolean isMIConnected = attachedDir().getAxis().isHorizontal()
-                        && blockRelative instanceof MatterInfuserBaseEntityBlock;
+                Direction direction = Direction.get(Direction.AxisDirection.POSITIVE, getBlockState().getValue(BlockStateProperties.AXIS));
+                Block blockRelative = level.getBlockState(
+                        worldPosition.relative(
+                                direction.getClockWise()
+                        )
+                ).getBlock();
+                if (!(blockRelative instanceof MatterInfuserBaseEntityBlock)) {
+                    blockRelative = level.getBlockState(
+                            worldPosition.relative(
+                                    direction.getCounterClockWise()
+                            )
+                    ).getBlock();
+                }
+                boolean isMIConnected = blockRelative instanceof MatterInfuserBaseEntityBlock;
 
                 boolean isUpConnectionAllow = !noInputBus() && isMIConnected && pSlot == UP_CONNECTION_SLOT;
 
@@ -117,10 +131,6 @@ public class FlowCedarCasingBlockEntity extends TCCraftingBlockEntity{
 
     public boolean noOutputBus() {
         return this.getCapability(TCCapabilities.ITEM_STATE_HOLDER).orElse(((IItemHandlerModifiable) EmptyHandler.INSTANCE)).getStackInSlot(OUTPUT_BUS_SLOT).isEmpty();
-    }
-
-    public Direction attachedDir() {
-        return getBlockState().getValue(BlockStateProperties.FACING);
     }
 
     public void tick(Level pLevel, BlockPos pPos, BlockState pState) {
@@ -273,5 +283,28 @@ public class FlowCedarCasingBlockEntity extends TCCraftingBlockEntity{
 
     public void setCooldown(int pCooldownTime) {
         this.cooldownTime = pCooldownTime;
+    }
+
+    public Direction attachedDir() {
+        Direction.Axis axis = getBlockState().getValue(BlockStateProperties.AXIS);
+        if (!axis.isHorizontal()) return Direction.DOWN;
+        Direction direction = Direction.get(Direction.AxisDirection.POSITIVE, axis);
+        if (level == null) return Direction.DOWN;
+        {
+            Direction relativeDir = direction.getClockWise();
+            BlockState relativeState = level.getBlockState(getBlockPos().relative(relativeDir));
+            if (relativeState.getBlock() instanceof MatterInfuserBaseEntityBlock
+                    && relativeState.getValue(BlockStateProperties.HORIZONTAL_FACING).equals(relativeDir))
+                return relativeDir;
+        }
+        {
+            Direction relativeDir = direction.getCounterClockWise();
+            BlockState relativeState = level.getBlockState(getBlockPos().relative(relativeDir));
+            if (relativeState.getBlock() instanceof MatterInfuserBaseEntityBlock
+                    && relativeState.getValue(BlockStateProperties.HORIZONTAL_FACING).equals(relativeDir))
+                return relativeDir;
+        }
+        return Direction.DOWN;
+
     }
 }

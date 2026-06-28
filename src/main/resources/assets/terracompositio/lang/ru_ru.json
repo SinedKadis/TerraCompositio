@@ -125,7 +125,8 @@
   "block.terracompositio.flow_cedar_tank_3": "Резервуар из Потокового Кедра",
   "item.terracompositio.technetium_ingot": "Стабильный Слиток Технеция",
   "block.terracompositio.ecf_saturated_air": "Насыщенный ЭПС воздух",
-  "item.terracompositio.creation_flow_journal": "Поток Созидания",
+  "item.terracompositio.creation_flow_journal": "Журнал о Потоке Созидания",
+  "item.terracompositio.creation_flow_journal.title": "Поток Созидания",
   "entity.terracompositio.flow_cedar_ent_entity": "Энт из Потокового Кедра",
   "item.terracompositio.flow_cedar_ent_spawn_egg": "Яйцо призыва Энта из Потокового Кедра",
   "block.terracompositio.path_pointer": "Указатель Пути",
@@ -179,11 +180,9 @@
   "item.terracompositio.apple_of_knowledge": "Яблоко Знания",
   "item.terracompositio.apple_of_ignorance": "Яблоко Забытия",
   "key.terracompositio.categories.main": "Terra Compositio",
-  "create.recipe.item_with_wrench_application": "Ручная сборка с Инструментом",
+  "create.recipe.item_with_wrench_application": "Ручное создание с Инструментом",
   "item.terracompositio.creation_flow_journal.no_pathchouli": "Установите Patchouli для лучшего игрового опыта",
-
-
-  "book.terracompositio.creation_flow_journal.name": "Creation Flow Journal",
+  "book.terracompositio.creation_flow_journal.name": "Поток Созидания",
   "book.terracompositio.creation_flow_journal.landing_text": "Записи о наблюдении за потоком созидания, автор John Pork",
   "book.terracompositio.creation_flow_journal.category.day_1.name": "Первая глава",
   "book.terracompositio.creation_flow_journal.category.day_1.description": "  Закладка первая: Вступление. Для получения 2 закладки преподнесите саженец кедра",

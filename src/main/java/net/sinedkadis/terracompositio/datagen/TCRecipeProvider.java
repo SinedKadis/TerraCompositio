@@ -525,7 +525,7 @@ public class TCRecipeProvider extends RecipeProvider implements IConditionBuilde
     }
 
     private static void buildGoldMaterials(@NotNull Consumer<FinishedRecipe> pWriter) {
-        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, TCItems.GOLD_ROD.get())
+        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, TCItems.GOLD_ROD.get(), 2)
                 .pattern("R")
                 .pattern("R")
                 .define('R', Items.GOLD_INGOT)
@@ -559,7 +559,7 @@ public class TCRecipeProvider extends RecipeProvider implements IConditionBuilde
                 .unlockedBy(getHasName(TCItems.INFUSED_IRON_INGOT.get()), has(TCItems.INFUSED_IRON_INGOT.get()))
                 .save(pWriter,Objects.requireNonNull(ResourceLocation.tryBuild(Objects.requireNonNull(key).getNamespace(),
                         Objects.requireNonNull(key).getPath() + "_from_block")));
-        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, TCItems.INFUSED_IRON_ROD.get())
+        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, TCItems.INFUSED_IRON_ROD.get(), 2)
                 .pattern("R")
                 .pattern("R")
                 .define('R', TCItems.INFUSED_IRON_INGOT.get())
@@ -629,7 +629,7 @@ public class TCRecipeProvider extends RecipeProvider implements IConditionBuilde
                 .unlockedBy(getHasName(TCItems.TECHNETIUM_INGOT.get()), has(TCItems.TECHNETIUM_INGOT.get()))
                 .save(pWriter,Objects.requireNonNull(ResourceLocation.tryBuild(Objects.requireNonNull(technetium).getNamespace(),
                         Objects.requireNonNull(technetium).getPath() + "_from_block")));
-        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, TCItems.TECHNETIUM_ROD.get())
+        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, TCItems.TECHNETIUM_ROD.get(), 2)
                 .pattern("R")
                 .pattern("R")
                 .define('R', TCItems.TECHNETIUM_INGOT.get())
@@ -646,7 +646,7 @@ public class TCRecipeProvider extends RecipeProvider implements IConditionBuilde
                 .requires(Items.COPPER_INGOT)
                 .unlockedBy(getHasName(Items.COPPER_INGOT), has(Items.COPPER_INGOT))
                 .save(pWriter);
-        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, TCItems.COPPER_ROD.get())
+        ShapedRecipeBuilder.shaped(RecipeCategory.TOOLS, TCItems.COPPER_ROD.get(), 2)
                 .pattern("R")
                 .pattern("R")
                 .define('R', Items.COPPER_INGOT)

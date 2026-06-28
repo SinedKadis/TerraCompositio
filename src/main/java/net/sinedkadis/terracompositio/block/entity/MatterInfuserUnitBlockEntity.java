@@ -68,7 +68,11 @@ public class MatterInfuserUnitBlockEntity extends MatterInfuserBaseBlockEntity{
                 boolean enough = pStack.getCount() >= 2;
                 boolean isRod = pStack.is(TCItems.INFUSED_IRON_ROD.get());
                 boolean slotIsEmpty = itemHandler.getStackInSlot(pSlot).isEmpty();
-                return manual && enough && isRod && slotIsEmpty;
+                Direction left = getBlockEntity().getBlockState().getValue(BlockStateProperties.HORIZONTAL_FACING).getClockWise();
+                if (level == null) return false;
+                BlockState leftState = level.getBlockState(getBlockPos().relative(left));
+                boolean leftIsMI = leftState.getBlock() instanceof MatterInfuserBaseEntityBlock;
+                return manual && enough && isRod && slotIsEmpty && leftIsMI;
             }
 
             @Override

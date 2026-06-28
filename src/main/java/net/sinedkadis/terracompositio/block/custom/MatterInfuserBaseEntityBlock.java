@@ -104,13 +104,11 @@ public abstract class MatterInfuserBaseEntityBlock extends TCBaseEntityBlock {
                 Direction direction1 = direction.getOpposite();
                 blockstate = blockstate.setValue(FACING, direction1);
                 if (blockstate.canSurvive(level, blockpos)) {
-                    BlockPos relative = blockpos.relative(direction1.getOpposite());
-                    BlockState blockState1 = level.getBlockState(relative);
-                    if (blockState1.is(TCBlocks.FLOW_CEDAR_CASING.get())) {
-                        if (blockState1.getValue(BlockStateProperties.FACING).getAxis().isHorizontal()) return null;
-                        level.setBlockAndUpdate(relative, blockState1.setValue(BlockStateProperties.FACING, direction1));
-                    }
-                    return blockstate;
+                    BlockPos relative = blockpos.relative(direction1.getOpposite(), 2);
+                    BlockState state = level.getBlockState(relative);
+                    if (!(state.getBlock() instanceof MatterInfuserBaseEntityBlock
+                            && state.getValue(BlockStateProperties.HORIZONTAL_FACING).equals(direction1.getOpposite())))
+                        return blockstate;
                 }
             }
         }

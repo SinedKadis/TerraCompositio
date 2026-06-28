@@ -146,6 +146,7 @@
   "item.terracompositio.technetium_ingot": "Stable Technetium Ingot",
   "block.terracompositio.ecf_saturated_air": "ECF saturated air",
   "item.terracompositio.creation_flow_journal": "Creation Flow Journal",
+  "item.terracompositio.creation_flow_journal.title": "Creation Flow Journal",
   "entity.terracompositio.flow_cedar_ent_entity": "Flow Cedar Ent",
   "item.terracompositio.flow_cedar_ent_spawn_egg": "Flow Cedar Ent Spawn Egg",
   "block.terracompositio.path_pointer": "Path Pointer",

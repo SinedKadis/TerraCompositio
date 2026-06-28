@@ -125,7 +125,8 @@
   "block.terracompositio.flow_cedar_tank_3": "Резервуар з Потокового Кедра",
   "item.terracompositio.technetium_ingot": "Стабільний Зливок Технеція",
   "block.terracompositio.ecf_saturated_air": "Насичене ЕПТ повітря",
-  "item.terracompositio.creation_flow_journal": "Поток Творення",
+  "item.terracompositio.creation_flow_journal": "Журнал про Поток Творення",
+  "item.terracompositio.creation_flow_journal.title": "Поток Творення",
   "entity.terracompositio.flow_cedar_ent_entity": "Ент з Потокового Кедра",
   "item.terracompositio.flow_cedar_ent_spawn_egg": "Яйце виклику Ента з Потокового Кедра",
   "block.terracompositio.path_pointer": "Вказівник Шляху",
@@ -183,7 +184,7 @@
 
   "key.terracompositio.categories.main": "Terra Compositio",
   "create.recipe.item_with_wrench_application": "Ручне застосування з Інструментом",
-  "book.terracompositio.creation_flow_journal.name": "Creation Flow Journal",
+  "book.terracompositio.creation_flow_journal.name": "Поток Творення",
   "book.terracompositio.creation_flow_journal.landing_text": "Записи про спостереження за потоком творення, автор — Джон Порк",
   "book.terracompositio.creation_flow_journal.category.day_1.name": "Перший розділ",
   "book.terracompositio.creation_flow_journal.category.day_1.description": "  Закладка перша: Вступ. Щоб отримати 2 закладку, піднесіть саджанець кедра",
