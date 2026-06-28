@@ -13,9 +13,8 @@ public interface ECFNetworkMemberBE extends ECFNetworkMember {
     default BlockEntity getEntity(){
         return  ((BlockEntity) this);
     }
-    default Level getLevel() {
-        return getEntity().getLevel();
-    }
+    Level getLevel();
+
     default BlockPos getPos() {
         return getEntity().getBlockPos();
     }

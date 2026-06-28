@@ -148,8 +148,8 @@ public class ItemStateHolderBehaviour implements IBEItemBehaviour {
     }
 
     @Override
+    @SuppressWarnings("unchecked")
     public <T extends BlockEntity> T getBlockEntity() {
-        //noinspection unchecked
         return (T) blockEntity;
     }
 

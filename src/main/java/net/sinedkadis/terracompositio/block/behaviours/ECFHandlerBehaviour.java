@@ -244,4 +244,15 @@ public class ECFHandlerBehaviour implements IBEECFBehaviour, IHaveKnowledge {
 
     }
 
+    @Override
+    @Nullable
+    public Level getLevel() {
+        return blockEntity.getLevel();
+    }
+
+    @Override
+    @SuppressWarnings("unchecked")
+    public <T extends BlockEntity> T getBlockEntity() {
+        return (T) blockEntity;
+    }
 }
