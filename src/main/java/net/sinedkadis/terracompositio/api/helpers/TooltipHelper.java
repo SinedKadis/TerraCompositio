@@ -39,21 +39,33 @@ public class TooltipHelper {
      */
     public static MutableComponent defaultTextWithArg(String translationKey, Object arg, ICustomUnit measurement) {
 
-        String stringArg = String.valueOf(arg);
-        int toCrop = 0;
-        if (stringArg.endsWith("f")) toCrop++;
+        MutableComponent mutableComponent;
 
-        int length = stringArg.length();
 
-        if (length > 6) toCrop = length - 6;
-        stringArg = stringArg.substring(0, length - toCrop);
-
-        MutableComponent mutableComponent = Component.literal(stringArg)
-                .append(Component.translatable(measurement.toTranslation()));
         if (arg instanceof MutableComponent component)
             mutableComponent = component;
+        else {
+            String stringArg = String.valueOf(arg);
+            int toCrop = 0;
+            if (stringArg.endsWith("f")) toCrop++;
+
+            int length = stringArg.length();
+
+            if (length > 6) toCrop = length - 6;
+            stringArg = stringArg.substring(0, length - toCrop);
+
+
+            mutableComponent = Component.literal(stringArg)
+                    .append(Component.translatable(measurement.toTranslation()));
+        }
+
+        ChatFormatting color;
+        if (translationKey.equals(Keys.CRAFT_EXCEPTION.toTranslation()))
+            color = ChatFormatting.RED;
+        else
+            color = ChatFormatting.AQUA;
         return Component.translatable(translationKey,
-                        mutableComponent.withStyle(ChatFormatting.AQUA))
+                        mutableComponent.withStyle(color))
                 .withStyle(ChatFormatting.GRAY);
     }
 
@@ -233,7 +245,8 @@ public class TooltipHelper {
         PROGRESS,
         MAX_PROGRESS,
         TIME_COLLECTED,
-        TIME_COLLECTION_CHANCE;
+        TIME_COLLECTION_CHANCE,
+        CRAFT_EXCEPTION;
 
         @Override
         public String getModID() {
@@ -246,13 +259,14 @@ public class TooltipHelper {
      * {@link net.sinedkadis.terracompositio.api.helpers.TooltipHelper#translationKeyHeader} at the start of string to get a translation key
      */
     public enum Units implements ICustomUnit {
+        NO_UNITS,
+        ERROR,
         BLOCKS,
         UNITS,
         MILIBUCKETS,
         ECF_SECOND,
         SECONDS,
         CONSUMER,
-        NO_UNITS,
         SOURCE;
 
         @Override

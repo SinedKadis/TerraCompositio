@@ -115,6 +115,11 @@ public class FlowCedarAltarBlockEntity extends TCCraftingBlockEntity implements 
     }
 
     @Override
+    protected int getECF() {
+        return 0;
+    }
+
+    @Override
     public int defaultConsumeAmount() {
         return 500;
     }

@@ -14,6 +14,7 @@ import net.minecraft.world.level.block.entity.BlockEntityType;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.items.IItemHandlerModifiable;
 import net.sinedkadis.terracompositio.api.IHaveKnowledge;
+import net.sinedkadis.terracompositio.api.TerraCompositioAPI;
 import net.sinedkadis.terracompositio.api.dummies.DummyECFHandler;
 import net.sinedkadis.terracompositio.api.helpers.TooltipHelper;
 import net.sinedkadis.terracompositio.api.registries.TCCapabilities;
@@ -34,6 +35,7 @@ public abstract class TCCraftingBlockEntity extends TCBlockEntity implements Wor
     protected int progress = 0;
     protected int maxProgress;
     protected float tickECFCost;
+    protected CraftException craftException = CraftException.EMPTY;
 
     public TCCraftingBlockEntity(BlockEntityType<?> type, BlockPos pos, BlockState state) {
         super(type, pos, state);
@@ -75,7 +77,9 @@ public abstract class TCCraftingBlockEntity extends TCBlockEntity implements Wor
 
 
     protected boolean sameItemInOutput(Item item) {
-        return this.getItemHandler().getStackInSlot(getOutputSlotIndex()).isEmpty() || this.getItemHandler().getStackInSlot(getOutputSlotIndex()).is(item);
+        boolean toReturn = this.getItemHandler().getStackInSlot(getOutputSlotIndex()).isEmpty() || this.getItemHandler().getStackInSlot(getOutputSlotIndex()).is(item);
+        checkCraftException(toReturn, CraftException.NO_SPACE);
+        return toReturn;
     }
 
     public int getOutputSlotIndex() {
@@ -83,9 +87,18 @@ public abstract class TCCraftingBlockEntity extends TCBlockEntity implements Wor
     }
 
     protected boolean enoughSpaceInOutput(int count) {
-        return this.getItemHandler().getStackInSlot(getOutputSlotIndex()).getCount() + count
+        boolean toReturn = this.getItemHandler().getStackInSlot(getOutputSlotIndex()).getCount() + count
                 <= Math.min(this.getItemHandler().getStackInSlot(getOutputSlotIndex()).getMaxStackSize(),
                 getItemHandler().getSlotLimit(1));
+        checkCraftException(toReturn, CraftException.NO_SPACE);
+        return toReturn;
+    }
+
+    public void checkCraftException(boolean toReturn, CraftException exception) {
+        if (!toReturn)
+            craftException = exception;
+        if (toReturn && craftException.equals(exception))
+            craftException = CraftException.EMPTY;
     }
 
     protected void playSoundIfNeeded(Level level, BlockPos pos) {
@@ -95,6 +108,16 @@ public abstract class TCCraftingBlockEntity extends TCBlockEntity implements Wor
     protected void craftItem() {
     }
     protected Optional<?> getCurrentRecipe(){return Optional.empty();}
+
+    public boolean enoughECF() {
+        int ecf = getECF();
+        boolean toReturn = ecf > tickECFCost;
+        checkCraftException(toReturn, CraftException.NO_ECF);
+        return toReturn;
+    }
+
+    abstract protected int getECF();
+
     protected boolean hasRecipe(){return false;}
 
     abstract protected IItemHandlerModifiable getItemHandler();
@@ -175,6 +198,8 @@ public abstract class TCCraftingBlockEntity extends TCBlockEntity implements Wor
     @Override
     public void collectKnowledgeData(CompoundTag data) {
         super.collectKnowledgeData(data);
+        if (!craftException.equals(CraftException.EMPTY))
+            data.putString(TooltipHelper.Keys.CRAFT_EXCEPTION.toData(), craftException.name());
         if (maxProgress == 0) return;
 
         float remaining = (maxProgress - progress) / 20f;
@@ -191,16 +216,32 @@ public abstract class TCCraftingBlockEntity extends TCBlockEntity implements Wor
     }
 
     @Override
-    public void addTooltipLines(CompoundTag data, List<Component> tooltip, boolean isShifting) {//todo add fallback
+    public void addTooltipLines(CompoundTag data, List<Component> tooltip, boolean isShifting) {
 
         TooltipHelper.addWithHeader(TooltipHelper.Headers.CRAFTING, tooltip, t -> {
             TooltipHelper.addIfExist(TooltipHelper.Keys.TIME_REMAINING, TooltipHelper.Units.SECONDS, t, data);
             TooltipHelper.addIfExist(TooltipHelper.Keys.PROGRESS, TooltipHelper.Units.SECONDS, t, data);
             TooltipHelper.addIfExist(TooltipHelper.Keys.MAX_PROGRESS, TooltipHelper.Units.SECONDS, t, data);
             TooltipHelper.addIfExist(TooltipHelper.Keys.CONSUME, TooltipHelper.Units.ECF_SECOND, t, data);
+            if (data.contains(TooltipHelper.Keys.CRAFT_EXCEPTION.toData())) {
+                TooltipHelper.addWithNoArg(
+                        TooltipHelper.Keys.CRAFT_EXCEPTION,
+                        Enum.valueOf(CraftException.class, data.getString(TooltipHelper.Keys.CRAFT_EXCEPTION.toData())),
+                        t
+                );
+            }
         });
 
 
         super.addTooltipLines(data, tooltip, isShifting);
+    }
+
+    public enum CraftException implements TooltipHelper.ICustomUnit {
+        NO_ECF, NO_SPACE, EMPTY;
+
+        @Override
+        public String getModID() {
+            return TerraCompositioAPI.MOD_ID;
+        }
     }
 }

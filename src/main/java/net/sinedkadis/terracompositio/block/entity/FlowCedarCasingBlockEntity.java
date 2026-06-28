@@ -138,6 +138,11 @@ public class FlowCedarCasingBlockEntity extends TCCraftingBlockEntity{
                 && !iItemHandler.getStackInSlot(DOWN_CONNECTION_SLOT).isEmpty();
     }
 
+    @Override
+    protected int getECF() {
+        return 0;
+    }
+
     protected IItemHandlerModifiable getItemHandler() {
         Optional<IItemHandler> capability = this.getCapability(ForgeCapabilities.ITEM_HANDLER).resolve();
         if (capability.isPresent()) {

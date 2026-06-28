@@ -74,11 +74,6 @@ public class FlowInfuserBlockEntity extends TCCraftingBlockEntity {
         }
     }
 
-    public boolean enoughECF() {
-        int ecf = ecfContainer().getECF();
-        return ecf > tickECFCost;
-    }
-
     public boolean hasRecipe() {
         Optional<FlowInfusionRecipe> recipe = getCurrentRecipe();
         if (recipe.isEmpty()){
@@ -101,6 +96,11 @@ public class FlowInfuserBlockEntity extends TCCraftingBlockEntity {
 
         assert this.level != null;
         return this.level.getRecipeManager().getRecipeFor(FlowInfusionRecipe.Type.INSTANCE, inventory, level);
+    }
+
+    @Override
+    protected int getECF() {
+        return ecfContainer().getECF();
     }
 
     @Override

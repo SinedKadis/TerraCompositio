@@ -113,9 +113,12 @@
   "info.terracompositio.time_remaining": "Remaining: %s",
   "info.terracompositio.time_collected": "Time Collected: %s",
   "info.terracompositio.time_collection_chance": "Time collection chance: %s%%",
+  "info.terracompositio.craft_exception": "%s",
 
 
   "info.terracompositio.seconds": " seconds",
+  "info.terracompositio.no_ecf": "Not enough ECF",
+  "info.terracompositio.no_space": "Not enough space in output",
 
 
   "info.terracompositio.ent_hold_header": "Holds: ",

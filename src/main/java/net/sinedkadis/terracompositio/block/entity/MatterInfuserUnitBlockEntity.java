@@ -173,10 +173,6 @@ public class MatterInfuserUnitBlockEntity extends MatterInfuserBaseBlockEntity{
         }
     }
 
-    protected boolean enoughECF() {
-        return this.getEcfContainer().getECF() >= Math.ceil(tickECFCost);
-    }
-
     protected boolean hasRecipe() {
         Optional<MatterInfusionRecipe> recipe = getCurrentRecipe();
         if (recipe.isEmpty()){
@@ -227,6 +223,11 @@ public class MatterInfuserUnitBlockEntity extends MatterInfuserBaseBlockEntity{
         return Optional.empty();
     }
 
+    @Override
+    protected int getECF() {
+        return getEcfContainer().getECF();
+    }
+
     public ItemStack getCatalyst() {
         MatterInfuserPortBlockEntity port = this.getPortBE();
         return port != null ? port.getInputSlot() : ItemStack.EMPTY;
@@ -248,11 +249,15 @@ public class MatterInfuserUnitBlockEntity extends MatterInfuserBaseBlockEntity{
 
     protected boolean sameItemInOutput(Item item) {
         ItemStack outputSlot = this.getItemInSlot(FlowCedarCasingBlockEntity.OUTPUT_INVENTORY_SLOT);
-        return outputSlot.isEmpty() || outputSlot.is(item);
+        boolean b = outputSlot.isEmpty() || outputSlot.is(item);
+        checkCraftException(b, CraftException.NO_SPACE);
+        return b;
     }
 
     protected boolean enoughSpaceInOutput(int count) {
         ItemStack outputSlot = this.getItemInSlot(FlowCedarCasingBlockEntity.OUTPUT_INVENTORY_SLOT);
-        return outputSlot.getCount() + count <= outputSlot.getMaxStackSize();
+        boolean b = outputSlot.getCount() + count <= outputSlot.getMaxStackSize();
+        checkCraftException(b, CraftException.NO_SPACE);
+        return b;
     }
 }

@@ -62,4 +62,9 @@ public class MatterInfuserPortBlockEntity extends MatterInfuserBaseBlockEntity {
             }
         }
     }
+
+    @Override
+    protected int getECF() {
+        return 0;
+    }
 }
