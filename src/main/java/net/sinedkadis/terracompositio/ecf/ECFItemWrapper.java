@@ -3,13 +3,10 @@ package net.sinedkadis.terracompositio.ecf;
 import lombok.Getter;
 import lombok.Setter;
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.server.level.ServerLevel;
 import net.minecraft.util.Mth;
 import net.minecraft.world.item.ItemStack;
-import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ICapabilityProvider;
@@ -17,6 +14,7 @@ import net.minecraftforge.common.util.LazyOptional;
 import net.sinedkadis.terracompositio.api.networks.ecf.ECFNetworkMember;
 import net.sinedkadis.terracompositio.api.networks.ecf.IECFHandler;
 import net.sinedkadis.terracompositio.api.registries.TCCapabilities;
+import net.sinedkadis.terracompositio.util.IEntityInstance;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -148,37 +146,7 @@ public class ECFItemWrapper implements IECFHandler, ICapabilityProvider {
     }
 
     @Override
-    public double x() {
-        return 0;
-    }
-
-    @Override
-    public double y() {
-        return 0;
-    }
-
-    @Override
-    public double z() {
-        return 0;
-    }
-
-    @Override
-    public BlockPos getPos() {
-        return null;
-    }
-
-    @Override
-    public BlockState getBlockState() {
-        return null;
-    }
-
-    @Override
-    public ServerLevel getLevel() {
-        return null;
-    }
-
-    @Override
-    public ECFNetworkMember getAttachedMember() {
+    public IEntityInstance getAttachedEntity() {
         return null;
     }
 

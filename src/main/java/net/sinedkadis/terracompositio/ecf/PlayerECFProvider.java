@@ -6,9 +6,9 @@ import net.minecraft.world.entity.player.Player;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.INBTSerializable;
 import net.minecraftforge.common.util.LazyOptional;
-import net.sinedkadis.terracompositio.api.networks.ecf.ECFNetworkMemberEntity;
 import net.sinedkadis.terracompositio.api.networks.ecf.IECFHandler;
 import net.sinedkadis.terracompositio.api.registries.TCCapabilities;
+import net.sinedkadis.terracompositio.util.IEntityInstance;
 import org.jetbrains.annotations.NotNull;
 import org.jetbrains.annotations.Nullable;
 
@@ -34,7 +34,7 @@ public class PlayerECFProvider implements net.minecraftforge.common.capabilities
 
     private IECFHandler createPlayerECFContainer() {
         if (this.handler == null) {
-            this.handler = new ECFHandlerPlayerArmor(new DefaultECFHandler((ECFNetworkMemberEntity) player)
+            this.handler = new ECFHandlerPlayerArmor(new DefaultECFHandler(IEntityInstance.wrap(player))
                     .setMaxECF(0) // I haven't thought of a use for this yet
                     .setOffset(vec3 -> vec3.add(0, 1, 0)));
         }

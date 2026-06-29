@@ -1,19 +1,17 @@
 package net.sinedkadis.terracompositio.api.dummies;
 
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.core.BlockPos;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import net.sinedkadis.terracompositio.api.networks.ecf.ECFNetwork;
 import net.sinedkadis.terracompositio.api.networks.ecf.ECFNetworkMember;
 import net.sinedkadis.terracompositio.api.networks.ecf.IECFHandler;
+import net.sinedkadis.terracompositio.util.IEntityInstance;
 
 import java.util.function.Function;
 
 /**
- * The placeholder, returned by {@link ECFNetwork#createDefaultECFHandler(ECFNetworkMember)}, if Terracompositio is not present
+ * The placeholder, returned by {@link ECFNetwork#createDefaultECFHandler(net.sinedkadis.terracompositio.util.IEntityInstance)}, if Terracompositio is not present
  */
 @SuppressWarnings("DataFlowIssue")
 @MethodsReturnNonnullByDefault
@@ -113,37 +111,7 @@ public class DummyECFHandler implements IECFHandler {
 
 
     @Override
-    public double x() {
-        return 0;
-    }
-
-    @Override
-    public double y() {
-        return 0;
-    }
-
-    @Override
-    public double z() {
-        return 0;
-    }
-
-    @Override
-    public BlockPos getPos() {
-        return null;
-    }
-
-    @Override
-    public BlockState getBlockState() {
-        return null;
-    }
-
-    @Override
-    public ServerLevel getLevel() {
-        return null;
-    }
-
-    @Override
-    public ECFNetworkMember getAttachedMember() {
+    public IEntityInstance getAttachedEntity() {
         return null;
     }
 

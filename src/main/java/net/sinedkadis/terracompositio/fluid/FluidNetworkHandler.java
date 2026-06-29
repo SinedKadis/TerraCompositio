@@ -7,7 +7,7 @@ import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.sinedkadis.terracompositio.api.helpers.ECFHelper;
 import net.sinedkadis.terracompositio.api.networks.NetworkAction;
 import net.sinedkadis.terracompositio.api.networks.fluid.FluidNetwork;
-import net.sinedkadis.terracompositio.api.networks.fluid.FluidNetworkMemberBE;
+import net.sinedkadis.terracompositio.api.networks.fluid.FluidNetworkMember;
 import net.sinedkadis.terracompositio.events.FluidNetworkEvent;
 
 import java.util.*;
@@ -15,13 +15,13 @@ import java.util.*;
 public class FluidNetworkHandler implements FluidNetwork {
     public static final FluidNetworkHandler INSTANCE = new FluidNetworkHandler();
 
-    private final Map<Level, Set<FluidNetworkMemberBE>> fluidSources = new WeakHashMap<>();
+    private final Map<Level, Set<FluidNetworkMember>> fluidSources = new WeakHashMap<>();
 
-    public void onNetworkEvent(FluidNetworkMemberBE source, NetworkAction action) {
+    public void onNetworkEvent(FluidNetworkMember source, NetworkAction action) {
         if (action == NetworkAction.ADD){
-            add(fluidSources, source.getLevel(),source);
+            add(fluidSources, source.getEntityInstance().tc$getLevel(), source);
         } else if (action == NetworkAction.REMOVE){
-            remove(fluidSources, source.getLevel(),source);
+            remove(fluidSources, source.getEntityInstance().tc$getLevel(), source);
         } else {
             networkMemberUpdated(source);
         }
@@ -44,33 +44,34 @@ public class FluidNetworkHandler implements FluidNetwork {
     }
 
     @Override
-    public boolean isIn(Level pLevel, FluidNetworkMemberBE fluidHandler) {
+    public boolean isIn(Level pLevel, FluidNetworkMember fluidHandler) {
         return fluidSources.getOrDefault(pLevel, Collections.emptySet()).stream().anyMatch(fluidSource -> fluidSource.equals(fluidHandler));
     }
 
     @Override
     public void updateInRange(Level level, BlockPos origin, int range) {
-        Set<FluidNetworkMemberBE> members = fluidSources.get(level);
+        Set<FluidNetworkMember> members = fluidSources.get(level);
         if (members == null) return;
-        for (FluidNetworkMemberBE member : members) {
-            if (member.getPos().closerThan(origin, range)) {
+        for (FluidNetworkMember member : members) {
+            if (member.getEntityInstance().tc$getBlockPos().closerThan(origin, range)) {
                 member.scheduleMemberUpdate();
             }
         }
     }
 
     @Override
-    public Set<FluidNetworkMemberBE> getAvailableNetworkTargets(FluidNetworkMemberBE requesterMember) {
-        Level level = requesterMember.getLevel();
-        Set<FluidNetworkMemberBE> members = fluidSources.get(level);
+    public Set<FluidNetworkMember> getAvailableNetworkTargets(FluidNetworkMember requesterMember) {
+        Level level = requesterMember.getEntityInstance().tc$getLevel();
+        Set<FluidNetworkMember> members = fluidSources.get(level);
         if (members == null) return Set.of();
 
-        Set<FluidNetworkMemberBE> toReturn = new HashSet<>();
+        Set<FluidNetworkMember> toReturn = new HashSet<>();
 
-        for (FluidNetworkMemberBE member : members) {
-            if (!member.getPos().closerThan(requesterMember.getPos(), requesterMember.getRange())) continue;
+        for (FluidNetworkMember member : members) {
+            if (!member.getEntityInstance().tc$getBlockPos().closerThan(requesterMember.getEntityInstance().tc$getBlockPos(), requesterMember.getRange()))
+                continue;
             if (member.getPriority() <= requesterMember.getPriority()) continue;
-            if (member.getEntity().equals(requesterMember.getEntity())) continue;
+            if (member.getEntityInstance().equals(requesterMember.getEntityInstance())) continue;
 
             toReturn.add(member);
         }
@@ -81,14 +82,14 @@ public class FluidNetworkHandler implements FluidNetwork {
     }
 
     @Override
-    public Set<FluidNetworkMemberBE> getAllFluidNetworkMembers(Level level) {
+    public Set<FluidNetworkMember> getAllFluidNetworkMembers(Level level) {
         return fluidSources.get(level);
     }
 
-    public void networkMemberUpdated(FluidNetworkMemberBE updated) {
-        if (fluidSources.containsKey(updated.getLevel())) {
-            for (FluidNetworkMemberBE source : fluidSources.get(updated.getLevel())) {
-                if (source.getPos().closerThan(updated.getPos(), updated.getRange())) {
+    public void networkMemberUpdated(FluidNetworkMember updated) {
+        if (fluidSources.containsKey(updated.getEntityInstance().tc$getLevel())) {
+            for (FluidNetworkMember source : fluidSources.get(updated.getEntityInstance().tc$getLevel())) {
+                if (source.getEntityInstance().tc$getBlockPos().closerThan(updated.getEntityInstance().tc$getBlockPos(), updated.getRange())) {
                     source.scheduleMemberUpdate();
                 }
             }
@@ -97,7 +98,7 @@ public class FluidNetworkHandler implements FluidNetwork {
 
 
     @Override
-    public void fireFluidNetworkEvent(FluidNetworkMemberBE source, NetworkAction action) {
+    public void fireFluidNetworkEvent(FluidNetworkMember source, NetworkAction action) {
         MinecraftForge.EVENT_BUS.post(new FluidNetworkEvent(source,action));
     }
 

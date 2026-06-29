@@ -20,10 +20,10 @@ public class ECFHelper {
      */
     public static boolean validMember(AnyNetworkMember target) {
         if (target == null) return false;
-        if (target.getEntity() instanceof BlockEntity memberBE) {
+        if (target.getEntityInstance() instanceof BlockEntity memberBE) {
             return !memberBE.isRemoved();
         }
-        if (target.getEntity() instanceof Entity memberEntity) {
+        if (target.getEntityInstance() instanceof Entity memberEntity) {
             return !memberEntity.isRemoved();
         }
         return false;
@@ -52,7 +52,9 @@ public class ECFHelper {
         int added = targetMainHandler.addECF(taken, true);
 
         if (added > 0) {
-            if (target.getPos().closerThan(source.getPos(), 2) && !(target instanceof Entity))
+            if (target.getEntityInstance().tc$getBlockPos()
+                    .closerThan(source.getEntityInstance().tc$getBlockPos(), 2)
+                    && !(target instanceof Entity))
                 added = targetMainHandler.addECF(added, false);
             else {
                 added = sourceMainHandler.sendECF(target, added, speed);

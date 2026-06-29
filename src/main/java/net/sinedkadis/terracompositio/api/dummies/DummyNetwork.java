@@ -8,7 +8,7 @@ import net.sinedkadis.terracompositio.api.networks.NetworkAction;
 import net.sinedkadis.terracompositio.api.networks.ecf.ECFNetwork;
 import net.sinedkadis.terracompositio.api.networks.ecf.ECFNetworkMember;
 import net.sinedkadis.terracompositio.api.networks.fluid.FluidNetwork;
-import net.sinedkadis.terracompositio.api.networks.fluid.FluidNetworkMemberBE;
+import net.sinedkadis.terracompositio.api.networks.fluid.FluidNetworkMember;
 
 import java.util.Set;
 
@@ -45,7 +45,7 @@ public class DummyNetwork implements ECFNetwork, FluidNetwork {
     }
 
     @Override
-    public void fireFluidNetworkEvent(FluidNetworkMemberBE source, NetworkAction action) {
+    public void fireFluidNetworkEvent(FluidNetworkMember source, NetworkAction action) {
 
     }
 
@@ -55,7 +55,7 @@ public class DummyNetwork implements ECFNetwork, FluidNetwork {
     }
 
     @Override
-    public boolean isIn(Level pLevel, FluidNetworkMemberBE ecfHandler) {
+    public boolean isIn(Level pLevel, FluidNetworkMember ecfHandler) {
         return false;
     }
 
@@ -65,12 +65,12 @@ public class DummyNetwork implements ECFNetwork, FluidNetwork {
     }
 
     @Override
-    public Set<FluidNetworkMemberBE> getAvailableNetworkTargets(FluidNetworkMemberBE requesterMember) {
+    public Set<FluidNetworkMember> getAvailableNetworkTargets(FluidNetworkMember requesterMember) {
         return Set.of();
     }
 
     @Override
-    public Set<FluidNetworkMemberBE> getAllFluidNetworkMembers(Level level) {
+    public Set<FluidNetworkMember> getAllFluidNetworkMembers(Level level) {
         return Set.of();
     }
 

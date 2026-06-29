@@ -20,13 +20,14 @@ import net.sinedkadis.terracompositio.api.helpers.ECFHelper;
 import net.sinedkadis.terracompositio.api.helpers.TooltipHelper;
 import net.sinedkadis.terracompositio.api.networks.NetworkAction;
 import net.sinedkadis.terracompositio.api.networks.fluid.FluidNetwork;
-import net.sinedkadis.terracompositio.api.networks.fluid.FluidNetworkMemberBE;
+import net.sinedkadis.terracompositio.api.networks.fluid.FluidNetworkMember;
 import net.sinedkadis.terracompositio.config.TCCommonConfigs;
 import net.sinedkadis.terracompositio.fluid.TCFluidTank;
 import net.sinedkadis.terracompositio.registries.TCBlockEntities;
 import net.sinedkadis.terracompositio.registries.TCBlocks;
 import net.sinedkadis.terracompositio.registries.TCFluids;
 import net.sinedkadis.terracompositio.registries.TCTags;
+import net.sinedkadis.terracompositio.util.IEntityInstance;
 import net.sinedkadis.terracompositio.util.behaviors.blockentity.IBEBehaviour;
 import net.sinedkadis.terracompositio.util.helpers.ParticleHelperInternal;
 import org.jetbrains.annotations.Nullable;
@@ -41,13 +42,13 @@ import static net.sinedkadis.terracompositio.api.registries.TCBlockStateProperti
 
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public class FlowCedarTankBlockEntity extends TCBlockEntity implements FluidNetworkMemberBE {
+public class FlowCedarTankBlockEntity extends TCBlockEntity implements FluidNetworkMember {
     protected final TCFluidTank fluidHandler = new TCFluidTank(8000, this);
     protected LazyOptional<IFluidHandler> lazyFluidHandler = LazyOptional.empty();
     private int tickCounter = 20;
     protected boolean scheduledUpdate = false;
     protected int scheduledMembersUpdate = -1;
-    protected Set<FluidNetworkMemberBE> scheduledMembers = new HashSet<>();
+    protected Set<FluidNetworkMember> scheduledMembers = new HashSet<>();
     private int previousPriority = 0;
 
     public FlowCedarTankBlockEntity(BlockPos pos, BlockState state) {
@@ -156,6 +157,11 @@ public class FlowCedarTankBlockEntity extends TCBlockEntity implements FluidNetw
     }
 
     @Override
+    public IEntityInstance getEntityInstance() {
+        return IEntityInstance.wrap(this);
+    }
+
+    @Override
     public int getRange() {
         return 10;
     }
@@ -168,7 +174,7 @@ public class FlowCedarTankBlockEntity extends TCBlockEntity implements FluidNetw
         }
         if (scheduledMembersUpdate == 0) {
             scheduledMembersUpdate = -1;
-            Set<FluidNetworkMemberBE> scheduledMembers1 = Set.copyOf(this.scheduledMembers);
+            Set<FluidNetworkMember> scheduledMembers1 = Set.copyOf(this.scheduledMembers);
             this.scheduledMembers.clear();
             scheduledMembers1.forEach(this::onFluidNetworkMemberUpdate);
         } else if (scheduledMembersUpdate > 0)
@@ -182,7 +188,7 @@ public class FlowCedarTankBlockEntity extends TCBlockEntity implements FluidNetw
     }
 
     @Override
-    public void scheduleMemberUpdate(FluidNetworkMemberBE updated) {
+    public void scheduleMemberUpdate(FluidNetworkMember updated) {
         this.scheduledMembers.add(updated);
         if (scheduledMembersUpdate < 0) scheduledMembersUpdate = TCCommonConfigs.TICKS_BETWEEN_BURSTS.get();
     }
@@ -191,7 +197,7 @@ public class FlowCedarTankBlockEntity extends TCBlockEntity implements FluidNetw
     public void onFluidNetworkMemberUpdate() {
         if (getMainHandler().getFluidInTank(0).getAmount() > 0) {
             FluidNetwork fluidNetwork = TerraCompositioAPI.instance().getFluidNetworkInstance();
-            Set<FluidNetworkMemberBE> targets = fluidNetwork.getAvailableNetworkTargets(this);
+            Set<FluidNetworkMember> targets = fluidNetwork.getAvailableNetworkTargets(this);
             targets.forEach(target -> {
                 if (target.getPriority() <= 0) return;
                 IFluidHandler mainHandler = target.getMainHandler();
@@ -203,14 +209,18 @@ public class FlowCedarTankBlockEntity extends TCBlockEntity implements FluidNetw
                 int amount = transferred.getAmount();
                 if (amount > 0) {
                     ParticleHelperInternal
-                            .sendFluidParticles((ServerLevel) level, target.getPos(), this.getBlockPos(), amount / 10, transferred);
+                            .sendFluidParticles((ServerLevel) level,
+                                    target.getEntityInstance().tc$getBlockPos(),
+                                    this.getBlockPos(),
+                                    amount / 10,
+                                    transferred);
                 }
             });
         }
     }
 
     @Override
-    public void onFluidNetworkMemberUpdate(FluidNetworkMemberBE updated) {
+    public void onFluidNetworkMemberUpdate(FluidNetworkMember updated) {
         if (updated.getPriority() > this.getPriority() && getMainHandler().getFluidInTank(0).getAmount() > 0 && ECFHelper.validMember(updated)) {
             IFluidHandler mainHandler = updated.getMainHandler();
             if (mainHandler.getTankCapacity(0) - mainHandler.getFluidInTank(0).getAmount() > 0) {
@@ -220,7 +230,11 @@ public class FlowCedarTankBlockEntity extends TCBlockEntity implements FluidNetw
             int amount = transferred.getAmount();
             if (amount > 0) {
                 ParticleHelperInternal
-                        .sendFluidParticles((ServerLevel) level, updated.getPos(), this.getBlockPos(), amount / 10, transferred);
+                        .sendFluidParticles((ServerLevel) level,
+                                updated.getEntityInstance().tc$getBlockPos(),
+                                this.getBlockPos(),
+                                amount / 10,
+                                transferred);
             }
         } else onFluidNetworkMemberUpdate();
     }

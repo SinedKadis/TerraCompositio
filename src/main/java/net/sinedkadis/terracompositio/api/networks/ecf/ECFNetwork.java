@@ -4,6 +4,7 @@ import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.Level;
 import net.sinedkadis.terracompositio.api.dummies.DummyECFHandler;
 import net.sinedkadis.terracompositio.api.networks.NetworkAction;
+import net.sinedkadis.terracompositio.util.IEntityInstance;
 
 import java.util.Set;
 
@@ -65,10 +66,10 @@ public interface ECFNetwork {
      * {@link net.minecraft.world.level.block.entity.BlockEntity},
      * {@link net.minecraft.world.entity.Entity} and other
      *
-     * @param attachedMember the attached to handler member
+     * @param entityInstance the attached to handler member
      * @return the iecf handler
      */
-    default IECFHandler createDefaultECFHandler(ECFNetworkMember attachedMember) {
+    default IECFHandler createDefaultECFHandler(IEntityInstance entityInstance) {
         return DummyECFHandler.instance;
     }
 }

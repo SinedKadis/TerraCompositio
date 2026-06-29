@@ -17,13 +17,12 @@ import net.minecraftforge.network.PacketDistributor;
 import net.sinedkadis.terracompositio.api.TerraCompositioAPI;
 import net.sinedkadis.terracompositio.api.networks.NetworkAction;
 import net.sinedkadis.terracompositio.api.networks.ecf.ECFNetworkMember;
-import net.sinedkadis.terracompositio.api.networks.ecf.ECFNetworkMemberBE;
-import net.sinedkadis.terracompositio.api.networks.ecf.ECFNetworkMemberEntity;
 import net.sinedkadis.terracompositio.api.networks.ecf.IECFHandler;
 import net.sinedkadis.terracompositio.block.entity.PathPointerBlockEntity;
 import net.sinedkadis.terracompositio.ecf.burst.ECFBurstProjectileEntity;
 import net.sinedkadis.terracompositio.network.TCPackets;
 import net.sinedkadis.terracompositio.network.packets.S2CPlayerEcfContainerSync;
+import net.sinedkadis.terracompositio.util.IEntityInstance;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.function.Function;
@@ -34,10 +33,7 @@ import static net.sinedkadis.terracompositio.block.entity.PathPointerBlockEntity
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class DefaultECFHandler implements IECFHandler, INBTSerializable<CompoundTag> {
-    @Getter
-    protected ECFNetworkMember attachedMember;
-    @Getter
-    protected boolean isEntity = false;
+    protected IEntityInstance attachedMember;
     @Getter
     protected int index = 0;
     @Getter
@@ -64,9 +60,13 @@ public class DefaultECFHandler implements IECFHandler, INBTSerializable<Compound
         queued = 0;
     }
 
-    public DefaultECFHandler(ECFNetworkMember attachedMember) {
+    public DefaultECFHandler(IEntityInstance attachedMember) {
         this.attachedMember = attachedMember;
-        if (attachedMember instanceof ECFNetworkMemberEntity) isEntity = true;
+    }
+
+    @Override
+    public IEntityInstance getAttachedEntity() {
+        return attachedMember;
     }
 
     @Override
@@ -100,20 +100,21 @@ public class DefaultECFHandler implements IECFHandler, INBTSerializable<Compound
         int added = Mth.clamp(cfe, 0, Math.min(available, freeSpace));
         if (added < 1)
             return 0;
+        Level level = target.getEntityInstance().tc$getLevel();
 
-        if (target instanceof PPECFMemberProxy proxy && proxy.target() instanceof ECFNetworkMemberEntity) {
+        if (target instanceof PPECFMemberProxy proxy && ((IEntityInstance) proxy.target()).tc$isEntity()) {
             BlockPos pos = proxy.proxy().getOutputPos();
-            PathPointerBlockEntity ppBE = ((PathPointerBlockEntity) target.getLevel().getBlockEntity(pos));
+            PathPointerBlockEntity ppBE = (PathPointerBlockEntity) (level.getBlockEntity(pos));
             if (ppBE != null) {
                 if (ppBE.parts.contains(PathPointerBlockEntity.PPPart.INFUSER)) {
-                    setYawAndPitchFromRot(pos.getCenter().vectorTo(proxy.target().getPos().getCenter()), ppBE);
+                    setYawAndPitchFromRot(pos.getCenter().vectorTo(proxy.target().getEntityInstance().tc$getPosition()), ppBE);
                 }
             }
         }
 
         ECFBurstProjectileEntity entity = ECFBurstProjectileEntity.sendBurst(this, target, added, speed);
         if (entity != null) {
-            getLevel().addFreshEntity(entity);
+            level.addFreshEntity(entity);
             target.getMainHandler().addToQueue(added);
         }
 
@@ -126,19 +127,20 @@ public class DefaultECFHandler implements IECFHandler, INBTSerializable<Compound
         if (!simulate) {
             this.setECF(this.getECF() + added);
 
-            getAttachedMember().scheduleMemberUpdate();
+            if (getAttachedEntity() instanceof ECFNetworkMember member)
+                member.scheduleMemberUpdate();
             onContentsChanged();
         }
         return added;
     }
 
     protected void sendCFEUpdate() {
-        if (getAttachedMember() instanceof ECFNetworkMemberBE cfeNetworkMemberBE) {
+        if (getAttachedEntity() instanceof ECFNetworkMember cfeNetworkMemberBE) {
             TerraCompositioAPI.INSTANCE.getECFNetworkInstance().fireECFNetworkEvent(cfeNetworkMemberBE, NetworkAction.UPDATE);
         }
-        if (isEntity) {
-            TerraCompositioAPI.INSTANCE.getECFNetworkInstance().fireECFNetworkEvent(getAttachedMember(), NetworkAction.UPDATE);
-            if (getAttachedMember() instanceof ServerPlayer serverPlayer) {
+        if (getAttachedEntity().tc$isEntity() && getAttachedEntity() instanceof ECFNetworkMember member) {
+            TerraCompositioAPI.INSTANCE.getECFNetworkInstance().fireECFNetworkEvent(member, NetworkAction.UPDATE);
+            if (getAttachedEntity() instanceof ServerPlayer serverPlayer) {
                 TCPackets.CHANNEL.send(PacketDistributor.PLAYER.with(() -> serverPlayer),
                         new S2CPlayerEcfContainerSync(this.getECF()));
             }
@@ -147,7 +149,7 @@ public class DefaultECFHandler implements IECFHandler, INBTSerializable<Compound
 
 
     protected void onContentsChanged() {
-        if (getAttachedMember() instanceof BlockEntity blockEntity) {
+        if (getAttachedEntity() instanceof BlockEntity blockEntity) {
             blockEntity.setChanged();
             Level level = blockEntity.getLevel();
             if (level != null && !level.isClientSide()) {

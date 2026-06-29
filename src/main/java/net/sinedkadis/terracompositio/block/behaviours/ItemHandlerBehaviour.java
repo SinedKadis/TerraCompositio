@@ -16,7 +16,6 @@ import net.minecraft.world.WorldlyContainer;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.capabilities.ForgeCapabilities;
@@ -285,11 +284,5 @@ public class ItemHandlerBehaviour implements IBEItemBehaviour, WorldlyContainer,
 
             }
         });
-    }
-
-    @Override
-    @SuppressWarnings("unchecked")
-    public <T extends BlockEntity> T getBlockEntity() {
-        return (T) blockEntity;
     }
 }

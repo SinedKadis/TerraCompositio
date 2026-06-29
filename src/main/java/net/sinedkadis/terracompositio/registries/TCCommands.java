@@ -17,7 +17,6 @@ import net.minecraftforge.network.PacketDistributor;
 import net.sinedkadis.terracompositio.TerraCompositio;
 import net.sinedkadis.terracompositio.api.TerraCompositioAPI;
 import net.sinedkadis.terracompositio.api.networks.ecf.ECFNetworkMember;
-import net.sinedkadis.terracompositio.api.networks.ecf.ECFNetworkMemberEntity;
 import net.sinedkadis.terracompositio.api.networks.ecf.IECFHandler;
 import net.sinedkadis.terracompositio.api.registries.TCCapabilities;
 import net.sinedkadis.terracompositio.network.TCPackets;
@@ -73,17 +72,17 @@ public class TCCommands {
 
     private static int clearECFData(CommandContext<CommandSourceStack> ctx, Entity... entities) {
         CommandSourceStack source = ctx.getSource();
-        ECFNetworkMemberEntity memberEntity;
+        ECFNetworkMember memberEntity;
         if (Arrays.stream(entities).toList().isEmpty()) {
             ServerPlayer player = source.getPlayer();
             if (player == null) {
                 source.sendFailure(Component.literal("No entities were provided"));
                 return 0;
             }
-            memberEntity = (ECFNetworkMemberEntity) player;
+            memberEntity = (ECFNetworkMember) player;
         } else {
             Entity entity = entities[0];
-            if (entity instanceof ECFNetworkMemberEntity memberEntity1)
+            if (entity instanceof ECFNetworkMember memberEntity1)
                 memberEntity = memberEntity1;
             else {
                 source.sendFailure(Component.literal("Entity has to be ECFNetworkMemberEntity"));
@@ -98,7 +97,7 @@ public class TCCommands {
         }
 
         NonNullSupplier<Exception> exception = Exception::new;
-        memberEntity.getEntity().getArmorSlots().forEach(itemStack -> {
+        memberEntity.getEntityInstance().tc$asEntity().getArmorSlots().forEach(itemStack -> {
             try {
                 itemStack.getCapability(TCCapabilities.ECF).orElseThrow(exception).clear();
             } catch (Exception ignored) {
@@ -114,17 +113,17 @@ public class TCCommands {
 
     private static int printCFEData(CommandContext<CommandSourceStack> ctx, Entity... entities) {
         CommandSourceStack source = ctx.getSource();
-        ECFNetworkMemberEntity memberEntity;
+        ECFNetworkMember memberEntity;
         if (Arrays.stream(entities).toList().isEmpty()) {
             ServerPlayer player = source.getPlayer();
             if (player == null) {
                 source.sendFailure(Component.literal("No entities were provided"));
                 return 0;
             }
-            memberEntity = (ECFNetworkMemberEntity) player;
+            memberEntity = (ECFNetworkMember) player;
         } else {
             Entity entity = entities[0];
-            if (entity instanceof ECFNetworkMemberEntity memberEntity1)
+            if (entity instanceof ECFNetworkMember memberEntity1)
                 memberEntity = memberEntity1;
             else {
                 source.sendFailure(Component.literal("Entity has to be ECFNetworkMemberEntity"));

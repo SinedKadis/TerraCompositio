@@ -54,8 +54,8 @@ public class ReachSourceGoal extends Goal {
 
         ECFNetworkMember member = searchMember();
         if (member != null) {
-            if (member.getPos().closerThan(mob.blockPosition(), stopDistance)) return false;
-            targetPosition = member.getPos().getCenter();
+            if (member.getEntityInstance().tc$getBlockPos().closerThan(mob.blockPosition(), stopDistance)) return false;
+            targetPosition = member.getEntityInstance().tc$getBlockPos().getCenter();
             return true;
         }
 
@@ -97,10 +97,10 @@ public class ReachSourceGoal extends Goal {
 
             if (!ECFHelper.validMember(member)) continue;
 
-            BlockPos memberPos = member.getPos();
+            BlockPos memberPos = member.getEntityInstance().tc$getBlockPos();
             if (!memberPos.closerThan(mobPos, searchLimit)) continue;
             if (memberPos.closerThan(mobPos, stopDistance)) continue;
-            if (member.getEntity().equals(mob)) continue;
+            if (member.getEntityInstance().equals(mob)) continue;
             if (member.getMainHandler().getECF() <= 0) continue;
 
             if (member instanceof FlowCedarEntEntity ent) {
