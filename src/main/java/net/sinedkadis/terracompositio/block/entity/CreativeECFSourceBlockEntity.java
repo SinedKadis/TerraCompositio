@@ -21,7 +21,7 @@ public class CreativeECFSourceBlockEntity extends TCBlockEntity{
     @Override
     public void addBEBehaviours(@NotNull List<IBEBehaviour> list) {
         list.add(new ECFHandlerBehaviour(this)
-                .ecfHandler(cfeHandlerBehaviour -> new DefaultECFHandler(cfeHandlerBehaviour) {
+                .ecfHandler(cfeHandlerBehaviour -> new DefaultECFHandler(cfeHandlerBehaviour.getEntityInstance()) {
                         @Override
                         public int getECF() {
                             return Integer.MAX_VALUE;

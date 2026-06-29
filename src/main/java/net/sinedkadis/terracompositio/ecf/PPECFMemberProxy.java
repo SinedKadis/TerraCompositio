@@ -1,12 +1,16 @@
 package net.sinedkadis.terracompositio.ecf;
 
-import net.minecraft.core.BlockPos;
-import net.minecraft.world.level.Level;
 import net.sinedkadis.terracompositio.api.networks.ecf.ECFNetworkMember;
 import net.sinedkadis.terracompositio.api.networks.ecf.IECFHandler;
 import net.sinedkadis.terracompositio.block.entity.PathPointerBlockEntity;
+import net.sinedkadis.terracompositio.util.IEntityInstance;
 
 public record PPECFMemberProxy(ECFNetworkMember target, PathPointerBlockEntity proxy) implements ECFNetworkMember {
+
+    @Override
+    public IEntityInstance getEntityInstance() {
+        return ((IEntityInstance) proxy);
+    }
 
     @Override
     public int getRange() {
@@ -23,20 +27,6 @@ public record PPECFMemberProxy(ECFNetworkMember target, PathPointerBlockEntity p
         return target.getMainHandler();
     }
 
-    @Override
-    public <T> T getEntity() {
-        return target.getEntity();
-    }
-
-    @Override
-    public Level getLevel() {
-        return proxy.getLevel();
-    }
-
-    @Override
-    public BlockPos getPos() {
-        return proxy.getBlockPos();
-    }
 
     @Override
     public void updateIfScheduled() {

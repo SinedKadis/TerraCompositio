@@ -24,7 +24,6 @@ import net.sinedkadis.terracompositio.api.helpers.TooltipHelper;
 import net.sinedkadis.terracompositio.api.networks.NetworkAction;
 import net.sinedkadis.terracompositio.api.networks.ecf.ECFNetwork;
 import net.sinedkadis.terracompositio.api.networks.ecf.ECFNetworkMember;
-import net.sinedkadis.terracompositio.api.networks.ecf.ECFNetworkMemberEntity;
 import net.sinedkadis.terracompositio.api.networks.ecf.IECFHandler;
 import net.sinedkadis.terracompositio.api.registries.TCCapabilities;
 import net.sinedkadis.terracompositio.block.entity.AirSaturatorBlockEntity;
@@ -33,6 +32,7 @@ import net.sinedkadis.terracompositio.config.TCInnerConfig;
 import net.sinedkadis.terracompositio.ecf.LimitlessDefaultECFHandler;
 import net.sinedkadis.terracompositio.ecf.burst.ECFBurstProjectileEntity;
 import net.sinedkadis.terracompositio.registries.TCEntities;
+import net.sinedkadis.terracompositio.util.IEntityInstance;
 import net.sinedkadis.terracompositio.util.helpers.ECFHelperInternal;
 import org.jetbrains.annotations.Nullable;
 
@@ -44,7 +44,7 @@ import java.util.function.ToIntFunction;
 
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
-public class ECFCloudEntity extends Entity implements ECFNetworkMemberEntity, IHaveKnowledge {
+public class ECFCloudEntity extends Entity implements ECFNetworkMember, IHaveKnowledge {
     private static final EntityDataAccessor<Integer> ECF_DATA =
             SynchedEntityData.defineId(ECFCloudEntity.class, EntityDataSerializers.INT);
     private int queuedECF;
@@ -53,7 +53,7 @@ public class ECFCloudEntity extends Entity implements ECFNetworkMemberEntity, IH
     protected int scheduledMembersUpdate = -1;
 
 
-    protected LazyOptional<IECFHandler> lazyECFOptional = LazyOptional.of(() -> new LimitlessDefaultECFHandler(this) {
+    protected LazyOptional<IECFHandler> lazyECFOptional = LazyOptional.of(() -> new LimitlessDefaultECFHandler(this.getEntityInstance()) {
         @Override
         public int getECF() {
             return getSyncedECF();
@@ -68,7 +68,7 @@ public class ECFCloudEntity extends Entity implements ECFNetworkMemberEntity, IH
         public int sendECF(ECFNetworkMember target, int ecf, float speed) {
             if (target instanceof DummyECFHandler) return 0;
 
-            if (target.getEntity() instanceof AirSaturatorBlockEntity) return 0;
+            if (target.getEntityInstance() instanceof AirSaturatorBlockEntity) return 0;
 
             IECFHandler mainHandler = target.getMainHandler();
             int freeSpace = mainHandler.getFreeSpace();
@@ -77,8 +77,8 @@ public class ECFCloudEntity extends Entity implements ECFNetworkMemberEntity, IH
                 return 0;
 
             Vec3 burstOffset = getBurstOffset(mainHandler);
-            BlockPos offset = BlockPos.containing(this.getPos().getCenter().add(burstOffset));
-            if (offset.closerThan(target.getPos(), 2)) {
+            Vec3 offset = this.getAttachedEntity().tc$getPosition().add(burstOffset);
+            if (offset.closerThan(target.getEntityInstance().tc$getPosition(), 2)) {
                 mainHandler.addECF(added, false);
                 return added;
             }
@@ -137,7 +137,7 @@ public class ECFCloudEntity extends Entity implements ECFNetworkMemberEntity, IH
 
     @Override
     public void onECFNetworkMemberUpdate(ECFNetworkMember updated) {
-        if (updated.getEntity() instanceof AirSaturatorBlockEntity) return;
+        if (updated.getEntityInstance() instanceof AirSaturatorBlockEntity) return;
         if (getPriority() < 0 && getMainHandler().getECF() > 0 && isValidMember(updated)) {
             if (updated.getMainHandler().getFreeSpace() > TCCommonConfigs.ECF_PER_BURST_TRANSFER_LIMIT.get())
                 scheduleMemberUpdate(updated);
@@ -151,8 +151,8 @@ public class ECFCloudEntity extends Entity implements ECFNetworkMemberEntity, IH
 
     private Vec3 getBurstOffset(IECFHandler target) {
         double r = getRadius();
-        BlockPos sourcePos = this.getPos();
-        BlockPos targetPos = target.getPos();
+        BlockPos sourcePos = this.blockPosition();
+        BlockPos targetPos = target.getEntityInstance().tc$getBlockPos();
         if (sourcePos.closerThan(targetPos,r)) return targetPos.subtract(sourcePos).getCenter();
         return sourcePos.getCenter().vectorTo(targetPos.getCenter()).normalize().scale(r);
     }
@@ -240,16 +240,6 @@ public class ECFCloudEntity extends Entity implements ECFNetworkMemberEntity, IH
     }
 
     @Override
-    public Level getLevel() {
-        return this.level();
-    }
-
-    @Override
-    public BlockPos getPos() {
-        return this.blockPosition();
-    }
-
-    @Override
     public void updateIfScheduled() {
         if (scheduleUpdate) {
             this.scheduleUpdate = false;
@@ -273,6 +263,11 @@ public class ECFCloudEntity extends Entity implements ECFNetworkMemberEntity, IH
     public void scheduleMemberUpdate(ECFNetworkMember updated) {
         this.scheduledMembers.add(updated);
         if (scheduledMembersUpdate < 0) scheduledMembersUpdate = 5;
+    }
+
+    @Override
+    public IEntityInstance getEntityInstance() {
+        return IEntityInstance.wrap(this);
     }
 
     @Override

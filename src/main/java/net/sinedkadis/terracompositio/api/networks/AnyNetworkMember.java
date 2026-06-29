@@ -1,7 +1,6 @@
 package net.sinedkadis.terracompositio.api.networks;
 
-import net.minecraft.core.BlockPos;
-import net.minecraft.world.level.Level;
+import net.sinedkadis.terracompositio.util.IEntityInstance;
 
 /**
  * The Common parts of Each Network Member.
@@ -9,26 +8,12 @@ import net.minecraft.world.level.Level;
 public interface AnyNetworkMember {
     /**
      * Gets entity. May be {@link net.minecraft.world.level.block.entity.BlockEntity},
-     * or {@link net.minecraft.world.entity.Entity}, depends on implementation
+     * or {@link net.minecraft.world.entity.Entity}
      *
-     * @param <T> the type parameter
      * @return the entity
      */
-    <T> T getEntity();
+    IEntityInstance getEntityInstance();
 
-    /**
-     * Gets level.
-     *
-     * @return the level
-     */
-    Level getLevel();
-
-    /**
-     * Gets block pos.
-     *
-     * @return the pos
-     */
-    BlockPos getPos();
 
     /**
      * Gets range. Using to filter interactions between network members and other purposes

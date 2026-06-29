@@ -1,5 +1,6 @@
 package net.sinedkadis.terracompositio.block.behaviours;
 
+import lombok.Getter;
 import net.minecraft.MethodsReturnNonnullByDefault;
 import net.minecraft.core.BlockPos;
 import net.minecraft.core.Direction;
@@ -11,7 +12,6 @@ import net.minecraft.world.InteractionResult;
 import net.minecraft.world.entity.player.Player;
 import net.minecraft.world.item.ItemStack;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.phys.BlockHitResult;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
@@ -32,6 +32,7 @@ import static net.sinedkadis.terracompositio.block.behaviours.ItemHandlerBehavio
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
 public class ItemStateHolderBehaviour implements IBEItemBehaviour {
+    @Getter
     private final TCBlockEntity blockEntity;
     protected LazyOptional<IItemHandler> lazyItemHandler = LazyOptional.empty();
     public ItemStateHolderBehaviour(TCBlockEntity blockEntity) {
@@ -146,14 +147,4 @@ public class ItemStateHolderBehaviour implements IBEItemBehaviour {
     public void onLoad(CompoundTag compoundTag) {
         itemHandler.deserializeNBT(compoundTag.getCompound("item_state_holder"));
     }
-
-    @Override
-    public <T extends BlockEntity> T getBlockEntity() {
-        //noinspection unchecked
-        return (T) blockEntity;
-    }
-
-
-
-
 }

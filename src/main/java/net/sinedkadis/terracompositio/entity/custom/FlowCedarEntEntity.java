@@ -42,7 +42,6 @@ import net.sinedkadis.terracompositio.api.helpers.TooltipHelper;
 import net.sinedkadis.terracompositio.api.networks.NetworkAction;
 import net.sinedkadis.terracompositio.api.networks.ecf.ECFNetwork;
 import net.sinedkadis.terracompositio.api.networks.ecf.ECFNetworkMember;
-import net.sinedkadis.terracompositio.api.networks.ecf.ECFNetworkMemberEntity;
 import net.sinedkadis.terracompositio.api.networks.ecf.IECFHandler;
 import net.sinedkadis.terracompositio.api.registries.TCCapabilities;
 import net.sinedkadis.terracompositio.block.entity.EntStatueBlockEntity;
@@ -56,6 +55,7 @@ import net.sinedkadis.terracompositio.entity.goals.ECFHoldGoal;
 import net.sinedkadis.terracompositio.entity.goals.ReachSourceGoal;
 import net.sinedkadis.terracompositio.registries.TCBlocks;
 import net.sinedkadis.terracompositio.registries.TCItems;
+import net.sinedkadis.terracompositio.util.IEntityInstance;
 import net.sinedkadis.terracompositio.util.helpers.ParticleHelperInternal;
 import org.jetbrains.annotations.Nullable;
 
@@ -68,7 +68,7 @@ import java.util.Set;
 
 @MethodsReturnNonnullByDefault
 @ParametersAreNonnullByDefault
-public class FlowCedarEntEntity extends AbstractGolem implements ECFNetworkMemberEntity, IHaveKnowledge {
+public class FlowCedarEntEntity extends AbstractGolem implements ECFNetworkMember, IHaveKnowledge {
     private static final EntityDataAccessor<Boolean> EXTRACTING =
             SynchedEntityData.defineId(FlowCedarEntEntity.class, EntityDataSerializers.BOOLEAN);
     private static final EntityDataAccessor<Boolean> HOLDING =
@@ -76,12 +76,12 @@ public class FlowCedarEntEntity extends AbstractGolem implements ECFNetworkMembe
     private static final EntityDataAccessor<Integer> ECF_DATA =
             SynchedEntityData.defineId(FlowCedarEntEntity.class, EntityDataSerializers.INT);
     public final AnimationState ecfHoldState = new AnimationState();
-    protected LazyOptional<IECFHandler> lazyCFEOptional = LazyOptional.of(() -> new DefaultECFHandler(this)
+    protected LazyOptional<IECFHandler> lazyCFEOptional = LazyOptional.of(() -> new DefaultECFHandler(this.getEntityInstance())
             .setMaxECF(64000)
             .setOffset(vec3 -> vec3.add(0, this.getBbHeight() + (0.1f + (this.getSyncedECF() / 10000d)) * 10 * 0.2f, 0))
             .setIndex(0));
     @Getter
-    protected LazyOptional<IECFHandler> innerECFOptional = LazyOptional.of(() -> new DefaultECFHandler(this)
+    protected LazyOptional<IECFHandler> innerECFOptional = LazyOptional.of(() -> new DefaultECFHandler(this.getEntityInstance())
             .setMaxECF(32)
             .setOffset(vec3 -> vec3.add(0,1,0))
             .setIndex(1));
@@ -149,7 +149,7 @@ public class FlowCedarEntEntity extends AbstractGolem implements ECFNetworkMembe
                                 false
                         );
                         if (taken > 0) {
-                            if (getLevel() instanceof ServerLevel serverLevel)
+                            if (this.level() instanceof ServerLevel serverLevel)
                                 ParticleHelperInternal.sendECFParticles(
                                         serverLevel,
                                         icfeHandler1.getOffset().apply(position()),
@@ -335,14 +335,10 @@ public class FlowCedarEntEntity extends AbstractGolem implements ECFNetworkMembe
         return SoundEvents.WOOD_FALL;
     }
 
-    @Override
-    public Level getLevel() {
-        return this.level();
-    }
 
     @Override
-    public BlockPos getPos() {
-        return this.blockPosition();
+    public IEntityInstance getEntityInstance() {
+        return IEntityInstance.wrap(this);
     }
 
     @Override
