@@ -48,7 +48,6 @@ import net.sinedkadis.terracompositio.api.helpers.BlockPosHelper;
 import net.sinedkadis.terracompositio.api.helpers.TooltipHelper;
 import net.sinedkadis.terracompositio.api.networks.NetworkAction;
 import net.sinedkadis.terracompositio.api.networks.ecf.ECFNetworkMember;
-import net.sinedkadis.terracompositio.api.networks.ecf.ECFNetworkMemberEntity;
 import net.sinedkadis.terracompositio.api.networks.ecf.IECFHandler;
 import net.sinedkadis.terracompositio.api.registries.TCBlockStateProperties;
 import net.sinedkadis.terracompositio.api.registries.TCCapabilities;
@@ -309,10 +308,9 @@ public class TechnetiumArmorItem extends TCArmorItem implements IHaveExtensibleE
     @Override
     public boolean canEquip(ItemStack stack, EquipmentSlot armorType, Entity entity) {
         boolean canEquip = super.canEquip(stack, armorType, entity);
-        if (entity instanceof Player || entity instanceof ECFNetworkMemberEntity) {
+        if (entity instanceof ECFNetworkMember member) {
             if (canEquip) {
                 if (armorType.equals(EquipmentSlot.HEAD)) {
-                    ECFNetworkMemberEntity member = ((ECFNetworkMemberEntity) entity);
                     TerraCompositioAPI.INSTANCE.getECFNetworkInstance().fireECFNetworkEvent(member, NetworkAction.UPDATE);
                 }
             }

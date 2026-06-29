@@ -89,8 +89,8 @@ public class ECFExtractGoal extends Goal {
                 .getAllECFNetworkMembers(level)) {
 
             if (!ECFHelper.validMember(member)) continue;
-            if (!member.getPos().closerThan(mobPos, extractRange)) continue;
-            if (member.getEntity().equals(mob)) continue;
+            if (!member.getEntityInstance().tc$getBlockPos().closerThan(mobPos, extractRange)) continue;
+            if (member.getEntityInstance().equals(mob)) continue;
             if (member.getMainHandler().getECF() <= 0) continue;
 
             if (member instanceof FlowCedarEntEntity ent) {
@@ -147,7 +147,7 @@ public class ECFExtractGoal extends Goal {
 
         if (targetPosition == null) {
             if (targetMember != null) {
-                targetPosition = targetMember.getPos();
+                targetPosition = targetMember.getEntityInstance().tc$getBlockPos();
             } else {
                 return;
             }

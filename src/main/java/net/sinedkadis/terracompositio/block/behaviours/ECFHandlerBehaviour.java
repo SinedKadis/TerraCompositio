@@ -6,7 +6,6 @@ import net.minecraft.core.Direction;
 import net.minecraft.nbt.CompoundTag;
 import net.minecraft.network.chat.Component;
 import net.minecraft.world.level.Level;
-import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.common.capabilities.Capability;
 import net.minecraftforge.common.util.LazyOptional;
 import net.sinedkadis.terracompositio.api.IHaveKnowledge;
@@ -16,13 +15,13 @@ import net.sinedkadis.terracompositio.api.helpers.TooltipHelper;
 import net.sinedkadis.terracompositio.api.networks.NetworkAction;
 import net.sinedkadis.terracompositio.api.networks.ecf.ECFNetwork;
 import net.sinedkadis.terracompositio.api.networks.ecf.ECFNetworkMember;
-import net.sinedkadis.terracompositio.api.networks.ecf.ECFNetworkMemberEntity;
 import net.sinedkadis.terracompositio.api.networks.ecf.IECFHandler;
 import net.sinedkadis.terracompositio.api.registries.TCCapabilities;
 import net.sinedkadis.terracompositio.block.entity.TCBlockEntity;
 import net.sinedkadis.terracompositio.config.TCCommonConfigs;
 import net.sinedkadis.terracompositio.config.TCInnerConfig;
 import net.sinedkadis.terracompositio.ecf.PPECFMemberProxy;
+import net.sinedkadis.terracompositio.util.IEntityInstance;
 import net.sinedkadis.terracompositio.util.behaviors.blockentity.IBEECFBehaviour;
 import net.sinedkadis.terracompositio.util.helpers.ECFHelperInternal;
 import org.jetbrains.annotations.Nullable;
@@ -42,7 +41,7 @@ public class ECFHandlerBehaviour implements IBEECFBehaviour, IHaveKnowledge {
 
     protected int range;
     protected int priority;
-    protected IECFHandler ecfHandler = TerraCompositioAPI.instance().getECFNetworkInstance().createDefaultECFHandler(this);
+    protected IECFHandler ecfHandler;
     protected LazyOptional<IECFHandler> lazyCFEOptional = LazyOptional.empty();
 
     protected boolean scheduledUpdate = false;
@@ -51,6 +50,7 @@ public class ECFHandlerBehaviour implements IBEECFBehaviour, IHaveKnowledge {
 
     public ECFHandlerBehaviour(TCBlockEntity blockEntity) {
         this.blockEntity = blockEntity;
+        ecfHandler = TerraCompositioAPI.instance().getECFNetworkInstance().createDefaultECFHandler(IEntityInstance.wrap(blockEntity));
         this.range = 5;
     }
 
@@ -70,12 +70,6 @@ public class ECFHandlerBehaviour implements IBEECFBehaviour, IHaveKnowledge {
     public ECFHandlerBehaviour ecfHandler(Function<ECFHandlerBehaviour, IECFHandler> ecfHandler) {
         this.ecfHandler = ecfHandler.apply(this);
         return this;
-    }
-
-
-    @Override
-    public BlockEntity getEntity() {
-        return blockEntity;
     }
 
     @Override
@@ -115,8 +109,8 @@ public class ECFHandlerBehaviour implements IBEECFBehaviour, IHaveKnowledge {
     public void onECFNetworkMemberUpdate(ECFNetworkMember updated) {
         if (getMainHandler().getECF() > 0 && isValidMember(updated)) {
             if (updated.getMainHandler().getFreeSpace() > TCCommonConfigs.ECF_PER_BURST_TRANSFER_LIMIT.get()) {
-                if (updated instanceof PPECFMemberProxy proxy && proxy.target() instanceof ECFNetworkMemberEntity) {
-                    if (updated.getPos().closerThan(proxy.proxy().getOutputPos(),getRange()))
+                if (updated instanceof PPECFMemberProxy proxy && ((IEntityInstance) proxy.target()).tc$isEntity()) {
+                    if (updated.getEntityInstance().tc$getBlockPos().closerThan(proxy.proxy().getOutputPos(), getRange()))
                         scheduleMemberUpdate(updated);
                 } else scheduleMemberUpdate(updated);
             }
@@ -244,4 +238,8 @@ public class ECFHandlerBehaviour implements IBEECFBehaviour, IHaveKnowledge {
 
     }
 
+    @Override
+    public IEntityInstance getEntityInstance() {
+        return IEntityInstance.wrap(blockEntity);
+    }
 }

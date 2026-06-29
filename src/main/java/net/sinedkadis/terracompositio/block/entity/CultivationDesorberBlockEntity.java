@@ -23,6 +23,7 @@ import net.sinedkadis.terracompositio.api.networks.ecf.ECFNetwork;
 import net.sinedkadis.terracompositio.api.networks.ecf.ECFNetworkMember;
 import net.sinedkadis.terracompositio.registries.TCBlockEntities;
 
+import net.sinedkadis.terracompositio.util.IEntityInstance;
 import net.sinedkadis.terracompositio.util.helpers.ParticleHelperInternal;
 import org.jetbrains.annotations.NotNull;
 
@@ -76,7 +77,8 @@ public class CultivationDesorberBlockEntity extends AbstractDesorberBlockEntity 
         ECFNetwork network = TerraCompositioAPI.instance().getECFNetworkInstance();
         Set<ECFNetworkMember> sources = network.getAllECFNetworkMembers((Level) level);
         List<CultivationDesorberBlockEntity> cultivators = sources.stream()
-                .map(ECFNetworkMember::getPos)
+                .map(ECFNetworkMember::getEntityInstance)
+                .map(IEntityInstance::tc$getBlockPos)
                 .filter(ecfSourceBlockPose -> Math.sqrt(ecfSourceBlockPose.distSqr(pos)) < 7)
                 .map(ecfSourceBlockPose -> {
                     if (level.getBlockEntity(ecfSourceBlockPose) instanceof CultivationDesorberBlockEntity blockEntity)

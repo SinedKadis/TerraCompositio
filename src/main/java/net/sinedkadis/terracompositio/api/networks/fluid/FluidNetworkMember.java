@@ -1,6 +1,5 @@
 package net.sinedkadis.terracompositio.api.networks.fluid;
 
-import net.minecraft.core.BlockPos;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraftforge.fluids.capability.IFluidHandler;
 import net.sinedkadis.terracompositio.api.networks.AnyNetworkMember;
@@ -10,7 +9,7 @@ import net.sinedkadis.terracompositio.api.networks.ecf.ECFNetworkMember;
 /**
  * The BlockEntity Fluid Network Member. Implement that to your {@link BlockEntity}
  */
-public interface FluidNetworkMemberBE extends AnyNetworkMember {
+public interface FluidNetworkMember extends AnyNetworkMember {
     /**
      * Gets main handler of member.
      *
@@ -20,7 +19,7 @@ public interface FluidNetworkMemberBE extends AnyNetworkMember {
 
     /**
      * Executes updates, that was scheduled. Behavior relates on implementation, recommended to call at tick method of your entity,
-     * and in method check if scheduled, than execute {@link net.sinedkadis.terracompositio.api.networks.fluid.FluidNetworkMemberBE#onFluidNetworkMemberUpdate()}.
+     * and in method check if scheduled, than execute {@link FluidNetworkMember#onFluidNetworkMemberUpdate()}.
      */
     void updateIfScheduled();
 
@@ -30,7 +29,7 @@ public interface FluidNetworkMemberBE extends AnyNetworkMember {
     void scheduleMemberUpdate();
 
     /**
-     * Executes scheduled update, recommended to call from {@link FluidNetworkMemberBE#updateIfScheduled()}.
+     * Executes scheduled update, recommended to call from {@link FluidNetworkMember#updateIfScheduled()}.
      */
     default void onFluidNetworkMemberUpdate() {
     }
@@ -39,9 +38,9 @@ public interface FluidNetworkMemberBE extends AnyNetworkMember {
      * Marks member to be scheduled for update with given cause on next tick.
      *
      * @param updated the member, that caused update. Needs to be stored internally to make possible
-     *                {@link FluidNetworkMemberBE#onFluidNetworkMemberUpdate(FluidNetworkMemberBE)} call
+     *                {@link FluidNetworkMember#onFluidNetworkMemberUpdate(FluidNetworkMember)} call
      */
-    default void scheduleMemberUpdate(FluidNetworkMemberBE updated) {
+    default void scheduleMemberUpdate(FluidNetworkMember updated) {
         scheduleMemberUpdate();
     }
 
@@ -50,17 +49,8 @@ public interface FluidNetworkMemberBE extends AnyNetworkMember {
      *
      * @param updated the member, that caused update
      */
-    default void onFluidNetworkMemberUpdate(FluidNetworkMemberBE updated) {
+    default void onFluidNetworkMemberUpdate(FluidNetworkMember updated) {
         onFluidNetworkMemberUpdate();
     }
 
-    @SuppressWarnings("unchecked")
-    default BlockEntity getEntity(){
-        return  ((BlockEntity) this);
-    }
-
-    @Override
-    default BlockPos getPos() {
-        return getEntity().getBlockPos();
-    }
 }

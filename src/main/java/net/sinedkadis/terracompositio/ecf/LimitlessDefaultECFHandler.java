@@ -3,10 +3,11 @@ package net.sinedkadis.terracompositio.ecf;
 import net.minecraft.util.Mth;
 import net.sinedkadis.terracompositio.api.networks.ecf.ECFNetworkMember;
 import net.sinedkadis.terracompositio.ecf.burst.ECFBurstProjectileEntity;
+import net.sinedkadis.terracompositio.util.IEntityInstance;
 import org.jetbrains.annotations.NotNull;
 
 public class LimitlessDefaultECFHandler extends DefaultECFHandler {
-    public LimitlessDefaultECFHandler(ECFNetworkMember entity) {
+    public LimitlessDefaultECFHandler(IEntityInstance entity) {
         super(entity);
     }
 

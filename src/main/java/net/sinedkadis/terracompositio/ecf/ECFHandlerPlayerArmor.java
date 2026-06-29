@@ -11,6 +11,7 @@ import net.sinedkadis.terracompositio.api.dummies.DummyECFHandler;
 import net.sinedkadis.terracompositio.api.networks.ecf.ECFNetworkMember;
 import net.sinedkadis.terracompositio.api.networks.ecf.IECFHandler;
 import net.sinedkadis.terracompositio.api.registries.TCCapabilities;
+import net.sinedkadis.terracompositio.util.IEntityInstance;
 
 import javax.annotation.ParametersAreNonnullByDefault;
 import java.util.function.Function;
@@ -26,7 +27,7 @@ public class ECFHandlerPlayerArmor implements IECFHandler {
 
     public ECFHandlerPlayerArmor(IECFHandler IECFHandler) {
         this.handler = IECFHandler;
-        handlerList = ((Player) IECFHandler.getAttachedMember().getEntity()).getArmorSlots();
+        handlerList = ((Player) IECFHandler.getAttachedEntity()).getArmorSlots();
     }
 
     @Override
@@ -167,8 +168,8 @@ public class ECFHandlerPlayerArmor implements IECFHandler {
     }
 
     @Override
-    public ECFNetworkMember getAttachedMember() {
-        return handler.getAttachedMember();
+    public IEntityInstance getAttachedEntity() {
+        return handler.getAttachedEntity();
     }
 
     @Override

@@ -8,7 +8,7 @@ import net.sinedkadis.terracompositio.api.networks.NetworkAction;
 import java.util.Set;
 
 /**
- * The Fluid network singleton. Used to manage interactions between different {@link FluidNetworkMemberBE}.
+ * The Fluid network singleton. Used to manage interactions between different {@link FluidNetworkMember}.
  */
 public interface FluidNetwork {
     /**
@@ -17,7 +17,7 @@ public interface FluidNetwork {
      * @param source the source
      * @param action the action
      */
-    void fireFluidNetworkEvent(FluidNetworkMemberBE source, NetworkAction action);
+    void fireFluidNetworkEvent(FluidNetworkMember source, NetworkAction action);
 
     /**
      * Checks if handler already added to network.
@@ -35,7 +35,7 @@ public interface FluidNetwork {
      * @param fluidHandler the fluid handler
      * @return the boolean
      */
-    boolean isIn(Level pLevel, FluidNetworkMemberBE fluidHandler);
+    boolean isIn(Level pLevel, FluidNetworkMember fluidHandler);
 
     /**
      * Updates members in given range.
@@ -52,7 +52,7 @@ public interface FluidNetwork {
      * @param requesterMember the member that request search
      * @return the available network targets
      */
-    Set<FluidNetworkMemberBE> getAvailableNetworkTargets(FluidNetworkMemberBE requesterMember);
+    Set<FluidNetworkMember> getAvailableNetworkTargets(FluidNetworkMember requesterMember);
 
     /**
      * Gets all fluid network members in given World.
@@ -60,5 +60,5 @@ public interface FluidNetwork {
      * @param level the level
      * @return the all fluid network members
      */
-    Set<FluidNetworkMemberBE> getAllFluidNetworkMembers(Level level);
+    Set<FluidNetworkMember> getAllFluidNetworkMembers(Level level);
 }

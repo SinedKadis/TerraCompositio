@@ -39,6 +39,7 @@ import net.sinedkadis.terracompositio.network.TCPackets;
 import net.sinedkadis.terracompositio.network.packets.S2CHighLightNodesSync;
 import net.sinedkadis.terracompositio.registries.TCBlockEntities;
 import net.sinedkadis.terracompositio.util.BindException;
+import net.sinedkadis.terracompositio.util.IEntityInstance;
 import net.sinedkadis.terracompositio.util.accessors.PlayerKnowledgeAccessor;
 import net.sinedkadis.terracompositio.util.behaviors.blockentity.IBEBehaviour;
 import org.jetbrains.annotations.NotNull;
@@ -246,7 +247,7 @@ public class PathPointerBlockEntity extends TCBlockEntity implements Nameable, E
         fullUpdateBE(pPlayer, (ServerLevel) level, outputPPBE);
 
         inputs.forEach(inputPPBE ->
-                TerraCompositioAPI.instance().getECFNetworkInstance().updateInRange((Level) level, inputPPBE.getPos(), 5));
+                TerraCompositioAPI.instance().getECFNetworkInstance().updateInRange((Level) level, inputPPBE.getBlockPos(), 5));
     }
 
     private static void tryBindInputsAndOutput(Set<PathPointerBlockEntity> inputs, @Nullable PathPointerBlockEntity outputPPBE) {
@@ -417,7 +418,7 @@ public class PathPointerBlockEntity extends TCBlockEntity implements Nameable, E
             if (receiverPos != null) {
                 PathPointerBlockEntity receiver = (PathPointerBlockEntity) level.getBlockEntity(receiverPos);
                 if (receiver != null) {
-                    receiver.getSenderPoses().remove(be.getPos());
+                    receiver.getSenderPoses().remove(be.getBlockPos());
                     updateClientHighLight(pPlayer, receiver);
                 }
 
@@ -714,6 +715,11 @@ public class PathPointerBlockEntity extends TCBlockEntity implements Nameable, E
 
 
     @Override
+    public IEntityInstance getEntityInstance() {
+        return IEntityInstance.wrap(this);
+    }
+
+    @Override
     public int getRange() {
         return 7;
     }
@@ -728,16 +734,6 @@ public class PathPointerBlockEntity extends TCBlockEntity implements Nameable, E
         return DummyECFHandler.instance;
     }
 
-    @Override
-    public <T> T getEntity() {
-        //noinspection unchecked
-        return ((T) this);
-    }
-
-    @Override
-    public BlockPos getPos() {
-        return this.getBlockPos();
-    }
 
     @Override
     public void updateIfScheduled() {

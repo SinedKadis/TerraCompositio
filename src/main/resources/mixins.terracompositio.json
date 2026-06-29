@@ -8,7 +8,9 @@
   "priority": 1000,
   "mixins": [
     "AbstractFurnaceBlockEntityMixin",
+    "BlockEntityMixin",
     "BlockStateBaseMixin",
+    "EntityMixin",
     "ItemEntityMixin",
     "PlayerMixin",
     "RedStoneWireBlockMixin",

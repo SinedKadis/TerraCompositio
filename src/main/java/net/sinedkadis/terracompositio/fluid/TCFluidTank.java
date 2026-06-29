@@ -4,17 +4,17 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.level.block.entity.BlockEntity;
 import net.minecraft.world.level.block.state.BlockState;
 import net.minecraftforge.fluids.capability.templates.FluidTank;
-import net.sinedkadis.terracompositio.api.networks.NetworkAction;
-import net.sinedkadis.terracompositio.api.networks.fluid.FluidNetworkMemberBE;
 import net.sinedkadis.terracompositio.api.TerraCompositioAPI;
+import net.sinedkadis.terracompositio.api.networks.NetworkAction;
+import net.sinedkadis.terracompositio.api.networks.fluid.FluidNetworkMember;
 
 public class TCFluidTank extends FluidTank {
     private final BlockEntity blockEntity;
 
-    public TCFluidTank(int size, FluidNetworkMemberBE blockEntity) {
+    public TCFluidTank(int size, FluidNetworkMember blockEntity) {
         super(size);
 
-        this.blockEntity = blockEntity.getEntity();
+        this.blockEntity = blockEntity.getEntityInstance().tc$asBE();
     }
 
     @Override
@@ -26,8 +26,8 @@ public class TCFluidTank extends FluidTank {
             BlockState blockState = blockEntity.getBlockState();
             level.sendBlockUpdated(blockEntity.getBlockPos(), blockState, blockState, 3);
         }
-        if (blockEntity instanceof FluidNetworkMemberBE fluidNetworkMemberBE){
-            TerraCompositioAPI.INSTANCE.getFluidNetworkInstance().fireFluidNetworkEvent(fluidNetworkMemberBE, NetworkAction.UPDATE);
+        if (blockEntity instanceof FluidNetworkMember fluidNetworkMember) {
+            TerraCompositioAPI.INSTANCE.getFluidNetworkInstance().fireFluidNetworkEvent(fluidNetworkMember, NetworkAction.UPDATE);
         }
     }
 }

@@ -22,6 +22,7 @@ import net.sinedkadis.terracompositio.api.networks.ecf.ECFNetworkMember;
 import net.sinedkadis.terracompositio.api.networks.ecf.IECFHandler;
 import net.sinedkadis.terracompositio.ecf.burst.ECFBurstProjectileEntity;
 import net.sinedkadis.terracompositio.registries.TCBlockEntities;
+import net.sinedkadis.terracompositio.util.IEntityInstance;
 import net.sinedkadis.terracompositio.util.helpers.ParticleHelperInternal;
 import org.jetbrains.annotations.NotNull;
 
@@ -48,8 +49,10 @@ public class ConstructionDesorberBlockEntity extends AbstractDesorberBlockEntity
         ECFNetwork network = TerraCompositioAPI.instance().getECFNetworkInstance();
         Set<ECFNetworkMember> members = network.getAllECFNetworkMembers((Level) level);
         List<ConstructionDesorberBlockEntity> constructors = members.stream()
-                .filter(ecfSource -> Math.sqrt(ecfSource.getPos().distSqr(pos)) < ecfSource.getRange())
-                .map(ECFNetworkMember::getPos)
+                .filter(ecfSource ->
+                        Math.sqrt(ecfSource.getEntityInstance().tc$getBlockPos().distSqr(pos)) < ecfSource.getRange())
+                .map(ECFNetworkMember::getEntityInstance)
+                .map(IEntityInstance::tc$getBlockPos)
                 .map(ecfSourceBlockPos -> {
                     if (level.getBlockEntity(ecfSourceBlockPos) instanceof ConstructionDesorberBlockEntity blockEntity)
                         return blockEntity;
@@ -103,7 +106,8 @@ public class ConstructionDesorberBlockEntity extends AbstractDesorberBlockEntity
         ECFNetwork network = TerraCompositioAPI.instance().getECFNetworkInstance();
         Set<ECFNetworkMember> sources = network.getAllECFNetworkMembers((Level) level);
         List<ConstructionDesorberBlockEntity> constructors = sources.stream()
-                .map(ECFNetworkMember::getPos)
+                .map(ECFNetworkMember::getEntityInstance)
+                .map(IEntityInstance::tc$getBlockPos)
                 .filter(cfeSourceBlockPos -> Math.sqrt(cfeSourceBlockPos.distSqr(pos)) < 7)
                 .map(cfeSourceBlockPos -> {
                     if (level.getBlockEntity(cfeSourceBlockPos) instanceof ConstructionDesorberBlockEntity blockEntity)

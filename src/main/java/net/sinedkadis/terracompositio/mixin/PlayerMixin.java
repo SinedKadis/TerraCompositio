@@ -12,7 +12,7 @@ import net.minecraft.world.level.Level;
 import net.minecraft.world.phys.Vec3;
 import net.minecraftforge.network.PacketDistributor;
 import net.sinedkadis.terracompositio.api.dummies.DummyECFHandler;
-import net.sinedkadis.terracompositio.api.networks.ecf.ECFNetworkMemberEntity;
+import net.sinedkadis.terracompositio.api.networks.ecf.ECFNetworkMember;
 import net.sinedkadis.terracompositio.api.networks.ecf.IECFHandler;
 import net.sinedkadis.terracompositio.api.registries.TCCapabilities;
 import net.sinedkadis.terracompositio.block.custom.ECFBoardBlock;
@@ -20,6 +20,7 @@ import net.sinedkadis.terracompositio.config.TCInnerConfig;
 import net.sinedkadis.terracompositio.network.TCPackets;
 import net.sinedkadis.terracompositio.network.packets.S2CAddPlayerKnowledge;
 import net.sinedkadis.terracompositio.network.packets.S2CPlayerEcfContainerSync;
+import net.sinedkadis.terracompositio.util.IEntityInstance;
 import net.sinedkadis.terracompositio.util.accessors.PlayerKnowledgeAccessor;
 import org.spongepowered.asm.mixin.Mixin;
 import org.spongepowered.asm.mixin.Unique;
@@ -34,7 +35,7 @@ import javax.annotation.ParametersAreNonnullByDefault;
 @Mixin(Player.class)
 @ParametersAreNonnullByDefault
 @MethodsReturnNonnullByDefault
-public abstract class PlayerMixin extends LivingEntity implements ECFNetworkMemberEntity, PlayerKnowledgeAccessor {
+public abstract class PlayerMixin extends LivingEntity implements ECFNetworkMember, PlayerKnowledgeAccessor {
     protected PlayerMixin(EntityType<? extends LivingEntity> pEntityType, Level pLevel) {
         super(pEntityType, pLevel);
     }
@@ -46,13 +47,8 @@ public abstract class PlayerMixin extends LivingEntity implements ECFNetworkMemb
     boolean scheduleUpdate = false;
 
     @Override
-    public Level getLevel() {
-        return this.level();
-    }
-
-    @Override
-    public BlockPos getPos() {
-        return this.blockPosition();
+    public IEntityInstance getEntityInstance() {
+        return IEntityInstance.wrap(this);
     }
 
     @Override
@@ -144,7 +140,7 @@ public abstract class PlayerMixin extends LivingEntity implements ECFNetworkMemb
                     TCPackets.CHANNEL.send(PacketDistributor.PLAYER.with(() -> serverPlayer),
                         new S2CAddPlayerKnowledge());
                 TCPackets.CHANNEL.send(PacketDistributor.PLAYER.with(() -> serverPlayer),
-                        new S2CPlayerEcfContainerSync(((ECFNetworkMemberEntity) serverPlayer).getMainHandler().getECF()));
+                        new S2CPlayerEcfContainerSync(((ECFNetworkMember) serverPlayer).getMainHandler().getECF()));
             }
     }
 

@@ -1,16 +1,11 @@
 package net.sinedkadis.terracompositio.api.networks.ecf;
 
 import net.minecraft.MethodsReturnNonnullByDefault;
-import net.minecraft.core.BlockPos;
-import net.minecraft.core.BlockSource;
 import net.minecraft.nbt.CompoundTag;
-import net.minecraft.server.level.ServerLevel;
-import net.minecraft.world.level.block.entity.BlockEntity;
-import net.minecraft.world.level.block.state.BlockState;
 import net.minecraft.world.phys.Vec3;
 import net.sinedkadis.terracompositio.api.helpers.ECFHelper;
+import net.sinedkadis.terracompositio.util.IEntityInstance;
 
-import java.util.Objects;
 import java.util.function.Function;
 
 
@@ -19,7 +14,7 @@ import java.util.function.Function;
  * {@link ECFHelper#doECFTransfer(ECFNetworkMember, ECFNetworkMember, int, float)}.
  */
 @MethodsReturnNonnullByDefault
-public interface IECFHandler extends BlockSource, ECFNetworkMember {
+public interface IECFHandler extends ECFNetworkMember {
     /**
      * Gets energy value.
      *
@@ -155,7 +150,7 @@ public interface IECFHandler extends BlockSource, ECFNetworkMember {
      *
      * @return the attached member
      */
-    ECFNetworkMember getAttachedMember();
+    IEntityInstance getAttachedEntity();
 
     /**
      * Gets offset. Used to move target relative attached member. Pass {@link Vec3#ZERO} to get clear offset,
@@ -188,36 +183,14 @@ public interface IECFHandler extends BlockSource, ECFNetworkMember {
      */
     IECFHandler setIndex(int index);
 
-    @Override
-    default double x() {
-        return (double)this.getPos().getX() + 0.5D;
-    }
-    @Override
-    default double y() {
-        return (double)this.getPos().getY() + 0.5D;
-    }
-    @Override
-    default double z() {
-        return (double)this.getPos().getZ() + 0.5D;
+
+    default IEntityInstance getEntityInstance() {
+        return getAttachedEntity();
     }
 
-    @Override
-    default BlockPos getPos() {
-        return getAttachedMember().getPos();
-    }
-
-    @Override
-    default BlockState getBlockState() {
-        return this.getLevel().getBlockState(this.getPos());
-    }
-    @Override
-    default ServerLevel getLevel() {
-        return (ServerLevel) getAttachedMember().getLevel();
-    }
-
-    @SuppressWarnings("unchecked")
-    default BlockEntity getEntity() {
-        return Objects.requireNonNull(this.getLevel().getBlockEntity(this.getPos()));
+    default ECFNetworkMember getAttachedMember() {
+        if (getAttachedEntity() instanceof ECFNetworkMember member) return member;
+        throw new RuntimeException("Attached entity is not ECF Network Member");
     }
 
     @Override

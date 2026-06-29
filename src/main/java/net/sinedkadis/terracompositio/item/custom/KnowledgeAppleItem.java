@@ -64,7 +64,7 @@ public class KnowledgeAppleItem extends Item {
         if (entityResult != null) {
             if ((entityResult.getEntity() instanceof AnyNetworkMember networkMember)) {
                 range = networkMember.getRange();
-                blockpos = networkMember.getPos();
+                blockpos = networkMember.getEntityInstance().tc$getBlockPos();
             }
         }
 
