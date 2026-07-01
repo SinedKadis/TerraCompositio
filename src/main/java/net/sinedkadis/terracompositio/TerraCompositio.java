@@ -104,6 +104,16 @@ public class TerraCompositio
         if (event.getTabKey() == CreativeModeTabs.SPAWN_EGGS) {
             event.accept(TCItems.FLOW_CEDAR_ENT_SPAWN_EGG);
         }
+        if (event.getTabKey() == CreativeModeTabs.REDSTONE_BLOCKS) {
+            event.accept(TCBlocks.FLOATING_BUTTON);
+            event.accept(TCBlocks.FLOATING_LEVER);
+            event.accept(TCBlocks.FLOATING_REDSTONE);
+            event.accept(TCBlocks.FLOATING_REPEATER);
+            event.accept(TCBlocks.FLOATING_COMPARATOR);
+            event.accept(TCBlocks.FLOATING_TORCH_HOLDER);
+            event.accept(TCBlocks.INFUSED_IRON_DOOR);
+            event.accept(TCBlocks.INFUSED_IRON_PRESSURE_PLATE);
+        }
     }
 
 }
