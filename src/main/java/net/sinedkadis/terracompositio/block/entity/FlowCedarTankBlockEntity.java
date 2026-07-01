@@ -111,13 +111,15 @@ public class FlowCedarTankBlockEntity extends TCBlockEntity implements FluidNetw
             if (fluidHandler.fill(fluidStack, IFluidHandler.FluidAction.SIMULATE)>=1000){
                 List<BlockPos> list = new ArrayList<>(
                         BlockPos.betweenClosedStream(pos.offset(-getRange(), -getRange(), -getRange()), pos.offset(getRange(), getRange(), getRange()))
-                        .filter(pos1 -> level.getBlockState(pos1).is(TCTags.Blocks.FLOW_CEDAR_LOGS))
-                        .filter(pos2 -> level.getBlockState(pos2).getValue(INFUSED))
-                        .toList());
+                            .filter(pos1 -> level.getBlockState(pos1).is(TCTags.Blocks.FLOW_CEDAR_LOGS))
+                            .filter(pos2 -> level.getBlockState(pos2).getValue(INFUSED))
+                                .map(BlockPos::immutable)
+                            .toList());
                 if (!list.isEmpty()) {
                     int index = level.getRandom().nextInt(list.size());
                     BlockPos blockPos = list.get(index);
-                    level.setBlockAndUpdate(blockPos, level.getBlockState(blockPos).setValue(INFUSED, false));
+                    BlockState blockState = level.getBlockState(blockPos);
+                    level.setBlockAndUpdate(blockPos, blockState.setValue(INFUSED, false));
                     fluidHandler.fill(fluidStack, IFluidHandler.FluidAction.EXECUTE);
                     ParticleHelperInternal.sendFluidParticles((ServerLevel) level, pos, blockPos, 100, fluidStack);
                 }
@@ -247,9 +249,9 @@ public class FlowCedarTankBlockEntity extends TCBlockEntity implements FluidNetw
         data.put(TooltipHelper.Keys.FLUID.toData(), compoundTag);
         data.putInt(TooltipHelper.Keys.RANGE.toData(), getRange());
 
-        if (TCCommonConfigs.DEBUG.get()) {
-            data.putInt(TooltipHelper.Keys.PRIORITY.toData(), getPriority());
-        }
+
+        data.putInt(TooltipHelper.Keys.PRIORITY.toData(), getPriority());
+
 
         super.collectKnowledgeData(data);
     }
